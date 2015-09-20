@@ -6,14 +6,14 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
 # Features #
 
 * Supported Estimator types:
-  * [`sklearn.ensemble.RandomForestClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html).
-  * [`sklearn.ensemble.RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html).
-  * [`sklearn.tree.DecisionTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html).
-  * [`sklearn.tree.DecisionTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html).
+  * [`DecisionTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html).
+  * [`DecisionTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html).
+  * [`RandomForestClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html).
+  * [`RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html).
 * Supported Transformer types:
-  * [`sklearn.preprocessing.LabelEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html).
-  * [`sklearn.preprocessing.MinMaxScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html).
-  * [`sklearn.preprocessing.StandardScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html).
+  * [`LabelEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html).
+  * [`MinMaxScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html).
+  * [`StandardScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html).
 * Production quality:
   * Complete test coverage.
   * Fully compliant with the [JPMML-Evaluator] (https://github.com/jpmml/jpmml-evaluator) library.
