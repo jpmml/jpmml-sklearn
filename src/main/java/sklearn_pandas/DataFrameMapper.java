@@ -18,6 +18,7 @@
  */
 package sklearn_pandas;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,15 +31,16 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.LocalTransformations;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
-import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.model.ReflectionUtil;
+import org.jpmml.model.visitors.AbstractSimpleVisitor;
 import org.jpmml.sklearn.CClassDict;
 import sklearn.Transformer;
 import sklearn.preprocessing.LabelEncoder;
@@ -72,7 +74,10 @@ public class DataFrameMapper extends CClassDict {
 		features.add(0, features.remove(features.size() - 1));
 
 		final
-		Map<FieldName, FieldName> transformedNames = new LinkedHashMap<>();
+		Map<FieldName, FieldName> renamedFields = new LinkedHashMap<>();
+
+		final
+		Map<FieldName, FieldName> transformedFields = new LinkedHashMap<>();
 
 		for(int i = 0; i < dataFields.size(); i++){
 			DataField dataField = dataFields.get(i);
@@ -85,47 +90,66 @@ public class DataFrameMapper extends CClassDict {
 
 			FieldName name = FieldName.create((String)feature[0]);
 
-			transformedNames.put(dataField.getName(), name);
-
-			Transformer transformer = (Transformer)feature[1];
+			renamedFields.put(dataField.getName(), name);
 
 			if(i > 0){
-				Expression expression = new FieldRef(name);
+				Transformer transformer = (Transformer)feature[1];
 
 				if(transformer != null){
-					expression = transformer.encode(name);
-				}
+					FieldName derivedName = FieldName.create("derived_" + name.getValue());
 
-				DerivedField derivedField = new DerivedField(dataField.getOpType(), dataField.getDataType())
-					.setName(dataField.getName())
-					.setExpression(expression);
+					Expression expression = transformer.encode(name);
 
-				localTransformations.addDerivedFields(derivedField);
+					DerivedField derivedField = new DerivedField(dataField.getOpType(), dataField.getDataType())
+						.setName(derivedName)
+						.setExpression(expression);
 
-				// XXX
-				if(transformer instanceof LabelEncoder){
-					dataField.setOpType(OpType.CATEGORICAL)
-						.setDataType(DataType.STRING);
+					localTransformations.addDerivedFields(derivedField);
+
+					// XXX
+					if(transformer instanceof LabelEncoder){
+						dataField.setOpType(OpType.CATEGORICAL)
+							.setDataType(DataType.STRING);
+					}
+
+					transformedFields.put(dataField.getName(), derivedName);
 				}
 			}
-
-			dataField.setName(name);
 		}
 
-		Visitor visitor = new AbstractVisitor(){
+		Visitor visitor = new AbstractSimpleVisitor(){
 
 			@Override
-			public VisitorAction visit(MiningField miningField){
-				FieldName transformedName = transformedNames.get(miningField.getName());
+			public VisitorAction visit(PMMLObject object){
+				List<Field> fields = ReflectionUtil.getAllInstanceFields(object);
 
-				if(transformedName != null){
-					miningField.setName(transformedName);
+				for(Field field : fields){
+					Object value = ReflectionUtil.getFieldValue(field, object);
+
+					if(value instanceof FieldName){
+						FieldName name = (FieldName)value;
+
+						FieldName updatedName = name;
+
+						if(renamedFields.containsKey(name)){
+							updatedName = renamedFields.get(name);
+						} // End if
+
+						if(!(object instanceof DataField || object instanceof MiningField)){
+
+							if(transformedFields.containsKey(name)){
+								updatedName = transformedFields.get(name);
+							}
+						}
+
+						ReflectionUtil.setFieldValue(field, object, updatedName);
+					}
 				}
 
 				return VisitorAction.CONTINUE;
 			}
 		};
-		visitor.applyTo(model);
+		visitor.applyTo(pmml);
 	}
 
 	public List<Object[]> getFeatures(){
