@@ -45,7 +45,7 @@ public class Main {
 	@Parameter (
 		names = "--pkl-mapper-input",
 		description = "DataFrameMapper pickle input file",
-		required = true
+		required = false
 	)
 	private File mapperInput = null;
 
@@ -100,14 +100,16 @@ public class Main {
 			estimatorStorage.close();
 		}
 
-		Storage mapperStorage = PickleUtil.createStorage(this.mapperInput);
+		if(this.mapperInput != null){
+			Storage mapperStorage = PickleUtil.createStorage(this.mapperInput);
 
-		try {
-			DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(mapperStorage);
+			try {
+				DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(mapperStorage);
 
-			mapper.updatePMML(pmml);
-		} finally {
-			mapperStorage.close();
+				mapper.updatePMML(pmml);
+			} finally {
+				mapperStorage.close();
+			}
 		}
 
 		return pmml;
