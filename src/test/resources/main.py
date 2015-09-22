@@ -1,6 +1,6 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import Imputer, LabelEncoder, MinMaxScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
@@ -13,7 +13,7 @@ import tempfile
 import zipfile
 
 def load_csv(name):
-    return pandas.read_csv("csv/" + name)
+    return pandas.read_csv("csv/" + name, na_values = ["N/A", "NA"])
 
 def store_csv(df, name):
     df.to_csv("csv/" + name, index = False)
@@ -146,7 +146,7 @@ print(auto_df.dtypes)
 auto_mapper = DataFrameMapper([
     ("cylinders", None),
     ("displacement", None),
-    ("horsepower", StandardScaler()),
+    (["horsepower"], Imputer()),
     (["weight"], MinMaxScaler()),
     ("acceleration", StandardScaler()),
     ("model_year", None),

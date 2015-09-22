@@ -29,6 +29,7 @@ import numpy.core.NDArray;
 import numpy.core.Scalar;
 import sklearn.ensemble.RandomForestClassifier;
 import sklearn.ensemble.RandomForestRegressor;
+import sklearn.preprocessing.Imputer;
 import sklearn.preprocessing.LabelEncoder;
 import sklearn.preprocessing.MinMaxScaler;
 import sklearn.preprocessing.StandardScaler;
@@ -75,6 +76,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MinMaxScaler", MinMaxScaler.class),
+			new ObjectConstructor("sklearn.preprocessing.imputation", "Imputer", Imputer.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "StandardScaler", StandardScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelEncoder", LabelEncoder.class),
 			new CClassDictConstructor("sklearn.tree._tree", "BestSplitter"),
