@@ -23,7 +23,7 @@ def store_pkl(obj, name):
     print(tmpDir)
     try:
         tmpFiles = joblib.dump(obj, os.path.join(tmpDir, name), compress = 0)
-        print(tmpFiles)
+        # print(tmpFiles)
         zipDir = zipfile.ZipFile("pkl/" + name + ".zip", "w")
         for tmpFile in tmpFiles:
             zipDir.write(tmpFile, os.path.relpath(tmpFile, tmpDir))
@@ -40,9 +40,9 @@ def dump(obj):
 # Binary classification
 #
 
-audit = load_csv("Audit.csv")
+audit_df = load_csv("Audit.csv")
 
-audit["Adjusted"] = audit["Adjusted"].astype(int)
+print(audit_df.dtypes)
 
 audit_mapper = DataFrameMapper([
     ("Age", None),
@@ -57,7 +57,7 @@ audit_mapper = DataFrameMapper([
     ("Adjusted", None)
 ])
 
-audit = audit_mapper.fit_transform(audit)
+audit = audit_mapper.fit_transform(audit_df)
 
 store_pkl(audit_mapper, "Audit.pkl")
 
@@ -66,14 +66,14 @@ audit_y = audit[:, 9]
 
 audit_y = audit_y.astype(int)
 
-print(audit_X, audit_y)
+print(audit_X.dtype, audit_y.dtype)
 
 def predict_audit(classifier):
     adjusted = DataFrame(classifier.predict(audit_X), columns = ["Adjusted"])
     adjusted_proba = DataFrame(classifier.predict_proba(audit_X), columns = ["probability_0", "probability_1"])
     return pandas.concat((adjusted, adjusted_proba), axis = 1)
 
-audit_tree = DecisionTreeClassifier(min_samples_leaf = 5)
+audit_tree = DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5)
 audit_tree.fit(audit_X, audit_y)
 
 store_pkl(audit_tree, "DecisionTreeAudit.pkl")
@@ -89,7 +89,9 @@ store_csv(predict_audit(audit_forest), "RandomForestAudit.csv")
 # Multi-class classification
 #
 
-iris = load_csv("Iris.csv")
+iris_df = load_csv("Iris.csv")
+
+print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
     ("Sepal.Length", None),
@@ -99,21 +101,21 @@ iris_mapper = DataFrameMapper([
     ("Species", None)
 ])
 
-iris = iris_mapper.fit_transform(iris)
+iris = iris_mapper.fit_transform(iris_df)
 
 store_pkl(iris_mapper, "Iris.pkl")
 
 iris_X = iris[:, 0:4]
 iris_y = iris[:, 4]
 
-print(iris_X, iris_y)
+print(iris_X.dtype, iris_y.dtype)
 
 def predict_iris(classifier):
     species = DataFrame(classifier.predict(iris_X), columns = ["Species"])
     species_proba = DataFrame(classifier.predict_proba(iris_X), columns = ["probability_setosa", "probability_versicolor", "probability_virginica"])
     return pandas.concat((species, species_proba), axis = 1)
 
-iris_tree = DecisionTreeClassifier(min_samples_leaf = 5)
+iris_tree = DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5)
 iris_tree.fit(iris_X, iris_y)
 
 store_pkl(iris_tree, "DecisionTreeIris.pkl")
@@ -129,11 +131,16 @@ store_csv(predict_iris(iris_forest), "RandomForestIris.csv")
 # Regression
 #
 
-auto = load_csv("Auto.csv")
+auto_df = load_csv("Auto.csv")
 
-auto["horsepower"] = auto["horsepower"].astype(float)
-auto["weight"] = auto["weight"].astype(float)
-auto["acceleration"] = auto["acceleration"].astype(float)
+print(auto_df.dtypes)
+
+auto_df["displacement"] = auto_df["displacement"].astype(float)
+auto_df["horsepower"] = auto_df["horsepower"].astype(float)
+auto_df["weight"] = auto_df["weight"].astype(float)
+auto_df["acceleration"] = auto_df["acceleration"].astype(float)
+
+print(auto_df.dtypes)
 
 # See https://github.com/paulgb/sklearn-pandas/issues/9
 auto_mapper = DataFrameMapper([
@@ -147,20 +154,20 @@ auto_mapper = DataFrameMapper([
     ("mpg", None)
 ])
 
-auto = auto_mapper.fit_transform(auto)
+auto = auto_mapper.fit_transform(auto_df)
 
 store_pkl(auto_mapper, "Auto.pkl")
 
 auto_X = auto[:, 0:7]
 auto_y = auto[:, 7]
 
-print(auto_X, auto_y)
+print(auto_X.dtype, auto_y.dtype)
 
 def predict_auto(regressor):
     mpg = DataFrame(regressor.predict(auto_X), columns = ["mpg"])
     return mpg
 
-auto_tree = DecisionTreeRegressor(min_samples_leaf = 5)
+auto_tree = DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5)
 auto_tree.fit(auto_X, auto_y)
 
 store_pkl(auto_tree, "DecisionTreeAuto.pkl")

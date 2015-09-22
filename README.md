@@ -106,7 +106,7 @@ joblib.dump(iris_mapper, "mapper.pkl")
 joblib.dump(iris_forest, "estimator.pkl")
 ```
 
-Looking for more code examples? Please see `src/test/resources/main.py`.
+Please see the test script file [main.py] (https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.
 
 ### The JPMML-SkLearn side of operations
 
