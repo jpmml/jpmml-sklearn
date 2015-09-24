@@ -1,4 +1,5 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Imputer, LabelEncoder, MinMaxScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
@@ -172,6 +173,12 @@ auto_tree.fit(auto_X, auto_y)
 
 store_pkl(auto_tree, "DecisionTreeAuto.pkl")
 store_csv(predict_auto(auto_tree), "DecisionTreeAuto.csv")
+
+auto_regression = LinearRegression()
+auto_regression.fit(auto_X, auto_y)
+
+store_pkl(auto_regression, "RegressionAuto.pkl")
+store_csv(predict_auto(auto_regression), "RegressionAuto.csv")
 
 auto_forest = RandomForestRegressor(random_state = 13, min_samples_leaf = 5)
 auto_forest.fit(auto_X, auto_y)

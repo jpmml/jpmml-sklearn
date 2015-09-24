@@ -31,4 +31,9 @@ public class RegressorTest extends EstimatorTest {
 	public void evaluateRandomForestAuto() throws Exception {
 		evaluate("RandomForest", "Auto");
 	}
+
+	@Test
+	public void evaluateRegressionAuto() throws Exception {
+		evaluate("Regression", "Auto");
+	}
 }
