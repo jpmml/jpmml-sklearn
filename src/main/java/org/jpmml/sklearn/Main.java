@@ -28,6 +28,7 @@ import javax.xml.transform.stream.StreamResult;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.JAXBUtil;
 import sklearn.Estimator;
@@ -93,7 +94,21 @@ public class Main {
 		Storage estimatorStorage = PickleUtil.createStorage(this.estimatorInput);
 
 		try {
-			Estimator estimator = (Estimator)PickleUtil.unpickle(estimatorStorage);
+			Object object = PickleUtil.unpickle(estimatorStorage);
+
+			if(!(object instanceof Estimator)){
+				String clazzName = null;
+
+				if(object instanceof ClassDict){
+					ClassDict classDict = (ClassDict)object;
+
+					clazzName = (String)classDict.get("__class__");
+				}
+
+				throw new IllegalArgumentException("The unpickled estimator object (Python class " + clazzName + ") is not an Estimator or a supported Estimator subclass");
+			}
+
+			Estimator estimator = (Estimator)object;
 
 			pmml = estimator.encodePMML();
 		} finally {
@@ -104,7 +119,13 @@ public class Main {
 			Storage mapperStorage = PickleUtil.createStorage(this.mapperInput);
 
 			try {
-				DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(mapperStorage);
+				Object object = PickleUtil.unpickle(mapperStorage);
+
+				if(!(object instanceof DataFrameMapper)){
+					throw new IllegalArgumentException("The unpickled mapper object is not a DataFrameMapper");
+				}
+
+				DataFrameMapper mapper = (DataFrameMapper)object;
 
 				mapper.updatePMML(pmml);
 			} finally {
