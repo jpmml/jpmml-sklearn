@@ -33,6 +33,7 @@ import org.dmg.pmml.Segment;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.TreeModel;
+import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.FieldCollector;
@@ -66,7 +67,8 @@ public class TreeConverter {
 
 		MiningSchema miningSchema = PMMLUtil.createMiningSchema((standalone ? dataField : null), fieldCollector);
 
-		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root);
+		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
+			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);
 
 		if(standalone){
 			FieldTypeAnalyzer fieldTypeAnalyzer = new TreeFieldTypeAnalyzer();
