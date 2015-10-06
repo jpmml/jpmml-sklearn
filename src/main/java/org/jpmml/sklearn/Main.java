@@ -37,11 +37,18 @@ import sklearn_pandas.DataFrameMapper;
 public class Main {
 
 	@Parameter (
-		names = "--pkl-estimator-input",
+		names = {"--pkl-input", "--pkl-estimator-input"},
 		description = "Estimator pickle input file",
 		required = true
 	)
 	private File estimatorInput = null;
+
+	@Parameter (
+		names = "--help",
+		description = "Show the list of configuration options and exit",
+		help = true
+	)
+	private boolean help = false;
 
 	@Parameter (
 		names = "--pkl-mapper-input",
@@ -71,6 +78,12 @@ public class Main {
 			commander.usage();
 
 			System.exit(-1);
+		}
+
+		if(main.help){
+			commander.usage();
+
+			System.exit(0);
 		}
 
 		main.run();
