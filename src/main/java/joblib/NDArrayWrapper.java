@@ -21,13 +21,15 @@ package joblib;
 import java.io.IOException;
 import java.io.InputStream;
 
-import numpy.NumPyUtil;
+import numpy.core.NDArrayUtil;
+
+import numpy.core.NDArray;
 import org.jpmml.sklearn.CClassDict;
 
 abstract
 public class NDArrayWrapper extends CClassDict {
 
-	private Object content = null;
+	private NDArray content = null;
 
 
 	public NDArrayWrapper(String module, String name){
@@ -41,7 +43,7 @@ public class NDArrayWrapper extends CClassDict {
 		return (String)get("filename");
 	}
 
-	public Object getContent(){
+	public NDArray getContent(){
 
 		if(this.content == null){
 			this.content = loadContent();
@@ -50,13 +52,13 @@ public class NDArrayWrapper extends CClassDict {
 		return this.content;
 	}
 
-	private Object loadContent(){
+	private NDArray loadContent(){
 
 		try {
 			InputStream is = getInputStream();
 
 			try {
-				return NumPyUtil.parseNpy(is);
+				return NDArrayUtil.parseNpy(is);
 			} finally {
 				is.close();
 			}

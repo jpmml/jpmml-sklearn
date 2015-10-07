@@ -27,6 +27,7 @@ import java.util.Map;
 import joblib.NDArrayWrapper;
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
+import numpy.core.NDArrayUtil;
 import numpy.core.Scalar;
 
 public class ClassDictUtil {
@@ -39,11 +40,11 @@ public class ClassDictUtil {
 		Object object = dict.get(name);
 
 		if(object instanceof NDArrayWrapper){
-			NDArrayWrapper array = (NDArrayWrapper)object;
+			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
 
-			Object content = array.getContent();
+			NDArray array = arrayWrapper.getContent();
 
-			return toArray(content);
+			return NDArrayUtil.getData(array);
 		} else
 
 		if(object instanceof Scalar){
@@ -59,23 +60,11 @@ public class ClassDictUtil {
 
 	static
 	public List<?> getArray(ClassDict dict, String name, String key){
-		NDArrayWrapper nodes = (NDArrayWrapper)dict.get(name);
+		NDArrayWrapper arrayWrapper = (NDArrayWrapper)dict.get(name);
 
-		Map<String, ?> content = (Map<String, ?>)nodes.getContent();
+		NDArray array = arrayWrapper.getContent();
 
-		return toArray(content.get(key));
-	}
-
-	static
-	private List<?> toArray(Object object){
-
-		if(object instanceof NDArray){
-			NDArray ndarray = (NDArray)object;
-
-			return ndarray.getData();
-		}
-
-		return (List<?>)object;
+		return NDArrayUtil.getData(array, key);
 	}
 
 	static

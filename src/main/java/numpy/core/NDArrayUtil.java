@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package numpy;
+package numpy.core;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -36,18 +36,37 @@ import com.google.common.primitives.Longs;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
-import numpy.core.NDArray;
 
-public class NumPyUtil {
+public class NDArrayUtil {
 
-	private NumPyUtil(){
+	private NDArrayUtil(){
+	}
+
+	/**
+	 * Gets the payload of a one-dimensional array.
+	 */
+	static
+	public List<?> getData(NDArray array){
+		return (List<?>)array.getData();
+	}
+
+	/**
+	 * Gets the payload of the specified dimension of a multi-dimensional array.
+	 *
+	 * @param key The dimension.
+	 */
+	static
+	public List<?> getData(NDArray array, String key){
+		Map<String, ?> data = (Map<String, ?>)array.getData();
+
+		return (List<?>)data.get(key);
 	}
 
 	/**
 	 * http://docs.scipy.org/doc/numpy-dev/neps/npy-format.html
 	 */
 	static
-	public Object parseNpy(InputStream is) throws IOException {
+	public NDArray parseNpy(InputStream is) throws IOException {
 		byte[] magicBytes = new byte[MAGIC_STRING.length];
 
 		ByteStreams.readFully(is, magicBytes);
@@ -90,6 +109,18 @@ public class NumPyUtil {
 			length *= (Integer)shape[i];
 		}
 
+		Object data = parseData(is, descr, length);
+
+		NDArray result = new NDArray();
+
+		result.__setstate__(new Object[]{Arrays.asList(majorVersion, minorVersion), shape, descr, fortranOrder, data});
+
+		return result;
+	}
+
+	static
+	private Object parseData(InputStream is, Object descr, int length) throws IOException {
+
 		if(descr instanceof String){
 			return parseArray(is, (String)descr, length);
 		}
@@ -119,9 +150,9 @@ public class NumPyUtil {
 			Object element = descriptor.read(is);
 
 			if(descriptor.isObject()){
-				NDArray ndarray = (NDArray)element;
+				NDArray array = (NDArray)element;
 
-				result.addAll(ndarray.getData());
+				result.addAll(NDArrayUtil.getData(array));
 
 				continue;
 			}

@@ -19,7 +19,6 @@
 package numpy.core;
 
 import java.util.Arrays;
-import java.util.List;
 
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.sklearn.CClassDict;
@@ -52,8 +51,8 @@ public class NDArray extends CClassDict {
 		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
 	}
 
-	public List<?> getData(){
-		return (List<?>)get("data");
+	public Object getData(){
+		return get("data");
 	}
 
 	private static final String[] SETSTATE_ATTRIBUTES = {

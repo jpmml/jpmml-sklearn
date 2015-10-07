@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import numpy.DType;
-import numpy.NumPyUtil;
 import org.jpmml.sklearn.CClassDict;
 
 public class Scalar extends CClassDict {
@@ -47,7 +46,7 @@ public class Scalar extends CClassDict {
 			InputStream is = new ByteArrayInputStream(obj);
 
 			try {
-				List<?> array = (List<?>)NumPyUtil.parseArray(is, dtype.getDescr(), 1);
+				List<?> array = (List<?>)NDArrayUtil.parseArray(is, dtype.getDescr(), 1);
 
 				return array.get(0);
 			} finally {

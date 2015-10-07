@@ -19,12 +19,11 @@
 package sklearn.tree;
 
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
-import joblib.NDArrayWrapper;
 import org.jpmml.sklearn.CClassDict;
+import org.jpmml.sklearn.ClassDictUtil;
 
 public class Tree extends CClassDict {
 
@@ -62,17 +61,15 @@ public class Tree extends CClassDict {
 	}
 
 	public double[] getValues(){
-		NDArrayWrapper values = (NDArrayWrapper)get("values");
+		List<? extends Number> values = (List<? extends Number>)ClassDictUtil.getArray(this, "values");
 
-		return Doubles.toArray((List<? extends Number>)values.getContent());
+		return Doubles.toArray(values);
 	}
 
 	private List<? extends Number> getNodeAttribute(String key){
-		NDArrayWrapper nodes = (NDArrayWrapper)get("nodes");
+		List<? extends Number> nodeAttributes = (List<? extends Number>)ClassDictUtil.getArray(this, "nodes", key);
 
-		Map<String, ?> content = (Map<String, ?>)nodes.getContent();
-
-		return (List<? extends Number>)content.get(key);
+		return nodeAttributes;
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {
