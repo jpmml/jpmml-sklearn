@@ -38,7 +38,7 @@ public class Classifier extends Estimator {
 	}
 
 	@Override
-	public DataField encodeTarget(){
+	public DataField encodeTargetField(){
 		DataField dataField = new DataField(FieldName.create("y"), OpType.CATEGORICAL, DataType.STRING);
 
 		List<Value> values = dataField.getValues();

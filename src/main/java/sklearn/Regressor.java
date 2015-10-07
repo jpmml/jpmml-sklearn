@@ -31,7 +31,7 @@ public class Regressor extends Estimator {
 	}
 
 	@Override
-	public DataField encodeTarget(){
+	public DataField encodeTargetField(){
 		DataField dataField = new DataField(FieldName.create("y"), OpType.CONTINUOUS, DataType.DOUBLE);
 
 		return dataField;

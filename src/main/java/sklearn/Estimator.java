@@ -39,22 +39,28 @@ public class Estimator extends ClassDict {
 	}
 
 	abstract
-	public DataField encodeTarget();
+	public DataField encodeTargetField();
+
+	public int getNumberOfFeatures(){
+		return (Integer)get("n_features_");
+	}
+
+	public DataField encodeActiveField(int index){
+		DataField dataField = new DataField(FieldName.create("x" + String.valueOf(index + 1)), OpType.CONTINUOUS, DataType.DOUBLE);
+
+		return dataField;
+	}
 
 	abstract
 	public Model encodeModel(List<DataField> dataFields);
 
 	public PMML encodePMML(){
 		List<DataField> dataFields = new ArrayList<>();
+		dataFields.add(encodeTargetField());
 
-		DataField targetDataField = encodeTarget();
-		dataFields.add(targetDataField);
-
-		Integer features = getFeatures();
-		for(int i = 0; i < features.intValue(); i++){
-			DataField dataField = new DataField(FieldName.create("x" + String.valueOf(i + 1)), OpType.CONTINUOUS, DataType.DOUBLE);
-
-			dataFields.add(dataField);
+		int features = getNumberOfFeatures();
+		for(int i = 0; i < features; i++){
+			dataFields.add(encodeActiveField(i));
 		}
 
 		DataDictionary dataDictionary = new DataDictionary(dataFields);
@@ -66,9 +72,5 @@ public class Estimator extends ClassDict {
 		pmml.addModels(model);
 
 		return pmml;
-	}
-
-	public Integer getFeatures(){
-		return (Integer)get("n_features_");
 	}
 }

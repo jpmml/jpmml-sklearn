@@ -38,6 +38,11 @@ public class LinearRegression extends Regressor {
 	}
 
 	@Override
+	public int getNumberOfFeatures(){
+		return (Integer)get("rank_");
+	}
+
+	@Override
 	public RegressionModel encodeModel(List<DataField> dataFields){
 		List<? extends Number> coefficients = getCoef();
 		if(coefficients.size() != (dataFields.size() - 1)){
@@ -63,11 +68,6 @@ public class LinearRegression extends Regressor {
 			.addRegressionTables(regressionTable);
 
 		return regressionModel;
-	}
-
-	@Override
-	public Integer getFeatures(){
-		return (Integer)get("rank_");
 	}
 
 	public List<? extends Number> getCoef(){
