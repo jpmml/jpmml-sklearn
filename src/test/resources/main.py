@@ -45,6 +45,10 @@ audit_df = load_csv("Audit.csv")
 
 print(audit_df.dtypes)
 
+audit_df["Deductions"] = audit_df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
+
+print(audit_df.dtypes)
+
 audit_mapper = DataFrameMapper([
     ("Age", None),
     ("Employment", LabelEncoder()),
@@ -53,7 +57,7 @@ audit_mapper = DataFrameMapper([
     ("Occupation", LabelEncoder()),
     ("Income", None),
     ("Gender", LabelEncoder()),
-    ("Deductions", None),
+    ("Deductions", LabelEncoder()),
     ("Hours", None),
     ("Adjusted", None)
 ])

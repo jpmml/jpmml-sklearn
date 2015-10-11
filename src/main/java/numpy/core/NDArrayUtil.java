@@ -358,9 +358,11 @@ public class NDArrayUtil {
 
 			setKind(kind);
 
-			int size = Integer.parseInt(descr.substring(i));
+			if(i < descr.length()){
+				int size = Integer.parseInt(descr.substring(i));
 
-			setSize(size);
+				setSize(size);
+			}
 		}
 
 		public Object read(InputStream is) throws IOException {
