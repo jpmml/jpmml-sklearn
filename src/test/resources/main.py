@@ -1,7 +1,7 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Imputer, LabelEncoder, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, Imputer, LabelEncoder, MinMaxScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
@@ -159,7 +159,6 @@ auto_df["acceleration"] = auto_df["acceleration"].astype(float)
 
 print(auto_df.dtypes)
 
-# See https://github.com/paulgb/sklearn-pandas/issues/9
 auto_mapper = DataFrameMapper([
     ("cylinders", None),
     ("displacement", None),
@@ -167,7 +166,7 @@ auto_mapper = DataFrameMapper([
     (["weight"], MinMaxScaler()),
     ("acceleration", StandardScaler()),
     ("model_year", None),
-    ("origin", None),
+    (["origin"], Binarizer(threshold = 1)),
     ("mpg", None)
 ])
 

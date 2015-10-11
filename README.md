@@ -13,6 +13,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
   * [`RandomForestClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html).
   * [`RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html).
 * Supported Transformer types:
+  * [`Binarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Binarizer.html).
   * [`Imputer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Imputer.html).
   * [`LabelEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html).
   * [`MinMaxScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html).
