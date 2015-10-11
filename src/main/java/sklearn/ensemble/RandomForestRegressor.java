@@ -21,6 +21,7 @@ package sklearn.ensemble;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
@@ -32,6 +33,11 @@ public class RandomForestRegressor extends Regressor {
 
 	public RandomForestRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.FLOAT;
 	}
 
 	@Override

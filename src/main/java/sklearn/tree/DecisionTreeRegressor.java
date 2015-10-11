@@ -21,6 +21,7 @@ package sklearn.tree;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.TreeModel;
 import sklearn.Regressor;
@@ -29,6 +30,11 @@ public class DecisionTreeRegressor extends Regressor implements HasTree {
 
 	public DecisionTreeRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.FLOAT;
 	}
 
 	@Override

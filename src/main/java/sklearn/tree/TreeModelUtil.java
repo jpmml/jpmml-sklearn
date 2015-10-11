@@ -37,7 +37,6 @@ import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.FieldCollector;
-import org.jpmml.converter.FieldTypeAnalyzer;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TreeModelFieldCollector;
 import sklearn.Estimator;
@@ -73,21 +72,12 @@ public class TreeModelUtil {
 		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);
 
-		if(standalone){
-			FieldTypeAnalyzer fieldTypeAnalyzer = new TreeFieldTypeAnalyzer();
-			fieldTypeAnalyzer.applyTo(treeModel);
-
-			PMMLUtil.refineDataFields(dataFields, fieldTypeAnalyzer);
-		}
-
 		return treeModel;
 	}
 
 	static
 	public <E extends Estimator & HasTree> MiningModel encodeTreeModelEnsemble(List<E> estimators, List<? extends Number> weights, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, List<DataField> dataFields){
 		List<Segment> segments = new ArrayList<>();
-
-		FieldTypeAnalyzer fieldTypeAnalyzer = new TreeFieldTypeAnalyzer();
 
 		for(int i = 0; i < estimators.size(); i++){
 			E estimator = estimators.get(i);
@@ -105,15 +95,11 @@ public class TreeModelUtil {
 			}
 
 			segments.add(segment);
-
-			fieldTypeAnalyzer.applyTo(treeModel);
 		}
 
 		Segmentation segmentation = new Segmentation(multipleModelMethod, segments);
 
 		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
-
-		PMMLUtil.refineDataFields(dataFields, fieldTypeAnalyzer);
 
 		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
 			.setSegmentation(segmentation);

@@ -21,6 +21,7 @@ package sklearn.tree;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.TreeModel;
@@ -31,6 +32,11 @@ public class DecisionTreeClassifier extends Classifier implements HasTree {
 
 	public DecisionTreeClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.FLOAT;
 	}
 
 	@Override

@@ -45,8 +45,22 @@ public class Estimator extends ClassDict {
 		return (Integer)get("n_features_");
 	}
 
+	/**
+	 * The {@link OpType operational type} of active fields.
+	 */
+	public OpType getOpType(){
+		return OpType.CONTINUOUS;
+	}
+
+	/**
+	 * The {@link DataType data type} of active fields.
+	 */
+	public DataType getDataType(){
+		return DataType.DOUBLE;
+	}
+
 	public DataField encodeActiveField(int index){
-		DataField dataField = new DataField(FieldName.create("x" + String.valueOf(index + 1)), OpType.CONTINUOUS, DataType.DOUBLE);
+		DataField dataField = new DataField(FieldName.create("x" + String.valueOf(index + 1)), getOpType(), getDataType());
 
 		return dataField;
 	}
