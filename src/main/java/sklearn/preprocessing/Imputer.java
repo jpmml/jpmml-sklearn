@@ -38,7 +38,7 @@ public class Imputer extends Transformer {
 	public Expression encode(FieldName name){
 		Number statistics = Iterables.getOnlyElement(getStatistics());
 
-		// (name == null) ? statistics : name
+		// "($name == null) ? statistics : $name"
 		return PMMLUtil.createApply("if", PMMLUtil.createApply("isMissing", new FieldRef(name)), PMMLUtil.createConstant(statistics), new FieldRef(name));
 	}
 

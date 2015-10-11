@@ -39,7 +39,7 @@ public class MinMaxScaler extends Transformer {
 		Number min = Iterables.getOnlyElement(getMin());
 		Number scale = Iterables.getOnlyElement(getScale());
 
-		// (name * scale) + min
+		// "($name * scale) + min"
 		return PMMLUtil.createApply("+", PMMLUtil.createApply("*", new FieldRef(name), PMMLUtil.createConstant(scale)), PMMLUtil.createConstant(min));
 	}
 

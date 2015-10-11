@@ -39,7 +39,7 @@ public class StandardScaler extends Transformer {
 		Number mean = Iterables.getOnlyElement(getMean());
 		Number std = Iterables.getOnlyElement(getStd());
 
-		// (name - mean) / std
+		// "($name - mean) / std"
 		return PMMLUtil.createApply("/", PMMLUtil.createApply("-", new FieldRef(name), PMMLUtil.createConstant(mean)), PMMLUtil.createConstant(std));
 	}
 
