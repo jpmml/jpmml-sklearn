@@ -16,39 +16,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package numpy.core;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
-public class ClassifierTest extends EstimatorTest {
+import static org.junit.Assert.assertEquals;
+
+public class NDArrayUtilTest {
 
 	@Test
-	public void evaluateDecisionTreeAudit() throws Exception {
-		evaluate("DecisionTree", "Audit");
-	}
+	public void getData(){
+		String[] data = {
+			"11", "12", "13",
+			"21", "22", "23"
+		};
 
-	@Test
-	public void evaluateRandomForestAudit() throws Exception {
-		evaluate("RandomForest", "Audit");
-	}
+		NDArray array = new NDArray();
+		array.put("shape", new Object[]{2, 3});
+		array.put("fortran_order", Boolean.FALSE);
+		array.put("data", Arrays.asList(data));
 
-	@Test
-	public void evaluateRegressionAudit() throws Exception {
-		evaluate("Regression", "Audit");
-	}
+		assertEquals(Arrays.asList(data), NDArrayUtil.getData(array));
 
-	@Test
-	public void evaluateDecisionTreeIris() throws Exception {
-		evaluate("DecisionTree", "Iris");
-	}
+		array.put("fortran_order", Boolean.TRUE);
 
-	@Test
-	public void evaluateRandomForestIris() throws Exception {
-		evaluate("RandomForest", "Iris");
-	}
-
-	@Test
-	public void evaluateRegressionIris() throws Exception {
-		evaluate("Regression", "Iris");
+		assertEquals(Arrays.asList("11", "13", "22", "12", "21", "23"), NDArrayUtil.getData(array));
 	}
 }

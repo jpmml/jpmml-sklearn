@@ -51,6 +51,14 @@ public class NDArray extends CClassDict {
 		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
 	}
 
+	public Object[] getShape(){
+		return (Object[])get("shape");
+	}
+
+	public Boolean getFortranOrder(){
+		return (Boolean)get("fortran_order");
+	}
+
 	public Object getData(){
 		return get("data");
 	}

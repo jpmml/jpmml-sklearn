@@ -24,7 +24,6 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
-import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
 import org.jpmml.converter.PMMLUtil;
@@ -44,23 +43,7 @@ public class LinearRegression extends Regressor {
 
 	@Override
 	public RegressionModel encodeModel(List<DataField> dataFields){
-		List<? extends Number> coefficients = getCoef();
-		if(coefficients.size() != (dataFields.size() - 1)){
-			throw new IllegalArgumentException();
-		}
-
-		Number intercept = Iterables.getOnlyElement(getIntercept());
-
-		RegressionTable regressionTable = new RegressionTable(intercept.doubleValue());
-
-		for(int i = 0; i < coefficients.size(); i++){
-			Number coefficient = coefficients.get(i);
-			DataField dataField = dataFields.get(i + 1);
-
-			NumericPredictor numericPredictor = new NumericPredictor(dataField.getName(), coefficient.doubleValue());
-
-			regressionTable.addNumericPredictors(numericPredictor);
-		}
+		RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(getCoef(), Iterables.getOnlyElement(getIntercept()), dataFields);
 
 		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
 

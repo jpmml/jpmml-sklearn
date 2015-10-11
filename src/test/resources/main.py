@@ -1,5 +1,5 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Imputer, LabelEncoder, MinMaxScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
@@ -90,6 +90,12 @@ audit_forest.fit(audit_X, audit_y)
 store_pkl(audit_forest, "RandomForestAudit.pkl")
 store_csv(predict_audit(audit_forest), "RandomForestAudit.csv")
 
+audit_regression = LogisticRegression()
+audit_regression.fit(audit_X, audit_y)
+
+store_pkl(audit_regression, "RegressionAudit.pkl")
+store_csv(predict_audit(audit_regression), "RegressionAudit.csv")
+
 #
 # Multi-class classification
 #
@@ -131,6 +137,12 @@ iris_forest.fit(iris_X, iris_y)
 
 store_pkl(iris_forest, "RandomForestIris.pkl")
 store_csv(predict_iris(iris_forest), "RandomForestIris.csv")
+
+iris_regression = LogisticRegression()
+iris_regression.fit(iris_X, iris_y)
+
+store_pkl(iris_regression, "RegressionIris.pkl")
+store_csv(predict_iris(iris_regression), "RegressionIris.csv")
 
 #
 # Regression
@@ -178,14 +190,14 @@ auto_tree.fit(auto_X, auto_y)
 store_pkl(auto_tree, "DecisionTreeAuto.pkl")
 store_csv(predict_auto(auto_tree), "DecisionTreeAuto.csv")
 
-auto_regression = LinearRegression()
-auto_regression.fit(auto_X, auto_y)
-
-store_pkl(auto_regression, "RegressionAuto.pkl")
-store_csv(predict_auto(auto_regression), "RegressionAuto.csv")
-
 auto_forest = RandomForestRegressor(random_state = 13, min_samples_leaf = 5)
 auto_forest.fit(auto_X, auto_y)
 
 store_pkl(auto_forest, "RandomForestAuto.pkl")
 store_csv(predict_auto(auto_forest), "RandomForestAuto.csv")
+
+auto_regression = LinearRegression()
+auto_regression.fit(auto_X, auto_y)
+
+store_pkl(auto_regression, "RegressionAuto.pkl")
+store_csv(predict_auto(auto_regression), "RegressionAuto.csv")

@@ -42,12 +42,25 @@ public class NDArrayUtil {
 	private NDArrayUtil(){
 	}
 
+	static
+	public int[] getShape(NDArray array){
+		Object[] shape = array.getShape();
+
+		int[] result = new int[shape.length];
+
+		for(int i = 0; i < shape.length; i++){
+			result[i] = (Integer)shape[i];
+		}
+
+		return result;
+	}
+
 	/**
 	 * Gets the payload of a one-dimensional array.
 	 */
 	static
 	public List<?> getData(NDArray array){
-		return (List<?>)array.getData();
+		return asJavaList(array, (List<?>)array.getData());
 	}
 
 	/**
@@ -59,7 +72,46 @@ public class NDArrayUtil {
 	public List<?> getData(NDArray array, String key){
 		Map<String, ?> data = (Map<String, ?>)array.getData();
 
-		return (List<?>)data.get(key);
+		return asJavaList(array, (List<?>)data.get(key));
+	}
+
+	static
+	private <E> List<E> asJavaList(NDArray array, List<E> values){
+		boolean fortranOrder = array.getFortranOrder();
+
+		if(fortranOrder){
+			int[] shape = getShape(array);
+
+			switch(shape.length){
+				case 1:
+					return values;
+				case 2:
+					return toJavaList(values, shape[0], shape[1]);
+				default:
+					throw new IllegalArgumentException();
+			}
+		}
+
+		return values;
+	}
+
+	/**
+	 * Translates a column-major (ie. Fortran-type) array to a row-major (ie. C-type) array.
+	 */
+	static
+	private <E> List<E> toJavaList(List<E> values, int rows, int columns){
+		List<E> result = new ArrayList<>(values.size());
+
+		for(int i = 0; i < values.size(); i++){
+			int row = i / columns;
+			int column = i % columns;
+
+			E value = values.get((column * rows) + row);
+
+			result.add(value);
+		}
+
+		return result;
 	}
 
 	/**
