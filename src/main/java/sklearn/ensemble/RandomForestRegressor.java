@@ -26,7 +26,7 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import sklearn.Regressor;
 import sklearn.tree.DecisionTreeRegressor;
-import sklearn.tree.TreeConverter;
+import sklearn.tree.TreeModelUtil;
 
 public class RandomForestRegressor extends Regressor {
 
@@ -38,7 +38,7 @@ public class RandomForestRegressor extends Regressor {
 	public MiningModel encodeModel(List<DataField> dataFields){
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		return TreeConverter.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields);
+		return TreeModelUtil.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields);
 	}
 
 	@SuppressWarnings (

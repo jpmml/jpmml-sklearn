@@ -39,7 +39,7 @@ public class DecisionTreeClassifier extends Classifier implements HasTree {
 
 		Output output = new Output(PMMLUtil.createProbabilityFields(dataField));
 
-		TreeModel treeModel = TreeConverter.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, dataFields, true)
+		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, dataFields, true)
 			.setOutput(output);
 
 		return treeModel;

@@ -42,7 +42,10 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TreeModelFieldCollector;
 import sklearn.Estimator;
 
-public class TreeConverter {
+public class TreeModelUtil {
+
+	private TreeModelUtil(){
+	}
 
 	static
 	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, List<DataField> dataFields, boolean standalone){

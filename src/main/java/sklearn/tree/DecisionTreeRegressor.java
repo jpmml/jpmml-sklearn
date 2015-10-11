@@ -33,7 +33,7 @@ public class DecisionTreeRegressor extends Regressor implements HasTree {
 
 	@Override
 	public TreeModel encodeModel(List<DataField> dataFields){
-		return TreeConverter.encodeTreeModel(this, MiningFunctionType.REGRESSION, dataFields, true);
+		return TreeModelUtil.encodeTreeModel(this, MiningFunctionType.REGRESSION, dataFields, true);
 	}
 
 	@Override
