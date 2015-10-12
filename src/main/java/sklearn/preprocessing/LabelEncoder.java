@@ -23,11 +23,13 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldColumnPair;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MapValues;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.Row;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -39,6 +41,16 @@ public class LabelEncoder extends SimpleTransformer {
 
 	public LabelEncoder(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public OpType getOpType(){
+		return OpType.CATEGORICAL;
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.STRING;
 	}
 
 	@Override

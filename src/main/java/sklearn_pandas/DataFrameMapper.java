@@ -27,7 +27,6 @@ import java.util.Map;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
@@ -35,7 +34,6 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.LocalTransformations;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
@@ -44,7 +42,6 @@ import org.jpmml.sklearn.CClassDict;
 import sklearn.ComplexTransformer;
 import sklearn.SimpleTransformer;
 import sklearn.Transformer;
-import sklearn.preprocessing.LabelEncoder;
 
 public class DataFrameMapper extends CClassDict {
 
@@ -128,17 +125,8 @@ public class DataFrameMapper extends CClassDict {
 
 				localTransformations.addDerivedFields(derivedField);
 
-				// XXX
-				if(transformer instanceof LabelEncoder){
-					dataField.setOpType(OpType.CATEGORICAL)
-						.setDataType(DataType.STRING);
-				} else
-
-				{
-					if((dataField.getDataType()).equals(DataType.FLOAT)){
-						dataField.setDataType(DataType.DOUBLE);
-					}
-				}
+				dataField.setOpType(simpleTransformer.getOpType())
+					.setDataType(simpleTransformer.getDataType());
 			} else
 
 			if(transformer instanceof ComplexTransformer){

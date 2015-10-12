@@ -19,11 +19,21 @@
 package sklearn;
 
 import net.razorvine.pickle.objects.ClassDict;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 
 abstract
 public class Transformer extends ClassDict {
 
 	public Transformer(String module, String name){
 		super(module, name);
+	}
+
+	public OpType getOpType(){
+		return OpType.CONTINUOUS;
+	}
+
+	public DataType getDataType(){
+		return DataType.DOUBLE;
 	}
 }
