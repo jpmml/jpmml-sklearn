@@ -21,8 +21,10 @@ package sklearn_pandas;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataDictionary;
@@ -33,6 +35,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.LocalTransformations;
 import org.dmg.pmml.MiningField;
+import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.Visitor;
@@ -74,6 +77,9 @@ public class DataFrameMapper extends CClassDict {
 		final
 		Map<FieldName, FieldName> renamedFields = new LinkedHashMap<>();
 
+		final
+		Set<FieldName> removedFields = new LinkedHashSet<>();
+
 		Iterator<DataField> it = dataFields.iterator();
 
 		// The target column
@@ -108,38 +114,52 @@ public class DataFrameMapper extends CClassDict {
 						return fieldRef;
 					}
 				};
-			} // End if
+			}
+
+			FieldName name = FieldName.create(getName(feature));
+
+			DataField dataField = it.next();
+
+			renamedFields.put(dataField.getName(), name);
 
 			if(transformer instanceof SimpleTransformer){
 				SimpleTransformer simpleTransformer = (SimpleTransformer)transformer;
-
-				FieldName name = FieldName.create(getName(feature));
-
-				DataField dataField = it.next();
-
-				renamedFields.put(dataField.getName(), name);
 
 				Expression expression = simpleTransformer.encode(name);
 
 				DerivedField derivedField = encodeDerivedField(dataField, expression);
 
 				localTransformations.addDerivedFields(derivedField);
-
-				dataField.setOpType(simpleTransformer.getOpType())
-					.setDataType(simpleTransformer.getDataType());
 			} else
 
 			if(transformer instanceof ComplexTransformer){
 				ComplexTransformer complexTransformer = (ComplexTransformer)transformer;
 
 				for(int j = 0; j < complexTransformer.getNumberOfFeatures(); j++){
-					throw new UnsupportedOperationException();
+					Expression expression = complexTransformer.encode(j, name);
+
+					DataField elementDataField = dataField;
+
+					if(j > 0){
+						elementDataField = it.next();
+
+						it.remove();
+
+						removedFields.add(elementDataField.getName());
+					}
+
+					DerivedField derivedField = encodeDerivedField(elementDataField, expression);
+
+					localTransformations.addDerivedFields(derivedField);
 				}
 			} else
 
 			{
 				throw new IllegalArgumentException();
 			}
+
+			dataField.setOpType(transformer.getOpType())
+				.setDataType(transformer.getDataType());
 		}
 
 		if(it.hasNext()){
@@ -147,6 +167,23 @@ public class DataFrameMapper extends CClassDict {
 		}
 
 		Visitor visitor = new AbstractVisitor(){
+
+			@Override
+			public VisitorAction visit(MiningSchema miningSchema){
+				List<MiningField> miningFields = miningSchema.getMiningFields();
+
+				for(Iterator<MiningField> it = miningFields.iterator(); it.hasNext(); ){
+					MiningField miningField = it.next();
+
+					FieldName name = miningField.getName();
+
+					if(removedFields.contains(name)){
+						it.remove();
+					}
+				}
+
+				return super.visit(miningSchema);
+			}
 
 			@Override
 			public VisitorAction visit(DataField dataField){

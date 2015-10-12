@@ -1,7 +1,7 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, Imputer, LabelEncoder, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
@@ -51,10 +51,10 @@ print(audit_df.dtypes)
 
 audit_mapper = DataFrameMapper([
     ("Age", None),
-    ("Employment", LabelEncoder()),
-    ("Education", LabelEncoder()),
-    ("Marital", LabelEncoder()),
-    ("Occupation", LabelEncoder()),
+    ("Employment", LabelBinarizer()),
+    ("Education", LabelBinarizer()),
+    ("Marital", LabelBinarizer()),
+    ("Occupation", LabelBinarizer()),
     ("Income", None),
     ("Gender", LabelEncoder()),
     ("Deductions", LabelEncoder()),
@@ -66,8 +66,8 @@ audit = audit_mapper.fit_transform(audit_df)
 
 store_pkl(audit_mapper, "Audit.pkl")
 
-audit_X = audit[:, 0:9]
-audit_y = audit[:, 9]
+audit_X = audit[:, 0:48]
+audit_y = audit[:, 48]
 
 audit_y = audit_y.astype(int)
 

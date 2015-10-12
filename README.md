@@ -15,6 +15,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
 * Supported Transformer types:
   * [`Binarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Binarizer.html).
   * [`Imputer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Imputer.html).
+  * [`LabelBinarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelBinarizer.html).
   * [`LabelEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html).
   * [`MinMaxScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html).
   * [`StandardScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html).

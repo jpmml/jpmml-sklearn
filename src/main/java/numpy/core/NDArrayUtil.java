@@ -361,6 +361,35 @@ public class NDArrayUtil {
 		return unpickler.load(is);
 	}
 
+	static
+	private String readUnicode(InputStream is, ByteOrder byteOrder, int size) throws IOException {
+		byte[] buffer = new byte[size * 4];
+
+		ByteStreams.readFully(is, buffer);
+
+		int length = buffer.length;
+
+		// Trim trailing '\0' characters
+		while(length > 0){
+
+			if((buffer[length - 1] | buffer[length - 2] | buffer[length - 3] | buffer[length - 4]) != 0){
+				break;
+			}
+
+			length -= 4;
+		}
+
+		if((ByteOrder.BIG_ENDIAN).equals(byteOrder)){
+			return new String(buffer, 0, length, "UTF-32BE");
+		} else
+
+		if((ByteOrder.LITTLE_ENDIAN).equals(byteOrder)){
+			return new String(buffer, 0, length, "UTF-32LE");
+		}
+
+		throw new IOException();
+	}
+
 	/**
 	 * http://docs.scipy.org/doc/numpy/reference/arrays.dtypes.html
 	 * http://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.byteorder.html
@@ -466,6 +495,14 @@ public class NDArrayUtil {
 				case OBJECT:
 					{
 						return readObject(is);
+					}
+				case UNICODE:
+					{
+						ByteOrder byteOrder = getByteOrder();
+
+						int size = getSize();
+
+						return readUnicode(is, byteOrder, size);
 					}
 				default:
 					break;

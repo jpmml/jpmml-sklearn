@@ -33,6 +33,7 @@ import sklearn.linear_model.LinearRegression;
 import sklearn.linear_model.LogisticRegression;
 import sklearn.preprocessing.Binarizer;
 import sklearn.preprocessing.Imputer;
+import sklearn.preprocessing.LabelBinarizer;
 import sklearn.preprocessing.LabelEncoder;
 import sklearn.preprocessing.MinMaxScaler;
 import sklearn.preprocessing.StandardScaler;
@@ -84,6 +85,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.preprocessing.data", "MinMaxScaler", MinMaxScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "StandardScaler", StandardScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.imputation", "Imputer", Imputer.class),
+			new ObjectConstructor("sklearn.preprocessing.label", "LabelBinarizer", LabelBinarizer.class),
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelEncoder", LabelEncoder.class),
 			new CClassDictConstructor("sklearn.tree._tree", "BestSplitter"),
 			new CClassDictConstructor("sklearn.tree._tree", "ClassificationCriterion"),
