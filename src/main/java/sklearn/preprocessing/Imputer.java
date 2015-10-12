@@ -26,9 +26,9 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.Transformer;
+import sklearn.SimpleTransformer;
 
-public class Imputer extends Transformer {
+public class Imputer extends SimpleTransformer {
 
 	public Imputer(String module, String name){
 		super(module, name);

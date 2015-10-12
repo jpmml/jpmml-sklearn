@@ -19,6 +19,7 @@
 package sklearn_pandas;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,8 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.CClassDict;
+import sklearn.ComplexTransformer;
+import sklearn.SimpleTransformer;
 import sklearn.Transformer;
 import sklearn.preprocessing.LabelEncoder;
 
@@ -64,7 +67,7 @@ public class DataFrameMapper extends CClassDict {
 		}
 
 		List<Object[]> features = new ArrayList<>(getFeatures());
-		if(features.size() == 0 || features.size() != dataFields.size()){
+		if(features.size() < 1){
 			throw new IllegalArgumentException();
 		}
 
@@ -74,30 +77,54 @@ public class DataFrameMapper extends CClassDict {
 		final
 		Map<FieldName, FieldName> renamedFields = new LinkedHashMap<>();
 
-		for(int i = 0; i < dataFields.size(); i++){
-			DataField dataField = dataFields.get(i);
+		Iterator<DataField> it = dataFields.iterator();
 
-			Object[] feature = features.get(i);
+		// The target column
+		{
+			Object[] feature = features.get(0);
 
-			if(feature[0] instanceof List){
-				feature[0] = Iterables.getOnlyElement((List<?>)feature[0]);
+			Transformer transformer = getTransformer(feature);
+			if(transformer != null){
+				throw new IllegalArgumentException();
 			}
 
-			FieldName name = FieldName.create((String)feature[0]);
+			FieldName name = FieldName.create(getName(feature));
+
+			DataField dataField = it.next();
 
 			renamedFields.put(dataField.getName(), name);
+		}
 
-			if(i > 0){
-				Expression expression = new FieldRef(name);
+		// Zero or more active columns
+		for(int i = 1; i < features.size(); i++){
+			Object[] feature = features.get(i);
 
-				Transformer transformer = (Transformer)feature[1];
-				if(transformer != null){
-					expression = transformer.encode(name);
-				}
+			Transformer transformer = getTransformer(feature);
 
-				DerivedField derivedField = new DerivedField(dataField.getOpType(), dataField.getDataType())
-					.setName(dataField.getName())
-					.setExpression(expression);
+			if(transformer == null){
+				transformer = new SimpleTransformer(null, null){
+
+					@Override
+					public Expression encode(FieldName name){
+						FieldRef fieldRef = new FieldRef(name);
+
+						return fieldRef;
+					}
+				};
+			} // End if
+
+			if(transformer instanceof SimpleTransformer){
+				SimpleTransformer simpleTransformer = (SimpleTransformer)transformer;
+
+				FieldName name = FieldName.create(getName(feature));
+
+				DataField dataField = it.next();
+
+				renamedFields.put(dataField.getName(), name);
+
+				Expression expression = simpleTransformer.encode(name);
+
+				DerivedField derivedField = encodeDerivedField(dataField, expression);
 
 				localTransformations.addDerivedFields(derivedField);
 
@@ -108,11 +135,27 @@ public class DataFrameMapper extends CClassDict {
 				} else
 
 				{
-					if((DataType.FLOAT).equals(dataField.getDataType())){
+					if((dataField.getDataType()).equals(DataType.FLOAT)){
 						dataField.setDataType(DataType.DOUBLE);
 					}
 				}
+			} else
+
+			if(transformer instanceof ComplexTransformer){
+				ComplexTransformer complexTransformer = (ComplexTransformer)transformer;
+
+				for(int j = 0; j < complexTransformer.getNumberOfFeatures(); j++){
+					throw new UnsupportedOperationException();
+				}
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
+		}
+
+		if(it.hasNext()){
+			throw new IllegalArgumentException();
 		}
 
 		Visitor visitor = new AbstractVisitor(){
@@ -145,5 +188,29 @@ public class DataFrameMapper extends CClassDict {
 
 	public List<Object[]> getFeatures(){
 		return (List)get("features");
+	}
+
+	static
+	private String getName(Object[] feature){
+
+		if(feature[0] instanceof List){
+			return (String)Iterables.getOnlyElement((List<?>)feature[0]);
+		}
+
+		return (String)feature[0];
+	}
+
+	static
+	private Transformer getTransformer(Object[] feature){
+		return (Transformer)feature[1];
+	}
+
+	static
+	private DerivedField encodeDerivedField(DataField dataField, Expression expression){
+		DerivedField derivedField = new DerivedField(dataField.getOpType(), dataField.getDataType())
+			.setName(dataField.getName())
+			.setExpression(expression);
+
+		return derivedField;
 	}
 }

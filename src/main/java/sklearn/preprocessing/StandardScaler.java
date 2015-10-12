@@ -26,9 +26,9 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.Transformer;
+import sklearn.SimpleTransformer;
 
-public class StandardScaler extends Transformer {
+public class StandardScaler extends SimpleTransformer {
 
 	public StandardScaler(String module, String name){
 		super(module, name);

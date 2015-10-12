@@ -18,12 +18,19 @@
  */
 package sklearn;
 
-import net.razorvine.pickle.objects.ClassDict;
+import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldName;
 
 abstract
-public class Transformer extends ClassDict {
+public class ComplexTransformer extends Transformer {
 
-	public Transformer(String module, String name){
+	public ComplexTransformer(String module, String name){
 		super(module, name);
 	}
+
+	abstract
+	public int getNumberOfFeatures();
+
+	abstract
+	public Expression encode(int index, FieldName name);
 }
