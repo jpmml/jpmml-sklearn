@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import joblib.NDArrayWrapper;
+import joblib.NDArrayWrapperConstructor;
 import net.razorvine.pickle.Unpickler;
 import numpy.DType;
 import numpy.core.NDArray;
@@ -58,27 +58,16 @@ public class PickleUtil {
 	}
 
 	static
-	public Object unpickle(final Storage storage) throws IOException {
+	public Object unpickle(Storage storage) throws IOException {
 		ObjectConstructor[] constructors = {
-			new CClassDictConstructor("joblib.numpy_pickle", "NDArrayWrapper"){
-
-				@Override
-				public NDArrayWrapper newObject(){
-					return new NDArrayWrapper(getModule(), getName()){
-
-						@Override
-						public InputStream getInputStream() throws IOException {
-							return storage.getArray(getFileName());
-						}
-					};
-				}
-			},
+			new NDArrayWrapperConstructor("joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new CClassDictConstructor("numpy", "dtype", DType.class),
 			new CClassDictConstructor("numpy.core.multiarray", "_reconstruct", NDArray.class),
 			new CClassDictConstructor("numpy.core.multiarray", "scalar", Scalar.class),
 			new CClassDictConstructor("numpy.random", "__RandomState_ctor"),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
+			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),
 			new ObjectConstructor("sklearn.linear_model.logistic", "LogisticRegression", LogisticRegression.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),
