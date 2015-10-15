@@ -1,11 +1,11 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
+from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
-import joblib
 import numpy
 import os
 import pandas

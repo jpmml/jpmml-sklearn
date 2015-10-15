@@ -105,7 +105,7 @@ iris_forest.fit(iris_X, iris_y)
 
 Serialize the `sklearn_pandas.DataFrameMapper` object and estimator object in `pickle` data format:
 ```python
-import joblib
+from sklearn.externals import joblib
 
 joblib.dump(iris_mapper, "mapper.pkl")
 joblib.dump(iris_forest, "estimator.pkl")
