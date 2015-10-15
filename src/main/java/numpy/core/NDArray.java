@@ -32,15 +32,37 @@ public class NDArray extends CClassDict {
 	@Override
 	public void __init__(Object[] args){
 
-		if(args.length == 3){
-
-			// https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/externals/joblib/numpy_pickle.py
-			if((args[0] instanceof ClassDictConstructor) && (args[1] instanceof Object[] && Arrays.equals((Object[])args[1], new Object[]{0})) && (args[2] instanceof byte[] && Arrays.equals((byte[])args[2], new byte[]{(byte)'b'}))){
-				return;
-			}
+		if(isDefault(args)){
+			// XXX
+			return;
 		}
 
 		super.__init__(args);
+	}
+
+	private boolean isDefault(Object[] args){
+
+		if(args.length != 3){
+			return false;
+		} // End if
+
+		if(args[0] instanceof ClassDictConstructor){
+
+			if((args[1] instanceof Object[] && Arrays.equals((Object[])args[1], new Object[]{0}))){
+
+				// Python 2(.7)
+				if((args[2] instanceof String) && ((String)args[2]).equals("b")){
+					return true;
+				} // End if
+
+				// Python 3(.4)
+				if((args[2] instanceof byte[] && Arrays.equals((byte[])args[2], new byte[]{(byte)'b'}))){
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

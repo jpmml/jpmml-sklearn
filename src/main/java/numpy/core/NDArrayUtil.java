@@ -362,32 +362,41 @@ public class NDArrayUtil {
 	}
 
 	static
+	private String readString(InputStream is, int size) throws IOException {
+		byte[] buffer = new byte[size];
+
+		ByteStreams.readFully(is, buffer);
+
+		return toString(buffer, "UTF-8");
+	}
+
+	static
 	private String readUnicode(InputStream is, ByteOrder byteOrder, int size) throws IOException {
 		byte[] buffer = new byte[size * 4];
 
 		ByteStreams.readFully(is, buffer);
 
-		int length = buffer.length;
-
-		// Trim trailing '\0' characters
-		while(length > 0){
-
-			if((buffer[length - 1] | buffer[length - 2] | buffer[length - 3] | buffer[length - 4]) != 0){
-				break;
-			}
-
-			length -= 4;
-		}
-
 		if((ByteOrder.BIG_ENDIAN).equals(byteOrder)){
-			return new String(buffer, 0, length, "UTF-32BE");
+			return toString(buffer, "UTF-32BE");
 		} else
 
 		if((ByteOrder.LITTLE_ENDIAN).equals(byteOrder)){
-			return new String(buffer, 0, length, "UTF-32LE");
+			return toString(buffer, "UTF-32LE");
 		}
 
 		throw new IOException();
+	}
+
+	static
+	private String toString(byte[] buffer, String encoding) throws IOException {
+		String string = new String(buffer, encoding);
+
+		// Trim trailing zero characters
+		while(string.length() > 0 && string.charAt(string.length() - 1) == '\0'){
+			string = string.substring(0, string.length() - 1);
+		}
+
+		return string;
 	}
 
 	/**
@@ -495,6 +504,12 @@ public class NDArrayUtil {
 				case OBJECT:
 					{
 						return readObject(is);
+					}
+				case STRING:
+					{
+						int size = getSize();
+
+						return readString(is, size);
 					}
 				case UNICODE:
 					{
