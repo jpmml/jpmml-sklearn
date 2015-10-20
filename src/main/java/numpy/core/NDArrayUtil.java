@@ -59,8 +59,8 @@ public class NDArrayUtil {
 	 * Gets the payload of a one-dimensional array.
 	 */
 	static
-	public List<?> getData(NDArray array){
-		return asJavaList(array, (List<?>)array.getData());
+	public List<?> getContent(NDArray array){
+		return asJavaList(array, (List<?>)array.getContent());
 	}
 
 	/**
@@ -69,8 +69,8 @@ public class NDArrayUtil {
 	 * @param key The dimension.
 	 */
 	static
-	public List<?> getData(NDArray array, String key){
-		Map<String, ?> data = (Map<String, ?>)array.getData();
+	public List<?> getContent(NDArray array, String key){
+		Map<String, ?> data = (Map<String, ?>)array.getContent();
 
 		return asJavaList(array, (List<?>)data.get(key));
 	}
@@ -155,13 +155,7 @@ public class NDArrayUtil {
 		Boolean fortranOrder = (Boolean)headerDict.get("fortran_order");
 		Object[] shape = (Object[])headerDict.get("shape");
 
-		int length = 1;
-
-		for(int i = 0; i < shape.length; i++){
-			length *= (Integer)shape[i];
-		}
-
-		Object data = parseData(is, descr, length);
+		byte[] data = ByteStreams.toByteArray(is);
 
 		NDArray result = new NDArray();
 
@@ -171,7 +165,18 @@ public class NDArrayUtil {
 	}
 
 	static
-	private Object parseData(InputStream is, Object descr, int length) throws IOException {
+	public Object parseData(InputStream is, Object descr, Object[] shape) throws IOException {
+		int length = 1;
+
+		for(int i = 0; i < shape.length; i++){
+			length *= (Integer)shape[i];
+		}
+
+		return parseData(is, descr, length);
+	}
+
+	static
+	public Object parseData(InputStream is, Object descr, int length) throws IOException {
 
 		if(descr instanceof String){
 			return parseArray(is, (String)descr, length);
@@ -204,7 +209,7 @@ public class NDArrayUtil {
 			if(descriptor.isObject()){
 				NDArray array = (NDArray)element;
 
-				result.addAll(NDArrayUtil.getData(array));
+				result.addAll(NDArrayUtil.getContent(array));
 
 				continue;
 			}

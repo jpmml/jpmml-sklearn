@@ -28,6 +28,9 @@ import org.jpmml.sklearn.CClassDict;
 
 public class Scalar extends CClassDict {
 
+	private List<?> content = null;
+
+
 	public Scalar(String module, String name){
 		super(module, name);
 	}
@@ -37,18 +40,24 @@ public class Scalar extends CClassDict {
 		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
 	}
 
-	public Object getData(){
-		DType dtype = getDType();
+	public List<?> getContent(){
 
-		byte[] obj = (byte[])get("obj");
+		if(this.content == null){
+			this.content = loadContent();
+		}
+
+		return this.content;
+	}
+
+	private List<?> loadContent(){
+		DType dtype = getDType();
+		byte[] obj = getObj();
 
 		try {
 			InputStream is = new ByteArrayInputStream(obj);
 
 			try {
-				List<?> array = (List<?>)NDArrayUtil.parseArray(is, dtype.getDescr(), 1);
-
-				return array.get(0);
+				return NDArrayUtil.parseArray(is, dtype.getDescr(), 1);
 			} finally {
 				is.close();
 			}
@@ -61,9 +70,8 @@ public class Scalar extends CClassDict {
 		return (DType)get("dtype");
 	}
 
-	@Override
-	public String toString(){
-		return String.valueOf(getData());
+	public byte[] getObj(){
+		return (byte[])get("obj");
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {

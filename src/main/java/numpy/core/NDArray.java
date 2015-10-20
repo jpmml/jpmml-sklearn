@@ -18,12 +18,18 @@
  */
 package numpy.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.sklearn.CClassDict;
 
 public class NDArray extends CClassDict {
+
+	private Object content = null;
+
 
 	public NDArray(){
 		super("numpy", "ndarray");
@@ -33,6 +39,7 @@ public class NDArray extends CClassDict {
 	public void __init__(Object[] args){
 
 		if(isDefault(args)){
+
 			// XXX
 			return;
 		}
@@ -73,8 +80,41 @@ public class NDArray extends CClassDict {
 		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
 	}
 
+	public Object getContent(){
+
+		if(this.content == null){
+			Object data = getData();
+
+			this.content = ((data instanceof byte[]) ? loadContent() : data);
+		}
+
+		return this.content;
+	}
+
+	private Object loadContent(){
+		Object[] shape = getShape();
+		Object descr = getDescr();
+		byte[] data = (byte[])getData();
+
+		try {
+			InputStream is = new ByteArrayInputStream(data);
+
+			try {
+				return NDArrayUtil.parseData(is, descr, shape);
+			} finally {
+				is.close();
+			}
+		} catch(IOException ioe){
+			throw new RuntimeException(ioe);
+		}
+	}
+
 	public Object[] getShape(){
 		return (Object[])get("shape");
+	}
+
+	public Object getDescr(){
+		return get("descr");
 	}
 
 	public Boolean getFortranOrder(){

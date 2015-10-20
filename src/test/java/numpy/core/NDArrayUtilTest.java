@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 public class NDArrayUtilTest {
 
 	@Test
-	public void getData(){
+	public void getContent(){
 		String[] data = {
 			"11", "12", "13",
 			"21", "22", "23"
@@ -38,10 +38,10 @@ public class NDArrayUtilTest {
 		array.put("fortran_order", Boolean.FALSE);
 		array.put("data", Arrays.asList(data));
 
-		assertEquals(Arrays.asList(data), NDArrayUtil.getData(array));
+		assertEquals(Arrays.asList(data), NDArrayUtil.getContent(array));
 
 		array.put("fortran_order", Boolean.TRUE);
 
-		assertEquals(Arrays.asList("11", "13", "22", "12", "21", "23"), NDArrayUtil.getData(array));
+		assertEquals(Arrays.asList("11", "13", "22", "12", "21", "23"), NDArrayUtil.getContent(array));
 	}
 }

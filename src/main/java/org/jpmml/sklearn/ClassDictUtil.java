@@ -44,15 +44,13 @@ public class ClassDictUtil {
 
 			NDArray array = arrayWrapper.getContent();
 
-			return NDArrayUtil.getData(array);
+			return NDArrayUtil.getContent(array);
 		} else
 
 		if(object instanceof Scalar){
 			Scalar scalar = (Scalar)object;
 
-			Object data = scalar.getData();
-
-			return Collections.singletonList(data);
+			return scalar.getContent();
 		}
 
 		throw new IllegalArgumentException();
@@ -60,11 +58,32 @@ public class ClassDictUtil {
 
 	static
 	public List<?> getArray(ClassDict dict, String name, String key){
-		NDArrayWrapper arrayWrapper = (NDArrayWrapper)dict.get(name);
+		Object object = dict.get(name);
 
-		NDArray array = arrayWrapper.getContent();
+		if(object instanceof NDArrayWrapper){
+			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
 
-		return NDArrayUtil.getData(array, key);
+			NDArray array = arrayWrapper.getContent();
+
+			return NDArrayUtil.getContent(array, key);
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	static
+	public int[] getShape(ClassDict dict, String name){
+		Object object = dict.get(name);
+
+		if(object instanceof NDArrayWrapper){
+			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
+
+			NDArray array = arrayWrapper.getContent();
+
+			return NDArrayUtil.getShape(array);
+		}
+
+		throw new IllegalArgumentException();
 	}
 
 	static

@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Iterables;
-import joblib.NDArrayWrapper;
-import numpy.core.NDArray;
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
@@ -255,11 +252,7 @@ public class LogisticRegression extends Classifier {
 	}
 
 	private int[] getCoefShape(){
-		NDArrayWrapper arrayWrapper = (NDArrayWrapper)get("coef_");
-
-		NDArray array = arrayWrapper.getContent();
-
-		return NDArrayUtil.getShape(array);
+		return ClassDictUtil.getShape(this, "coef_");
 	}
 
 	static
