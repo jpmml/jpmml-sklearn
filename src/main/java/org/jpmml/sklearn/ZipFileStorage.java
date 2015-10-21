@@ -34,8 +34,8 @@ public class ZipFileStorage implements Storage {
 	private ZipFile zipFile = null;
 
 
-	public ZipFileStorage(File file) throws IOException {
-		this.zipFile = new ZipFile(file);
+	public ZipFileStorage(ZipFile zipFile){
+		this.zipFile = zipFile;
 	}
 
 	@Override
@@ -75,16 +75,14 @@ public class ZipFileStorage implements Storage {
 	}
 
 	static
-	public boolean accept(File file){
+	public ZipFileStorage open(File file){
 
 		try {
 			ZipFile zipFile = new ZipFile(file);
 
-			zipFile.close();
-
-			return true;
+			return new ZipFileStorage(zipFile);
 		} catch(IOException ioe){
-			return false;
+			return null;
 		}
 	}
 }

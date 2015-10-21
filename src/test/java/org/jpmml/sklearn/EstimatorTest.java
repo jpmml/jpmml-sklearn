@@ -20,6 +20,7 @@ package org.jpmml.sklearn;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipInputStream;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ArchiveBatch;
@@ -41,28 +42,34 @@ public class EstimatorTest extends ArchiveBatchTest {
 				return clazz.getResourceAsStream(path);
 			}
 
+			private ZipInputStream openZip(String path) throws IOException {
+				InputStream is = open(path + ".zip");
+
+				return new ZipInputStream(is);
+			}
+
 			@Override
 			public PMML getPMML() throws IOException {
 				PMML pmml;
 
-				Storage estimatorStorage = new ZipStreamStorage(open("/pkl/" + getName() + getDataset() + ".pkl.zip"));
+				ZipInputStream estimatorZis = openZip("/pkl/" + getName() + getDataset() + ".pkl");
 
 				try {
-					Estimator estimator = (Estimator)PickleUtil.unpickle(estimatorStorage);
+					Estimator estimator = (Estimator)PickleUtil.unpickle(new ZipInputStreamStorage(estimatorZis));
 
 					pmml = estimator.encodePMML();
 				} finally {
-					estimatorStorage.close();
+					estimatorZis.close();
 				}
 
-				Storage mapperStorage = new ZipStreamStorage(open("/pkl/" + getDataset() + ".pkl.zip"));
+				ZipInputStream mapperZis = openZip("/pkl/" + getDataset() + ".pkl");
 
 				try {
-					DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(mapperStorage);
+					DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(new ZipInputStreamStorage(mapperZis));
 
 					mapper.updatePMML(pmml);
 				} finally {
-					mapperStorage.close();
+					mapperZis.close();
 				}
 
 				return pmml;

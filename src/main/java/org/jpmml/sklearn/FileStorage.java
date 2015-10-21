@@ -34,11 +34,21 @@ public class FileStorage implements Storage {
 
 	@Override
 	public InputStream getObject() throws IOException {
+
+		if(this.file == null){
+			throw new IOException();
+		}
+
 		return new FileInputStream(this.file);
 	}
 
 	@Override
 	public InputStream getArray(String name) throws IOException {
+
+		if(this.file == null){
+			throw new IOException();
+		}
+
 		File dir = this.file.getParentFile();
 
 		return new FileInputStream(new File(dir, name));
@@ -46,5 +56,6 @@ public class FileStorage implements Storage {
 
 	@Override
 	public void close(){
+		this.file = null;
 	}
 }

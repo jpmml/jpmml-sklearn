@@ -34,7 +34,12 @@ public class InputStreamStorage implements Storage {
 	}
 
 	@Override
-	public InputStream getObject(){
+	public InputStream getObject() throws IOException {
+
+		if(this.buffer == null){
+			throw new IOException();
+		}
+
 		return new ByteArrayInputStream(this.buffer);
 	}
 

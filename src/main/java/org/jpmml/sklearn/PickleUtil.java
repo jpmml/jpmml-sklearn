@@ -48,10 +48,11 @@ public class PickleUtil {
 	}
 
 	static
-	public Storage createStorage(File file) throws IOException {
+	public Storage createStorage(File file){
+		ZipFileStorage storage = ZipFileStorage.open(file);
 
-		if(ZipFileStorage.accept(file)){
-			return new ZipFileStorage(file);
+		if(storage != null){
+			return storage;
 		}
 
 		return new FileStorage(file);

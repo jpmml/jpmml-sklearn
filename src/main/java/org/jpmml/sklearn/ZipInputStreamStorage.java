@@ -31,13 +31,12 @@ import com.google.common.collect.Ordering;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 
-public class ZipStreamStorage implements Storage {
+public class ZipInputStreamStorage implements Storage {
 
 	private Map<String, byte[]> entries = new LinkedHashMap<>();
 
 
-	public ZipStreamStorage(InputStream is) throws IOException {
-		ZipInputStream zis = new ZipInputStream(is);
+	public ZipInputStreamStorage(ZipInputStream zis) throws IOException {
 
 		while(true){
 			ZipEntry entry = zis.getNextEntry();
@@ -52,7 +51,7 @@ public class ZipStreamStorage implements Storage {
 	}
 
 	@Override
-	public InputStream getObject(){
+	public InputStream getObject() throws IOException {
 		Set<String> names = this.entries.keySet();
 
 		Ordering<String> ordering = new Ordering<String>(){
@@ -69,15 +68,15 @@ public class ZipStreamStorage implements Storage {
 	}
 
 	@Override
-	public InputStream getArray(String name){
+	public InputStream getArray(String name) throws IOException {
 		return getInputStream(name);
 	}
 
-	private InputStream getInputStream(String name){
+	private InputStream getInputStream(String name) throws IOException {
 		byte[] buffer = this.entries.get(name);
 
 		if(buffer == null){
-			throw new NullPointerException();
+			throw new IOException();
 		}
 
 		return new ByteArrayInputStream(buffer);
