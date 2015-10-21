@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import net.razorvine.pickle.objects.ClassDictConstructor;
+import numpy.DType;
 import org.jpmml.sklearn.CClassDict;
 
 public class NDArray extends CClassDict {
@@ -95,6 +96,12 @@ public class NDArray extends CClassDict {
 		Object[] shape = getShape();
 		Object descr = getDescr();
 		byte[] data = (byte[])getData();
+
+		if(descr instanceof DType){
+			DType dType = (DType)descr;
+
+			descr = dType.toDescr();
+		}
 
 		try {
 			InputStream is = new ByteArrayInputStream(data);

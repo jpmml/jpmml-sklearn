@@ -9,6 +9,7 @@ from pandas import DataFrame
 import numpy
 import os
 import pandas
+import pickle
 import shutil
 import tempfile
 import zipfile
@@ -32,6 +33,11 @@ def store_pkl(obj, name):
         print(zipDir.filename)
     finally:
         shutil.rmtree(tmpDir)
+
+#def store_pkl(obj, name):
+#    con = open("pkl/" + name, "wb")
+#    pickle.dump(obj, con, protocol = -1)
+#    con.close()
 
 def dump(obj):
     for attr in dir(obj):

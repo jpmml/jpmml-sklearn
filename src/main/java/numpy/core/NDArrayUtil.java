@@ -60,7 +60,9 @@ public class NDArrayUtil {
 	 */
 	static
 	public List<?> getContent(NDArray array){
-		return asJavaList(array, (List<?>)array.getContent());
+		Object content = array.getContent();
+
+		return asJavaList(array, (List<?>)content);
 	}
 
 	/**
@@ -70,9 +72,9 @@ public class NDArrayUtil {
 	 */
 	static
 	public List<?> getContent(NDArray array, String key){
-		Map<String, ?> data = (Map<String, ?>)array.getContent();
+		Map<String, ?> content = (Map<String, ?>)array.getContent();
 
-		return asJavaList(array, (List<?>)data.get(key));
+		return asJavaList(array, (List<?>)content.get(key));
 	}
 
 	static
@@ -170,13 +172,7 @@ public class NDArrayUtil {
 
 		for(int i = 0; i < shape.length; i++){
 			length *= (Integer)shape[i];
-		}
-
-		return parseData(is, descr, length);
-	}
-
-	static
-	public Object parseData(InputStream is, Object descr, int length) throws IOException {
+		} // End if
 
 		if(descr instanceof String){
 			return parseArray(is, (String)descr, length);
@@ -462,12 +458,12 @@ public class NDArrayUtil {
 
 		public Object read(InputStream is) throws IOException {
 			Kind kind = getKind();
+			ByteOrder byteOrder = getByteOrder();
+			int size = getSize();
 
 			switch(kind){
 				case BOOLEAN:
 					{
-						int size = getSize();
-
 						switch(size){
 							case 1:
 								return (readByte(is) == 1);
@@ -478,9 +474,6 @@ public class NDArrayUtil {
 					break;
 				case INTEGER:
 					{
-						ByteOrder byteOrder = getByteOrder();
-
-						int size = getSize();
 						switch(size){
 							case 4:
 								return readInt(is, byteOrder);
@@ -493,9 +486,6 @@ public class NDArrayUtil {
 					break;
 				case FLOAT:
 					{
-						ByteOrder byteOrder = getByteOrder();
-
-						int size = getSize();
 						switch(size){
 							case 4:
 								return readFloat(is, byteOrder);
@@ -512,17 +502,19 @@ public class NDArrayUtil {
 					}
 				case STRING:
 					{
-						int size = getSize();
-
 						return readString(is, size);
 					}
 				case UNICODE:
 					{
-						ByteOrder byteOrder = getByteOrder();
-
-						int size = getSize();
-
 						return readUnicode(is, byteOrder, size);
+					}
+				case VOID:
+					{
+						byte[] buffer = new byte[size];
+
+						ByteStreams.readFully(is, buffer);
+
+						return buffer;
 					}
 				default:
 					break;

@@ -18,12 +18,17 @@
  */
 package numpy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.jpmml.sklearn.CClassDict;
 
 public class DType extends CClassDict {
-
-	private String descr = null;
-
 
 	public DType(String module, String name){
 		super(module, name);
@@ -32,8 +37,6 @@ public class DType extends CClassDict {
 	@Override
 	public void __init__(Object[] args){
 		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
-
-		this.descr = (String)get("obj");
 	}
 
 	/**
@@ -44,15 +47,58 @@ public class DType extends CClassDict {
 		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
 	}
 
-	public String getDescr(){
+	public Object toDescr(){
+		Map<String, Object[]> values = getValues();
 
-		if(this.descr == null){
-			throw new IllegalStateException();
+		if(values == null){
+			String obj = getObj();
+			String order = getOrder();
+
+			return formatDescr(obj, order);
+		} // End if
+
+		if((TREE_KEYS).equals(values.keySet())){
+			return formatDescr(TREE_KEYS, values);
 		}
 
-		String order = (String)get("order");
+		throw new IllegalArgumentException();
+	}
 
-		return (order != null ? (order + this.descr) : this.descr);
+	public Map<String, Object[]> getValues(){
+		return (Map)get("values");
+	}
+
+	public String getObj(){
+		return (String)get("obj");
+	}
+
+	public String getOrder(){
+		return (String)get("order");
+	}
+
+	static
+	private List<Object[]> formatDescr(Collection<String> keys, Map<String, Object[]> values){
+		List<Object[]> result = new ArrayList<>();
+
+		for(String key : keys){
+			Object[] value = values.get(key);
+
+			DType dType = (DType)value[0];
+
+			result.add(new Object[]{key, dType.toDescr()});
+		}
+
+		return result;
+	}
+
+	static
+	private String formatDescr(String obj, String order){
+
+		if(obj == null){
+			throw new IllegalArgumentException();
+		}
+
+		return (order != null ? (order + obj) : obj);
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {
@@ -71,4 +117,6 @@ public class DType extends CClassDict {
 		"alignment",
 		"flags"
 	};
+
+	private static final Set<String> TREE_KEYS = new LinkedHashSet<>(Arrays.asList("left_child", "right_child", "feature", "threshold", "impurity", "n_node_samples", "weighted_n_node_samples"));
 }

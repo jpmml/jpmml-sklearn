@@ -57,7 +57,7 @@ public class Scalar extends CClassDict {
 			InputStream is = new ByteArrayInputStream(obj);
 
 			try {
-				return NDArrayUtil.parseArray(is, dtype.getDescr(), 1);
+				return (List<?>)NDArrayUtil.parseData(is, dtype.toDescr(), new Object[0]);
 			} finally {
 				is.close();
 			}

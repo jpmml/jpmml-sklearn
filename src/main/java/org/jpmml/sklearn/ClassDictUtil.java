@@ -39,6 +39,12 @@ public class ClassDictUtil {
 	public List<?> getArray(ClassDict dict, String name){
 		Object object = dict.get(name);
 
+		if(object instanceof NDArray){
+			NDArray array = (NDArray)object;
+
+			return NDArrayUtil.getContent(array);
+		} else
+
 		if(object instanceof NDArrayWrapper){
 			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
 
@@ -60,6 +66,12 @@ public class ClassDictUtil {
 	public List<?> getArray(ClassDict dict, String name, String key){
 		Object object = dict.get(name);
 
+		if(object instanceof NDArray){
+			NDArray array = (NDArray)object;
+
+			return NDArrayUtil.getContent(array, key);
+		} else
+
 		if(object instanceof NDArrayWrapper){
 			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
 
@@ -74,6 +86,12 @@ public class ClassDictUtil {
 	static
 	public int[] getShape(ClassDict dict, String name){
 		Object object = dict.get(name);
+
+		if(object instanceof NDArray){
+			NDArray array = (NDArray)object;
+
+			return NDArrayUtil.getShape(array);
+		} else
 
 		if(object instanceof NDArrayWrapper){
 			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
@@ -110,7 +128,10 @@ public class ClassDictUtil {
 
 			sep = "\n";
 
-			sb.append("\t" + entry.getKey() + "=" + entry.getValue() + ("/*" + (entry.getValue() != null ? entry.getValue().getClass() : "N/A") + "*/"));
+			String key = entry.getKey();
+			Object value = entry.getValue();
+
+			sb.append("\t" + key + "=" + value + (" /*" + (value != null ? value.getClass() : "N/A") + "*/"));
 		}
 
 		sb.append("\n}\n");
