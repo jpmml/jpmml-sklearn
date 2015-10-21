@@ -57,6 +57,10 @@ public class ClassDictUtil {
 			Scalar scalar = (Scalar)object;
 
 			return scalar.getContent();
+		} // End if
+
+		if(object instanceof Number){
+			return Collections.singletonList(object);
 		}
 
 		throw new IllegalArgumentException();
