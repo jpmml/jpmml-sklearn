@@ -51,8 +51,27 @@ public class CClassDict extends ClassDict {
 		reset();
 	}
 
+	public HashMap<String, Object> __getstate__(){
+		HashMap<String, Object> result = new LinkedHashMap<>(this);
+		result.remove("__class__");
+
+		return result;
+	}
+
+	@Override
+	public void __setstate__(HashMap<String, Object> values){
+		HashMap<String, Object> state = __getstate__();
+
+		// The state is additive
+		state.putAll(values);
+
+		super.__setstate__(state);
+	}
+
 	protected void reset(){
-		__setstate__(new HashMap<String, Object>());
+		HashMap<String, Object> state = new HashMap<>();
+
+		super.__setstate__(state);
 	}
 
 	static
