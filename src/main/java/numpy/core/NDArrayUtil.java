@@ -36,6 +36,7 @@ import com.google.common.primitives.Longs;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
+import numpy.DType;
 
 public class NDArrayUtil {
 
@@ -168,6 +169,13 @@ public class NDArrayUtil {
 
 	static
 	public Object parseData(InputStream is, Object descr, Object[] shape) throws IOException {
+
+		if(descr instanceof DType){
+			DType dType = (DType)descr;
+
+			descr = dType.toDescr();
+		}
+
 		int length = 1;
 
 		for(int i = 0; i < shape.length; i++){

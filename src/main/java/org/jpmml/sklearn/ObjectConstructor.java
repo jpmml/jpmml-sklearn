@@ -21,10 +21,12 @@ package org.jpmml.sklearn;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import net.razorvine.pickle.IObjectConstructor;
 import net.razorvine.pickle.PickleException;
 import net.razorvine.pickle.objects.ClassDict;
+import net.razorvine.pickle.objects.ClassDictConstructor;
 
 public class ObjectConstructor implements IObjectConstructor {
 
@@ -75,6 +77,32 @@ public class ObjectConstructor implements IObjectConstructor {
 		return newObject();
 	}
 
+	public ClassDict reconstruct(Object first, Object second){
+
+		if(first instanceof ClassDictConstructor){
+			ClassDictConstructor constructor = (ClassDictConstructor)first;
+
+			ClassDict dict = (ClassDict)constructor.construct(new Object[0]);
+			dict.__setstate__(new HashMap<String, Object>()); // Initializes the previously uninitialized "__class__" attribute
+
+			if(isObject(dict) && (second == null)){
+				return newObject();
+			}
+		} else
+
+		if(first instanceof CClassDictConstructor){
+			CClassDictConstructor constructor = (CClassDictConstructor)first;
+
+			CClassDict dict = constructor.construct(new Object[0]);
+
+			if(isObject(dict) && (second == null)){
+				return newObject();
+			}
+		}
+
+		throw new PickleException(getModule() + "." + getName() + ".reconstruct(" + first + ", " + second + ")");
+	}
+
 	public String getModule(){
 		return this.module;
 	}
@@ -97,5 +125,10 @@ public class ObjectConstructor implements IObjectConstructor {
 
 	private void setClazz(Class<? extends ClassDict> clazz){
 		this.clazz = clazz;
+	}
+
+	static
+	private boolean isObject(ClassDict dict){
+		return ("__builtin__.object").equals(dict.get("__class__"));
 	}
 }

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import com.google.common.base.Charsets;
 import numpy.DType;
 import org.jpmml.sklearn.CClassDict;
 
@@ -57,7 +58,7 @@ public class Scalar extends CClassDict {
 			InputStream is = new ByteArrayInputStream(obj);
 
 			try {
-				return (List<?>)NDArrayUtil.parseData(is, dtype.toDescr(), new Object[0]);
+				return (List<?>)NDArrayUtil.parseData(is, dtype, new Object[0]);
 			} finally {
 				is.close();
 			}
@@ -71,7 +72,15 @@ public class Scalar extends CClassDict {
 	}
 
 	public byte[] getObj(){
-		return (byte[])get("obj");
+		Object obj = get("obj");
+
+		if(obj instanceof String){
+			String string = (String)obj;
+
+			return string.getBytes(Charsets.ISO_8859_1);
+		}
+
+		return (byte[])obj;
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {

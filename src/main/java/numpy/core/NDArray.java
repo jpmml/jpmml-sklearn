@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import com.google.common.base.Charsets;
 import net.razorvine.pickle.objects.ClassDictConstructor;
-import numpy.DType;
 import org.jpmml.sklearn.CClassDict;
 
 public class NDArray extends CClassDict {
@@ -84,9 +84,7 @@ public class NDArray extends CClassDict {
 	public Object getContent(){
 
 		if(this.content == null){
-			Object data = getData();
-
-			this.content = ((data instanceof byte[]) ? loadContent() : data);
+			this.content = loadContent();
 		}
 
 		return this.content;
@@ -95,16 +93,14 @@ public class NDArray extends CClassDict {
 	private Object loadContent(){
 		Object[] shape = getShape();
 		Object descr = getDescr();
-		byte[] data = (byte[])getData();
+		Object data = getData();
 
-		if(descr instanceof DType){
-			DType dType = (DType)descr;
-
-			descr = dType.toDescr();
+		if(!(data instanceof byte[])){
+			return data;
 		}
 
 		try {
-			InputStream is = new ByteArrayInputStream(data);
+			InputStream is = new ByteArrayInputStream((byte[])data);
 
 			try {
 				return NDArrayUtil.parseData(is, descr, shape);
@@ -129,7 +125,15 @@ public class NDArray extends CClassDict {
 	}
 
 	public Object getData(){
-		return get("data");
+		Object data = get("data");
+
+		if(data instanceof String){
+			String string = (String)data;
+
+			return string.getBytes(Charsets.ISO_8859_1);
+		}
+
+		return data;
 	}
 
 	private static final String[] SETSTATE_ATTRIBUTES = {
