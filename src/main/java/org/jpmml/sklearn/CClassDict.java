@@ -36,7 +36,7 @@ public class CClassDict extends ClassDict {
 	public void __init__(Object[] args){
 
 		if(args.length > 0){
-			throw new PickleException(get("__class__") + ".__init__(" + Arrays.deepToString(args) + ")");
+			throw new PickleException(ClassDictUtil.formatMember(this, "__init__(" + Arrays.deepToString(args) + ")"));
 		}
 
 		reset();
@@ -45,7 +45,7 @@ public class CClassDict extends ClassDict {
 	public void __setstate__(Object[] args){
 
 		if(args.length > 0){
-			throw new PickleException(get("__class__") + ".__setstate__(" + Arrays.deepToString(args) + ")");
+			throw new PickleException(ClassDictUtil.formatMember(this, "__setstate__(" + Arrays.deepToString(args) + ")"));
 		}
 
 		reset();

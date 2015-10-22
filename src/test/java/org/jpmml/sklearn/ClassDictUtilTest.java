@@ -18,26 +18,19 @@
  */
 package org.jpmml.sklearn;
 
-public class CClassDictConstructor extends ObjectConstructor {
+import org.junit.Test;
+import sklearn.tree.Tree;
 
-	public CClassDictConstructor(String module, String name){
-		super(module, name, CClassDict.class);
-	}
+import static org.junit.Assert.assertEquals;
 
-	public CClassDictConstructor(String module, String name, Class<? extends CClassDict> clazz){
-		super(module, name, clazz);
-	}
+public class ClassDictUtilTest {
 
-	@Override
-	public CClassDict newObject(){
-		return (CClassDict)super.newObject();
-	}
+	@Test
+	public void formatMember(){
+		CClassDictConstructor constructor = new CClassDictConstructor("sklearn.tree._tree", "Tree", Tree.class);
 
-	@Override
-	public CClassDict construct(Object[] args){
-		CClassDict dict = newObject();
-		dict.__init__(args);
+		Tree tree = (Tree)constructor.construct(new Object[]{0, 0, 0});
 
-		return dict;
+		assertEquals("sklearn.tree._tree.Tree.values", ClassDictUtil.formatMember(tree, "values"));
 	}
 }

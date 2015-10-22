@@ -28,7 +28,6 @@ import javax.xml.transform.stream.StreamResult;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.JAXBUtil;
 import sklearn.Estimator;
@@ -110,7 +109,7 @@ public class Main {
 			Object object = PickleUtil.unpickle(estimatorStorage);
 
 			if(!(object instanceof Estimator)){
-				throw new IllegalArgumentException("The unpickled estimator object (" + getClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
+				throw new IllegalArgumentException("The unpickled estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
 			}
 
 			Estimator estimator = (Estimator)object;
@@ -127,7 +126,7 @@ public class Main {
 				Object object = PickleUtil.unpickle(mapperStorage);
 
 				if(!(object instanceof DataFrameMapper)){
-					throw new IllegalArgumentException("The unpickled mapper object (" + getClass(object) + ") is not a DataFrameMapper");
+					throw new IllegalArgumentException("The unpickled mapper object (" + ClassDictUtil.formatClass(object) + ") is not a DataFrameMapper");
 				}
 
 				DataFrameMapper mapper = (DataFrameMapper)object;
@@ -163,21 +162,5 @@ public class Main {
 
 	public void setOutput(File output){
 		this.output = output;
-	}
-
-	static
-	private String getClass(Object object){
-
-		if(object instanceof ClassDict){
-			ClassDict classDict = (ClassDict)object;
-
-			String clazz = (String)classDict.get("__class__");
-
-			return "Python class " + clazz;
-		}
-
-		Class<?> clazz = object.getClass();
-
-		return "Java class " + clazz.getName();
 	}
 }

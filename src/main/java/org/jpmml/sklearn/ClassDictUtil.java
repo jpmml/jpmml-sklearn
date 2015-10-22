@@ -63,7 +63,7 @@ public class ClassDictUtil {
 			return Collections.singletonList(object);
 		}
 
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
 	}
 
 	static
@@ -84,7 +84,7 @@ public class ClassDictUtil {
 			return NDArrayUtil.getContent(array, key);
 		}
 
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
 	}
 
 	static
@@ -105,7 +105,30 @@ public class ClassDictUtil {
 			return NDArrayUtil.getShape(array);
 		}
 
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
+	}
+
+	static
+	public String formatMember(ClassDict dict, String name){
+		String clazz = (String)dict.get("__class__");
+
+		return (clazz + "." + name);
+	}
+
+	static
+	public String formatClass(Object object){
+
+		if(object instanceof ClassDict){
+			ClassDict dict = (ClassDict)object;
+
+			String clazz = (String)dict.get("__class__");
+
+			return "Python class " + clazz;
+		}
+
+		Class<?> clazz = object.getClass();
+
+		return "Java class " + clazz.getName();
 	}
 
 	static
