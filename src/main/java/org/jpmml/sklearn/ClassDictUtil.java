@@ -118,6 +118,10 @@ public class ClassDictUtil {
 	static
 	public String formatClass(Object object){
 
+		if(object == null){
+			return null;
+		} // End if
+
 		if(object instanceof ClassDict){
 			ClassDict dict = (ClassDict)object;
 

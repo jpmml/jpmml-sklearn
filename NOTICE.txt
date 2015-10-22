@@ -1,4 +1,4 @@
-JPMML-R includes third-party dependencies that are released under the Apache License, Version 2.0:
+JPMML-SkLearn includes third-party dependencies that are released under the Apache License, Version 2.0:
   * Guava - https://github.com/google/guava
   * JCommander - http://jcommander.org
 
@@ -206,8 +206,9 @@ JPMML-R includes third-party dependencies that are released under the Apache Lic
 
 --------------------------------------------------------------------------------
 
-Additionally, JPMML-R includes third-party dependencies that are released under the MIT License:
+Additionally, JPMML-SkLearn includes third-party dependencies that are released under the MIT License:
   * Pyrolite - https://github.com/irmen/Pyrolite
+  * Simple Logging Facade for Java (SLF4J) - http://www.slf4j.org/
 
 Copyright (c) by Irmen de Jong (irmen@razorvine.net)
 All rights reserved.

@@ -42,6 +42,9 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.CClassDict;
+import org.jpmml.sklearn.ClassDictUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sklearn.ComplexTransformer;
 import sklearn.SimpleTransformer;
 import sklearn.Transformer;
@@ -53,9 +56,22 @@ public class DataFrameMapper extends CClassDict {
 	}
 
 	public void updatePMML(PMML pmml){
+		List<Object[]> features = new ArrayList<>(getFeatures());
+
+		if(features.size() < 1){
+			logger.warn("The list of mappings is empty");
+
+			return;
+		}
+
+		// Move the target column from the last position to the first position
+		features.add(0, features.remove(features.size() - 1));
+
 		DataDictionary dataDictionary = pmml.getDataDictionary();
 
 		List<DataField> dataFields = dataDictionary.getDataFields();
+
+		logger.info("Re-mapping {} target field and {} active field(s)", 1, (dataFields.size() - 1));
 
 		Model model = Iterables.getOnlyElement(pmml.getModels());
 
@@ -65,14 +81,6 @@ public class DataFrameMapper extends CClassDict {
 
 			model.setLocalTransformations(localTransformations);
 		}
-
-		List<Object[]> features = new ArrayList<>(getFeatures());
-		if(features.size() < 1){
-			throw new IllegalArgumentException();
-		}
-
-		// Move the target column from the last position to the first position
-		features.add(0, features.remove(features.size() - 1));
 
 		final
 		Map<FieldName, FieldName> renamedFields = new LinkedHashMap<>();
@@ -86,14 +94,18 @@ public class DataFrameMapper extends CClassDict {
 		{
 			Object[] feature = features.get(0);
 
+			FieldName name = FieldName.create(getName(feature));
+
 			Transformer transformer = getTransformer(feature);
 			if(transformer != null){
+				logger.error("Target field {} must not specify a transformation", name);
+
 				throw new IllegalArgumentException();
 			}
 
-			FieldName name = FieldName.create(getName(feature));
-
 			DataField dataField = it.next();
+
+			logger.info("Renaming target field {} to {}", dataField.getName(), name);
 
 			renamedFields.put(dataField.getName(), name);
 		}
@@ -101,6 +113,8 @@ public class DataFrameMapper extends CClassDict {
 		// Zero or more active columns
 		for(int i = 1; i < features.size(); i++){
 			Object[] feature = features.get(i);
+
+			FieldName name = FieldName.create(getName(feature));
 
 			Transformer transformer = getTransformer(feature);
 
@@ -116,9 +130,9 @@ public class DataFrameMapper extends CClassDict {
 				};
 			}
 
-			FieldName name = FieldName.create(getName(feature));
-
 			DataField dataField = it.next();
+
+			logger.info("Renaming active field {} to {}", dataField.getName(), name);
 
 			renamedFields.put(dataField.getName(), name);
 
@@ -144,6 +158,8 @@ public class DataFrameMapper extends CClassDict {
 						elementDataField = it.next();
 
 						it.remove();
+
+						logger.info("Removing active field {}", elementDataField.getName());
 
 						removedFields.add(elementDataField.getName());
 					}
@@ -218,16 +234,29 @@ public class DataFrameMapper extends CClassDict {
 	static
 	private String getName(Object[] feature){
 
-		if(feature[0] instanceof List){
-			return (String)Iterables.getOnlyElement((List<?>)feature[0]);
-		}
+		try {
+			if(feature[0] instanceof List){
+				return (String)Iterables.getOnlyElement((List<?>)feature[0]);
+			}
 
-		return (String)feature[0];
+			return (String)feature[0];
+		} catch(RuntimeException re){
+			logger.error("The first element ({}) is not a String", ClassDictUtil.formatClass(feature[0]), re);
+
+			throw re;
+		}
 	}
 
 	static
 	private Transformer getTransformer(Object[] feature){
-		return (Transformer)feature[1];
+
+		try {
+			return (Transformer)feature[1];
+		} catch(RuntimeException re){
+			logger.error("The second element ({}) is not a Transformer or is not a supported Transformer subclass", ClassDictUtil.formatClass(feature[1]),  re);
+
+			throw re;
+		}
 	}
 
 	static
@@ -238,4 +267,6 @@ public class DataFrameMapper extends CClassDict {
 
 		return derivedField;
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(DataFrameMapper.class);
 }
