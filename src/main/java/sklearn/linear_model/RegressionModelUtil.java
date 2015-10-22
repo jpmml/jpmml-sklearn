@@ -24,6 +24,8 @@ import java.util.List;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegressionModelUtil {
 
@@ -40,6 +42,12 @@ public class RegressionModelUtil {
 			DataField dataField = dataFields.get(i);
 
 			Number coefficient = it.next();
+
+			if(Double.compare(coefficient.doubleValue(), 0d) == 0){
+				logger.info("Skipping predictor variable {} due to a zero coefficient", dataField.getName());
+
+				continue;
+			}
 
 			NumericPredictor numericPredictor = new NumericPredictor(dataField.getName(), coefficient.doubleValue());
 
@@ -60,4 +68,6 @@ public class RegressionModelUtil {
 
 		return regressionTable;
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(RegressionModelUtil.class);
 }
