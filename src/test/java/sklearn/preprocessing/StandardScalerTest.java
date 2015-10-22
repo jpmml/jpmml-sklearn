@@ -34,6 +34,8 @@ public class StandardScalerTest {
 		FieldName name = FieldName.create("x");
 
 		StandardScaler scaler = new StandardScaler("sklearn.preprocessing.data", "StandardScaler");
+		scaler.put("with_mean", Boolean.TRUE);
+		scaler.put("with_std", Boolean.TRUE);
 		scaler.put("mean_", 6d);
 		scaler.put("std_", 2d);
 

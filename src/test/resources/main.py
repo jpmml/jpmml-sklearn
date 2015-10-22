@@ -111,10 +111,10 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-    ("Sepal.Length", None),
-    ("Sepal.Width", None),
-    ("Petal.Length", None),
-    ("Petal.Width", None),
+    ("Sepal.Length", StandardScaler(with_mean = True, with_std = False)),
+    ("Sepal.Width", StandardScaler(with_mean = True, with_std = False)),
+    ("Petal.Length", StandardScaler(with_std = False)),
+    ("Petal.Width", StandardScaler(with_std = False)),
     ("Species", None)
 ])
 
@@ -170,7 +170,7 @@ auto_mapper = DataFrameMapper([
     ("displacement", None),
     (["horsepower"], Imputer()),
     (["weight"], MinMaxScaler()),
-    ("acceleration", StandardScaler()),
+    ("acceleration", StandardScaler(with_mean = False)),
     ("model_year", None),
     (["origin"], Binarizer(threshold = 1)),
     ("mpg", None)

@@ -36,21 +36,34 @@ public class StandardScaler extends SimpleTransformer {
 
 	@Override
 	public Expression encode(FieldName name){
-		Number mean = Iterables.getOnlyElement(getMean());
-		Number std = Iterables.getOnlyElement(getStd());
-
 		Expression expression = new FieldRef(name);
 
-		if(Double.compare(mean.doubleValue(), 0d) != 0){
-			expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean));
+		if(withMean()){
+			Number mean = Iterables.getOnlyElement(getMean());
+
+			if(Double.compare(mean.doubleValue(), 0d) != 0){
+				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean));
+			}
 		} // End if
 
-		if(Double.compare(std.doubleValue(), 1d) != 0){
-			expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(std));
+		if(withStd()){
+			Number std = Iterables.getOnlyElement(getStd());
+
+			if(Double.compare(std.doubleValue(), 1d) != 0){
+				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(std));
+			}
 		}
 
 		// "($name - mean) / std"
 		return expression;
+	}
+
+	public Boolean withMean(){
+		return (Boolean)get("with_mean");
+	}
+
+	public Boolean withStd(){
+		return (Boolean)get("with_std");
 	}
 
 	public List<? extends Number> getMean(){
