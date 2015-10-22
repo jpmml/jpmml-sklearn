@@ -90,8 +90,8 @@ public class ObjectConstructor implements IObjectConstructor {
 			}
 		} else
 
-		if(first instanceof CClassDictConstructor){
-			CClassDictConstructor constructor = (CClassDictConstructor)first;
+		if(first instanceof ExtensionObjectConstructor){
+			ExtensionObjectConstructor constructor = (ExtensionObjectConstructor)first;
 
 			CClassDict dict = constructor.construct(new Object[0]);
 

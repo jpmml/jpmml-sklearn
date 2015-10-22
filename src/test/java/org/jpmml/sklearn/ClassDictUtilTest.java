@@ -27,7 +27,7 @@ public class ClassDictUtilTest {
 
 	@Test
 	public void formatMember(){
-		CClassDictConstructor constructor = new CClassDictConstructor("sklearn.tree._tree", "Tree", Tree.class);
+		ExtensionObjectConstructor constructor = new ExtensionObjectConstructor("sklearn.tree._tree", "Tree", Tree.class);
 
 		Tree tree = (Tree)constructor.construct(new Object[]{0, 0, 0});
 

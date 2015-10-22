@@ -18,13 +18,13 @@
  */
 package org.jpmml.sklearn;
 
-public class CClassDictConstructor extends ObjectConstructor {
+public class ExtensionObjectConstructor extends ObjectConstructor {
 
-	public CClassDictConstructor(String module, String name){
+	public ExtensionObjectConstructor(String module, String name){
 		super(module, name, CClassDict.class);
 	}
 
-	public CClassDictConstructor(String module, String name, Class<? extends CClassDict> clazz){
+	public ExtensionObjectConstructor(String module, String name, Class<? extends CClassDict> clazz){
 		super(module, name, clazz);
 	}
 
