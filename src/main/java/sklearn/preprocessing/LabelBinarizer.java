@@ -62,7 +62,7 @@ public class LabelBinarizer extends ComplexTransformer {
 		Number posLabel = getPosLabel();
 		Number negLabel = getNegLabel();
 
-		if((Integer.valueOf(1)).equals(posLabel) && (Integer.valueOf(0)).equals(negLabel)){
+		if(Double.compare(posLabel.doubleValue(), 1d) == 0 && Double.compare(negLabel.doubleValue(), 0d) == 0){
 			NormDiscrete normDiscrete = new NormDiscrete(name, String.valueOf(value));
 
 			return normDiscrete;

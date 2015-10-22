@@ -39,8 +39,18 @@ public class StandardScaler extends SimpleTransformer {
 		Number mean = Iterables.getOnlyElement(getMean());
 		Number std = Iterables.getOnlyElement(getStd());
 
+		Expression expression = new FieldRef(name);
+
+		if(Double.compare(mean.doubleValue(), 0d) != 0){
+			expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean));
+		} // End if
+
+		if(Double.compare(std.doubleValue(), 1d) != 0){
+			expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(std));
+		}
+
 		// "($name - mean) / std"
-		return PMMLUtil.createApply("/", PMMLUtil.createApply("-", new FieldRef(name), PMMLUtil.createConstant(mean)), PMMLUtil.createConstant(std));
+		return expression;
 	}
 
 	public List<? extends Number> getMean(){

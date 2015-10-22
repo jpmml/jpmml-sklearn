@@ -39,8 +39,18 @@ public class MinMaxScaler extends SimpleTransformer {
 		Number min = Iterables.getOnlyElement(getMin());
 		Number scale = Iterables.getOnlyElement(getScale());
 
+		Expression expression = new FieldRef(name);
+
+		if(Double.compare(scale.doubleValue(), 1d) != 0){
+			expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scale));
+		} // End if
+
+		if(Double.compare(min.doubleValue(), 0d) != 0){
+			expression = PMMLUtil.createApply("+", expression, PMMLUtil.createConstant(min));
+		}
+
 		// "($name * scale) + min"
-		return PMMLUtil.createApply("+", PMMLUtil.createApply("*", new FieldRef(name), PMMLUtil.createConstant(scale)), PMMLUtil.createConstant(min));
+		return expression;
 	}
 
 	public List<? extends Number> getMin(){
