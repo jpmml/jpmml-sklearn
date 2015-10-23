@@ -168,7 +168,7 @@ print(auto_df.dtypes)
 auto_mapper = DataFrameMapper([
     ("cylinders", None),
     ("displacement", None),
-    (["horsepower"], Imputer()),
+    (["horsepower"], Imputer(missing_values = "NaN")),
     (["weight"], MinMaxScaler()),
     ("acceleration", StandardScaler(with_mean = False)),
     ("model_year", None),

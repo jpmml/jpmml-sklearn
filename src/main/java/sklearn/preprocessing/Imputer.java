@@ -36,10 +36,31 @@ public class Imputer extends SimpleTransformer {
 
 	@Override
 	public Expression encode(FieldName name){
+		Object missingValues = getMissingValues();
 		Number statistics = Iterables.getOnlyElement(getStatistics());
 
+		Expression expression = new FieldRef(name);
+
+		if(missingValues instanceof String){
+			expression = PMMLUtil.createApply("isMissing", expression);
+		} else
+
+		if(missingValues instanceof Number){
+			Number number = (Number)missingValues;
+
+			expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(number));
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+
 		// "($name == null) ? statistics : $name"
-		return PMMLUtil.createApply("if", PMMLUtil.createApply("isMissing", new FieldRef(name)), PMMLUtil.createConstant(statistics), new FieldRef(name));
+		return PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statistics), new FieldRef(name));
+	}
+
+	public Object getMissingValues(){
+		return get("missing_values");
 	}
 
 	public List<? extends Number> getStatistics(){
