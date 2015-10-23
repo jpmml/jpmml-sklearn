@@ -26,7 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DerivedField;
@@ -182,6 +185,18 @@ public class DataFrameMapper extends CClassDict {
 		}
 
 		if(it.hasNext()){
+			Function<DataField, FieldName> function = new Function<DataField, FieldName>(){
+
+				@Override
+				public FieldName apply(DataField dataField){
+					return dataField.getName();
+				}
+			};
+
+			List<FieldName> unusedNames = Lists.newArrayList(Iterators.transform(it, function));
+
+			logger.error("The list of mappings is shorter than the list of fields. Unused active fields: {}", unusedNames);
+
 			throw new IllegalArgumentException();
 		}
 
