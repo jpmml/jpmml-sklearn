@@ -86,6 +86,7 @@ public class LabelEncoder extends SimpleTransformer {
 		return mapValues;
 	}
 
+	@Override
 	public List<?> getClasses(){
 		return ClassDictUtil.getArray(this, "classes_");
 	}

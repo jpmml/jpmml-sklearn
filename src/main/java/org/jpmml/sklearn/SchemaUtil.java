@@ -16,31 +16,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn;
+package org.jpmml.sklearn;
 
-import java.util.Collections;
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDict;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.dmg.pmml.DataField;
+import org.dmg.pmml.Value;
+import org.jpmml.converter.PMMLUtil;
 
-abstract
-public class Transformer extends ClassDict {
+public class SchemaUtil {
 
-	public Transformer(String module, String name){
-		super(module, name);
+	private SchemaUtil(){
 	}
 
-	public OpType getOpType(){
-		return OpType.CONTINUOUS;
-	}
+	static
+	public void addValues(DataField dataField, List<?> classes){
+		List<Value> values = dataField.getValues();
 
-	public DataType getDataType(){
-		return DataType.DOUBLE;
-	}
+		Function<Object, String> function = new Function<Object, String>(){
 
-	public List<?> getClasses(){
-		return Collections.emptyList();
+			@Override
+			public String apply(Object object){
+				return PMMLUtil.formatValue(object);
+			}
+		};
+
+		values.addAll(PMMLUtil.createValues(Lists.transform((List<?>)classes, function)));
 	}
 }

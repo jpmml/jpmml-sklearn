@@ -20,15 +20,12 @@ package sklearn;
 
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Value;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.SchemaUtil;
 
 abstract
 public class Classifier extends Estimator {
@@ -41,19 +38,7 @@ public class Classifier extends Estimator {
 	public DataField encodeTargetField(){
 		DataField dataField = new DataField(FieldName.create("y"), OpType.CATEGORICAL, DataType.STRING);
 
-		List<Value> values = dataField.getValues();
-
-		List<?> classes = getClasses();
-
-		Function<Object, String> function = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object object){
-				return PMMLUtil.formatValue(object);
-			}
-		};
-
-		values.addAll(PMMLUtil.createValues(Lists.transform((List<?>)classes, function)));
+		SchemaUtil.addValues(dataField, getClasses());
 
 		return dataField;
 	}

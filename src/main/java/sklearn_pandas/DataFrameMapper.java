@@ -43,6 +43,7 @@ import org.dmg.pmml.VisitorAction;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.CClassDict;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.SchemaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.ComplexTransformer;
@@ -176,6 +177,8 @@ public class DataFrameMapper extends CClassDict {
 
 			dataField.setOpType(transformer.getOpType())
 				.setDataType(transformer.getDataType());
+
+			SchemaUtil.addValues(dataField, transformer.getClasses());
 		}
 
 		if(it.hasNext()){

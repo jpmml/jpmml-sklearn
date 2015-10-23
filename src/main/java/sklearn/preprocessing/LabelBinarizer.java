@@ -72,6 +72,7 @@ public class LabelBinarizer extends ComplexTransformer {
 		return PMMLUtil.createApply("if", PMMLUtil.createApply("equal", new FieldRef(name), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 	}
 
+	@Override
 	public List<?> getClasses(){
 		return (List)ClassDictUtil.getArray(this, "classes_");
 	}
