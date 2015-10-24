@@ -6,6 +6,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
 # Features #
 
 * Supported Estimator types:
+  * [`GradientBoostingRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html).
   * [`DecisionTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html).
   * [`DecisionTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html).
   * [`LinearRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html).

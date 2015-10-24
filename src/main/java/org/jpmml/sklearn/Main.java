@@ -109,7 +109,7 @@ public class Main {
 			Object object = PickleUtil.unpickle(estimatorStorage);
 
 			if(!(object instanceof Estimator)){
-				throw new IllegalArgumentException("The unpickled estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
+				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
 			}
 
 			Estimator estimator = (Estimator)object;
@@ -126,7 +126,7 @@ public class Main {
 				Object object = PickleUtil.unpickle(mapperStorage);
 
 				if(!(object instanceof DataFrameMapper)){
-					throw new IllegalArgumentException("The unpickled mapper object (" + ClassDictUtil.formatClass(object) + ") is not a DataFrameMapper");
+					throw new IllegalArgumentException("The mapper object (" + ClassDictUtil.formatClass(object) + ") is not a DataFrameMapper");
 				}
 
 				DataFrameMapper mapper = (DataFrameMapper)object;

@@ -16,29 +16,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package sklearn.ensemble;
 
-import org.junit.Test;
+import java.util.List;
 
-public class RegressorTest extends EstimatorTest {
+import com.google.common.collect.Iterables;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.BaseEstimator;
 
-	@Test
-	public void evaluateDecisionTreeAuto() throws Exception {
-		evaluate("DecisionTree", "Auto");
+public class QuantileEstimator extends BaseEstimator implements HasIntercept {
+
+	public QuantileEstimator(String module, String name){
+		super(module, name);
 	}
 
-	@Test
-	public void evaluateGradientBoostingAuto() throws Exception {
-		evaluate("GradientBoosting", "Auto");
+	public Number getIntercept(){
+		return Iterables.getOnlyElement(getQuantile());
 	}
 
-	@Test
-	public void evaluateRandomForestAuto() throws Exception {
-		evaluate("RandomForest", "Auto");
-	}
-
-	@Test
-	public void evaluateRegressionAuto() throws Exception {
-		evaluate("Regression", "Auto");
+	public List<? extends Number> getQuantile(){
+		return (List)ClassDictUtil.getArray(this, "quantile");
 	}
 }

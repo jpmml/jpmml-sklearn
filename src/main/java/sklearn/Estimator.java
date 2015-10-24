@@ -21,7 +21,6 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -32,7 +31,7 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLUtil;
 
 abstract
-public class Estimator extends ClassDict {
+public class Estimator extends BaseEstimator {
 
 	public Estimator(String module, String name){
 		super(module, name);

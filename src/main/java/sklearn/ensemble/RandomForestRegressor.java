@@ -44,13 +44,10 @@ public class RandomForestRegressor extends Regressor {
 	public MiningModel encodeModel(List<DataField> dataFields){
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		return TreeModelUtil.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields);
+		return TreeModelUtil.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields, true);
 	}
 
-	@SuppressWarnings (
-		value = {"unchecked"}
-	)
 	public List<DecisionTreeRegressor> getEstimators(){
-		return (List<DecisionTreeRegressor>)get("estimators_");
+		return (List)get("estimators_");
 	}
 }

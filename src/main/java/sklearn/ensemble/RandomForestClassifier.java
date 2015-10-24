@@ -50,16 +50,13 @@ public class RandomForestClassifier extends Classifier {
 
 		List<DecisionTreeClassifier> estimators = getEstimators();
 
-		MiningModel miningModel = TreeModelUtil.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, dataFields)
+		MiningModel miningModel = TreeModelUtil.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, dataFields, true)
 			.setOutput(output);
 
 		return miningModel;
 	}
 
-	@SuppressWarnings (
-		value = {"unchecked"}
-	)
 	public List<DecisionTreeClassifier> getEstimators(){
-		return (List<DecisionTreeClassifier>)get("estimators_");
+		return (List)get("estimators_");
 	}
 }

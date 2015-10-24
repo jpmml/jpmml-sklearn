@@ -16,29 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package sklearn.ensemble;
 
-import org.junit.Test;
+import java.util.List;
 
-public class RegressorTest extends EstimatorTest {
+import com.google.common.collect.Iterables;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.BaseEstimator;
 
-	@Test
-	public void evaluateDecisionTreeAuto() throws Exception {
-		evaluate("DecisionTree", "Auto");
+public class MeanEstimator extends BaseEstimator implements HasIntercept {
+
+	public MeanEstimator(String module, String name){
+		super(module, name);
 	}
 
-	@Test
-	public void evaluateGradientBoostingAuto() throws Exception {
-		evaluate("GradientBoosting", "Auto");
+	@Override
+	public Number getIntercept(){
+		return Iterables.getOnlyElement(getMean());
 	}
 
-	@Test
-	public void evaluateRandomForestAuto() throws Exception {
-		evaluate("RandomForest", "Auto");
-	}
-
-	@Test
-	public void evaluateRegressionAuto() throws Exception {
-		evaluate("Regression", "Auto");
+	public List<? extends Number> getMean(){
+		return (List)ClassDictUtil.getArray(this, "mean");
 	}
 }

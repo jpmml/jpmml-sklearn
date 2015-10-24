@@ -16,29 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package sklearn;
 
-import org.junit.Test;
+import net.razorvine.pickle.objects.ClassDict;
 
-public class RegressorTest extends EstimatorTest {
+abstract
+public class BaseEstimator extends ClassDict {
 
-	@Test
-	public void evaluateDecisionTreeAuto() throws Exception {
-		evaluate("DecisionTree", "Auto");
-	}
-
-	@Test
-	public void evaluateGradientBoostingAuto() throws Exception {
-		evaluate("GradientBoosting", "Auto");
-	}
-
-	@Test
-	public void evaluateRandomForestAuto() throws Exception {
-		evaluate("RandomForest", "Auto");
-	}
-
-	@Test
-	public void evaluateRegressionAuto() throws Exception {
-		evaluate("Regression", "Auto");
+	public BaseEstimator(String module, String name){
+		super(module, name);
 	}
 }

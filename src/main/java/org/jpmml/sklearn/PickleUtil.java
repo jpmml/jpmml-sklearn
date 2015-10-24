@@ -27,6 +27,10 @@ import net.razorvine.pickle.Unpickler;
 import numpy.DType;
 import numpy.core.NDArray;
 import numpy.core.Scalar;
+import numpy.random.RandomState;
+import sklearn.ensemble.GradientBoostingRegressor;
+import sklearn.ensemble.MeanEstimator;
+import sklearn.ensemble.QuantileEstimator;
 import sklearn.ensemble.RandomForestClassifier;
 import sklearn.ensemble.RandomForestRegressor;
 import sklearn.linear_model.LinearRegression;
@@ -39,6 +43,8 @@ import sklearn.preprocessing.MinMaxScaler;
 import sklearn.preprocessing.StandardScaler;
 import sklearn.tree.DecisionTreeClassifier;
 import sklearn.tree.DecisionTreeRegressor;
+import sklearn.tree.PresortBestSplitter;
+import sklearn.tree.RegressionCriterion;
 import sklearn.tree.Tree;
 import sklearn_pandas.DataFrameMapper;
 
@@ -65,9 +71,12 @@ public class PickleUtil {
 			new ExtensionObjectConstructor("numpy", "dtype", DType.class),
 			new ExtensionObjectConstructor("numpy.core.multiarray", "_reconstruct", NDArray.class),
 			new ExtensionObjectConstructor("numpy.core.multiarray", "scalar", Scalar.class),
-			new ExtensionObjectConstructor("numpy.random", "__RandomState_ctor"),
+			new ExtensionObjectConstructor("numpy.random", "__RandomState_ctor", RandomState.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "GradientBoostingRegressor", GradientBoostingRegressor.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "MeanEstimator", MeanEstimator.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "QuantileEstimator", QuantileEstimator.class),
 			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),
 			new ObjectConstructor("sklearn.linear_model.logistic", "LogisticRegression", LogisticRegression.class),
@@ -79,7 +88,8 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelEncoder", LabelEncoder.class),
 			new ExtensionObjectConstructor("sklearn.tree._tree", "BestSplitter"),
 			new ExtensionObjectConstructor("sklearn.tree._tree", "ClassificationCriterion"),
-			new ExtensionObjectConstructor("sklearn.tree._tree", "RegressionCriterion"),
+			new ExtensionObjectConstructor("sklearn.tree._tree", "PresortBestSplitter", PresortBestSplitter.class),
+			new ExtensionObjectConstructor("sklearn.tree._tree", "RegressionCriterion", RegressionCriterion.class),
 			new ExtensionObjectConstructor("sklearn.tree._tree", "Tree", Tree.class),
 			new ObjectConstructor("sklearn.tree.tree", "DecisionTreeClassifier", DecisionTreeClassifier.class),
 			new ObjectConstructor("sklearn.tree.tree", "DecisionTreeRegressor", DecisionTreeRegressor.class),

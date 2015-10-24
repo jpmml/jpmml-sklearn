@@ -76,7 +76,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeTreeModelEnsemble(List<E> estimators, List<? extends Number> weights, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, List<DataField> dataFields){
+	public <E extends Estimator & HasTree> MiningModel encodeTreeModelEnsemble(List<E> estimators, List<? extends Number> weights, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, List<DataField> dataFields, boolean standalone){
 		List<Segment> segments = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
@@ -90,7 +90,7 @@ public class TreeModelUtil {
 				.setPredicate(new True())
 				.setModel(treeModel);
 
-			if(weight != null){
+			if(weight != null && Double.compare(weight.doubleValue(), 1d) != 0){
 				segment.setWeight(weight.doubleValue());
 			}
 
@@ -99,7 +99,15 @@ public class TreeModelUtil {
 
 		Segmentation segmentation = new Segmentation(multipleModelMethod, segments);
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
+		MiningSchema miningSchema;
+
+		if(standalone){
+			miningSchema = PMMLUtil.createMiningSchema(dataFields);
+		} else
+
+		{
+			miningSchema = PMMLUtil.createMiningSchema(null, dataFields.subList(1, dataFields.size()));
+		}
 
 		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
 			.setSegmentation(segmentation);

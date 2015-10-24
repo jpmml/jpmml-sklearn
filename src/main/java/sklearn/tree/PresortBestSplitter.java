@@ -16,29 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package sklearn.tree;
 
-import org.junit.Test;
+import org.jpmml.sklearn.CClassDict;
 
-public class RegressorTest extends EstimatorTest {
+public class PresortBestSplitter extends CClassDict {
 
-	@Test
-	public void evaluateDecisionTreeAuto() throws Exception {
-		evaluate("DecisionTree", "Auto");
+	public PresortBestSplitter(String module, String name){
+		super(module, name);
 	}
 
-	@Test
-	public void evaluateGradientBoostingAuto() throws Exception {
-		evaluate("GradientBoosting", "Auto");
+	@Override
+	public void __init__(Object[] args){
+		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
 	}
 
-	@Test
-	public void evaluateRandomForestAuto() throws Exception {
-		evaluate("RandomForest", "Auto");
-	}
-
-	@Test
-	public void evaluateRegressionAuto() throws Exception {
-		evaluate("Regression", "Auto");
-	}
+	private static final String[] INIT_ATTRIBUTES = {
+		"criterion",
+		"max_features",
+		"min_samples_leaf",
+		"min_weight_leaf",
+		"random_state"
+	};
 }

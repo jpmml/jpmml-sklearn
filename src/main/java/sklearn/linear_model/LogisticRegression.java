@@ -73,8 +73,6 @@ public class LogisticRegression extends Classifier {
 
 	@Override
 	public MiningModel encodeModel(List<DataField> dataFields){
-		DataField dataField = dataFields.get(0);
-
 		int[] shape = getCoefShape();
 
 		int numberOfClasses = shape[0];
@@ -173,6 +171,8 @@ public class LogisticRegression extends Classifier {
 
 			segmentation.addSegments(segment);
 		}
+
+		DataField dataField = dataFields.get(0);
 
 		MiningSchema classificationMiningSchema = new MiningSchema();
 

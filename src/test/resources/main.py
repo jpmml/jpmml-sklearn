@@ -1,4 +1,5 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble.gradient_boosting import GradientBoostingRegressor
 from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -188,6 +189,12 @@ print(auto_X.dtype, auto_y.dtype)
 def predict_auto(regressor):
     mpg = DataFrame(regressor.predict(auto_X), columns = ["mpg"])
     return mpg
+
+auto_gbm = GradientBoostingRegressor(random_state = 13, init = None)
+auto_gbm.fit(auto_X, auto_y)
+
+store_pkl(auto_gbm, "GradientBoostingAuto.pkl")
+store_csv(predict_auto(auto_gbm), "GradientBoostingAuto.csv")
 
 auto_tree = DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5)
 auto_tree.fit(auto_X, auto_y)

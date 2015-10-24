@@ -259,9 +259,7 @@ public class DataFrameMapper extends CClassDict {
 
 			return (String)feature[0];
 		} catch(RuntimeException re){
-			logger.error("The first element ({}) is not a String", ClassDictUtil.formatClass(feature[0]), re);
-
-			throw re;
+			throw new IllegalArgumentException("The key object (" + ClassDictUtil.formatClass(feature[0]) + ") is not a String", re);
 		}
 	}
 
@@ -271,9 +269,7 @@ public class DataFrameMapper extends CClassDict {
 		try {
 			return (Transformer)feature[1];
 		} catch(RuntimeException re){
-			logger.error("The second element ({}) is not a Transformer or is not a supported Transformer subclass", ClassDictUtil.formatClass(feature[1]),  re);
-
-			throw re;
+			throw new IllegalArgumentException("The value object (" + ClassDictUtil.formatClass(feature[1]) + ") is not a Transformer or is not a supported Transformer subclass", re);
 		}
 	}
 
