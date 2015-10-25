@@ -18,41 +18,32 @@
  */
 package sklearn.linear_model;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.Expression;
 import org.dmg.pmml.FeatureType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.FieldUsageType;
-import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MiningSchema;
-import org.dmg.pmml.MultipleModelMethodType;
-import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.RegressionNormalizationMethodType;
 import org.dmg.pmml.RegressionTable;
-import org.dmg.pmml.Segment;
-import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TransformationDictionary;
-import org.dmg.pmml.True;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
 public class LogisticRegression extends Classifier {
 
@@ -82,134 +73,67 @@ public class LogisticRegression extends Classifier {
 
 		List<? extends Number> intercepts = getIntercept();
 
-		List<?> classes = getClasses();
+		Function<Object, String> targetCategoryFunction = new Function<Object, String>(){
+
+			@Override
+			public String apply(Object object){
+				return String.valueOf(object);
+			}
+		};
+
+		List<String> targetCategories = Lists.transform(getClasses(), targetCategoryFunction);
+
+		Function<RegressionModel, FieldName> probabilityFieldFunction = new Function<RegressionModel, FieldName>(){
+
+			@Override
+			public FieldName apply(RegressionModel regressionModel){
+				Output output = regressionModel.getOutput();
+
+				OutputField outputField = Iterables.getLast(output.getOutputFields());
+
+				return outputField.getName();
+			}
+		};
 
 		if(numberOfClasses == 1){
 
-			if(classes.size() != 2){
+			if(targetCategories.size() != 2){
 				throw new IllegalArgumentException();
 			}
+
+			targetCategories = Lists.reverse(targetCategories);
+
+			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), dataFields);
+
+			List<FieldName> probabilityFields = new ArrayList<>();
+			probabilityFields.add(probabilityFieldFunction.apply(regressionModel));
+			probabilityFields.add(FieldName.create("logitDecisionFunction_" + targetCategories.get(1)));
+
+			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, regressionModel, dataFields);
+		} else
+
+		if(numberOfClasses >= 2){
+
+			if(targetCategories.size() != numberOfClasses){
+				throw new IllegalArgumentException();
+			}
+
+			List<RegressionModel> regressionModels = new ArrayList<>();
+
+			for(int i = 0; i < targetCategories.size(); i++){
+				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), dataFields);
+
+				regressionModels.add(regressionModel);
+			}
+
+			List<FieldName> probabilityFields = Lists.transform(regressionModels, probabilityFieldFunction);
+
+			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, regressionModels, dataFields);
 		} else
 
 		{
-			if(classes.size() != numberOfClasses){
-				throw new IllegalArgumentException();
-			}
+			throw new IllegalArgumentException();
 		}
-
-		MiningSchema regressionMiningSchema = PMMLUtil.createMiningSchema(null, dataFields.subList(1, dataFields.size()));
-
-		Segmentation segmentation = new Segmentation(MultipleModelMethodType.MODEL_CHAIN, null);
-
-		Map<String, FieldName> categoryProbabilities = new LinkedHashMap<>();
-
-		for(int i = 0; i < numberOfClasses; i++){
-			String targetCategory;
-
-			// The probability of the second class is obtained by computation.
-			// The probability of the first class is obtained by subtracting the probability of the second class from 1.0
-			if(numberOfClasses == 1){
-				targetCategory = String.valueOf(classes.get(classes.size() - 1));
-			} else
-
-			{
-				targetCategory = String.valueOf(classes.get(i));
-			}
-
-			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), dataFields);
-
-			OutputField decisionFunction = PMMLUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
-
-			OutputField logitDecisionFunction = new OutputField(FieldName.create("logitDecisionFunction_" + targetCategory))
-				.setFeature(FeatureType.TRANSFORMED_VALUE)
-				.setDataType(DataType.DOUBLE)
-				.setOpType(OpType.CONTINUOUS)
-				.setExpression(PMMLUtil.createApply("logit", new FieldRef(decisionFunction.getName())));
-
-			categoryProbabilities.put(targetCategory, logitDecisionFunction.getName());
-
-			Output output = new Output()
-				.addOutputFields(decisionFunction, logitDecisionFunction);
-
-			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, regressionMiningSchema, null)
-				.addRegressionTables(regressionTable)
-				.setOutput(output);
-
-			Segment segment = new Segment()
-				.setPredicate(new True())
-				.setModel(regressionModel);
-
-			segmentation.addSegments(segment);
-		}
-
-		if(numberOfClasses == 1){
-			String targetCategory = String.valueOf(classes.get(0));
-
-			MiningField miningField = PMMLUtil.createMiningField(Iterables.getOnlyElement(categoryProbabilities.values()));
-
-			MiningSchema miningSchema = new MiningSchema()
-				.addMiningFields(miningField);
-
-			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), -1d);
-
-			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, 1d);
-
-			OutputField logitDecisionFunction = PMMLUtil.createPredictedField(FieldName.create("logitDecisionFunction_" + targetCategory));
-
-			categoryProbabilities.put(targetCategory, logitDecisionFunction.getName());
-
-			Output output = new Output()
-				.addOutputFields(logitDecisionFunction);
-
-			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
-				.addRegressionTables(regressionTable)
-				.setOutput(output);
-
-			Segment segment = new Segment()
-				.setPredicate(new True())
-				.setModel(regressionModel);
-
-			segmentation.addSegments(segment);
-		}
-
-		DataField dataField = dataFields.get(0);
-
-		MiningSchema classificationMiningSchema = new MiningSchema();
-
-		classificationMiningSchema.addMiningFields(PMMLUtil.createMiningField(dataField.getName(), FieldUsageType.TARGET));
-
-		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.CLASSIFICATION, classificationMiningSchema, null)
-			.setNormalizationMethod(numberOfClasses > 1 ? RegressionNormalizationMethodType.SIMPLEMAX : null);
-
-		Collection<Map.Entry<String, FieldName>> entries = categoryProbabilities.entrySet();
-		for(Map.Entry<String, FieldName> entry : entries){
-			MiningField miningField = PMMLUtil.createMiningField(entry.getValue());
-
-			classificationMiningSchema.addMiningFields(miningField);
-
-			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), 1d);
-
-			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, 0d)
-				.setTargetCategory(entry.getKey());
-
-			regressionModel.addRegressionTables(regressionTable);
-		}
-
-		Segment segment = new Segment()
-			.setPredicate(new True())
-			.setModel(regressionModel);
-
-		segmentation.addSegments(segment);
-
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
-
-		Output output = new Output(PMMLUtil.createProbabilityFields(dataField));
-
-		MiningModel miningModel = new MiningModel(MiningFunctionType.CLASSIFICATION, miningSchema)
-			.setSegmentation(segmentation)
-			.setOutput(output);
-
-		return miningModel;
 	}
 
 	@Override
@@ -217,30 +141,11 @@ public class LogisticRegression extends Classifier {
 		PMML pmml = super.encodePMML();
 
 		TransformationDictionary transformationDictionary = new TransformationDictionary()
-			.addDefineFunctions(encodeLogitFunction());
+			.addDefineFunctions(EstimatorUtil.encodeLogitFunction());
 
 		pmml.setTransformationDictionary(transformationDictionary);
 
 		return pmml;
-	}
-
-	public DefineFunction encodeLogitFunction(){
-		FieldName name = FieldName.create("value");
-
-		ParameterField parameterField = new ParameterField(name)
-			.setDataType(DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS);
-
-		// "1 / (1 + exp(-1 * $name))"
-		Expression expression = PMMLUtil.createApply("/", PMMLUtil.createConstant(1d), PMMLUtil.createApply("+", PMMLUtil.createConstant(1d), PMMLUtil.createApply("exp", PMMLUtil.createApply("*", PMMLUtil.createConstant(-1d), new FieldRef(name)))));
-
-		DefineFunction defineFunction = new DefineFunction("logit", OpType.CONTINUOUS, null)
-			.setDataType(DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.addParameterFields(parameterField)
-			.setExpression(expression);
-
-		return defineFunction;
 	}
 
 	public List<? extends Number> getCoef(){
@@ -256,14 +161,26 @@ public class LogisticRegression extends Classifier {
 	}
 
 	static
-	private <E> List<E> getRow(List<E> values, int rows, int columns, int row){
+	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, List<DataField> dataFields){
+		RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(coefficients, intercept, dataFields);
 
-		if(values.size() != (rows * columns)){
-			throw new IllegalArgumentException();
-		}
+		OutputField decisionFunction = PMMLUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
-		int offset = (row * columns);
+		OutputField transformedDecisionFunction = new OutputField(FieldName.create("logitDecisionFunction_" + targetCategory))
+			.setFeature(FeatureType.TRANSFORMED_VALUE)
+			.setDataType(DataType.DOUBLE)
+			.setOpType(OpType.CONTINUOUS)
+			.setExpression(PMMLUtil.createApply("logit", new FieldRef(decisionFunction.getName())));
 
-		return values.subList(offset, offset + columns);
+		Output output = new Output()
+			.addOutputFields(decisionFunction, transformedDecisionFunction);
+
+		MiningSchema miningSchema = PMMLUtil.createMiningSchema(null, dataFields.subList(1, dataFields.size()));
+
+		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
+			.addRegressionTables(regressionTable)
+			.setOutput(output);
+
+		return regressionModel;
 	}
 }

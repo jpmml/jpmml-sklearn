@@ -1,5 +1,5 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
-from sklearn.ensemble.gradient_boosting import GradientBoostingRegressor
+from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -91,6 +91,12 @@ audit_tree.fit(audit_X, audit_y)
 store_pkl(audit_tree, "DecisionTreeAudit.pkl")
 store_csv(predict_audit(audit_tree), "DecisionTreeAudit.csv")
 
+audit_gbm = GradientBoostingClassifier(random_state = 13, init = None)
+audit_gbm.fit(audit_X, audit_y)
+
+store_pkl(audit_gbm, "GradientBoostingAudit.pkl")
+store_csv(predict_audit(audit_gbm), "GradientBoostingAudit.csv")
+
 audit_forest = RandomForestClassifier(random_state = 13, min_samples_leaf = 5)
 audit_forest.fit(audit_X, audit_y)
 
@@ -138,6 +144,12 @@ iris_tree.fit(iris_X, iris_y)
 
 store_pkl(iris_tree, "DecisionTreeIris.pkl")
 store_csv(predict_iris(iris_tree), "DecisionTreeIris.csv")
+
+iris_gbm = GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17)
+iris_gbm.fit(iris_X, iris_y)
+
+store_pkl(iris_gbm, "GradientBoostingIris.pkl")
+store_csv(predict_iris(iris_gbm), "GradientBoostingIris.csv")
 
 iris_forest = RandomForestClassifier(random_state = 13, min_samples_leaf = 5)
 iris_forest.fit(iris_X, iris_y)
@@ -190,17 +202,17 @@ def predict_auto(regressor):
     mpg = DataFrame(regressor.predict(auto_X), columns = ["mpg"])
     return mpg
 
-auto_gbm = GradientBoostingRegressor(random_state = 13, init = None)
-auto_gbm.fit(auto_X, auto_y)
-
-store_pkl(auto_gbm, "GradientBoostingAuto.pkl")
-store_csv(predict_auto(auto_gbm), "GradientBoostingAuto.csv")
-
 auto_tree = DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5)
 auto_tree.fit(auto_X, auto_y)
 
 store_pkl(auto_tree, "DecisionTreeAuto.pkl")
 store_csv(predict_auto(auto_tree), "DecisionTreeAuto.csv")
+
+auto_gbm = GradientBoostingRegressor(random_state = 13, init = None)
+auto_gbm.fit(auto_X, auto_y)
+
+store_pkl(auto_gbm, "GradientBoostingAuto.pkl")
+store_csv(predict_auto(auto_gbm), "GradientBoostingAuto.csv")
 
 auto_forest = RandomForestRegressor(random_state = 13, min_samples_leaf = 5)
 auto_forest.fit(auto_X, auto_y)

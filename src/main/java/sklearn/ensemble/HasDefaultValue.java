@@ -18,7 +18,12 @@
  */
 package sklearn.ensemble;
 
-interface HasIntercept {
+import org.dmg.pmml.TargetValue;
 
-	Number getIntercept();
+/**
+ * @see TargetValue#getDefaultValue()
+ */
+interface HasDefaultValue {
+
+	Number getDefaultValue();
 }

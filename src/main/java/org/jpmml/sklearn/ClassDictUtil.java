@@ -162,7 +162,7 @@ public class ClassDictUtil {
 			String key = entry.getKey();
 			Object value = entry.getValue();
 
-			sb.append("\t" + key + "=" + value + (" /*" + (value != null ? value.getClass() : "N/A") + "*/"));
+			sb.append("\t" + key + "=" + value + (" // " + (value != null ? (value.getClass()).getName() : "N/A")));
 		}
 
 		sb.append("\n}\n");

@@ -29,7 +29,6 @@ import org.dmg.pmml.Output;
 import org.jpmml.converter.PMMLUtil;
 import sklearn.Classifier;
 import sklearn.tree.DecisionTreeClassifier;
-import sklearn.tree.TreeModelUtil;
 
 public class RandomForestClassifier extends Classifier {
 
@@ -50,7 +49,7 @@ public class RandomForestClassifier extends Classifier {
 
 		List<DecisionTreeClassifier> estimators = getEstimators();
 
-		MiningModel miningModel = TreeModelUtil.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, dataFields, true)
+		MiningModel miningModel = RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, dataFields)
 			.setOutput(output);
 
 		return miningModel;

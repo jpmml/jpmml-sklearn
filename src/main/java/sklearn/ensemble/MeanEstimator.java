@@ -24,14 +24,14 @@ import com.google.common.collect.Iterables;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.BaseEstimator;
 
-public class MeanEstimator extends BaseEstimator implements HasIntercept {
+public class MeanEstimator extends BaseEstimator implements HasDefaultValue {
 
 	public MeanEstimator(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public Number getIntercept(){
+	public Number getDefaultValue(){
 		return Iterables.getOnlyElement(getMean());
 	}
 

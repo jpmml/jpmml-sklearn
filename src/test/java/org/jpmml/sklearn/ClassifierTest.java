@@ -28,6 +28,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateGradientBoostingAudit() throws Exception {
+		evaluate("GradientBoosting", "Audit");
+	}
+
+	@Test
 	public void evaluateRandomForestAudit() throws Exception {
 		evaluate("RandomForest", "Audit");
 	}
@@ -40,6 +45,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateDecisionTreeIris() throws Exception {
 		evaluate("DecisionTree", "Iris");
+	}
+
+	@Test
+	public void evaluateGradientBoostingIris() throws Exception {
+		evaluate("GradientBoosting", "Iris");
 	}
 
 	@Test

@@ -89,9 +89,6 @@ public class DataFrameMapper extends CClassDict {
 		final
 		Map<FieldName, FieldName> renamedFields = new LinkedHashMap<>();
 
-		final
-		Set<FieldName> removedFields = new LinkedHashSet<>();
-
 		Iterator<DataField> it = dataFields.iterator();
 
 		// The target column
@@ -161,11 +158,11 @@ public class DataFrameMapper extends CClassDict {
 					if(j > 0){
 						elementDataField = it.next();
 
+						logger.info("Renaming active field {} to {}", elementDataField.getName(), name);
+
+						renamedFields.put(elementDataField.getName(), name);
+
 						it.remove();
-
-						logger.info("Removing active field {}", elementDataField.getName());
-
-						removedFields.add(elementDataField.getName());
 					}
 
 					DerivedField derivedField = encodeDerivedField(elementDataField, expression);
@@ -200,24 +197,7 @@ public class DataFrameMapper extends CClassDict {
 			throw new IllegalArgumentException();
 		}
 
-		Visitor visitor = new AbstractVisitor(){
-
-			@Override
-			public VisitorAction visit(MiningSchema miningSchema){
-				List<MiningField> miningFields = miningSchema.getMiningFields();
-
-				for(Iterator<MiningField> it = miningFields.iterator(); it.hasNext(); ){
-					MiningField miningField = it.next();
-
-					FieldName name = miningField.getName();
-
-					if(removedFields.contains(name)){
-						it.remove();
-					}
-				}
-
-				return super.visit(miningSchema);
-			}
+		Visitor fieldRenamer = new AbstractVisitor(){
 
 			@Override
 			public VisitorAction visit(DataField dataField){
@@ -242,7 +222,32 @@ public class DataFrameMapper extends CClassDict {
 				return name;
 			}
 		};
-		visitor.applyTo(pmml);
+
+		fieldRenamer.applyTo(pmml);
+
+		Visitor miningSchemaPruner = new AbstractVisitor(){
+
+			@Override
+			public VisitorAction visit(MiningSchema miningSchema){
+				Set<FieldName> names = new LinkedHashSet<>();
+
+				List<MiningField> miningFields = miningSchema.getMiningFields();
+
+				for(Iterator<MiningField> it = miningFields.iterator(); it.hasNext(); ){
+					MiningField miningField = it.next();
+
+					FieldName name = miningField.getName();
+
+					if(!names.add(name)){
+						it.remove();
+					}
+				}
+
+				return super.visit(miningSchema);
+			}
+		};
+
+		miningSchemaPruner.applyTo(pmml);
 	}
 
 	public List<Object[]> getFeatures(){

@@ -20,21 +20,12 @@ package sklearn.ensemble;
 
 import java.util.List;
 
-import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+import org.dmg.pmml.TargetValue;
 
-public class QuantileEstimator extends BaseEstimator implements HasDefaultValue {
+/**
+ * @see TargetValue#getPriorProbability()
+ */
+public interface HasPriorProbabilities {
 
-	public QuantileEstimator(String module, String name){
-		super(module, name);
-	}
-
-	public Number getDefaultValue(){
-		return Iterables.getOnlyElement(getQuantile());
-	}
-
-	public List<? extends Number> getQuantile(){
-		return (List)ClassDictUtil.getArray(this, "quantile");
-	}
+	List<? extends Number> getPriorProbabilities();
 }

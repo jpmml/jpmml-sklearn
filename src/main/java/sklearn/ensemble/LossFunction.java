@@ -18,23 +18,24 @@
  */
 package sklearn.ensemble;
 
-import java.util.List;
+import net.razorvine.pickle.objects.ClassDict;
+import org.dmg.pmml.DefineFunction;
 
-import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+abstract
+public class LossFunction extends ClassDict {
 
-public class QuantileEstimator extends BaseEstimator implements HasDefaultValue {
-
-	public QuantileEstimator(String module, String name){
+	public LossFunction(String module, String name){
 		super(module, name);
 	}
 
-	public Number getDefaultValue(){
-		return Iterables.getOnlyElement(getQuantile());
+	abstract
+	public String getFunction();
+
+	public DefineFunction encodeFunction(){
+		return null;
 	}
 
-	public List<? extends Number> getQuantile(){
-		return (List)ClassDictUtil.getArray(this, "quantile");
+	public Integer getK(){
+		return (Integer)get("K");
 	}
 }

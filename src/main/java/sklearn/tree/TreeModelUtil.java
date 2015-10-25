@@ -18,19 +18,14 @@
  */
 package sklearn.tree;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MiningSchema;
-import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Node;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
-import org.dmg.pmml.Segment;
-import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.TreeModel;
 import org.dmg.pmml.TreeModel.SplitCharacteristic;
@@ -60,7 +55,7 @@ public class TreeModelUtil {
 			.setId("1")
 			.setPredicate(new True());
 
-		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, dataFields);
+		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, dataFields);
 
 		DataField dataField = dataFields.get(0);
 
@@ -76,47 +71,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeTreeModelEnsemble(List<E> estimators, List<? extends Number> weights, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, List<DataField> dataFields, boolean standalone){
-		List<Segment> segments = new ArrayList<>();
-
-		for(int i = 0; i < estimators.size(); i++){
-			E estimator = estimators.get(i);
-			Number weight = (weights != null ? weights.get(i) : null);
-
-			TreeModel treeModel = encodeTreeModel(estimator, miningFunction, dataFields, false);
-
-			Segment segment = new Segment()
-				.setId(String.valueOf(i + 1))
-				.setPredicate(new True())
-				.setModel(treeModel);
-
-			if(weight != null && Double.compare(weight.doubleValue(), 1d) != 0){
-				segment.setWeight(weight.doubleValue());
-			}
-
-			segments.add(segment);
-		}
-
-		Segmentation segmentation = new Segmentation(multipleModelMethod, segments);
-
-		MiningSchema miningSchema;
-
-		if(standalone){
-			miningSchema = PMMLUtil.createMiningSchema(dataFields);
-		} else
-
-		{
-			miningSchema = PMMLUtil.createMiningSchema(null, dataFields.subList(1, dataFields.size()));
-		}
-
-		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
-			.setSegmentation(segmentation);
-
-		return miningModel;
-	}
-
-	static
-	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, List<DataField> dataFields){
+	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunctionType miningFunction, List<DataField> dataFields){
 		int feature = features[index];
 
 		// A non-leaf (binary split) node
@@ -140,13 +95,13 @@ public class TreeModelUtil {
 				.setId(String.valueOf(leftIndex + 1))
 				.setPredicate(leftPredicate);
 
-			encodeNode(leftChild, leftIndex, leftChildren, rightChildren, features, thresholds, values, dataFields);
+			encodeNode(leftChild, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, dataFields);
 
 			Node rightChild = new Node()
 				.setId(String.valueOf(rightIndex + 1))
 				.setPredicate(rightPredicate);
 
-			encodeNode(rightChild, rightIndex, leftChildren, rightChildren, features, thresholds, values, dataFields);
+			encodeNode(rightChild, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, dataFields);
 
 			node.addNodes(leftChild, rightChild);
 		} else
@@ -155,7 +110,7 @@ public class TreeModelUtil {
 		{
 			DataField dataField = dataFields.get(0);
 
-			if(dataField.hasValues()){
+			if((MiningFunctionType.CLASSIFICATION).equals(miningFunction)){
 				List<Value> validValues = dataField.getValues();
 
 				double[] scoreRecordCounts = getRow(values, leftChildren.length, validValues.size(), index);
@@ -191,10 +146,14 @@ public class TreeModelUtil {
 				node.setScore(score);
 			} else
 
-			{
+			if((MiningFunctionType.REGRESSION).equals(miningFunction)){
 				String score = PMMLUtil.formatValue(values[index]);
 
 				node.setScore(score);
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
 		}
 	}

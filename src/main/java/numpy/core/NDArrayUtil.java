@@ -79,6 +79,36 @@ public class NDArrayUtil {
 	}
 
 	static
+	public <E> List<E> getRow(List<E> values, int rows, int columns, int row){
+
+		if(values.size() != (rows * columns)){
+			throw new IllegalArgumentException();
+		}
+
+		int offset = (row * columns);
+
+		return values.subList(offset, offset + columns);
+	}
+
+	static
+	public <E> List<E> getColumn(List<E> values, int rows, int columns, int column){
+
+		if(values.size() != (rows * columns)){
+			throw new IllegalArgumentException();
+		}
+
+		List<E> result = new ArrayList<>();
+
+		for(int row = 0; row < rows; row++){
+			E value = values.get((row * columns) + column);
+
+			result.add(value);
+		}
+
+		return result;
+	}
+
+	static
 	private <E> List<E> asJavaList(NDArray array, List<E> values){
 		boolean fortranOrder = array.getFortranOrder();
 

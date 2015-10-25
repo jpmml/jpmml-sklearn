@@ -28,8 +28,13 @@ import numpy.DType;
 import numpy.core.NDArray;
 import numpy.core.Scalar;
 import numpy.random.RandomState;
+import sklearn.ensemble.BinomialDeviance;
+import sklearn.ensemble.GradientBoostingClassifier;
 import sklearn.ensemble.GradientBoostingRegressor;
+import sklearn.ensemble.LogOddsEstimator;
 import sklearn.ensemble.MeanEstimator;
+import sklearn.ensemble.MultinomialDeviance;
+import sklearn.ensemble.PriorProbabilityEstimator;
 import sklearn.ensemble.QuantileEstimator;
 import sklearn.ensemble.RandomForestClassifier;
 import sklearn.ensemble.RandomForestRegressor;
@@ -74,8 +79,13 @@ public class PickleUtil {
 			new ExtensionObjectConstructor("numpy.random", "__RandomState_ctor", RandomState.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "BinomialDeviance", BinomialDeviance.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "GradientBoostingClassifier", GradientBoostingClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "GradientBoostingRegressor", GradientBoostingRegressor.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "LogOddsEstimator", LogOddsEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "MeanEstimator", MeanEstimator.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "MultinomialDeviance", MultinomialDeviance.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "PriorProbabilityEstimator", PriorProbabilityEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "QuantileEstimator", QuantileEstimator.class),
 			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),

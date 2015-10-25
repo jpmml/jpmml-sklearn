@@ -22,25 +22,10 @@ import java.util.List;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldUsageType;
-import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MiningSchema;
-import org.dmg.pmml.MultipleModelMethodType;
-import org.dmg.pmml.NumericPredictor;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.RegressionTable;
-import org.dmg.pmml.Segment;
-import org.dmg.pmml.Segmentation;
-import org.dmg.pmml.True;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
-import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
-import sklearn.tree.TreeModelUtil;
 
 public class GradientBoostingRegressor extends Regressor {
 
@@ -49,80 +34,36 @@ public class GradientBoostingRegressor extends Regressor {
 	}
 
 	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
-	}
-
-	@Override
 	public int getNumberOfFeatures(){
 		return (Integer)get("n_features");
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
-		Segmentation segmentation = new Segmentation(MultipleModelMethodType.MODEL_CHAIN, null);
-
-		FieldName decisionFunction = FieldName.create("decisionFunction");
-
-		// Computes the value of the decision function
-		{
-			Output output = new Output()
-				.addOutputFields(PMMLUtil.createPredictedField(decisionFunction));
-
-			List<DecisionTreeRegressor> estimators = getEstimators();
-
-			MiningModel miningModel = TreeModelUtil.encodeTreeModelEnsemble(estimators, null, MultipleModelMethodType.SUM, MiningFunctionType.REGRESSION, dataFields, false)
-				.setOutput(output);
-
-			Segment segment = new Segment()
-				.setPredicate(new True())
-				.setModel(miningModel);
-
-			segmentation.addSegments(segment);
-		}
-
-		// Scales and shifts the the value of the decision function
-		{
-			Object init = getInit();
-
-			if(!(init instanceof HasIntercept)){
-				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(init) + ") is not a BaseEstimator or is not a supported BaseEstimator subclass");
-			}
-
-			HasIntercept hasIntercept = (HasIntercept)init;
-
-			Number learningRate = getLearningRate();
-
-			DataField dataField = dataFields.get(0);
-
-			MiningSchema miningSchema = new MiningSchema()
-				.addMiningFields(PMMLUtil.createMiningField(dataField.getName(), FieldUsageType.TARGET))
-				.addMiningFields(PMMLUtil.createMiningField(decisionFunction));
-
-			NumericPredictor numericPredictor = new NumericPredictor(decisionFunction, learningRate.doubleValue());
-
-			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, hasIntercept.getIntercept());
-
-			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
-				.addRegressionTables(regressionTable);
-
-			Segment segment = new Segment()
-				.setPredicate(new True())
-				.setModel(regressionModel);
-
-			segmentation.addSegments(segment);
-		}
-
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
-
-		MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, miningSchema)
-			.setSegmentation(segmentation);
-
-		return miningModel;
+	public DataType getDataType(){
+		return DataType.FLOAT;
 	}
 
-	public Object getInit(){
-		return get("init_");
+	@Override
+	public MiningModel encodeModel(List<DataField> dataFields){
+		HasDefaultValue init = getInit();
+
+		List<DecisionTreeRegressor> estimators = getEstimators();
+
+		return GradientBoostingUtil.encodeGradientBoosting(estimators, init.getDefaultValue(), getLearningRate(), dataFields, true);
+	}
+
+	public HasDefaultValue getInit(){
+		Object init = get("init_");
+
+		try {
+			if(init == null){
+				throw new NullPointerException();
+			}
+
+			return (HasDefaultValue)init;
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(init) + ") is not a BaseEstimator or is not a supported BaseEstimator subclass", re);
+		}
 	}
 
 	public Number getLearningRate(){

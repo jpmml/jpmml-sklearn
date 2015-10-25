@@ -18,35 +18,21 @@
  */
 package sklearn.ensemble;
 
-import java.util.List;
+import org.dmg.pmml.DefineFunction;
 
-import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MultipleModelMethodType;
-import sklearn.Regressor;
-import sklearn.tree.DecisionTreeRegressor;
+public class MultinomialDeviance extends LossFunction {
 
-public class RandomForestRegressor extends Regressor {
-
-	public RandomForestRegressor(String module, String name){
+	public MultinomialDeviance(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
+	public String getFunction(){
+		return "exp";
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
-		List<DecisionTreeRegressor> estimators = getEstimators();
-
-		return RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields);
-	}
-
-	public List<DecisionTreeRegressor> getEstimators(){
-		return (List)get("estimators_");
+	public DefineFunction encodeFunction(){
+		return null;
 	}
 }
