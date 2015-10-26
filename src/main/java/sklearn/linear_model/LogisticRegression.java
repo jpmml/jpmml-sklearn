@@ -30,15 +30,12 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.FeatureType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.RegressionTable;
 import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -162,8 +159,6 @@ public class LogisticRegression extends Classifier {
 
 	static
 	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, List<DataField> dataFields){
-		RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(coefficients, intercept, dataFields);
-
 		OutputField decisionFunction = PMMLUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
 		OutputField transformedDecisionFunction = new OutputField(FieldName.create("logitDecisionFunction_" + targetCategory))
@@ -175,10 +170,7 @@ public class LogisticRegression extends Classifier {
 		Output output = new Output()
 			.addOutputFields(decisionFunction, transformedDecisionFunction);
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(null, dataFields.subList(1, dataFields.size()));
-
-		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
-			.addRegressionTables(regressionTable)
+		RegressionModel regressionModel = RegressionModelUtil.encodeRegressionModel(coefficients, intercept, dataFields, false)
 			.setOutput(output);
 
 		return regressionModel;

@@ -18,12 +18,16 @@
  */
 package sklearn.linear_model;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.MiningFunctionType;
+import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NumericPredictor;
+import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
+import org.jpmml.converter.FieldCollector;
+import org.jpmml.converter.PMMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,15 +37,34 @@ public class RegressionModelUtil {
 	}
 
 	static
+	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, List<DataField> dataFields, boolean standalone){
+		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, dataFields);
+
+		DataField dataField = dataFields.get(0);
+
+		FieldCollector fieldCollector = new RegressionModelFieldCollector();
+		fieldCollector.applyTo(regressionTable);
+
+		MiningSchema miningSchema = PMMLUtil.createMiningSchema((standalone ? dataField : null), fieldCollector);
+
+		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
+			.addRegressionTables(regressionTable);
+
+		return regressionModel;
+	}
+
+	static
 	public RegressionTable encodeRegressionTable(List<? extends Number> coefficients, Number intercept, List<DataField> dataFields){
+
+		if(coefficients.size() != (dataFields.size() - 1)){
+			throw new IllegalArgumentException();
+		}
+
 		RegressionTable regressionTable = new RegressionTable(intercept.doubleValue());
 
-		Iterator<? extends Number> it = coefficients.iterator();
-
-		for(int i = 1; i < dataFields.size(); i++){
-			DataField dataField = dataFields.get(i);
-
-			Number coefficient = it.next();
+		for(int i = 0; i < coefficients.size(); i++){
+			Number coefficient = coefficients.get(i);
+			DataField dataField = dataFields.get(i + 1);
 
 			if(Double.compare(coefficient.doubleValue(), 0d) == 0){
 				logger.info("Skipping predictor variable {} due to a zero coefficient", dataField.getName());
@@ -52,10 +75,6 @@ public class RegressionModelUtil {
 			NumericPredictor numericPredictor = new NumericPredictor(dataField.getName(), coefficient.doubleValue());
 
 			regressionTable.addNumericPredictors(numericPredictor);
-		}
-
-		if(it.hasNext()){
-			throw new IllegalArgumentException();
 		}
 
 		return regressionTable;

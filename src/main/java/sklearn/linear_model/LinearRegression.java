@@ -22,11 +22,7 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.RegressionTable;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
 
@@ -43,14 +39,7 @@ public class LinearRegression extends Regressor {
 
 	@Override
 	public RegressionModel encodeModel(List<DataField> dataFields){
-		RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(getCoef(), Iterables.getOnlyElement(getIntercept()), dataFields);
-
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
-
-		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
-			.addRegressionTables(regressionTable);
-
-		return regressionModel;
+		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), dataFields, true);
 	}
 
 	public List<? extends Number> getCoef(){
