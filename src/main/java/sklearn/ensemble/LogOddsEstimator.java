@@ -20,18 +20,19 @@ package sklearn.ensemble;
 
 import java.util.List;
 
+import com.google.common.collect.Iterables;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.BaseEstimator;
 
-public class LogOddsEstimator extends BaseEstimator implements HasPriorProbabilities {
+public class LogOddsEstimator extends BaseEstimator implements HasPriorProbability {
 
 	public LogOddsEstimator(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public List<? extends Number> getPriorProbabilities(){
-		return getPrior();
+	public Number getPriorProbability(int index){
+		return Iterables.get(getPrior(), index);
 	}
 
 	public List<? extends Number> getPrior(){

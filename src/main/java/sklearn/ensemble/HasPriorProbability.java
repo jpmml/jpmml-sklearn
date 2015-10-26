@@ -18,24 +18,12 @@
  */
 package sklearn.ensemble;
 
-import java.util.List;
+import org.dmg.pmml.TargetValue;
 
-import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+/**
+ * @see TargetValue#getPriorProbability()
+ */
+public interface HasPriorProbability {
 
-public class PriorProbabilityEstimator extends BaseEstimator implements HasPriorProbability {
-
-	public PriorProbabilityEstimator(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public Number getPriorProbability(int index){
-		return Iterables.get(getPriors(), index);
-	}
-
-	public List<? extends Number> getPriors(){
-		return (List)ClassDictUtil.getArray(this, "priors");
-	}
+	Number getPriorProbability(int index);
 }

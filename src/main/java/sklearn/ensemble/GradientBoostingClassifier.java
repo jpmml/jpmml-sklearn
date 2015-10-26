@@ -65,7 +65,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 		int numberOfClasses = loss.getK();
 
-		HasPriorProbabilities init = getInit();
+		HasPriorProbability init = getInit();
 
 		Number learningRate = getLearningRate();
 
@@ -101,9 +101,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			Number priorProbability = Iterables.getOnlyElement(init.getPriorProbabilities());
-
-			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), loss, estimators, priorProbability, learningRate, dataFields);
+			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), loss, estimators, init.getPriorProbability(0), learningRate, dataFields);
 
 			List<FieldName> probabilityFields = new ArrayList<>();
 			probabilityFields.add(probabilityFieldFunction.apply(miningModel));
@@ -118,12 +116,10 @@ public class GradientBoostingClassifier extends Classifier {
 				throw new IllegalArgumentException();
 			}
 
-			List<? extends Number> priorProbabilities = init.getPriorProbabilities();
-
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), loss, NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), priorProbabilities.get(i), learningRate, dataFields);
+				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), loss, NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, dataFields);
 
 				miningModels.add(miningModel);
 			}
@@ -170,7 +166,7 @@ public class GradientBoostingClassifier extends Classifier {
 		}
 	}
 
-	public HasPriorProbabilities getInit(){
+	public HasPriorProbability getInit(){
 		Object init = get("init_");
 
 		try {
@@ -178,7 +174,7 @@ public class GradientBoostingClassifier extends Classifier {
 				throw new NullPointerException();
 			}
 
-			return (HasPriorProbabilities)init;
+			return (HasPriorProbability)init;
 		} catch(RuntimeException re){
 			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(init) + ") is not a BaseEstimator or is not a supported BaseEstimator subclass", re);
 		}

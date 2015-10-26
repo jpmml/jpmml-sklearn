@@ -38,6 +38,8 @@ import sklearn.ensemble.PriorProbabilityEstimator;
 import sklearn.ensemble.QuantileEstimator;
 import sklearn.ensemble.RandomForestClassifier;
 import sklearn.ensemble.RandomForestRegressor;
+import sklearn.ensemble.ScaledLogOddsEstimator;
+import sklearn.ensemble.ZeroEstimator;
 import sklearn.linear_model.LinearRegression;
 import sklearn.linear_model.LogisticRegression;
 import sklearn.preprocessing.Binarizer;
@@ -87,6 +89,8 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "MultinomialDeviance", MultinomialDeviance.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "PriorProbabilityEstimator", PriorProbabilityEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "QuantileEstimator", QuantileEstimator.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ScaledLogOddsEstimator", ScaledLogOddsEstimator.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ZeroEstimator", ZeroEstimator.class),
 			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),
 			new ObjectConstructor("sklearn.linear_model.logistic", "LogisticRegression", LogisticRegression.class),

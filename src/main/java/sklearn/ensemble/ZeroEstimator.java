@@ -18,14 +18,21 @@
  */
 package sklearn.ensemble;
 
-import java.util.List;
+import sklearn.BaseEstimator;
 
-import org.dmg.pmml.TargetValue;
+public class ZeroEstimator extends BaseEstimator implements HasDefaultValue, HasPriorProbability {
 
-/**
- * @see TargetValue#getPriorProbability()
- */
-public interface HasPriorProbabilities {
+	public ZeroEstimator(String module, String name){
+		super(module, name);
+	}
 
-	List<? extends Number> getPriorProbabilities();
+	@Override
+	public Number getDefaultValue(){
+		return 0;
+	}
+
+	@Override
+	public Number getPriorProbability(int index){
+		return 0;
+	}
 }

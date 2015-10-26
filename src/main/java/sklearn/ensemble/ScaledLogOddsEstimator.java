@@ -18,24 +18,9 @@
  */
 package sklearn.ensemble;
 
-import java.util.List;
+public class ScaledLogOddsEstimator extends LogOddsEstimator {
 
-import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
-
-public class PriorProbabilityEstimator extends BaseEstimator implements HasPriorProbability {
-
-	public PriorProbabilityEstimator(String module, String name){
+	public ScaledLogOddsEstimator(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public Number getPriorProbability(int index){
-		return Iterables.get(getPriors(), index);
-	}
-
-	public List<? extends Number> getPriors(){
-		return (List)ClassDictUtil.getArray(this, "priors");
 	}
 }
