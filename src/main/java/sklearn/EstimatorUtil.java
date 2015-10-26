@@ -21,6 +21,8 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
@@ -45,12 +47,31 @@ import org.dmg.pmml.RegressionTable;
 import org.dmg.pmml.Segment;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.True;
+import org.jpmml.converter.FieldCollector;
 import org.jpmml.converter.PMMLUtil;
 import sklearn.linear_model.RegressionModelUtil;
 
 public class EstimatorUtil {
 
 	private EstimatorUtil(){
+	}
+
+	static
+	public MiningSchema encodeMiningSchema(List<DataField> dataFields, FieldCollector fieldCollector, boolean standalone){
+		Function<DataField, FieldName> function = new Function<DataField, FieldName>(){
+
+			@Override
+			public FieldName apply(DataField dataField){
+				return dataField.getName();
+			}
+		};
+
+		FieldName targetField = (standalone ? function.apply(dataFields.get(0)) : null);
+
+		List<FieldName> activeFields = new ArrayList<>(Lists.transform(dataFields.subList(1, dataFields.size()), function));
+		activeFields.retainAll(fieldCollector.getFields());
+
+		return PMMLUtil.createMiningSchema(targetField, activeFields);
 	}
 
 	static

@@ -35,6 +35,7 @@ import org.jpmml.converter.FieldCollector;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TreeModelFieldCollector;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 
 public class TreeModelUtil {
 
@@ -57,12 +58,10 @@ public class TreeModelUtil {
 
 		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, dataFields);
 
-		DataField dataField = dataFields.get(0);
-
 		FieldCollector fieldCollector = new TreeModelFieldCollector();
 		fieldCollector.applyTo(root);
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema((standalone ? dataField : null), fieldCollector);
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(dataFields, fieldCollector, standalone);
 
 		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);
