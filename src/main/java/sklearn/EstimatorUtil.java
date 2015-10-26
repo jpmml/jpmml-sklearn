@@ -170,16 +170,26 @@ public class EstimatorUtil {
 
 	static
 	public DefineFunction encodeLogitFunction(){
+		return encodeLossFunction("logit", -1d);
+	}
+
+	static
+	public DefineFunction encodeAdaBoostFunction(){
+		return encodeLossFunction("adaboost", -2d);
+	}
+
+	static
+	private DefineFunction encodeLossFunction(String function, Number multiplier){
 		FieldName name = FieldName.create("value");
 
 		ParameterField parameterField = new ParameterField(name)
 			.setDataType(DataType.DOUBLE)
 			.setOpType(OpType.CONTINUOUS);
 
-		// "1 / (1 + exp(-1 * $name))"
-		Expression expression = PMMLUtil.createApply("/", PMMLUtil.createConstant(1d), PMMLUtil.createApply("+", PMMLUtil.createConstant(1d), PMMLUtil.createApply("exp", PMMLUtil.createApply("*", PMMLUtil.createConstant(-1d), new FieldRef(name)))));
+		// "1 / (1 + exp($multiplier * $name))"
+		Expression expression = PMMLUtil.createApply("/", PMMLUtil.createConstant(1d), PMMLUtil.createApply("+", PMMLUtil.createConstant(1d), PMMLUtil.createApply("exp", PMMLUtil.createApply("*", PMMLUtil.createConstant(multiplier), new FieldRef(name)))));
 
-		DefineFunction defineFunction = new DefineFunction("logit", OpType.CONTINUOUS, null)
+		DefineFunction defineFunction = new DefineFunction(function, OpType.CONTINUOUS, null)
 			.setDataType(DataType.DOUBLE)
 			.setOpType(OpType.CONTINUOUS)
 			.addParameterFields(parameterField)

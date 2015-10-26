@@ -29,6 +29,7 @@ import numpy.core.NDArray;
 import numpy.core.Scalar;
 import numpy.random.RandomState;
 import sklearn.ensemble.BinomialDeviance;
+import sklearn.ensemble.ExponentialLoss;
 import sklearn.ensemble.GradientBoostingClassifier;
 import sklearn.ensemble.GradientBoostingRegressor;
 import sklearn.ensemble.LogOddsEstimator;
@@ -82,6 +83,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "BinomialDeviance", BinomialDeviance.class),
+			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ExponentialLoss", ExponentialLoss.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "GradientBoostingClassifier", GradientBoostingClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "GradientBoostingRegressor", GradientBoostingRegressor.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "LogOddsEstimator", LogOddsEstimator.class),

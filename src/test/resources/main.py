@@ -91,7 +91,7 @@ audit_tree.fit(audit_X, audit_y)
 store_pkl(audit_tree, "DecisionTreeAudit.pkl")
 store_csv(predict_audit(audit_tree), "DecisionTreeAudit.csv")
 
-audit_gbm = GradientBoostingClassifier(random_state = 13, init = None)
+audit_gbm = GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None)
 audit_gbm.fit(audit_X, audit_y)
 
 store_pkl(audit_gbm, "GradientBoostingAudit.pkl")
