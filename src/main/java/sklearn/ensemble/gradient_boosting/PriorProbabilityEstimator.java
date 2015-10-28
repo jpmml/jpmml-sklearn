@@ -16,23 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
-import org.dmg.pmml.DefineFunction;
+import java.util.List;
 
-public class MultinomialDeviance extends LossFunction {
+import com.google.common.collect.Iterables;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.BaseEstimator;
 
-	public MultinomialDeviance(String module, String name){
+public class PriorProbabilityEstimator extends BaseEstimator implements HasPriorProbability {
+
+	public PriorProbabilityEstimator(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public String getFunction(){
-		return "exp";
+	public Number getPriorProbability(int index){
+		return Iterables.get(getPriors(), index);
 	}
 
-	@Override
-	public DefineFunction encodeFunction(){
-		return null;
+	public List<? extends Number> getPriors(){
+		return (List)ClassDictUtil.getArray(this, "priors");
 	}
 }

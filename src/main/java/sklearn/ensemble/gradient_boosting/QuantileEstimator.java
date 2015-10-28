@@ -16,37 +16,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MultipleModelMethodType;
-import sklearn.Regressor;
-import sklearn.tree.DecisionTreeRegressor;
+import com.google.common.collect.Iterables;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.BaseEstimator;
 
-public class RandomForestRegressor extends Regressor {
+public class QuantileEstimator extends BaseEstimator implements HasDefaultValue {
 
-	public RandomForestRegressor(String module, String name){
+	public QuantileEstimator(String module, String name){
 		super(module, name);
 	}
 
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
+	public Number getDefaultValue(){
+		return Iterables.getOnlyElement(getQuantile());
 	}
 
-	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
-		List<DecisionTreeRegressor> estimators = getEstimators();
-
-		return RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields);
-	}
-
-	public List<DecisionTreeRegressor> getEstimators(){
-		return (List)get("estimators_");
+	public List<? extends Number> getQuantile(){
+		return (List)ClassDictUtil.getArray(this, "quantile");
 	}
 }

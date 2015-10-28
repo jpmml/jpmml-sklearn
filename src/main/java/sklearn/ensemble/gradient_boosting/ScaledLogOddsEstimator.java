@@ -16,24 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
-import org.dmg.pmml.DefineFunction;
-import sklearn.EstimatorUtil;
+public class ScaledLogOddsEstimator extends LogOddsEstimator {
 
-public class BinomialDeviance extends LossFunction {
-
-	public BinomialDeviance(String module, String name){
+	public ScaledLogOddsEstimator(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public String getFunction(){
-		return "logit";
-	}
-
-	@Override
-	public DefineFunction encodeFunction(){
-		return EstimatorUtil.encodeLogitFunction();
 	}
 }

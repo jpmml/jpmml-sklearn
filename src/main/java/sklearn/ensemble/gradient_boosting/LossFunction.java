@@ -16,23 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
-import sklearn.BaseEstimator;
+import net.razorvine.pickle.objects.ClassDict;
+import org.dmg.pmml.DefineFunction;
 
-public class ZeroEstimator extends BaseEstimator implements HasDefaultValue, HasPriorProbability {
+abstract
+public class LossFunction extends ClassDict {
 
-	public ZeroEstimator(String module, String name){
+	public LossFunction(String module, String name){
 		super(module, name);
 	}
 
-	@Override
-	public Number getDefaultValue(){
-		return 0;
+	abstract
+	public String getFunction();
+
+	public DefineFunction encodeFunction(){
+		return null;
 	}
 
-	@Override
-	public Number getPriorProbability(int index){
-		return 0;
+	public Integer getK(){
+		return (Integer)get("K");
 	}
 }

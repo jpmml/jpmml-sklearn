@@ -16,14 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
-import org.dmg.pmml.TargetValue;
+import java.util.List;
 
-/**
- * @see TargetValue#getPriorProbability()
- */
-public interface HasPriorProbability {
+import com.google.common.collect.Iterables;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.BaseEstimator;
 
-	Number getPriorProbability(int index);
+public class LogOddsEstimator extends BaseEstimator implements HasPriorProbability {
+
+	public LogOddsEstimator(String module, String name){
+		super(module, name);
+	}
+
+	@Override
+	public Number getPriorProbability(int index){
+		return Iterables.get(getPrior(), index);
+	}
+
+	public List<? extends Number> getPrior(){
+		return (List)ClassDictUtil.getArray(this, "prior");
+	}
 }

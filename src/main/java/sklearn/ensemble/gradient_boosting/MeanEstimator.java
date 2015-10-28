@@ -16,14 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
-import org.dmg.pmml.TargetValue;
+import java.util.List;
 
-/**
- * @see TargetValue#getDefaultValue()
- */
-interface HasDefaultValue {
+import com.google.common.collect.Iterables;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.BaseEstimator;
 
-	Number getDefaultValue();
+public class MeanEstimator extends BaseEstimator implements HasDefaultValue {
+
+	public MeanEstimator(String module, String name){
+		super(module, name);
+	}
+
+	@Override
+	public Number getDefaultValue(){
+		return Iterables.getOnlyElement(getMean());
+	}
+
+	public List<? extends Number> getMean(){
+		return (List)ClassDictUtil.getArray(this, "mean");
+	}
 }

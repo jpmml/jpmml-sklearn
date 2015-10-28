@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.forest;
 
 import java.util.List;
 
@@ -25,14 +25,12 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
-import org.dmg.pmml.Output;
-import org.jpmml.converter.PMMLUtil;
-import sklearn.Classifier;
-import sklearn.tree.DecisionTreeClassifier;
+import sklearn.Regressor;
+import sklearn.tree.DecisionTreeRegressor;
 
-public class RandomForestClassifier extends Classifier {
+public class RandomForestRegressor extends Regressor {
 
-	public RandomForestClassifier(String module, String name){
+	public RandomForestRegressor(String module, String name){
 		super(module, name);
 	}
 
@@ -43,19 +41,12 @@ public class RandomForestClassifier extends Classifier {
 
 	@Override
 	public MiningModel encodeModel(List<DataField> dataFields){
-		DataField dataField = dataFields.get(0);
+		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		Output output = new Output(PMMLUtil.createProbabilityFields(dataField));
-
-		List<DecisionTreeClassifier> estimators = getEstimators();
-
-		MiningModel miningModel = RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, dataFields)
-			.setOutput(output);
-
-		return miningModel;
+		return RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields);
 	}
 
-	public List<DecisionTreeClassifier> getEstimators(){
+	public List<DecisionTreeRegressor> getEstimators(){
 		return (List)get("estimators_");
 	}
 }

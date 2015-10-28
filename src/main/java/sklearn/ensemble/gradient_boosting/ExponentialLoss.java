@@ -16,26 +16,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
-import java.util.List;
+import org.dmg.pmml.DefineFunction;
+import sklearn.EstimatorUtil;
 
-import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+public class ExponentialLoss extends LossFunction {
 
-public class PriorProbabilityEstimator extends BaseEstimator implements HasPriorProbability {
-
-	public PriorProbabilityEstimator(String module, String name){
+	public ExponentialLoss(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public Number getPriorProbability(int index){
-		return Iterables.get(getPriors(), index);
+	public String getFunction(){
+		return "adaboost";
 	}
 
-	public List<? extends Number> getPriors(){
-		return (List)ClassDictUtil.getArray(this, "priors");
+	@Override
+	public DefineFunction encodeFunction(){
+		return EstimatorUtil.encodeAdaBoostFunction();
 	}
 }

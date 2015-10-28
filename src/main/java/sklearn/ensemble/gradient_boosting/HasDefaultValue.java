@@ -16,25 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn.ensemble.gradient_boosting;
 
-import java.util.List;
+import org.dmg.pmml.TargetValue;
 
-import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+/**
+ * @see TargetValue#getDefaultValue()
+ */
+interface HasDefaultValue {
 
-public class QuantileEstimator extends BaseEstimator implements HasDefaultValue {
-
-	public QuantileEstimator(String module, String name){
-		super(module, name);
-	}
-
-	public Number getDefaultValue(){
-		return Iterables.getOnlyElement(getQuantile());
-	}
-
-	public List<? extends Number> getQuantile(){
-		return (List)ClassDictUtil.getArray(this, "quantile");
-	}
+	Number getDefaultValue();
 }
