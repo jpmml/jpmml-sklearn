@@ -20,6 +20,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
   * [`LabelBinarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelBinarizer.html).
   * [`LabelEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html).
   * [`MinMaxScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html).
+  * [`OneHotEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html).
   * [`StandardScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html).
 * Production quality:
   * Complete test coverage.

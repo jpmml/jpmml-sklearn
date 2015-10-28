@@ -3,7 +3,7 @@ from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, Gradi
 from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
@@ -71,6 +71,8 @@ audit_mapper = DataFrameMapper([
 
 audit = audit_mapper.fit_transform(audit_df)
 
+print(audit.shape)
+
 store_pkl(audit_mapper, "Audit.pkl")
 
 audit_X = audit[:, 0:48]
@@ -127,6 +129,8 @@ iris_mapper = DataFrameMapper([
 
 iris = iris_mapper.fit_transform(iris_df)
 
+print(iris.shape)
+
 store_pkl(iris_mapper, "Iris.pkl")
 
 iris_X = iris[:, 0:4]
@@ -179,7 +183,7 @@ auto_df["acceleration"] = auto_df["acceleration"].astype(float)
 print(auto_df.dtypes)
 
 auto_mapper = DataFrameMapper([
-    ("cylinders", None),
+    (["cylinders"], OneHotEncoder()),
     ("displacement", None),
     (["horsepower"], Imputer(missing_values = "NaN")),
     (["weight"], MinMaxScaler()),
@@ -191,10 +195,12 @@ auto_mapper = DataFrameMapper([
 
 auto = auto_mapper.fit_transform(auto_df)
 
+print(auto.shape)
+
 store_pkl(auto_mapper, "Auto.pkl")
 
-auto_X = auto[:, 0:7]
-auto_y = auto[:, 7]
+auto_X = auto[:, 0:11]
+auto_y = auto[:, 11]
 
 print(auto_X.dtype, auto_y.dtype)
 

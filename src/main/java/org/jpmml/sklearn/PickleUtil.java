@@ -48,6 +48,7 @@ import sklearn.preprocessing.Imputer;
 import sklearn.preprocessing.LabelBinarizer;
 import sklearn.preprocessing.LabelEncoder;
 import sklearn.preprocessing.MinMaxScaler;
+import sklearn.preprocessing.OneHotEncoder;
 import sklearn.preprocessing.StandardScaler;
 import sklearn.tree.DecisionTreeClassifier;
 import sklearn.tree.DecisionTreeRegressor;
@@ -98,6 +99,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.linear_model.logistic", "LogisticRegression", LogisticRegression.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MinMaxScaler", MinMaxScaler.class),
+			new ObjectConstructor("sklearn.preprocessing.data", "OneHotEncoder", OneHotEncoder.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "StandardScaler", StandardScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.imputation", "Imputer", Imputer.class),
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelBinarizer", LabelBinarizer.class),
