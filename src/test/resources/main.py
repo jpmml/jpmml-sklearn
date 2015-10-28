@@ -2,6 +2,7 @@ from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegresso
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler
 from sklearn_pandas import DataFrameMapper
@@ -99,6 +100,12 @@ audit_gbm.fit(audit_X, audit_y)
 store_pkl(audit_gbm, "GradientBoostingAudit.pkl")
 store_csv(predict_audit(audit_gbm), "GradientBoostingAudit.csv")
 
+audit_nb = GaussianNB()
+audit_nb.fit(audit_X, audit_y)
+
+store_pkl(audit_nb, "NaiveBayesAudit.pkl")
+store_csv(predict_audit(audit_nb), "NaiveBayesAudit.csv")
+
 audit_forest = RandomForestClassifier(random_state = 13, min_samples_leaf = 5)
 audit_forest.fit(audit_X, audit_y)
 
@@ -154,6 +161,12 @@ iris_gbm.fit(iris_X, iris_y)
 
 store_pkl(iris_gbm, "GradientBoostingIris.pkl")
 store_csv(predict_iris(iris_gbm), "GradientBoostingIris.csv")
+
+iris_nb = GaussianNB()
+iris_nb.fit(iris_X, iris_y)
+
+store_pkl(iris_nb, "NaiveBayesIris.pkl")
+store_csv(predict_iris(iris_nb), "NaiveBayesIris.csv")
 
 iris_forest = RandomForestClassifier(random_state = 13, min_samples_leaf = 5)
 iris_forest.fit(iris_X, iris_y)

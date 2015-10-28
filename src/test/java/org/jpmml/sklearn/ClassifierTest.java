@@ -33,6 +33,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateNaiveBayesAudit() throws Exception {
+		evaluate("NaiveBayes", "Audit");
+	}
+
+	@Test
 	public void evaluateRandomForestAudit() throws Exception {
 		evaluate("RandomForest", "Audit");
 	}
@@ -50,6 +55,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateGradientBoostingIris() throws Exception {
 		evaluate("GradientBoosting", "Iris");
+	}
+
+	@Test
+	public void evaluateNaiveBayesIris() throws Exception {
+		evaluate("NaiveBayes", "Iris");
 	}
 
 	@Test

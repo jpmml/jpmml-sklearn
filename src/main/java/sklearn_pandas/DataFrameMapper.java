@@ -30,6 +30,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import org.dmg.pmml.BayesOutput;
 import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DerivedField;
@@ -198,6 +199,13 @@ public class DataFrameMapper extends CClassDict {
 		}
 
 		Visitor fieldRenamer = new AbstractVisitor(){
+
+			@Override
+			public VisitorAction visit(BayesOutput bayesOutput){
+				bayesOutput.setFieldName(filterName(bayesOutput.getFieldName()));
+
+				return super.visit(bayesOutput);
+			}
 
 			@Override
 			public VisitorAction visit(DataField dataField){

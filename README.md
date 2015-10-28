@@ -10,6 +10,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
   * [`GradientBoostingRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html).
   * [`DecisionTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html).
   * [`DecisionTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html).
+  * [`GaussianNB`] (http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html).
   * [`LinearRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html).
   * [`LogisticRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html).
   * [`RandomForestClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html).
