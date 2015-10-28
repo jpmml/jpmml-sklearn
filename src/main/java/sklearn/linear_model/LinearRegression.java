@@ -34,7 +34,13 @@ public class LinearRegression extends Regressor {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return (Integer)get("rank_");
+		int[] shape = getCoefShape();
+
+		if(shape.length != 1){
+			throw new IllegalArgumentException();
+		}
+
+		return shape[0];
 	}
 
 	@Override
@@ -48,5 +54,9 @@ public class LinearRegression extends Regressor {
 
 	public List<? extends Number> getIntercept(){
 		return (List)ClassDictUtil.getArray(this, "intercept_");
+	}
+
+	private int[] getCoefShape(){
+		return ClassDictUtil.getShape(this, "coef_");
 	}
 }
