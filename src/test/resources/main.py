@@ -100,6 +100,12 @@ audit_gbm.fit(audit_X, audit_y)
 store_pkl(audit_gbm, "GradientBoostingAudit.pkl")
 store_csv(predict_audit(audit_gbm), "GradientBoostingAudit.csv")
 
+audit_logistic = LogisticRegression()
+audit_logistic.fit(audit_X, audit_y)
+
+store_pkl(audit_logistic, "LogisticRegressionAudit.pkl")
+store_csv(predict_audit(audit_logistic), "LogisticRegressionAudit.csv")
+
 audit_nb = GaussianNB()
 audit_nb.fit(audit_X, audit_y)
 
@@ -111,12 +117,6 @@ audit_forest.fit(audit_X, audit_y)
 
 store_pkl(audit_forest, "RandomForestAudit.pkl")
 store_csv(predict_audit(audit_forest), "RandomForestAudit.csv")
-
-audit_regression = LogisticRegression()
-audit_regression.fit(audit_X, audit_y)
-
-store_pkl(audit_regression, "RegressionAudit.pkl")
-store_csv(predict_audit(audit_regression), "RegressionAudit.csv")
 
 #
 # Multi-class classification
@@ -162,6 +162,12 @@ iris_gbm.fit(iris_X, iris_y)
 store_pkl(iris_gbm, "GradientBoostingIris.pkl")
 store_csv(predict_iris(iris_gbm), "GradientBoostingIris.csv")
 
+iris_logistic = LogisticRegression()
+iris_logistic.fit(iris_X, iris_y)
+
+store_pkl(iris_logistic, "LogisticRegressionIris.pkl")
+store_csv(predict_iris(iris_logistic), "LogisticRegressionIris.csv")
+
 iris_nb = GaussianNB()
 iris_nb.fit(iris_X, iris_y)
 
@@ -173,12 +179,6 @@ iris_forest.fit(iris_X, iris_y)
 
 store_pkl(iris_forest, "RandomForestIris.pkl")
 store_csv(predict_iris(iris_forest), "RandomForestIris.csv")
-
-iris_regression = LogisticRegression()
-iris_regression.fit(iris_X, iris_y)
-
-store_pkl(iris_regression, "RegressionIris.pkl")
-store_csv(predict_iris(iris_regression), "RegressionIris.csv")
 
 #
 # Regression
@@ -233,14 +233,14 @@ auto_gbm.fit(auto_X, auto_y)
 store_pkl(auto_gbm, "GradientBoostingAuto.pkl")
 store_csv(predict_auto(auto_gbm), "GradientBoostingAuto.csv")
 
+auto_linear = LinearRegression()
+auto_linear.fit(auto_X, auto_y)
+
+store_pkl(auto_linear, "LinearRegressionAuto.pkl")
+store_csv(predict_auto(auto_linear), "LinearRegressionAuto.csv")
+
 auto_forest = RandomForestRegressor(random_state = 13, min_samples_leaf = 5)
 auto_forest.fit(auto_X, auto_y)
 
 store_pkl(auto_forest, "RandomForestAuto.pkl")
 store_csv(predict_auto(auto_forest), "RandomForestAuto.csv")
-
-auto_regression = LinearRegression()
-auto_regression.fit(auto_X, auto_y)
-
-store_pkl(auto_regression, "RegressionAuto.pkl")
-store_csv(predict_auto(auto_regression), "RegressionAuto.csv")

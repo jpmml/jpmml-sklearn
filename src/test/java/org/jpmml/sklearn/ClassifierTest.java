@@ -33,6 +33,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLogisticRegressionAudit() throws Exception {
+		evaluate("LogisticRegression", "Audit");
+	}
+
+	@Test
 	public void evaluateNaiveBayesAudit() throws Exception {
 		evaluate("NaiveBayes", "Audit");
 	}
@@ -40,11 +45,6 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateRandomForestAudit() throws Exception {
 		evaluate("RandomForest", "Audit");
-	}
-
-	@Test
-	public void evaluateRegressionAudit() throws Exception {
-		evaluate("Regression", "Audit");
 	}
 
 	@Test
@@ -58,6 +58,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLogisticRegressionIris() throws Exception {
+		evaluate("LogisticRegression", "Iris");
+	}
+
+	@Test
 	public void evaluateNaiveBayesIris() throws Exception {
 		evaluate("NaiveBayes", "Iris");
 	}
@@ -65,10 +70,5 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateRandomForestIris() throws Exception {
 		evaluate("RandomForest", "Iris");
-	}
-
-	@Test
-	public void evaluateRegressionIris() throws Exception {
-		evaluate("Regression", "Iris");
 	}
 }
