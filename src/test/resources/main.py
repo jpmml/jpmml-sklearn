@@ -1,7 +1,7 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler
@@ -244,3 +244,9 @@ auto_forest.fit(auto_X, auto_y)
 
 store_pkl(auto_forest, "RandomForestAuto.pkl")
 store_csv(predict_auto(auto_forest), "RandomForestAuto.csv")
+
+auto_ridge = Ridge()
+auto_ridge.fit(auto_X, auto_y)
+
+store_pkl(auto_ridge, "RidgeAuto.pkl")
+store_csv(predict_auto(auto_ridge), "RidgeAuto.csv")

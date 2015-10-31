@@ -16,34 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package sklearn.linear_model;
 
-import org.junit.Test;
+public class Ridge extends BaseLinearRegressor {
 
-public class RegressorTest extends EstimatorTest {
-
-	@Test
-	public void evaluateDecisionTreeAuto() throws Exception {
-		evaluate("DecisionTree", "Auto");
-	}
-
-	@Test
-	public void evaluateGradientBoostingAuto() throws Exception {
-		evaluate("GradientBoosting", "Auto");
-	}
-
-	@Test
-	public void evaluateLinearRegressionAuto() throws Exception {
-		evaluate("LinearRegression", "Auto");
-	}
-
-	@Test
-	public void evaluateRandomForestAuto() throws Exception {
-		evaluate("RandomForest", "Auto");
-	}
-
-	@Test
-	public void evaluateRidgeAuto() throws Exception {
-		evaluate("Ridge", "Auto");
+	public Ridge(String module, String name){
+		super(module, name);
 	}
 }
