@@ -83,48 +83,21 @@ audit_y = audit_y.astype(int)
 
 print(audit_X.dtype, audit_y.dtype)
 
-def predict_audit(classifier, with_proba = True):
+def build_audit(classifier, name, with_proba = True):
+    classifier.fit(audit_X, audit_y)
+    store_pkl(classifier, name + ".pkl")
     adjusted = DataFrame(classifier.predict(audit_X), columns = ["Adjusted"])
-    if(with_proba == False):
-        return adjusted
-    adjusted_proba = DataFrame(classifier.predict_proba(audit_X), columns = ["probability_0", "probability_1"])
-    return pandas.concat((adjusted, adjusted_proba), axis = 1)
+    if(with_proba == True):
+        adjusted_proba = DataFrame(classifier.predict_proba(audit_X), columns = ["probability_0", "probability_1"])
+        adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+    store_csv(adjusted, name + ".csv")
 
-audit_tree = DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5)
-audit_tree.fit(audit_X, audit_y)
-
-store_pkl(audit_tree, "DecisionTreeAudit.pkl")
-store_csv(predict_audit(audit_tree), "DecisionTreeAudit.csv")
-
-audit_gbm = GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None)
-audit_gbm.fit(audit_X, audit_y)
-
-store_pkl(audit_gbm, "GradientBoostingAudit.pkl")
-store_csv(predict_audit(audit_gbm), "GradientBoostingAudit.csv")
-
-audit_logistic = LogisticRegression()
-audit_logistic.fit(audit_X, audit_y)
-
-store_pkl(audit_logistic, "LogisticRegressionAudit.pkl")
-store_csv(predict_audit(audit_logistic), "LogisticRegressionAudit.csv")
-
-audit_nb = GaussianNB()
-audit_nb.fit(audit_X, audit_y)
-
-store_pkl(audit_nb, "NaiveBayesAudit.pkl")
-store_csv(predict_audit(audit_nb), "NaiveBayesAudit.csv")
-
-audit_forest = RandomForestClassifier(random_state = 13, min_samples_leaf = 5)
-audit_forest.fit(audit_X, audit_y)
-
-store_pkl(audit_forest, "RandomForestAudit.pkl")
-store_csv(predict_audit(audit_forest), "RandomForestAudit.csv")
-
-audit_ridge = RidgeClassifier()
-audit_ridge.fit(audit_X, audit_y)
-
-store_pkl(audit_ridge, "RidgeAudit.pkl")
-store_csv(predict_audit(audit_ridge, with_proba = False), "RidgeAudit.csv")
+build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAudit")
+build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
+build_audit(LogisticRegression(), "LogisticRegressionAudit")
+build_audit(GaussianNB(), "NaiveBayesAudit")
+build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
+build_audit(RidgeClassifier(), "RidgeAudit", with_proba = False)
 
 #
 # Multi-class classification
@@ -153,48 +126,21 @@ iris_y = iris[:, 4]
 
 print(iris_X.dtype, iris_y.dtype)
 
-def predict_iris(classifier, with_proba = True):
+def build_iris(classifier, name, with_proba = True):
+    classifier.fit(iris_X, iris_y)
+    store_pkl(classifier, name + ".pkl")
     species = DataFrame(classifier.predict(iris_X), columns = ["Species"])
-    if(with_proba == False):
-        return species
-    species_proba = DataFrame(classifier.predict_proba(iris_X), columns = ["probability_setosa", "probability_versicolor", "probability_virginica"])
-    return pandas.concat((species, species_proba), axis = 1)
+    if(with_proba == True):
+        species_proba = DataFrame(classifier.predict_proba(iris_X), columns = ["probability_setosa", "probability_versicolor", "probability_virginica"])
+        species = pandas.concat((species, species_proba), axis = 1)
+    store_csv(species, name + ".csv")
 
-iris_tree = DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5)
-iris_tree.fit(iris_X, iris_y)
-
-store_pkl(iris_tree, "DecisionTreeIris.pkl")
-store_csv(predict_iris(iris_tree), "DecisionTreeIris.csv")
-
-iris_gbm = GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17)
-iris_gbm.fit(iris_X, iris_y)
-
-store_pkl(iris_gbm, "GradientBoostingIris.pkl")
-store_csv(predict_iris(iris_gbm), "GradientBoostingIris.csv")
-
-iris_logistic = LogisticRegression()
-iris_logistic.fit(iris_X, iris_y)
-
-store_pkl(iris_logistic, "LogisticRegressionIris.pkl")
-store_csv(predict_iris(iris_logistic), "LogisticRegressionIris.csv")
-
-iris_nb = GaussianNB()
-iris_nb.fit(iris_X, iris_y)
-
-store_pkl(iris_nb, "NaiveBayesIris.pkl")
-store_csv(predict_iris(iris_nb), "NaiveBayesIris.csv")
-
-iris_forest = RandomForestClassifier(random_state = 13, min_samples_leaf = 5)
-iris_forest.fit(iris_X, iris_y)
-
-store_pkl(iris_forest, "RandomForestIris.pkl")
-store_csv(predict_iris(iris_forest), "RandomForestIris.csv")
-
-iris_ridge = RidgeClassifier()
-iris_ridge.fit(iris_X, iris_y)
-
-store_pkl(iris_ridge, "RidgeIris.pkl")
-store_csv(predict_iris(iris_ridge, with_proba = False), "RidgeIris.csv")
+build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris")
+build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
+build_iris(LogisticRegression(), "LogisticRegressionIris")
+build_iris(GaussianNB(), "NaiveBayesIris")
+build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris")
+build_iris(RidgeClassifier(), "RidgeIris", with_proba = False)
 
 #
 # Regression
@@ -233,36 +179,14 @@ auto_y = auto[:, 11]
 
 print(auto_X.dtype, auto_y.dtype)
 
-def predict_auto(regressor):
+def build_auto(regressor, name):
+    regressor = regressor.fit(auto_X, auto_y)
+    store_pkl(regressor, name + ".pkl")
     mpg = DataFrame(regressor.predict(auto_X), columns = ["mpg"])
-    return mpg
+    store_csv(mpg, name + ".csv")
 
-auto_tree = DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5)
-auto_tree.fit(auto_X, auto_y)
-
-store_pkl(auto_tree, "DecisionTreeAuto.pkl")
-store_csv(predict_auto(auto_tree), "DecisionTreeAuto.csv")
-
-auto_gbm = GradientBoostingRegressor(random_state = 13, init = None)
-auto_gbm.fit(auto_X, auto_y)
-
-store_pkl(auto_gbm, "GradientBoostingAuto.pkl")
-store_csv(predict_auto(auto_gbm), "GradientBoostingAuto.csv")
-
-auto_linear = LinearRegression()
-auto_linear.fit(auto_X, auto_y)
-
-store_pkl(auto_linear, "LinearRegressionAuto.pkl")
-store_csv(predict_auto(auto_linear), "LinearRegressionAuto.csv")
-
-auto_forest = RandomForestRegressor(random_state = 13, min_samples_leaf = 5)
-auto_forest.fit(auto_X, auto_y)
-
-store_pkl(auto_forest, "RandomForestAuto.pkl")
-store_csv(predict_auto(auto_forest), "RandomForestAuto.csv")
-
-auto_ridge = Ridge()
-auto_ridge.fit(auto_X, auto_y)
-
-store_pkl(auto_ridge, "RidgeAuto.pkl")
-store_csv(predict_auto(auto_ridge), "RidgeAuto.csv")
+build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
+build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
+build_auto(LinearRegression(), "LinearRegressionAuto")
+build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
+build_auto(Ridge(), "RidgeAuto")
