@@ -15,6 +15,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
     * [`linear_model.LinearRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
     * [`linear_model.LogisticRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
     * [`linear_model.Ridge`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)
+    * [`linear_model.RidgeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html)
   * Naive Bayes:
     * [`naive_bayes.GaussianNB`] (http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)
   * Preprocessing and Normalization:

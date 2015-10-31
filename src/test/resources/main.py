@@ -1,7 +1,7 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge
+from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge, RidgeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler
@@ -83,8 +83,10 @@ audit_y = audit_y.astype(int)
 
 print(audit_X.dtype, audit_y.dtype)
 
-def predict_audit(classifier):
+def predict_audit(classifier, with_proba = True):
     adjusted = DataFrame(classifier.predict(audit_X), columns = ["Adjusted"])
+    if(with_proba == False):
+        return adjusted
     adjusted_proba = DataFrame(classifier.predict_proba(audit_X), columns = ["probability_0", "probability_1"])
     return pandas.concat((adjusted, adjusted_proba), axis = 1)
 
@@ -118,6 +120,12 @@ audit_forest.fit(audit_X, audit_y)
 store_pkl(audit_forest, "RandomForestAudit.pkl")
 store_csv(predict_audit(audit_forest), "RandomForestAudit.csv")
 
+audit_ridge = RidgeClassifier()
+audit_ridge.fit(audit_X, audit_y)
+
+store_pkl(audit_ridge, "RidgeAudit.pkl")
+store_csv(predict_audit(audit_ridge, with_proba = False), "RidgeAudit.csv")
+
 #
 # Multi-class classification
 #
@@ -145,8 +153,10 @@ iris_y = iris[:, 4]
 
 print(iris_X.dtype, iris_y.dtype)
 
-def predict_iris(classifier):
+def predict_iris(classifier, with_proba = True):
     species = DataFrame(classifier.predict(iris_X), columns = ["Species"])
+    if(with_proba == False):
+        return species
     species_proba = DataFrame(classifier.predict_proba(iris_X), columns = ["probability_setosa", "probability_versicolor", "probability_virginica"])
     return pandas.concat((species, species_proba), axis = 1)
 
@@ -179,6 +189,12 @@ iris_forest.fit(iris_X, iris_y)
 
 store_pkl(iris_forest, "RandomForestIris.pkl")
 store_csv(predict_iris(iris_forest), "RandomForestIris.csv")
+
+iris_ridge = RidgeClassifier()
+iris_ridge.fit(iris_X, iris_y)
+
+store_pkl(iris_ridge, "RidgeIris.pkl")
+store_csv(predict_iris(iris_ridge, with_proba = False), "RidgeIris.csv")
 
 #
 # Regression

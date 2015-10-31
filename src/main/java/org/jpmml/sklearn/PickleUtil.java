@@ -44,6 +44,7 @@ import sklearn.ensemble.gradient_boosting.ZeroEstimator;
 import sklearn.linear_model.LinearRegression;
 import sklearn.linear_model.LogisticRegression;
 import sklearn.linear_model.Ridge;
+import sklearn.linear_model.RidgeClassifier;
 import sklearn.naive_bayes.GaussianNB;
 import sklearn.preprocessing.Binarizer;
 import sklearn.preprocessing.Imputer;
@@ -100,6 +101,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),
 			new ObjectConstructor("sklearn.linear_model.logistic", "LogisticRegression", LogisticRegression.class),
 			new ObjectConstructor("sklearn.linear_model.ridge", "Ridge", Ridge.class),
+			new ObjectConstructor("sklearn.linear_model.ridge", "RidgeClassifier", RidgeClassifier.class),
 			new ObjectConstructor("sklearn.naive_bayes", "GaussianNB", GaussianNB.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MinMaxScaler", MinMaxScaler.class),
