@@ -20,27 +20,44 @@ package sklearn.linear_model;
 
 import java.util.List;
 
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.RegressionModel;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.Regressor;
 
-public class LogisticRegression extends BaseLinearClassifier {
+abstract
+public class BaseLinearRegressor extends Regressor {
 
-	public LogisticRegression(String module, String name){
+	public BaseLinearRegressor(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
-		String multiClass = getMultiClass();
+	public int getNumberOfFeatures(){
+		int[] shape = getCoefShape();
 
-		if(!("ovr").equals(multiClass)){
+		if(shape.length != 1){
 			throw new IllegalArgumentException();
 		}
 
-		return super.encodeModel(dataFields);
+		return shape[0];
 	}
 
-	public String getMultiClass(){
-		return (String)get("multi_class");
+	@Override
+	public RegressionModel encodeModel(List<DataField> dataFields){
+		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), dataFields, true);
+	}
+
+	public List<? extends Number> getCoef(){
+		return (List)ClassDictUtil.getArray(this, "coef_");
+	}
+
+	public List<? extends Number> getIntercept(){
+		return (List)ClassDictUtil.getArray(this, "intercept_");
+	}
+
+	private int[] getCoefShape(){
+		return ClassDictUtil.getShape(this, "coef_");
 	}
 }

@@ -18,45 +18,9 @@
  */
 package sklearn.linear_model;
 
-import java.util.List;
-
-import com.google.common.collect.Iterables;
-import org.dmg.pmml.DataField;
-import org.dmg.pmml.RegressionModel;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.Regressor;
-
-public class LinearRegression extends Regressor {
+public class LinearRegression extends BaseLinearRegressor {
 
 	public LinearRegression(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getCoefShape();
-
-		if(shape.length != 1){
-			throw new IllegalArgumentException();
-		}
-
-		return shape[0];
-	}
-
-	@Override
-	public RegressionModel encodeModel(List<DataField> dataFields){
-		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), dataFields, true);
-	}
-
-	public List<? extends Number> getCoef(){
-		return (List)ClassDictUtil.getArray(this, "coef_");
-	}
-
-	public List<? extends Number> getIntercept(){
-		return (List)ClassDictUtil.getArray(this, "intercept_");
-	}
-
-	private int[] getCoefShape(){
-		return ClassDictUtil.getShape(this, "coef_");
 	}
 }
