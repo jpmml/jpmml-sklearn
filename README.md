@@ -39,7 +39,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
 
 ### The Python side of operations
 
-* Python 3.4 or newer.
+* Python 2.7, 3.4 or newer.
 * [`scikit-learn`] (https://pypi.python.org/pypi/scikit-learn) 0.16.0 or newer.
 * [`pandas`] (https://pypi.python.org/pypi/pandas) 0.16.2 or newer.
 * [`sklearn-pandas`] (https://pypi.python.org/pypi/sklearn-pandas) 0.0.10 or newer.
