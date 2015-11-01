@@ -1,7 +1,7 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge, RidgeClassifier
+from sklearn.linear_model import Lasso, LinearRegression, LogisticRegression, Ridge, RidgeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler
@@ -187,6 +187,7 @@ def build_auto(regressor, name):
 
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
+build_auto(Lasso(random_state = 13), "LassoAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
 build_auto(Ridge(), "RidgeAuto")
