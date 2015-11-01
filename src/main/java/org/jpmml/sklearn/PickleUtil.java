@@ -41,6 +41,7 @@ import sklearn.ensemble.gradient_boosting.PriorProbabilityEstimator;
 import sklearn.ensemble.gradient_boosting.QuantileEstimator;
 import sklearn.ensemble.gradient_boosting.ScaledLogOddsEstimator;
 import sklearn.ensemble.gradient_boosting.ZeroEstimator;
+import sklearn.linear_model.ElasticNet;
 import sklearn.linear_model.Lasso;
 import sklearn.linear_model.LinearRegression;
 import sklearn.linear_model.LogisticRegression;
@@ -100,6 +101,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ZeroEstimator", ZeroEstimator.class),
 			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),
+			new ObjectConstructor("sklearn.linear_model.coordinate_descent", "ElasticNet", ElasticNet.class),
 			new ObjectConstructor("sklearn.linear_model.coordinate_descent", "Lasso", Lasso.class),
 			new ObjectConstructor("sklearn.linear_model.logistic", "LogisticRegression", LogisticRegression.class),
 			new ObjectConstructor("sklearn.linear_model.ridge", "Ridge", Ridge.class),

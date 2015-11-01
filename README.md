@@ -12,6 +12,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
     * [`ensemble.RandomForestClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
     * [`ensemble.RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
   * Generalized Linear Models:
+    * [`linear_model.ElasticNet`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
     * [`linear_model.Lasso`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html)
     * [`linear_model.LinearRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
     * [`linear_model.LogisticRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
