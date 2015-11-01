@@ -1,7 +1,7 @@
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import ElasticNet, Lasso, LinearRegression, LogisticRegression, Ridge, RidgeClassifier
+from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler
@@ -94,10 +94,10 @@ def build_audit(classifier, name, with_proba = True):
 
 build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
-build_audit(LogisticRegression(), "LogisticRegressionAudit")
+build_audit(LogisticRegressionCV(), "LogisticRegressionAudit")
 build_audit(GaussianNB(), "NaiveBayesAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
-build_audit(RidgeClassifier(), "RidgeAudit", with_proba = False)
+build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 
 #
 # Multi-class classification
@@ -137,10 +137,10 @@ def build_iris(classifier, name, with_proba = True):
 
 build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
-build_iris(LogisticRegression(), "LogisticRegressionIris")
+build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
 build_iris(GaussianNB(), "NaiveBayesIris")
 build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris")
-build_iris(RidgeClassifier(), "RidgeIris", with_proba = False)
+build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
 
 #
 # Regression
@@ -186,9 +186,9 @@ def build_auto(regressor, name):
     store_csv(mpg, name + ".csv")
 
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
-build_auto(ElasticNet(random_state = 13), "ElasticNetAuto")
+build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
-build_auto(Lasso(random_state = 13), "LassoAuto")
+build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
-build_auto(Ridge(), "RidgeAuto")
+build_auto(RidgeCV(), "RidgeAuto")

@@ -13,11 +13,16 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
     * [`ensemble.RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
   * Generalized Linear Models:
     * [`linear_model.ElasticNet`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
+    * [`linear_model.ElasticNetCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html)
     * [`linear_model.Lasso`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html)
+    * [`linear_model.LassoCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html)
     * [`linear_model.LinearRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
     * [`linear_model.LogisticRegression`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
+    * [`linear_model.LogisticRegressionCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegressionCV.html)
     * [`linear_model.Ridge`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)
+    * [`linear_model.RidgeCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html)
     * [`linear_model.RidgeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html)
+    * [`linear_model.RidgeClassifierCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html)
   * Naive Bayes:
     * [`naive_bayes.GaussianNB`] (http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)
   * Preprocessing and Normalization:
