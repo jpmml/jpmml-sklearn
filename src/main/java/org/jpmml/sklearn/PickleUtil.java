@@ -19,6 +19,7 @@
 package org.jpmml.sklearn;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -69,10 +70,17 @@ public class PickleUtil {
 
 	static
 	public Storage createStorage(File file){
-		ZipFileStorage storage = ZipFileStorage.open(file);
 
-		if(storage != null){
-			return storage;
+		try {
+			InputStream is = new FileInputStream(file);
+
+			try {
+				return new CompressedInputStreamStorage(is);
+			} catch(IOException ioe){
+				is.close();
+			}
+		} catch(IOException ioe){
+			// Ignored
 		}
 
 		return new FileStorage(file);

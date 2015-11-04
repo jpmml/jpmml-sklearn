@@ -34,28 +34,29 @@ public class FileStorage implements Storage {
 
 	@Override
 	public InputStream getObject() throws IOException {
-
-		if(this.file == null){
-			throw new IOException();
-		}
-
-		return new FileInputStream(this.file);
+		return new FileInputStream(ensureOpen());
 	}
 
 	@Override
 	public InputStream getArray(String name) throws IOException {
+		File file = ensureOpen();
 
-		if(this.file == null){
-			throw new IOException();
-		}
+		File arrayFile = new File(file.getParentFile(), name);
 
-		File dir = this.file.getParentFile();
-
-		return new FileInputStream(new File(dir, name));
+		return new FileInputStream(arrayFile);
 	}
 
 	@Override
 	public void close(){
 		this.file = null;
+	}
+
+	private File ensureOpen() throws IOException {
+
+		if(this.file == null){
+			throw new IOException();
+		}
+
+		return this.file;
 	}
 }

@@ -124,8 +124,8 @@ Serialize the `sklearn_pandas.DataFrameMapper` object and estimator object in `p
 ```python
 from sklearn.externals import joblib
 
-joblib.dump(iris_mapper, "mapper.pkl")
-joblib.dump(iris_forest, "estimator.pkl")
+joblib.dump(iris_mapper, "mapper.pkl", compress = 9)
+joblib.dump(iris_forest, "estimator.pkl", compress = 9)
 ```
 
 Please see the test script file [main.py] (https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.

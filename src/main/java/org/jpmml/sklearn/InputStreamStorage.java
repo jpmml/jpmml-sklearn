@@ -18,29 +18,21 @@
  */
 package org.jpmml.sklearn;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.google.common.io.ByteStreams;
-
 public class InputStreamStorage implements Storage {
 
-	private byte[] buffer = null;
+	private InputStream is = null;
 
 
-	public InputStreamStorage(InputStream is) throws IOException {
-		this.buffer = ByteStreams.toByteArray(is);
+	public InputStreamStorage(InputStream is){
+		this.is = is;
 	}
 
 	@Override
 	public InputStream getObject() throws IOException {
-
-		if(this.buffer == null){
-			throw new IOException();
-		}
-
-		return new ByteArrayInputStream(this.buffer);
+		return ensureOpen();
 	}
 
 	@Override
@@ -49,7 +41,23 @@ public class InputStreamStorage implements Storage {
 	}
 
 	@Override
-	public void close(){
-		this.buffer = null;
+	public void close() throws IOException {
+
+		try {
+			if(this.is != null){
+				this.is.close();
+			}
+		} finally {
+			this.is = null;
+		}
+	}
+
+	private InputStream ensureOpen() throws IOException {
+
+		if(this.is == null){
+			throw new IOException();
+		}
+
+		return this.is;
 	}
 }

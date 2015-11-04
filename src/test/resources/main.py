@@ -9,12 +9,8 @@ from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
 import numpy
-import os
 import pandas
-import pickle
-import shutil
-import tempfile
-import zipfile
+#import pickle
 
 def load_csv(name):
     return pandas.read_csv("csv/" + name, na_values = ["N/A", "NA"])
@@ -22,20 +18,11 @@ def load_csv(name):
 def store_csv(df, name):
     df.to_csv("csv/" + name, index = False)
 
+# Joblib dump
 def store_pkl(obj, name):
-    tmpDir = tempfile.mkdtemp()
-    print(tmpDir)
-    try:
-        tmpFiles = joblib.dump(obj, os.path.join(tmpDir, name), compress = 0)
-        # print(tmpFiles)
-        zipDir = zipfile.ZipFile("pkl/" + name + ".zip", "w")
-        for tmpFile in tmpFiles:
-            zipDir.write(tmpFile, os.path.relpath(tmpFile, tmpDir))
-        zipDir.close()
-        print(zipDir.filename)
-    finally:
-        shutil.rmtree(tmpDir)
+    joblib.dump(obj, "pkl/" + name, compress = 9)
 
+# Pickle dump
 #def store_pkl(obj, name):
 #    con = open("pkl/" + name, "wb")
 #    pickle.dump(obj, con, protocol = -1)
