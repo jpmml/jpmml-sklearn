@@ -30,6 +30,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.BayesOutput;
 import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
@@ -45,7 +46,6 @@ import org.dmg.pmml.PMML;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.model.visitors.AbstractVisitor;
-import org.jpmml.sklearn.CClassDict;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SchemaUtil;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ import sklearn.ComplexTransformer;
 import sklearn.SimpleTransformer;
 import sklearn.Transformer;
 
-public class DataFrameMapper extends CClassDict {
+public class DataFrameMapper extends ClassDict {
 
 	public DataFrameMapper(String module, String name){
 		super(module, name);

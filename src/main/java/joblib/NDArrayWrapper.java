@@ -21,13 +21,12 @@ package joblib;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.razorvine.pickle.objects.ClassDict;
+import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
 
-import numpy.core.NDArray;
-import org.jpmml.sklearn.CClassDict;
-
 abstract
-public class NDArrayWrapper extends CClassDict {
+public class NDArrayWrapper extends ClassDict {
 
 	private NDArray content = null;
 
