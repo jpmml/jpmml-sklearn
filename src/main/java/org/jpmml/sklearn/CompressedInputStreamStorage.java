@@ -21,6 +21,7 @@ package org.jpmml.sklearn;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.zip.InflaterInputStream;
 
 import com.google.common.io.ByteStreams;
@@ -29,11 +30,11 @@ import com.google.common.io.CountingInputStream;
 public class CompressedInputStreamStorage extends InputStreamStorage {
 
 	public CompressedInputStreamStorage(InputStream is) throws IOException {
-		super(init(is));
+		super(init(new PushbackInputStream(is)));
 	}
 
 	static
-	private InputStream init(InputStream is) throws IOException {
+	private InputStream init(PushbackInputStream is) throws IOException {
 		byte[] headerBytes = new byte[2 + 19];
 
 		ByteStreams.readFully(is, headerBytes);
@@ -49,6 +50,17 @@ public class CompressedInputStreamStorage extends InputStreamStorage {
 
 		final
 		long expectedSize = Long.parseLong(header.substring(4), 16);
+
+		// Consume the first byte
+		int firstByte = is.read();
+		if(firstByte < 0){
+			return is;
+		} // End if
+
+		// If the first byte is not a space character, then make it available for reading again
+		if(firstByte != '\u0020'){
+			is.unread(firstByte);
+		}
 
 		InflaterInputStream zlibIs = new InflaterInputStream(is);
 
