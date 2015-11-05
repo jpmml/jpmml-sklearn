@@ -20,9 +20,9 @@ package sklearn.linear_model;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.preprocessing.LabelBinarizer;
 
 public class RidgeClassifier extends BaseLinearClassifier {
@@ -39,8 +39,8 @@ public class RidgeClassifier extends BaseLinearClassifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
-		MiningModel miningModel = super.encodeModel(dataFields)
+	public MiningModel encodeModel(Schema schema){
+		MiningModel miningModel = super.encodeModel(schema)
 			.setOutput(null);
 
 		return miningModel;

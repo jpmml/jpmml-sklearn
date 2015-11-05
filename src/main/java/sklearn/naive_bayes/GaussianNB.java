@@ -20,13 +20,11 @@ package sklearn.naive_bayes;
 
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.BayesInput;
 import org.dmg.pmml.BayesInputs;
 import org.dmg.pmml.BayesOutput;
-import org.dmg.pmml.DataField;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.GaussianDistribution;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
@@ -38,7 +36,9 @@ import org.dmg.pmml.TargetValueStat;
 import org.dmg.pmml.TargetValueStats;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
 public class GaussianNB extends Classifier {
 
@@ -58,21 +58,13 @@ public class GaussianNB extends Classifier {
 	}
 
 	@Override
-	public NaiveBayesModel encodeModel(List<DataField> dataFields){
+	public NaiveBayesModel encodeModel(Schema schema){
 		int[] shape = getThetaShape();
 
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		Function<Object, String> targetCategoryFunction = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object object){
-				return String.valueOf(object);
-			}
-		};
-
-		List<String> targetCategories = Lists.transform(getClasses(), targetCategoryFunction);
+		List<String> targetCategories = schema.getTargetCategories();
 
 		List<? extends Number> theta = getTheta();
 		List<? extends Number> sigma = getSigma();
@@ -80,27 +72,27 @@ public class GaussianNB extends Classifier {
 		BayesInputs bayesInputs = new BayesInputs();
 
 		for(int i = 0; i < numberOfFeatures; i++){
-			DataField dataField = dataFields.get(i + 1);
+			FieldName activeField = schema.getActiveField(i);
 
 			List<? extends Number> means = NDArrayUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
 			List<? extends Number> variances = NDArrayUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
 
-			BayesInput bayesInput = new BayesInput(dataField.getName())
+			BayesInput bayesInput = new BayesInput(activeField)
 				.setTargetValueStats(encodeTargetValueStats(targetCategories, means, variances));
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}
 
-		DataField dataField = dataFields.get(0);
+		FieldName targetField = schema.getTargetField();
 
 		List<? extends Number> classCount = getClassCount();
 
-		BayesOutput bayesOutput = new BayesOutput(dataField.getName(), null)
+		BayesOutput bayesOutput = new BayesOutput(targetField, null)
 			.setTargetValueCounts(encodeTargetValueCounts(targetCategories, classCount));
 
-		Output output = new Output(PMMLUtil.createProbabilityFields(dataField));
+		MiningSchema miningSchema = PMMLUtil.createMiningSchema(targetField, schema.getActiveFields());
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
+		Output output = EstimatorUtil.encodeClassifierOutput(schema);
 
 		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunctionType.CLASSIFICATION, miningSchema, bayesInputs, bayesOutput)
 			.setOutput(output);

@@ -20,7 +20,7 @@ package sklearn.tree;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Node;
@@ -30,10 +30,10 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.TreeModel;
 import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
-import org.dmg.pmml.Value;
 import org.jpmml.converter.FieldCollector;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TreeModelFieldCollector;
+import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 
@@ -43,7 +43,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, List<DataField> dataFields, boolean standalone){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, Schema schema, boolean standalone){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -56,12 +56,12 @@ public class TreeModelUtil {
 			.setId("1")
 			.setPredicate(new True());
 
-		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, dataFields);
+		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 		FieldCollector fieldCollector = new TreeModelFieldCollector();
 		fieldCollector.applyTo(root);
 
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(dataFields, fieldCollector, standalone);
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector, standalone);
 
 		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);
@@ -70,21 +70,21 @@ public class TreeModelUtil {
 	}
 
 	static
-	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunctionType miningFunction, List<DataField> dataFields){
+	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunctionType miningFunction, Schema schema){
 		int feature = features[index];
 
 		// A non-leaf (binary split) node
 		if(feature >= 0){
-			DataField dataField = dataFields.get(feature + 1);
+			FieldName activeField = schema.getActiveField(feature);
 
 			double threshold = thresholds[index];
 
 			String value = PMMLUtil.formatValue(threshold);
 
-			Predicate leftPredicate = new SimplePredicate(dataField.getName(), SimplePredicate.Operator.LESS_OR_EQUAL)
+			Predicate leftPredicate = new SimplePredicate(activeField, SimplePredicate.Operator.LESS_OR_EQUAL)
 				.setValue(value);
 
-			Predicate rightPredicate = new SimplePredicate(dataField.getName(), SimplePredicate.Operator.GREATER_THAN)
+			Predicate rightPredicate = new SimplePredicate(activeField, SimplePredicate.Operator.GREATER_THAN)
 				.setValue(value);
 
 			int leftIndex = leftChildren[index];
@@ -94,25 +94,23 @@ public class TreeModelUtil {
 				.setId(String.valueOf(leftIndex + 1))
 				.setPredicate(leftPredicate);
 
-			encodeNode(leftChild, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, dataFields);
+			encodeNode(leftChild, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			Node rightChild = new Node()
 				.setId(String.valueOf(rightIndex + 1))
 				.setPredicate(rightPredicate);
 
-			encodeNode(rightChild, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, dataFields);
+			encodeNode(rightChild, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			node.addNodes(leftChild, rightChild);
 		} else
 
 		// A leaf node
 		{
-			DataField dataField = dataFields.get(0);
-
 			if((MiningFunctionType.CLASSIFICATION).equals(miningFunction)){
-				List<Value> validValues = dataField.getValues();
+				List<String> targetCategories = schema.getTargetCategories();
 
-				double[] scoreRecordCounts = getRow(values, leftChildren.length, validValues.size(), index);
+				double[] scoreRecordCounts = getRow(values, leftChildren.length, targetCategories.size(), index);
 
 				double recordCount = 0;
 
@@ -126,10 +124,10 @@ public class TreeModelUtil {
 
 				Double probability = null;
 
-				for(int i = 0; i < validValues.size(); i++){
-					Value validValue = validValues.get(i);
+				for(int i = 0; i < targetCategories.size(); i++){
+					String targetCategory = targetCategories.get(i);
 
-					ScoreDistribution scoreDistribution = new ScoreDistribution(validValue.getValue(), scoreRecordCounts[i]);
+					ScoreDistribution scoreDistribution = new ScoreDistribution(targetCategory, scoreRecordCounts[i]);
 
 					node.addScoreDistributions(scoreDistribution);
 

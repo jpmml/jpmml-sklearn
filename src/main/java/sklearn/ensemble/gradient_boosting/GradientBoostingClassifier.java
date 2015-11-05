@@ -25,7 +25,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FeatureType;
@@ -39,6 +38,7 @@ import org.dmg.pmml.PMML;
 import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -60,7 +60,7 @@ public class GradientBoostingClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
+	public MiningModel encodeModel(Schema schema){
 		LossFunction loss = getLoss();
 
 		int numberOfClasses = loss.getK();
@@ -71,15 +71,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		Function<Object, String> targetCategoryFunction = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object object){
-				return String.valueOf(object);
-			}
-		};
-
-		List<String> targetCategories = Lists.transform(getClasses(), targetCategoryFunction);
+		List<String> targetCategories = schema.getTargetCategories();
 
 		Function<MiningModel, FieldName> probabilityFieldFunction = new Function<MiningModel, FieldName>(){
 
@@ -101,13 +93,13 @@ public class GradientBoostingClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), loss, estimators, init.getPriorProbability(0), learningRate, dataFields);
+			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), loss, estimators, init.getPriorProbability(0), learningRate, schema);
 
 			List<FieldName> probabilityFields = new ArrayList<>();
 			probabilityFields.add(probabilityFieldFunction.apply(miningModel));
 			probabilityFields.add(FieldName.create(loss.getFunction() + "DecisionFunction_" + targetCategories.get(1)));
 
-			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, miningModel, dataFields);
+			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, miningModel, schema);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -119,14 +111,14 @@ public class GradientBoostingClassifier extends Classifier {
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), loss, NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, dataFields);
+				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), loss, NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, schema);
 
 				miningModels.add(miningModel);
 			}
 
 			List<FieldName> probabilityFields = Lists.transform(miningModels, probabilityFieldFunction);
 
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, miningModels, dataFields);
+			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, miningModels, schema);
 		} else
 
 		{
@@ -189,7 +181,7 @@ public class GradientBoostingClassifier extends Classifier {
 	}
 
 	static
-	private MiningModel encodeCategoryRegressor(String targetCategory, LossFunction loss, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, List<DataField> dataFields){
+	private MiningModel encodeCategoryRegressor(String targetCategory, LossFunction loss, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, Schema schema){
 		OutputField decisionFunction = PMMLUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
 		OutputField transformedDecisionField = new OutputField(FieldName.create(loss.getFunction() + "DecisionFunction_" + targetCategory))
@@ -201,7 +193,7 @@ public class GradientBoostingClassifier extends Classifier {
 		Output output = new Output()
 			.addOutputFields(decisionFunction, transformedDecisionField);
 
-		MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, priorProbability, learningRate, dataFields, false)
+		MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, priorProbability, learningRate, schema, false)
 			.setOutput(output);
 
 		return miningModel;

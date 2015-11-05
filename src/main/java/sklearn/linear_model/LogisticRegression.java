@@ -18,10 +18,8 @@
  */
 package sklearn.linear_model;
 
-import java.util.List;
-
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.MiningModel;
+import org.jpmml.sklearn.Schema;
 
 public class LogisticRegression extends BaseLinearClassifier {
 
@@ -30,14 +28,14 @@ public class LogisticRegression extends BaseLinearClassifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
+	public MiningModel encodeModel(Schema schema){
 		String multiClass = getMultiClass();
 
 		if(!("ovr").equals(multiClass)){
 			throw new IllegalArgumentException();
 		}
 
-		return super.encodeModel(dataFields);
+		return super.encodeModel(schema);
 	}
 
 	public String getMultiClass(){

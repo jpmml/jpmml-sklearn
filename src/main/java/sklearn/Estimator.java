@@ -18,7 +18,6 @@
  */
 package sklearn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataDictionary;
@@ -29,6 +28,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.sklearn.Schema;
 
 abstract
 public class Estimator extends BaseEstimator {
@@ -38,7 +38,10 @@ public class Estimator extends BaseEstimator {
 	}
 
 	abstract
-	public DataField encodeTargetField();
+	public DataField encodeTargetField(FieldName name, List<String> targetCategories);
+
+	abstract
+	public Model encodeModel(Schema schema);
 
 	public int getNumberOfFeatures(){
 		return (Integer)get("n_features_");
@@ -58,31 +61,41 @@ public class Estimator extends BaseEstimator {
 		return DataType.DOUBLE;
 	}
 
-	public DataField encodeActiveField(int index){
-		DataField dataField = new DataField(FieldName.create("x" + String.valueOf(index + 1)), getOpType(), getDataType());
+	public DataDictionary encodeDataDictionary(Schema schema){
+		DataDictionary dataDictionary = new DataDictionary(null);
 
-		return dataField;
-	}
+		FieldName targetField = schema.getTargetField();
+		if(targetField != null){
+			DataField dataField = encodeTargetField(targetField, schema.getTargetCategories());
 
-	abstract
-	public Model encodeModel(List<DataField> dataFields);
-
-	public PMML encodePMML(){
-		List<DataField> dataFields = new ArrayList<>();
-		dataFields.add(encodeTargetField());
-
-		int features = getNumberOfFeatures();
-		for(int i = 0; i < features; i++){
-			dataFields.add(encodeActiveField(i));
+			dataDictionary.addDataFields(dataField);
 		}
 
-		DataDictionary dataDictionary = new DataDictionary(dataFields);
+		List<FieldName> activeFields = schema.getActiveFields();
+		for(FieldName activeField : activeFields){
+			DataField dataField = new DataField(activeField, getOpType(), getDataType());
 
-		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn"), dataDictionary);
+			dataDictionary.addDataFields(dataField);
+		}
 
-		Model model = encodeModel(dataFields);
+		return dataDictionary;
+	}
 
-		pmml.addModels(model);
+	public Schema createSchema(){
+		Schema schema = new Schema(getNumberOfFeatures());
+
+		return schema;
+	}
+
+	public PMML encodePMML(){
+		Schema schema = createSchema();
+
+		DataDictionary dataDictionary = encodeDataDictionary(schema);
+
+		Model model = encodeModel(schema);
+
+		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn"), dataDictionary)
+			.addModels(model);
 
 		return pmml;
 	}

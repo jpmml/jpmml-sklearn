@@ -20,13 +20,14 @@ package sklearn.linear_model;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
 import org.jpmml.converter.FieldCollector;
+import org.jpmml.sklearn.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.EstimatorUtil;
@@ -37,13 +38,13 @@ public class RegressionModelUtil {
 	}
 
 	static
-	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, List<DataField> dataFields, boolean standalone){
-		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, dataFields);
+	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema, boolean standalone){
+		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
 		FieldCollector fieldCollector = new RegressionModelFieldCollector();
 		fieldCollector.applyTo(regressionTable);
 
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(dataFields, fieldCollector, standalone);
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector, standalone);
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
 			.addRegressionTables(regressionTable);
@@ -52,9 +53,10 @@ public class RegressionModelUtil {
 	}
 
 	static
-	public RegressionTable encodeRegressionTable(List<? extends Number> coefficients, Number intercept, List<DataField> dataFields){
+	public RegressionTable encodeRegressionTable(List<? extends Number> coefficients, Number intercept, Schema schema){
+		List<FieldName> activeFields = schema.getActiveFields();
 
-		if(coefficients.size() != (dataFields.size() - 1)){
+		if(coefficients.size() != activeFields.size()){
 			throw new IllegalArgumentException();
 		}
 
@@ -62,15 +64,15 @@ public class RegressionModelUtil {
 
 		for(int i = 0; i < coefficients.size(); i++){
 			Number coefficient = coefficients.get(i);
-			DataField dataField = dataFields.get(i + 1);
+			FieldName activeField = activeFields.get(i);
 
 			if(Double.compare(coefficient.doubleValue(), 0d) == 0){
-				logger.info("Skipping predictor variable {} due to a zero coefficient", dataField.getName());
+				logger.info("Skipping predictor variable {} due to a zero coefficient", activeField);
 
 				continue;
 			}
 
-			NumericPredictor numericPredictor = new NumericPredictor(dataField.getName(), coefficient.doubleValue());
+			NumericPredictor numericPredictor = new NumericPredictor(activeField, coefficient.doubleValue());
 
 			regressionTable.addNumericPredictors(numericPredictor);
 		}

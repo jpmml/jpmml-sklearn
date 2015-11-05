@@ -20,14 +20,14 @@ package sklearn.ensemble.forest;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Output;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeClassifier;
 
 public class RandomForestClassifier extends Classifier {
@@ -42,14 +42,12 @@ public class RandomForestClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
-		DataField dataField = dataFields.get(0);
-
-		Output output = new Output(PMMLUtil.createProbabilityFields(dataField));
-
+	public MiningModel encodeModel(Schema schema){
 		List<DecisionTreeClassifier> estimators = getEstimators();
 
-		MiningModel miningModel = RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, dataFields)
+		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+
+		MiningModel miningModel = RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, schema)
 			.setOutput(output);
 
 		return miningModel;

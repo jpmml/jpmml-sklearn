@@ -18,13 +18,19 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
 
 abstract
@@ -35,12 +41,38 @@ public class Classifier extends Estimator {
 	}
 
 	@Override
-	public DataField encodeTargetField(){
-		DataField dataField = new DataField(FieldName.create("y"), OpType.CATEGORICAL, DataType.STRING);
+	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
+		DataField dataField = new DataField(name, OpType.CATEGORICAL, DataType.STRING);
 
-		SchemaUtil.addValues(dataField, getClasses());
+		SchemaUtil.addValues(dataField, targetCategories);
 
 		return dataField;
+	}
+
+	@Override
+	public Schema createSchema(){
+		Schema schema = super.createSchema();
+
+		Function<Object, String> function = new Function<Object, String>(){
+
+			@Override
+			public String apply(Object object){
+				String targetCategory = PMMLUtil.formatValue(object);
+
+				if(targetCategory == null || CharMatcher.WHITESPACE.matchesAnyOf(targetCategory)){
+					throw new IllegalArgumentException(targetCategory);
+				}
+
+				return targetCategory;
+			}
+		};
+
+		List<String> targetCategories = new ArrayList<>(Lists.transform(getClasses(), function));
+		if(targetCategories != null && targetCategories.size() > 0){
+			schema.setTargetCategories(targetCategories);
+		}
+
+		return schema;
 	}
 
 	public List<?> getClasses(){

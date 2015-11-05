@@ -18,15 +18,13 @@
  */
 package sklearn.tree;
 
-import java.util.List;
-
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
 public class DecisionTreeClassifier extends Classifier implements HasTree {
 
@@ -40,12 +38,10 @@ public class DecisionTreeClassifier extends Classifier implements HasTree {
 	}
 
 	@Override
-	public TreeModel encodeModel(List<DataField> dataFields){
-		DataField dataField = dataFields.get(0);
+	public TreeModel encodeModel(Schema schema){
+		Output output = EstimatorUtil.encodeClassifierOutput(schema);
 
-		Output output = new Output(PMMLUtil.createProbabilityFields(dataField));
-
-		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, dataFields, true)
+		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, schema, true)
 			.setOutput(output);
 
 		return treeModel;

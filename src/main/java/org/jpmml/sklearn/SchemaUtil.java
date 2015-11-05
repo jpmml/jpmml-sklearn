@@ -23,6 +23,7 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.PMMLUtil;
 
@@ -32,17 +33,39 @@ public class SchemaUtil {
 	}
 
 	static
-	public void addValues(DataField dataField, List<?> classes){
-		List<Value> values = dataField.getValues();
+	public void addValues(DataField dataField, List<?> objects){
 
-		Function<Object, String> function = new Function<Object, String>(){
+		if(objects != null && objects.size() > 0){
+			List<Value> values = dataField.getValues();
 
-			@Override
-			public String apply(Object object){
-				return PMMLUtil.formatValue(object);
-			}
-		};
+			Function<Object, String> function = new Function<Object, String>(){
 
-		values.addAll(PMMLUtil.createValues(Lists.transform((List<?>)classes, function)));
+				@Override
+				public String apply(Object object){
+					return PMMLUtil.formatValue(object);
+				}
+			};
+
+			values.addAll(PMMLUtil.createValues(Lists.transform(objects, function)));
+		}
+	}
+
+	static
+	public List<OutputField> encodeProbabilityFields(Schema schema){
+		List<String> targetCategories = schema.getTargetCategories();
+
+		if(targetCategories != null && targetCategories.size() > 0){
+			Function<String, OutputField> function = new Function<String, OutputField>(){
+
+				@Override
+				public OutputField apply(String targetCategory){
+					return PMMLUtil.createProbabilityField(targetCategory);
+				}
+			};
+
+			return Lists.transform(targetCategories, function);
+		}
+
+		return null;
 	}
 }

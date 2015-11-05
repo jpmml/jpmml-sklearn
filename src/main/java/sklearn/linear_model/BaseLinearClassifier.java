@@ -25,7 +25,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FeatureType;
 import org.dmg.pmml.FieldName;
@@ -39,6 +38,7 @@ import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 
@@ -61,25 +61,16 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
+	public MiningModel encodeModel(Schema schema){
 		int[] shape = getCoefShape();
 
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
+		List<String> targetCategories = schema.getTargetCategories();
+
 		List<? extends Number> coefficients = getCoef();
-
 		List<? extends Number> intercepts = getIntercept();
-
-		Function<Object, String> targetCategoryFunction = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object object){
-				return String.valueOf(object);
-			}
-		};
-
-		List<String> targetCategories = Lists.transform(getClasses(), targetCategoryFunction);
 
 		Function<RegressionModel, FieldName> probabilityFieldFunction = new Function<RegressionModel, FieldName>(){
 
@@ -101,13 +92,13 @@ public class BaseLinearClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), dataFields);
+			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), schema);
 
 			List<FieldName> probabilityFields = new ArrayList<>();
 			probabilityFields.add(probabilityFieldFunction.apply(regressionModel));
 			probabilityFields.add(FieldName.create("logitDecisionFunction_" + targetCategories.get(1)));
 
-			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, regressionModel, dataFields);
+			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, regressionModel, schema);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -119,14 +110,14 @@ public class BaseLinearClassifier extends Classifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), dataFields);
+				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), schema);
 
 				regressionModels.add(regressionModel);
 			}
 
 			List<FieldName> probabilityFields = Lists.transform(regressionModels, probabilityFieldFunction);
 
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, regressionModels, dataFields);
+			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, regressionModels, schema);
 		} else
 
 		{
@@ -159,7 +150,7 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	static
-	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, List<DataField> dataFields){
+	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, Schema schema){
 		OutputField decisionFunction = PMMLUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
 		OutputField transformedDecisionFunction = new OutputField(FieldName.create("logitDecisionFunction_" + targetCategory))
@@ -171,7 +162,7 @@ public class BaseLinearClassifier extends Classifier {
 		Output output = new Output()
 			.addOutputFields(decisionFunction, transformedDecisionFunction);
 
-		RegressionModel regressionModel = RegressionModelUtil.encodeRegressionModel(coefficients, intercept, dataFields, false)
+		RegressionModel regressionModel = RegressionModelUtil.encodeRegressionModel(coefficients, intercept, schema, false)
 			.setOutput(output);
 
 		return regressionModel;

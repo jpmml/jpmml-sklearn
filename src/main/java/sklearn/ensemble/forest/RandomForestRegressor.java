@@ -20,11 +20,11 @@ package sklearn.ensemble.forest;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
+import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
 import sklearn.tree.DecisionTreeRegressor;
 
@@ -40,10 +40,10 @@ public class RandomForestRegressor extends Regressor {
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
+	public MiningModel encodeModel(Schema schema){
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		return RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, dataFields);
+		return RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, schema);
 	}
 
 	public List<DecisionTreeRegressor> getEstimators(){

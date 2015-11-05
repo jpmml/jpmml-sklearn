@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MiningSchema;
@@ -30,6 +29,7 @@ import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.tree.HasTree;
@@ -41,12 +41,12 @@ public class RandomForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeRandomForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, final MiningFunctionType miningFunction, final List<DataField> dataFields){
+	public <E extends Estimator & HasTree> MiningModel encodeRandomForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, final MiningFunctionType miningFunction, final Schema schema){
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
 			@Override
 			public TreeModel apply(E estimator){
-				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, dataFields, false);
+				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, schema, false);
 			}
 		};
 
@@ -54,7 +54,7 @@ public class RandomForestUtil {
 
 		Segmentation segmentation = EstimatorUtil.encodeSegmentation(multipleModelMethod, treeModels, null);
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
+		MiningSchema miningSchema = PMMLUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
 
 		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
 			.setSegmentation(segmentation);

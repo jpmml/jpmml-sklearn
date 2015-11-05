@@ -20,10 +20,10 @@ package sklearn.ensemble.gradient_boosting;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
 import sklearn.tree.DecisionTreeRegressor;
 
@@ -44,12 +44,12 @@ public class GradientBoostingRegressor extends Regressor {
 	}
 
 	@Override
-	public MiningModel encodeModel(List<DataField> dataFields){
+	public MiningModel encodeModel(Schema schema){
 		HasDefaultValue init = getInit();
 
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		return GradientBoostingUtil.encodeGradientBoosting(estimators, init.getDefaultValue(), getLearningRate(), dataFields, true);
+		return GradientBoostingUtil.encodeGradientBoosting(estimators, init.getDefaultValue(), getLearningRate(), schema, true);
 	}
 
 	public HasDefaultValue getInit(){

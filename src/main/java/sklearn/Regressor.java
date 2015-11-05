@@ -18,6 +18,8 @@
  */
 package sklearn;
 
+import java.util.List;
+
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
@@ -31,8 +33,8 @@ public class Regressor extends Estimator {
 	}
 
 	@Override
-	public DataField encodeTargetField(){
-		DataField dataField = new DataField(FieldName.create("y"), OpType.CONTINUOUS, DataType.DOUBLE);
+	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
+		DataField dataField = new DataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
 
 		return dataField;
 	}

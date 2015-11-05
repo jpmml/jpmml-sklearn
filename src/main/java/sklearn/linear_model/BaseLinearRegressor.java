@@ -21,9 +21,9 @@ package sklearn.linear_model;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.RegressionModel;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
 
 abstract
@@ -45,8 +45,8 @@ public class BaseLinearRegressor extends Regressor {
 	}
 
 	@Override
-	public RegressionModel encodeModel(List<DataField> dataFields){
-		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), dataFields, true);
+	public RegressionModel encodeModel(Schema schema){
+		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), schema, true);
 	}
 
 	public List<? extends Number> getCoef(){

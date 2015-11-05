@@ -21,9 +21,6 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
@@ -49,6 +46,8 @@ import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.True;
 import org.jpmml.converter.FieldCollector;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.SchemaUtil;
 import sklearn.linear_model.RegressionModelUtil;
 
 public class EstimatorUtil {
@@ -57,25 +56,17 @@ public class EstimatorUtil {
 	}
 
 	static
-	public MiningSchema encodeMiningSchema(List<DataField> dataFields, FieldCollector fieldCollector, boolean standalone){
-		Function<DataField, FieldName> function = new Function<DataField, FieldName>(){
+	public MiningSchema encodeMiningSchema(Schema schema, FieldCollector fieldCollector, boolean standalone){
+		FieldName targetField = (standalone ? schema.getTargetField() : null);
 
-			@Override
-			public FieldName apply(DataField dataField){
-				return dataField.getName();
-			}
-		};
-
-		FieldName targetField = (standalone ? function.apply(dataFields.get(0)) : null);
-
-		List<FieldName> activeFields = new ArrayList<>(Lists.transform(dataFields.subList(1, dataFields.size()), function));
+		List<FieldName> activeFields = new ArrayList<>(schema.getActiveFields());
 		activeFields.retainAll(fieldCollector.getFields());
 
 		return PMMLUtil.createMiningSchema(targetField, activeFields);
 	}
 
 	static
-	public MiningModel encodeBinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, Model model, List<DataField> dataFields){
+	public MiningModel encodeBinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, Model model, Schema schema){
 
 		if(targetCategories.size() != 2 || (targetCategories.size() != probabilityFields.size())){
 			throw new IllegalArgumentException();
@@ -106,16 +97,16 @@ public class EstimatorUtil {
 			models.add(regressionModel);
 		}
 
-		return encodeClassifier(targetCategories, probabilityFields, models, null, dataFields);
+		return encodeClassifier(targetCategories, probabilityFields, models, null, schema);
 	}
 
 	static
-	public MiningModel encodeMultinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, List<DataField> dataFields){
-		return encodeClassifier(targetCategories, probabilityFields, models, RegressionNormalizationMethodType.SIMPLEMAX, dataFields);
+	public MiningModel encodeMultinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, Schema schema){
+		return encodeClassifier(targetCategories, probabilityFields, models, RegressionNormalizationMethodType.SIMPLEMAX, schema);
 	}
 
 	static
-	public MiningModel encodeClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, RegressionNormalizationMethodType normalizationMethod, List<DataField> dataFields){
+	public MiningModel encodeClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, RegressionNormalizationMethodType normalizationMethod, Schema schema){
 
 		if(targetCategories.size() != probabilityFields.size()){
 			throw new IllegalArgumentException();
@@ -123,11 +114,11 @@ public class EstimatorUtil {
 
 		List<Model> segmentationModels = new ArrayList<>(models);
 
-		DataField dataField = dataFields.get(0);
+		FieldName targetField = schema.getTargetField();
 
 		{
 			MiningSchema miningSchema = new MiningSchema()
-				.addMiningFields(PMMLUtil.createMiningField(dataField.getName(), FieldUsageType.TARGET));
+				.addMiningFields(PMMLUtil.createMiningField(targetField, FieldUsageType.TARGET));
 
 			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.CLASSIFICATION, miningSchema, null)
 				.setNormalizationMethod(normalizationMethod);
@@ -148,11 +139,11 @@ public class EstimatorUtil {
 			segmentationModels.add(regressionModel);
 		}
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(dataFields);
+		MiningSchema miningSchema = PMMLUtil.createMiningSchema(targetField, schema.getActiveFields());
 
 		Segmentation segmentation = encodeSegmentation(MultipleModelMethodType.MODEL_CHAIN, segmentationModels, null);
 
-		Output output = new Output(PMMLUtil.createProbabilityFields(dataField));
+		Output output = encodeClassifierOutput(schema);
 
 		MiningModel miningModel = new MiningModel(MiningFunctionType.CLASSIFICATION, miningSchema)
 			.setSegmentation(segmentation)
@@ -187,6 +178,19 @@ public class EstimatorUtil {
 		}
 
 		return segmentation;
+	}
+
+	static
+	public Output encodeClassifierOutput(Schema schema){
+		List<OutputField> outputFields = SchemaUtil.encodeProbabilityFields(schema);
+
+		if(outputFields != null && outputFields.size() > 0){
+			Output output = new Output(outputFields);
+
+			return output;
+		}
+
+		return null;
 	}
 
 	static
