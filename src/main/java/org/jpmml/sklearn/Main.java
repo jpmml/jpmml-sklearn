@@ -103,6 +103,8 @@ public class Main {
 	public PMML convert() throws IOException {
 		PMML pmml;
 
+		Schema schema;
+
 		Storage estimatorStorage = PickleUtil.createStorage(this.estimatorInput);
 
 		try {
@@ -114,7 +116,9 @@ public class Main {
 
 			Estimator estimator = (Estimator)object;
 
-			pmml = estimator.encodePMML();
+			schema = estimator.createSchema();
+
+			pmml = estimator.encodePMML(schema);
 		} finally {
 			estimatorStorage.close();
 		}
@@ -131,7 +135,7 @@ public class Main {
 
 				DataFrameMapper mapper = (DataFrameMapper)object;
 
-				mapper.updatePMML(pmml);
+				mapper.updatePMML(schema, pmml);
 			} finally {
 				mapperStorage.close();
 			}

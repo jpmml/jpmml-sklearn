@@ -32,12 +32,17 @@ public class Schema {
 	private List<FieldName> activeFields = null;
 
 
-	public Schema(int size){
-		this(createTargetField(), createActiveFields(size));
+	public Schema(List<FieldName> activeFields){
+		this(null, null, activeFields);
 	}
 
 	public Schema(FieldName targetField, List<FieldName> activeFields){
+		this(targetField, null, activeFields);
+	}
+
+	public Schema(FieldName targetField, List<String> targetCategories, List<FieldName> activeFields){
 		setTargetField(targetField);
+		setTargetCategories(targetCategories);
 		setActiveFields(activeFields);
 	}
 
@@ -53,7 +58,7 @@ public class Schema {
 		return this.targetCategories;
 	}
 
-	public void setTargetCategories(List<String> targetCategories){
+	private void setTargetCategories(List<String> targetCategories){
 		this.targetCategories = targetCategories;
 	}
 

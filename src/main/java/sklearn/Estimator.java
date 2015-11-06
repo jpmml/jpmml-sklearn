@@ -38,6 +38,9 @@ public class Estimator extends BaseEstimator {
 	}
 
 	abstract
+	public Schema createSchema();
+
+	abstract
 	public DataField encodeTargetField(FieldName name, List<String> targetCategories);
 
 	abstract
@@ -81,15 +84,7 @@ public class Estimator extends BaseEstimator {
 		return dataDictionary;
 	}
 
-	public Schema createSchema(){
-		Schema schema = new Schema(getNumberOfFeatures());
-
-		return schema;
-	}
-
-	public PMML encodePMML(){
-		Schema schema = createSchema();
-
+	public PMML encodePMML(Schema schema){
 		DataDictionary dataDictionary = encodeDataDictionary(schema);
 
 		Model model = encodeModel(schema);

@@ -21,32 +21,27 @@ package sklearn;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.OpType;
 import org.jpmml.sklearn.Schema;
 
 abstract
-public class Regressor extends Estimator {
+public class Clusterer extends Estimator {
 
-	public Regressor(String module, String name){
+	public Clusterer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public Schema createSchema(){
-		FieldName targetField = Schema.createTargetField();
 		List<FieldName> activeFields = Schema.createActiveFields(getNumberOfFeatures());
 
-		Schema schema = new Schema(targetField, activeFields);
+		Schema schema = new Schema(activeFields);
 
 		return schema;
 	}
 
 	@Override
 	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
-		DataField dataField = new DataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
-
-		return dataField;
+		throw new UnsupportedOperationException();
 	}
 }

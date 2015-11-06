@@ -127,8 +127,8 @@ public class GradientBoostingClassifier extends Classifier {
 	}
 
 	@Override
-	public PMML encodePMML(){
-		PMML pmml = super.encodePMML();
+	public PMML encodePMML(Schema schema){
+		PMML pmml = super.encodePMML(schema);
 
 		LossFunction loss = getLoss();
 

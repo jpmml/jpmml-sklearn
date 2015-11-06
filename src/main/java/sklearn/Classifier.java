@@ -41,17 +41,9 @@ public class Classifier extends Estimator {
 	}
 
 	@Override
-	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
-		DataField dataField = new DataField(name, OpType.CATEGORICAL, DataType.STRING);
-
-		SchemaUtil.addValues(dataField, targetCategories);
-
-		return dataField;
-	}
-
-	@Override
 	public Schema createSchema(){
-		Schema schema = super.createSchema();
+		FieldName targetField = Schema.createTargetField();
+		List<FieldName> activeFields = Schema.createActiveFields(getNumberOfFeatures());
 
 		Function<Object, String> function = new Function<Object, String>(){
 
@@ -68,11 +60,22 @@ public class Classifier extends Estimator {
 		};
 
 		List<String> targetCategories = new ArrayList<>(Lists.transform(getClasses(), function));
-		if(targetCategories != null && targetCategories.size() > 0){
-			schema.setTargetCategories(targetCategories);
+		if(targetCategories.isEmpty()){
+			throw new IllegalArgumentException();
 		}
 
+		Schema schema = new Schema(targetField, targetCategories, activeFields);
+
 		return schema;
+	}
+
+	@Override
+	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
+		DataField dataField = new DataField(name, OpType.CATEGORICAL, DataType.STRING);
+
+		SchemaUtil.addValues(dataField, targetCategories);
+
+		return dataField;
 	}
 
 	public List<?> getClasses(){

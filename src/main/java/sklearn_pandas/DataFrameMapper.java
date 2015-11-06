@@ -47,6 +47,7 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,23 +61,36 @@ public class DataFrameMapper extends ClassDict {
 		super(module, name);
 	}
 
-	public void updatePMML(PMML pmml){
+	public void updatePMML(Schema schema, PMML pmml){
+		FieldName targetField = schema.getTargetField();
+		List<FieldName> activeFields = schema.getActiveFields();
+
 		List<Object[]> features = new ArrayList<>(getFeatures());
 
 		if(features.size() < 1){
 			logger.warn("The list of mappings is empty");
 
 			return;
+		} // End if
+
+		if(targetField != null){
+			logger.info("Re-mapping 1 target field and {} active field(s)", activeFields.size());
+
+			// Move the target column from the last position to the first position
+			features.add(0, features.remove(features.size() - 1));
+		} else
+
+		{
+			logger.info("Re-mapping {} active field(s)", activeFields.size());
 		}
 
-		// Move the target column from the last position to the first position
-		features.add(0, features.remove(features.size() - 1));
+		Iterator<Object[]> featureIt = features.iterator();
 
 		DataDictionary dataDictionary = pmml.getDataDictionary();
 
 		List<DataField> dataFields = dataDictionary.getDataFields();
 
-		logger.info("Re-mapping {} target field and {} active field(s)", 1, (dataFields.size() - 1));
+		Iterator<DataField> dataFieldIt = dataFields.iterator();
 
 		Model model = Iterables.getOnlyElement(pmml.getModels());
 
@@ -90,11 +104,9 @@ public class DataFrameMapper extends ClassDict {
 		final
 		Map<FieldName, FieldName> renamedFields = new LinkedHashMap<>();
 
-		Iterator<DataField> it = dataFields.iterator();
-
 		// The target column
-		{
-			Object[] feature = features.get(0);
+		if(targetField != null){
+			Object[] feature = featureIt.next();
 
 			FieldName name = FieldName.create(getName(feature));
 
@@ -105,7 +117,7 @@ public class DataFrameMapper extends ClassDict {
 				throw new IllegalArgumentException();
 			}
 
-			DataField dataField = it.next();
+			DataField dataField = dataFieldIt.next();
 
 			logger.info("Renaming target field {} to {}", dataField.getName(), name);
 
@@ -113,8 +125,8 @@ public class DataFrameMapper extends ClassDict {
 		}
 
 		// Zero or more active columns
-		for(int i = 1; i < features.size(); i++){
-			Object[] feature = features.get(i);
+		while(featureIt.hasNext()){
+			Object[] feature = featureIt.next();
 
 			FieldName name = FieldName.create(getName(feature));
 
@@ -132,7 +144,7 @@ public class DataFrameMapper extends ClassDict {
 				};
 			}
 
-			DataField dataField = it.next();
+			DataField dataField = dataFieldIt.next();
 
 			logger.info("Renaming active field {} to {}", dataField.getName(), name);
 
@@ -157,13 +169,13 @@ public class DataFrameMapper extends ClassDict {
 					DataField elementDataField = dataField;
 
 					if(j > 0){
-						elementDataField = it.next();
+						elementDataField = dataFieldIt.next();
 
 						logger.info("Renaming active field {} to {}", elementDataField.getName(), name);
 
 						renamedFields.put(elementDataField.getName(), name);
 
-						it.remove();
+						dataFieldIt.remove();
 					}
 
 					DerivedField derivedField = encodeDerivedField(elementDataField, expression);
@@ -182,7 +194,7 @@ public class DataFrameMapper extends ClassDict {
 			SchemaUtil.addValues(dataField, transformer.getClasses());
 		}
 
-		if(it.hasNext()){
+		if(dataFieldIt.hasNext()){
 			Function<DataField, FieldName> function = new Function<DataField, FieldName>(){
 
 				@Override
@@ -191,7 +203,7 @@ public class DataFrameMapper extends ClassDict {
 				}
 			};
 
-			List<FieldName> unusedNames = Lists.newArrayList(Iterators.transform(it, function));
+			List<FieldName> unusedNames = Lists.newArrayList(Iterators.transform(dataFieldIt, function));
 
 			logger.error("The list of mappings is shorter than the list of fields. Unused active fields: {}", unusedNames);
 

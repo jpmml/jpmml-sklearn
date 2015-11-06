@@ -57,12 +57,16 @@ public class EstimatorTest extends ArchiveBatchTest {
 			public PMML getPMML() throws IOException {
 				PMML pmml;
 
+				Schema schema;
+
 				Storage estimatorStorage = openStorage("/pkl/" + getName() + getDataset() + ".pkl");
 
 				try {
 					Estimator estimator = (Estimator)PickleUtil.unpickle(estimatorStorage);
 
-					pmml = estimator.encodePMML();
+					schema = estimator.createSchema();
+
+					pmml = estimator.encodePMML(schema);
 				} finally {
 					estimatorStorage.close();
 				}
@@ -72,7 +76,7 @@ public class EstimatorTest extends ArchiveBatchTest {
 				try {
 					DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(mapperStorage);
 
-					mapper.updatePMML(pmml);
+					mapper.updatePMML(schema, pmml);
 				} finally {
 					mapperStorage.close();
 				}

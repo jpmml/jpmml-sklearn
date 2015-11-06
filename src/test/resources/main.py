@@ -1,3 +1,4 @@
+from sklearn.cluster import KMeans
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
@@ -31,6 +32,42 @@ def store_pkl(obj, name):
 def dump(obj):
     for attr in dir(obj):
         print("obj.%s = %s" % (attr, getattr(obj, attr)))
+
+#
+# Clustering
+#
+
+wheat_df = load_csv("Wheat.csv")
+
+print(wheat_df.dtypes)
+
+wheat_df = wheat_df.drop("Variety", axis = 1)
+
+print(wheat_df.dtypes)
+
+wheat_mapper = DataFrameMapper([
+    (["Area"], MinMaxScaler()),
+    (["Perimeter"], MinMaxScaler()),
+    (["Compactness"], MinMaxScaler()),
+    (["Kernel.Length"], MinMaxScaler()),
+    (["Kernel.Width"], MinMaxScaler()),
+    (["Asymmetry"], MinMaxScaler()),
+    (["Groove.Length"], MinMaxScaler())
+])
+
+wheat_X = wheat_mapper.fit_transform(wheat_df)
+
+print(wheat_X.shape)
+
+store_pkl(wheat_mapper, "Wheat.pkl")
+
+def build_wheat(kmeans, name):
+    kmeans.fit(wheat_X)
+    store_pkl(kmeans, name + ".pkl")
+    cluster = DataFrame(kmeans.predict(wheat_X), columns = ["Cluster"])
+    store_csv(cluster, name + ".csv")
+
+build_wheat(KMeans(n_clusters = 3, random_state = 13), "KMeansWheat")
 
 #
 # Binary classification
