@@ -78,7 +78,7 @@ public class KMeans extends Clusterer {
 
 			Cluster cluster = new Cluster()
 				.setId(String.valueOf(i))
-				.setSize(labelCounts.count(i))
+				.setSize((labelCounts.size () > 0 ? labelCounts.count(i) : null))
 				.setArray(array);
 
 			clusters.add(cluster);
@@ -129,20 +129,22 @@ public class KMeans extends Clusterer {
 	private Multiset<Integer> parseLabels(List<? extends Number> labels){
 		Multiset<Integer> result = HashMultiset.create();
 
-		Function<Number, Integer> function = new Function<Number, Integer>(){
+		if(labels != null){
+			Function<Number, Integer> function = new Function<Number, Integer>(){
 
-			@Override
-			public Integer apply(Number number){
+				@Override
+				public Integer apply(Number number){
 
-				if(number instanceof Integer){
-					return (Integer)number;
+					if(number instanceof Integer){
+						return (Integer)number;
+					}
+
+					return number.intValue();
 				}
+			};
 
-				return number.intValue();
-			}
-		};
-
-		result.addAll(Lists.transform(labels, function));
+			result.addAll(Lists.transform(labels, function));
+		}
 
 		return result;
 	}

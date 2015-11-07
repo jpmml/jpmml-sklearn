@@ -8,6 +8,7 @@ Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to 
 * Supported Estimator and Transformer types:
   * Clustering:
     * [`cluster.KMeans`] (http://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
+    * [`cluster.MiniBatchKMeans`] (http://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html)
   * Ensemble Methods:
     * [`ensemble.GradientBoostingClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
     * [`ensemble.GradientBoostingRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)

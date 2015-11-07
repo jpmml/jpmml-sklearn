@@ -1,4 +1,4 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
@@ -68,6 +68,7 @@ def build_wheat(kmeans, name):
     store_csv(cluster, name + ".csv")
 
 build_wheat(KMeans(n_clusters = 3, random_state = 13), "KMeansWheat")
+build_wheat(MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state = 13), "MiniBatchKMeansWheat")
 
 #
 # Binary classification

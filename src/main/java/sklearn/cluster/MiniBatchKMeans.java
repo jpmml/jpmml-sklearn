@@ -16,19 +16,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package sklearn.cluster;
 
-import org.junit.Test;
+import java.util.List;
 
-public class ClustererTest extends EstimatorTest {
+public class MiniBatchKMeans extends KMeans {
 
-	@Test
-	public void evaluateKMeansWheat() throws Exception {
-		evaluate("KMeans", "Wheat");
+	public MiniBatchKMeans(String module, String name){
+		super(module, name);
 	}
 
-	@Test
-	public void evaluateMiniBatchKMeansWheat() throws Exception {
-		evaluate("MiniBatchKMeans", "Wheat");
+	@Override
+	public List<? extends Number> getLabels(){
+
+		if(!containsKey("labels_")){
+			return null;
+		}
+
+		return super.getLabels();
 	}
 }
