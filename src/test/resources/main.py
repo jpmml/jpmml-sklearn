@@ -61,10 +61,19 @@ print(wheat_X.shape)
 
 store_pkl(wheat_mapper, "Wheat.pkl")
 
-def build_wheat(kmeans, name):
+def kmeans_distance(kmeans, center):
+    return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - wheat_X, 2), axis = 1)
+
+def build_wheat(kmeans, name, with_affinity = True):
     kmeans.fit(wheat_X)
     store_pkl(kmeans, name + ".pkl")
     cluster = DataFrame(kmeans.predict(wheat_X), columns = ["Cluster"])
+    if(with_affinity == True):
+        affinity_0 = kmeans_distance(kmeans, 0)
+        affinity_1 = kmeans_distance(kmeans, 1)
+        affinity_2 = kmeans_distance(kmeans, 2)
+        cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity_0", "affinity_1", "affinity_2"])
+        cluster = pandas.concat((cluster, cluster_affinity), axis = 1)
     store_csv(cluster, name + ".csv")
 
 build_wheat(KMeans(n_clusters = 3, random_state = 13), "KMeansWheat")

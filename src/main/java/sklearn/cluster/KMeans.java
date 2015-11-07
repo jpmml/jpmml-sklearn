@@ -36,6 +36,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.SquaredEuclidean;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -104,8 +105,11 @@ public class KMeans extends Clusterer {
 
 		MiningSchema miningSchema = PMMLUtil.createMiningSchema(null, activeFields);
 
-		Output output = new Output()
-			.addOutputFields(PMMLUtil.createPredictedField(FieldName.create("Cluster")));
+		List<OutputField> outputFields = new ArrayList<>();
+		outputFields.add(PMMLUtil.createPredictedField(FieldName.create("Cluster")));
+		outputFields.addAll(encodeAffinityFields(clusters));
+
+		Output output = new Output(outputFields);
 
 		ClusteringModel clusteringModel = new ClusteringModel(MiningFunctionType.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, miningSchema, comparisonMeasure, clusteringFields, clusters)
 			.setOutput(output);
@@ -164,5 +168,20 @@ public class KMeans extends Clusterer {
 		Array array = new Array(Array.Type.REAL, value);
 
 		return array;
+	}
+
+	static
+	private List<OutputField> encodeAffinityFields(List<Cluster> clusters){
+		Function<Cluster, OutputField> function = new Function<Cluster, OutputField>(){
+
+			@Override
+			public OutputField apply(Cluster cluster){
+				OutputField outputField = PMMLUtil.createAffinityField(cluster.getId());
+
+				return outputField;
+			}
+		};
+
+		return Lists.transform(clusters, function);
 	}
 }
