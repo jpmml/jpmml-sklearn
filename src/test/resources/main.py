@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans, MiniBatchKMeans
+from sklearn.decomposition import PCA
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
@@ -142,10 +143,8 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-    ("Sepal.Length", StandardScaler(with_mean = True, with_std = False)),
-    ("Sepal.Width", StandardScaler(with_mean = True, with_std = False)),
-    ("Petal.Length", StandardScaler(with_std = False)),
-    ("Petal.Width", StandardScaler(with_std = False)),
+    (["Sepal.Length", "Sepal.Width"], PCA(n_components = 1)),
+    (["Petal.Length", "Petal.Width"], PCA()),
     ("Species", None)
 ])
 
@@ -155,8 +154,8 @@ print(iris.shape)
 
 store_pkl(iris_mapper, "Iris.pkl")
 
-iris_X = iris[:, 0:4]
-iris_y = iris[:, 4]
+iris_X = iris[:, 0:3]
+iris_y = iris[:, 3]
 
 print(iris_X.dtype, iris_y.dtype)
 

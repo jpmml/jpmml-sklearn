@@ -31,6 +31,7 @@ import numpy.core.Scalar;
 import numpy.random.RandomState;
 import sklearn.cluster.KMeans;
 import sklearn.cluster.MiniBatchKMeans;
+import sklearn.decomposition.PCA;
 import sklearn.ensemble.forest.RandomForestClassifier;
 import sklearn.ensemble.forest.RandomForestRegressor;
 import sklearn.ensemble.gradient_boosting.BinomialDeviance;
@@ -98,6 +99,7 @@ public class PickleUtil {
 			new ExtensionObjectConstructor("numpy.random", "__RandomState_ctor", RandomState.class),
 			new ObjectConstructor("sklearn.cluster.k_means_", "KMeans", KMeans.class),
 			new ObjectConstructor("sklearn.cluster.k_means_", "MiniBatchKMeans", MiniBatchKMeans.class),
+			new ObjectConstructor("sklearn.decomposition.pca", "PCA", PCA.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "BinomialDeviance", BinomialDeviance.class),
