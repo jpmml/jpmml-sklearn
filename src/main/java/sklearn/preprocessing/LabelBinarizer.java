@@ -28,9 +28,9 @@ import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.ComplexTransformer;
+import sklearn.OneToManyTransformer;
 
-public class LabelBinarizer extends ComplexTransformer {
+public class LabelBinarizer extends OneToManyTransformer {
 
 	public LabelBinarizer(String module, String name){
 		super(module, name);
@@ -47,7 +47,7 @@ public class LabelBinarizer extends ComplexTransformer {
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
+	public int getNumberOfOutputs(){
 		List<?> classes = getClasses();
 
 		return classes.size();

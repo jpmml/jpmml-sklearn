@@ -24,18 +24,27 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 
 abstract
-public class ComplexTransformer extends Transformer {
+public class ManyToOneTransformer extends ComplexTransformer {
 
-	public ComplexTransformer(String module, String name){
+	public ManyToOneTransformer(String module, String name){
 		super(module, name);
 	}
 
 	abstract
-	public int getNumberOfInputs();
+	public Expression encode(List<FieldName> names);
 
-	abstract
-	public int getNumberOfOutputs();
+	@Override
+	public int getNumberOfOutputs(){
+		return 1;
+	}
 
-	abstract
-	public Expression encode(int index, List<FieldName> names);
+	@Override
+	public Expression encode(int index, List<FieldName> names){
+
+		if(index != 0){
+			throw new IllegalArgumentException();
+		}
+
+		return encode(names);
+	}
 }

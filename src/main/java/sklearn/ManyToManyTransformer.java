@@ -18,24 +18,10 @@
  */
 package sklearn;
 
-import java.util.List;
-
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
-
 abstract
-public class ComplexTransformer extends Transformer {
+public class ManyToManyTransformer extends ComplexTransformer {
 
-	public ComplexTransformer(String module, String name){
+	public ManyToManyTransformer(String module, String name){
 		super(module, name);
 	}
-
-	abstract
-	public int getNumberOfInputs();
-
-	abstract
-	public int getNumberOfOutputs();
-
-	abstract
-	public Expression encode(int index, List<FieldName> names);
 }

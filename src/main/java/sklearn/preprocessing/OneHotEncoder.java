@@ -31,9 +31,9 @@ import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.ComplexTransformer;
+import sklearn.OneToManyTransformer;
 
-public class OneHotEncoder extends ComplexTransformer {
+public class OneHotEncoder extends OneToManyTransformer {
 
 	public OneHotEncoder(String module, String name){
 		super(module, name);
@@ -55,7 +55,7 @@ public class OneHotEncoder extends ComplexTransformer {
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
+	public int getNumberOfOutputs(){
 		List<? extends Number> values = getValues();
 
 		return values.size();
