@@ -15,24 +15,24 @@ import pandas
 #import pickle
 
 def load_csv(name):
-    return pandas.read_csv("csv/" + name, na_values = ["N/A", "NA"])
+	return pandas.read_csv("csv/" + name, na_values = ["N/A", "NA"])
 
 def store_csv(df, name):
-    df.to_csv("csv/" + name, index = False)
+	df.to_csv("csv/" + name, index = False)
 
 # Joblib dump
 def store_pkl(obj, name):
-    joblib.dump(obj, "pkl/" + name, compress = 9)
+	joblib.dump(obj, "pkl/" + name, compress = 9)
 
 # Pickle dump
 #def store_pkl(obj, name):
-#    con = open("pkl/" + name, "wb")
-#    pickle.dump(obj, con, protocol = -1)
-#    con.close()
+#	con = open("pkl/" + name, "wb")
+#	pickle.dump(obj, con, protocol = -1)
+#	con.close()
 
 def dump(obj):
-    for attr in dir(obj):
-        print("obj.%s = %s" % (attr, getattr(obj, attr)))
+	for attr in dir(obj):
+		print("obj.%s = %s" % (attr, getattr(obj, attr)))
 
 #
 # Clustering
@@ -47,13 +47,13 @@ wheat_df = wheat_df.drop("Variety", axis = 1)
 print(wheat_df.dtypes)
 
 wheat_mapper = DataFrameMapper([
-    (["Area"], MinMaxScaler()),
-    (["Perimeter"], MinMaxScaler()),
-    (["Compactness"], MinMaxScaler()),
-    (["Kernel.Length"], MinMaxScaler()),
-    (["Kernel.Width"], MinMaxScaler()),
-    (["Asymmetry"], MinMaxScaler()),
-    (["Groove.Length"], MinMaxScaler())
+	(["Area"], MinMaxScaler()),
+	(["Perimeter"], MinMaxScaler()),
+	(["Compactness"], MinMaxScaler()),
+	(["Kernel.Length"], MinMaxScaler()),
+	(["Kernel.Width"], MinMaxScaler()),
+	(["Asymmetry"], MinMaxScaler()),
+	(["Groove.Length"], MinMaxScaler())
 ])
 
 wheat_X = wheat_mapper.fit_transform(wheat_df)
@@ -63,19 +63,19 @@ print(wheat_X.shape)
 store_pkl(wheat_mapper, "Wheat.pkl")
 
 def kmeans_distance(kmeans, center):
-    return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - wheat_X, 2), axis = 1)
+	return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - wheat_X, 2), axis = 1)
 
 def build_wheat(kmeans, name, with_affinity = True):
-    kmeans.fit(wheat_X)
-    store_pkl(kmeans, name + ".pkl")
-    cluster = DataFrame(kmeans.predict(wheat_X), columns = ["Cluster"])
-    if(with_affinity == True):
-        affinity_0 = kmeans_distance(kmeans, 0)
-        affinity_1 = kmeans_distance(kmeans, 1)
-        affinity_2 = kmeans_distance(kmeans, 2)
-        cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity_0", "affinity_1", "affinity_2"])
-        cluster = pandas.concat((cluster, cluster_affinity), axis = 1)
-    store_csv(cluster, name + ".csv")
+	kmeans.fit(wheat_X)
+	store_pkl(kmeans, name + ".pkl")
+	cluster = DataFrame(kmeans.predict(wheat_X), columns = ["Cluster"])
+	if(with_affinity == True):
+		affinity_0 = kmeans_distance(kmeans, 0)
+		affinity_1 = kmeans_distance(kmeans, 1)
+		affinity_2 = kmeans_distance(kmeans, 2)
+		cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity_0", "affinity_1", "affinity_2"])
+		cluster = pandas.concat((cluster, cluster_affinity), axis = 1)
+	store_csv(cluster, name + ".csv")
 
 build_wheat(KMeans(n_clusters = 3, random_state = 13), "KMeansWheat")
 build_wheat(MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state = 13), "MiniBatchKMeansWheat")
@@ -93,16 +93,16 @@ audit_df["Deductions"] = audit_df["Deductions"].replace(True, "TRUE").replace(Fa
 print(audit_df.dtypes)
 
 audit_mapper = DataFrameMapper([
-    ("Age", None),
-    ("Employment", LabelBinarizer()),
-    ("Education", LabelBinarizer()),
-    ("Marital", LabelBinarizer()),
-    ("Occupation", LabelBinarizer()),
-    ("Income", None),
-    ("Gender", LabelEncoder()),
-    ("Deductions", LabelEncoder()),
-    ("Hours", None),
-    ("Adjusted", None)
+	("Age", None),
+	("Employment", LabelBinarizer()),
+	("Education", LabelBinarizer()),
+	("Marital", LabelBinarizer()),
+	("Occupation", LabelBinarizer()),
+	("Income", None),
+	("Gender", LabelEncoder()),
+	("Deductions", LabelEncoder()),
+	("Hours", None),
+	("Adjusted", None)
 ])
 
 audit = audit_mapper.fit_transform(audit_df)
@@ -119,13 +119,13 @@ audit_y = audit_y.astype(int)
 print(audit_X.dtype, audit_y.dtype)
 
 def build_audit(classifier, name, with_proba = True):
-    classifier.fit(audit_X, audit_y)
-    store_pkl(classifier, name + ".pkl")
-    adjusted = DataFrame(classifier.predict(audit_X), columns = ["Adjusted"])
-    if(with_proba == True):
-        adjusted_proba = DataFrame(classifier.predict_proba(audit_X), columns = ["probability_0", "probability_1"])
-        adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
-    store_csv(adjusted, name + ".csv")
+	classifier.fit(audit_X, audit_y)
+	store_pkl(classifier, name + ".pkl")
+	adjusted = DataFrame(classifier.predict(audit_X), columns = ["Adjusted"])
+	if(with_proba == True):
+		adjusted_proba = DataFrame(classifier.predict_proba(audit_X), columns = ["probability_0", "probability_1"])
+		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name + ".csv")
 
 build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
@@ -143,9 +143,9 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-    (["Sepal.Length", "Sepal.Width"], PCA(n_components = 1)),
-    (["Petal.Length", "Petal.Width"], PCA()),
-    ("Species", None)
+	(["Sepal.Length", "Sepal.Width"], PCA(n_components = 1)),
+	(["Petal.Length", "Petal.Width"], PCA()),
+	("Species", None)
 ])
 
 iris = iris_mapper.fit_transform(iris_df)
@@ -160,13 +160,13 @@ iris_y = iris[:, 3]
 print(iris_X.dtype, iris_y.dtype)
 
 def build_iris(classifier, name, with_proba = True):
-    classifier.fit(iris_X, iris_y)
-    store_pkl(classifier, name + ".pkl")
-    species = DataFrame(classifier.predict(iris_X), columns = ["Species"])
-    if(with_proba == True):
-        species_proba = DataFrame(classifier.predict_proba(iris_X), columns = ["probability_setosa", "probability_versicolor", "probability_virginica"])
-        species = pandas.concat((species, species_proba), axis = 1)
-    store_csv(species, name + ".csv")
+	classifier.fit(iris_X, iris_y)
+	store_pkl(classifier, name + ".pkl")
+	species = DataFrame(classifier.predict(iris_X), columns = ["Species"])
+	if(with_proba == True):
+		species_proba = DataFrame(classifier.predict_proba(iris_X), columns = ["probability_setosa", "probability_versicolor", "probability_virginica"])
+		species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name + ".csv")
 
 build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
@@ -191,14 +191,14 @@ auto_df["acceleration"] = auto_df["acceleration"].astype(float)
 print(auto_df.dtypes)
 
 auto_mapper = DataFrameMapper([
-    (["cylinders"], OneHotEncoder()),
-    ("displacement", None),
-    (["horsepower"], Imputer(missing_values = "NaN")),
-    (["weight"], MinMaxScaler()),
-    ("acceleration", StandardScaler(with_mean = False)),
-    ("model_year", None),
-    (["origin"], Binarizer(threshold = 1)),
-    ("mpg", None)
+	(["cylinders"], OneHotEncoder()),
+	("displacement", None),
+	(["horsepower"], Imputer(missing_values = "NaN")),
+	(["weight"], MinMaxScaler()),
+	("acceleration", StandardScaler(with_mean = False)),
+	("model_year", None),
+	(["origin"], Binarizer(threshold = 1)),
+	("mpg", None)
 ])
 
 auto = auto_mapper.fit_transform(auto_df)
@@ -213,10 +213,10 @@ auto_y = auto[:, 11]
 print(auto_X.dtype, auto_y.dtype)
 
 def build_auto(regressor, name):
-    regressor = regressor.fit(auto_X, auto_y)
-    store_pkl(regressor, name + ".pkl")
-    mpg = DataFrame(regressor.predict(auto_X), columns = ["mpg"])
-    store_csv(mpg, name + ".csv")
+	regressor = regressor.fit(auto_X, auto_y)
+	store_pkl(regressor, name + ".pkl")
+	mpg = DataFrame(regressor.predict(auto_X), columns = ["mpg"])
+	store_csv(mpg, name + ".csv")
 
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
 build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
