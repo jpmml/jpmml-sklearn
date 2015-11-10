@@ -71,6 +71,12 @@ public class StandardScaler extends SimpleTransformer {
 	}
 
 	public List<? extends Number> getStd(){
-		return (List)ClassDictUtil.getArray(this, "std_");
+		try {
+			// SkLearn 0.16
+			return (List)ClassDictUtil.getArray(this, "std_");
+		} catch(IllegalArgumentException iae){
+			// SkLearn 0.17
+			return (List)ClassDictUtil.getArray(this, "scale_");
+		}
 	}
 }

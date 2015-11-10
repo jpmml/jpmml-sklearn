@@ -1,7 +1,7 @@
 JPMML-SkLearn
 =============
 
-Java library for converting [Scikit-Learn] (http://scikit-learn.org/) models to PMML.
+Java library and command-line application for converting [Scikit-Learn] (http://scikit-learn.org/) models to PMML.
 
 # Features #
 
