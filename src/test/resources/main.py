@@ -195,7 +195,7 @@ auto_mapper = DataFrameMapper([
 	("displacement", None),
 	(["horsepower"], Imputer(missing_values = "NaN")),
 	(["weight"], MinMaxScaler()),
-	("acceleration", StandardScaler(with_mean = False)),
+	(["acceleration"], StandardScaler(with_mean = False)),
 	("model_year", None),
 	(["origin"], Binarizer(threshold = 1)),
 	("mpg", None)
