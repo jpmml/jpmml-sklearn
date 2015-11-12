@@ -58,8 +58,7 @@ import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sklearn.ComplexTransformer;
-import sklearn.SimpleTransformer;
+import sklearn.OneToOneTransformer;
 import sklearn.Transformer;
 
 public class DataFrameMapper extends ClassDict {
@@ -111,17 +110,16 @@ public class DataFrameMapper extends ClassDict {
 		final
 		Map<FieldName, FieldName> updatedTargetFields = new LinkedHashMap<>();
 
-		final
-		SetMultimap<FieldName, FieldName> updatedActiveFields = LinkedHashMultimap.create();
-
 		// The target field
 		if(targetField != null){
 			Object[] feature = featureIt.next();
 
-			FieldName name = getField(feature);
-			Transformer transformer = getTransformer(feature);
+			List<FieldName> names = getNameList(feature);
+			List<Transformer> transformers = getTransformerList(feature);
 
-			if(transformer != null){
+			FieldName name = Iterables.getOnlyElement(names);
+
+			if(!transformers.isEmpty()){
 				logger.error("Target field {} must not specify a transformation", name);
 
 				throw new IllegalArgumentException();
@@ -136,14 +134,18 @@ public class DataFrameMapper extends ClassDict {
 			dataField.setName(name);
 		}
 
+		final
+		SetMultimap<FieldName, FieldName> updatedActiveFields = LinkedHashMultimap.create();
+
 		// Zero or more active fields
 		while(featureIt.hasNext()){
 			Object[] feature = featureIt.next();
 
-			Transformer transformer = getTransformer(feature);
+			List<FieldName> names = getNameList(feature);
+			List<Transformer> transformers = getTransformerList(feature);
 
-			if(transformer == null){
-				transformer = new SimpleTransformer(null, null){
+			if(transformers.isEmpty()){
+				Transformer transformer = new OneToOneTransformer(null, null){
 
 					@Override
 					public Expression encode(FieldName name){
@@ -152,108 +154,38 @@ public class DataFrameMapper extends ClassDict {
 						return fieldRef;
 					}
 				};
-			} // End if
 
-			if(transformer instanceof SimpleTransformer){
-				SimpleTransformer simpleTransformer = (SimpleTransformer)transformer;
+				transformers = Collections.singletonList(transformer);
+			}
 
-				FieldName name = getField(feature);
+			Transformer transformer = Iterables.getOnlyElement(transformers);
 
-				DataField dataField = dataFieldIt.next();
+			int numberOfInputs = transformer.getNumberOfInputs();
+			int numberOfOutputs = transformer.getNumberOfOutputs();
 
-				logger.info("Mapping active field {} to {}", dataField.getName(), name);
+			if(names.size() != numberOfInputs){
+				throw new IllegalArgumentException();
+			}
 
-				updatedActiveFields.put(dataField.getName(), name);
+			Step step = updateActiveFields(dataFieldIt, names, transformer, numberOfInputs, numberOfOutputs);
 
-				Expression expression = simpleTransformer.encode(name);
+			List<FieldName> inputNames = step.getInputNames();
+			List<FieldName> outputNames = step.getOutputNames();
 
-				DerivedField derivedField = new DerivedField(dataField.getOpType(), dataField.getDataType())
-					.setName(dataField.getName())
+			logger.info("Mapping active field(s) {} to {}", outputNames, inputNames);
+
+			for(int i = 0; i < numberOfOutputs; i++){
+				FieldName outputName = outputNames.get(i);
+
+				updatedActiveFields.putAll(outputName, inputNames);
+
+				Expression expression = transformer.encode(i, inputNames);
+
+				DerivedField derivedField = new DerivedField(step.getOpType(), step.getDataType())
+					.setName(outputName)
 					.setExpression(expression);
 
 				localTransformations.addDerivedFields(derivedField);
-
-				updateDataField(dataField, name, simpleTransformer);
-			} else
-
-			if(transformer instanceof ComplexTransformer){
-				ComplexTransformer complexTransformer = (ComplexTransformer)transformer;
-
-				int numberOfInputs = complexTransformer.getNumberOfInputs();
-				int numberOfOutputs = complexTransformer.getNumberOfOutputs();
-
-				List<FieldName> inputNames = getFieldList(feature, numberOfInputs);
-				List<FieldName> outputNames = new ArrayList<>();
-
-				OpType opType = null;
-				DataType dataType = null;
-
-				for(int i = 0; i < Math.min(numberOfInputs, numberOfOutputs); i++){
-					FieldName inputName = inputNames.get(i);
-
-					DataField dataField = dataFieldIt.next();
-
-					outputNames.add(dataField.getName());
-
-					if(opType != null && !(opType).equals(dataField.getOpType())){
-						throw new IllegalArgumentException();
-					} // End if
-
-					if(dataType != null && !(dataType).equals(dataField.getDataType())){
-						throw new IllegalArgumentException();
-					}
-
-					opType = dataField.getOpType();
-					dataType = dataField.getDataType();
-
-					updateDataField(dataField, inputName, complexTransformer);
-				}
-
-				if(numberOfInputs > numberOfOutputs){
-					int count = (numberOfInputs - numberOfOutputs);
-
-					for(int i = 0; i < count; i++){
-						FieldName inputName = inputNames.get(numberOfOutputs + i);
-
-						DataField dataField = new DataField();
-
-						dataFieldIt.add(dataField);
-
-						updateDataField(dataField, inputName, complexTransformer);
-					}
-				} else
-
-				if(numberOfInputs < numberOfOutputs){
-					int count = (numberOfOutputs - numberOfInputs);
-
-					for(int i = 0; i < count; i++){
-						DataField dataField = dataFieldIt.next();
-
-						outputNames.add(dataField.getName());
-
-						dataFieldIt.remove();
-					}
-				}
-
-				logger.info("Mapping active field(s) {} to {}", outputNames, inputNames);
-
-				for(int i = 0; i < numberOfOutputs; i++){
-					FieldName outputName = outputNames.get(i);
-
-					updatedActiveFields.putAll(outputName, inputNames);
-
-					Expression expression = complexTransformer.encode(i, inputNames);
-
-					DerivedField derivedField = new DerivedField(opType, dataType)
-						.setName(outputName)
-						.setExpression(expression);
-
-					localTransformations.addDerivedFields(derivedField);
-				}
-			} else
-
-			{
-				throw new IllegalArgumentException();
 			}
 		}
 
@@ -355,65 +287,62 @@ public class DataFrameMapper extends ClassDict {
 	}
 
 	static
-	private FieldName getField(Object[] feature){
-		return FieldName.create(getName(feature));
-	}
+	private Step updateActiveFields(ListIterator<DataField> dataFieldIt, List<FieldName> inputNames, Transformer transformer, int numberOfInputs, int numberOfOutputs){
+		OpType opType = null;
+		DataType dataType = null;
 
-	static
-	private List<FieldName> getFieldList(Object[] feature, int expectedSize){
-		List<String> names = getNameList(feature);
+		List<FieldName> outputNames = new ArrayList<>();
 
-		if(names.size() != expectedSize){
-			throw new IllegalArgumentException("Expected " + expectedSize + " element(s), got " + names.size() + " element(s)");
-		}
+		for(int i = 0; i < Math.min(numberOfInputs, numberOfOutputs); i++){
+			FieldName inputName = inputNames.get(i);
 
-		Function<String, FieldName> function = new Function<String, FieldName>(){
+			DataField dataField = dataFieldIt.next();
 
-			@Override
-			public FieldName apply(String name){
-				return FieldName.create(name);
-			}
-		};
+			outputNames.add(dataField.getName());
 
-		return Lists.transform(names, function);
-	}
+			if(opType != null && !(opType).equals(dataField.getOpType())){
+				throw new IllegalArgumentException();
+			} // End if
 
-	static
-	private String getName(Object[] feature){
-
-		try {
-			if(feature[0] instanceof List){
-				return (String)Iterables.getOnlyElement((List<?>)feature[0]);
+			if(dataType != null && !(dataType).equals(dataField.getDataType())){
+				throw new IllegalArgumentException();
 			}
 
-			return (String)feature[0];
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The key object (" + ClassDictUtil.formatClass(feature[0]) + ") is not a String", re);
+			opType = dataField.getOpType();
+			dataType = dataField.getDataType();
+
+			updateDataField(dataField, inputName, transformer);
 		}
-	}
 
-	static
-	private List<String> getNameList(Object[] feature){
+		if(numberOfInputs > numberOfOutputs){
+			int count = (numberOfInputs - numberOfOutputs);
 
-		try {
-			if(feature[0] instanceof List){
-				return (List)feature[0];
+			for(int i = 0; i < count; i++){
+				FieldName inputName = inputNames.get(numberOfOutputs + i);
+
+				DataField dataField = new DataField();
+
+				dataFieldIt.add(dataField);
+
+				updateDataField(dataField, inputName, transformer);
 			}
+		} else
 
-			return Collections.singletonList((String)feature[0]);
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The key object (" + ClassDictUtil.formatClass(feature[0]) + ") is not a String list", re);
+		if(numberOfInputs < numberOfOutputs){
+			int count = (numberOfOutputs - numberOfInputs);
+
+			for(int i = 0; i < count; i++){
+				DataField dataField = dataFieldIt.next();
+
+				outputNames.add(dataField.getName());
+
+				dataFieldIt.remove();
+			}
 		}
-	}
 
-	static
-	private Transformer getTransformer(Object[] feature){
+		Step step = new Step(dataType, opType, inputNames, outputNames);
 
-		try {
-			return (Transformer)feature[1];
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The value object (" + ClassDictUtil.formatClass(feature[1]) + ") is not a Transformer or is not a supported Transformer subclass", re);
-		}
+		return step;
 	}
 
 	static
@@ -423,6 +352,114 @@ public class DataFrameMapper extends ClassDict {
 			.setDataType(transformer.getDataType());
 
 		SchemaUtil.addValues(dataField, transformer.getClasses());
+	}
+
+	static
+	private List<FieldName> getNameList(Object[] feature){
+		Function<Object, FieldName> function = new Function<Object, FieldName>(){
+
+			@Override
+			public FieldName apply(Object object){
+
+				if(object instanceof String){
+					return FieldName.create((String)object);
+				}
+
+				throw new IllegalArgumentException("The key object (" + ClassDictUtil.formatClass(object) + ") is not a String");
+			}
+		};
+
+		try {
+			if(feature[0] instanceof List){
+				return new ArrayList<>(Lists.transform(((List)feature[0]), function));
+			}
+
+			return Collections.singletonList(function.apply(feature[0]));
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("Invalid mapping key", re);
+		}
+	}
+
+	static
+	private List<Transformer> getTransformerList(Object[] feature){
+		Function<Object, Transformer> function = new Function<Object, Transformer>(){
+
+			@Override
+			public Transformer apply(Object object){
+
+				if(object instanceof Transformer){
+					return (Transformer)object;
+				}
+
+				throw new IllegalArgumentException("The value object (" + ClassDictUtil.formatClass(object) + ") is not a Transformer or is not a supported Transformer subclass");
+			}
+		};
+
+		try {
+			if(feature[1] == null){
+				return Collections.emptyList();
+			} // End if
+
+			if(feature[1] instanceof List){
+				return new ArrayList<>(Lists.transform((List)feature[1], function));
+			}
+
+			return Collections.singletonList(function.apply(feature[1]));
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("Invalid mapping value", re);
+		}
+	}
+
+	static
+	private class Step {
+
+		private DataType dataType = null;
+
+		private OpType opType = null;
+
+		private List<FieldName> inputNames = null;
+
+		private List<FieldName> outputNames = null;
+
+
+		private Step(DataType dataType, OpType opType, List<FieldName> inputNames, List<FieldName> outputNames){
+			setDataType(dataType);
+			setOpType(opType);
+			setInputNames(inputNames);
+			setOutputNames(outputNames);
+		}
+
+		public DataType getDataType(){
+			return this.dataType;
+		}
+
+		private void setDataType(DataType dataType){
+			this.dataType = dataType;
+		}
+
+		public OpType getOpType(){
+			return this.opType;
+		}
+
+		private void setOpType(OpType opType){
+			this.opType = opType;
+		}
+
+		public List<FieldName> getInputNames(){
+			return this.inputNames;
+		}
+
+		private void setInputNames(List<FieldName> inputNames){
+			this.inputNames = inputNames;
+		}
+
+		public List<FieldName> getOutputNames(){
+			return this.outputNames;
+		}
+
+		private void setOutputNames(List<FieldName> outputNames){
+			this.outputNames = outputNames;
+		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DataFrameMapper.class);

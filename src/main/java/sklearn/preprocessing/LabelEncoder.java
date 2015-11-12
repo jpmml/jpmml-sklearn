@@ -35,9 +35,9 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import sklearn.SimpleTransformer;
+import sklearn.OneToOneTransformer;
 
-public class LabelEncoder extends SimpleTransformer {
+public class LabelEncoder extends OneToOneTransformer {
 
 	public LabelEncoder(String module, String name){
 		super(module, name);

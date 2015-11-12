@@ -22,9 +22,9 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
-import sklearn.SimpleTransformer;
+import sklearn.OneToOneTransformer;
 
-public class Binarizer extends SimpleTransformer {
+public class Binarizer extends OneToOneTransformer {
 
 	public Binarizer(String module, String name){
 		super(module, name);

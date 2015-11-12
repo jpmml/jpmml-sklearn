@@ -23,6 +23,8 @@ import java.util.List;
 
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 
 abstract
@@ -31,6 +33,15 @@ public class Transformer extends ClassDict {
 	public Transformer(String module, String name){
 		super(module, name);
 	}
+
+	abstract
+	public int getNumberOfInputs();
+
+	abstract
+	public int getNumberOfOutputs();
+
+	abstract
+	public Expression encode(int index, List<FieldName> names);
 
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;

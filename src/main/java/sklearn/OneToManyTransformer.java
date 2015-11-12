@@ -24,7 +24,7 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 
 abstract
-public class OneToManyTransformer extends ComplexTransformer {
+public class OneToManyTransformer extends Transformer {
 
 	public OneToManyTransformer(String module, String name){
 		super(module, name);

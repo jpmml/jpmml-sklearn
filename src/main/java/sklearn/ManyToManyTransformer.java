@@ -19,7 +19,7 @@
 package sklearn;
 
 abstract
-public class ManyToManyTransformer extends ComplexTransformer {
+public class ManyToManyTransformer extends Transformer {
 
 	public ManyToManyTransformer(String module, String name){
 		super(module, name);

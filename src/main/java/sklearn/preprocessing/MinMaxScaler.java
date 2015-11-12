@@ -26,9 +26,9 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.SimpleTransformer;
+import sklearn.OneToOneTransformer;
 
-public class MinMaxScaler extends SimpleTransformer {
+public class MinMaxScaler extends OneToOneTransformer {
 
 	public MinMaxScaler(String module, String name){
 		super(module, name);
