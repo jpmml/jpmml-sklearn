@@ -49,7 +49,7 @@ public class StandardScaler extends MultiTransformer {
 	public Expression encode(int index, FieldName name){
 		Expression expression = new FieldRef(name);
 
-		if(withMean()){
+		if(getWithMean()){
 			Number mean = Iterables.get(getMean(), index);
 
 			if(Double.compare(mean.doubleValue(), 0d) != 0){
@@ -57,7 +57,7 @@ public class StandardScaler extends MultiTransformer {
 			}
 		} // End if
 
-		if(withStd()){
+		if(gwtWithStd()){
 			Number std = Iterables.get(getStd(), index);
 
 			if(Double.compare(std.doubleValue(), 1d) != 0){
@@ -69,11 +69,11 @@ public class StandardScaler extends MultiTransformer {
 		return expression;
 	}
 
-	public Boolean withMean(){
+	public Boolean getWithMean(){
 		return (Boolean)get("with_mean");
 	}
 
-	public Boolean withStd(){
+	public Boolean gwtWithStd(){
 		return (Boolean)get("with_std");
 	}
 
