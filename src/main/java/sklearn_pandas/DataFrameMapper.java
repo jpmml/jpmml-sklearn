@@ -195,8 +195,10 @@ public class DataFrameMapper extends ClassDict {
 
 					List<FieldName> outputNames = new ArrayList<>();
 
+					String className = getClassName(transformer);
+
 					for(int i = 0; i < numberOfOutputs; i++){
-						FieldName outputName = FieldName.create("("+ row +"," + column + "," + i + ")");
+						FieldName outputName = FieldName.create(className + "("+ row +"," + column + "," + i + ")");
 
 						outputNames.add(outputName);
 					}
@@ -392,6 +394,19 @@ public class DataFrameMapper extends ClassDict {
 			.setDataType(transformer.getDataType());
 
 		SchemaUtil.addValues(dataField, transformer.getClasses());
+	}
+
+	static
+	private String getClassName(Transformer transformer){
+		Class<? extends Transformer> clazz = transformer.getClass();
+
+		String name = clazz.getName();
+
+		if(name.startsWith("sklearn.")){
+			name = name.substring("sklearn.".length());
+		}
+
+		return name;
 	}
 
 	static
