@@ -39,21 +39,21 @@ public class StandardScalerTest {
 		scaler.put("mean_", 6d);
 		scaler.put("std_", 2d);
 
-		Expression expression = scaler.encode(name);
+		Expression expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof Apply);
 		assertEquals("/", ((Apply)expression).getFunction());
 
 		scaler.put("std_", 1);
 
-		expression = scaler.encode(name);
+		expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof Apply);
 		assertEquals("-", ((Apply)expression).getFunction());
 
 		scaler.put("mean_", 0);
 
-		expression = scaler.encode(name);
+		expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof FieldRef);
 	}

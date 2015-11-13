@@ -26,18 +26,29 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.OneToOneTransformer;
+import sklearn.MultiTransformer;
 
-public class MinMaxScaler extends OneToOneTransformer {
+public class MinMaxScaler extends MultiTransformer {
 
 	public MinMaxScaler(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public Expression encode(FieldName name){
-		Number min = Iterables.getOnlyElement(getMin());
-		Number scale = Iterables.getOnlyElement(getScale());
+	public int getNumberOfFeatures(){
+		int[] shape = getMinShape();
+
+		if(shape.length != 1){
+			throw new IllegalArgumentException();
+		}
+
+		return shape[0];
+	}
+
+	@Override
+	public Expression encode(int index, FieldName name){
+		Number min = Iterables.get(getMin(), index);
+		Number scale = Iterables.get(getScale(), index);
 
 		Expression expression = new FieldRef(name);
 
@@ -59,5 +70,9 @@ public class MinMaxScaler extends OneToOneTransformer {
 
 	public List<? extends Number> getScale(){
 		return (List)ClassDictUtil.getArray(this, "scale_");
+	}
+
+	private int[] getMinShape(){
+		return ClassDictUtil.getShape(this, "min_");
 	}
 }

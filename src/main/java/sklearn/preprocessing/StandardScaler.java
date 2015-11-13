@@ -26,20 +26,31 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.OneToOneTransformer;
+import sklearn.MultiTransformer;
 
-public class StandardScaler extends OneToOneTransformer {
+public class StandardScaler extends MultiTransformer {
 
 	public StandardScaler(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public Expression encode(FieldName name){
+	public int getNumberOfFeatures(){
+		int[] shape = getMeanShape();
+
+		if(shape.length != 1){
+			throw new IllegalArgumentException();
+		}
+
+		return shape[0];
+	}
+
+	@Override
+	public Expression encode(int index, FieldName name){
 		Expression expression = new FieldRef(name);
 
 		if(withMean()){
-			Number mean = Iterables.getOnlyElement(getMean());
+			Number mean = Iterables.get(getMean(), index);
 
 			if(Double.compare(mean.doubleValue(), 0d) != 0){
 				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean));
@@ -47,7 +58,7 @@ public class StandardScaler extends OneToOneTransformer {
 		} // End if
 
 		if(withStd()){
-			Number std = Iterables.getOnlyElement(getStd());
+			Number std = Iterables.get(getStd(), index);
 
 			if(Double.compare(std.doubleValue(), 1d) != 0){
 				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(std));
@@ -78,5 +89,9 @@ public class StandardScaler extends OneToOneTransformer {
 			// SkLearn 0.17
 			return (List)ClassDictUtil.getArray(this, "scale_");
 		}
+	}
+
+	private int[] getMeanShape(){
+		return ClassDictUtil.getShape(this, "mean_");
 	}
 }

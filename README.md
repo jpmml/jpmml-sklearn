@@ -100,26 +100,24 @@ iris_df = pandas.read_csv("Iris.csv")
 
 Describe data and data pre-processing actions by creating an appropriate `sklearn_pandas.DataFrameMapper` object:
 ```python
+from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn_pandas import DataFrameMapper
 
 iris_mapper = DataFrameMapper([
-    ("Sepal.Length", StandardScaler()),
-    ("Sepal.Width", StandardScaler()),
-    ("Petal.Length", StandardScaler()),
-    ("Petal.Width", StandardScaler()),
+    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), PCA(n_components = 3)]),
     ("Species", None)
 ])
 
-iris_df = iris_mapper.fit_transform(iris_df)
+iris = iris_mapper.fit_transform(iris_df)
 ```
 
 Train an appropriate estimator object:
 ```python
 from sklearn.ensemble.forest import RandomForestClassifier
 
-iris_X = iris_df[:, 0:4]
-iris_y = iris_df[:, 4]
+iris_X = iris[:, 0:3]
+iris_y = iris[:, 3]
 
 iris_forest = RandomForestClassifier(min_samples_leaf = 5)
 iris_forest.fit(iris_X, iris_y)

@@ -37,21 +37,21 @@ public class MinMaxScalerTest {
 		scaler.put("min_", 2d);
 		scaler.put("scale_", 6d);
 
-		Expression expression = scaler.encode(name);
+		Expression expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof Apply);
 		assertEquals("+", ((Apply)expression).getFunction());
 
 		scaler.put("min_", 0);
 
-		expression = scaler.encode(name);
+		expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof Apply);
 		assertEquals("*", ((Apply)expression).getFunction());
 
 		scaler.put("scale_", 1);
 
-		expression = scaler.encode(name);
+		expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof FieldRef);
 	}

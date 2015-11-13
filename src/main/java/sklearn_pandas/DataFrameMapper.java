@@ -138,7 +138,7 @@ public class DataFrameMapper extends ClassDict {
 		SetMultimap<FieldName, FieldName> updatedActiveFields = LinkedHashMultimap.create();
 
 		// Zero or more active fields
-		while(featureIt.hasNext()){
+		for(int row = 0; featureIt.hasNext(); row++){
 			Object[] feature = featureIt.next();
 
 			List<FieldName> names = getNameList(feature);
@@ -158,34 +158,65 @@ public class DataFrameMapper extends ClassDict {
 				transformers = Collections.singletonList(transformer);
 			}
 
-			Transformer transformer = Iterables.getOnlyElement(transformers);
+			List<FieldName> inputNames = names;
 
-			int numberOfInputs = transformer.getNumberOfInputs();
-			int numberOfOutputs = transformer.getNumberOfOutputs();
+			ListIterator<Transformer> transformerIt = transformers.listIterator();
 
-			if(names.size() != numberOfInputs){
-				throw new IllegalArgumentException();
-			}
+			for(int column = 0; transformerIt.hasNext(); column++){
+				Transformer transformer = transformerIt.next();
 
-			Step step = updateActiveFields(dataFieldIt, names, transformer, numberOfInputs, numberOfOutputs);
+				int numberOfInputs = transformer.getNumberOfInputs();
+				int numberOfOutputs = transformer.getNumberOfOutputs();
 
-			List<FieldName> inputNames = step.getInputNames();
-			List<FieldName> outputNames = step.getOutputNames();
+				Step step;
 
-			logger.info("Mapping active field(s) {} to {}", outputNames, inputNames);
+				if(!transformerIt.hasNext()){
+					Step finalStep = updateDataDictionary(dataFieldIt, names, transformers.get(0), names.size(), numberOfOutputs);
 
-			for(int i = 0; i < numberOfOutputs; i++){
-				FieldName outputName = outputNames.get(i);
+					logger.info("Mapping active field(s) {} to {}", finalStep.getOutputNames(), finalStep.getInputNames());
 
-				updatedActiveFields.putAll(outputName, inputNames);
+					for(int i = 0; i < numberOfOutputs; i++){
+						FieldName outputName = finalStep.getOutputName(i);
 
-				Expression expression = transformer.encode(i, inputNames);
+						updatedActiveFields.putAll(outputName, names);
+					}
 
-				DerivedField derivedField = new DerivedField(step.getOpType(), step.getDataType())
-					.setName(outputName)
-					.setExpression(expression);
+					if(inputNames.size() != numberOfInputs){
+						throw new IllegalArgumentException();
+					}
 
-				localTransformations.addDerivedFields(derivedField);
+					step = new Step(finalStep.getDataType(), finalStep.getOpType(), inputNames, finalStep.getOutputNames());
+				} else
+
+				{
+					if(inputNames.size() != numberOfInputs){
+						throw new IllegalArgumentException();
+					}
+
+					List<FieldName> outputNames = new ArrayList<>();
+
+					for(int i = 0; i < numberOfOutputs; i++){
+						FieldName outputName = FieldName.create("("+ row +"," + column + "," + i + ")");
+
+						outputNames.add(outputName);
+					}
+
+					step = new Step(transformer.getDataType(), transformer.getOpType(), inputNames, outputNames);
+				}
+
+				for(int i = 0; i < numberOfOutputs; i++){
+					FieldName outputName = step.getOutputName(i);
+
+					Expression expression = transformer.encode(i, step.getInputNames());
+
+					DerivedField derivedField = new DerivedField(step.getOpType(), step.getDataType())
+						.setName(outputName)
+						.setExpression(expression);
+
+					localTransformations.addDerivedFields(derivedField);
+				}
+
+				inputNames = step.getOutputNames();
 			}
 		}
 
@@ -286,10 +317,19 @@ public class DataFrameMapper extends ClassDict {
 		return (List)get("features");
 	}
 
+	/**
+	 * @param transformer The first transformer in the list of transformers.
+	 * @param numberOfInputs The number of dimensions in the input feature space.
+	 * @param numberOfOutputs The number of dimensions in the output (ie. transformed) feature space.
+	 */
 	static
-	private Step updateActiveFields(ListIterator<DataField> dataFieldIt, List<FieldName> inputNames, Transformer transformer, int numberOfInputs, int numberOfOutputs){
+	private Step updateDataDictionary(ListIterator<DataField> dataFieldIt, List<FieldName> inputNames, Transformer transformer, int numberOfInputs, int numberOfOutputs){
 		OpType opType = null;
 		DataType dataType = null;
+
+		if(inputNames.size() != numberOfInputs){
+			throw new IllegalArgumentException();
+		}
 
 		List<FieldName> outputNames = new ArrayList<>();
 
@@ -445,12 +485,24 @@ public class DataFrameMapper extends ClassDict {
 			this.opType = opType;
 		}
 
+		public FieldName getInputName(int index){
+			List<FieldName> inputNames = getInputNames();
+
+			return inputNames.get(index);
+		}
+
 		public List<FieldName> getInputNames(){
 			return this.inputNames;
 		}
 
 		private void setInputNames(List<FieldName> inputNames){
 			this.inputNames = inputNames;
+		}
+
+		public FieldName getOutputName(int index){
+			List<FieldName> outputNames = getOutputNames();
+
+			return outputNames.get(index);
 		}
 
 		public List<FieldName> getOutputNames(){

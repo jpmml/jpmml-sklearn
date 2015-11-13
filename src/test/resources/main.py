@@ -47,13 +47,7 @@ wheat_df = wheat_df.drop("Variety", axis = 1)
 print(wheat_df.dtypes)
 
 wheat_mapper = DataFrameMapper([
-	(["Area"], MinMaxScaler()),
-	(["Perimeter"], MinMaxScaler()),
-	(["Compactness"], MinMaxScaler()),
-	(["Kernel.Length"], MinMaxScaler()),
-	(["Kernel.Width"], MinMaxScaler()),
-	(["Asymmetry"], MinMaxScaler()),
-	(["Groove.Length"], MinMaxScaler())
+	(["Area", "Perimeter", "Compactness", "Kernel.Length", "Kernel.Width", "Asymmetry", "Groove.Length"], MinMaxScaler())
 ])
 
 wheat_X = wheat_mapper.fit_transform(wheat_df)
@@ -143,8 +137,7 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-	(["Sepal.Length", "Sepal.Width"], PCA(n_components = 1)),
-	(["Petal.Length", "Petal.Width"], PCA()),
+	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), PCA(n_components = 3)]),
 	("Species", None)
 ])
 
@@ -191,11 +184,8 @@ auto_df["acceleration"] = auto_df["acceleration"].astype(float)
 print(auto_df.dtypes)
 
 auto_mapper = DataFrameMapper([
-	(["cylinders"], OneHotEncoder()),
-	("displacement", None),
-	(["horsepower"], Imputer(missing_values = "NaN")),
-	(["weight"], MinMaxScaler()),
-	(["acceleration"], StandardScaler(with_mean = False)),
+	(["cylinders"], None),
+	(["displacement", "horsepower", "weight", "acceleration"], [Imputer(missing_values = "NaN"), StandardScaler()]),
 	("model_year", None),
 	(["origin"], Binarizer(threshold = 1)),
 	("mpg", None)
@@ -207,8 +197,8 @@ print(auto.shape)
 
 store_pkl(auto_mapper, "Auto.pkl")
 
-auto_X = auto[:, 0:11]
-auto_y = auto[:, 11]
+auto_X = auto[:, 0:7]
+auto_y = auto[:, 7]
 
 print(auto_X.dtype, auto_y.dtype)
 

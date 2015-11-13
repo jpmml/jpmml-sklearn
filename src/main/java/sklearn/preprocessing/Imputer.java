@@ -26,18 +26,29 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.OneToOneTransformer;
+import sklearn.MultiTransformer;
 
-public class Imputer extends OneToOneTransformer {
+public class Imputer extends MultiTransformer {
 
 	public Imputer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public Expression encode(FieldName name){
+	public int getNumberOfFeatures(){
+		int[] shape = getStatisticsShape();
+
+		if(shape.length != 1){
+			throw new IllegalArgumentException();
+		}
+
+		return shape[0];
+	}
+
+	@Override
+	public Expression encode(int index, FieldName name){
 		Object missingValues = getMissingValues();
-		Number statistics = Iterables.getOnlyElement(getStatistics());
+		Number statistics = Iterables.get(getStatistics(), index);
 
 		Expression expression = new FieldRef(name);
 
@@ -65,5 +76,9 @@ public class Imputer extends OneToOneTransformer {
 
 	public List<? extends Number> getStatistics(){
 		return (List)ClassDictUtil.getArray(this, "statistics_");
+	}
+
+	private int[] getStatisticsShape(){
+		return ClassDictUtil.getShape(this, "statistics_");
 	}
 }

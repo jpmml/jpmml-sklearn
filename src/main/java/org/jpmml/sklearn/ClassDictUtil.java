@@ -103,6 +103,10 @@ public class ClassDictUtil {
 			NDArray array = arrayWrapper.getContent();
 
 			return NDArrayUtil.getShape(array);
+		} // End if
+
+		if(object instanceof Number){
+			return new int[]{1};
 		}
 
 		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
