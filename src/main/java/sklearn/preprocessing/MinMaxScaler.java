@@ -27,6 +27,7 @@ import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.MultiTransformer;
+import sklearn.ValueUtil;
 
 public class MinMaxScaler extends MultiTransformer {
 
@@ -52,11 +53,11 @@ public class MinMaxScaler extends MultiTransformer {
 
 		Expression expression = new FieldRef(name);
 
-		if(Double.compare(scale.doubleValue(), 1d) != 0){
+		if(!ValueUtil.isOne(scale)){
 			expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scale));
 		} // End if
 
-		if(Double.compare(min.doubleValue(), 0d) != 0){
+		if(!ValueUtil.isZero(min)){
 			expression = PMMLUtil.createApply("+", expression, PMMLUtil.createConstant(min));
 		}
 

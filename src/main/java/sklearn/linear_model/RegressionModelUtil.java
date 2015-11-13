@@ -31,6 +31,7 @@ import org.jpmml.sklearn.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.EstimatorUtil;
+import sklearn.ValueUtil;
 
 public class RegressionModelUtil {
 
@@ -66,7 +67,7 @@ public class RegressionModelUtil {
 			Number coefficient = coefficients.get(i);
 			FieldName activeField = activeFields.get(i);
 
-			if(Double.compare(coefficient.doubleValue(), 0d) == 0){
+			if(ValueUtil.isZero(coefficient)){
 				logger.info("Skipping predictor variable {} due to a zero coefficient", activeField);
 
 				continue;

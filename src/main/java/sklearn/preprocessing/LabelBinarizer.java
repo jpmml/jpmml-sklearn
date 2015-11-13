@@ -29,6 +29,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.OneToManyTransformer;
+import sklearn.ValueUtil;
 
 public class LabelBinarizer extends OneToManyTransformer {
 
@@ -62,7 +63,7 @@ public class LabelBinarizer extends OneToManyTransformer {
 		Number posLabel = getPosLabel();
 		Number negLabel = getNegLabel();
 
-		if(Double.compare(posLabel.doubleValue(), 1d) == 0 && Double.compare(negLabel.doubleValue(), 0d) == 0){
+		if(ValueUtil.isOne(posLabel) && ValueUtil.isZero(negLabel)){
 			NormDiscrete normDiscrete = new NormDiscrete(name, String.valueOf(value));
 
 			return normDiscrete;

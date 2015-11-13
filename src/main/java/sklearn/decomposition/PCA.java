@@ -28,6 +28,7 @@ import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.ManyToManyTransformer;
+import sklearn.ValueUtil;
 
 public class PCA extends ManyToManyTransformer {
 
@@ -78,16 +79,26 @@ public class PCA extends ManyToManyTransformer {
 		for(int i = 0; i < numberOfFeatures; i++){
 			FieldName name = names.get(i);
 
-			// "($name[i] - mean[i]) * component[i]"
-			Expression expression = PMMLUtil.createApply("*", PMMLUtil.createApply("-", new FieldRef(name), PMMLUtil.createConstant(mean.get(i))), PMMLUtil.createConstant(component.get(i)));
+			Expression expression = new FieldRef(name);
 
+			if(!ValueUtil.isZero(mean.get(i))){
+				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean.get(i)));
+			} // End if
+
+			if(!ValueUtil.isOne(component.get(i))){
+				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(component.get(i)));
+			}
+
+			// "($name[i] - mean[i]) * component[i]"
 			apply.addExpressions(expression);
 		}
 
 		if(getWhiten()){
 			List<? extends Number> explainedVariance = getExplainedVariance();
 
-			apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt((explainedVariance.get(index)).doubleValue())));
+			if(!ValueUtil.isOne(explainedVariance.get(index))){
+				apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt((explainedVariance.get(index)).doubleValue())));
+			}
 		}
 
 		return apply;

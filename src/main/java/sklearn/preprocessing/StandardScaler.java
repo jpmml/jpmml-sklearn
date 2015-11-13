@@ -27,6 +27,7 @@ import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.MultiTransformer;
+import sklearn.ValueUtil;
 
 public class StandardScaler extends MultiTransformer {
 
@@ -52,7 +53,7 @@ public class StandardScaler extends MultiTransformer {
 		if(getWithMean()){
 			Number mean = Iterables.get(getMean(), index);
 
-			if(Double.compare(mean.doubleValue(), 0d) != 0){
+			if(!ValueUtil.isZero(mean)){
 				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean));
 			}
 		} // End if
@@ -60,7 +61,7 @@ public class StandardScaler extends MultiTransformer {
 		if(gwtWithStd()){
 			Number std = Iterables.get(getStd(), index);
 
-			if(Double.compare(std.doubleValue(), 1d) != 0){
+			if(!ValueUtil.isOne(std)){
 				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(std));
 			}
 		}

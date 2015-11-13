@@ -170,7 +170,7 @@ public class EstimatorUtil {
 				.setPredicate(new True())
 				.setModel(model);
 
-			if(weight != null && Double.compare(weight.doubleValue(), 1d) != 0){
+			if(weight != null && !ValueUtil.isOne(weight)){
 				segment.setWeight(weight.doubleValue());
 			}
 
