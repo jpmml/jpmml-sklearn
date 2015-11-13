@@ -137,7 +137,7 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), PCA(n_components = 3)]),
+	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), PCA(n_components = 3, whiten = True)]),
 	("Species", None)
 ])
 

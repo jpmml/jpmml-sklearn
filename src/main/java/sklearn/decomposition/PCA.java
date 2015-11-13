@@ -71,10 +71,6 @@ public class PCA extends ManyToManyTransformer {
 		List<? extends Number> components = getComponents();
 		List<? extends Number> mean = getMean();
 
-		if(getWhiten()){
-			throw new IllegalArgumentException();
-		}
-
 		List<? extends Number> component = NDArrayUtil.getRow(components, numberOfComponents, numberOfFeatures, index);
 
 		Apply apply = new Apply("sum");
@@ -88,6 +84,12 @@ public class PCA extends ManyToManyTransformer {
 			apply.addExpressions(expression);
 		}
 
+		if(getWhiten()){
+			List<? extends Number> explainedVariance = getExplainedVariance();
+
+			apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt((explainedVariance.get(index)).doubleValue())));
+		}
+
 		return apply;
 	}
 
@@ -97,6 +99,10 @@ public class PCA extends ManyToManyTransformer {
 
 	public List<? extends Number> getComponents(){
 		return (List)ClassDictUtil.getArray(this, "components_");
+	}
+
+	public List<? extends Number> getExplainedVariance(){
+		return (List)ClassDictUtil.getArray(this, "explained_variance_");
 	}
 
 	public List<? extends Number> getMean(){
