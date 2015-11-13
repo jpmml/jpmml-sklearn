@@ -11,6 +11,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`cluster.MiniBatchKMeans`] (http://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html)
   * Matrix Decomposition:
     * [`decomposition.PCA`] (http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)
+    * [`decomposition.IncrementalPCA`] (http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.IncrementalPCA.html)
   * Ensemble Methods:
     * [`ensemble.GradientBoostingClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
     * [`ensemble.GradientBoostingRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)

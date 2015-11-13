@@ -1,5 +1,5 @@
 from sklearn.cluster import KMeans, MiniBatchKMeans
-from sklearn.decomposition import PCA
+from sklearn.decomposition import IncrementalPCA
 from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
@@ -137,7 +137,7 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), PCA(n_components = 3, whiten = True)]),
+	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), IncrementalPCA(n_components = 3, whiten = True)]),
 	("Species", None)
 ])
 
