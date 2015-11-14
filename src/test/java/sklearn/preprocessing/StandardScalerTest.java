@@ -34,24 +34,31 @@ public class StandardScalerTest {
 		FieldName name = FieldName.create("x");
 
 		StandardScaler scaler = new StandardScaler("sklearn.preprocessing.data", "StandardScaler");
-		scaler.put("with_mean", Boolean.TRUE);
-		scaler.put("with_std", Boolean.TRUE);
+		scaler.put("with_mean", Boolean.FALSE);
+		scaler.put("with_std", Boolean.FALSE);
 		scaler.put("mean_", 6d);
 		scaler.put("std_", 2d);
 
 		Expression expression = scaler.encode(0, name);
 
+		assertTrue(expression instanceof FieldRef);
+
+		scaler.put("with_mean", Boolean.TRUE);
+		scaler.put("with_std", Boolean.TRUE);
+
+		expression = scaler.encode(0, name);
+
 		assertTrue(expression instanceof Apply);
 		assertEquals("/", ((Apply)expression).getFunction());
 
-		scaler.put("std_", 1);
+		scaler.put("std_", 1d);
 
 		expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof Apply);
 		assertEquals("-", ((Apply)expression).getFunction());
 
-		scaler.put("mean_", 0);
+		scaler.put("mean_", 0d);
 
 		expression = scaler.encode(0, name);
 

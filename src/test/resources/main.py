@@ -6,7 +6,7 @@ from sklearn.externals import joblib
 from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler
+from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
@@ -137,7 +137,7 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), IncrementalPCA(n_components = 3, whiten = True)]),
+	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [RobustScaler(), IncrementalPCA(n_components = 3, whiten = True)]),
 	("Species", None)
 ])
 

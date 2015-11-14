@@ -27,29 +27,38 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MinMaxScalerTest {
+public class RobustScalerTest {
 
 	@Test
 	public void encode(){
 		FieldName name = FieldName.create("x");
 
-		MinMaxScaler scaler = new MinMaxScaler("sklearn.preprocessing.data", "MinMaxScaler");
-		scaler.put("min_", 2d);
-		scaler.put("scale_", 6d);
+		RobustScaler scaler = new RobustScaler("sklearn.preprocessing.data", "RobustScaler");
+		scaler.put("with_centering", Boolean.FALSE);
+		scaler.put("with_scaling", Boolean.FALSE);
+		scaler.put("center_", 6);
+		scaler.put("scale_", 2);
 
 		Expression expression = scaler.encode(0, name);
 
-		assertTrue(expression instanceof Apply);
-		assertEquals("+", ((Apply)expression).getFunction());
+		assertTrue(expression instanceof FieldRef);
 
-		scaler.put("min_", 0d);
+		scaler.put("with_centering", Boolean.TRUE);
+		scaler.put("with_scaling", Boolean.TRUE);
 
 		expression = scaler.encode(0, name);
 
 		assertTrue(expression instanceof Apply);
-		assertEquals("*", ((Apply)expression).getFunction());
+		assertEquals("/", ((Apply)expression).getFunction());
 
-		scaler.put("scale_", 1d);
+		scaler.put("scale_", 1);
+
+		expression = scaler.encode(0, name);
+
+		assertTrue(expression instanceof Apply);
+		assertEquals("-", ((Apply)expression).getFunction());
+
+		scaler.put("center_", 0);
 
 		expression = scaler.encode(0, name);
 
