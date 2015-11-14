@@ -34,6 +34,7 @@ import sklearn.cluster.MiniBatchKMeans;
 import sklearn.decomposition.IncrementalPCA;
 import sklearn.decomposition.PCA;
 import sklearn.discriminant_analysis.LinearDiscriminantAnalysis;
+import sklearn.ensemble.forest.ExtraTreesClassifier;
 import sklearn.ensemble.forest.ExtraTreesRegressor;
 import sklearn.ensemble.forest.RandomForestClassifier;
 import sklearn.ensemble.forest.RandomForestRegressor;
@@ -66,6 +67,7 @@ import sklearn.preprocessing.RobustScaler;
 import sklearn.preprocessing.StandardScaler;
 import sklearn.tree.DecisionTreeClassifier;
 import sklearn.tree.DecisionTreeRegressor;
+import sklearn.tree.ExtraTreeClassifier;
 import sklearn.tree.ExtraTreeRegressor;
 import sklearn.tree.PresortBestSplitter;
 import sklearn.tree.RegressionCriterion;
@@ -108,6 +110,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.decomposition.incremental_pca", "IncrementalPCA", IncrementalPCA.class),
 			new ObjectConstructor("sklearn.decomposition.pca", "PCA", PCA.class),
 			new ObjectConstructor("sklearn.discriminant_analysis", "LinearDiscriminantAnalysis", LinearDiscriminantAnalysis.class),
+			new ObjectConstructor("sklearn.ensemble.forest", "ExtraTreesClassifier", ExtraTreesClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "ExtraTreesRegressor", ExtraTreesRegressor.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
@@ -151,6 +154,7 @@ public class PickleUtil {
 			new ExtensionObjectConstructor("sklearn.tree._tree", "Tree", Tree.class),
 			new ObjectConstructor("sklearn.tree.tree", "DecisionTreeClassifier", DecisionTreeClassifier.class),
 			new ObjectConstructor("sklearn.tree.tree", "DecisionTreeRegressor", DecisionTreeRegressor.class),
+			new ObjectConstructor("sklearn.tree.tree", "ExtraTreeClassifier", ExtraTreeClassifier.class),
 			new ObjectConstructor("sklearn.tree.tree", "ExtraTreeRegressor", ExtraTreeRegressor.class),
 			new ObjectConstructor("sklearn_pandas", "DataFrameMapper", DataFrameMapper.class),
 		};

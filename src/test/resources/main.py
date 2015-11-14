@@ -1,7 +1,7 @@
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble.forest import ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
 from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV
@@ -123,6 +123,7 @@ def build_audit(classifier, name, with_proba = True):
 	store_csv(adjusted, name + ".csv")
 
 build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAudit")
+build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 build_audit(LogisticRegressionCV(), "LogisticRegressionAudit")
@@ -164,6 +165,7 @@ def build_iris(classifier, name, with_proba = True):
 	store_csv(species, name + ".csv")
 
 build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris")
+build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
