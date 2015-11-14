@@ -1,7 +1,7 @@
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble.forest import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble.forest import ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
 from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV
@@ -213,6 +213,7 @@ def build_auto(regressor, name):
 
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
 build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
+build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
 build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")

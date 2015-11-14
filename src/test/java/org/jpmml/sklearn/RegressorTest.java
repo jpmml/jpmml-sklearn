@@ -33,6 +33,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateExtraTreesAuto() throws Exception {
+		evaluate("ExtraTrees", "Auto");
+	}
+
+	@Test
 	public void evaluateGradientBoostingAuto() throws Exception {
 		evaluate("GradientBoosting", "Auto");
 	}
