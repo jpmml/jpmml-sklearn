@@ -18,35 +18,9 @@
  */
 package sklearn.ensemble.forest;
 
-import java.util.List;
-
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MultipleModelMethodType;
-import org.jpmml.sklearn.Schema;
-import sklearn.Regressor;
-import sklearn.tree.DecisionTreeRegressor;
-
-public class RandomForestRegressor extends Regressor {
+public class RandomForestRegressor extends BaseForestRegressor {
 
 	public RandomForestRegressor(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		List<DecisionTreeRegressor> estimators = getEstimators();
-
-		return RandomForestUtil.encodeRandomForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, schema);
-	}
-
-	public List<DecisionTreeRegressor> getEstimators(){
-		return (List)get("estimators_");
 	}
 }

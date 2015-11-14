@@ -18,7 +18,7 @@
  */
 package sklearn.ensemble.forest;
 
-public class ExtraTreesRegressor extends RandomForestRegressor {
+public class ExtraTreesRegressor extends BaseForestRegressor {
 
 	public ExtraTreesRegressor(String module, String name){
 		super(module, name);

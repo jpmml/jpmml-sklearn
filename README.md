@@ -48,6 +48,8 @@ Java library and command-line application for converting [Scikit-Learn] (http://
   * Decision Trees:
     * [`tree.DecisionTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
     * [`tree.DecisionTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html)
+    * [`tree.ExtraTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html)
+    * [`tree.ExtraTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Production quality:
   * Complete test coverage.
   * Fully compliant with the [JPMML-Evaluator] (https://github.com/jpmml/jpmml-evaluator) library.

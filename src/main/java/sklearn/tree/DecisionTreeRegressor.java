@@ -18,30 +18,9 @@
  */
 package sklearn.tree;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.TreeModel;
-import org.jpmml.sklearn.Schema;
-import sklearn.Regressor;
-
-public class DecisionTreeRegressor extends Regressor implements HasTree {
+public class DecisionTreeRegressor extends TreeRegressor {
 
 	public DecisionTreeRegressor(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
-	}
-
-	@Override
-	public TreeModel encodeModel(Schema schema){
-		return TreeModelUtil.encodeTreeModel(this, MiningFunctionType.REGRESSION, schema, true);
-	}
-
-	@Override
-	public Tree getTree(){
-		return (Tree)get("tree_");
 	}
 }

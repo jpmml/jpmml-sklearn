@@ -35,13 +35,13 @@ import sklearn.EstimatorUtil;
 import sklearn.tree.HasTree;
 import sklearn.tree.TreeModelUtil;
 
-public class RandomForestUtil {
+public class BaseForestUtil {
 
-	private RandomForestUtil(){
+	private BaseForestUtil(){
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeRandomForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, final MiningFunctionType miningFunction, final Schema schema){
+	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, final MiningFunctionType miningFunction, final Schema schema){
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
 			@Override

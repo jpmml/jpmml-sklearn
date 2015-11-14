@@ -18,9 +18,38 @@
  */
 package sklearn.tree;
 
-public class DecisionTreeClassifier extends TreeClassifier {
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.MiningFunctionType;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.TreeModel;
+import org.jpmml.sklearn.Schema;
+import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
-	public DecisionTreeClassifier(String module, String name){
+abstract
+public class TreeClassifier extends Classifier implements HasTree {
+
+	public TreeClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.FLOAT;
+	}
+
+	@Override
+	public TreeModel encodeModel(Schema schema){
+		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+
+		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, schema, true)
+			.setOutput(output);
+
+		return treeModel;
+	}
+
+	@Override
+	public Tree getTree(){
+		return (Tree)get("tree_");
 	}
 }

@@ -18,7 +18,7 @@
  */
 package sklearn.tree;
 
-public class ExtraTreeClassifier extends DecisionTreeClassifier {
+public class ExtraTreeClassifier extends TreeClassifier {
 
 	public ExtraTreeClassifier(String module, String name){
 		super(module, name);

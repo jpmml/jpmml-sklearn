@@ -18,7 +18,7 @@
  */
 package sklearn.tree;
 
-public class ExtraTreeRegressor extends DecisionTreeRegressor {
+public class ExtraTreeRegressor extends TreeRegressor {
 
 	public ExtraTreeRegressor(String module, String name){
 		super(module, name);

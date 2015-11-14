@@ -18,9 +18,36 @@
  */
 package sklearn.ensemble.forest;
 
-public class ExtraTreesClassifier extends BaseForestClassifier {
+import java.util.List;
 
-	public ExtraTreesClassifier(String module, String name){
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.MiningFunctionType;
+import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.MultipleModelMethodType;
+import org.jpmml.sklearn.Schema;
+import sklearn.Regressor;
+import sklearn.tree.TreeRegressor;
+
+abstract
+public class BaseForestRegressor extends Regressor {
+
+	public BaseForestRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.FLOAT;
+	}
+
+	@Override
+	public MiningModel encodeModel(Schema schema){
+		List<TreeRegressor> estimators = getEstimators();
+
+		return BaseForestUtil.encodeBaseForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, schema);
+	}
+
+	public List<TreeRegressor> getEstimators(){
+		return (List)get("estimators_");
 	}
 }
