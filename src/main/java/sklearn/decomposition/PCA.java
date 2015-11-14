@@ -40,20 +40,12 @@ public class PCA extends ManyToManyTransformer {
 	public int getNumberOfInputs(){
 		int[] shape = getComponentsShape();
 
-		if(shape.length != 2){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[1];
 	}
 
 	@Override
 	public int getNumberOfOutputs(){
 		int[] shape = getComponentsShape();
-
-		if(shape.length != 2){
-			throw new IllegalArgumentException();
-		}
 
 		return shape[0];
 	}
@@ -121,6 +113,6 @@ public class PCA extends ManyToManyTransformer {
 	}
 
 	private int[] getComponentsShape(){
-		return ClassDictUtil.getShape(this, "components_");
+		return ClassDictUtil.getShape(this, "components_", 2);
 	}
 }

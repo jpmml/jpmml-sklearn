@@ -37,10 +37,6 @@ public class BaseLinearRegressor extends Regressor {
 	public int getNumberOfFeatures(){
 		int[] shape = getCoefShape();
 
-		if(shape.length != 1){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[0];
 	}
 
@@ -58,6 +54,6 @@ public class BaseLinearRegressor extends Regressor {
 	}
 
 	private int[] getCoefShape(){
-		return ClassDictUtil.getShape(this, "coef_");
+		return ClassDictUtil.getShape(this, "coef_", 1);
 	}
 }

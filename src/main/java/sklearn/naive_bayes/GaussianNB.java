@@ -50,10 +50,6 @@ public class GaussianNB extends Classifier {
 	public int getNumberOfFeatures(){
 		int[] shape = getThetaShape();
 
-		if(shape.length != 2){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[1];
 	}
 
@@ -113,7 +109,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	private int[] getThetaShape(){
-		return ClassDictUtil.getShape(this, "theta_");
+		return ClassDictUtil.getShape(this, "theta_", 2);
 	}
 
 	static

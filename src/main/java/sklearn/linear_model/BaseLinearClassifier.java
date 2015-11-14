@@ -53,10 +53,6 @@ public class BaseLinearClassifier extends Classifier {
 	public int getNumberOfFeatures(){
 		int[] shape = getCoefShape();
 
-		if(shape.length != 2){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[1];
 	}
 
@@ -146,7 +142,7 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	private int[] getCoefShape(){
-		return ClassDictUtil.getShape(this, "coef_");
+		return ClassDictUtil.getShape(this, "coef_", 2);
 	}
 
 	static

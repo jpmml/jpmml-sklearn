@@ -88,7 +88,18 @@ public class ClassDictUtil {
 	}
 
 	static
-	public int[] getShape(ClassDict dict, String name){
+	public int[] getShape(ClassDict dict, String name, int length){
+		int[] shape = getShape(dict, name);
+
+		if(shape.length != length){
+			throw new IllegalArgumentException("The dimensionality of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + shape.length + ") is not " + length);
+		}
+
+		return shape;
+	}
+
+	static
+	private int[] getShape(ClassDict dict, String name){
 		Object object = dict.get(name);
 
 		if(object instanceof NDArray){

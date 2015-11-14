@@ -38,10 +38,6 @@ public class Imputer extends MultiTransformer {
 	public int getNumberOfFeatures(){
 		int[] shape = getStatisticsShape();
 
-		if(shape.length != 1){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[0];
 	}
 
@@ -79,6 +75,6 @@ public class Imputer extends MultiTransformer {
 	}
 
 	private int[] getStatisticsShape(){
-		return ClassDictUtil.getShape(this, "statistics_");
+		return ClassDictUtil.getShape(this, "statistics_", 1);
 	}
 }

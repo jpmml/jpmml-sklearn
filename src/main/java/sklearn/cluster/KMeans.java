@@ -53,10 +53,6 @@ public class KMeans extends Clusterer {
 	public int getNumberOfFeatures(){
 		int[] shape = getClusterCentersShape();
 
-		if(shape.length != 2){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[1];
 	}
 
@@ -126,7 +122,7 @@ public class KMeans extends Clusterer {
 	}
 
 	private int[] getClusterCentersShape(){
-		return ClassDictUtil.getShape(this, "cluster_centers_");
+		return ClassDictUtil.getShape(this, "cluster_centers_", 2);
 	}
 
 	static

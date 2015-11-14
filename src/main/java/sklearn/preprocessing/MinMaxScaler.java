@@ -39,10 +39,6 @@ public class MinMaxScaler extends MultiTransformer {
 	public int getNumberOfFeatures(){
 		int[] shape = getMinShape();
 
-		if(shape.length != 1){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[0];
 	}
 
@@ -74,6 +70,6 @@ public class MinMaxScaler extends MultiTransformer {
 	}
 
 	private int[] getMinShape(){
-		return ClassDictUtil.getShape(this, "min_");
+		return ClassDictUtil.getShape(this, "min_", 1);
 	}
 }

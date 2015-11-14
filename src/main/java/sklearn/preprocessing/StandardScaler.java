@@ -39,10 +39,6 @@ public class StandardScaler extends MultiTransformer {
 	public int getNumberOfFeatures(){
 		int[] shape = getMeanShape();
 
-		if(shape.length != 1){
-			throw new IllegalArgumentException();
-		}
-
 		return shape[0];
 	}
 
@@ -93,6 +89,6 @@ public class StandardScaler extends MultiTransformer {
 	}
 
 	private int[] getMeanShape(){
-		return ClassDictUtil.getShape(this, "mean_");
+		return ClassDictUtil.getShape(this, "mean_", 1);
 	}
 }
