@@ -58,6 +58,7 @@ import sklearn.preprocessing.Binarizer;
 import sklearn.preprocessing.Imputer;
 import sklearn.preprocessing.LabelBinarizer;
 import sklearn.preprocessing.LabelEncoder;
+import sklearn.preprocessing.MaxAbsScaler;
 import sklearn.preprocessing.MinMaxScaler;
 import sklearn.preprocessing.OneHotEncoder;
 import sklearn.preprocessing.RobustScaler;
@@ -132,6 +133,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.linear_model.ridge", "RidgeClassifierCV", RidgeClassifier.class),
 			new ObjectConstructor("sklearn.naive_bayes", "GaussianNB", GaussianNB.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),
+			new ObjectConstructor("sklearn.preprocessing.data", "MaxAbsScaler", MaxAbsScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MinMaxScaler", MinMaxScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "OneHotEncoder", OneHotEncoder.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "RobustScaler", RobustScaler.class),

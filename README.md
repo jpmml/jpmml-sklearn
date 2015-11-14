@@ -38,6 +38,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`preprocessing.Imputer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Imputer.html)
     * [`preprocessing.LabelBinarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelBinarizer.html)
     * [`preprocessing.LabelEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html)
+    * [`preprocessing.MaxAbsScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MaxAbsScaler.html)
     * [`preprocessing.MinMaxScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html)
     * [`preprocessing.OneHotEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html)
     * [`preprocessing.RobustScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)

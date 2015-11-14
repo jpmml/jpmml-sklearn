@@ -7,7 +7,7 @@ from sklearn.externals import joblib
 from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
