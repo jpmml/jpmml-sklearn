@@ -33,6 +33,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLinearDiscriminantAnalysisAudit() throws Exception {
+		evaluate("LinearDiscriminantAnalysis", "Audit");
+	}
+
+	@Test
 	public void evaluateLogisticRegressionAudit() throws Exception {
 		evaluate("LogisticRegression", "Audit");
 	}
@@ -60,6 +65,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateGradientBoostingIris() throws Exception {
 		evaluate("GradientBoosting", "Iris");
+	}
+
+	@Test
+	public void evaluateLinearDiscriminantAnalysisIris() throws Exception {
+		evaluate("LinearDiscriminantAnalysis", "Iris");
 	}
 
 	@Test

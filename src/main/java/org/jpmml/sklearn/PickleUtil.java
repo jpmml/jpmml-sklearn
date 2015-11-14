@@ -33,6 +33,7 @@ import sklearn.cluster.KMeans;
 import sklearn.cluster.MiniBatchKMeans;
 import sklearn.decomposition.IncrementalPCA;
 import sklearn.decomposition.PCA;
+import sklearn.discriminant_analysis.LinearDiscriminantAnalysis;
 import sklearn.ensemble.forest.RandomForestClassifier;
 import sklearn.ensemble.forest.RandomForestRegressor;
 import sklearn.ensemble.gradient_boosting.BinomialDeviance;
@@ -103,6 +104,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.cluster.k_means_", "MiniBatchKMeans", MiniBatchKMeans.class),
 			new ObjectConstructor("sklearn.decomposition.incremental_pca", "IncrementalPCA", IncrementalPCA.class),
 			new ObjectConstructor("sklearn.decomposition.pca", "PCA", PCA.class),
+			new ObjectConstructor("sklearn.discriminant_analysis", "LinearDiscriminantAnalysis", LinearDiscriminantAnalysis.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestClassifier", RandomForestClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "RandomForestRegressor", RandomForestRegressor.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "BinomialDeviance", BinomialDeviance.class),
