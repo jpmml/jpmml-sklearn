@@ -117,8 +117,11 @@ public class EstimatorUtil {
 		FieldName targetField = schema.getTargetField();
 
 		{
-			MiningSchema miningSchema = new MiningSchema()
-				.addMiningFields(PMMLUtil.createMiningField(targetField, FieldUsageType.TARGET));
+			MiningSchema miningSchema = new MiningSchema();
+
+			if(targetField != null){
+				miningSchema.addMiningFields(PMMLUtil.createMiningField(targetField, FieldUsageType.TARGET));
+			}
 
 			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.CLASSIFICATION, miningSchema, null)
 				.setNormalizationMethod(normalizationMethod);

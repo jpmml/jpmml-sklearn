@@ -1,11 +1,11 @@
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble.bagging import BaggingRegressor
+from sklearn.ensemble.bagging import BaggingClassifier, BaggingRegressor
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import LinearRegression, LogisticRegressionCV
+from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifierCV
 from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
@@ -131,6 +131,7 @@ build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "Extr
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 build_audit(LogisticRegressionCV(), "LogisticRegressionAudit")
+build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
 build_audit(GaussianNB(), "NaiveBayesAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
@@ -206,6 +207,7 @@ build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "Extra
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
+build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")
 build_iris(GaussianNB(), "NaiveBayesIris")
 build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris")
 build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)

@@ -34,6 +34,7 @@ import sklearn.cluster.MiniBatchKMeans;
 import sklearn.decomposition.IncrementalPCA;
 import sklearn.decomposition.PCA;
 import sklearn.discriminant_analysis.LinearDiscriminantAnalysis;
+import sklearn.ensemble.bagging.BaggingClassifier;
 import sklearn.ensemble.bagging.BaggingRegressor;
 import sklearn.ensemble.forest.ExtraTreesClassifier;
 import sklearn.ensemble.forest.ExtraTreesRegressor;
@@ -117,6 +118,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.decomposition.incremental_pca", "IncrementalPCA", IncrementalPCA.class),
 			new ObjectConstructor("sklearn.decomposition.pca", "PCA", PCA.class),
 			new ObjectConstructor("sklearn.discriminant_analysis", "LinearDiscriminantAnalysis", LinearDiscriminantAnalysis.class),
+			new ObjectConstructor("sklearn.ensemble.bagging", "BaggingClassifier", BaggingClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.bagging", "BaggingRegressor", BaggingRegressor.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "ExtraTreesClassifier", ExtraTreesClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.forest", "ExtraTreesRegressor", ExtraTreesRegressor.class),

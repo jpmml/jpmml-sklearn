@@ -22,29 +22,48 @@ import java.util.List;
 
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.PMML;
+import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.sklearn.Schema;
-import sklearn.Regressor;
+import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
-public class BaggingRegressor extends Regressor {
+public class BaggingClassifier extends Classifier {
 
-	public BaggingRegressor(String module, String name){
+	public BaggingClassifier(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<Regressor> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 		List<List<? extends Number>> estimatorsFeatures = getEstimatorsFeatures();
 
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunctionType.REGRESSION, schema);
+		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+
+		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunctionType.CLASSIFICATION, schema)
+			.setOutput(output);
 
 		return miningModel;
 	}
 
-	public List<Regressor> getEstimators(){
+	@Override
+	public PMML encodePMML(Schema schema){
+		PMML pmml = super.encodePMML(schema);
+
+		TransformationDictionary transformationDictionary = new TransformationDictionary()
+			.addDefineFunctions(EstimatorUtil.encodeAdaBoostFunction(), EstimatorUtil.encodeLogitFunction());
+
+		pmml.setTransformationDictionary(transformationDictionary);
+
+		return pmml;
+	}
+
+	public List<Classifier> getEstimators(){
 		List<?> estimators = (List)get("estimators_");
 
-		return BaggingUtil.transformEstimators(estimators, Regressor.class);
+		return BaggingUtil.transformEstimators(estimators, Classifier.class);
 	}
 
 	public List<List<? extends Number>> getEstimatorsFeatures(){

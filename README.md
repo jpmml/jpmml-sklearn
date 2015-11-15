@@ -15,6 +15,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
   * Discriminant Analysis:
     * [`discriminant_analysis.LinearDiscriminantAnalysis`] (http://scikit-learn.org/stable/modules/generated/sklearn.discriminant_analysis.LinearDiscriminantAnalysis.html)
   * Ensemble Methods:
+    * [`ensemble.BaggingClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingClassifier.html)
     * [`ensemble.BaggingRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html)
     * [`ensemble.ExtraTreesClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.ExtraTreesClassifier.html)
     * [`ensemble.ExtraTreesRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.ExtraTreesRegressor.html)

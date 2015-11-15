@@ -48,6 +48,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLogisticRegressionEnsembleAudit() throws Exception {
+		evaluate("LogisticRegressionEnsemble", "Audit");
+	}
+
+	@Test
 	public void evaluateNaiveBayesAudit() throws Exception {
 		evaluate("NaiveBayes", "Audit");
 	}
@@ -85,6 +90,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateLogisticRegressionIris() throws Exception {
 		evaluate("LogisticRegression", "Iris");
+	}
+
+	@Test
+	public void evaluateLogisticRegressionEnsembleIris() throws Exception {
+		evaluate("LogisticRegressionEnsemble", "Iris");
 	}
 
 	@Test
