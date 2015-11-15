@@ -4,7 +4,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV
+from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
@@ -221,3 +221,36 @@ build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
 build_auto(RidgeCV(), "RidgeAuto")
+
+housing_df = load_csv("Housing.csv")
+
+print(housing_df.dtypes)
+
+housing_df["CHAS"] = housing_df["CHAS"].astype(float)
+housing_df["RAD"] = housing_df["RAD"].astype(float)
+
+print(housing_df.dtypes)
+
+housing_columns = housing_df.columns.tolist()
+
+housing_mapper = DataFrameMapper([
+	(housing_columns[: -1], StandardScaler()),
+	(housing_columns[-1], None)
+])
+
+housing = housing_mapper.fit_transform(housing_df)
+
+print(housing.shape)
+
+store_pkl(housing_mapper, "Housing.pkl")
+
+housing_X = housing[:, 0:13]
+housing_y = housing[:, 13]
+
+def build_housing(regressor, name):
+	regressor = regressor.fit(housing_X, housing_y)
+	store_pkl(regressor, name + ".pkl")
+	medv = DataFrame(regressor.predict(housing_X), columns = ["MEDV"])
+	store_csv(medv, name + ".csv")
+
+build_housing(SGDRegressor(random_state = 13), "SGDHousing")
