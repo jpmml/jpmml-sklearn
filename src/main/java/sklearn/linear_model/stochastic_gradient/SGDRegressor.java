@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.linear_model;
+package sklearn.linear_model.stochastic_gradient;
 
-public class Log extends LossFunction {
+import sklearn.linear_model.BaseLinearRegressor;
 
-	public Log(String module, String name){
+public class SGDRegressor extends BaseLinearRegressor {
+
+	public SGDRegressor(String module, String name){
 		super(module, name);
 	}
 }

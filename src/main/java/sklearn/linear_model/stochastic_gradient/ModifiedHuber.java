@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.linear_model;
+package sklearn.linear_model.stochastic_gradient;
 
-public class ElasticNet extends BaseLinearRegressor {
+public class ModifiedHuber extends LossFunction {
 
-	public ElasticNet(String module, String name){
+	public ModifiedHuber(String module, String name){
 		super(module, name);
 	}
 }

@@ -4,7 +4,10 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV, SGDClassifier, SGDRegressor
+from sklearn.linear_model import LinearRegression, LogisticRegressionCV
+from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
+from sklearn.linear_model.ridge import RidgeCV, RidgeClassifierCV
+from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler

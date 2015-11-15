@@ -16,11 +16,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.linear_model;
+package sklearn.linear_model.stochastic_gradient;
 
-public class Lasso extends BaseLinearRegressor {
+public class SquaredHinge extends LossFunction {
 
-	public Lasso(String module, String name){
+	public SquaredHinge(String module, String name){
 		super(module, name);
 	}
+
+	@Override
+	public void __init__(Object[] args){
+		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
+	}
+
+	private static final String[] INIT_ATTRIBUTES = {
+		"threshold"
+	};
 }

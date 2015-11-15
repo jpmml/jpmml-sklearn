@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.linear_model;
+package sklearn.linear_model.ridge;
 
 import java.util.List;
+
+import sklearn.linear_model.BaseLinearClassifier;
 
 import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.ClassDictUtil;
