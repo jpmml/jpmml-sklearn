@@ -66,8 +66,18 @@ public class CompressedInputStreamStorage extends InputStreamStorage {
 
 		InputStream result = new FilterInputStream(new CountingInputStream(zlibIs)){
 
+			private boolean closed = false;
+
+
 			@Override
 			public void close() throws IOException {
+
+				if(this.closed){
+					return;
+				}
+
+				this.closed = true;
+
 				long size = ((CountingInputStream)super.in).getCount();
 
 				super.close();

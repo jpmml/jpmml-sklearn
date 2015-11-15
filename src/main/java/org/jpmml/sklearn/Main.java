@@ -20,7 +20,6 @@ package org.jpmml.sklearn;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.xml.transform.stream.StreamResult;
@@ -89,26 +88,12 @@ public class Main {
 	}
 
 	private void run() throws Exception {
-		PMML pmml = convert();
-
-		OutputStream os = new FileOutputStream(this.output);
-
-		try {
-			JAXBUtil.marshalPMML(pmml, new StreamResult(os));
-		} finally {
-			os.close();
-		}
-	}
-
-	public PMML convert() throws IOException {
 		PMML pmml;
 
 		Schema schema;
 
-		Storage estimatorStorage = PickleUtil.createStorage(this.estimatorInput);
-
-		try {
-			Object object = PickleUtil.unpickle(estimatorStorage);
+		try(Storage storage = PickleUtil.createStorage(this.estimatorInput)){
+			Object object = PickleUtil.unpickle(storage);
 
 			if(!(object instanceof Estimator)){
 				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
@@ -119,15 +104,12 @@ public class Main {
 			schema = estimator.createSchema();
 
 			pmml = estimator.encodePMML(schema);
-		} finally {
-			estimatorStorage.close();
 		}
 
 		if(this.mapperInput != null){
-			Storage mapperStorage = PickleUtil.createStorage(this.mapperInput);
 
-			try {
-				Object object = PickleUtil.unpickle(mapperStorage);
+			try(Storage storage = PickleUtil.createStorage(this.mapperInput)){
+				Object object = PickleUtil.unpickle(storage);
 
 				if(!(object instanceof DataFrameMapper)){
 					throw new IllegalArgumentException("The mapper object (" + ClassDictUtil.formatClass(object) + ") is not a DataFrameMapper");
@@ -136,12 +118,16 @@ public class Main {
 				DataFrameMapper mapper = (DataFrameMapper)object;
 
 				mapper.updatePMML(schema, pmml);
-			} finally {
-				mapperStorage.close();
 			}
 		}
 
-		return pmml;
+		OutputStream os = new FileOutputStream(this.output);
+
+		try {
+			JAXBUtil.marshalPMML(pmml, new StreamResult(os));
+		} finally {
+			os.close();
+		}
 	}
 
 	public File getEstimatorInput(){

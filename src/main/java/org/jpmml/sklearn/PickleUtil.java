@@ -165,14 +165,10 @@ public class PickleUtil {
 			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
 		}
 
-		InputStream is = storage.getObject();
-
-		try {
+		try(InputStream is = storage.getObject()){
 			Unpickler unpickler = new Unpickler();
 
 			return unpickler.load(is);
-		} finally {
-			is.close();
 		}
 	}
 }

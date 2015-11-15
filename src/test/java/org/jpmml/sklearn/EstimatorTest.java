@@ -59,26 +59,18 @@ public class EstimatorTest extends ArchiveBatchTest {
 
 				Schema schema;
 
-				Storage estimatorStorage = openStorage("/pkl/" + getName() + getDataset() + ".pkl");
-
-				try {
-					Estimator estimator = (Estimator)PickleUtil.unpickle(estimatorStorage);
+				try(Storage storage = openStorage("/pkl/" + getName() + getDataset() + ".pkl")){
+					Estimator estimator = (Estimator)PickleUtil.unpickle(storage);
 
 					schema = estimator.createSchema();
 
 					pmml = estimator.encodePMML(schema);
-				} finally {
-					estimatorStorage.close();
 				}
 
-				Storage mapperStorage = openStorage("/pkl/" + getDataset() + ".pkl");
-
-				try {
-					DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(mapperStorage);
+				try(Storage storage = openStorage("/pkl/" + getDataset() + ".pkl")){
+					DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(storage);
 
 					mapper.updatePMML(schema, pmml);
-				} finally {
-					mapperStorage.close();
 				}
 
 				return pmml;
