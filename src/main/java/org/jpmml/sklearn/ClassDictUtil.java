@@ -37,18 +37,10 @@ public class ClassDictUtil {
 
 	static
 	public List<?> getArray(ClassDict dict, String name){
-		Object object = dict.get(name);
+		Object object = NDArrayUtil.unwrap(dict.get(name));
 
 		if(object instanceof NDArray){
 			NDArray array = (NDArray)object;
-
-			return NDArrayUtil.getContent(array);
-		} else
-
-		if(object instanceof NDArrayWrapper){
-			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
-
-			NDArray array = arrayWrapper.getContent();
 
 			return NDArrayUtil.getContent(array);
 		} else
@@ -68,18 +60,10 @@ public class ClassDictUtil {
 
 	static
 	public List<?> getArray(ClassDict dict, String name, String key){
-		Object object = dict.get(name);
+		Object object = NDArrayUtil.unwrap(dict.get(name));
 
 		if(object instanceof NDArray){
 			NDArray array = (NDArray)object;
-
-			return NDArrayUtil.getContent(array, key);
-		} else
-
-		if(object instanceof NDArrayWrapper){
-			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
-
-			NDArray array = arrayWrapper.getContent();
 
 			return NDArrayUtil.getContent(array, key);
 		}

@@ -33,6 +33,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import joblib.NDArrayWrapper;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
@@ -41,6 +42,18 @@ import numpy.DType;
 public class NDArrayUtil {
 
 	private NDArrayUtil(){
+	}
+
+	static
+	public Object unwrap(Object object){
+
+		if(object instanceof NDArrayWrapper){
+			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
+
+			return arrayWrapper.getContent();
+		}
+
+		return object;
 	}
 
 	static
