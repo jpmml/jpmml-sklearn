@@ -4,7 +4,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.externals import joblib
-from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV, SGDRegressor
+from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, LogisticRegressionCV, RidgeCV, RidgeClassifierCV, SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
@@ -131,6 +131,39 @@ build_audit(GaussianNB(), "NaiveBayesAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 
+versicolor_df = load_csv("Versicolor.csv")
+
+print(versicolor_df.dtypes)
+
+versicolor_columns = versicolor_df.columns.tolist()
+
+versicolor_mapper = DataFrameMapper([
+	(versicolor_columns[: -1], RobustScaler()),
+	(versicolor_columns[-1], None)
+])
+
+versicolor = versicolor_mapper.fit_transform(versicolor_df)
+
+print(versicolor.shape)
+
+store_pkl(versicolor_mapper, "Versicolor.pkl")
+
+versicolor_X = versicolor[:, 0:4]
+versicolor_y = versicolor[:, 4]
+versicolor_y = versicolor_y.astype(int)
+
+def build_versicolor(classifier, name, with_proba = True):
+	classifier.fit(versicolor_X, versicolor_y)
+	store_pkl(classifier, name + ".pkl")
+	species = DataFrame(classifier.predict(versicolor_X), columns = ["Species"])
+	if(with_proba == True):
+		species_proba = DataFrame(classifier.predict_proba(versicolor_X), columns = ["probability_0", "probability_1"])
+		species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name + ".csv")
+
+build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)
+build_versicolor(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogVersicolor")
+
 #
 # Multi-class classification
 #
@@ -172,6 +205,8 @@ build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
 build_iris(GaussianNB(), "NaiveBayesIris")
 build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris")
 build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
+build_iris(SGDClassifier(random_state = 13, n_iter = 100), "SGDIris", with_proba = False)
+build_iris(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogIris")
 
 #
 # Regression

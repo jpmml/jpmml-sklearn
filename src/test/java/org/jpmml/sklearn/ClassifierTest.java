@@ -101,4 +101,24 @@ public class ClassifierTest extends EstimatorTest {
 	public void evaluateRidgeIris() throws Exception {
 		evaluate("Ridge", "Iris");
 	}
+
+	@Test
+	public void evaluateSGDIris() throws Exception {
+		evaluate("SGD", "Iris");
+	}
+
+	@Test
+	public void evaluateSGDLogIris() throws Exception {
+		evaluate("SGDLog", "Iris");
+	}
+
+	@Test
+	public void evaluateSGDVersicolor() throws Exception {
+		evaluate("SGD", "Versicolor");
+	}
+
+	@Test
+	public void evaluateSGDLogVersicolor() throws Exception {
+		evaluate("SGDLog", "Versicolor");
+	}
 }

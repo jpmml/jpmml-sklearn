@@ -50,12 +50,17 @@ import sklearn.ensemble.gradient_boosting.QuantileEstimator;
 import sklearn.ensemble.gradient_boosting.ScaledLogOddsEstimator;
 import sklearn.ensemble.gradient_boosting.ZeroEstimator;
 import sklearn.linear_model.ElasticNet;
+import sklearn.linear_model.Hinge;
 import sklearn.linear_model.Lasso;
 import sklearn.linear_model.LinearRegression;
+import sklearn.linear_model.Log;
 import sklearn.linear_model.LogisticRegression;
+import sklearn.linear_model.ModifiedHuber;
 import sklearn.linear_model.Ridge;
 import sklearn.linear_model.RidgeClassifier;
+import sklearn.linear_model.SGDClassifier;
 import sklearn.linear_model.SGDRegressor;
+import sklearn.linear_model.SquaredHinge;
 import sklearn.naive_bayes.GaussianNB;
 import sklearn.preprocessing.Binarizer;
 import sklearn.preprocessing.Imputer;
@@ -138,6 +143,11 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.linear_model.ridge", "RidgeCV", Ridge.class),
 			new ObjectConstructor("sklearn.linear_model.ridge", "RidgeClassifier", RidgeClassifier.class),
 			new ObjectConstructor("sklearn.linear_model.ridge", "RidgeClassifierCV", RidgeClassifier.class),
+			new ExtensionObjectConstructor("sklearn.linear_model.sgd_fast", "Hinge", Hinge.class),
+			new ExtensionObjectConstructor("sklearn.linear_model.sgd_fast", "Log", Log.class),
+			new ExtensionObjectConstructor("sklearn.linear_model.sgd_fast", "ModifiedHuber", ModifiedHuber.class),
+			new ExtensionObjectConstructor("sklearn.linear_model.sgd_fast", "SquaredHinge", SquaredHinge.class),
+			new ObjectConstructor("sklearn.linear_model.stochastic_gradient", "SGDClassifier", SGDClassifier.class),
 			new ObjectConstructor("sklearn.linear_model.stochastic_gradient", "SGDRegressor", SGDRegressor.class),
 			new ObjectConstructor("sklearn.naive_bayes", "GaussianNB", GaussianNB.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),

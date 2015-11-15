@@ -33,6 +33,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`linear_model.RidgeCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html)
     * [`linear_model.RidgeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html)
     * [`linear_model.RidgeClassifierCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html)
+    * [`linear_model.SGDClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html)
     * [`linear_model.SGDRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDRegressor.html)
   * Naive Bayes:
     * [`naive_bayes.GaussianNB`] (http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)
