@@ -38,7 +38,7 @@ public class TreeRegressor extends Regressor implements HasTree {
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		return TreeModelUtil.encodeTreeModel(this, MiningFunctionType.REGRESSION, schema, true);
+		return TreeModelUtil.encodeTreeModel(this, MiningFunctionType.REGRESSION, schema);
 	}
 
 	@Override

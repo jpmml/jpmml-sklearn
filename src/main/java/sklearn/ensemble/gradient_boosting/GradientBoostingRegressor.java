@@ -49,7 +49,7 @@ public class GradientBoostingRegressor extends Regressor {
 
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		return GradientBoostingUtil.encodeGradientBoosting(estimators, init.getDefaultValue(), getLearningRate(), schema, true);
+		return GradientBoostingUtil.encodeGradientBoosting(estimators, init.getDefaultValue(), getLearningRate(), schema);
 	}
 
 	public HasDefaultValue getInit(){

@@ -42,7 +42,7 @@ public class BaseLinearRegressor extends Regressor {
 
 	@Override
 	public RegressionModel encodeModel(Schema schema){
-		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), schema, true);
+		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), schema);
 	}
 
 	public List<? extends Number> getCoef(){

@@ -33,6 +33,13 @@ public class SchemaUtil {
 	}
 
 	static
+	public Schema createSegmentSchema(Schema schema){
+		Schema result = new Schema(null, schema.getTargetCategories(), schema.getActiveFields());
+
+		return result;
+	}
+
+	static
 	public void addValues(DataField dataField, List<?> objects){
 
 		if(objects != null && objects.size() > 0){

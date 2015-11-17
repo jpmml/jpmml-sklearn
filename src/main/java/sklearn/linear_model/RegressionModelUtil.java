@@ -39,13 +39,13 @@ public class RegressionModelUtil {
 	}
 
 	static
-	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema, boolean standalone){
+	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema){
 		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
 		FieldCollector fieldCollector = new RegressionModelFieldCollector();
 		fieldCollector.applyTo(regressionTable);
 
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector, standalone);
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector);
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
 			.addRegressionTables(regressionTable);

@@ -30,6 +30,7 @@ import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.SchemaUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.tree.HasTree;
@@ -44,9 +45,12 @@ public class BaseForestUtil {
 	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, final MiningFunctionType miningFunction, final Schema schema){
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
+			private Schema segmentSchema = SchemaUtil.createSegmentSchema(schema);
+
+
 			@Override
 			public TreeModel apply(E estimator){
-				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, schema, false);
+				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, this.segmentSchema);
 			}
 		};
 

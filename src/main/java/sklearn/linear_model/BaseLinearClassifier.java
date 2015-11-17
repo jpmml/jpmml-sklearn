@@ -39,6 +39,7 @@ import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.SchemaUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 
@@ -80,6 +81,8 @@ public class BaseLinearClassifier extends Classifier {
 			}
 		};
 
+		Schema segmentSchema = SchemaUtil.createSegmentSchema(schema);
+
 		if(numberOfClasses == 1){
 
 			if(targetCategories.size() != 2){
@@ -88,7 +91,7 @@ public class BaseLinearClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), schema);
+			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), segmentSchema);
 
 			List<FieldName> probabilityFields = new ArrayList<>();
 			probabilityFields.add(probabilityFieldFunction.apply(regressionModel));
@@ -106,7 +109,7 @@ public class BaseLinearClassifier extends Classifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), schema);
+				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), segmentSchema);
 
 				regressionModels.add(regressionModel);
 			}
@@ -158,7 +161,7 @@ public class BaseLinearClassifier extends Classifier {
 		Output output = new Output()
 			.addOutputFields(decisionFunction, transformedDecisionFunction);
 
-		RegressionModel regressionModel = RegressionModelUtil.encodeRegressionModel(coefficients, intercept, schema, false)
+		RegressionModel regressionModel = RegressionModelUtil.encodeRegressionModel(coefficients, intercept, schema)
 			.setOutput(output);
 
 		return regressionModel;

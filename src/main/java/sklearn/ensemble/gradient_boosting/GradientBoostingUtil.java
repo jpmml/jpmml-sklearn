@@ -39,6 +39,7 @@ import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.SchemaUtil;
 import sklearn.EstimatorUtil;
 import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -50,7 +51,7 @@ public class GradientBoostingUtil {
 	}
 
 	static
-	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, final Schema schema, boolean standalone){
+	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, final Schema schema){
 		List<Model> models = new ArrayList<>();
 
 		FieldName sumField = FieldName.create("sum");
@@ -58,9 +59,12 @@ public class GradientBoostingUtil {
 		{
 			Function<DecisionTreeRegressor, TreeModel> function = new Function<DecisionTreeRegressor, TreeModel>(){
 
+				private Schema segmentSchema = SchemaUtil.createSegmentSchema(schema);
+
+
 				@Override
 				public TreeModel apply(DecisionTreeRegressor regressor){
-					return TreeModelUtil.encodeTreeModel(regressor, MiningFunctionType.REGRESSION, schema, false);
+					return TreeModelUtil.encodeTreeModel(regressor, MiningFunctionType.REGRESSION, this.segmentSchema);
 				}
 			};
 
@@ -89,18 +93,13 @@ public class GradientBoostingUtil {
 
 			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, initialPrediction);
 
-			MiningSchema miningSchema;
+			MiningSchema miningSchema = new MiningSchema();
 
-			if(standalone){
-				miningSchema = new MiningSchema()
-					.addMiningFields(PMMLUtil.createMiningField(targetField, FieldUsageType.TARGET))
-					.addMiningFields(miningField);
-			} else
-
-			{
-				miningSchema = new MiningSchema()
-					.addMiningFields(miningField);
+			if(targetField != null){
+				miningSchema.addMiningFields(PMMLUtil.createMiningField(targetField, FieldUsageType.TARGET));
 			}
+
+			miningSchema.addMiningFields(miningField);
 
 			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
 				.addRegressionTables(regressionTable);
@@ -110,7 +109,7 @@ public class GradientBoostingUtil {
 
 		Segmentation segmentation = EstimatorUtil.encodeSegmentation(MultipleModelMethodType.MODEL_CHAIN, models, null);
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema((standalone ? targetField : null), schema.getActiveFields());
+		MiningSchema miningSchema = PMMLUtil.createMiningSchema(targetField, schema.getActiveFields());
 
 		MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, miningSchema)
 			.setSegmentation(segmentation);

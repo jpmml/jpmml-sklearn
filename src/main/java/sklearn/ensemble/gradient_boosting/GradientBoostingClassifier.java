@@ -39,6 +39,7 @@ import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.SchemaUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -85,6 +86,8 @@ public class GradientBoostingClassifier extends Classifier {
 			}
 		};
 
+		Schema segmentSchema = SchemaUtil.createSegmentSchema(schema);
+
 		if(numberOfClasses == 1){
 
 			if(targetCategories.size() != 2){
@@ -93,7 +96,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), loss, estimators, init.getPriorProbability(0), learningRate, schema);
+			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), loss, estimators, init.getPriorProbability(0), learningRate, segmentSchema);
 
 			List<FieldName> probabilityFields = new ArrayList<>();
 			probabilityFields.add(probabilityFieldFunction.apply(miningModel));
@@ -111,7 +114,7 @@ public class GradientBoostingClassifier extends Classifier {
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), loss, NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, schema);
+				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), loss, NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, segmentSchema);
 
 				miningModels.add(miningModel);
 			}
@@ -193,7 +196,7 @@ public class GradientBoostingClassifier extends Classifier {
 		Output output = new Output()
 			.addOutputFields(decisionFunction, transformedDecisionField);
 
-		MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, priorProbability, learningRate, schema, false)
+		MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, priorProbability, learningRate, schema)
 			.setOutput(output);
 
 		return miningModel;

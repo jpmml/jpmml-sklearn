@@ -42,7 +42,7 @@ public class TreeClassifier extends Classifier implements HasTree {
 	public TreeModel encodeModel(Schema schema){
 		Output output = EstimatorUtil.encodeClassifierOutput(schema);
 
-		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, schema, true)
+		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, schema)
 			.setOutput(output);
 
 		return treeModel;

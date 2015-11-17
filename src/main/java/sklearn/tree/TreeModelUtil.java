@@ -43,7 +43,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, Schema schema, boolean standalone){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -61,7 +61,7 @@ public class TreeModelUtil {
 		FieldCollector fieldCollector = new TreeModelFieldCollector();
 		fieldCollector.applyTo(root);
 
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector, standalone);
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector);
 
 		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);

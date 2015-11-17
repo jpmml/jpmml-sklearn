@@ -56,8 +56,8 @@ public class EstimatorUtil {
 	}
 
 	static
-	public MiningSchema encodeMiningSchema(Schema schema, FieldCollector fieldCollector, boolean standalone){
-		FieldName targetField = (standalone ? schema.getTargetField() : null);
+	public MiningSchema encodeMiningSchema(Schema schema, FieldCollector fieldCollector){
+		FieldName targetField = schema.getTargetField();
 
 		List<FieldName> activeFields = new ArrayList<>(schema.getActiveFields());
 		activeFields.retainAll(fieldCollector.getFields());
