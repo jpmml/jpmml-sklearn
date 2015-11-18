@@ -42,6 +42,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Clusterer;
+import sklearn.ValueUtil;
 
 public class KMeans extends Clusterer {
 
@@ -64,9 +65,13 @@ public class KMeans extends Clusterer {
 		int numberOfFeatures = shape[1];
 
 		List<? extends Number> clusterCenters = getClusterCenters();
-		List<? extends Number> labels = getLabels();
+		List<Integer> labels = getLabels();
 
-		Multiset<Integer> labelCounts = parseLabels(labels);
+		Multiset<Integer> labelCounts = HashMultiset.create();
+
+		if(labels != null){
+			labelCounts.addAll(labels);
+		}
 
 		List<Cluster> clusters = new ArrayList<>();
 
@@ -117,36 +122,12 @@ public class KMeans extends Clusterer {
 		return (List)ClassDictUtil.getArray(this, "cluster_centers_");
 	}
 
-	public List<? extends Number> getLabels(){
-		return (List)ClassDictUtil.getArray(this, "labels_");
+	public List<Integer> getLabels(){
+		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "labels_"));
 	}
 
 	private int[] getClusterCentersShape(){
 		return ClassDictUtil.getShape(this, "cluster_centers_", 2);
-	}
-
-	static
-	private Multiset<Integer> parseLabels(List<? extends Number> labels){
-		Multiset<Integer> result = HashMultiset.create();
-
-		if(labels != null){
-			Function<Number, Integer> function = new Function<Number, Integer>(){
-
-				@Override
-				public Integer apply(Number number){
-
-					if(number instanceof Integer){
-						return (Integer)number;
-					}
-
-					return number.intValue();
-				}
-			};
-
-			result.addAll(Lists.transform(labels, function));
-		}
-
-		return result;
 	}
 
 	static

@@ -27,7 +27,7 @@ public class MiniBatchKMeans extends KMeans {
 	}
 
 	@Override
-	public List<? extends Number> getLabels(){
+	public List<Integer> getLabels(){
 
 		if(!containsKey("labels_")){
 			return null;

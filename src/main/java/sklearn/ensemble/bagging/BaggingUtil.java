@@ -37,6 +37,7 @@ import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.ValueUtil;
 
 public class BaggingUtil {
 
@@ -44,17 +45,17 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<? extends Number>> estimatorsFeatures, MiningFunctionType miningFunction, Schema schema){
+	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, MiningFunctionType miningFunction, Schema schema){
 		List<Model> models = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
 			E estimator = estimators.get(i);
-			List<? extends Number> estimatorFeatures = estimatorsFeatures.get(i);
+			List<Integer> estimatorFeatures = estimatorsFeatures.get(i);
 
 			List<FieldName> activeFields = new ArrayList<>();
 
-			for(Number estimatorFeature : estimatorFeatures){
-				FieldName activeField = schema.getActiveField(estimatorFeature.intValue());
+			for(Integer estimatorFeature : estimatorFeatures){
+				FieldName activeField = schema.getActiveField(estimatorFeature);
 
 				activeFields.add(activeField);
 			}
@@ -95,17 +96,17 @@ public class BaggingUtil {
 	}
 
 	static
-	public List<List<? extends Number>> transformEstimatorsFeatures(List<?> estimatorsFeatures){
-		Function<Object, List<? extends Number>> function = new Function<Object, List<? extends Number>>(){
+	public List<List<Integer>> transformEstimatorsFeatures(List<?> estimatorsFeatures){
+		Function<Object, List<Integer>> function = new Function<Object, List<Integer>>(){
 
 			@Override
-			public List<? extends Number> apply(Object object){
+			public List<Integer> apply(Object object){
 				object = NDArrayUtil.unwrap(object);
 
 				if(object instanceof NDArray){
 					NDArray array = (NDArray)object;
 
-					return (List)array.getContent();
+					return ValueUtil.asIntegers((List)array.getContent());
 				}
 
 				throw new IllegalArgumentException("The estimator features object (" + ClassDictUtil.formatClass(object) + ") is not an array");

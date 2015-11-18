@@ -18,7 +18,12 @@
  */
 package sklearn;
 
+import java.util.List;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
+import com.google.common.primitives.Ints;
 
 public class ValueUtil {
 
@@ -33,6 +38,58 @@ public class ValueUtil {
 	static
 	public boolean isOne(Number number){
 		return DoubleMath.fuzzyEquals(number.doubleValue(), 1d, ValueUtil.TOLERANCE);
+	}
+
+	static
+	public List<Integer> asIntegers(List<? extends Number> numbers){
+
+		if(numbers == null){
+			return null;
+		}
+
+		Function<Number, Integer> function = new Function<Number, Integer>(){
+
+			@Override
+			public Integer apply(Number number){
+
+				if(number instanceof Integer){
+					return (Integer)number;
+				}
+
+				double value = number.doubleValue();
+
+				if(DoubleMath.isMathematicalInteger(value)){
+					return Ints.checkedCast((long)value);
+				}
+
+				throw new IllegalArgumentException();
+			}
+		};
+
+		return Lists.transform(numbers, function);
+	}
+
+	static
+	public List<Double> asDoubles(List<? extends Number> numbers){
+
+		if(numbers == null){
+			return null;
+		}
+
+		Function<Number, Double> function = new Function<Number, Double>(){
+
+			@Override
+			public Double apply(Number number){
+
+				if(number instanceof Double){
+					return (Double)number;
+				}
+
+				return Double.valueOf(number.doubleValue());
+			}
+		};
+
+		return Lists.transform(numbers, function);
 	}
 
 	private static final double TOLERANCE = 1e-15;

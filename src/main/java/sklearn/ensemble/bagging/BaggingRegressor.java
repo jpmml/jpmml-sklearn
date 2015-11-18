@@ -34,7 +34,7 @@ public class BaggingRegressor extends Regressor {
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		List<Regressor> estimators = getEstimators();
-		List<List<? extends Number>> estimatorsFeatures = getEstimatorsFeatures();
+		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
 		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunctionType.REGRESSION, schema);
 
@@ -47,7 +47,7 @@ public class BaggingRegressor extends Regressor {
 		return BaggingUtil.transformEstimators(estimators, Regressor.class);
 	}
 
-	public List<List<? extends Number>> getEstimatorsFeatures(){
+	public List<List<Integer>> getEstimatorsFeatures(){
 		List<?> estimatorsFeatures = (List)get("estimators_features_");
 
 		return BaggingUtil.transformEstimatorsFeatures(estimatorsFeatures);

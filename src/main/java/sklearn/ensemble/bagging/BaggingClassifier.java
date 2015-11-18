@@ -38,7 +38,7 @@ public class BaggingClassifier extends Classifier {
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		List<Classifier> estimators = getEstimators();
-		List<List<? extends Number>> estimatorsFeatures = getEstimatorsFeatures();
+		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
 		Output output = EstimatorUtil.encodeClassifierOutput(schema);
 
@@ -66,7 +66,7 @@ public class BaggingClassifier extends Classifier {
 		return BaggingUtil.transformEstimators(estimators, Classifier.class);
 	}
 
-	public List<List<? extends Number>> getEstimatorsFeatures(){
+	public List<List<Integer>> getEstimatorsFeatures(){
 		List<?> estimatorsFeatures = (List)get("estimators_features_");
 
 		return BaggingUtil.transformEstimatorsFeatures(estimatorsFeatures);

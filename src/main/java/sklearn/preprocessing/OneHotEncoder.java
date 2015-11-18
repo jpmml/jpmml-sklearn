@@ -32,6 +32,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.OneToManyTransformer;
+import sklearn.ValueUtil;
 
 public class OneHotEncoder extends OneToManyTransformer {
 
@@ -73,7 +74,7 @@ public class OneHotEncoder extends OneToManyTransformer {
 	}
 
 	public List<? extends Number> getValues(){
-		List<? extends Number> featureSizes = getFeatureSizes();
+		List<Integer> featureSizes = getFeatureSizes();
 
 		if(featureSizes.size() != 1){
 			throw new IllegalArgumentException();
@@ -85,10 +86,10 @@ public class OneHotEncoder extends OneToManyTransformer {
 			return getActiveFeatures();
 		}
 
-		Number featureSize = featureSizes.get(0);
+		Integer featureSize = featureSizes.get(0);
 
 		List<Integer> result = new ArrayList<>();
-		result.addAll(ContiguousSet.create(Range.closedOpen(0, featureSize.intValue()), DiscreteDomain.integers()));
+		result.addAll(ContiguousSet.create(Range.closedOpen(0, featureSize), DiscreteDomain.integers()));
 
 		return result;
 	}
@@ -97,7 +98,7 @@ public class OneHotEncoder extends OneToManyTransformer {
 		return (List)ClassDictUtil.getArray(this, "active_features_");
 	}
 
-	public List<? extends Number> getFeatureSizes(){
-		return (List)ClassDictUtil.getArray(this, "n_values_");
+	public List<Integer> getFeatureSizes(){
+		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "n_values_"));
 	}
 }

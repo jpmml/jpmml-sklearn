@@ -39,6 +39,7 @@ import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
+import sklearn.ValueUtil;
 
 public class GaussianNB extends Classifier {
 
@@ -81,7 +82,7 @@ public class GaussianNB extends Classifier {
 
 		FieldName targetField = schema.getTargetField();
 
-		List<? extends Number> classCount = getClassCount();
+		List<Integer> classCount = getClassCount();
 
 		BayesOutput bayesOutput = new BayesOutput(targetField, null)
 			.setTargetValueCounts(encodeTargetValueCounts(targetCategories, classCount));
@@ -96,8 +97,8 @@ public class GaussianNB extends Classifier {
 		return naiveBayesModel;
 	}
 
-	public List<? extends Number> getClassCount(){
-		return (List)ClassDictUtil.getArray(this, "class_count_");
+	public List<Integer> getClassCount(){
+		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "class_count_"));
 	}
 
 	public List<? extends Number> getTheta(){
@@ -137,7 +138,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	static
-	public TargetValueCounts encodeTargetValueCounts(List<String> targetCategories, List<? extends Number> counts){
+	public TargetValueCounts encodeTargetValueCounts(List<String> targetCategories, List<Integer> counts){
 
 		if(targetCategories.size() != counts.size()){
 			throw new IllegalArgumentException();
@@ -146,9 +147,7 @@ public class GaussianNB extends Classifier {
 		TargetValueCounts targetValueCounts = new TargetValueCounts();
 
 		for(int i = 0; i < targetCategories.size(); i++){
-			Number count = counts.get(i);
-
-			TargetValueCount targetValueCount = new TargetValueCount(targetCategories.get(i), count.intValue());
+			TargetValueCount targetValueCount = new TargetValueCount(targetCategories.get(i), counts.get(i));
 
 			targetValueCounts.addTargetValueCounts(targetValueCount);
 		}
