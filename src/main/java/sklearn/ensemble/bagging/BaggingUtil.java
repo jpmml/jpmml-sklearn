@@ -19,12 +19,17 @@
 package sklearn.ensemble.bagging;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
@@ -75,6 +80,21 @@ public class BaggingUtil {
 			.setSegmentation(segmentation);
 
 		return miningModel;
+	}
+
+	static
+	public <E extends Estimator> Set<DefineFunction> encodeDefineFunctions(List<E> estimators){
+		Map<String, DefineFunction> result = new LinkedHashMap<>();
+
+		for(E estimator : estimators){
+			Set<DefineFunction> defineFunctions = estimator.encodeDefineFunctions();
+
+			for(DefineFunction defineFunction : defineFunctions){
+				result.put(defineFunction.getName(), defineFunction);
+			}
+		}
+
+		return new LinkedHashSet<>(result.values());
 	}
 
 	static

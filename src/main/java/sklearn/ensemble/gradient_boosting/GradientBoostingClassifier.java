@@ -19,7 +19,9 @@
 package sklearn.ensemble.gradient_boosting;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -34,8 +36,6 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
-import org.dmg.pmml.PMML;
-import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
@@ -130,21 +130,15 @@ public class GradientBoostingClassifier extends Classifier {
 	}
 
 	@Override
-	public PMML encodePMML(Schema schema){
-		PMML pmml = super.encodePMML(schema);
-
+	public Set<DefineFunction> encodeDefineFunctions(){
 		LossFunction loss = getLoss();
 
 		DefineFunction defineFunction = loss.encodeFunction();
-
 		if(defineFunction != null){
-			TransformationDictionary transformationDictionary = new TransformationDictionary()
-				.addDefineFunctions(defineFunction);
-
-			pmml.setTransformationDictionary(transformationDictionary);
+			return Collections.singleton(defineFunction);
 		}
 
-		return pmml;
+		return super.encodeDefineFunctions();
 	}
 
 	public LossFunction getLoss(){

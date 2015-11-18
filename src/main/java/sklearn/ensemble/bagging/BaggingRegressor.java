@@ -19,7 +19,9 @@
 package sklearn.ensemble.bagging;
 
 import java.util.List;
+import java.util.Set;
 
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.Schema;
@@ -39,6 +41,13 @@ public class BaggingRegressor extends Regressor {
 		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunctionType.REGRESSION, schema);
 
 		return miningModel;
+	}
+
+	@Override
+	public Set<DefineFunction> encodeDefineFunctions(){
+		List<Regressor> estimators = getEstimators();
+
+		return BaggingUtil.encodeDefineFunctions(estimators);
 	}
 
 	public List<Regressor> getEstimators(){

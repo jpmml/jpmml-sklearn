@@ -19,12 +19,12 @@
 package sklearn.ensemble.bagging;
 
 import java.util.List;
+import java.util.Set;
 
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.Output;
-import org.dmg.pmml.PMML;
-import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
@@ -49,15 +49,10 @@ public class BaggingClassifier extends Classifier {
 	}
 
 	@Override
-	public PMML encodePMML(Schema schema){
-		PMML pmml = super.encodePMML(schema);
+	public Set<DefineFunction> encodeDefineFunctions(){
+		List<Classifier> estimators = getEstimators();
 
-		TransformationDictionary transformationDictionary = new TransformationDictionary()
-			.addDefineFunctions(EstimatorUtil.encodeAdaBoostFunction(), EstimatorUtil.encodeLogitFunction());
-
-		pmml.setTransformationDictionary(transformationDictionary);
-
-		return pmml;
+		return BaggingUtil.encodeDefineFunctions(estimators);
 	}
 
 	public List<Classifier> getEstimators(){

@@ -19,13 +19,16 @@
 package sklearn.linear_model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FeatureType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
@@ -33,9 +36,7 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
-import org.dmg.pmml.PMML;
 import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
@@ -125,15 +126,8 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	@Override
-	public PMML encodePMML(Schema schema){
-		PMML pmml = super.encodePMML(schema);
-
-		TransformationDictionary transformationDictionary = new TransformationDictionary()
-			.addDefineFunctions(EstimatorUtil.encodeLogitFunction());
-
-		pmml.setTransformationDictionary(transformationDictionary);
-
-		return pmml;
+	public Set<DefineFunction> encodeDefineFunctions(){
+		return Collections.singleton(EstimatorUtil.encodeLogitFunction());
 	}
 
 	public List<? extends Number> getCoef(){

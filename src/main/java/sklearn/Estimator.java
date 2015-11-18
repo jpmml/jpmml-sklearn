@@ -18,15 +18,19 @@
  */
 package sklearn;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.Schema;
 
@@ -84,13 +88,36 @@ public class Estimator extends BaseEstimator {
 		return dataDictionary;
 	}
 
+	public Set<DefineFunction> encodeDefineFunctions(){
+		return Collections.emptySet();
+	}
+
+	public TransformationDictionary encodeTransformationDictionary(Schema schema){
+		Set<DefineFunction> defineFunctions = encodeDefineFunctions();
+
+		if(defineFunctions.isEmpty()){
+			return null;
+		}
+
+		TransformationDictionary transformationDictionary = new TransformationDictionary();
+
+		for(DefineFunction defineFunction : defineFunctions){
+			transformationDictionary.addDefineFunctions(defineFunction);
+		}
+
+		return transformationDictionary;
+	}
+
 	public PMML encodePMML(Schema schema){
 		DataDictionary dataDictionary = encodeDataDictionary(schema);
+		TransformationDictionary transformationDictionary = encodeTransformationDictionary(schema);
+
+		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn"), dataDictionary)
+			.setTransformationDictionary(transformationDictionary);
 
 		Model model = encodeModel(schema);
 
-		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn"), dataDictionary)
-			.addModels(model);
+		pmml.addModels(model);
 
 		return pmml;
 	}
