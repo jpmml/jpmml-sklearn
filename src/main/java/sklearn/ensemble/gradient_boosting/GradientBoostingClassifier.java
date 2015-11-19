@@ -102,7 +102,7 @@ public class GradientBoostingClassifier extends Classifier {
 			probabilityFields.add(probabilityFieldFunction.apply(miningModel));
 			probabilityFields.add(FieldName.create(loss.getFunction() + "DecisionFunction_" + targetCategories.get(1)));
 
-			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, miningModel, schema);
+			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, miningModel, true, schema);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -121,7 +121,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 			List<FieldName> probabilityFields = Lists.transform(miningModels, probabilityFieldFunction);
 
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, miningModels, schema);
+			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, miningModels, true, schema);
 		} else
 
 		{

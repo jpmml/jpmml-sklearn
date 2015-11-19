@@ -65,6 +65,8 @@ public class BaseLinearClassifier extends Classifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
+		boolean hasProbabilityDistribution = hasProbabilityDistribution();
+
 		List<String> targetCategories = schema.getTargetCategories();
 
 		List<? extends Number> coefficients = getCoef();
@@ -98,7 +100,7 @@ public class BaseLinearClassifier extends Classifier {
 			probabilityFields.add(probabilityFieldFunction.apply(regressionModel));
 			probabilityFields.add(FieldName.create("logitDecisionFunction_" + targetCategories.get(1)));
 
-			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, regressionModel, schema);
+			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, regressionModel, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -117,7 +119,7 @@ public class BaseLinearClassifier extends Classifier {
 
 			List<FieldName> probabilityFields = Lists.transform(regressionModels, probabilityFieldFunction);
 
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, regressionModels, schema);
+			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, regressionModels, hasProbabilityDistribution, schema);
 		} else
 
 		{

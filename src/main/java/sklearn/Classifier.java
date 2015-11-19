@@ -40,6 +40,10 @@ public class Classifier extends Estimator {
 		super(module, name);
 	}
 
+	public boolean hasProbabilityDistribution(){
+		return true;
+	}
+
 	@Override
 	public Schema createSchema(){
 		FieldName targetField = Schema.createTargetField();

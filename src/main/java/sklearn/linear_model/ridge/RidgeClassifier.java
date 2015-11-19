@@ -20,11 +20,8 @@ package sklearn.linear_model.ridge;
 
 import java.util.List;
 
-import sklearn.linear_model.BaseLinearClassifier;
-
-import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.Schema;
+import sklearn.linear_model.BaseLinearClassifier;
 import sklearn.preprocessing.LabelBinarizer;
 
 public class RidgeClassifier extends BaseLinearClassifier {
@@ -34,18 +31,15 @@ public class RidgeClassifier extends BaseLinearClassifier {
 	}
 
 	@Override
+	public boolean hasProbabilityDistribution(){
+		return false;
+	}
+
+	@Override
 	public List<?> getClasses(){
 		LabelBinarizer labelBinarizer = getLabelBinarizer();
 
 		return labelBinarizer.getClasses();
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		MiningModel miningModel = super.encodeModel(schema)
-			.setOutput(null);
-
-		return miningModel;
 	}
 
 	public LabelBinarizer getLabelBinarizer(){

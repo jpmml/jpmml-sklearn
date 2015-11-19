@@ -66,7 +66,7 @@ public class EstimatorUtil {
 	}
 
 	static
-	public MiningModel encodeBinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, Model model, Schema schema){
+	public MiningModel encodeBinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, Model model, boolean hasProbabilityDistribution, Schema schema){
 
 		if(targetCategories.size() != 2 || (targetCategories.size() != probabilityFields.size())){
 			throw new IllegalArgumentException();
@@ -97,16 +97,16 @@ public class EstimatorUtil {
 			models.add(regressionModel);
 		}
 
-		return encodeClassifier(targetCategories, probabilityFields, models, null, schema);
+		return encodeClassifier(targetCategories, probabilityFields, models, null, hasProbabilityDistribution, schema);
 	}
 
 	static
-	public MiningModel encodeMultinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, Schema schema){
-		return encodeClassifier(targetCategories, probabilityFields, models, RegressionNormalizationMethodType.SIMPLEMAX, schema);
+	public MiningModel encodeMultinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, boolean hasProbabilityDistribution, Schema schema){
+		return encodeClassifier(targetCategories, probabilityFields, models, RegressionNormalizationMethodType.SIMPLEMAX, hasProbabilityDistribution, schema);
 	}
 
 	static
-	public MiningModel encodeClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, RegressionNormalizationMethodType normalizationMethod, Schema schema){
+	private MiningModel encodeClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, RegressionNormalizationMethodType normalizationMethod, boolean hasProbabilityDistribution, Schema schema){
 
 		if(targetCategories.size() != probabilityFields.size()){
 			throw new IllegalArgumentException();
@@ -146,7 +146,7 @@ public class EstimatorUtil {
 
 		Segmentation segmentation = encodeSegmentation(MultipleModelMethodType.MODEL_CHAIN, segmentationModels, null);
 
-		Output output = encodeClassifierOutput(schema);
+		Output output = (hasProbabilityDistribution ? encodeClassifierOutput(schema) : null);
 
 		MiningModel miningModel = new MiningModel(MiningFunctionType.CLASSIFICATION, miningSchema)
 			.setSegmentation(segmentation)

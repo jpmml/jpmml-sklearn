@@ -18,11 +18,8 @@
  */
 package sklearn.linear_model.stochastic_gradient;
 
-import sklearn.linear_model.BaseLinearClassifier;
-
-import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.Schema;
+import sklearn.linear_model.BaseLinearClassifier;
 
 public class SGDClassifier extends BaseLinearClassifier {
 
@@ -31,16 +28,14 @@ public class SGDClassifier extends BaseLinearClassifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public boolean hasProbabilityDistribution(){
 		LossFunction lossFunction = getLossFunction();
 
-		MiningModel miningModel = super.encodeModel(schema);
-
-		if(!(lossFunction instanceof Log)){
-			miningModel.setOutput(null);
+		if(lossFunction instanceof Log){
+			return true;
 		}
 
-		return miningModel;
+		return false;
 	}
 
 	public String getLoss(){
