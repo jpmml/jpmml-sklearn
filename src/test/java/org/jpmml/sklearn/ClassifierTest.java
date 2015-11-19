@@ -68,6 +68,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateRidgeEnsembleAudit() throws Exception {
+		evaluate("RidgeEnsemble", "Audit");
+	}
+
+	@Test
 	public void evaluateDecisionTreeIris() throws Exception {
 		evaluate("DecisionTree", "Iris");
 	}
@@ -110,6 +115,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateRidgeIris() throws Exception {
 		evaluate("Ridge", "Iris");
+	}
+
+	@Test
+	public void evaluateRidgeEnsembleIris() throws Exception {
+		evaluate("RidgeEnsemble", "Iris");
 	}
 
 	@Test

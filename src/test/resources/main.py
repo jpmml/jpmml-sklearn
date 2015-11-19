@@ -7,7 +7,7 @@ from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, Gradi
 from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
-from sklearn.linear_model.ridge import RidgeCV, RidgeClassifierCV
+from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
 from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -135,6 +135,7 @@ build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimat
 build_audit(GaussianNB(), "NaiveBayesAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
+build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
 
 versicolor_df = load_csv("Versicolor.csv")
 
@@ -211,6 +212,7 @@ build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimato
 build_iris(GaussianNB(), "NaiveBayesIris")
 build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris")
 build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
+build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleIris")
 build_iris(SGDClassifier(random_state = 13, n_iter = 100), "SGDIris", with_proba = False)
 build_iris(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogIris")
 

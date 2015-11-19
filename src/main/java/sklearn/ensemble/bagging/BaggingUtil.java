@@ -50,7 +50,7 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, MiningFunctionType miningFunction, Schema schema){
+	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, Schema schema){
 		List<Model> models = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
@@ -72,7 +72,7 @@ public class BaggingUtil {
 			models.add(model);
 		}
 
-		Segmentation segmentation = EstimatorUtil.encodeSegmentation(MultipleModelMethodType.AVERAGE, models, null);
+		Segmentation segmentation = EstimatorUtil.encodeSegmentation(multipleModelMethod, models, null);
 
 		MiningSchema miningSchema = PMMLUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
 
