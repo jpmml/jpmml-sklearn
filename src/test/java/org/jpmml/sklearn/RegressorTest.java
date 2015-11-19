@@ -28,6 +28,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateDecisionTreeEnsembleAuto() throws Exception {
+		evaluate("DecisionTreeEnsemble", "Auto");
+	}
+
+	@Test
 	public void evaluateElasticNetAuto() throws Exception {
 		evaluate("ElasticNet", "Auto");
 	}

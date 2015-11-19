@@ -127,6 +127,7 @@ def build_audit(classifier, name, with_proba = True):
 	store_csv(adjusted, name + ".csv")
 
 build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAudit")
+build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAudit")
 build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
@@ -204,6 +205,7 @@ def build_iris(classifier, name, with_proba = True):
 	store_csv(species, name + ".csv")
 
 build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris")
+build_iris(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleIris")
 build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
@@ -257,12 +259,13 @@ def build_auto(regressor, name):
 	store_csv(mpg, name + ".csv")
 
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
+build_auto(BaggingRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAuto")
 build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
 build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
-build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
+build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.5), "LinearRegressionEnsembleAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
 build_auto(RidgeCV(), "RidgeAuto")
 

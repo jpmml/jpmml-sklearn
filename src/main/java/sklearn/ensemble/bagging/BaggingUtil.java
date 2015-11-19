@@ -98,24 +98,6 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> List<E> transformEstimators(List<?> estimators, final Class<? extends E> clazz){
-		Function<Object, E> function = new Function<Object, E>(){
-
-			@Override
-			public E apply(Object object){
-
-				if(clazz.isInstance(object)){
-					return clazz.cast(object);
-				}
-
-				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
-			}
-		};
-
-		return Lists.transform(estimators, function);
-	}
-
-	static
 	public List<List<Integer>> transformEstimatorsFeatures(List<?> estimatorsFeatures){
 		Function<Object, List<Integer>> function = new Function<Object, List<Integer>>(){
 

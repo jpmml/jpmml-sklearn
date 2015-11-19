@@ -21,11 +21,16 @@ package sklearn.ensemble.bagging;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
@@ -34,6 +39,20 @@ public class BaggingClassifier extends Classifier {
 
 	public BaggingClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public DataType getDataType(){
+		Classifier baseEstimator = getBaseEstimator();
+
+		return baseEstimator.getDataType();
+	}
+
+	@Override
+	public OpType getOpType(){
+		Classifier baseEstimator = getBaseEstimator();
+
+		return baseEstimator.getOpType();
 	}
 
 	@Override
@@ -62,15 +81,21 @@ public class BaggingClassifier extends Classifier {
 
 	@Override
 	public Set<DefineFunction> encodeDefineFunctions(){
-		List<Classifier> estimators = getEstimators();
+		Classifier baseEstimator = getBaseEstimator();
 
-		return BaggingUtil.encodeDefineFunctions(estimators);
+		return baseEstimator.encodeDefineFunctions();
+	}
+
+	public Classifier getBaseEstimator(){
+		Object baseEstimator = get("base_estimator_");
+
+		return BaggingClassifier.transformer.apply(baseEstimator);
 	}
 
 	public List<Classifier> getEstimators(){
 		List<?> estimators = (List)get("estimators_");
 
-		return BaggingUtil.transformEstimators(estimators, Classifier.class);
+		return Lists.transform(estimators, BaggingClassifier.transformer);
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
@@ -78,4 +103,21 @@ public class BaggingClassifier extends Classifier {
 
 		return BaggingUtil.transformEstimatorsFeatures(estimatorsFeatures);
 	}
+
+	private static final Function<Object, Classifier> transformer = new Function<Object, Classifier>(){
+
+		@Override
+		public Classifier apply(Object object){
+
+			try {
+				if(object == null){
+					throw new NullPointerException();
+				}
+
+				return (Classifier)object;
+			} catch(RuntimeException re){
+				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not a Classifier or is not a supported Classifier subclass", re);
+			}
+		}
+	};
 }
