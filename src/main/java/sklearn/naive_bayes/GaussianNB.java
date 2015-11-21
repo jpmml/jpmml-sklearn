@@ -123,10 +123,7 @@ public class GaussianNB extends Classifier {
 		TargetValueStats targetValueStats = new TargetValueStats();
 
 		for(int i = 0; i < targetCategories.size(); i++){
-			Number mean = means.get(i);
-			Number variance = variances.get(i);
-
-			GaussianDistribution gaussianDistribution = new GaussianDistribution(mean.doubleValue(), variance.doubleValue());
+			GaussianDistribution gaussianDistribution = new GaussianDistribution(ValueUtil.asDouble(means.get(i)), ValueUtil.asDouble(variances.get(i)));
 
 			TargetValueStat targetValueStat = new TargetValueStat(targetCategories.get(i))
 				.setContinuousDistribution(gaussianDistribution);

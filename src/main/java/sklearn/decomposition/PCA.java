@@ -89,7 +89,7 @@ public class PCA extends ManyToManyTransformer {
 			List<? extends Number> explainedVariance = getExplainedVariance();
 
 			if(!ValueUtil.isOne(explainedVariance.get(index))){
-				apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt((explainedVariance.get(index)).doubleValue())));
+				apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVariance.get(index)))));
 			}
 		}
 

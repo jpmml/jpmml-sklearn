@@ -73,6 +73,7 @@ import sklearn.preprocessing.MinMaxScaler;
 import sklearn.preprocessing.OneHotEncoder;
 import sklearn.preprocessing.RobustScaler;
 import sklearn.preprocessing.StandardScaler;
+import sklearn.svm.SVR;
 import sklearn.tree.DecisionTreeClassifier;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.ExtraTreeClassifier;
@@ -163,6 +164,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.preprocessing.imputation", "Imputer", Imputer.class),
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelBinarizer", LabelBinarizer.class),
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelEncoder", LabelEncoder.class),
+			new ObjectConstructor("sklearn.svm.classes", "SVR", SVR.class),
 			new ExtensionObjectConstructor("sklearn.tree._tree", "BestSplitter"),
 			new ExtensionObjectConstructor("sklearn.tree._tree", "ClassificationCriterion"),
 			new ExtensionObjectConstructor("sklearn.tree._tree", "PresortBestSplitter", PresortBestSplitter.class),

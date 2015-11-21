@@ -24,6 +24,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
 import com.google.common.primitives.Ints;
+import org.dmg.pmml.Array;
+import org.jpmml.converter.PMMLUtil;
 
 public class ValueUtil {
 
@@ -41,6 +43,22 @@ public class ValueUtil {
 	}
 
 	static
+	public Integer asInteger(Number number){
+
+		if(number instanceof Integer){
+			return (Integer)number;
+		}
+
+		double value = number.doubleValue();
+
+		if(DoubleMath.isMathematicalInteger(value)){
+			return Ints.checkedCast((long)value);
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	static
 	public List<Integer> asIntegers(List<? extends Number> numbers){
 
 		if(numbers == null){
@@ -51,22 +69,21 @@ public class ValueUtil {
 
 			@Override
 			public Integer apply(Number number){
-
-				if(number instanceof Integer){
-					return (Integer)number;
-				}
-
-				double value = number.doubleValue();
-
-				if(DoubleMath.isMathematicalInteger(value)){
-					return Ints.checkedCast((long)value);
-				}
-
-				throw new IllegalArgumentException();
+				return asInteger(number);
 			}
 		};
 
 		return Lists.transform(numbers, function);
+	}
+
+	static
+	public Double asDouble(Number number){
+
+		if(number instanceof Double){
+			return (Double)number;
+		}
+
+		return Double.valueOf(number.doubleValue());
 	}
 
 	static
@@ -80,16 +97,28 @@ public class ValueUtil {
 
 			@Override
 			public Double apply(Number number){
-
-				if(number instanceof Double){
-					return (Double)number;
-				}
-
-				return Double.valueOf(number.doubleValue());
+				return asDouble(number);
 			}
 		};
 
 		return Lists.transform(numbers, function);
+	}
+
+	static
+	public Array encodeArray(List<? extends Number> values){
+		Function<Number, String> function = new Function<Number, String>(){
+
+			@Override
+			public String apply(Number number){
+				return PMMLUtil.formatValue(number);
+			}
+		};
+
+		String value = PMMLUtil.formatArrayValue(Lists.transform(values, function));
+
+		Array array = new Array(Array.Type.REAL, value);
+
+		return array;
 	}
 
 	private static final double TOLERANCE = 1e-15;

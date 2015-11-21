@@ -41,6 +41,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
 import sklearn.EstimatorUtil;
+import sklearn.ValueUtil;
 import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.TreeModelUtil;
@@ -89,7 +90,7 @@ public class GradientBoostingUtil {
 		{
 			MiningField miningField = PMMLUtil.createMiningField(sumField);
 
-			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), learningRate.doubleValue());
+			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), ValueUtil.asDouble(learningRate));
 
 			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, initialPrediction);
 

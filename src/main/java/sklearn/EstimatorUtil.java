@@ -174,7 +174,7 @@ public class EstimatorUtil {
 				.setModel(model);
 
 			if(weight != null && !ValueUtil.isOne(weight)){
-				segment.setWeight(weight.doubleValue());
+				segment.setWeight(ValueUtil.asDouble(weight));
 			}
 
 			segmentation.addSegments(segment);

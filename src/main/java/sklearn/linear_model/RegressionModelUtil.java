@@ -61,7 +61,7 @@ public class RegressionModelUtil {
 			throw new IllegalArgumentException();
 		}
 
-		RegressionTable regressionTable = new RegressionTable(intercept.doubleValue());
+		RegressionTable regressionTable = new RegressionTable(ValueUtil.asDouble(intercept));
 
 		for(int i = 0; i < coefficients.size(); i++){
 			Number coefficient = coefficients.get(i);
@@ -73,7 +73,7 @@ public class RegressionModelUtil {
 				continue;
 			}
 
-			NumericPredictor numericPredictor = new NumericPredictor(activeField, coefficient.doubleValue());
+			NumericPredictor numericPredictor = new NumericPredictor(activeField, ValueUtil.asDouble(coefficient));
 
 			regressionTable.addNumericPredictors(numericPredictor);
 		}
@@ -83,7 +83,7 @@ public class RegressionModelUtil {
 
 	static
 	public RegressionTable encodeRegressionTable(NumericPredictor numericPredictor, Number intercept){
-		RegressionTable regressionTable = new RegressionTable(intercept.doubleValue())
+		RegressionTable regressionTable = new RegressionTable(ValueUtil.asDouble(intercept))
 			.addNumericPredictors(numericPredictor);
 
 		return regressionTable;

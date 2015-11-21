@@ -76,4 +76,9 @@ public class RegressorTest extends EstimatorTest {
 	public void evaluateSGDHousing() throws Exception {
 		evaluate("SGD", "Housing");
 	}
+
+	@Test
+	public void evaluateSVRHousing() throws Exception {
+		evaluate("SVR", "Housing");
+	}
 }

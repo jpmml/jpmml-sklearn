@@ -49,6 +49,8 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`preprocessing.OneHotEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html)
     * [`preprocessing.RobustScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)
     * [`preprocessing.StandardScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
+  * Support Vector Machines:
+    * [`svm.SVR`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
   * Decision Trees:
     * [`tree.DecisionTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
     * [`tree.DecisionTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html)

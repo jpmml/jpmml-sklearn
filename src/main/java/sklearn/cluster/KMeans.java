@@ -76,7 +76,7 @@ public class KMeans extends Clusterer {
 		List<Cluster> clusters = new ArrayList<>();
 
 		for(int i = 0; i < numberOfClusters; i++){
-			Array array = encodeArray(NDArrayUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
+			Array array = ValueUtil.encodeArray(NDArrayUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
 
 			Cluster cluster = new Cluster()
 				.setId(String.valueOf(i))
@@ -128,23 +128,6 @@ public class KMeans extends Clusterer {
 
 	private int[] getClusterCentersShape(){
 		return ClassDictUtil.getShape(this, "cluster_centers_", 2);
-	}
-
-	static
-	private Array encodeArray(List<? extends Number> values){
-		Function<Number, String> function = new Function<Number, String>(){
-
-			@Override
-			public String apply(Number number){
-				return PMMLUtil.formatValue(number);
-			}
-		};
-
-		String value = PMMLUtil.formatArrayValue(Lists.transform(values, function));
-
-		Array array = new Array(Array.Type.REAL, value);
-
-		return array;
 	}
 
 	static
