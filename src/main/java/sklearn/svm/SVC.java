@@ -22,22 +22,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
+import numpy.core.NDArrayUtil;
 import org.dmg.pmml.Kernel;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.SupportVectorMachine;
 import org.dmg.pmml.SupportVectorMachineModel;
+import org.dmg.pmml.SvmClassificationMethodType;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import sklearn.Regressor;
+import sklearn.Classifier;
 import sklearn.ValueUtil;
 
-public class SVR extends Regressor {
+public class SVC extends Classifier {
 
-	public SVR(String module, String name){
+	public SVC(String module, String name){
 		super(module, name);
 	}
 
@@ -49,6 +51,11 @@ public class SVR extends Regressor {
 	}
 
 	@Override
+	public boolean hasProbabilityDistribution(){
+		return false;
+	}
+
+	@Override
 	public SupportVectorMachineModel encodeModel(Schema schema){
 		int[] shape = getSupportVectorsShape();
 
@@ -57,8 +64,15 @@ public class SVR extends Regressor {
 
 		List<Integer> support = getSupport();
 		List<? extends Number> supportVectors = getSupportVectors();
+		List<Integer> supportSizes = getSupportSizes();
 		List<? extends Number> dualCoef = getDualCoef();
 		List<? extends Number> intercept = getIntercept();
+
+		int[] offsets = new int[supportSizes.size() + 1];
+
+		for(int i = 0; i < supportSizes.size(); i++){
+			offsets[i + 1] = offsets[i] + supportSizes.get(i);
+		}
 
 		VectorDictionary vectorDictionary = SupportVectorMachineUtil.encodeVectorDictionary(support, supportVectors, numberOfVectors, numberOfFeatures, schema);
 
@@ -68,13 +82,37 @@ public class SVR extends Regressor {
 
 		List<SupportVectorMachine> supportVectorMachines = new ArrayList<>();
 
-		SupportVectorMachine supportVectorMachine = SupportVectorMachineUtil.encodeSupportVectorMachine(vectorInstances, dualCoef, Iterables.getOnlyElement(intercept));
+		int i = 0;
 
-		supportVectorMachines.add(supportVectorMachine);
+		List<String> targetCategories = schema.getTargetCategories();
+
+		for(int first = 0; first < targetCategories.size(); first++){
+
+			for(int second = first + 1; second < targetCategories.size(); second++){
+				List<VectorInstance> svmVectorInstances = new ArrayList<>();
+				svmVectorInstances.addAll(slice(vectorInstances, offsets, first));
+				svmVectorInstances.addAll(slice(vectorInstances, offsets, second));
+
+				List<Number> svmDualCoef = new ArrayList<>();
+				svmDualCoef.addAll(slice(NDArrayUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, second - 1), offsets, first));
+				svmDualCoef.addAll(slice(NDArrayUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, first), offsets, second));
+
+				// LibSVM: (decisionFunction > 0 ? first : second)
+				// PMML: (decisionFunction < 0 ? first : second)
+				SupportVectorMachine supportVectorMachine = SupportVectorMachineUtil.encodeSupportVectorMachine(svmVectorInstances, svmDualCoef, Iterables.get(intercept, i))
+					.setTargetCategory(targetCategories.get(second))
+					.setAlternateTargetCategory(targetCategories.get(first));
+
+				supportVectorMachines.add(supportVectorMachine);
+
+				i++;
+			}
+		}
 
 		MiningSchema miningSchema = PMMLUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
 
-		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.REGRESSION, miningSchema, vectorDictionary, supportVectorMachines)
+		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.CLASSIFICATION, miningSchema, vectorDictionary, supportVectorMachines)
+			.setClassificationMethod(SvmClassificationMethodType.ONE_AGAINST_ONE)
 			.setKernel(kernel);
 
 		return supportVectorMachineModel;
@@ -104,6 +142,10 @@ public class SVR extends Regressor {
 		return (List)ClassDictUtil.getArray(this, "support_vectors_");
 	}
 
+	public List<Integer> getSupportSizes(){
+		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "n_support_"));
+	}
+
 	public List<? extends Number> getDualCoef(){
 		return (List)ClassDictUtil.getArray(this, "_dual_coef_");
 	}
@@ -114,5 +156,10 @@ public class SVR extends Regressor {
 
 	private int[] getSupportVectorsShape(){
 		return ClassDictUtil.getShape(this, "support_vectors_", 2);
+	}
+
+	static
+	private <E> List<E> slice(List<E> list, int[] offsets, int index){
+		return list.subList(offsets[index], offsets[index + 1]);
 	}
 }
