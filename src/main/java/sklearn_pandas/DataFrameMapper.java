@@ -58,7 +58,7 @@ import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sklearn.OneToOneTransformer;
+import sklearn.MultiTransformer;
 import sklearn.Transformer;
 
 public class DataFrameMapper extends ClassDict {
@@ -141,17 +141,23 @@ public class DataFrameMapper extends ClassDict {
 		for(int row = 0; featureIt.hasNext(); row++){
 			Object[] feature = featureIt.next();
 
+			final
 			List<FieldName> names = getNameList(feature);
 			List<Transformer> transformers = getTransformerList(feature);
 
 			if(transformers.isEmpty()){
-				Transformer transformer = new OneToOneTransformer(null, null){
+				Transformer transformer = new MultiTransformer(null, null){
 
 					@Override
-					public Expression encode(FieldName name){
-						FieldRef fieldRef = new FieldRef(name);
+					public int getNumberOfFeatures(){
+						return names.size();
+					}
 
-						return fieldRef;
+					@Override
+					public Expression encode(int index, FieldName name){
+						Expression expression = new FieldRef(name);
+
+						return expression;
 					}
 				};
 
