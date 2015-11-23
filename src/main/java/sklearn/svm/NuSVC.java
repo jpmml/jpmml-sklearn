@@ -18,9 +18,9 @@
  */
 package sklearn.svm;
 
-public class SVC extends BaseLibSVMClassifier {
+public class NuSVC extends BaseLibSVMClassifier {
 
-	public SVC(String module, String name){
+	public NuSVC(String module, String name){
 		super(module, name);
 	}
 }

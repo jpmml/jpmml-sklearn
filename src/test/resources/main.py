@@ -12,7 +12,7 @@ from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
-from sklearn.svm import NuSVR, SVC, SVR
+from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
@@ -171,7 +171,8 @@ def build_versicolor(classifier, name, with_proba = True):
 
 build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)
 build_versicolor(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogVersicolor")
-build_versicolor(SVC(random_state = 13), "SVCVersicolor", with_proba = False);
+build_versicolor(SVC(), "SVCVersicolor", with_proba = False)
+build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
 
 #
 # Multi-class classification
@@ -219,7 +220,8 @@ build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
 build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleIris")
 build_iris(SGDClassifier(random_state = 13, n_iter = 100), "SGDIris", with_proba = False)
 build_iris(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogIris")
-build_iris(SVC(random_state = 13), "SVCIris", with_proba = False)
+build_iris(SVC(), "SVCIris", with_proba = False)
+build_iris(NuSVC(), "NuSVCIris", with_proba = False)
 
 #
 # Regression

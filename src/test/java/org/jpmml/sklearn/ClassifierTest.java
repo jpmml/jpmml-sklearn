@@ -148,6 +148,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateNuSVCIris() throws Exception {
+		evaluate("NuSVC", "Iris");
+	}
+
+	@Test
 	public void evaluateSGDVersicolor() throws Exception {
 		evaluate("SGD", "Versicolor");
 	}
@@ -160,5 +165,10 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateSVCVersicolor() throws Exception {
 		evaluate("SVC", "Versicolor");
+	}
+
+	@Test
+	public void evaluateNuSVCVersicolor() throws Exception {
+		evaluate("NuSVC", "Versicolor");
 	}
 }
