@@ -18,9 +18,9 @@
  */
 package sklearn.svm;
 
-public class SVR extends BaseLibSVMRegressor {
+public class NuSVR extends BaseLibSVMRegressor {
 
-	public SVR(String module, String name){
+	public NuSVR(String module, String name){
 		super(module, name);
 	}
 }

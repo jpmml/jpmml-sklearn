@@ -52,6 +52,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
   * Support Vector Machines:
     * [`svm.SVC`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
     * [`svm.SVR`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
+    * [`svm.NuSVR`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html)
   * Decision Trees:
     * [`tree.DecisionTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
     * [`tree.DecisionTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html)
