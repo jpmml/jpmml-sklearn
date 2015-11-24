@@ -73,6 +73,7 @@ import sklearn.preprocessing.MinMaxScaler;
 import sklearn.preprocessing.OneHotEncoder;
 import sklearn.preprocessing.RobustScaler;
 import sklearn.preprocessing.StandardScaler;
+import sklearn.svm.LinearSVR;
 import sklearn.svm.NuSVC;
 import sklearn.svm.NuSVR;
 import sklearn.svm.SVC;
@@ -167,6 +168,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.preprocessing.imputation", "Imputer", Imputer.class),
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelBinarizer", LabelBinarizer.class),
 			new ObjectConstructor("sklearn.preprocessing.label", "LabelEncoder", LabelEncoder.class),
+			new ObjectConstructor("sklearn.svm.classes", "LinearSVR", LinearSVR.class),
 			new ObjectConstructor("sklearn.svm.classes", "NuSVC", NuSVC.class),
 			new ObjectConstructor("sklearn.svm.classes", "NuSVR", NuSVR.class),
 			new ObjectConstructor("sklearn.svm.classes", "SVC", SVC.class),

@@ -12,7 +12,7 @@ from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
-from sklearn.svm import NuSVC, NuSVR, SVC, SVR
+from sklearn.svm import LinearSVR, NuSVC, NuSVR, SVC, SVR
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
 
@@ -307,4 +307,5 @@ def build_housing(regressor, name):
 
 build_housing(SGDRegressor(random_state = 13), "SGDHousing")
 build_housing(SVR(), "SVRHousing")
+build_housing(LinearSVR(random_state = 13), "LinearSVRHousing")
 build_housing(NuSVR(), "NuSVRHousing")
