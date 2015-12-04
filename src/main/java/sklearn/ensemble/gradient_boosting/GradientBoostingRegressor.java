@@ -25,6 +25,7 @@ import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
+import sklearn.ValueUtil;
 import sklearn.tree.DecisionTreeRegressor;
 
 public class GradientBoostingRegressor extends Regressor {
@@ -35,7 +36,7 @@ public class GradientBoostingRegressor extends Regressor {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return (Integer)get("n_features");
+		return ValueUtil.asInteger((Number)get("n_features"));
 	}
 
 	@Override

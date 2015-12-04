@@ -42,6 +42,7 @@ import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
+import sklearn.ValueUtil;
 import sklearn.tree.DecisionTreeRegressor;
 
 public class GradientBoostingClassifier extends Classifier {
@@ -52,7 +53,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return (Integer)get("n_features");
+		return ValueUtil.asInteger((Number)get("n_features"));
 	}
 
 	@Override

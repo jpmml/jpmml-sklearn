@@ -38,6 +38,7 @@ import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
 import numpy.DType;
+import sklearn.ValueUtil;
 
 public class NDArrayUtil {
 
@@ -63,7 +64,7 @@ public class NDArrayUtil {
 		int[] result = new int[shape.length];
 
 		for(int i = 0; i < shape.length; i++){
-			result[i] = (Integer)shape[i];
+			result[i] = ValueUtil.asInteger((Number)shape[i]);
 		}
 
 		return result;
@@ -222,7 +223,7 @@ public class NDArrayUtil {
 		int length = 1;
 
 		for(int i = 0; i < shape.length; i++){
-			length *= (Integer)shape[i];
+			length *= ValueUtil.asInteger((Number)shape[i]);
 		} // End if
 
 		if(descr instanceof String){

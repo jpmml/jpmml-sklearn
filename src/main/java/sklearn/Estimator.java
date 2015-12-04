@@ -51,7 +51,7 @@ public class Estimator extends BaseEstimator {
 	public Model encodeModel(Schema schema);
 
 	public int getNumberOfFeatures(){
-		return (Integer)get("n_features_");
+		return ValueUtil.asInteger((Number)get("n_features_"));
 	}
 
 	/**

@@ -16,27 +16,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble.gradient_boosting;
+package sklearn;
 
-import net.razorvine.pickle.objects.ClassDict;
-import org.dmg.pmml.DefineFunction;
-import sklearn.ValueUtil;
+import org.junit.Test;
 
-abstract
-public class LossFunction extends ClassDict {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-	public LossFunction(String module, String name){
-		super(module, name);
-	}
+public class ValueUtilTest {
 
-	abstract
-	public String getFunction();
+	@Test
+	public void asInteger(){
+		assertEquals((Integer)0, ValueUtil.asInteger((Integer)0));
+		assertEquals((Integer)0, ValueUtil.asInteger((Long)0L));
+		assertEquals((Integer)0, ValueUtil.asInteger((Float)0f));
+		assertEquals((Integer)0, ValueUtil.asInteger((Double)0d));
 
-	public DefineFunction encodeFunction(){
-		return null;
-	}
+		try {
+			ValueUtil.asInteger((Double)0.5d);
 
-	public Integer getK(){
-		return ValueUtil.asInteger((Number)get("K"));
+			fail();
+		} catch(IllegalArgumentException iae){
+			// Ignored
+		}
+
+		try {
+			ValueUtil.asInteger((Double)(Integer.MAX_VALUE + 0.5d));
+
+			fail();
+		} catch(IllegalArgumentException iae){
+			// Ignored
+		}
 	}
 }
