@@ -40,9 +40,9 @@ import org.dmg.pmml.Segmentation;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.ValueUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
-import sklearn.ValueUtil;
 
 public class BaggingUtil {
 

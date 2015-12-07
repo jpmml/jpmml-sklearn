@@ -26,8 +26,8 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.ValueUtil;
 import sklearn.MultiTransformer;
-import sklearn.ValueUtil;
 
 public class MaxAbsScaler extends MultiTransformer {
 

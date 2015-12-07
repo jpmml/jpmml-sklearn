@@ -24,8 +24,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningModel;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.ValueUtil;
 import sklearn.Regressor;
-import sklearn.ValueUtil;
 import sklearn.tree.DecisionTreeRegressor;
 
 public class GradientBoostingRegressor extends Regressor {

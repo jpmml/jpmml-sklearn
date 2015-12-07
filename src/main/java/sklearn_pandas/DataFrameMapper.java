@@ -56,11 +56,11 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
+import org.jpmml.sklearn.TupleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.MultiTransformer;
 import sklearn.Transformer;
-import sklearn.TupleUtil;
 
 public class DataFrameMapper extends ClassDict {
 

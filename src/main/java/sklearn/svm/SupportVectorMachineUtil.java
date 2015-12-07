@@ -37,7 +37,7 @@ import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorFields;
 import org.dmg.pmml.VectorInstance;
 import org.jpmml.sklearn.Schema;
-import sklearn.ValueUtil;
+import org.jpmml.sklearn.ValueUtil;
 
 public class SupportVectorMachineUtil {
 

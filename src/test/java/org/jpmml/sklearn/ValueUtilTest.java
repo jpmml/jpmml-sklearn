@@ -16,28 +16,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn;
+package org.jpmml.sklearn;
 
-import java.util.List;
+import org.junit.Test;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class TupleUtil {
+public class ValueUtilTest {
 
-	private TupleUtil(){
-	}
+	@Test
+	public void asInteger(){
+		assertEquals((Integer)0, ValueUtil.asInteger((Integer)0));
+		assertEquals((Integer)0, ValueUtil.asInteger((Long)0L));
+		assertEquals((Integer)0, ValueUtil.asInteger((Float)0f));
+		assertEquals((Integer)0, ValueUtil.asInteger((Double)0d));
 
-	static
-	public List<?> extractElement(List<Object[]> tuples, final int i){
-		Function<Object[], Object> function = new Function<Object[], Object>(){
+		try {
+			ValueUtil.asInteger((Double)0.5d);
 
-			@Override
-			public Object apply(Object[] tuple){
-				return tuple[i];
-			}
-		};
+			fail();
+		} catch(IllegalArgumentException iae){
+			// Ignored
+		}
 
-		return Lists.transform(tuples, function);
+		try {
+			ValueUtil.asInteger((Double)(Integer.MAX_VALUE + 0.5d));
+
+			fail();
+		} catch(IllegalArgumentException iae){
+			// Ignored
+		}
 	}
 }

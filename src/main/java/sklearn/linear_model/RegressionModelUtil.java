@@ -28,10 +28,10 @@ import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
 import org.jpmml.converter.FieldCollector;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.ValueUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.EstimatorUtil;
-import sklearn.ValueUtil;
 
 public class RegressionModelUtil {
 

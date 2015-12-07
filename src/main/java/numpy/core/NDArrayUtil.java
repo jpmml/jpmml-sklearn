@@ -36,8 +36,8 @@ import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
 import numpy.DType;
-import sklearn.TupleUtil;
-import sklearn.ValueUtil;
+import org.jpmml.sklearn.TupleUtil;
+import org.jpmml.sklearn.ValueUtil;
 
 public class NDArrayUtil {
 

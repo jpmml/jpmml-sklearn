@@ -32,8 +32,8 @@ import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.ValueUtil;
 import sklearn.Regressor;
-import sklearn.ValueUtil;
 
 abstract
 public class BaseLibSVMRegressor extends Regressor {

@@ -41,8 +41,8 @@ import org.dmg.pmml.SquaredEuclidean;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.ValueUtil;
 import sklearn.Clusterer;
-import sklearn.ValueUtil;
 
 public class KMeans extends Clusterer {
 

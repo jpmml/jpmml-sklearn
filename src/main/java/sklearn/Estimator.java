@@ -33,6 +33,7 @@ import org.dmg.pmml.PMML;
 import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.Schema;
+import org.jpmml.sklearn.ValueUtil;
 
 abstract
 public class Estimator extends BaseEstimator {

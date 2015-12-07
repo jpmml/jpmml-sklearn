@@ -40,9 +40,9 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
+import org.jpmml.sklearn.ValueUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
-import sklearn.ValueUtil;
 import sklearn.tree.DecisionTreeRegressor;
 
 public class GradientBoostingClassifier extends Classifier {
