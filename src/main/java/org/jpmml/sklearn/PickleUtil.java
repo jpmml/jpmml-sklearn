@@ -86,6 +86,7 @@ import sklearn.tree.PresortBestSplitter;
 import sklearn.tree.RegressionCriterion;
 import sklearn.tree.Tree;
 import sklearn_pandas.DataFrameMapper;
+import sklearn_pandas.TransformerPipeline;
 
 public class PickleUtil {
 
@@ -182,7 +183,9 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.tree.tree", "DecisionTreeRegressor", DecisionTreeRegressor.class),
 			new ObjectConstructor("sklearn.tree.tree", "ExtraTreeClassifier", ExtraTreeClassifier.class),
 			new ObjectConstructor("sklearn.tree.tree", "ExtraTreeRegressor", ExtraTreeRegressor.class),
-			new ObjectConstructor("sklearn_pandas", "DataFrameMapper", DataFrameMapper.class),
+			new ObjectConstructor("sklearn_pandas", "DataFrameMapper", DataFrameMapper.class), // sklearn_pandas 0.X
+			new ObjectConstructor("sklearn_pandas.dataframe_mapper", "DataFrameMapper", DataFrameMapper.class), // sklearn_pandas 1.X
+			new ObjectConstructor("sklearn_pandas.pipeline", "TransformerPipeline", TransformerPipeline.class),
 		};
 
 		for(ObjectConstructor constructor : constructors){

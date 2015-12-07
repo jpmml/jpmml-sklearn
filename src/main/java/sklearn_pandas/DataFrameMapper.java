@@ -60,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.MultiTransformer;
 import sklearn.Transformer;
+import sklearn.TupleUtil;
 
 public class DataFrameMapper extends ClassDict {
 
@@ -459,6 +460,14 @@ public class DataFrameMapper extends ClassDict {
 		try {
 			if(feature[1] == null){
 				return Collections.emptyList();
+			} // End if
+
+			if(feature[1] instanceof TransformerPipeline){
+				TransformerPipeline transformerPipeline = (TransformerPipeline)feature[1];
+
+				List<Object[]> steps = transformerPipeline.getSteps();
+
+				return new ArrayList<>(Lists.transform((List)TupleUtil.extractElement(steps, 1), function));
 			} // End if
 
 			if(feature[1] instanceof List){

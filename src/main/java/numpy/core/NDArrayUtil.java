@@ -28,8 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -38,6 +36,7 @@ import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
 import numpy.DType;
+import sklearn.TupleUtil;
 import sklearn.ValueUtil;
 
 public class NDArrayUtil {
@@ -234,12 +233,12 @@ public class NDArrayUtil {
 
 		Map<String, List<?>> result = new LinkedHashMap<>();
 
-		List<Object[]> objects = parseMultiArray(is, (List<String>)extractElement(dims, 1), length);
+		List<Object[]> objects = parseMultiArray(is, (List<String>)TupleUtil.extractElement(dims, 1), length);
 
 		for(int i = 0; i < dims.size(); i++){
 			Object[] dim = dims.get(i);
 
-			result.put((String)dim[0], extractElement(objects, i));
+			result.put((String)dim[0], TupleUtil.extractElement(objects, i));
 		}
 
 		return result;
@@ -297,19 +296,6 @@ public class NDArrayUtil {
 		}
 
 		return result;
-	}
-
-	static
-	private List<?> extractElement(List<Object[]> objects, final int i){
-		Function<Object[], Object> function = new Function<Object[], Object>(){
-
-			@Override
-			public Object apply(Object[] objects){
-				return objects[i];
-			}
-		};
-
-		return Lists.transform(objects, function);
 	}
 
 	static
