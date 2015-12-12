@@ -20,7 +20,6 @@ package sklearn_pandas;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,9 +30,7 @@ import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.SetMultimap;
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.BayesOutput;
 import org.dmg.pmml.DataDictionary;
@@ -136,7 +133,7 @@ public class DataFrameMapper extends ClassDict {
 		}
 
 		final
-		SetMultimap<FieldName, FieldName> updatedActiveFields = LinkedHashMultimap.create();
+		Map<FieldName, Set<FieldName>> updatedActiveFields = new LinkedHashMap<>();
 
 		// Zero or more active fields
 		for(int row = 0; featureIt.hasNext(); row++){
@@ -145,6 +142,8 @@ public class DataFrameMapper extends ClassDict {
 			final
 			List<FieldName> names = getNameList(feature);
 			List<Transformer> transformers = getTransformerList(feature);
+
+			Set<FieldName> uniqueNames = new LinkedHashSet<>(names);
 
 			if(transformers.isEmpty()){
 				Transformer transformer = new MultiTransformer(null, null){
@@ -185,7 +184,7 @@ public class DataFrameMapper extends ClassDict {
 					for(int i = 0; i < numberOfOutputs; i++){
 						FieldName outputName = finalStep.getOutputName(i);
 
-						updatedActiveFields.putAll(outputName, names);
+						updatedActiveFields.put(outputName, uniqueNames);
 					}
 
 					if(inputNames.size() != numberOfInputs){
@@ -281,38 +280,26 @@ public class DataFrameMapper extends ClassDict {
 			public VisitorAction visit(MiningSchema miningSchema){
 				List<MiningField> miningFields = miningSchema.getMiningFields();
 
+				Set<FieldName> names = new LinkedHashSet<>();
+
 				ListIterator<MiningField> miningFieldIt = miningFields.listIterator();
 				while(miningFieldIt.hasNext()){
 					MiningField miningField = miningFieldIt.next();
 
 					FieldName name = miningField.getName();
 
-					if(updatedActiveFields.containsKey(name)){
-						Set<FieldName> updatedNames = updatedActiveFields.get(name);
+					Set<FieldName> updatedNames = updatedActiveFields.get(name);
+					if(updatedNames != null){
+						names.addAll(updatedNames);
 
-						Iterator<FieldName> updatedNameIt = updatedNames.iterator();
-
-						miningField.setName(updatedNameIt.next());
-
-						while(updatedNameIt.hasNext()){
-							MiningField updatedMiningField = PMMLUtil.createMiningField(updatedNameIt.next());
-
-							miningFieldIt.add(updatedMiningField);
-						}
+						miningFieldIt.remove();
 					}
 				}
 
-				Set<FieldName> names = new LinkedHashSet<>();
+				for(FieldName name : names){
+					MiningField miningField = PMMLUtil.createMiningField(name);
 
-				miningFieldIt = miningFields.listIterator();
-				while(miningFieldIt.hasNext()){
-					MiningField miningField = miningFieldIt.next();
-
-					FieldName name = miningField.getName();
-
-					if(!names.add(name)){
-						miningFieldIt.remove();
-					}
+					miningFieldIt.add(miningField);
 				}
 
 				return super.visit(miningSchema);
