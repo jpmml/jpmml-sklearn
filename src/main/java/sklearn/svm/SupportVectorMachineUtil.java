@@ -29,6 +29,7 @@ import org.dmg.pmml.Kernel;
 import org.dmg.pmml.LinearKernel;
 import org.dmg.pmml.PolynomialKernel;
 import org.dmg.pmml.RadialBasisKernel;
+import org.dmg.pmml.RealSparseArray;
 import org.dmg.pmml.SigmoidKernel;
 import org.dmg.pmml.SupportVector;
 import org.dmg.pmml.SupportVectorMachine;
@@ -56,13 +57,26 @@ public class SupportVectorMachineUtil {
 
 		VectorDictionary vectorDictionary = new VectorDictionary(vectorFields);
 
+		Double defaultValue = Double.valueOf(0d);
+
 		for(int i = 0; i < numberOfVectors; i++){
 			String id = String.valueOf(support.get(i));
 
-			Array array = ValueUtil.encodeArray(NDArrayUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i));
+			VectorInstance vectorInstance = new VectorInstance(id);
 
-			VectorInstance vectorInstance = new VectorInstance(id)
-				.setArray(array);
+			List<? extends Number> values = NDArrayUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
+
+			if(!ValueUtil.isSparseArray(values, defaultValue, 0.75d)){
+				Array array = ValueUtil.encodeArray(values);
+
+				vectorInstance.setArray(array);
+			} else
+
+			{
+				RealSparseArray sparseArray = ValueUtil.encodeSparseArray(values, defaultValue);
+
+				vectorInstance.setREALSparseArray(sparseArray);
+			}
 
 			vectorDictionary.addVectorInstances(vectorInstance);
 		}

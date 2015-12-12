@@ -25,6 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
 import com.google.common.primitives.Ints;
 import org.dmg.pmml.Array;
+import org.dmg.pmml.RealSparseArray;
 import org.jpmml.converter.PMMLUtil;
 
 public class ValueUtil {
@@ -34,12 +35,12 @@ public class ValueUtil {
 
 	static
 	public boolean isZero(Number number){
-		return DoubleMath.fuzzyEquals(number.doubleValue(), 0d, ValueUtil.TOLERANCE);
+		return fuzzyEquals(number, ZERO);
 	}
 
 	static
 	public boolean isOne(Number number){
-		return DoubleMath.fuzzyEquals(number.doubleValue(), 1d, ValueUtil.TOLERANCE);
+		return fuzzyEquals(number, ONE);
 	}
 
 	static
@@ -105,6 +106,20 @@ public class ValueUtil {
 	}
 
 	static
+	public boolean isSparseArray(List<? extends Number> values, Double defaultValue, double threshold){
+		int count = 0;
+
+		for(Number value : values){
+
+			if(fuzzyEquals(value, defaultValue)){
+				count++;
+			}
+		}
+
+		return (count / (double)values.size()) >= threshold;
+	}
+
+	static
 	public Array encodeArray(List<? extends Number> values){
 		Function<Number, String> function = new Function<Number, String>(){
 
@@ -121,5 +136,32 @@ public class ValueUtil {
 		return array;
 	}
 
-	private static final double TOLERANCE = 1e-15;
+	static
+	public RealSparseArray encodeSparseArray(List<? extends Number> values, Double defaultValue){
+		RealSparseArray sparseArray = new RealSparseArray()
+			.setN(values.size())
+			.setDefaultValue(defaultValue);
+
+		int index = 1;
+
+		for(Number value : values){
+
+			if(!fuzzyEquals(value, defaultValue)){
+				sparseArray.addEntries(asDouble(value));
+				sparseArray.addIndices(Integer.valueOf(index));
+			}
+
+			index++;
+		}
+
+		return sparseArray;
+	}
+
+	static
+	private boolean fuzzyEquals(Number left, Number right){
+		return DoubleMath.fuzzyEquals(left.doubleValue(), right.doubleValue(), 1e-15);
+	}
+
+	private static final Double ZERO = Double.valueOf(0d);
+	private static final Double ONE = Double.valueOf(1d);
 }
