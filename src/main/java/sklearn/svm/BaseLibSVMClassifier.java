@@ -31,11 +31,12 @@ import org.dmg.pmml.SupportVectorMachineModel;
 import org.dmg.pmml.SvmClassificationMethodType;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorInstance;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.FieldCollector;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.ValueUtil;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
 abstract
 public class BaseLibSVMClassifier extends Classifier {
@@ -110,7 +111,10 @@ public class BaseLibSVMClassifier extends Classifier {
 			}
 		}
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
+		FieldCollector fieldCollector = new SupportVectorMachineModelFieldCollector();
+		fieldCollector.applyTo(vectorDictionary);
+
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector);
 
 		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.CLASSIFICATION, miningSchema, vectorDictionary, supportVectorMachines)
 			.setClassificationMethod(SvmClassificationMethodType.ONE_AGAINST_ONE)

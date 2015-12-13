@@ -18,6 +18,7 @@
  */
 package sklearn.svm;
 
+import java.util.BitSet;
 import java.util.List;
 
 import numpy.core.NDArrayUtil;
@@ -47,17 +48,39 @@ public class SupportVectorMachineUtil {
 
 	static
 	public VectorDictionary encodeVectorDictionary(List<Integer> support, List<? extends Number> supportVectors, int numberOfVectors, int numberOfFeatures, Schema schema){
+		BitSet features = new BitSet(numberOfFeatures);
+
+		Double defaultValue = Double.valueOf(0d);
+
+		for(int i = 0; i < numberOfVectors; i++){
+			List<? extends Number> values = NDArrayUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
+
+			BitSet vectorFeatures = ValueUtil.getIndices(values, defaultValue);
+
+			// Set bits that correspond to non-default values
+			vectorFeatures.flip(0, numberOfFeatures);
+
+			features.or(vectorFeatures);
+		}
+
+		if(features.cardinality() == numberOfFeatures){
+			features = null;
+		}
+
 		VectorFields vectorFields = new VectorFields();
 
 		for(int i = 0; i < numberOfFeatures; i++){
+
+			if(features != null && !features.get(i)){
+				continue;
+			}
+
 			FieldRef fieldRef = new FieldRef(schema.getActiveField(i));
 
 			vectorFields.addFieldRefs(fieldRef);
 		}
 
 		VectorDictionary vectorDictionary = new VectorDictionary(vectorFields);
-
-		Double defaultValue = Double.valueOf(0d);
 
 		for(int i = 0; i < numberOfVectors; i++){
 			String id = String.valueOf(support.get(i));
@@ -66,16 +89,20 @@ public class SupportVectorMachineUtil {
 
 			List<? extends Number> values = NDArrayUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
 
-			if(!ValueUtil.isSparseArray(values, defaultValue, 0.75d)){
-				Array array = ValueUtil.encodeArray(values);
+			if(features != null){
+				values = ValueUtil.filterByIndices(values, features);
+			}
 
-				vectorInstance.setArray(array);
-			} else
-
-			{
+			if(ValueUtil.isSparseArray(values, defaultValue, 0.75d)){
 				RealSparseArray sparseArray = ValueUtil.encodeSparseArray(values, defaultValue);
 
 				vectorInstance.setREALSparseArray(sparseArray);
+			} else
+
+			{
+				Array array = ValueUtil.encodeArray(values);
+
+				vectorInstance.setArray(array);
 			}
 
 			vectorDictionary.addVectorInstances(vectorInstance);

@@ -18,6 +18,8 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -106,17 +108,33 @@ public class ValueUtil {
 	}
 
 	static
-	public boolean isSparseArray(List<? extends Number> values, Double defaultValue, double threshold){
-		int count = 0;
+	public BitSet getIndices(List<? extends Number> values, Number targetValue){
+		BitSet result = new BitSet(values.size());
 
-		for(Number value : values){
+		for(int i = 0; i < values.size(); i++){
+			Number value = values.get(i);
 
-			if(fuzzyEquals(value, defaultValue)){
-				count++;
+			if(fuzzyEquals(value, targetValue)){
+				result.set(i, true);
 			}
 		}
 
-		return (count / (double)values.size()) >= threshold;
+		return result;
+	}
+
+	static
+	public <E> List<E> filterByIndices(List<E> list, BitSet filter){
+		List<E> result = new ArrayList<>(list.size());
+
+		for(int i = 0; i < list.size(); i++){
+			E element = list.get(i);
+
+			if(filter.get(i)){
+				result.add(element);
+			}
+		}
+
+		return result;
 	}
 
 	static
@@ -134,6 +152,20 @@ public class ValueUtil {
 		Array array = new Array(Array.Type.REAL, value);
 
 		return array;
+	}
+
+	static
+	public boolean isSparseArray(List<? extends Number> values, Double defaultValue, double threshold){
+		int count = 0;
+
+		for(Number value : values){
+
+			if(fuzzyEquals(value, defaultValue)){
+				count++;
+			}
+		}
+
+		return ((double)count / (double)values.size()) >= threshold;
 	}
 
 	static
