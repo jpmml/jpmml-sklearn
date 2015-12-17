@@ -28,7 +28,6 @@ import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import numpy.core.NDArray;
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
@@ -103,7 +102,7 @@ public class BaggingUtil {
 
 			@Override
 			public List<Integer> apply(Object object){
-				object = NDArrayUtil.unwrap(object);
+				object = ClassDictUtil.unwrap(object);
 
 				if(object instanceof NDArray){
 					NDArray array = (NDArray)object;

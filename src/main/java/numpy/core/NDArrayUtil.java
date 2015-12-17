@@ -31,7 +31,6 @@ import java.util.Map;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import joblib.NDArrayWrapper;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
@@ -45,28 +44,12 @@ public class NDArrayUtil {
 	}
 
 	static
-	public Object unwrap(Object object){
-
-		if(object instanceof NDArrayWrapper){
-			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
-
-			return arrayWrapper.getContent();
-		}
-
-		return object;
-	}
-
-	static
 	public int[] getShape(NDArray array){
 		Object[] shape = array.getShape();
 
-		int[] result = new int[shape.length];
+		List<? extends Number> values = (List)Arrays.asList(shape);
 
-		for(int i = 0; i < shape.length; i++){
-			result[i] = ValueUtil.asInteger((Number)shape[i]);
-		}
-
-		return result;
+		return Ints.toArray(ValueUtil.asIntegers(values));
 	}
 
 	/**

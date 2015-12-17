@@ -29,6 +29,8 @@ import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
 import numpy.core.Scalar;
+import scipy.sparse.CSRMatrix;
+import scipy.sparse.CSRMatrixUtil;
 
 public class ClassDictUtil {
 
@@ -37,12 +39,18 @@ public class ClassDictUtil {
 
 	static
 	public List<?> getArray(ClassDict dict, String name){
-		Object object = NDArrayUtil.unwrap(dict.get(name));
+		Object object = unwrap(dict.get(name));
 
 		if(object instanceof NDArray){
 			NDArray array = (NDArray)object;
 
 			return NDArrayUtil.getContent(array);
+		} else
+
+		if(object instanceof CSRMatrix){
+			CSRMatrix matrix = (CSRMatrix)object;
+
+			return CSRMatrixUtil.getContent(matrix);
 		} else
 
 		if(object instanceof Scalar){
@@ -60,7 +68,7 @@ public class ClassDictUtil {
 
 	static
 	public List<?> getArray(ClassDict dict, String name, String key){
-		Object object = NDArrayUtil.unwrap(dict.get(name));
+		Object object = unwrap(dict.get(name));
 
 		if(object instanceof NDArray){
 			NDArray array = (NDArray)object;
@@ -84,7 +92,7 @@ public class ClassDictUtil {
 
 	static
 	private int[] getShape(ClassDict dict, String name){
-		Object object = dict.get(name);
+		Object object = unwrap(dict.get(name));
 
 		if(object instanceof NDArray){
 			NDArray array = (NDArray)object;
@@ -92,12 +100,10 @@ public class ClassDictUtil {
 			return NDArrayUtil.getShape(array);
 		} else
 
-		if(object instanceof NDArrayWrapper){
-			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
+		if(object instanceof CSRMatrix){
+			CSRMatrix matrix = (CSRMatrix)object;
 
-			NDArray array = arrayWrapper.getContent();
-
-			return NDArrayUtil.getShape(array);
+			return CSRMatrixUtil.getShape(matrix);
 		} // End if
 
 		if(object instanceof Number){
@@ -105,6 +111,18 @@ public class ClassDictUtil {
 		}
 
 		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
+	}
+
+	static
+	public Object unwrap(Object object){
+
+		if(object instanceof NDArrayWrapper){
+			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
+
+			return arrayWrapper.getContent();
+		}
+
+		return object;
 	}
 
 	static

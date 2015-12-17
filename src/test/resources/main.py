@@ -1,3 +1,4 @@
+from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -160,8 +161,11 @@ versicolor_X = versicolor[:, 0:4]
 versicolor_y = versicolor[:, 4]
 versicolor_y = versicolor_y.astype(int)
 
-def build_versicolor(classifier, name, with_proba = True):
-	classifier.fit(versicolor_X, versicolor_y)
+def build_versicolor(classifier, name, to_sparse = False, with_proba = True):
+	if(to_sparse):
+		classifier.fit(sparse.csr_matrix(versicolor_X), versicolor_y)
+	else:
+		classifier.fit(versicolor_X, versicolor_y)
 	store_pkl(classifier, name + ".pkl")
 	species = DataFrame(classifier.predict(versicolor_X), columns = ["Species"])
 	if(with_proba == True):
@@ -171,8 +175,8 @@ def build_versicolor(classifier, name, with_proba = True):
 
 build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)
 build_versicolor(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogVersicolor")
-build_versicolor(SVC(), "SVCVersicolor", with_proba = False)
-build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
+build_versicolor(SVC(), "SVCVersicolor", to_sparse = True, with_proba = False)
+build_versicolor(NuSVC(), "NuSVCVersicolor", to_sparse = True, with_proba = False)
 
 #
 # Multi-class classification
@@ -299,13 +303,16 @@ store_pkl(housing_mapper, "Housing.pkl")
 housing_X = housing[:, 0:13]
 housing_y = housing[:, 13]
 
-def build_housing(regressor, name):
-	regressor = regressor.fit(housing_X, housing_y)
+def build_housing(regressor, name, to_sparse = False):
+	if(to_sparse):
+		regressor = regressor.fit(sparse.csr_matrix(housing_X), housing_y)
+	else:
+		regressor = regressor.fit(housing_X, housing_y)
 	store_pkl(regressor, name + ".pkl")
 	medv = DataFrame(regressor.predict(housing_X), columns = ["MEDV"])
 	store_csv(medv, name + ".csv")
 
 build_housing(SGDRegressor(random_state = 13), "SGDHousing")
-build_housing(SVR(), "SVRHousing")
-build_housing(LinearSVR(random_state = 13), "LinearSVRHousing")
-build_housing(NuSVR(), "NuSVRHousing")
+build_housing(SVR(), "SVRHousing", to_sparse = True)
+build_housing(LinearSVR(random_state = 13), "LinearSVRHousing", to_sparse = True)
+build_housing(NuSVR(), "NuSVRHousing", to_sparse = True)

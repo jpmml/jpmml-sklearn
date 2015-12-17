@@ -29,6 +29,7 @@ import numpy.DType;
 import numpy.core.NDArray;
 import numpy.core.Scalar;
 import numpy.random.RandomState;
+import scipy.sparse.CSRMatrix;
 import sklearn.cluster.KMeans;
 import sklearn.cluster.MiniBatchKMeans;
 import sklearn.decomposition.IncrementalPCA;
@@ -119,6 +120,7 @@ public class PickleUtil {
 			new ExtensionObjectConstructor("numpy.core.multiarray", "_reconstruct", NDArray.class),
 			new ExtensionObjectConstructor("numpy.core.multiarray", "scalar", Scalar.class),
 			new ExtensionObjectConstructor("numpy.random", "__RandomState_ctor", RandomState.class),
+			new ObjectConstructor("scipy.sparse.csr", "csr_matrix", CSRMatrix.class),
 			new ObjectConstructor("sklearn.cluster.k_means_", "KMeans", KMeans.class),
 			new ObjectConstructor("sklearn.cluster.k_means_", "MiniBatchKMeans", MiniBatchKMeans.class),
 			new ObjectConstructor("sklearn.decomposition.incremental_pca", "IncrementalPCA", IncrementalPCA.class),
