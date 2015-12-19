@@ -18,6 +18,7 @@
  */
 package sklearn.svm;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import numpy.core.NDArrayUtil;
 import org.dmg.pmml.Array;
 import org.dmg.pmml.Coefficient;
 import org.dmg.pmml.Coefficients;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Kernel;
 import org.dmg.pmml.LinearKernel;
@@ -38,8 +40,11 @@ import org.dmg.pmml.SupportVectors;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorFields;
 import org.dmg.pmml.VectorInstance;
+import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.ValueUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SupportVectorMachineUtil {
 
@@ -63,19 +68,22 @@ public class SupportVectorMachineUtil {
 			features.or(vectorFeatures);
 		}
 
-		if(features.cardinality() == numberOfFeatures){
-			features = null;
-		}
+		int numberOfUsedFeatures = features.cardinality();
+
+		List<FieldName> unusedActiveFields = new ArrayList<>();
 
 		VectorFields vectorFields = new VectorFields();
 
 		for(int i = 0; i < numberOfFeatures; i++){
+			FieldName activeField = schema.getActiveField(i);
 
-			if(features != null && !features.get(i)){
+			if(!features.get(i)){
+				unusedActiveFields.add(activeField);
+
 				continue;
 			}
 
-			FieldRef fieldRef = new FieldRef(schema.getActiveField(i));
+			FieldRef fieldRef = new FieldRef(activeField);
 
 			vectorFields.addFieldRefs(fieldRef);
 		}
@@ -89,9 +97,9 @@ public class SupportVectorMachineUtil {
 
 			List<? extends Number> values = NDArrayUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
 
-			if(features != null){
+			if(numberOfUsedFeatures < numberOfFeatures){
 				values = ValueUtil.filterByIndices(values, features);
-			}
+			} // End if
 
 			if(ValueUtil.isSparseArray(values, defaultValue, 0.75d)){
 				RealSparseArray sparseArray = ValueUtil.encodeSparseArray(values, defaultValue);
@@ -106,6 +114,10 @@ public class SupportVectorMachineUtil {
 			}
 
 			vectorDictionary.addVectorInstances(vectorInstance);
+		}
+
+		if(!unusedActiveFields.isEmpty()){
+			logger.info("Skipped {} active field(s): {}", unusedActiveFields.size(), LoggerUtil.formatNameList(unusedActiveFields));
 		}
 
 		return vectorDictionary;
@@ -169,4 +181,6 @@ public class SupportVectorMachineUtil {
 
 		throw new IllegalArgumentException();
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(SupportVectorMachineUtil.class);
 }

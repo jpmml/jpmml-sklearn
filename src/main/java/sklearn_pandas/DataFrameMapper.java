@@ -51,6 +51,7 @@ import org.dmg.pmml.VisitorAction;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
 import org.jpmml.sklearn.TupleUtil;
@@ -179,7 +180,7 @@ public class DataFrameMapper extends ClassDict {
 				if(!transformerIt.hasNext()){
 					Step finalStep = updateDataDictionary(dataFieldIt, names, transformers.get(0), names.size(), numberOfOutputs);
 
-					logger.info("Mapping active field(s) {} to {}", finalStep.getOutputNames(), finalStep.getInputNames());
+					logger.info("Mapping active field(s) {} to {}", LoggerUtil.formatNameList(finalStep.getOutputNames()), LoggerUtil.formatNameList(finalStep.getInputNames()));
 
 					for(int i = 0; i < numberOfOutputs; i++){
 						FieldName outputName = finalStep.getOutputName(i);
@@ -237,9 +238,9 @@ public class DataFrameMapper extends ClassDict {
 				}
 			};
 
-			List<FieldName> unusedNames = Lists.newArrayList(Iterators.transform(dataFieldIt, function));
+			List<FieldName> unmappedActiveFields = Lists.newArrayList(Iterators.transform(dataFieldIt, function));
 
-			logger.error("The list of mappings is shorter than the list of fields. Unused active fields: {}", unusedNames);
+			logger.error("The list of mappings is shorter than the list of fields. Found {} unmapped active field(s): {}", unmappedActiveFields.size(), LoggerUtil.formatNameList(unmappedActiveFields));
 
 			throw new IllegalArgumentException();
 		}

@@ -52,14 +52,6 @@ public class Tree extends CClassDict {
 		return Doubles.toArray(getNodeAttribute("threshold"));
 	}
 
-	public int[] getNodeSamples(){
-		return Ints.toArray(getNodeAttribute("n_node_samples"));
-	}
-
-	public double[] getWeightedNodeSamples(){
-		return Doubles.toArray(getNodeAttribute("weighted_n_node_samples"));
-	}
-
 	public double[] getValues(){
 		List<? extends Number> values = (List<? extends Number>)ClassDictUtil.getArray(this, "values");
 

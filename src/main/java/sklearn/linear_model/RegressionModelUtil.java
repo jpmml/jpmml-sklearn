@@ -18,6 +18,7 @@
  */
 package sklearn.linear_model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.FieldName;
@@ -27,6 +28,7 @@ import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
 import org.jpmml.converter.FieldCollector;
+import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.ValueUtil;
 import org.slf4j.Logger;
@@ -63,12 +65,14 @@ public class RegressionModelUtil {
 
 		RegressionTable regressionTable = new RegressionTable(ValueUtil.asDouble(intercept));
 
+		List<FieldName> unusedActiveFields = new ArrayList<>();
+
 		for(int i = 0; i < coefficients.size(); i++){
 			Number coefficient = coefficients.get(i);
 			FieldName activeField = activeFields.get(i);
 
 			if(ValueUtil.isZero(coefficient)){
-				logger.info("Skipping predictor variable {} due to a zero coefficient", activeField);
+				unusedActiveFields.add(activeField);
 
 				continue;
 			}
@@ -76,6 +80,10 @@ public class RegressionModelUtil {
 			NumericPredictor numericPredictor = new NumericPredictor(activeField, ValueUtil.asDouble(coefficient));
 
 			regressionTable.addNumericPredictors(numericPredictor);
+		}
+
+		if(!unusedActiveFields.isEmpty()){
+			logger.info("Skipped {} active field(s): {}", unusedActiveFields.size(), LoggerUtil.formatNameList(unusedActiveFields));
 		}
 
 		return regressionTable;
