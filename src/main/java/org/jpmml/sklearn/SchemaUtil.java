@@ -70,7 +70,7 @@ public class SchemaUtil {
 				}
 			};
 
-			return Lists.transform(targetCategories, function);
+			return Lists.newArrayList(Lists.transform(targetCategories, function));
 		}
 
 		return null;

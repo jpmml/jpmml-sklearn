@@ -20,7 +20,9 @@ package org.jpmml.sklearn;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 
+import com.google.common.io.ByteStreams;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ArchiveBatch;
 import org.jpmml.evaluator.ArchiveBatchTest;
@@ -73,10 +75,20 @@ public class EstimatorTest extends ArchiveBatchTest {
 					mapper.updatePMML(schema, pmml);
 				}
 
+				ensureSerializability(pmml);
+
 				return pmml;
 			}
 		};
 
 		return result;
+	}
+
+	static
+	private void ensureSerializability(Object object) throws IOException {
+
+		try(ObjectOutputStream oos = new ObjectOutputStream(ByteStreams.nullOutputStream())){
+			oos.writeObject(object);
+		}
 	}
 }
