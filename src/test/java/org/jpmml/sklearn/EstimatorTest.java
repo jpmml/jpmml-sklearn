@@ -20,27 +20,24 @@ package org.jpmml.sklearn;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 
-import com.google.common.io.ByteStreams;
 import org.dmg.pmml.PMML;
-import org.jpmml.evaluator.ArchiveBatch;
-import org.jpmml.evaluator.ArchiveBatchTest;
+import org.jpmml.evaluator.Batch;
+import org.jpmml.evaluator.IntegrationTest;
+import org.jpmml.evaluator.IntegrationTestBatch;
 import sklearn.Estimator;
 import sklearn_pandas.DataFrameMapper;
 
 abstract
-public class EstimatorTest extends ArchiveBatchTest {
+public class EstimatorTest extends IntegrationTest {
 
 	@Override
-	protected ArchiveBatch createBatch(String name, String dataset){
-		ArchiveBatch result = new ArchiveBatch(name, dataset){
+	protected Batch createBatch(String name, String dataset){
+		Batch result = new IntegrationTestBatch(name, dataset){
 
 			@Override
-			public InputStream open(String path){
-				Class<? extends EstimatorTest> clazz = EstimatorTest.this.getClass();
-
-				return clazz.getResourceAsStream(path);
+			public IntegrationTest getIntegrationTest(){
+				return EstimatorTest.this;
 			}
 
 			private Storage openStorage(String path) throws IOException {
@@ -75,20 +72,10 @@ public class EstimatorTest extends ArchiveBatchTest {
 					mapper.updatePMML(schema, pmml);
 				}
 
-				ensureSerializability(pmml);
-
 				return pmml;
 			}
 		};
 
 		return result;
-	}
-
-	static
-	private void ensureSerializability(Object object) throws IOException {
-
-		try(ObjectOutputStream oos = new ObjectOutputStream(ByteStreams.nullOutputStream())){
-			oos.writeObject(object);
-		}
 	}
 }
