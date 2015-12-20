@@ -28,10 +28,11 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.Value;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.SchemaUtil;
 
 abstract
 public class Classifier extends Estimator {
@@ -77,7 +78,9 @@ public class Classifier extends Estimator {
 	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
 		DataField dataField = new DataField(name, OpType.CATEGORICAL, DataType.STRING);
 
-		SchemaUtil.addValues(dataField, targetCategories);
+		List<Value> values = dataField.getValues();
+
+		values.addAll(PMMLUtil.createValues(targetCategories));
 
 		return dataField;
 	}

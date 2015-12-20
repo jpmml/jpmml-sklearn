@@ -40,7 +40,6 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.SchemaUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -87,7 +86,7 @@ public class GradientBoostingClassifier extends Classifier {
 			}
 		};
 
-		Schema segmentSchema = SchemaUtil.createSegmentSchema(schema);
+		Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
 
 		if(numberOfClasses == 1){
 

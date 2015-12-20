@@ -40,7 +40,6 @@ import org.dmg.pmml.TreeModel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.SchemaUtil;
 import sklearn.EstimatorUtil;
 import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -60,7 +59,7 @@ public class GradientBoostingUtil {
 		{
 			Function<DecisionTreeRegressor, TreeModel> function = new Function<DecisionTreeRegressor, TreeModel>(){
 
-				private Schema segmentSchema = SchemaUtil.createSegmentSchema(schema);
+				private Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
 
 
 				@Override

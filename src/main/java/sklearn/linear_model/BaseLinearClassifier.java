@@ -40,7 +40,6 @@ import org.dmg.pmml.RegressionModel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.SchemaUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 
@@ -84,7 +83,7 @@ public class BaseLinearClassifier extends Classifier {
 			}
 		};
 
-		Schema segmentSchema = SchemaUtil.createSegmentSchema(schema);
+		Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
 
 		if(numberOfClasses == 1){
 

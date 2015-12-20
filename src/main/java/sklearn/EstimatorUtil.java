@@ -21,6 +21,8 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
@@ -48,12 +50,18 @@ import org.jpmml.converter.FieldCollector;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.SchemaUtil;
 import sklearn.linear_model.RegressionModelUtil;
 
 public class EstimatorUtil {
 
 	private EstimatorUtil(){
+	}
+
+	static
+	public Schema createSegmentSchema(Schema schema){
+		Schema result = new Schema(null, schema.getTargetCategories(), schema.getActiveFields());
+
+		return result;
 	}
 
 	static
@@ -186,15 +194,26 @@ public class EstimatorUtil {
 
 	static
 	public Output encodeClassifierOutput(Schema schema){
-		List<OutputField> outputFields = SchemaUtil.encodeProbabilityFields(schema);
+		List<String> targetCategories = schema.getTargetCategories();
 
-		if(outputFields != null && outputFields.size() > 0){
-			Output output = new Output(outputFields);
-
-			return output;
+		if(targetCategories == null || targetCategories.isEmpty()){
+			return null;
 		}
 
-		return null;
+		Function<String, OutputField> function = new Function<String, OutputField>(){
+
+			@Override
+			public OutputField apply(String value){
+				return PMMLUtil.createProbabilityField(value);
+			}
+		};
+
+		List<OutputField> outputFields = new ArrayList<>();
+		outputFields.addAll(Lists.transform(targetCategories, function));
+
+		Output output = new Output(outputFields);
+
+		return output;
 	}
 
 	static

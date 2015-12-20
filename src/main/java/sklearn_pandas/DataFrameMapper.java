@@ -46,14 +46,15 @@ import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.Value;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.SchemaUtil;
 import org.jpmml.sklearn.TupleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -388,7 +389,22 @@ public class DataFrameMapper extends ClassDict {
 			.setOpType(transformer.getOpType())
 			.setDataType(transformer.getDataType());
 
-		SchemaUtil.addValues(dataField, transformer.getClasses());
+		List<Value> values = dataField.getValues();
+		if(values.size() > 0){
+			values.clear();
+		}
+
+		List<?> classes = transformer.getClasses();
+
+		Function<Object, String> function = new Function<Object, String>(){
+
+			@Override
+			public String apply(Object value){
+				return ValueUtil.formatValue(value);
+			}
+		};
+
+		values.addAll(PMMLUtil.createValues(Lists.transform(classes, function)));
 	}
 
 	static
