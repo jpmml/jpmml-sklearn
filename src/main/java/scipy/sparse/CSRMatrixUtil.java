@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.primitives.Ints;
-import org.jpmml.sklearn.ValueUtil;
+import org.jpmml.converter.ValueUtil;
 
 public class CSRMatrixUtil {
 

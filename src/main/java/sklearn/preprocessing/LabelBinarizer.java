@@ -27,8 +27,8 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.ValueUtil;
 import sklearn.OneToManyTransformer;
 
 public class LabelBinarizer extends OneToManyTransformer {

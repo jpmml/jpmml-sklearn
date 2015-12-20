@@ -31,7 +31,7 @@ import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Row;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -71,7 +71,7 @@ public class LabelEncoder extends OneToOneTransformer {
 			Document document = documentBuilder.newDocument();
 
 			Element inputCell = document.createElement("input");
-			inputCell.setTextContent(PMMLUtil.formatValue(classes.get(i)));
+			inputCell.setTextContent(ValueUtil.formatValue(classes.get(i)));
 
 			Element outputCell = document.createElement("output");
 			outputCell.setTextContent(String.valueOf(i));

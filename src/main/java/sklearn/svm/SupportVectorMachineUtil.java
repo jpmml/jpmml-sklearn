@@ -40,9 +40,10 @@ import org.dmg.pmml.SupportVectors;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorFields;
 import org.dmg.pmml.VectorInstance;
+import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.ValueUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,14 +102,14 @@ public class SupportVectorMachineUtil {
 				values = ValueUtil.filterByIndices(values, features);
 			} // End if
 
-			if(ValueUtil.isSparseArray(values, defaultValue, 0.75d)){
-				RealSparseArray sparseArray = ValueUtil.encodeSparseArray(values, defaultValue);
+			if(ValueUtil.isSparse(values, defaultValue, 0.75d)){
+				RealSparseArray sparseArray = PMMLUtil.createRealSparseArray(values, defaultValue);
 
 				vectorInstance.setREALSparseArray(sparseArray);
 			} else
 
 			{
-				Array array = ValueUtil.encodeArray(values);
+				Array array = PMMLUtil.createRealArray(values);
 
 				vectorInstance.setArray(array);
 			}

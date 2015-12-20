@@ -31,8 +31,8 @@ import org.dmg.pmml.TreeModel;
 import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
 import org.jpmml.converter.FieldCollector;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TreeModelFieldCollector;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -79,7 +79,7 @@ public class TreeModelUtil {
 
 			double threshold = thresholds[index];
 
-			String value = PMMLUtil.formatValue(threshold);
+			String value = ValueUtil.formatValue(threshold);
 
 			Predicate leftPredicate = new SimplePredicate(activeField, SimplePredicate.Operator.LESS_OR_EQUAL)
 				.setValue(value);
@@ -144,7 +144,7 @@ public class TreeModelUtil {
 			} else
 
 			if((MiningFunctionType.REGRESSION).equals(miningFunction)){
-				String score = PMMLUtil.formatValue(values[index]);
+				String score = ValueUtil.formatValue(values[index]);
 
 				node.setScore(score);
 			} else

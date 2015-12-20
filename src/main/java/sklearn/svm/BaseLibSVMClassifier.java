@@ -32,9 +32,10 @@ import org.dmg.pmml.SvmClassificationMethodType;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.FieldCollector;
+import org.jpmml.converter.SupportVectorMachineModelFieldCollector;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.ValueUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 

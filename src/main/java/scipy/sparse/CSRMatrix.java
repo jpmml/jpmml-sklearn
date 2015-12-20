@@ -21,8 +21,8 @@ package scipy.sparse;
 import java.util.List;
 
 import net.razorvine.pickle.objects.ClassDict;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.ValueUtil;
 
 public class CSRMatrix extends ClassDict {
 

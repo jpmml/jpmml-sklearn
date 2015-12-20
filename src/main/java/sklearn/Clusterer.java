@@ -33,7 +33,7 @@ public class Clusterer extends Estimator {
 
 	@Override
 	public Schema createSchema(){
-		List<FieldName> activeFields = Schema.createActiveFields(getNumberOfFeatures());
+		List<FieldName> activeFields = createActiveFields(getNumberOfFeatures());
 
 		Schema schema = new Schema(activeFields);
 

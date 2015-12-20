@@ -28,7 +28,7 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
@@ -46,14 +46,14 @@ public class Classifier extends Estimator {
 
 	@Override
 	public Schema createSchema(){
-		FieldName targetField = Schema.createTargetField();
-		List<FieldName> activeFields = Schema.createActiveFields(getNumberOfFeatures());
+		FieldName targetField = createTargetField();
+		List<FieldName> activeFields = createActiveFields(getNumberOfFeatures());
 
 		Function<Object, String> function = new Function<Object, String>(){
 
 			@Override
 			public String apply(Object object){
-				String targetCategory = PMMLUtil.formatValue(object);
+				String targetCategory = ValueUtil.formatValue(object);
 
 				if(targetCategory == null || CharMatcher.WHITESPACE.matchesAnyOf(targetCategory)){
 					throw new IllegalArgumentException(targetCategory);

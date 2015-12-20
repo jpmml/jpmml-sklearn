@@ -22,13 +22,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
-import javax.xml.transform.stream.StreamResult;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
-import org.jpmml.model.JAXBUtil;
+import org.jpmml.converter.MetroJAXBUtil;
 import sklearn.Estimator;
 import sklearn_pandas.DataFrameMapper;
 
@@ -121,12 +119,8 @@ public class Main {
 			}
 		}
 
-		OutputStream os = new FileOutputStream(this.output);
-
-		try {
-			JAXBUtil.marshalPMML(pmml, new StreamResult(os));
-		} finally {
-			os.close();
+		try(OutputStream os = new FileOutputStream(this.output)){
+			MetroJAXBUtil.marshalPMML(pmml, os);
 		}
 	}
 

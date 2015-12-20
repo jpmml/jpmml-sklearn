@@ -18,7 +18,6 @@
  */
 package org.jpmml.sklearn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.FieldName;
@@ -74,21 +73,5 @@ public class Schema {
 
 	private void setActiveFields(List<FieldName> activeFields){
 		this.activeFields = activeFields;
-	}
-
-	static
-	public FieldName createTargetField(){
-		return FieldName.create("y");
-	}
-
-	static
-	public List<FieldName> createActiveFields(int size){
-		List<FieldName> result = new ArrayList<>();
-
-		for(int i = 0; i < size; i++){
-			result.add(FieldName.create("x" + String.valueOf(i + 1)));
-		}
-
-		return result;
 	}
 }

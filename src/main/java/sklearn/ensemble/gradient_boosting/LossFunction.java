@@ -20,7 +20,7 @@ package sklearn.ensemble.gradient_boosting;
 
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DefineFunction;
-import org.jpmml.sklearn.ValueUtil;
+import org.jpmml.converter.ValueUtil;
 
 abstract
 public class LossFunction extends ClassDict {

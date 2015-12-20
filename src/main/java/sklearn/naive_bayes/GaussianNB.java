@@ -35,9 +35,9 @@ import org.dmg.pmml.TargetValueCounts;
 import org.dmg.pmml.TargetValueStat;
 import org.dmg.pmml.TargetValueStats;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.ValueUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 

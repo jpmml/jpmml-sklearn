@@ -18,6 +18,7 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -32,8 +33,8 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.TransformationDictionary;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.ValueUtil;
 
 abstract
 public class Estimator extends BaseEstimator {
@@ -121,5 +122,21 @@ public class Estimator extends BaseEstimator {
 		pmml.addModels(model);
 
 		return pmml;
+	}
+
+	static
+	public FieldName createTargetField(){
+		return FieldName.create("y");
+	}
+
+	static
+	public List<FieldName> createActiveFields(int size){
+		List<FieldName> result = new ArrayList<>();
+
+		for(int i = 0; i < size; i++){
+			result.add(FieldName.create("x" + String.valueOf(i + 1)));
+		}
+
+		return result;
 	}
 }

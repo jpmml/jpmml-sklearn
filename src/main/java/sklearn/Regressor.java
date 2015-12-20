@@ -35,8 +35,8 @@ public class Regressor extends Estimator {
 
 	@Override
 	public Schema createSchema(){
-		FieldName targetField = Schema.createTargetField();
-		List<FieldName> activeFields = Schema.createActiveFields(getNumberOfFeatures());
+		FieldName targetField = createTargetField();
+		List<FieldName> activeFields = createActiveFields(getNumberOfFeatures());
 
 		Schema schema = new Schema(targetField, activeFields);
 

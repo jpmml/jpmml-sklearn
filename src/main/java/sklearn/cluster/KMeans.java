@@ -39,9 +39,9 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.SquaredEuclidean;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.ValueUtil;
 import sklearn.Clusterer;
 
 public class KMeans extends Clusterer {
@@ -76,7 +76,7 @@ public class KMeans extends Clusterer {
 		List<Cluster> clusters = new ArrayList<>();
 
 		for(int i = 0; i < numberOfClusters; i++){
-			Array array = ValueUtil.encodeArray(NDArrayUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
+			Array array = PMMLUtil.createRealArray(NDArrayUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
 
 			Cluster cluster = new Cluster()
 				.setId(String.valueOf(i))

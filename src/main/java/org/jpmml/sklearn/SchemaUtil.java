@@ -26,6 +26,7 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 
 public class SchemaUtil {
 
@@ -49,7 +50,7 @@ public class SchemaUtil {
 
 				@Override
 				public String apply(Object object){
-					return PMMLUtil.formatValue(object);
+					return ValueUtil.formatValue(object);
 				}
 			};
 

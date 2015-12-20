@@ -29,9 +29,8 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.ValueUtil;
 import sklearn.OneToManyTransformer;
 
 public class OneHotEncoder extends OneToManyTransformer {
@@ -68,7 +67,7 @@ public class OneHotEncoder extends OneToManyTransformer {
 
 		Number value = values.get(index);
 
-		NormDiscrete normDicrete = new NormDiscrete(name, PMMLUtil.formatValue(value));
+		NormDiscrete normDicrete = new NormDiscrete(name, ValueUtil.formatValue(value));
 
 		return normDicrete;
 	}

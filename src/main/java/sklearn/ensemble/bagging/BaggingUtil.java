@@ -37,9 +37,9 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Segmentation;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import org.jpmml.sklearn.ValueUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 

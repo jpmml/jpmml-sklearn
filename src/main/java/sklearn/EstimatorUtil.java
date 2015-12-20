@@ -46,9 +46,9 @@ import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.True;
 import org.jpmml.converter.FieldCollector;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.Schema;
 import org.jpmml.sklearn.SchemaUtil;
-import org.jpmml.sklearn.ValueUtil;
 import sklearn.linear_model.RegressionModelUtil;
 
 public class EstimatorUtil {
