@@ -41,12 +41,11 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.LocalTransformations;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningSchema;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.TransformationDictionary;
 import org.dmg.pmml.Value;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
@@ -99,13 +98,11 @@ public class DataFrameMapper extends ClassDict {
 
 		ListIterator<DataField> dataFieldIt = dataFields.listIterator();
 
-		Model model = Iterables.getOnlyElement(pmml.getModels());
+		TransformationDictionary transformationDictionary = pmml.getTransformationDictionary();
+		if(transformationDictionary == null){
+			transformationDictionary = new TransformationDictionary();
 
-		LocalTransformations localTransformations = model.getLocalTransformations();
-		if(localTransformations == null){
-			localTransformations = new LocalTransformations();
-
-			model.setLocalTransformations(localTransformations);
+			pmml.setTransformationDictionary(transformationDictionary);
 		}
 
 		final
@@ -224,7 +221,7 @@ public class DataFrameMapper extends ClassDict {
 						.setName(outputName)
 						.setExpression(expression);
 
-					localTransformations.addDerivedFields(derivedField);
+					transformationDictionary.addDerivedFields(derivedField);
 				}
 
 				inputNames = step.getOutputNames();
