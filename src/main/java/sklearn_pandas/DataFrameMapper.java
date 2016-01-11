@@ -27,6 +27,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
@@ -411,13 +412,9 @@ public class DataFrameMapper extends ClassDict {
 	private String getClassName(Transformer transformer){
 		Class<? extends Transformer> clazz = transformer.getClass();
 
-		String name = clazz.getName();
+		String name = clazz.getSimpleName();
 
-		if(name.startsWith("sklearn.")){
-			name = name.substring("sklearn.".length());
-		}
-
-		return name;
+		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
 	}
 
 	static
