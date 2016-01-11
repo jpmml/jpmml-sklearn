@@ -20,11 +20,18 @@ package org.jpmml.sklearn;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
+import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.Visitor;
+import org.dmg.pmml.VisitorAction;
 import org.jpmml.evaluator.Batch;
 import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
+import org.jpmml.evaluator.visitors.InvalidFeatureInspector;
+import org.jpmml.evaluator.visitors.UnsupportedFeatureInspector;
 import sklearn.Estimator;
 import sklearn_pandas.DataFrameMapper;
 
@@ -72,10 +79,30 @@ public class EstimatorTest extends IntegrationTest {
 					mapper.updatePMML(schema, pmml);
 				}
 
+				ensureValidity(pmml);
+
 				return pmml;
 			}
 		};
 
 		return result;
+	}
+
+	static
+	private void ensureValidity(PMML pmml){
+		List<Visitor> visitors = Arrays.<Visitor>asList(
+			new UnsupportedFeatureInspector(),
+			new InvalidFeatureInspector(){
+
+				@Override
+				public VisitorAction visit(MiningSchema miningSchema){
+					return VisitorAction.SKIP;
+				}
+			}
+		);
+
+		for(Visitor visitor : visitors){
+			visitor.applyTo(pmml);
+		}
 	}
 }
