@@ -46,20 +46,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-converter</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.razorvine</groupId>
-			<artifactId>pyrolite</artifactId>
-			<version>4.10</version>
-		</dependency>
-
-		<!-- Mirrors the one specified by the org.jpmml:pmml-model dependency -->
-		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-			<version>2.2.11</version>
+			<version>1.0.2</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.sun.xml.fastinfoset</groupId>
@@ -78,6 +65,12 @@
 					<artifactId>stax-ex</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>net.razorvine</groupId>
+			<artifactId>pyrolite</artifactId>
+			<version>4.10</version>
 		</dependency>
 
 		<dependency>
@@ -101,13 +94,13 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>1.2.8</version>
+			<version>1.2.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>1.2.8</version>
+			<version>1.2.10</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

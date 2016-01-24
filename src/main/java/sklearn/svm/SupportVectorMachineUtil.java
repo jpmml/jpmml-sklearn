@@ -105,7 +105,7 @@ public class SupportVectorMachineUtil {
 			if(ValueUtil.isSparse(values, defaultValue, 0.75d)){
 				RealSparseArray sparseArray = PMMLUtil.createRealSparseArray(values, defaultValue);
 
-				vectorInstance.setREALSparseArray(sparseArray);
+				vectorInstance.setRealSparseArray(sparseArray);
 			} else
 
 			{

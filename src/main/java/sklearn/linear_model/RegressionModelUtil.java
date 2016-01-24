@@ -27,9 +27,8 @@ import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
-import org.jpmml.converter.FieldCollector;
-import org.jpmml.converter.RegressionModelFieldCollector;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.model.visitors.FieldReferenceFinder;
 import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.Schema;
 import org.slf4j.Logger;
@@ -45,10 +44,10 @@ public class RegressionModelUtil {
 	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema){
 		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
-		FieldCollector fieldCollector = new RegressionModelFieldCollector();
-		fieldCollector.applyTo(regressionTable);
+		FieldReferenceFinder fieldReferenceFinder = new FieldReferenceFinder();
+		fieldReferenceFinder.applyTo(regressionTable);
 
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector);
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldReferenceFinder);
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
 			.addRegressionTables(regressionTable);

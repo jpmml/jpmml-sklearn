@@ -30,9 +30,8 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.TreeModel;
 import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
-import org.jpmml.converter.FieldCollector;
-import org.jpmml.converter.TreeModelFieldCollector;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.model.visitors.FieldReferenceFinder;
 import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -58,10 +57,10 @@ public class TreeModelUtil {
 
 		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-		FieldCollector fieldCollector = new TreeModelFieldCollector();
-		fieldCollector.applyTo(root);
+		FieldReferenceFinder fieldReferenceFinder = new FieldReferenceFinder();
+		fieldReferenceFinder.applyTo(root);
 
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldCollector);
+		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldReferenceFinder);
 
 		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);

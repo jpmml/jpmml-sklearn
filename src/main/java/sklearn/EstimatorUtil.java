@@ -46,9 +46,9 @@ import org.dmg.pmml.RegressionTable;
 import org.dmg.pmml.Segment;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.True;
-import org.jpmml.converter.FieldCollector;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.model.visitors.FieldReferenceFinder;
 import org.jpmml.sklearn.Schema;
 import sklearn.linear_model.RegressionModelUtil;
 
@@ -65,11 +65,11 @@ public class EstimatorUtil {
 	}
 
 	static
-	public MiningSchema encodeMiningSchema(Schema schema, FieldCollector fieldCollector){
+	public MiningSchema encodeMiningSchema(Schema schema, FieldReferenceFinder fieldReferenceFinder){
 		FieldName targetField = schema.getTargetField();
 
 		List<FieldName> activeFields = new ArrayList<>(schema.getActiveFields());
-		activeFields.retainAll(fieldCollector.getFields());
+		activeFields.retainAll(fieldReferenceFinder.getFieldNames());
 
 		return PMMLUtil.createMiningSchema(targetField, activeFields);
 	}
