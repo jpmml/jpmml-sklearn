@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import org.dmg.pmml.Extension;
+import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.MetroJAXBUtil;
 import sklearn.Estimator;
@@ -40,6 +42,13 @@ public class Main {
 	private File estimatorInput = null;
 
 	@Parameter (
+		names = {"--repr-estimator"},
+		description = "Estimator string representation",
+		hidden = true
+	)
+	private String estimatorRepr = null;
+
+	@Parameter (
 		names = "--help",
 		description = "Show the list of configuration options and exit",
 		help = true
@@ -52,6 +61,13 @@ public class Main {
 		required = false
 	)
 	private File mapperInput = null;
+
+	@Parameter (
+		names = "--repr-mapper",
+		description = "DataFrameMapper string representation",
+		hidden = true
+	)
+	private String mapperRepr = null;
 
 	@Parameter (
 		names = "--pmml-output",
@@ -104,6 +120,10 @@ public class Main {
 			pmml = estimator.encodePMML(schema);
 		}
 
+		if(this.estimatorRepr != null){
+			addObjectRepr(pmml, "estimator", this.estimatorRepr);
+		} // End if
+
 		if(this.mapperInput != null){
 
 			try(Storage storage = PickleUtil.createStorage(this.mapperInput)){
@@ -116,6 +136,10 @@ public class Main {
 				DataFrameMapper mapper = (DataFrameMapper)object;
 
 				mapper.updatePMML(schema, pmml);
+			}
+
+			if(this.mapperRepr != null){
+				addObjectRepr(pmml, "mapper", this.mapperRepr);
 			}
 		}
 
@@ -146,5 +170,23 @@ public class Main {
 
 	public void setOutput(File output){
 		this.output = output;
+	}
+
+	static
+	private void addObjectRepr(PMML pmml, String name, String content){
+		MiningBuildTask miningBuildTask = pmml.getMiningBuildTask();
+
+		if(miningBuildTask == null){
+			miningBuildTask = new MiningBuildTask();
+
+			pmml.setMiningBuildTask(miningBuildTask);
+		}
+
+		Extension extension = new Extension()
+			.setName(name)
+			.setValue("repr(" + name + ")")
+			.addContent(content);
+
+		miningBuildTask.addExtensions(extension);
 	}
 }
