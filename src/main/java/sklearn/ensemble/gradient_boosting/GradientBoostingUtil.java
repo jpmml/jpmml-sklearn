@@ -21,8 +21,6 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldUsageType;
 import org.dmg.pmml.MiningField;
@@ -37,10 +35,10 @@ import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.MiningModelUtil;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.Schema;
-import sklearn.EstimatorUtil;
 import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.TreeModelUtil;
@@ -51,31 +49,20 @@ public class GradientBoostingUtil {
 	}
 
 	static
-	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, final Schema schema){
+	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
 		List<Model> models = new ArrayList<>();
 
 		FieldName sumField = FieldName.create("sum");
 
 		{
-			Function<DecisionTreeRegressor, TreeModel> function = new Function<DecisionTreeRegressor, TreeModel>(){
+			List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunctionType.REGRESSION, schema);
 
-				private Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
-
-
-				@Override
-				public TreeModel apply(DecisionTreeRegressor regressor){
-					return TreeModelUtil.encodeTreeModel(regressor, MiningFunctionType.REGRESSION, this.segmentSchema);
-				}
-			};
-
-			List<TreeModel> treeModels = Lists.transform(regressors, function);
-
-			Segmentation segmentation = EstimatorUtil.encodeSegmentation(MultipleModelMethodType.SUM, treeModels, null);
+			Segmentation segmentation = MiningModelUtil.createSegmentation(MultipleModelMethodType.SUM, treeModels);
 
 			Output output = new Output()
-				.addOutputFields(PMMLUtil.createPredictedField(sumField));
+				.addOutputFields(ModelUtil.createPredictedField(sumField));
 
-			MiningSchema miningSchema = PMMLUtil.createMiningSchema(null, schema.getActiveFields());
+			MiningSchema miningSchema = ModelUtil.createMiningSchema(null, schema.getActiveFields());
 
 			MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, miningSchema)
 				.setSegmentation(segmentation)
@@ -87,7 +74,7 @@ public class GradientBoostingUtil {
 		FieldName targetField = schema.getTargetField();
 
 		{
-			MiningField miningField = PMMLUtil.createMiningField(sumField);
+			MiningField miningField = ModelUtil.createMiningField(sumField);
 
 			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), ValueUtil.asDouble(learningRate));
 
@@ -96,7 +83,7 @@ public class GradientBoostingUtil {
 			MiningSchema miningSchema = new MiningSchema();
 
 			if(targetField != null){
-				miningSchema.addMiningFields(PMMLUtil.createMiningField(targetField, FieldUsageType.TARGET));
+				miningSchema.addMiningFields(ModelUtil.createMiningField(targetField, FieldUsageType.TARGET));
 			}
 
 			miningSchema.addMiningFields(miningField);
@@ -107,9 +94,9 @@ public class GradientBoostingUtil {
 			models.add(regressionModel);
 		}
 
-		Segmentation segmentation = EstimatorUtil.encodeSegmentation(MultipleModelMethodType.MODEL_CHAIN, models, null);
+		Segmentation segmentation = MiningModelUtil.createSegmentation(MultipleModelMethodType.MODEL_CHAIN, models);
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(targetField, schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(targetField, schema.getActiveFields());
 
 		MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, miningSchema)
 			.setSegmentation(segmentation);

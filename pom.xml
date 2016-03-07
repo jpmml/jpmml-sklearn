@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-converter</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.sun.xml.fastinfoset</groupId>
@@ -94,13 +94,13 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>1.2.10</version>
+			<version>1.2.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>1.2.10</version>
+			<version>1.2.12</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -163,6 +163,7 @@
 							<value>src/test/resources/logging.properties</value>
 						</property>
 					</systemProperties>
+					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
 			<plugin>

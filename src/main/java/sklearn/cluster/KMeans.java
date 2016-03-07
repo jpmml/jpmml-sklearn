@@ -21,9 +21,7 @@ package sklearn.cluster;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.Array;
@@ -36,8 +34,9 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.SquaredEuclidean;
+import org.jpmml.converter.ClusteringModelUtil;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -88,29 +87,15 @@ public class KMeans extends Clusterer {
 
 		List<FieldName> activeFields = schema.getActiveFields();
 
-		Function<FieldName, ClusteringField> function = new Function<FieldName, ClusteringField>(){
-
-			@Override
-			public ClusteringField apply(FieldName name){
-				ClusteringField clusteringField = new ClusteringField(name);
-
-				return clusteringField;
-			}
-		};
-
-		List<ClusteringField> clusteringFields = new ArrayList<>(Lists.transform(activeFields, function));
+		List<ClusteringField> clusteringFields = ClusteringModelUtil.createClusteringFields(activeFields);
 
 		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
 			.setCompareFunction(CompareFunctionType.ABS_DIFF)
 			.setMeasure(new SquaredEuclidean());
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(null, activeFields);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(null, activeFields);
 
-		List<OutputField> outputFields = new ArrayList<>();
-		outputFields.add(PMMLUtil.createPredictedField(FieldName.create("Cluster")));
-		outputFields.addAll(encodeAffinityFields(clusters));
-
-		Output output = new Output(outputFields);
+		Output output = ClusteringModelUtil.createOutput(FieldName.create("Cluster"), clusters);
 
 		ClusteringModel clusteringModel = new ClusteringModel(MiningFunctionType.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, miningSchema, comparisonMeasure, clusteringFields, clusters)
 			.setOutput(output);
@@ -128,20 +113,5 @@ public class KMeans extends Clusterer {
 
 	private int[] getClusterCentersShape(){
 		return ClassDictUtil.getShape(this, "cluster_centers_", 2);
-	}
-
-	static
-	private List<OutputField> encodeAffinityFields(List<Cluster> clusters){
-		Function<Cluster, OutputField> function = new Function<Cluster, OutputField>(){
-
-			@Override
-			public OutputField apply(Cluster cluster){
-				OutputField outputField = PMMLUtil.createAffinityField(cluster.getId());
-
-				return outputField;
-			}
-		};
-
-		return Lists.transform(clusters, function);
 	}
 }

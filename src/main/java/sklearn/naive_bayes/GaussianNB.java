@@ -34,7 +34,7 @@ import org.dmg.pmml.TargetValueCount;
 import org.dmg.pmml.TargetValueCounts;
 import org.dmg.pmml.TargetValueStat;
 import org.dmg.pmml.TargetValueStats;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
@@ -87,7 +87,7 @@ public class GaussianNB extends Classifier {
 		BayesOutput bayesOutput = new BayesOutput(targetField, null)
 			.setTargetValueCounts(encodeTargetValueCounts(targetCategories, classCount));
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(targetField, schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(targetField, schema.getActiveFields());
 
 		Output output = EstimatorUtil.encodeClassifierOutput(schema);
 

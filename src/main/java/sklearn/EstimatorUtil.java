@@ -21,8 +21,6 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
@@ -43,12 +41,10 @@ import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionNormalizationMethodType;
 import org.dmg.pmml.RegressionTable;
-import org.dmg.pmml.Segment;
 import org.dmg.pmml.Segmentation;
-import org.dmg.pmml.True;
+import org.jpmml.converter.MiningModelUtil;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.ValueUtil;
-import org.jpmml.model.visitors.FieldReferenceFinder;
 import org.jpmml.sklearn.Schema;
 import sklearn.linear_model.RegressionModelUtil;
 
@@ -65,19 +61,9 @@ public class EstimatorUtil {
 	}
 
 	static
-	public MiningSchema encodeMiningSchema(Schema schema, FieldReferenceFinder fieldReferenceFinder){
-		FieldName targetField = schema.getTargetField();
-
-		List<FieldName> activeFields = new ArrayList<>(schema.getActiveFields());
-		activeFields.retainAll(fieldReferenceFinder.getFieldNames());
-
-		return PMMLUtil.createMiningSchema(targetField, activeFields);
-	}
-
-	static
 	public MiningModel encodeBinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, Model model, boolean hasProbabilityDistribution, Schema schema){
 
-		if(targetCategories.size() != 2 || (targetCategories.size() != probabilityFields.size())){
+		if((targetCategories.size() != 2) || (targetCategories.size() != probabilityFields.size())){
 			throw new IllegalArgumentException();
 		}
 
@@ -85,13 +71,13 @@ public class EstimatorUtil {
 		models.add(model);
 
 		{
-			MiningField miningField = PMMLUtil.createMiningField(probabilityFields.get(0));
+			MiningField miningField = ModelUtil.createMiningField(probabilityFields.get(0));
 
 			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), -1d);
 
 			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, 1d);
 
-			OutputField outputField = PMMLUtil.createPredictedField(probabilityFields.get(1));
+			OutputField outputField = ModelUtil.createPredictedField(probabilityFields.get(1));
 
 			Output output = new Output()
 				.addOutputFields(outputField);
@@ -129,14 +115,14 @@ public class EstimatorUtil {
 			MiningSchema miningSchema = new MiningSchema();
 
 			if(targetField != null){
-				miningSchema.addMiningFields(PMMLUtil.createMiningField(targetField, FieldUsageType.TARGET));
+				miningSchema.addMiningFields(ModelUtil.createMiningField(targetField, FieldUsageType.TARGET));
 			}
 
 			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.CLASSIFICATION, miningSchema, null)
 				.setNormalizationMethod(normalizationMethod);
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				MiningField miningField = PMMLUtil.createMiningField(probabilityFields.get(i));
+				MiningField miningField = ModelUtil.createMiningField(probabilityFields.get(i));
 
 				miningSchema.addMiningFields(miningField);
 
@@ -151,9 +137,9 @@ public class EstimatorUtil {
 			segmentationModels.add(regressionModel);
 		}
 
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(targetField, schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(targetField, schema.getActiveFields());
 
-		Segmentation segmentation = encodeSegmentation(MultipleModelMethodType.MODEL_CHAIN, segmentationModels, null);
+		Segmentation segmentation = MiningModelUtil.createSegmentation(MultipleModelMethodType.MODEL_CHAIN, segmentationModels);
 
 		Output output = (hasProbabilityDistribution ? encodeClassifierOutput(schema) : null);
 
@@ -165,34 +151,6 @@ public class EstimatorUtil {
 	}
 
 	static
-	public Segmentation encodeSegmentation(MultipleModelMethodType multipleModelMethod, List<? extends Model> models, List<? extends Number> weights){
-
-		if((weights != null) && (models.size() != weights.size())){
-			throw new IllegalArgumentException();
-		}
-
-		Segmentation segmentation = new Segmentation(multipleModelMethod, null);
-
-		for(int i = 0; i < models.size(); i++){
-			Model model = models.get(i);
-			Number weight = (weights != null ? weights.get(i) : null);
-
-			Segment segment = new Segment()
-				.setId(String.valueOf(i + 1))
-				.setPredicate(new True())
-				.setModel(model);
-
-			if(weight != null && !ValueUtil.isOne(weight)){
-				segment.setWeight(ValueUtil.asDouble(weight));
-			}
-
-			segmentation.addSegments(segment);
-		}
-
-		return segmentation;
-	}
-
-	static
 	public Output encodeClassifierOutput(Schema schema){
 		List<String> targetCategories = schema.getTargetCategories();
 
@@ -200,18 +158,7 @@ public class EstimatorUtil {
 			return null;
 		}
 
-		Function<String, OutputField> function = new Function<String, OutputField>(){
-
-			@Override
-			public OutputField apply(String value){
-				return PMMLUtil.createProbabilityField(value);
-			}
-		};
-
-		List<OutputField> outputFields = new ArrayList<>();
-		outputFields.addAll(Lists.transform(targetCategories, function));
-
-		Output output = new Output(outputFields);
+		Output output = new Output(ModelUtil.createProbabilityFields(targetCategories));
 
 		return output;
 	}

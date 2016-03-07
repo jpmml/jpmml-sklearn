@@ -49,6 +49,7 @@ import org.dmg.pmml.TransformationDictionary;
 import org.dmg.pmml.Value;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
@@ -297,7 +298,7 @@ public class DataFrameMapper extends ClassDict {
 				}
 
 				for(FieldName name : names){
-					MiningField miningField = PMMLUtil.createMiningField(name);
+					MiningField miningField = ModelUtil.createMiningField(name);
 
 					miningFieldIt.add(miningField);
 				}

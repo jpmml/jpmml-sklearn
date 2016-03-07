@@ -37,6 +37,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.RegressionModel;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
@@ -145,7 +146,7 @@ public class BaseLinearClassifier extends Classifier {
 
 	static
 	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, Schema schema){
-		OutputField decisionFunction = PMMLUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
+		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
 		OutputField transformedDecisionFunction = new OutputField(FieldName.create("logitDecisionFunction_" + targetCategory))
 			.setFeature(FeatureType.TRANSFORMED_VALUE)

@@ -36,6 +36,7 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -52,7 +53,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return ValueUtil.asInteger((Number)get("n_features"));
+		return ValueUtil.asInt((Number)get("n_features"));
 	}
 
 	@Override
@@ -179,7 +180,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 	static
 	private MiningModel encodeCategoryRegressor(String targetCategory, LossFunction loss, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, Schema schema){
-		OutputField decisionFunction = PMMLUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
+		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
 		OutputField transformedDecisionField = new OutputField(FieldName.create(loss.getFunction() + "DecisionFunction_" + targetCategory))
 			.setFeature(FeatureType.TRANSFORMED_VALUE)

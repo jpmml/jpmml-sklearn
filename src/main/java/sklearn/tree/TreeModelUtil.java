@@ -20,6 +20,8 @@ package sklearn.tree;
 
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
@@ -30,8 +32,8 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.TreeModel;
 import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.model.visitors.FieldReferenceFinder;
 import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -39,6 +41,22 @@ import sklearn.EstimatorUtil;
 public class TreeModelUtil {
 
 	private TreeModelUtil(){
+	}
+
+	static
+	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final MiningFunctionType miningFunction, final Schema schema){
+		Function<E, TreeModel> function = new Function<E, TreeModel>(){
+
+			private Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
+
+
+			@Override
+			public TreeModel apply(E estimator){
+				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, this.segmentSchema);
+			}
+		};
+
+		return Lists.transform(estimators, function);
 	}
 
 	static
@@ -57,10 +75,7 @@ public class TreeModelUtil {
 
 		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-		FieldReferenceFinder fieldReferenceFinder = new FieldReferenceFinder();
-		fieldReferenceFinder.applyTo(root);
-
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldReferenceFinder);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields(), root);
 
 		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);

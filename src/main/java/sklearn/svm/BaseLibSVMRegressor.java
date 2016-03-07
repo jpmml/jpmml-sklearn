@@ -29,11 +29,10 @@ import org.dmg.pmml.SupportVectorMachine;
 import org.dmg.pmml.SupportVectorMachineModel;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorInstance;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.model.visitors.FieldReferenceFinder;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.Schema;
-import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 abstract
@@ -74,10 +73,7 @@ public class BaseLibSVMRegressor extends Regressor {
 
 		supportVectorMachines.add(supportVectorMachine);
 
-		FieldReferenceFinder fieldReferenceFinder = new FieldReferenceFinder();
-		fieldReferenceFinder.applyTo(vectorDictionary);
-
-		MiningSchema miningSchema = EstimatorUtil.encodeMiningSchema(schema, fieldReferenceFinder);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields(), vectorDictionary);
 
 		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.REGRESSION, miningSchema, vectorDictionary, supportVectorMachines)
 			.setKernel(kernel);

@@ -20,18 +20,16 @@ package sklearn.ensemble.forest;
 
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.MiningModelUtil;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.tree.HasTree;
 import sklearn.tree.TreeModelUtil;
 
@@ -41,23 +39,12 @@ public class BaseForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, final MiningFunctionType miningFunction, final Schema schema){
-		Function<E, TreeModel> function = new Function<E, TreeModel>(){
+	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, Schema schema){
+		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimators, miningFunction, schema);
 
-			private Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
+		Segmentation segmentation = MiningModelUtil.createSegmentation(multipleModelMethod, treeModels);
 
-
-			@Override
-			public TreeModel apply(E estimator){
-				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, this.segmentSchema);
-			}
-		};
-
-		List<TreeModel> treeModels = Lists.transform(estimators, function);
-
-		Segmentation segmentation = EstimatorUtil.encodeSegmentation(multipleModelMethod, treeModels, null);
-
-		MiningSchema miningSchema = PMMLUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
 
 		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
 			.setSegmentation(segmentation);

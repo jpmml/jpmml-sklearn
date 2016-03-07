@@ -205,7 +205,7 @@ public class NDArrayUtil {
 		int length = 1;
 
 		for(int i = 0; i < shape.length; i++){
-			length *= ValueUtil.asInteger((Number)shape[i]);
+			length *= ValueUtil.asInt((Number)shape[i]);
 		} // End if
 
 		if(descr instanceof String){

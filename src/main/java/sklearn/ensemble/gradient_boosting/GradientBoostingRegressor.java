@@ -36,7 +36,7 @@ public class GradientBoostingRegressor extends Regressor {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return ValueUtil.asInteger((Number)get("n_features"));
+		return ValueUtil.asInt((Number)get("n_features"));
 	}
 
 	@Override

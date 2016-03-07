@@ -53,7 +53,7 @@ public class Estimator extends BaseEstimator {
 	public Model encodeModel(Schema schema);
 
 	public int getNumberOfFeatures(){
-		return ValueUtil.asInteger((Number)get("n_features_"));
+		return ValueUtil.asInt((Number)get("n_features_"));
 	}
 
 	/**
@@ -112,9 +112,10 @@ public class Estimator extends BaseEstimator {
 
 	public PMML encodePMML(Schema schema){
 		DataDictionary dataDictionary = encodeDataDictionary(schema);
+
 		TransformationDictionary transformationDictionary = encodeTransformationDictionary(schema);
 
-		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn"), dataDictionary)
+		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn", "1.0-SNAPSHOT"), dataDictionary)
 			.setTransformationDictionary(transformationDictionary);
 
 		Model model = encodeModel(schema);
