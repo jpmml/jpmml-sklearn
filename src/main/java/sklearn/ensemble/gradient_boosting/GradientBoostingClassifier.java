@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataType;
@@ -75,18 +73,6 @@ public class GradientBoostingClassifier extends Classifier {
 
 		List<String> targetCategories = schema.getTargetCategories();
 
-		Function<MiningModel, FieldName> probabilityFieldFunction = new Function<MiningModel, FieldName>(){
-
-			@Override
-			public FieldName apply(MiningModel miningModel){
-				Output output = miningModel.getOutput();
-
-				OutputField outputField = Iterables.getLast(output.getOutputFields());
-
-				return outputField.getName();
-			}
-		};
-
 		Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
 
 		if(numberOfClasses == 1){
@@ -97,13 +83,11 @@ public class GradientBoostingClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), loss, estimators, init.getPriorProbability(0), learningRate, segmentSchema);
+			double coefficient = loss.getCoefficient();
 
-			List<FieldName> probabilityFields = new ArrayList<>();
-			probabilityFields.add(probabilityFieldFunction.apply(miningModel));
-			probabilityFields.add(FieldName.create(loss.getFunction() + "DecisionFunction_" + targetCategories.get(1)));
+			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), estimators, init.getPriorProbability(0), learningRate, null, segmentSchema);
 
-			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, miningModel, true, schema);
+			return EstimatorUtil.encodeBinaryLogisticClassifier(targetCategories, miningModel, coefficient, true, schema);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -115,14 +99,12 @@ public class GradientBoostingClassifier extends Classifier {
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), loss, NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, segmentSchema);
+				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, loss.getFunction(), segmentSchema);
 
 				miningModels.add(miningModel);
 			}
 
-			List<FieldName> probabilityFields = Lists.transform(miningModels, probabilityFieldFunction);
-
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, miningModels, true, schema);
+			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, miningModels, true, schema);
 		} else
 
 		{
@@ -179,17 +161,21 @@ public class GradientBoostingClassifier extends Classifier {
 	}
 
 	static
-	private MiningModel encodeCategoryRegressor(String targetCategory, LossFunction loss, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, Schema schema){
+	private MiningModel encodeCategoryRegressor(String targetCategory, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, String outputTransformation, Schema schema){
 		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
-		OutputField transformedDecisionField = new OutputField(FieldName.create(loss.getFunction() + "DecisionFunction_" + targetCategory))
-			.setFeature(FeatureType.TRANSFORMED_VALUE)
-			.setDataType(DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setExpression(PMMLUtil.createApply(loss.getFunction(), new FieldRef(decisionFunction.getName())));
-
 		Output output = new Output()
-			.addOutputFields(decisionFunction, transformedDecisionField);
+			.addOutputFields(decisionFunction);
+
+		if(outputTransformation != null){
+			OutputField transformedDecisionField = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory))
+				.setFeature(FeatureType.TRANSFORMED_VALUE)
+				.setDataType(DataType.DOUBLE)
+				.setOpType(OpType.CONTINUOUS)
+				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())));
+
+			output.addOutputFields(transformedDecisionField);
+		}
 
 		MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, priorProbability, learningRate, schema)
 			.setOutput(output);

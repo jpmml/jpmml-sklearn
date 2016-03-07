@@ -28,6 +28,11 @@ public class ExponentialLoss extends LossFunction {
 	}
 
 	@Override
+	public double getCoefficient(){
+		return -2d;
+	}
+
+	@Override
 	public String getFunction(){
 		return "adaboost";
 	}

@@ -28,6 +28,11 @@ public class BinomialDeviance extends LossFunction {
 	}
 
 	@Override
+	public double getCoefficient(){
+		return -1d;
+	}
+
+	@Override
 	public String getFunction(){
 		return "logit";
 	}

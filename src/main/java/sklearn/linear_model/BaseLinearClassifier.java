@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataType;
@@ -67,22 +65,10 @@ public class BaseLinearClassifier extends Classifier {
 
 		boolean hasProbabilityDistribution = hasProbabilityDistribution();
 
-		List<String> targetCategories = schema.getTargetCategories();
-
 		List<? extends Number> coefficients = getCoef();
 		List<? extends Number> intercepts = getIntercept();
 
-		Function<RegressionModel, FieldName> probabilityFieldFunction = new Function<RegressionModel, FieldName>(){
-
-			@Override
-			public FieldName apply(RegressionModel regressionModel){
-				Output output = regressionModel.getOutput();
-
-				OutputField outputField = Iterables.getLast(output.getOutputFields());
-
-				return outputField.getName();
-			}
-		};
+		List<String> targetCategories = schema.getTargetCategories();
 
 		Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
 
@@ -94,13 +80,9 @@ public class BaseLinearClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), segmentSchema);
+			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
 
-			List<FieldName> probabilityFields = new ArrayList<>();
-			probabilityFields.add(probabilityFieldFunction.apply(regressionModel));
-			probabilityFields.add(FieldName.create("logitDecisionFunction_" + targetCategories.get(1)));
-
-			return EstimatorUtil.encodeBinomialClassifier(targetCategories, probabilityFields, regressionModel, hasProbabilityDistribution, schema);
+			return EstimatorUtil.encodeBinaryLogisticClassifier(targetCategories, regressionModel, -1d, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -112,14 +94,12 @@ public class BaseLinearClassifier extends Classifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), segmentSchema);
+				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), "logit", segmentSchema);
 
 				regressionModels.add(regressionModel);
 			}
 
-			List<FieldName> probabilityFields = Lists.transform(regressionModels, probabilityFieldFunction);
-
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, probabilityFields, regressionModels, hasProbabilityDistribution, schema);
+			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, regressionModels, hasProbabilityDistribution, schema);
 		} else
 
 		{
@@ -145,17 +125,21 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	static
-	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, Schema schema){
+	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, String outputTransformation, Schema schema){
 		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
-		OutputField transformedDecisionFunction = new OutputField(FieldName.create("logitDecisionFunction_" + targetCategory))
-			.setFeature(FeatureType.TRANSFORMED_VALUE)
-			.setDataType(DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setExpression(PMMLUtil.createApply("logit", new FieldRef(decisionFunction.getName())));
-
 		Output output = new Output()
-			.addOutputFields(decisionFunction, transformedDecisionFunction);
+			.addOutputFields(decisionFunction);
+
+		if(outputTransformation != null){
+			OutputField transformedDecisionFunction = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory))
+				.setFeature(FeatureType.TRANSFORMED_VALUE)
+				.setDataType(DataType.DOUBLE)
+				.setOpType(OpType.CONTINUOUS)
+				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())));
+
+			output.addOutputFields(transformedDecisionFunction);
+		}
 
 		RegressionModel regressionModel = RegressionModelUtil.encodeRegressionModel(coefficients, intercept, schema)
 			.setOutput(output);

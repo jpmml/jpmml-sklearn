@@ -18,35 +18,27 @@
  */
 package sklearn;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.FieldUsageType;
-import org.dmg.pmml.MiningField;
-import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.MultipleModelMethodType;
-import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ParameterField;
-import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.RegressionNormalizationMethodType;
-import org.dmg.pmml.RegressionTable;
-import org.dmg.pmml.Segmentation;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.Schema;
-import sklearn.linear_model.RegressionModelUtil;
 
 public class EstimatorUtil {
 
@@ -61,91 +53,19 @@ public class EstimatorUtil {
 	}
 
 	static
-	public MiningModel encodeBinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, Model model, boolean hasProbabilityDistribution, Schema schema){
+	public MiningModel encodeBinaryLogisticClassifier(List<String> targetCategories, Model model, double coefficient, boolean hasProbabilityDistribution, Schema schema){
+		FieldName inputField = Lists.transform(Collections.singletonList(model), EstimatorUtil.LAST_OUTPUT).get(0);
 
-		if((targetCategories.size() != 2) || (targetCategories.size() != probabilityFields.size())){
-			throw new IllegalArgumentException();
-		}
+		MiningModel miningModel = MiningModelUtil.createBinaryLogisticClassification(schema.getTargetField(), targetCategories, schema.getActiveFields(), model, inputField, coefficient, hasProbabilityDistribution);
 
-		List<Model> models = new ArrayList<>();
-		models.add(model);
-
-		{
-			MiningField miningField = ModelUtil.createMiningField(probabilityFields.get(0));
-
-			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), -1d);
-
-			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, 1d);
-
-			OutputField outputField = ModelUtil.createPredictedField(probabilityFields.get(1));
-
-			Output output = new Output()
-				.addOutputFields(outputField);
-
-			MiningSchema miningSchema = new MiningSchema()
-				.addMiningFields(miningField);
-
-			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
-				.addRegressionTables(regressionTable)
-				.setOutput(output);
-
-			models.add(regressionModel);
-		}
-
-		return encodeClassifier(targetCategories, probabilityFields, models, null, hasProbabilityDistribution, schema);
+		return miningModel;
 	}
 
 	static
-	public MiningModel encodeMultinomialClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, boolean hasProbabilityDistribution, Schema schema){
-		return encodeClassifier(targetCategories, probabilityFields, models, RegressionNormalizationMethodType.SIMPLEMAX, hasProbabilityDistribution, schema);
-	}
+	public MiningModel encodeMultinomialClassifier(List<String> targetCategories, List<? extends Model> models, boolean hasProbabilityDistribution, Schema schema){
+		List<FieldName> inputFields = Lists.transform(models, EstimatorUtil.LAST_OUTPUT);
 
-	static
-	private MiningModel encodeClassifier(List<String> targetCategories, List<FieldName> probabilityFields, List<? extends Model> models, RegressionNormalizationMethodType normalizationMethod, boolean hasProbabilityDistribution, Schema schema){
-
-		if(targetCategories.size() != probabilityFields.size()){
-			throw new IllegalArgumentException();
-		}
-
-		List<Model> segmentationModels = new ArrayList<>(models);
-
-		FieldName targetField = schema.getTargetField();
-
-		{
-			MiningSchema miningSchema = new MiningSchema();
-
-			if(targetField != null){
-				miningSchema.addMiningFields(ModelUtil.createMiningField(targetField, FieldUsageType.TARGET));
-			}
-
-			RegressionModel regressionModel = new RegressionModel(MiningFunctionType.CLASSIFICATION, miningSchema, null)
-				.setNormalizationMethod(normalizationMethod);
-
-			for(int i = 0; i < targetCategories.size(); i++){
-				MiningField miningField = ModelUtil.createMiningField(probabilityFields.get(i));
-
-				miningSchema.addMiningFields(miningField);
-
-				NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), 1d);
-
-				RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, 0d)
-					.setTargetCategory(targetCategories.get(i));
-
-				regressionModel.addRegressionTables(regressionTable);
-			}
-
-			segmentationModels.add(regressionModel);
-		}
-
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(targetField, schema.getActiveFields());
-
-		Segmentation segmentation = MiningModelUtil.createSegmentation(MultipleModelMethodType.MODEL_CHAIN, segmentationModels);
-
-		Output output = (hasProbabilityDistribution ? encodeClassifierOutput(schema) : null);
-
-		MiningModel miningModel = new MiningModel(MiningFunctionType.CLASSIFICATION, miningSchema)
-			.setSegmentation(segmentation)
-			.setOutput(output);
+		MiningModel miningModel = MiningModelUtil.createClassification(schema.getTargetField(), targetCategories, schema.getActiveFields(), models, inputFields, hasProbabilityDistribution);
 
 		return miningModel;
 	}
@@ -174,7 +94,7 @@ public class EstimatorUtil {
 	}
 
 	static
-	private DefineFunction encodeLossFunction(String function, Number multiplier){
+	private DefineFunction encodeLossFunction(String function, double multiplier){
 		FieldName name = FieldName.create("value");
 
 		ParameterField parameterField = new ParameterField(name)
@@ -192,4 +112,16 @@ public class EstimatorUtil {
 
 		return defineFunction;
 	}
+
+	private static final Function<Model, FieldName> LAST_OUTPUT = new Function<Model, FieldName>(){
+
+		@Override
+		public FieldName apply(Model model){
+			Output output = model.getOutput();
+
+			OutputField outputField = Iterables.getLast(output.getOutputFields());
+
+			return outputField.getName();
+		}
+	};
 }

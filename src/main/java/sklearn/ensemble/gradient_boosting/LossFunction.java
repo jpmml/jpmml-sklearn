@@ -30,6 +30,9 @@ public class LossFunction extends ClassDict {
 	}
 
 	abstract
+	public double getCoefficient();
+
+	abstract
 	public String getFunction();
 
 	public DefineFunction encodeFunction(){

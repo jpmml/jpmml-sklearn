@@ -27,6 +27,11 @@ public class MultinomialDeviance extends LossFunction {
 	}
 
 	@Override
+	public double getCoefficient(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public String getFunction(){
 		return "exp";
 	}
