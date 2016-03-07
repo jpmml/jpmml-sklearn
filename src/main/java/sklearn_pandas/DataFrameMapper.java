@@ -32,6 +32,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.BayesOutput;
 import org.dmg.pmml.DataDictionary;
@@ -136,6 +137,8 @@ public class DataFrameMapper extends ClassDict {
 		final
 		Map<FieldName, Set<FieldName>> updatedActiveFields = new LinkedHashMap<>();
 
+		Set<FieldName> mappedNames = new LinkedHashSet<>();
+
 		// Zero or more active fields
 		for(int row = 0; featureIt.hasNext(); row++){
 			Object[] feature = featureIt.next();
@@ -144,7 +147,27 @@ public class DataFrameMapper extends ClassDict {
 			List<FieldName> names = getNameList(feature);
 			List<Transformer> transformers = getTransformerList(feature);
 
-			Set<FieldName> uniqueNames = new LinkedHashSet<>(names);
+			Set<FieldName> uniqueNames = new LinkedHashSet<>();
+			Set<FieldName> duplicateNames = new LinkedHashSet<>();
+
+			for(FieldName name : names){
+				boolean unique = uniqueNames.add(name);
+
+				if(!unique){
+					duplicateNames.add(name);
+				}
+			}
+
+			Sets.SetView<FieldName> duplicateMappedNames = Sets.intersection(uniqueNames, mappedNames);
+			if(duplicateMappedNames.size() > 0){
+				duplicateMappedNames.copyInto(duplicateNames);
+			} // End if
+
+			if(duplicateNames.size() > 0){
+				logger.error("Duplicate mappings(s): {}", new ArrayList<>(duplicateNames));
+
+				throw new IllegalArgumentException();
+			} // End if
 
 			if(transformers.isEmpty()){
 				Transformer transformer = new MultiTransformer(null, null){
@@ -227,6 +250,8 @@ public class DataFrameMapper extends ClassDict {
 
 				inputNames = step.getOutputNames();
 			}
+
+			mappedNames.addAll(names);
 		}
 
 		if(dataFieldIt.hasNext()){
