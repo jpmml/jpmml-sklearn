@@ -180,7 +180,7 @@ public class SupportVectorMachineUtil {
 				.setGamma(gamma);
 		}
 
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(kernel);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(SupportVectorMachineUtil.class);

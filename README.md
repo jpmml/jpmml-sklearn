@@ -39,6 +39,8 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`linear_model.SGDRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDRegressor.html)
   * Naive Bayes:
     * [`naive_bayes.GaussianNB`] (http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)
+  * Neural network models:
+    * [`neural_network.MLPRegressor`] (http://scikit-learn.org/dev/modules/generated/sklearn.neural_network.MLPRegressor.html)
   * Preprocessing and Normalization:
     * [`preprocessing.Binarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Binarizer.html)
     * [`preprocessing.Imputer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Imputer.html)
@@ -171,7 +173,7 @@ java -jar target/converter-executable-1.0-SNAPSHOT.jar --help
 
 # License #
 
-JPMML-SkLearn is dual-licensed under the [GNU Affero General Public License (AGPL) version 3.0] (http://www.gnu.org/licenses/agpl-3.0.html) and a commercial license.
+JPMML-SkLearn is licensed under the [GNU Affero General Public License (AGPL) version 3.0] (http://www.gnu.org/licenses/agpl-3.0.html). Other licenses are available on request.
 
 # Additional information #
 

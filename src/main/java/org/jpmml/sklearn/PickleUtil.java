@@ -65,6 +65,7 @@ import sklearn.linear_model.stochastic_gradient.SGDClassifier;
 import sklearn.linear_model.stochastic_gradient.SGDRegressor;
 import sklearn.linear_model.stochastic_gradient.SquaredHinge;
 import sklearn.naive_bayes.GaussianNB;
+import sklearn.neural_network.MLPRegressor;
 import sklearn.preprocessing.Binarizer;
 import sklearn.preprocessing.Imputer;
 import sklearn.preprocessing.LabelBinarizer;
@@ -162,6 +163,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.linear_model.stochastic_gradient", "SGDClassifier", SGDClassifier.class),
 			new ObjectConstructor("sklearn.linear_model.stochastic_gradient", "SGDRegressor", SGDRegressor.class),
 			new ObjectConstructor("sklearn.naive_bayes", "GaussianNB", GaussianNB.class),
+			new ObjectConstructor("sklearn.neural_network.multilayer_perceptron", "MLPRegressor", MLPRegressor.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MaxAbsScaler", MaxAbsScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MinMaxScaler", MinMaxScaler.class),

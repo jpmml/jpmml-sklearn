@@ -11,6 +11,7 @@ from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
 from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
+from sklearn.neural_network import MLPRegressor
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, SVC, SVR
@@ -312,6 +313,7 @@ def build_housing(regressor, name, to_sparse = False):
 	medv = DataFrame(regressor.predict(housing_X), columns = ["MEDV"])
 	store_csv(medv, name + ".csv")
 
+build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), algorithm = "l-bfgs", random_state = 13, tol = 0.001, max_iter = 1000), "MLPHousing")
 build_housing(SGDRegressor(random_state = 13), "SGDHousing")
 build_housing(SVR(), "SVRHousing", to_sparse = True)
 build_housing(LinearSVR(random_state = 13), "LinearSVRHousing", to_sparse = True)

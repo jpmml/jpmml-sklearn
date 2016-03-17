@@ -73,6 +73,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateMLPHousing() throws Exception {
+		evaluate("MLP", "Housing");
+	}
+
+	@Test
 	public void evaluateSGDHousing() throws Exception {
 		evaluate("SGD", "Housing");
 	}

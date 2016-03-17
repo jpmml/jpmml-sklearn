@@ -44,6 +44,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningSchema;
+import org.dmg.pmml.NeuralOutput;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.TransformationDictionary;
@@ -284,6 +285,21 @@ public class DataFrameMapper extends ClassDict {
 				miningField.setName(filterName(miningField.getName()));
 
 				return super.visit(miningField);
+			}
+
+			@Override
+			public VisitorAction visit(NeuralOutput neuralOutput){
+				DerivedField derivedField = neuralOutput.getDerivedField();
+
+				Expression expression = derivedField.getExpression();
+
+				if(expression instanceof FieldRef){
+					FieldRef fieldRef = (FieldRef)expression;
+
+					fieldRef.setField(filterName(fieldRef.getField()));
+				}
+
+				return super.visit(neuralOutput);
 			}
 
 			private FieldName filterName(FieldName name){
