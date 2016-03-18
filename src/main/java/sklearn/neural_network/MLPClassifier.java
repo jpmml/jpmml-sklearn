@@ -24,12 +24,14 @@ import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.NeuralNetwork;
+import org.dmg.pmml.Output;
 import org.jpmml.sklearn.Schema;
-import sklearn.Regressor;
+import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
-public class MLPRegressor extends Regressor {
+public class MLPClassifier extends Classifier {
 
-	public MLPRegressor(String module, String name){
+	public MLPClassifier(String module, String name){
 		super(module, name);
 	}
 
@@ -51,7 +53,10 @@ public class MLPRegressor extends Regressor {
 		List<?> coefs = getCoefs();
 		List<?> intercepts = getIntercepts();
 
-		NeuralNetwork neuralNetwork = NeuralNetworkUtil.encodeNeuralNetwork(MiningFunctionType.REGRESSION, activation, coefs, intercepts, schema);
+		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+
+		NeuralNetwork neuralNetwork = NeuralNetworkUtil.encodeNeuralNetwork(MiningFunctionType.CLASSIFICATION, activation, coefs, intercepts, schema)
+			.setOutput(output);
 
 		return neuralNetwork;
 	}

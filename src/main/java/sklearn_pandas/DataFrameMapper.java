@@ -45,6 +45,7 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NeuralOutput;
+import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.TransformationDictionary;
@@ -297,6 +298,12 @@ public class DataFrameMapper extends ClassDict {
 					FieldRef fieldRef = (FieldRef)expression;
 
 					fieldRef.setField(filterName(fieldRef.getField()));
+				} else
+
+				if(expression instanceof NormDiscrete){
+					NormDiscrete normDiscrete = (NormDiscrete)expression;
+
+					normDiscrete.setField(filterName(normDiscrete.getField()));
 				}
 
 				return super.visit(neuralOutput);

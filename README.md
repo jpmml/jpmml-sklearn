@@ -40,6 +40,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
   * Naive Bayes:
     * [`naive_bayes.GaussianNB`] (http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)
   * Neural network models:
+    * [`neural_network.MLPClassifier`] (http://scikit-learn.org/dev/modules/generated/sklearn.neural_network.MLPClassifier.html)
     * [`neural_network.MLPRegressor`] (http://scikit-learn.org/dev/modules/generated/sklearn.neural_network.MLPRegressor.html)
   * Preprocessing and Normalization:
     * [`preprocessing.Binarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Binarizer.html)

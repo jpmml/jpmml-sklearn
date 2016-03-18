@@ -118,6 +118,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateMLPIris() throws Exception {
+		evaluate("MLP", "Iris");
+	}
+
+	@Test
 	public void evaluateRandomForestIris() throws Exception {
 		evaluate("RandomForest", "Iris");
 	}
@@ -150,6 +155,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateNuSVCIris() throws Exception {
 		evaluate("NuSVC", "Iris");
+	}
+
+	@Test
+	public void evaluateMLPVersicolor() throws Exception {
+		evaluate("MLP", "Versicolor");
 	}
 
 	@Test

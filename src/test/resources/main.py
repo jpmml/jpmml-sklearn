@@ -11,7 +11,7 @@ from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
 from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neural_network import MLPRegressor
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, SVC, SVR
@@ -174,6 +174,7 @@ def build_versicolor(classifier, name, to_sparse = False, with_proba = True):
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name + ".csv")
 
+build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), algorithm = "l-bfgs", random_state = 13, tol = 0.01, max_iter = 100), "MLPVersicolor")
 build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)
 build_versicolor(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogVersicolor")
 build_versicolor(SVC(), "SVCVersicolor", to_sparse = True, with_proba = False)
@@ -219,6 +220,7 @@ build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimato
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
 build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")
+build_iris(MLPClassifier(activation = "tanh", hidden_layer_sizes = (3,), algorithm = "l-bfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPIris")
 build_iris(GaussianNB(), "NaiveBayesIris")
 build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris")
 build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
