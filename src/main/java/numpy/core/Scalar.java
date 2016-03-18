@@ -26,8 +26,9 @@ import java.util.List;
 import com.google.common.base.Charsets;
 import numpy.DType;
 import org.jpmml.sklearn.CClassDict;
+import org.jpmml.sklearn.HasArray;
 
-public class Scalar extends CClassDict {
+public class Scalar extends CClassDict implements HasArray {
 
 	private List<?> content = null;
 
@@ -39,6 +40,20 @@ public class Scalar extends CClassDict {
 	@Override
 	public void __init__(Object[] args){
 		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
+	}
+
+	@Override
+	public List<?> getArrayContent(){
+		List<?> content = getContent();
+
+		return content;
+	}
+
+	@Override
+	public int[] getArrayShape(){
+		List<?> content = getContent();
+
+		return new int[]{content.size()};
 	}
 
 	public List<?> getContent(){

@@ -22,12 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.common.base.Charsets;
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.sklearn.CClassDict;
+import org.jpmml.sklearn.HasArray;
 
-public class NDArray extends CClassDict {
+public class NDArray extends CClassDict implements HasArray {
 
 	private Object content = null;
 
@@ -79,6 +81,16 @@ public class NDArray extends CClassDict {
 	@Override
 	public void __setstate__(Object[] args){
 		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
+	}
+
+	@Override
+	public List<?> getArrayContent(){
+		return NDArrayUtil.getContent(this);
+	}
+
+	@Override
+	public int[] getArrayShape(){
+		return NDArrayUtil.getShape(this);
 	}
 
 	public Object getContent(){

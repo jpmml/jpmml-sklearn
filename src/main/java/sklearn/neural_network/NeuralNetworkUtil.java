@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.ActivationFunctionType;
 import org.dmg.pmml.Connection;
@@ -45,6 +44,7 @@ import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.Schema;
 
 public class NeuralNetworkUtil {
@@ -53,7 +53,19 @@ public class NeuralNetworkUtil {
 	}
 
 	static
-	public NeuralNetwork encodeNeuralNetwork(MiningFunctionType miningFunction, String activation, List<?> coefs, List<?> intercepts, Schema schema){
+	public int getNumberOfFeatures(List<? extends HasArray> coefs){
+		HasArray input = coefs.get(0);
+
+		int[] shape = input.getArrayShape();
+		if(shape.length != 2){
+			throw new IllegalArgumentException();
+		}
+
+		return shape[0];
+	}
+
+	static
+	public NeuralNetwork encodeNeuralNetwork(MiningFunctionType miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, Schema schema){
 		ActivationFunctionType activationFunction = parseActivationFunction(activation);
 
 		if(coefs.size() != intercepts.size()){
@@ -81,18 +93,17 @@ public class NeuralNetworkUtil {
 		List<NeuralLayer> neuralLayers = new ArrayList<>();
 
 		for(int layer = 0; layer < coefs.size(); layer++){
-			NDArray coef = (NDArray)coefs.get(layer);
-			NDArray intercept = (NDArray)intercepts.get(layer);
+			HasArray coef = coefs.get(layer);
+			HasArray intercept = intercepts.get(layer);
 
-			List<?> coefMatrix = NDArrayUtil.getContent(coef);
-			List<?> interceptVector = NDArrayUtil.getContent(intercept);
-
-			int[] shape = NDArrayUtil.getShape(coef);
+			int[] shape = coef.getArrayShape();
 
 			int rows = shape[0];
 			int columns = shape[1];
 
 			List<Neuron> neurons = new ArrayList<>();
+
+			List<?> interceptVector = intercept.getArrayContent();
 
 			for(int column = 0; column < columns; column++){
 				Neuron neuron = new Neuron()
@@ -105,6 +116,8 @@ public class NeuralNetworkUtil {
 
 				neurons.add(neuron);
 			}
+
+			List<?> coefMatrix = coef.getArrayContent();
 
 			for(int row = 0; row < rows; row++){
 				List<?> weights = NDArrayUtil.getRow(coefMatrix, rows, columns, row);

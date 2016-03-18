@@ -23,11 +23,22 @@ import java.util.List;
 import net.razorvine.pickle.objects.ClassDict;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.HasArray;
 
-public class CSRMatrix extends ClassDict {
+public class CSRMatrix extends ClassDict implements HasArray {
 
 	public CSRMatrix(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<?> getArrayContent(){
+		return CSRMatrixUtil.getContent(this);
+	}
+
+	@Override
+	public int[] getArrayShape(){
+		return CSRMatrixUtil.getShape(this);
 	}
 
 	public List<?> getData(){

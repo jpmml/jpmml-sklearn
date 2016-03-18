@@ -20,13 +20,15 @@ package joblib;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
+import org.jpmml.sklearn.HasArray;
 
 abstract
-public class NDArrayWrapper extends ClassDict {
+public class NDArrayWrapper extends ClassDict implements HasArray {
 
 	private NDArray content = null;
 
@@ -37,6 +39,20 @@ public class NDArrayWrapper extends ClassDict {
 
 	abstract
 	public InputStream getInputStream() throws IOException;
+
+	@Override
+	public List<?> getArrayContent(){
+		NDArray content = getContent();
+
+		return content.getArrayContent();
+	}
+
+	@Override
+	public int[] getArrayShape(){
+		NDArray content = getContent();
+
+		return content.getArrayShape();
+	}
 
 	public String getFileName(){
 		return (String)get("filename");

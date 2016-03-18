@@ -27,7 +27,6 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import numpy.core.NDArray;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
@@ -40,6 +39,7 @@ import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 
@@ -102,12 +102,11 @@ public class BaggingUtil {
 
 			@Override
 			public List<Integer> apply(Object object){
-				object = ClassDictUtil.unwrap(object);
 
-				if(object instanceof NDArray){
-					NDArray array = (NDArray)object;
+				if(object instanceof HasArray){
+					HasArray hasArray = (HasArray)object;
 
-					return ValueUtil.asIntegers((List)array.getContent());
+					return ValueUtil.asIntegers((List)hasArray.getArrayContent());
 				}
 
 				throw new IllegalArgumentException("The estimator features object (" + ClassDictUtil.formatClass(object) + ") is not an array");
