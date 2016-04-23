@@ -20,7 +20,6 @@ package sklearn.naive_bayes;
 
 import java.util.List;
 
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.BayesInput;
 import org.dmg.pmml.BayesInputs;
 import org.dmg.pmml.BayesOutput;
@@ -37,6 +36,7 @@ import org.dmg.pmml.TargetValueStats;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
@@ -71,8 +71,8 @@ public class GaussianNB extends Classifier {
 		for(int i = 0; i < numberOfFeatures; i++){
 			FieldName activeField = schema.getActiveField(i);
 
-			List<? extends Number> means = NDArrayUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
-			List<? extends Number> variances = NDArrayUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
+			List<? extends Number> means = MatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
+			List<? extends Number> variances = MatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
 
 			BayesInput bayesInput = new BayesInput(activeField)
 				.setTargetValueStats(encodeTargetValueStats(targetCategories, means, variances));

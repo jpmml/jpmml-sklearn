@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FeatureType;
@@ -38,6 +37,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
@@ -99,7 +99,7 @@ public class GradientBoostingClassifier extends Classifier {
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, loss.getFunction(), segmentSchema);
+				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), MatrixUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, loss.getFunction(), segmentSchema);
 
 				miningModels.add(miningModel);
 			}

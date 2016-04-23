@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.Kernel;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
@@ -34,6 +33,7 @@ import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 
@@ -95,8 +95,8 @@ public class BaseLibSVMClassifier extends Classifier {
 				svmVectorInstances.addAll(slice(vectorInstances, offsets, second));
 
 				List<Number> svmDualCoef = new ArrayList<>();
-				svmDualCoef.addAll(slice(NDArrayUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, second - 1), offsets, first));
-				svmDualCoef.addAll(slice(NDArrayUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, first), offsets, second));
+				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, second - 1), offsets, first));
+				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, first), offsets, second));
 
 				// LibSVM: (decisionFunction > 0 ? first : second)
 				// PMML: (decisionFunction < 0 ? first : second)

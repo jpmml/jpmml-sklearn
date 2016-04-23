@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.ActivationFunctionType;
 import org.dmg.pmml.Connection;
 import org.dmg.pmml.DataType;
@@ -45,6 +44,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.Schema;
 
 public class NeuralNetworkUtil {
@@ -120,7 +120,7 @@ public class NeuralNetworkUtil {
 			List<?> coefMatrix = coef.getArrayContent();
 
 			for(int row = 0; row < rows; row++){
-				List<?> weights = NDArrayUtil.getRow(coefMatrix, rows, columns, row);
+				List<?> weights = MatrixUtil.getRow(coefMatrix, rows, columns, row);
 
 				connect(entities.get(row), neurons, weights);
 			}

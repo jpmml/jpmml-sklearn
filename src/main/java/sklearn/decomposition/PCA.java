@@ -20,7 +20,6 @@ package sklearn.decomposition;
 
 import java.util.List;
 
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
@@ -28,6 +27,7 @@ import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.MatrixUtil;
 import sklearn.ManyToManyTransformer;
 
 public class PCA extends ManyToManyTransformer {
@@ -64,7 +64,7 @@ public class PCA extends ManyToManyTransformer {
 		List<? extends Number> components = getComponents();
 		List<? extends Number> mean = getMean();
 
-		List<? extends Number> component = NDArrayUtil.getRow(components, numberOfComponents, numberOfFeatures, index);
+		List<? extends Number> component = MatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, index);
 
 		Apply apply = new Apply("sum");
 

@@ -23,7 +23,6 @@ import java.util.List;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.Array;
 import org.dmg.pmml.Cluster;
 import org.dmg.pmml.ClusteringField;
@@ -40,6 +39,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Clusterer;
 
@@ -75,7 +75,7 @@ public class KMeans extends Clusterer {
 		List<Cluster> clusters = new ArrayList<>();
 
 		for(int i = 0; i < numberOfClusters; i++){
-			Array array = PMMLUtil.createRealArray(NDArrayUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
+			Array array = PMMLUtil.createRealArray(MatrixUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
 
 			Cluster cluster = new Cluster()
 				.setId(String.valueOf(i))

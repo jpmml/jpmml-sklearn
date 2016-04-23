@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FeatureType;
@@ -38,6 +37,7 @@ import org.dmg.pmml.RegressionModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
@@ -80,7 +80,7 @@ public class BaseLinearClassifier extends Classifier {
 
 			targetCategories = Lists.reverse(targetCategories);
 
-			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
+			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
 
 			return EstimatorUtil.encodeBinaryLogisticClassifier(targetCategories, regressionModel, -1d, hasProbabilityDistribution, schema);
 		} else
@@ -94,7 +94,7 @@ public class BaseLinearClassifier extends Classifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0; i < targetCategories.size(); i++){
-				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), NDArrayUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), "logit", segmentSchema);
+				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), "logit", segmentSchema);
 
 				regressionModels.add(regressionModel);
 			}

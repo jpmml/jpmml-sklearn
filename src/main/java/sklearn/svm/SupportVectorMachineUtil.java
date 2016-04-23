@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import numpy.core.NDArrayUtil;
 import org.dmg.pmml.Array;
 import org.dmg.pmml.Coefficient;
 import org.dmg.pmml.Coefficients;
@@ -43,6 +42,7 @@ import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
+import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class SupportVectorMachineUtil {
 		Double defaultValue = Double.valueOf(0d);
 
 		for(int i = 0; i < numberOfVectors; i++){
-			List<? extends Number> values = NDArrayUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
+			List<? extends Number> values = MatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
 
 			BitSet vectorFeatures = ValueUtil.getIndices(values, defaultValue);
 
@@ -96,7 +96,7 @@ public class SupportVectorMachineUtil {
 
 			VectorInstance vectorInstance = new VectorInstance(id);
 
-			List<? extends Number> values = NDArrayUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
+			List<? extends Number> values = MatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
 
 			if(numberOfUsedFeatures < numberOfFeatures){
 				values = ValueUtil.filterByIndices(values, features);
