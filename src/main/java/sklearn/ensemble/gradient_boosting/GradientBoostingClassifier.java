@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FeatureType;
@@ -33,12 +32,14 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.RegressionNormalizationMethodType;
+import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -81,13 +82,11 @@ public class GradientBoostingClassifier extends Classifier {
 				throw new IllegalArgumentException();
 			}
 
-			targetCategories = Lists.reverse(targetCategories);
-
 			double coefficient = loss.getCoefficient();
 
-			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(0), estimators, init.getPriorProbability(0), learningRate, null, segmentSchema);
+			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(1), estimators, init.getPriorProbability(0), learningRate, null, segmentSchema);
 
-			return EstimatorUtil.encodeBinaryLogisticClassifier(targetCategories, miningModel, coefficient, true, schema);
+			return MiningModelUtil.createBinaryLogisticClassification(schema, miningModel, coefficient, true);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -104,7 +103,7 @@ public class GradientBoostingClassifier extends Classifier {
 				miningModels.add(miningModel);
 			}
 
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, miningModels, true, schema);
+			return MiningModelUtil.createClassification(schema, miningModels, RegressionNormalizationMethodType.SIMPLEMAX, true);
 		} else
 
 		{

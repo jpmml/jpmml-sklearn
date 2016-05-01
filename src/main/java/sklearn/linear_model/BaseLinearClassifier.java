@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FeatureType;
@@ -34,11 +33,13 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.RegressionModel;
+import org.dmg.pmml.RegressionNormalizationMethodType;
+import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 
@@ -78,11 +79,9 @@ public class BaseLinearClassifier extends Classifier {
 				throw new IllegalArgumentException();
 			}
 
-			targetCategories = Lists.reverse(targetCategories);
+			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(1), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
 
-			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(0), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
-
-			return EstimatorUtil.encodeBinaryLogisticClassifier(targetCategories, regressionModel, -1d, hasProbabilityDistribution, schema);
+			return MiningModelUtil.createBinaryLogisticClassification(schema, regressionModel, -1d, hasProbabilityDistribution);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -99,7 +98,7 @@ public class BaseLinearClassifier extends Classifier {
 				regressionModels.add(regressionModel);
 			}
 
-			return EstimatorUtil.encodeMultinomialClassifier(targetCategories, regressionModels, hasProbabilityDistribution, schema);
+			return MiningModelUtil.createClassification(schema, regressionModels, RegressionNormalizationMethodType.SIMPLEMAX, hasProbabilityDistribution);
 		} else
 
 		{

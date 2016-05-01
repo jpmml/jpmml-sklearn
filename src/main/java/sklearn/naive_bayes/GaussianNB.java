@@ -34,12 +34,11 @@ import org.dmg.pmml.TargetValueCounts;
 import org.dmg.pmml.TargetValueStat;
 import org.dmg.pmml.TargetValueStats;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 
 public class GaussianNB extends Classifier {
 
@@ -81,15 +80,18 @@ public class GaussianNB extends Classifier {
 		}
 
 		FieldName targetField = schema.getTargetField();
+		if(targetField == null){
+			throw new IllegalArgumentException();
+		}
 
 		List<Integer> classCount = getClassCount();
 
 		BayesOutput bayesOutput = new BayesOutput(targetField, null)
 			.setTargetValueCounts(encodeTargetValueCounts(targetCategories, classCount));
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(targetField, schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
-		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+		Output output = ModelUtil.createProbabilityOutput(schema);
 
 		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunctionType.CLASSIFICATION, miningSchema, bayesInputs, bayesOutput)
 			.setOutput(output);

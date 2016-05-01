@@ -19,7 +19,7 @@
 package sklearn.linear_model;
 
 import org.dmg.pmml.MiningModel;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.Schema;
 
 public class LogisticRegression extends BaseLinearClassifier {
 

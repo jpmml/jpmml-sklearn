@@ -28,7 +28,7 @@ import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.Schema;
 import sklearn.Estimator;
 import sklearn.tree.HasTree;
 import sklearn.tree.TreeModelUtil;
@@ -44,7 +44,7 @@ public class BaseForestUtil {
 
 		Segmentation segmentation = MiningModelUtil.createSegmentation(multipleModelMethod, treeModels);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
 			.setSegmentation(segmentation);

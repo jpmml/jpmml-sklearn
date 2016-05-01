@@ -29,8 +29,8 @@ import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
 
 public class BaggingRegressor extends Regressor {

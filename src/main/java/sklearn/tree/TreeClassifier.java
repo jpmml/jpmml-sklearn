@@ -22,9 +22,9 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 
 abstract
 public class TreeClassifier extends Classifier implements HasTree {
@@ -40,7 +40,7 @@ public class TreeClassifier extends Classifier implements HasTree {
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+		Output output = ModelUtil.createProbabilityOutput(schema);
 
 		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, schema)
 			.setOutput(output);

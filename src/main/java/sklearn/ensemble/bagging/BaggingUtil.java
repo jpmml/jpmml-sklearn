@@ -37,10 +37,10 @@ import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Segmentation;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
-import org.jpmml.sklearn.Schema;
 import sklearn.Estimator;
 
 public class BaggingUtil {
@@ -73,7 +73,7 @@ public class BaggingUtil {
 
 		Segmentation segmentation = MiningModelUtil.createSegmentation(multipleModelMethod, models);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema.getTargetField(), schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
 			.setSegmentation(segmentation);

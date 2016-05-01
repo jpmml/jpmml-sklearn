@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.NeuralNetwork;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.HasArray;
-import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
 
 public class MLPRegressor extends Regressor {

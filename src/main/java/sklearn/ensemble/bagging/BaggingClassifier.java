@@ -30,10 +30,10 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
+import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 
 public class BaggingClassifier extends Classifier {
 
@@ -71,7 +71,7 @@ public class BaggingClassifier extends Classifier {
 			}
 		}
 
-		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+		Output output = ModelUtil.createProbabilityOutput(schema);
 
 		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, multipleModelMethod, MiningFunctionType.CLASSIFICATION, schema)
 			.setOutput(output);

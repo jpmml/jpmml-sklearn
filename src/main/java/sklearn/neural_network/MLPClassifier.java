@@ -23,10 +23,10 @@ import java.util.List;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.NeuralNetwork;
 import org.dmg.pmml.Output;
+import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.HasArray;
-import org.jpmml.sklearn.Schema;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 
 public class MLPClassifier extends Classifier {
 
@@ -48,7 +48,7 @@ public class MLPClassifier extends Classifier {
 		List<? extends HasArray> coefs = getCoefs();
 		List<? extends HasArray> intercepts = getIntercepts();
 
-		Output output = EstimatorUtil.encodeClassifierOutput(schema);
+		Output output = ModelUtil.createProbabilityOutput(schema);
 
 		NeuralNetwork neuralNetwork = NeuralNetworkUtil.encodeNeuralNetwork(MiningFunctionType.CLASSIFICATION, activation, coefs, intercepts, schema)
 			.setOutput(output);

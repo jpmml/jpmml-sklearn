@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningModel;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
 import sklearn.tree.DecisionTreeRegressor;
 

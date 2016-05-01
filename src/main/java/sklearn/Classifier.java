@@ -30,9 +30,10 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.Schema;
 
 abstract
 public class Classifier extends Estimator {
@@ -47,8 +48,8 @@ public class Classifier extends Estimator {
 
 	@Override
 	public Schema createSchema(){
-		FieldName targetField = createTargetField();
-		List<FieldName> activeFields = createActiveFields(getNumberOfFeatures());
+		FieldName targetField = SchemaUtil.createTargetField();
+		List<FieldName> activeFields = SchemaUtil.createActiveFields(getNumberOfFeatures());
 
 		Function<Object, String> function = new Function<Object, String>(){
 

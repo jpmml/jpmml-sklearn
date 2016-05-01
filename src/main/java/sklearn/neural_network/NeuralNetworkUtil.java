@@ -42,10 +42,10 @@ import org.dmg.pmml.NnNormalizationMethodType;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.MatrixUtil;
-import org.jpmml.sklearn.Schema;
 
 public class NeuralNetworkUtil {
 
@@ -175,7 +175,7 @@ public class NeuralNetworkUtil {
 				break;
 		}
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema.getTargetField(), activeFields);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, miningSchema, neuralInputs, neuralLayers)
 			.setNeuralOutputs(neuralOutputs);
@@ -253,9 +253,9 @@ public class NeuralNetworkUtil {
 		NeuralOutputs neuralOutputs = new NeuralOutputs();
 
 		for(int i = 0; i < targetCategories.size(); i++){
-			Entity entity = entities.get(i);
-
 			String targetCategory = targetCategories.get(i);
+
+			Entity entity = entities.get(i);
 
 			DerivedField derivedField = new DerivedField(OpType.CATEGORICAL, DataType.STRING)
 				.setExpression(new NormDiscrete(targetField, targetCategory));

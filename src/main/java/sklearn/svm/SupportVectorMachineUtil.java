@@ -40,10 +40,10 @@ import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorFields;
 import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.MatrixUtil;
-import org.jpmml.sklearn.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -28,6 +28,7 @@ import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.Extension;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.Schema;
 import org.jpmml.model.MetroJAXBUtil;
 import sklearn.Estimator;
 import sklearn_pandas.DataFrameMapper;

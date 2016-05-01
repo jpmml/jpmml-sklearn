@@ -21,7 +21,7 @@ package sklearn.tree;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
 abstract

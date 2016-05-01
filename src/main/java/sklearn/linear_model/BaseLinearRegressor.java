@@ -22,8 +22,8 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.RegressionModel;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.Regressor;
 
 abstract

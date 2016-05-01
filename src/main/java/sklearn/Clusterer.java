@@ -22,7 +22,8 @@ import java.util.List;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.FieldName;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaUtil;
 
 abstract
 public class Clusterer extends Estimator {
@@ -33,7 +34,7 @@ public class Clusterer extends Estimator {
 
 	@Override
 	public Schema createSchema(){
-		List<FieldName> activeFields = createActiveFields(getNumberOfFeatures());
+		List<FieldName> activeFields = SchemaUtil.createActiveFields(getNumberOfFeatures());
 
 		Schema schema = new Schema(activeFields);
 

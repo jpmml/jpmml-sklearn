@@ -24,7 +24,8 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaUtil;
 
 abstract
 public class Regressor extends Estimator {
@@ -35,8 +36,8 @@ public class Regressor extends Estimator {
 
 	@Override
 	public Schema createSchema(){
-		FieldName targetField = createTargetField();
-		List<FieldName> activeFields = createActiveFields(getNumberOfFeatures());
+		FieldName targetField = SchemaUtil.createTargetField();
+		List<FieldName> activeFields = SchemaUtil.createActiveFields(getNumberOfFeatures());
 
 		Schema schema = new Schema(targetField, activeFields);
 

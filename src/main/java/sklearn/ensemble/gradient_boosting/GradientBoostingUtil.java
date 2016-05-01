@@ -37,8 +37,8 @@ import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.Schema;
 import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.TreeModelUtil;
@@ -69,9 +69,7 @@ public class GradientBoostingUtil {
 				.setOutput(output);
 
 			models.add(miningModel);
-		}
-
-		FieldName targetField = schema.getTargetField();
+		} // End block
 
 		{
 			MiningField miningField = ModelUtil.createMiningField(sumField);
@@ -82,6 +80,7 @@ public class GradientBoostingUtil {
 
 			MiningSchema miningSchema = new MiningSchema();
 
+			FieldName targetField = schema.getTargetField();
 			if(targetField != null){
 				miningSchema.addMiningFields(ModelUtil.createMiningField(targetField, FieldUsageType.TARGET));
 			}
@@ -96,7 +95,7 @@ public class GradientBoostingUtil {
 
 		Segmentation segmentation = MiningModelUtil.createSegmentation(MultipleModelMethodType.MODEL_CHAIN, models);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(targetField, schema.getActiveFields());
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, miningSchema)
 			.setSegmentation(segmentation);

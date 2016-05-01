@@ -24,7 +24,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 import sklearn.tree.TreeRegressor;
 

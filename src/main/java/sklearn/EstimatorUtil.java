@@ -18,27 +18,15 @@
  */
 package sklearn;
 
-import java.util.Collections;
-import java.util.List;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ParameterField;
-import org.jpmml.converter.MiningModelUtil;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.sklearn.Schema;
+import org.jpmml.converter.Schema;
 
 public class EstimatorUtil {
 
@@ -50,37 +38,6 @@ public class EstimatorUtil {
 		Schema result = new Schema(null, schema.getTargetCategories(), schema.getActiveFields());
 
 		return result;
-	}
-
-	static
-	public MiningModel encodeBinaryLogisticClassifier(List<String> targetCategories, Model model, double coefficient, boolean hasProbabilityDistribution, Schema schema){
-		FieldName inputField = Lists.transform(Collections.singletonList(model), EstimatorUtil.LAST_OUTPUT).get(0);
-
-		MiningModel miningModel = MiningModelUtil.createBinaryLogisticClassification(schema.getTargetField(), targetCategories, schema.getActiveFields(), model, inputField, coefficient, hasProbabilityDistribution);
-
-		return miningModel;
-	}
-
-	static
-	public MiningModel encodeMultinomialClassifier(List<String> targetCategories, List<? extends Model> models, boolean hasProbabilityDistribution, Schema schema){
-		List<FieldName> inputFields = Lists.transform(models, EstimatorUtil.LAST_OUTPUT);
-
-		MiningModel miningModel = MiningModelUtil.createClassification(schema.getTargetField(), targetCategories, schema.getActiveFields(), models, inputFields, hasProbabilityDistribution);
-
-		return miningModel;
-	}
-
-	static
-	public Output encodeClassifierOutput(Schema schema){
-		List<String> targetCategories = schema.getTargetCategories();
-
-		if(targetCategories == null || targetCategories.isEmpty()){
-			return null;
-		}
-
-		Output output = new Output(ModelUtil.createProbabilityFields(targetCategories));
-
-		return output;
 	}
 
 	static
@@ -112,16 +69,4 @@ public class EstimatorUtil {
 
 		return defineFunction;
 	}
-
-	private static final Function<Model, FieldName> LAST_OUTPUT = new Function<Model, FieldName>(){
-
-		@Override
-		public FieldName apply(Model model){
-			Output output = model.getOutput();
-
-			OutputField outputField = Iterables.getLast(output.getOutputFields());
-
-			return outputField.getName();
-		}
-	};
 }
