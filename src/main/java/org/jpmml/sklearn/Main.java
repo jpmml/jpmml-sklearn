@@ -43,7 +43,7 @@ public class Main {
 	private File estimatorInput = null;
 
 	@Parameter (
-		names = {"--repr-estimator"},
+		names = "--repr-estimator",
 		description = "Estimator string representation",
 		hidden = true
 	)

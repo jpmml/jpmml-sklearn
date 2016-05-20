@@ -69,14 +69,8 @@ public class Scalar extends CClassDict implements HasArray {
 		DType dtype = getDType();
 		byte[] obj = getObj();
 
-		try {
-			InputStream is = new ByteArrayInputStream(obj);
-
-			try {
-				return (List<?>)NDArrayUtil.parseData(is, dtype, new Object[0]);
-			} finally {
-				is.close();
-			}
+		try(InputStream is = new ByteArrayInputStream(obj)){
+			return (List<?>)NDArrayUtil.parseData(is, dtype, new Object[0]);
 		} catch(IOException ioe){
 			throw new RuntimeException(ioe);
 		}

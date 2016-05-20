@@ -56,7 +56,7 @@ public class TreeModelUtil {
 			}
 		};
 
-		return Lists.transform(estimators, function);
+		return Lists.newArrayList(Lists.transform(estimators, function));
 	}
 
 	static

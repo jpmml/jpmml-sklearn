@@ -111,14 +111,8 @@ public class NDArray extends CClassDict implements HasArray {
 			return data;
 		}
 
-		try {
-			InputStream is = new ByteArrayInputStream((byte[])data);
-
-			try {
-				return NDArrayUtil.parseData(is, descr, shape);
-			} finally {
-				is.close();
-			}
+		try(InputStream is = new ByteArrayInputStream((byte[])data)){
+			return NDArrayUtil.parseData(is, descr, shape);
 		} catch(IOException ioe){
 			throw new RuntimeException(ioe);
 		}

@@ -69,14 +69,8 @@ public class NDArrayWrapper extends ClassDict implements HasArray {
 
 	private NDArray loadContent(){
 
-		try {
-			InputStream is = getInputStream();
-
-			try {
-				return NDArrayUtil.parseNpy(is);
-			} finally {
-				is.close();
-			}
+		try(InputStream is = getInputStream()){
+			return NDArrayUtil.parseNpy(is);
 		} catch(IOException ioe){
 			throw new RuntimeException(ioe);
 		}
