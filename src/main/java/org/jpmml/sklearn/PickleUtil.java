@@ -90,6 +90,8 @@ import sklearn.tree.RegressionCriterion;
 import sklearn.tree.Tree;
 import sklearn_pandas.DataFrameMapper;
 import sklearn_pandas.TransformerPipeline;
+import xgboost.sklearn.Booster;
+import xgboost.sklearn.XGBRegressor;
 
 public class PickleUtil {
 
@@ -192,11 +194,16 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn_pandas", "DataFrameMapper", DataFrameMapper.class), // sklearn_pandas 0.X
 			new ObjectConstructor("sklearn_pandas.dataframe_mapper", "DataFrameMapper", DataFrameMapper.class), // sklearn_pandas 1.X
 			new ObjectConstructor("sklearn_pandas.pipeline", "TransformerPipeline", TransformerPipeline.class),
+			new ObjectConstructor("xgboost.core", "Booster", Booster.class),
+			new ObjectConstructor("xgboost.sklearn", "XGBRegressor", XGBRegressor.class),
 		};
 
 		for(ObjectConstructor constructor : constructors){
 			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
 		}
+
+		// XXX
+		Unpickler.registerConstructor("builtins", "bytearray", new SmartByteArrayConstructor());
 
 		try(InputStream is = storage.getObject()){
 			Unpickler unpickler = new Unpickler();

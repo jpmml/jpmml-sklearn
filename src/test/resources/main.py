@@ -17,6 +17,7 @@ from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncod
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, SVC, SVR
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
+from xgboost.sklearn import XGBRegressor
 
 import numpy
 import pandas
@@ -280,6 +281,7 @@ build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.5), "LinearRegressionEnsembleAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
 build_auto(RidgeCV(), "RidgeAuto")
+build_auto(XGBRegressor(), "XGBAuto")
 
 housing_df = load_csv("Housing.csv")
 

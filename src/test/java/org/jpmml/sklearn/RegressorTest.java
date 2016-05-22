@@ -18,6 +18,7 @@
  */
 package org.jpmml.sklearn;
 
+import org.jpmml.evaluator.Batch;
 import org.junit.Test;
 
 public class RegressorTest extends EstimatorTest {
@@ -70,6 +71,14 @@ public class RegressorTest extends EstimatorTest {
 	@Test
 	public void evaluateRidgeAuto() throws Exception {
 		evaluate("Ridge", "Auto");
+	}
+
+	@Test
+	public void evaluateXGBAuto() throws Exception {
+
+		try(Batch batch = createBatch("XGB", "Auto")){
+			evaluate(batch, null, 1e-6, 1e-6);
+		}
 	}
 
 	@Test

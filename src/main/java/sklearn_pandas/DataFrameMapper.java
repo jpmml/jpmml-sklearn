@@ -48,6 +48,7 @@ import org.dmg.pmml.NeuralOutput;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.Target;
 import org.dmg.pmml.TransformationDictionary;
 import org.dmg.pmml.Value;
 import org.dmg.pmml.Visitor;
@@ -307,6 +308,13 @@ public class DataFrameMapper extends ClassDict {
 				}
 
 				return super.visit(neuralOutput);
+			}
+
+			@Override
+			public VisitorAction visit(Target target){
+				target.setField(filterName(target.getField()));
+
+				return super.visit(target);
 			}
 
 			private FieldName filterName(FieldName name){
