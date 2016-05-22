@@ -17,7 +17,7 @@ from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncod
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, SVC, SVR
 from sklearn_pandas import DataFrameMapper
 from pandas import DataFrame
-from xgboost.sklearn import XGBRegressor
+from xgboost.sklearn import XGBClassifier, XGBRegressor
 
 import numpy
 import pandas
@@ -141,6 +141,7 @@ build_audit(GaussianNB(), "NaiveBayesAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
+build_audit(XGBClassifier(objective = "binary:logistic"), "XGBAudit")
 
 versicolor_df = load_csv("Versicolor.csv")
 
@@ -230,6 +231,7 @@ build_iris(SGDClassifier(random_state = 13, n_iter = 100), "SGDIris", with_proba
 build_iris(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogIris")
 build_iris(SVC(), "SVCIris", with_proba = False)
 build_iris(NuSVC(), "NuSVCIris", with_proba = False)
+build_iris(XGBClassifier(objective = "multi:softmax"), "XGBIris")
 
 #
 # Regression
@@ -281,7 +283,7 @@ build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.5), "LinearRegressionEnsembleAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
 build_auto(RidgeCV(), "RidgeAuto")
-build_auto(XGBRegressor(), "XGBAuto")
+build_auto(XGBRegressor(objective = "reg:linear"), "XGBAuto")
 
 housing_df = load_csv("Housing.csv")
 

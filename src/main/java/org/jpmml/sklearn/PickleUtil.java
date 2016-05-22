@@ -91,6 +91,7 @@ import sklearn.tree.Tree;
 import sklearn_pandas.DataFrameMapper;
 import sklearn_pandas.TransformerPipeline;
 import xgboost.sklearn.Booster;
+import xgboost.sklearn.XGBClassifier;
 import xgboost.sklearn.XGBRegressor;
 
 public class PickleUtil {
@@ -195,6 +196,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn_pandas.dataframe_mapper", "DataFrameMapper", DataFrameMapper.class), // sklearn_pandas 1.X
 			new ObjectConstructor("sklearn_pandas.pipeline", "TransformerPipeline", TransformerPipeline.class),
 			new ObjectConstructor("xgboost.core", "Booster", Booster.class),
+			new ObjectConstructor("xgboost.sklearn", "XGBClassifier", XGBClassifier.class),
 			new ObjectConstructor("xgboost.sklearn", "XGBRegressor", XGBRegressor.class),
 		};
 

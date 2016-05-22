@@ -65,6 +65,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`tree.ExtraTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
   * [XGBoost] (https://github.com/dmlc/xgboost):
+    * [`xgboost.XGBClassifier`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
     * [`xgboost.XGBRegressor`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
 * Production quality:
   * Complete test coverage.

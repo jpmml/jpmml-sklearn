@@ -18,34 +18,7 @@
  */
 package xgboost.sklearn;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningModel;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+public interface HasBooster {
 
-public class XGBRegressor extends Regressor implements HasBooster {
-
-	public XGBRegressor(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		return BoosterUtil.getNumberOfFeatures(this);
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		return BoosterUtil.encodeBooster(this, schema);
-	}
-
-	@Override
-	public Booster getBooster(){
-		return (Booster)get("_Booster");
-	}
+	Booster getBooster();
 }

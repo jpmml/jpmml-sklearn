@@ -18,14 +18,18 @@
  */
 package xgboost.sklearn;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningModel;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import org.jpmml.sklearn.HasArray;
+import sklearn.Classifier;
 
-public class XGBRegressor extends Regressor implements HasBooster {
+public class XGBClassifier extends Classifier implements HasBooster {
 
-	public XGBRegressor(String module, String name){
+	public XGBClassifier(String module, String name){
 		super(module, name);
 	}
 
@@ -37,6 +41,27 @@ public class XGBRegressor extends Regressor implements HasBooster {
 	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
+	}
+
+	@Override
+	public List<?> getClasses(){
+		List<Object> result = new ArrayList<>();
+
+		List<?> values = (List<?>)get("classes_");
+		for(Object value : values){
+
+			if(value instanceof HasArray){
+				HasArray hasArray = (HasArray)value;
+
+				result.addAll(hasArray.getArrayContent());
+			} else
+
+			{
+				result.add(value);
+			}
+		}
+
+		return result;
 	}
 
 	@Override

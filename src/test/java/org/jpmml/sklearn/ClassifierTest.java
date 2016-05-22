@@ -18,6 +18,7 @@
  */
 package org.jpmml.sklearn;
 
+import org.jpmml.evaluator.Batch;
 import org.junit.Test;
 
 public class ClassifierTest extends EstimatorTest {
@@ -75,6 +76,14 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateRidgeEnsembleAudit() throws Exception {
 		evaluate("RidgeEnsemble", "Audit");
+	}
+
+	@Test
+	public void evaluateXGBAudit() throws Exception {
+
+		try(Batch batch = createBatch("XGB", "Audit")){
+			evaluate(batch, null, 1e-5, 1e-5);
+		}
 	}
 
 	@Test
@@ -155,6 +164,14 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateNuSVCIris() throws Exception {
 		evaluate("NuSVC", "Iris");
+	}
+
+	@Test
+	public void evaluateXGBIris() throws Exception {
+
+		try(Batch batch = createBatch("XGB", "Iris")){
+			evaluate(batch, null, 1e-5, 1e-5);
+		}
 	}
 
 	@Test
