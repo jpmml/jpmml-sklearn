@@ -204,9 +204,6 @@ public class PickleUtil {
 			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
 		}
 
-		// XXX
-		Unpickler.registerConstructor("builtins", "bytearray", new SmartByteArrayConstructor());
-
 		try(InputStream is = storage.getObject()){
 			Unpickler unpickler = new Unpickler();
 
