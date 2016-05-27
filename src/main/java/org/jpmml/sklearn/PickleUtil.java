@@ -65,6 +65,9 @@ import sklearn.linear_model.stochastic_gradient.SGDClassifier;
 import sklearn.linear_model.stochastic_gradient.SGDRegressor;
 import sklearn.linear_model.stochastic_gradient.SquaredHinge;
 import sklearn.naive_bayes.GaussianNB;
+import sklearn.neighbors.BinaryTree;
+import sklearn.neighbors.DistanceMetric;
+import sklearn.neighbors.KNeighborsRegressor;
 import sklearn.neural_network.MLPClassifier;
 import sklearn.neural_network.MLPRegressor;
 import sklearn.preprocessing.Binarizer;
@@ -167,6 +170,9 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.linear_model.stochastic_gradient", "SGDClassifier", SGDClassifier.class),
 			new ObjectConstructor("sklearn.linear_model.stochastic_gradient", "SGDRegressor", SGDRegressor.class),
 			new ObjectConstructor("sklearn.naive_bayes", "GaussianNB", GaussianNB.class),
+			new ExtensionObjectConstructor("sklearn.neighbors.dist_metrics", "newObj", DistanceMetric.class),
+			new ExtensionObjectConstructor("sklearn.neighbors.kd_tree", "newObj", BinaryTree.class),
+			new ObjectConstructor("sklearn.neighbors.regression", "KNeighborsRegressor", KNeighborsRegressor.class),
 			new ObjectConstructor("sklearn.neural_network.multilayer_perceptron", "MLPClassifier", MLPClassifier.class),
 			new ObjectConstructor("sklearn.neural_network.multilayer_perceptron", "MLPRegressor", MLPRegressor.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),

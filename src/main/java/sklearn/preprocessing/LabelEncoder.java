@@ -18,10 +18,10 @@
  */
 package sklearn.preprocessing;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
@@ -33,8 +33,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Row;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.jpmml.sklearn.DOMUtil;
 import sklearn.OneToOneTransformer;
 
 public class LabelEncoder extends OneToOneTransformer {
@@ -59,24 +58,18 @@ public class LabelEncoder extends OneToOneTransformer {
 			.addFieldColumnPairs(new FieldColumnPair(name, "input"))
 			.setOutputColumn("output");
 
-		DocumentBuilder documentBuilder = createDocumentBuilder();
+		DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
 
 		InlineTable inlineTable = new InlineTable();
+
+		List<String> keys = Arrays.asList("input", "output");
 
 		List<?> classes = getClasses();
 
 		for(int i = 0; i < classes.size(); i++){
-			Row row = new Row();
+			List<String> values = Arrays.asList(ValueUtil.formatValue(classes.get(i)), String.valueOf(i));
 
-			Document document = documentBuilder.newDocument();
-
-			Element inputCell = document.createElement("input");
-			inputCell.setTextContent(ValueUtil.formatValue(classes.get(i)));
-
-			Element outputCell = document.createElement("output");
-			outputCell.setTextContent(String.valueOf(i));
-
-			row.addContent(inputCell, outputCell);
+			Row row = DOMUtil.createRow(documentBuilder, keys, values);
 
 			inlineTable.addRows(row);
 		}
@@ -89,17 +82,5 @@ public class LabelEncoder extends OneToOneTransformer {
 	@Override
 	public List<?> getClasses(){
 		return ClassDictUtil.getArray(this, "classes_");
-	}
-
-	static
-	private DocumentBuilder createDocumentBuilder(){
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		documentBuilderFactory.setNamespaceAware(true);
-
-		try {
-			return documentBuilderFactory.newDocumentBuilder();
-		} catch(Exception e){
-			throw new RuntimeException(e);
-		}
 	}
 }

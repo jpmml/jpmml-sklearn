@@ -42,6 +42,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.InstanceField;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NeuralOutput;
@@ -280,6 +281,13 @@ public class DataFrameMapper extends ClassDict {
 				bayesOutput.setFieldName(filterName(bayesOutput.getFieldName()));
 
 				return super.visit(bayesOutput);
+			}
+
+			@Override
+			public VisitorAction visit(InstanceField instanceField){
+				instanceField.setField(filterName(instanceField.getField()));
+
+				return super.visit(instanceField);
 			}
 
 			@Override
