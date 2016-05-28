@@ -24,6 +24,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.dmg.pmml.Row;
+import org.jpmml.converter.ValueUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -33,7 +34,7 @@ public class DOMUtil {
 	}
 
 	static
-	public Row createRow(DocumentBuilder documentBuilder, List<String> keys, List<String> values){
+	public Row createRow(DocumentBuilder documentBuilder, List<String> keys, List<?> values){
 		Row row = new Row();
 
 		Document document = documentBuilder.newDocument();
@@ -44,7 +45,7 @@ public class DOMUtil {
 
 		for(int i = 0; i < keys.size(); i++){
 			Element element = document.createElement(keys.get(i));
-			element.setTextContent(values.get(i));
+			element.setTextContent(ValueUtil.formatValue(values.get(i)));
 
 			row.addContent(element);
 		}

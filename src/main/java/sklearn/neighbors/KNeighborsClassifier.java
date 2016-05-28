@@ -20,18 +20,20 @@ package sklearn.neighbors;
 
 import java.util.List;
 
-import org.dmg.pmml.ContinuousScoringMethodType;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.dmg.pmml.CategoricalScoringMethodType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.Regressor;
+import sklearn.Classifier;
 
-public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasTrainingData {
+public class KNeighborsClassifier extends Classifier implements HasNeighbors, HasTrainingData {
 
-	public KNeighborsRegressor(String module, String name){
+	public KNeighborsClassifier(String module, String name){
 		super(module, name);
 	}
 
@@ -54,8 +56,8 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
-		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunctionType.REGRESSION, numberOfInstances, numberOfFeatures, schema)
-			.setContinuousScoringMethod(ContinuousScoringMethodType.AVERAGE);
+		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunctionType.CLASSIFICATION, numberOfInstances, numberOfFeatures, schema)
+			.setCategoricalScoringMethod(CategoricalScoringMethodType.MAJORITY_VOTE);
 
 		return nearestNeighborModel;
 	}
@@ -81,8 +83,23 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	}
 
 	@Override
-	public List<? extends Number> getY(){
-		return (List)ClassDictUtil.getArray(this, "_y");
+	public List<?> getY(){
+		final
+		List<?> classes = getClasses();
+
+		Function<Number, Object> function = new Function<Number, Object>(){
+
+			@Override
+			public Object apply(Number number){
+				int index = ValueUtil.asInt(number);
+
+				return classes.get(index);
+			}
+		};
+
+		List<? extends Number> y = (List)ClassDictUtil.getArray(this, "_y");
+
+		return Lists.transform(y, function);
 	}
 
 	@Override

@@ -107,6 +107,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateKNNIris() throws Exception {
+		evaluate("KNN", "Iris");
+	}
+
+	@Test
 	public void evaluateLinearDiscriminantAnalysisIris() throws Exception {
 		evaluate("LinearDiscriminantAnalysis", "Iris");
 	}
@@ -172,6 +177,11 @@ public class ClassifierTest extends EstimatorTest {
 		try(Batch batch = createBatch("XGB", "Iris")){
 			evaluate(batch, null, 1e-5, 1e-5);
 		}
+	}
+
+	@Test
+	public void evaluateKNNVersicolor() throws Exception {
+		evaluate("KNN", "Versicolor");
 	}
 
 	@Test
