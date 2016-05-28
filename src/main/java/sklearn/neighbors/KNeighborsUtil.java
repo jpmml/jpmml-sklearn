@@ -27,6 +27,7 @@ import org.dmg.pmml.CityBlock;
 import org.dmg.pmml.CompareFunctionType;
 import org.dmg.pmml.ComparisonMeasure;
 import org.dmg.pmml.Euclidean;
+import org.dmg.pmml.FeatureType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.InstanceField;
@@ -38,6 +39,8 @@ import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Minkowski;
 import org.dmg.pmml.NearestNeighborModel;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Row;
 import org.dmg.pmml.TrainingInstances;
 import org.jpmml.converter.ModelUtil;
@@ -110,16 +113,31 @@ public class KNeighborsUtil {
 
 		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator.getMetric(), estimator.getP());
 
-		int numberOfNeighbors = estimator.getNumberOfNeighbors();
-
 		String weights = estimator.getWeights();
 		if(!(weights).equals("uniform")){
 			throw new IllegalArgumentException(weights);
 		}
 
+		int numberOfNeighbors = estimator.getNumberOfNeighbors();
+
+		List<OutputField> outputFields = new ArrayList<>(numberOfNeighbors);
+
+		for(int i = 0; i < numberOfNeighbors; i++){
+			int rank = (i + 1);
+
+			OutputField outputField = new OutputField(FieldName.create("neighbor_" + rank))
+				.setFeature(FeatureType.ENTITY_ID)
+				.setRank(rank);
+
+			outputFields.add(outputField);
+		}
+
+		Output output = new Output(outputFields);
+
 		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
-		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunctionType.REGRESSION, numberOfNeighbors, miningSchema, trainingInstances, comparisonMeasure, knnInputs);
+		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunctionType.REGRESSION, numberOfNeighbors, miningSchema, trainingInstances, comparisonMeasure, knnInputs)
+			.setOutput(output);
 
 		return nearestNeighborModel;
 	}

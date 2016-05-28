@@ -313,16 +313,20 @@ store_pkl(housing_mapper, "Housing.pkl")
 housing_X = housing[:, 0:13]
 housing_y = housing[:, 13]
 
-def build_housing(regressor, name, to_sparse = False):
+def build_housing(regressor, name, to_sparse = False, with_kneighbors = False):
 	if(to_sparse):
 		regressor = regressor.fit(sparse.csr_matrix(housing_X), housing_y)
 	else:
 		regressor = regressor.fit(housing_X, housing_y)
 	store_pkl(regressor, name + ".pkl")
 	medv = DataFrame(regressor.predict(housing_X), columns = ["MEDV"])
+	if(with_kneighbors == True):
+		kneighbors = regressor.kneighbors(housing_X)
+		medv_ids = DataFrame(kneighbors[1] + 1, columns = ["neighbor_" + str(x + 1) for x in range(regressor.n_neighbors)])
+		medv = pandas.concat((medv, medv_ids), axis = 1)
 	store_csv(medv, name + ".csv")
 
-build_housing(KNeighborsRegressor(), "KNNHousing")
+build_housing(KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), algorithm = "l-bfgs", random_state = 13, tol = 0.001, max_iter = 1000), "MLPHousing")
 build_housing(SGDRegressor(random_state = 13), "SGDHousing")
 build_housing(SVR(), "SVRHousing", to_sparse = True)

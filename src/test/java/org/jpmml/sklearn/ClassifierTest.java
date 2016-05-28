@@ -18,6 +18,10 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.Batch;
 import org.junit.Test;
 
@@ -108,7 +112,12 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateKNNIris() throws Exception {
-		evaluate("KNN", "Iris");
+
+		try(Batch batch = createBatch("KNN", "Iris")){
+			Set<FieldName> ignoredFields = createFieldList("neighbor", 5);
+
+			evaluate(batch, ignoredFields);
+		}
 	}
 
 	@Test
@@ -181,7 +190,12 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateKNNVersicolor() throws Exception {
-		evaluate("KNN", "Versicolor");
+
+		try(Batch batch = createBatch("KNN", "Versicolor")){
+			Set<FieldName> ignoredFields = createFieldList("neighbor", 5);
+
+			evaluate(batch, ignoredFields);
+		}
 	}
 
 	@Test
@@ -207,5 +221,16 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateNuSVCVersicolor() throws Exception {
 		evaluate("NuSVC", "Versicolor");
+	}
+
+	static
+	private Set<FieldName> createFieldList(String prefix, int count){
+		Set<FieldName> result = new LinkedHashSet<>();
+
+		for(int i = 0; i < count; i++){
+			result.add(FieldName.create(prefix + "_" + (i + 1)));
+		}
+
+		return result;
 	}
 }
