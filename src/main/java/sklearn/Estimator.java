@@ -19,21 +19,15 @@
 package sklearn;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
-import org.dmg.pmml.DataDictionary;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMML;
-import org.dmg.pmml.TransformationDictionary;
-import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.FeatureMapper;
 
 abstract
 public class Estimator extends BaseEstimator {
@@ -43,13 +37,10 @@ public class Estimator extends BaseEstimator {
 	}
 
 	abstract
-	public Schema createSchema();
+	public Model encodeModel(FeatureSchema schema);
 
 	abstract
-	public DataField encodeTargetField(FieldName name, List<String> targetCategories);
-
-	abstract
-	public Model encodeModel(Schema schema);
+	public Model encodeModel(FeatureMapper featureMapper);
 
 	public int getNumberOfFeatures(){
 		return ValueUtil.asInt((Number)get("n_features_"));
@@ -69,58 +60,7 @@ public class Estimator extends BaseEstimator {
 		return DataType.DOUBLE;
 	}
 
-	public DataDictionary encodeDataDictionary(Schema schema){
-		DataDictionary dataDictionary = new DataDictionary(null);
-
-		FieldName targetField = schema.getTargetField();
-		if(targetField != null){
-			DataField dataField = encodeTargetField(targetField, schema.getTargetCategories());
-
-			dataDictionary.addDataFields(dataField);
-		}
-
-		List<FieldName> activeFields = schema.getActiveFields();
-		for(FieldName activeField : activeFields){
-			DataField dataField = new DataField(activeField, getOpType(), getDataType());
-
-			dataDictionary.addDataFields(dataField);
-		}
-
-		return dataDictionary;
-	}
-
 	public Set<DefineFunction> encodeDefineFunctions(){
 		return Collections.emptySet();
-	}
-
-	public TransformationDictionary encodeTransformationDictionary(Schema schema){
-		Set<DefineFunction> defineFunctions = encodeDefineFunctions();
-
-		if(defineFunctions.isEmpty()){
-			return null;
-		}
-
-		TransformationDictionary transformationDictionary = new TransformationDictionary();
-
-		for(DefineFunction defineFunction : defineFunctions){
-			transformationDictionary.addDefineFunctions(defineFunction);
-		}
-
-		return transformationDictionary;
-	}
-
-	public PMML encodePMML(Schema schema){
-		DataDictionary dataDictionary = encodeDataDictionary(schema);
-
-		TransformationDictionary transformationDictionary = encodeTransformationDictionary(schema);
-
-		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn", "1.0-SNAPSHOT"), dataDictionary)
-			.setTransformationDictionary(transformationDictionary);
-
-		Model model = encodeModel(schema);
-
-		pmml.addModels(model);
-
-		return pmml;
 	}
 }

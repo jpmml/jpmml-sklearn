@@ -18,49 +18,58 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Apply;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.MultiTransformer;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
 
-public class MaxAbsScaler extends MultiTransformer {
+public class MaxAbsScaler extends Transformer {
 
 	public MaxAbsScaler(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getScaleShape();
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+		List<? extends Number> scale = getScale();
 
-		return shape[0];
-	}
-
-	@Override
-	public Expression encode(int index, FieldName name){
-		Expression expression = new FieldRef(name);
-
-		Number scale = Iterables.get(getScale(), index);
-
-		if(!ValueUtil.isOne(scale)){
-			expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(scale));
+		if(inputFeatures.size() != scale.size()){
+			throw new IllegalArgumentException();
 		}
 
-		// "$name / scale"
-		return expression;
+		List<Feature> features = new ArrayList<>();
+
+		for(int i = 0; i < inputFeatures.size(); i++){
+			Feature inputFeature = inputFeatures.get(i);
+
+			Number value = scale.get(i);
+			if(ValueUtil.isOne(value)){
+				features.add(inputFeature);
+
+				continue;
+			}
+
+			// "$name / scale"
+			Apply apply = PMMLUtil.createApply("/", new FieldRef(inputFeature.getName()), PMMLUtil.createConstant(value));
+
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
+
+			features.add(new ContinuousFeature(derivedField));
+		}
+
+		return features;
 	}
 
 	public List<? extends Number> getScale(){
 		return (List)ClassDictUtil.getArray(this, "scale_");
-	}
-
-	private int[] getScaleShape(){
-		return ClassDictUtil.getShape(this, "scale_", 1);
 	}
 }

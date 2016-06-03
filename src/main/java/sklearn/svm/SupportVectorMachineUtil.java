@@ -39,8 +39,9 @@ import org.dmg.pmml.SupportVectors;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorFields;
 import org.dmg.pmml.VectorInstance;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.MatrixUtil;
@@ -53,7 +54,7 @@ public class SupportVectorMachineUtil {
 	}
 
 	static
-	public VectorDictionary encodeVectorDictionary(List<Integer> support, List<? extends Number> supportVectors, int numberOfVectors, int numberOfFeatures, Schema schema){
+	public VectorDictionary encodeVectorDictionary(List<Integer> support, List<? extends Number> supportVectors, int numberOfVectors, int numberOfFeatures, FeatureSchema schema){
 		BitSet features = new BitSet(numberOfFeatures);
 
 		Double defaultValue = Double.valueOf(0d);
@@ -71,20 +72,22 @@ public class SupportVectorMachineUtil {
 
 		int numberOfUsedFeatures = features.cardinality();
 
-		List<FieldName> unusedActiveFields = new ArrayList<>();
+		List<FieldName> unusedNames = new ArrayList<>();
 
 		VectorFields vectorFields = new VectorFields();
 
 		for(int i = 0; i < numberOfFeatures; i++){
-			FieldName activeField = schema.getActiveField(i);
+			Feature feature = schema.getFeature(i);
+
+			FieldName name = feature.getName();
 
 			if(!features.get(i)){
-				unusedActiveFields.add(activeField);
+				unusedNames.add(name);
 
 				continue;
 			}
 
-			FieldRef fieldRef = new FieldRef(activeField);
+			FieldRef fieldRef = new FieldRef(name);
 
 			vectorFields.addFieldRefs(fieldRef);
 		}
@@ -117,8 +120,8 @@ public class SupportVectorMachineUtil {
 			vectorDictionary.addVectorInstances(vectorInstance);
 		}
 
-		if(!unusedActiveFields.isEmpty()){
-			logger.info("Skipped {} active field(s): {}", unusedActiveFields.size(), LoggerUtil.formatNameList(unusedActiveFields));
+		if(!unusedNames.isEmpty()){
+			logger.info("Skipped {} active field(s): {}", unusedNames.size(), LoggerUtil.formatNameList(unusedNames));
 		}
 
 		return vectorDictionary;

@@ -21,11 +21,13 @@ package sklearn;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.CaseFormat;
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.Feature;
+import org.jpmml.sklearn.FeatureMapper;
 
 abstract
 public class Transformer extends ClassDict {
@@ -35,13 +37,7 @@ public class Transformer extends ClassDict {
 	}
 
 	abstract
-	public int getNumberOfInputs();
-
-	abstract
-	public int getNumberOfOutputs();
-
-	abstract
-	public Expression encode(int index, List<FieldName> names);
+	public List<Feature> encodeFeatures(String id, List<Feature> features, FeatureMapper featureMapper);
 
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
@@ -53,5 +49,21 @@ public class Transformer extends ClassDict {
 
 	public List<?> getClasses(){
 		return Collections.emptyList();
+	}
+
+	protected String name(){
+		Class<? extends Transformer> clazz = getClass();
+
+		String name = clazz.getSimpleName();
+
+		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
+	}
+
+	protected FieldName createName(String id){
+		return FieldName.create(name() + id);
+	}
+
+	protected FieldName createName(String id, int index){
+		return FieldName.create(name() + id + "[" + index + "]");
 	}
 }

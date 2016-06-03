@@ -18,41 +18,24 @@
  */
 package sklearn.preprocessing;
 
-import org.dmg.pmml.Apply;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class MinMaxScalerTest {
+public class MinMaxScalerTest extends ScalerTest {
 
 	@Test
 	public void encode(){
-		FieldName name = FieldName.create("x");
-
 		MinMaxScaler scaler = new MinMaxScaler("sklearn.preprocessing.data", "MinMaxScaler");
 		scaler.put("min_", 2d);
 		scaler.put("scale_", 6d);
 
-		Expression expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof Apply);
-		assertEquals("+", ((Apply)expression).getFunction());
+		assertTransformedFeature(scaler, "+");
 
 		scaler.put("min_", 0d);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof Apply);
-		assertEquals("*", ((Apply)expression).getFunction());
+		assertTransformedFeature(scaler, "*");
 
 		scaler.put("scale_", 1d);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof FieldRef);
+		assertSameFeature(scaler);
 	}
 }

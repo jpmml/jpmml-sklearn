@@ -23,8 +23,8 @@ import java.util.List;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.NeuralNetwork;
 import org.dmg.pmml.Output;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.HasArray;
 import sklearn.Classifier;
 
@@ -42,7 +42,7 @@ public class MLPClassifier extends Classifier {
 	}
 
 	@Override
-	public NeuralNetwork encodeModel(Schema schema){
+	public NeuralNetwork encodeModel(FeatureSchema schema){
 		String activation = getActivation();
 
 		List<? extends HasArray> coefs = getCoefs();

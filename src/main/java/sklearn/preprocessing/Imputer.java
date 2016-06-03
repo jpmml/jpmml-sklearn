@@ -18,52 +18,67 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.MultiTransformer;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
 
-public class Imputer extends MultiTransformer {
+public class Imputer extends Transformer {
 
 	public Imputer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getStatisticsShape();
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+		List<? extends Number> statistics = getStatistics();
 
-		return shape[0];
-	}
-
-	@Override
-	public Expression encode(int index, FieldName name){
-		Object missingValues = getMissingValues();
-		Number statistics = Iterables.get(getStatistics(), index);
-
-		Expression expression = new FieldRef(name);
-
-		if(missingValues instanceof String){
-			expression = PMMLUtil.createApply("isMissing", expression);
-		} else
-
-		if(missingValues instanceof Number){
-			Number number = (Number)missingValues;
-
-			expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(number));
-		} else
-
-		{
+		if(statistics.size() != inputFeatures.size()){
 			throw new IllegalArgumentException();
 		}
 
-		// "($name == null) ? statistics : $name"
-		return PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statistics), new FieldRef(name));
+		Object missingValues = getMissingValues();
+
+		List<Feature> features = new ArrayList<>();
+
+		for(int i = 0; i < inputFeatures.size(); i++){
+			Feature inputFeature = inputFeatures.get(i);
+
+			Expression expression = new FieldRef(inputFeature.getName());
+
+			if(missingValues instanceof String){
+				expression = PMMLUtil.createApply("isMissing", expression);
+			} else
+
+			if(missingValues instanceof Number){
+				Number number = (Number)missingValues;
+
+				expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(number));
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
+
+			Number statisticValue = statistics.get(i);
+
+			// "($name == null) ? statistics : $name"
+			expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), new FieldRef(inputFeature.getName()));
+
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), expression);
+
+			features.add(new ContinuousFeature(derivedField));
+		}
+
+		return features;
 	}
 
 	public Object getMissingValues(){
@@ -72,9 +87,5 @@ public class Imputer extends MultiTransformer {
 
 	public List<? extends Number> getStatistics(){
 		return (List)ClassDictUtil.getArray(this, "statistics_");
-	}
-
-	private int[] getStatisticsShape(){
-		return ClassDictUtil.getShape(this, "statistics_", 1);
 	}
 }

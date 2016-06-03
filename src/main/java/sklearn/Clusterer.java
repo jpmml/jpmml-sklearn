@@ -18,12 +18,10 @@
  */
 package sklearn;
 
-import java.util.List;
-
-import org.dmg.pmml.DataField;
-import org.dmg.pmml.FieldName;
-import org.jpmml.converter.Schema;
+import org.dmg.pmml.Model;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.SchemaUtil;
+import org.jpmml.sklearn.FeatureMapper;
 
 abstract
 public class Clusterer extends Estimator {
@@ -33,16 +31,18 @@ public class Clusterer extends Estimator {
 	}
 
 	@Override
-	public Schema createSchema(){
-		List<FieldName> activeFields = SchemaUtil.createActiveFields(getNumberOfFeatures());
+	public Model encodeModel(FeatureMapper featureMapper){
 
-		Schema schema = new Schema(activeFields);
+		if(featureMapper.isEmpty()){
+			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
+		} else
 
-		return schema;
-	}
+		{
+			featureMapper.updateActiveFields(getNumberOfFeatures(), false, getOpType(), getDataType());
+		}
 
-	@Override
-	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
-		throw new UnsupportedOperationException();
+		FeatureSchema schema = featureMapper.createUnsupervisedSchema();
+
+		return encodeModel(schema);
 	}
 }

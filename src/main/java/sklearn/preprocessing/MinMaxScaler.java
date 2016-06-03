@@ -18,47 +18,66 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.MultiTransformer;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
 
-public class MinMaxScaler extends MultiTransformer {
+public class MinMaxScaler extends Transformer {
 
 	public MinMaxScaler(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getMinShape();
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+		List<? extends Number> min = getMin();
+		List<? extends Number> scale = getScale();
 
-		return shape[0];
-	}
-
-	@Override
-	public Expression encode(int index, FieldName name){
-		Number min = Iterables.get(getMin(), index);
-		Number scale = Iterables.get(getScale(), index);
-
-		Expression expression = new FieldRef(name);
-
-		if(!ValueUtil.isOne(scale)){
-			expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scale));
-		} // End if
-
-		if(!ValueUtil.isZero(min)){
-			expression = PMMLUtil.createApply("+", expression, PMMLUtil.createConstant(min));
+		if(inputFeatures.size() != min.size() || inputFeatures.size() != scale.size()){
+			throw new IllegalArgumentException();
 		}
 
-		// "($name * scale) + min"
-		return expression;
+		List<Feature> features = new ArrayList<>();
+
+		for(int i = 0; i < inputFeatures.size(); i++){
+			Feature inputFeature = inputFeatures.get(i);
+
+			Number minValue = min.get(i);
+			Number scaleValue = scale.get(i);
+
+			// "($name * scale) + min"
+			Expression expression = new FieldRef(inputFeature.getName());
+
+			if(!ValueUtil.isOne(scaleValue)){
+				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scaleValue));
+			} // End if
+
+			if(!ValueUtil.isZero(minValue)){
+				expression = PMMLUtil.createApply("+", expression, PMMLUtil.createConstant(minValue));
+			} // End if
+
+			if(expression instanceof FieldRef){
+				features.add(inputFeature);
+
+				continue;
+			}
+
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), expression);
+
+			features.add(new ContinuousFeature(derivedField));
+		}
+
+		return features;
 	}
 
 	public List<? extends Number> getMin(){
@@ -67,9 +86,5 @@ public class MinMaxScaler extends MultiTransformer {
 
 	public List<? extends Number> getScale(){
 		return (List)ClassDictUtil.getArray(this, "scale_");
-	}
-
-	private int[] getMinShape(){
-		return ClassDictUtil.getShape(this, "min_", 1);
 	}
 }

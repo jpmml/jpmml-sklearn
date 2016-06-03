@@ -18,50 +18,31 @@
  */
 package sklearn.preprocessing;
 
-import org.dmg.pmml.Apply;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class StandardScalerTest {
+public class StandardScalerTest extends ScalerTest {
 
 	@Test
 	public void encode(){
-		FieldName name = FieldName.create("x");
-
 		StandardScaler scaler = new StandardScaler("sklearn.preprocessing.data", "StandardScaler");
 		scaler.put("with_mean", Boolean.FALSE);
 		scaler.put("with_std", Boolean.FALSE);
 		scaler.put("mean_", 6d);
 		scaler.put("std_", 2d);
 
-		Expression expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof FieldRef);
+		assertSameFeature(scaler);
 
 		scaler.put("with_mean", Boolean.TRUE);
 		scaler.put("with_std", Boolean.TRUE);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof Apply);
-		assertEquals("/", ((Apply)expression).getFunction());
+		assertTransformedFeature(scaler, "/");
 
 		scaler.put("std_", 1d);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof Apply);
-		assertEquals("-", ((Apply)expression).getFunction());
+		assertTransformedFeature(scaler, "-");
 
 		scaler.put("mean_", 0d);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof FieldRef);
+		assertSameFeature(scaler);
 	}
 }

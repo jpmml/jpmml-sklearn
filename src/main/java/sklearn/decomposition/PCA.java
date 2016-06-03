@@ -18,82 +18,91 @@
  */
 package sklearn.decomposition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.MatrixUtil;
-import sklearn.ManyToManyTransformer;
+import sklearn.Transformer;
 
-public class PCA extends ManyToManyTransformer {
+public class PCA extends Transformer {
 
 	public PCA(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfInputs(){
-		int[] shape = getComponentsShape();
-
-		return shape[1];
-	}
-
-	@Override
-	public int getNumberOfOutputs(){
-		int[] shape = getComponentsShape();
-
-		return shape[0];
-	}
-
-	@Override
-	public Expression encode(int index, List<FieldName> names){
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		int[] shape = getComponentsShape();
 
 		int numberOfComponents = shape[0];
 		int numberOfFeatures = shape[1];
 
-		if(numberOfFeatures != names.size()){
+		if(inputFeatures.size() != numberOfFeatures){
 			throw new IllegalArgumentException();
 		}
 
 		List<? extends Number> components = getComponents();
 		List<? extends Number> mean = getMean();
 
-		List<? extends Number> component = MatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, index);
+		Boolean whiten = getWhiten();
 
-		Apply apply = new Apply("sum");
+		List<? extends Number> explainedVariance = (whiten ? getExplainedVariance() : null);
 
-		for(int i = 0; i < numberOfFeatures; i++){
-			FieldName name = names.get(i);
+		List<Feature> features = new ArrayList<>();
 
-			Expression expression = new FieldRef(name);
+		for(int i = 0; i < numberOfComponents; i++){
+			List<? extends Number> component = MatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
-			if(!ValueUtil.isZero(mean.get(i))){
-				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean.get(i)));
-			} // End if
+			Apply apply = new Apply("sum");
 
-			if(!ValueUtil.isOne(component.get(i))){
-				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(component.get(i)));
+			for(int j = 0; j < numberOfFeatures; j++){
+				Feature inputFeature = inputFeatures.get(j);
+
+				// "($name[i] - mean[i]) * component[i]"
+				Expression expression = new FieldRef(inputFeature.getName());
+
+				Number meanValue = mean.get(j);
+				if(!ValueUtil.isZero(meanValue)){
+					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
+				}
+
+				Number componentValue = component.get(j);
+				if(!ValueUtil.isOne(componentValue)){
+					expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(componentValue));
+				}
+
+				apply.addExpressions(expression);
 			}
 
-			// "($name[i] - mean[i]) * component[i]"
-			apply.addExpressions(expression);
-		}
+			if(whiten){
+				Number explainedVarianceValue = explainedVariance.get(i);
 
-		if(getWhiten()){
-			List<? extends Number> explainedVariance = getExplainedVariance();
-
-			if(!ValueUtil.isOne(explainedVariance.get(index))){
-				apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVariance.get(index)))));
+				if(!ValueUtil.isOne(explainedVarianceValue)){
+					apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVarianceValue))));
+				}
 			}
+
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
+
+			features.add(new ContinuousFeature(derivedField));
 		}
 
-		return apply;
+		return features;
+	}
+
+	@Override
+	protected String name(){
+		return "pca";
 	}
 
 	public Boolean getWhiten(){

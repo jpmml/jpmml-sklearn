@@ -18,13 +18,8 @@
  */
 package xgboost.sklearn;
 
-import java.util.List;
-
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningModel;
 import org.jpmml.converter.FeatureSchema;
-import org.jpmml.converter.Schema;
-import org.jpmml.xgboost.FeatureMap;
 import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.Learner;
 
@@ -43,28 +38,14 @@ public class BoosterUtil {
 	}
 
 	static
-	public MiningModel encodeBooster(HasBooster hasBooster, Schema schema){
+	public MiningModel encodeBooster(HasBooster hasBooster, FeatureSchema schema){
 		Booster booster = hasBooster.getBooster();
 
 		Learner learner = booster.getLearner();
 
-		FieldName targetField = schema.getTargetField();
-		List<String> targetCategories = schema.getTargetCategories();
-
-		FeatureMap featureMap = new FeatureMap();
-
-		List<FieldName> activeFields = schema.getActiveFields();
-		for(int i = 0; i < activeFields.size(); i++){
-			FieldName activeField = activeFields.get(i);
-
-			featureMap.load(String.valueOf(i), activeField.getValue(), "q");
-		}
-
-		FeatureSchema featureSchema = featureMap.createSchema(targetField, targetCategories);
-
 		GBTree gbt = learner.getGBTree();
 
-		MiningModel miningModel = gbt.encodeMiningModel(learner.getObj(), learner.getBaseScore(), featureSchema);
+		MiningModel miningModel = gbt.encodeMiningModel(learner.getObj(), learner.getBaseScore(), schema);
 
 		return miningModel;
 	}

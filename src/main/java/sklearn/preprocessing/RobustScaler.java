@@ -18,52 +18,82 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.MultiTransformer;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
 
-public class RobustScaler extends MultiTransformer {
+public class RobustScaler extends Transformer {
 
 	public RobustScaler(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getCenterOrScaleShape();
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+		Boolean withCentering = getWithCentering();
+		Boolean withScaling = getWithScaling();
 
-		return shape[0];
-	}
+		List<? extends Number> center = (withCentering ? getCenter() : null);
+		List<? extends Number> scale = (withScaling ? getScale() : null);
 
-	@Override
-	public Expression encode(int index, FieldName name){
-		Expression expression = new FieldRef(name);
-
-		if(getWithCentering()){
-			Number center = Iterables.get(getCenter(), index);
-
-			if(!ValueUtil.isZero(center)){
-				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(center));
-			}
+		if(center == null && scale == null){
+			return inputFeatures;
 		} // End if
 
-		if(getWithScaling()){
-			Number scale = Iterables.get(getScale(), index);
+		if(withCentering && inputFeatures.size() != center.size()){
+			throw new IllegalArgumentException();
+		} // End if
 
-			if(!ValueUtil.isOne(scale)){
-				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(scale));
-			}
+		if(withScaling && inputFeatures.size() != scale.size()){
+			throw new IllegalArgumentException();
 		}
 
-		// "($name - center) / scale"
-		return expression;
+		List<Feature> features = new ArrayList<>();
+
+		for(int i = 0; i < inputFeatures.size(); i++){
+			Feature inputFeature = inputFeatures.get(i);
+
+			// "($name - center) / scale"
+			Expression expression = new FieldRef(inputFeature.getName());
+
+			if(withCentering){
+				Number centerValue = center.get(i);
+
+				if(!ValueUtil.isZero(centerValue)){
+					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(centerValue));
+				}
+			} // End if
+
+			if(withScaling){
+				Number scaleValue = scale.get(i);
+
+				if(!ValueUtil.isOne(scaleValue)){
+					expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(scaleValue));
+				}
+			} // End if
+
+			if(expression instanceof FieldRef){
+				features.add(inputFeature);
+
+				continue;
+			}
+
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), expression);
+
+			features.add(new ContinuousFeature(derivedField));
+		}
+
+		return features;
 	}
 
 	public Boolean getWithCentering(){
@@ -80,18 +110,5 @@ public class RobustScaler extends MultiTransformer {
 
 	public List<? extends Number> getScale(){
 		return (List)ClassDictUtil.getArray(this, "scale_");
-	}
-
-	private int[] getCenterOrScaleShape(){
-
-		if(getWithCentering()){
-			return ClassDictUtil.getShape(this, "center_", 1);
-		} else
-
-		if(getWithScaling()){
-			return ClassDictUtil.getShape(this, "scale_", 1);
-		}
-
-		return new int[]{1};
 	}
 }

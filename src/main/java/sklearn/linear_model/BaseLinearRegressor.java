@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.RegressionModel;
-import org.jpmml.converter.Schema;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
 
@@ -41,7 +41,7 @@ public class BaseLinearRegressor extends Regressor {
 	}
 
 	@Override
-	public RegressionModel encodeModel(Schema schema){
+	public RegressionModel encodeModel(FeatureSchema schema){
 		return RegressionModelUtil.encodeRegressionModel(getCoef(), Iterables.getOnlyElement(getIntercept()), schema);
 	}
 

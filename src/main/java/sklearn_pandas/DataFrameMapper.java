@@ -20,51 +20,27 @@ package sklearn_pandas;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.razorvine.pickle.objects.ClassDict;
-import org.dmg.pmml.BayesOutput;
-import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.InstanceField;
-import org.dmg.pmml.MiningField;
-import org.dmg.pmml.MiningSchema;
-import org.dmg.pmml.NeuralOutput;
 import org.dmg.pmml.NormDiscrete;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMML;
-import org.dmg.pmml.Target;
-import org.dmg.pmml.TransformationDictionary;
-import org.dmg.pmml.Value;
-import org.dmg.pmml.Visitor;
-import org.dmg.pmml.VisitorAction;
-import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
-import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.PseudoFeature;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.LoggerUtil;
+import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.TupleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sklearn.MultiTransformer;
 import sklearn.Transformer;
 
 public class DataFrameMapper extends ClassDict {
@@ -73,90 +49,34 @@ public class DataFrameMapper extends ClassDict {
 		super(module, name);
 	}
 
-	public void updatePMML(Schema schema, PMML pmml){
-		FieldName targetField = schema.getTargetField();
-		List<FieldName> activeFields = schema.getActiveFields();
+	public void encodeFeatures(FeatureMapper featureMapper){
+		List<Object[]> steps = getFeatures();
 
-		List<Object[]> features = new ArrayList<>(getFeatures());
-
-		if(features.size() < 1){
+		if(steps.size() < 1){
 			logger.warn("The list of mappings is empty");
 
 			return;
-		} // End if
-
-		if(targetField != null){
-			logger.info("Updating 1 target field and {} active field(s)", activeFields.size());
-
-			// Move the target column from the last position to the first position
-			features.add(0, features.remove(features.size() - 1));
-		} else
-
-		{
-			logger.info("Updating {} active field(s)", activeFields.size());
 		}
-
-		ListIterator<Object[]> featureIt = features.listIterator();
-
-		DataDictionary dataDictionary = pmml.getDataDictionary();
-
-		List<DataField> dataFields = dataDictionary.getDataFields();
-
-		ListIterator<DataField> dataFieldIt = dataFields.listIterator();
-
-		TransformationDictionary transformationDictionary = pmml.getTransformationDictionary();
-		if(transformationDictionary == null){
-			transformationDictionary = new TransformationDictionary();
-
-			pmml.setTransformationDictionary(transformationDictionary);
-		}
-
-		final
-		Map<FieldName, FieldName> updatedTargetFields = new LinkedHashMap<>();
-
-		// The target field
-		if(targetField != null){
-			Object[] feature = featureIt.next();
-
-			List<FieldName> names = getNameList(feature);
-			List<Transformer> transformers = getTransformerList(feature);
-
-			FieldName name = Iterables.getOnlyElement(names);
-
-			if(!transformers.isEmpty()){
-				logger.error("Target field {} must not specify a transformation", name);
-
-				throw new IllegalArgumentException();
-			}
-
-			DataField dataField = dataFieldIt.next();
-
-			logger.info("Mapping target field {} to {}", dataField.getName(), name);
-
-			updatedTargetFields.put(dataField.getName(), name);
-
-			dataField.setName(name);
-		}
-
-		final
-		Map<FieldName, Set<FieldName>> updatedActiveFields = new LinkedHashMap<>();
 
 		Set<FieldName> mappedNames = new LinkedHashSet<>();
 
-		// Zero or more active fields
-		for(int row = 0; featureIt.hasNext(); row++){
-			Object[] feature = featureIt.next();
+		for(int row = 0; row < steps.size(); row++){
+			Object[] step = steps.get(row);
 
-			final
-			List<FieldName> names = getNameList(feature);
-			List<Transformer> transformers = getTransformerList(feature);
+			List<Feature> features = new ArrayList<>();
 
 			Set<FieldName> uniqueNames = new LinkedHashSet<>();
 			Set<FieldName> duplicateNames = new LinkedHashSet<>();
 
+			List<FieldName> names = getNameList(step);
 			for(FieldName name : names){
-				boolean unique = uniqueNames.add(name);
+				DataField dataField = featureMapper.createDataField(name);
 
+				Feature feature = new PseudoFeature(dataField);
+
+				features.add(feature);
+
+				boolean unique = uniqueNames.add(name);
 				if(!unique){
 					duplicateNames.add(name);
 				}
@@ -171,312 +91,39 @@ public class DataFrameMapper extends ClassDict {
 				logger.error("Duplicate mappings(s): {}", new ArrayList<>(duplicateNames));
 
 				throw new IllegalArgumentException();
-			} // End if
-
-			if(transformers.isEmpty()){
-				Transformer transformer = new MultiTransformer(null, null){
-
-					@Override
-					public int getNumberOfFeatures(){
-						return names.size();
-					}
-
-					@Override
-					public Expression encode(int index, FieldName name){
-						Expression expression = new FieldRef(name);
-
-						return expression;
-					}
-				};
-
-				transformers = Collections.singletonList(transformer);
 			}
 
-			List<FieldName> inputNames = names;
+			List<Transformer> transformers = getTransformerList(step);
+			for(int column = 0; column < transformers.size(); column++){
+				Transformer transformer = transformers.get(column);
 
-			ListIterator<Transformer> transformerIt = transformers.listIterator();
-
-			for(int column = 0; transformerIt.hasNext(); column++){
-				Transformer transformer = transformerIt.next();
-
-				int numberOfInputs = transformer.getNumberOfInputs();
-				int numberOfOutputs = transformer.getNumberOfOutputs();
-
-				Step step;
-
-				if(!transformerIt.hasNext()){
-					Step finalStep = updateDataDictionary(dataFieldIt, names, transformers.get(0), names.size(), numberOfOutputs);
-
-					logger.info("Mapping active field(s) {} to {}", LoggerUtil.formatNameList(finalStep.getOutputNames()), LoggerUtil.formatNameList(finalStep.getInputNames()));
-
-					for(int i = 0; i < numberOfOutputs; i++){
-						FieldName outputName = finalStep.getOutputName(i);
-
-						updatedActiveFields.put(outputName, uniqueNames);
-					}
-
-					if(inputNames.size() != numberOfInputs){
-						throw new IllegalArgumentException();
-					}
-
-					step = new Step(finalStep.getDataType(), finalStep.getOpType(), inputNames, finalStep.getOutputNames());
-				} else
-
-				{
-					if(inputNames.size() != numberOfInputs){
-						throw new IllegalArgumentException();
-					}
-
-					List<FieldName> outputNames = new ArrayList<>();
-
-					String className = getClassName(transformer);
-
-					for(int i = 0; i < numberOfOutputs; i++){
-						FieldName outputName = FieldName.create(className + "("+ row +"," + column + "," + i + ")");
-
-						outputNames.add(outputName);
-					}
-
-					step = new Step(transformer.getDataType(), transformer.getOpType(), inputNames, outputNames);
+				for(Feature feature : features){
+					featureMapper.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
 				}
 
-				for(int i = 0; i < numberOfOutputs; i++){
-					FieldName outputName = step.getOutputName(i);
+				features = transformer.encodeFeatures("(" + row + "," + column + ")", features, featureMapper);
+			} // End for
 
-					Expression expression = transformer.encode(i, step.getInputNames());
+			for(int i = 0; i < features.size(); i++){
+				Feature feature = features.get(i);
 
-					DerivedField derivedField = new DerivedField(step.getOpType(), step.getDataType())
-						.setName(outputName)
-						.setExpression(expression);
+				if(feature instanceof BinaryFeature){
+					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
-					transformationDictionary.addDerivedFields(derivedField);
+					NormDiscrete normDiscrete = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
+
+					DerivedField derivedField = featureMapper.createDerivedField(FieldName.create((binaryFeature.getName()).getValue() + "[" + binaryFeature.getValue() + "]"), normDiscrete);
+
+					features.set(i, new ContinuousFeature(derivedField));
 				}
-
-				inputNames = step.getOutputNames();
 			}
 
-			mappedNames.addAll(names);
+			featureMapper.addStep(features);
 		}
-
-		if(dataFieldIt.hasNext()){
-			Function<DataField, FieldName> function = new Function<DataField, FieldName>(){
-
-				@Override
-				public FieldName apply(DataField dataField){
-					return dataField.getName();
-				}
-			};
-
-			List<FieldName> unmappedActiveFields = Lists.newArrayList(Iterators.transform(dataFieldIt, function));
-
-			logger.error("The list of mappings is shorter than the list of fields. Found {} unmapped active field(s): {}", unmappedActiveFields.size(), LoggerUtil.formatNameList(unmappedActiveFields));
-
-			throw new IllegalArgumentException();
-		}
-
-		Visitor targetFieldUpdater = new AbstractVisitor(){
-
-			@Override
-			public VisitorAction visit(BayesOutput bayesOutput){
-				bayesOutput.setFieldName(filterName(bayesOutput.getFieldName()));
-
-				return super.visit(bayesOutput);
-			}
-
-			@Override
-			public VisitorAction visit(InstanceField instanceField){
-				instanceField.setField(filterName(instanceField.getField()));
-
-				return super.visit(instanceField);
-			}
-
-			@Override
-			public VisitorAction visit(MiningField miningField){
-				miningField.setName(filterName(miningField.getName()));
-
-				return super.visit(miningField);
-			}
-
-			@Override
-			public VisitorAction visit(NeuralOutput neuralOutput){
-				DerivedField derivedField = neuralOutput.getDerivedField();
-
-				Expression expression = derivedField.getExpression();
-
-				if(expression instanceof FieldRef){
-					FieldRef fieldRef = (FieldRef)expression;
-
-					fieldRef.setField(filterName(fieldRef.getField()));
-				} else
-
-				if(expression instanceof NormDiscrete){
-					NormDiscrete normDiscrete = (NormDiscrete)expression;
-
-					normDiscrete.setField(filterName(normDiscrete.getField()));
-				}
-
-				return super.visit(neuralOutput);
-			}
-
-			@Override
-			public VisitorAction visit(Target target){
-				target.setField(filterName(target.getField()));
-
-				return super.visit(target);
-			}
-
-			private FieldName filterName(FieldName name){
-
-				if(updatedTargetFields.containsKey(name)){
-					FieldName updatedName = updatedTargetFields.get(name);
-
-					return updatedName;
-				}
-
-				return name;
-			}
-		};
-
-		targetFieldUpdater.applyTo(pmml);
-
-		Visitor activeFieldUpdater = new AbstractVisitor(){
-
-			@Override
-			public VisitorAction visit(MiningSchema miningSchema){
-				List<MiningField> miningFields = miningSchema.getMiningFields();
-
-				Set<FieldName> names = new LinkedHashSet<>();
-
-				ListIterator<MiningField> miningFieldIt = miningFields.listIterator();
-				while(miningFieldIt.hasNext()){
-					MiningField miningField = miningFieldIt.next();
-
-					FieldName name = miningField.getName();
-
-					Set<FieldName> updatedNames = updatedActiveFields.get(name);
-					if(updatedNames != null){
-						names.addAll(updatedNames);
-
-						miningFieldIt.remove();
-					}
-				}
-
-				for(FieldName name : names){
-					MiningField miningField = ModelUtil.createMiningField(name);
-
-					miningFieldIt.add(miningField);
-				}
-
-				return super.visit(miningSchema);
-			}
-		};
-
-		activeFieldUpdater.applyTo(pmml);
 	}
 
 	public List<Object[]> getFeatures(){
 		return (List)get("features");
-	}
-
-	/**
-	 * @param transformer The first transformer in the list of transformers.
-	 * @param numberOfInputs The number of dimensions in the input feature space.
-	 * @param numberOfOutputs The number of dimensions in the output (ie. transformed) feature space.
-	 */
-	static
-	private Step updateDataDictionary(ListIterator<DataField> dataFieldIt, List<FieldName> inputNames, Transformer transformer, int numberOfInputs, int numberOfOutputs){
-		OpType opType = null;
-		DataType dataType = null;
-
-		if(inputNames.size() != numberOfInputs){
-			throw new IllegalArgumentException();
-		}
-
-		List<FieldName> outputNames = new ArrayList<>();
-
-		for(int i = 0; i < Math.min(numberOfInputs, numberOfOutputs); i++){
-			FieldName inputName = inputNames.get(i);
-
-			DataField dataField = dataFieldIt.next();
-
-			outputNames.add(dataField.getName());
-
-			if(opType != null && !(opType).equals(dataField.getOpType())){
-				throw new IllegalArgumentException();
-			} // End if
-
-			if(dataType != null && !(dataType).equals(dataField.getDataType())){
-				throw new IllegalArgumentException();
-			}
-
-			opType = dataField.getOpType();
-			dataType = dataField.getDataType();
-
-			updateDataField(dataField, inputName, transformer);
-		}
-
-		if(numberOfInputs > numberOfOutputs){
-			int count = (numberOfInputs - numberOfOutputs);
-
-			for(int i = 0; i < count; i++){
-				FieldName inputName = inputNames.get(numberOfOutputs + i);
-
-				DataField dataField = new DataField();
-
-				dataFieldIt.add(dataField);
-
-				updateDataField(dataField, inputName, transformer);
-			}
-		} else
-
-		if(numberOfInputs < numberOfOutputs){
-			int count = (numberOfOutputs - numberOfInputs);
-
-			for(int i = 0; i < count; i++){
-				DataField dataField = dataFieldIt.next();
-
-				outputNames.add(dataField.getName());
-
-				dataFieldIt.remove();
-			}
-		}
-
-		Step step = new Step(dataType, opType, inputNames, outputNames);
-
-		return step;
-	}
-
-	static
-	private void updateDataField(DataField dataField, FieldName name, Transformer transformer){
-		dataField.setName(name)
-			.setOpType(transformer.getOpType())
-			.setDataType(transformer.getDataType());
-
-		List<Value> values = dataField.getValues();
-		if(values.size() > 0){
-			values.clear();
-		}
-
-		List<?> classes = transformer.getClasses();
-
-		Function<Object, String> function = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object value){
-				return ValueUtil.formatValue(value);
-			}
-		};
-
-		values.addAll(PMMLUtil.createValues(Lists.transform(classes, function)));
-	}
-
-	static
-	private String getClassName(Transformer transformer){
-		Class<? extends Transformer> clazz = transformer.getClass();
-
-		String name = clazz.getSimpleName();
-
-		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
 	}
 
 	static
@@ -540,70 +187,6 @@ public class DataFrameMapper extends ClassDict {
 			return Collections.singletonList(function.apply(feature[1]));
 		} catch(RuntimeException re){
 			throw new IllegalArgumentException("Invalid mapping value", re);
-		}
-	}
-
-	static
-	private class Step {
-
-		private DataType dataType = null;
-
-		private OpType opType = null;
-
-		private List<FieldName> inputNames = null;
-
-		private List<FieldName> outputNames = null;
-
-
-		private Step(DataType dataType, OpType opType, List<FieldName> inputNames, List<FieldName> outputNames){
-			setDataType(dataType);
-			setOpType(opType);
-			setInputNames(inputNames);
-			setOutputNames(outputNames);
-		}
-
-		public DataType getDataType(){
-			return this.dataType;
-		}
-
-		private void setDataType(DataType dataType){
-			this.dataType = dataType;
-		}
-
-		public OpType getOpType(){
-			return this.opType;
-		}
-
-		private void setOpType(OpType opType){
-			this.opType = opType;
-		}
-
-		public FieldName getInputName(int index){
-			List<FieldName> inputNames = getInputNames();
-
-			return inputNames.get(index);
-		}
-
-		public List<FieldName> getInputNames(){
-			return this.inputNames;
-		}
-
-		private void setInputNames(List<FieldName> inputNames){
-			this.inputNames = inputNames;
-		}
-
-		public FieldName getOutputName(int index){
-			List<FieldName> outputNames = getOutputNames();
-
-			return outputNames.get(index);
-		}
-
-		public List<FieldName> getOutputNames(){
-			return this.outputNames;
-		}
-
-		private void setOutputNames(List<FieldName> outputNames){
-			this.outputNames = outputNames;
 		}
 	}
 

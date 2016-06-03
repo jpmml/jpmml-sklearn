@@ -27,8 +27,9 @@ import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class RegressionModelUtil {
 	}
 
 	static
-	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema){
+	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, FeatureSchema schema){
 		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
 		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema, regressionTable);
@@ -52,34 +53,36 @@ public class RegressionModelUtil {
 	}
 
 	static
-	public RegressionTable encodeRegressionTable(List<? extends Number> coefficients, Number intercept, Schema schema){
-		List<FieldName> activeFields = schema.getActiveFields();
+	public RegressionTable encodeRegressionTable(List<? extends Number> coefficients, Number intercept, FeatureSchema schema){
+		List<Feature> features = schema.getFeatures();
 
-		if(coefficients.size() != activeFields.size()){
+		if(coefficients.size() != features.size()){
 			throw new IllegalArgumentException();
 		}
 
 		RegressionTable regressionTable = new RegressionTable(ValueUtil.asDouble(intercept));
 
-		List<FieldName> unusedActiveFields = new ArrayList<>();
+		List<FieldName> unusedNames = new ArrayList<>();
 
 		for(int i = 0; i < coefficients.size(); i++){
 			Number coefficient = coefficients.get(i);
-			FieldName activeField = activeFields.get(i);
+			Feature feature = features.get(i);
+
+			FieldName name = feature.getName();
 
 			if(ValueUtil.isZero(coefficient)){
-				unusedActiveFields.add(activeField);
+				unusedNames.add(name);
 
 				continue;
 			}
 
-			NumericPredictor numericPredictor = new NumericPredictor(activeField, ValueUtil.asDouble(coefficient));
+			NumericPredictor numericPredictor = new NumericPredictor(name, ValueUtil.asDouble(coefficient));
 
 			regressionTable.addNumericPredictors(numericPredictor);
 		}
 
-		if(!unusedActiveFields.isEmpty()){
-			logger.info("Skipped {} active field(s): {}", unusedActiveFields.size(), LoggerUtil.formatNameList(unusedActiveFields));
+		if(!unusedNames.isEmpty()){
+			logger.info("Skipped {} active field(s): {}", unusedNames.size(), LoggerUtil.formatNameList(unusedNames));
 		}
 
 		return regressionTable;

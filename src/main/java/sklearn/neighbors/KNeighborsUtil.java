@@ -43,8 +43,9 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Row;
 import org.dmg.pmml.TrainingInstances;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.DOMUtil;
 import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Estimator;
@@ -55,7 +56,7 @@ public class KNeighborsUtil {
 	}
 
 	static
-	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunctionType miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
+	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunctionType miningFunction, int numberOfInstances, int numberOfFeatures, FeatureSchema schema){
 		List<String> keys = new ArrayList<>();
 
 		InstanceFields instanceFields = new InstanceFields();
@@ -65,23 +66,27 @@ public class KNeighborsUtil {
 		FieldName targetField = schema.getTargetField();
 		if(targetField != null){
 			InstanceField instanceField = new InstanceField(targetField)
-				.setColumn(targetField.getValue());
+				.setColumn("y");
 
 			instanceFields.addInstanceFields(instanceField);
 
 			keys.add(instanceField.getColumn());
 		}
 
-		List<FieldName> activeFields = schema.getActiveFields();
-		for(FieldName activeField : activeFields){
-			InstanceField instanceField = new InstanceField(activeField)
-				.setColumn(activeField.getValue());
+		List<Feature> features = schema.getFeatures();
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+
+			FieldName name = feature.getName();
+
+			InstanceField instanceField = new InstanceField(name)
+				.setColumn("x" + String.valueOf(i + 1));
 
 			instanceFields.addInstanceFields(instanceField);
 
 			keys.add(instanceField.getColumn());
 
-			KNNInput knnInput = new KNNInput(activeField);
+			KNNInput knnInput = new KNNInput(name);
 
 			knnInputs.addKNNInputs(knnInput);
 		}

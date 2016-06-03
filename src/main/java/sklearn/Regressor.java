@@ -18,14 +18,12 @@
  */
 package sklearn;
 
-import java.util.List;
-
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.Schema;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.SchemaUtil;
+import org.jpmml.sklearn.FeatureMapper;
 
 abstract
 public class Regressor extends Estimator {
@@ -35,19 +33,20 @@ public class Regressor extends Estimator {
 	}
 
 	@Override
-	public Schema createSchema(){
-		FieldName targetField = SchemaUtil.createTargetField();
-		List<FieldName> activeFields = SchemaUtil.createActiveFields(getNumberOfFeatures());
+	public Model encodeModel(FeatureMapper featureMapper){
 
-		Schema schema = new Schema(targetField, activeFields);
+		if(featureMapper.isEmpty()){
+			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
+			featureMapper.initTargetField(SchemaUtil.createTargetField(), OpType.CONTINUOUS, DataType.DOUBLE, null);
+		} else
 
-		return schema;
-	}
+		{
+			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
+			featureMapper.updateTargetField(OpType.CONTINUOUS, DataType.DOUBLE, null);
+		}
 
-	@Override
-	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
-		DataField dataField = new DataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
+		FeatureSchema schema = featureMapper.createSupervisedSchema();
 
-		return dataField;
+		return encodeModel(schema);
 	}
 }

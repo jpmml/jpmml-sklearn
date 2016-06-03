@@ -33,8 +33,9 @@ import org.dmg.pmml.TargetValueCount;
 import org.dmg.pmml.TargetValueCounts;
 import org.dmg.pmml.TargetValueStat;
 import org.dmg.pmml.TargetValueStats;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
@@ -54,7 +55,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	@Override
-	public NaiveBayesModel encodeModel(Schema schema){
+	public NaiveBayesModel encodeModel(FeatureSchema schema){
 		int[] shape = getThetaShape();
 
 		int numberOfClasses = shape[0];
@@ -68,12 +69,12 @@ public class GaussianNB extends Classifier {
 		BayesInputs bayesInputs = new BayesInputs();
 
 		for(int i = 0; i < numberOfFeatures; i++){
-			FieldName activeField = schema.getActiveField(i);
+			Feature feature = schema.getFeature(i);
 
 			List<? extends Number> means = MatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
 			List<? extends Number> variances = MatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
 
-			BayesInput bayesInput = new BayesInput(activeField)
+			BayesInput bayesInput = new BayesInput(feature.getName())
 				.setTargetValueStats(encodeTargetValueStats(targetCategories, means, variances));
 
 			bayesInputs.addBayesInputs(bayesInput);

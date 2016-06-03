@@ -30,8 +30,8 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 
@@ -56,7 +56,7 @@ public class BaggingClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public MiningModel encodeModel(FeatureSchema schema){
 		List<Classifier> estimators = getEstimators();
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 

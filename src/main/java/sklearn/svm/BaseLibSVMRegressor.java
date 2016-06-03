@@ -29,8 +29,8 @@ import org.dmg.pmml.SupportVectorMachine;
 import org.dmg.pmml.SupportVectorMachineModel;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorInstance;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
@@ -50,7 +50,7 @@ public class BaseLibSVMRegressor extends Regressor {
 	}
 
 	@Override
-	public SupportVectorMachineModel encodeModel(Schema schema){
+	public SupportVectorMachineModel encodeModel(FeatureSchema schema){
 		int[] shape = getSupportVectorsShape();
 
 		int numberOfVectors = shape[0];

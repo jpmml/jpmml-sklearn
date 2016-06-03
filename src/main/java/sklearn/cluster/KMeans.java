@@ -35,9 +35,10 @@ import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.SquaredEuclidean;
 import org.jpmml.converter.ClusteringModelUtil;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
@@ -57,7 +58,7 @@ public class KMeans extends Clusterer {
 	}
 
 	@Override
-	public ClusteringModel encodeModel(Schema schema){
+	public ClusteringModel encodeModel(FeatureSchema schema){
 		int[] shape = getClusterCentersShape();
 
 		int numberOfClusters = shape[0];
@@ -85,15 +86,20 @@ public class KMeans extends Clusterer {
 			clusters.add(cluster);
 		}
 
-		List<FieldName> activeFields = schema.getActiveFields();
+		List<FieldName> names = new ArrayList<>();
 
-		List<ClusteringField> clusteringFields = ClusteringModelUtil.createClusteringFields(activeFields);
+		List<Feature> features = schema.getFeatures();
+		for(Feature feature : features){
+			names.add(feature.getName());
+		}
+
+		List<ClusteringField> clusteringFields = ClusteringModelUtil.createClusteringFields(names);
 
 		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
 			.setCompareFunction(CompareFunctionType.ABS_DIFF)
 			.setMeasure(new SquaredEuclidean());
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(null, activeFields);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		Output output = ClusteringModelUtil.createOutput(FieldName.create("Cluster"), clusters);
 

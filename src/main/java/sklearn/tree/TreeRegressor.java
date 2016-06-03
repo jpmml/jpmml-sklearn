@@ -21,7 +21,7 @@ package sklearn.tree;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.Schema;
+import org.jpmml.converter.FeatureSchema;
 import sklearn.Regressor;
 
 abstract
@@ -37,7 +37,7 @@ public class TreeRegressor extends Regressor implements HasTree {
 	}
 
 	@Override
-	public TreeModel encodeModel(Schema schema){
+	public TreeModel encodeModel(FeatureSchema schema){
 		return TreeModelUtil.encodeTreeModel(this, MiningFunctionType.REGRESSION, schema);
 	}
 

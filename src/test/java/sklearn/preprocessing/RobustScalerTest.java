@@ -18,50 +18,31 @@
  */
 package sklearn.preprocessing;
 
-import org.dmg.pmml.Apply;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class RobustScalerTest {
+public class RobustScalerTest extends ScalerTest {
 
 	@Test
 	public void encode(){
-		FieldName name = FieldName.create("x");
-
 		RobustScaler scaler = new RobustScaler("sklearn.preprocessing.data", "RobustScaler");
 		scaler.put("with_centering", Boolean.FALSE);
 		scaler.put("with_scaling", Boolean.FALSE);
 		scaler.put("center_", 6);
 		scaler.put("scale_", 2);
 
-		Expression expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof FieldRef);
+		assertSameFeature(scaler);
 
 		scaler.put("with_centering", Boolean.TRUE);
 		scaler.put("with_scaling", Boolean.TRUE);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof Apply);
-		assertEquals("/", ((Apply)expression).getFunction());
+		assertTransformedFeature(scaler, "/");
 
 		scaler.put("scale_", 1);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof Apply);
-		assertEquals("-", ((Apply)expression).getFunction());
+		assertTransformedFeature(scaler, "-");
 
 		scaler.put("center_", 0);
 
-		expression = scaler.encode(0, name);
-
-		assertTrue(expression instanceof FieldRef);
+		assertSameFeature(scaler);
 	}
 }

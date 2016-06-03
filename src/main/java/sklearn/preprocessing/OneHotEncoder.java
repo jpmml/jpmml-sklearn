@@ -25,15 +25,16 @@ import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.ListFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.OneToManyTransformer;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
 
-public class OneHotEncoder extends OneToManyTransformer {
+public class OneHotEncoder extends Transformer {
 
 	public OneHotEncoder(String module, String name){
 		super(module, name);
@@ -55,21 +56,32 @@ public class OneHotEncoder extends OneToManyTransformer {
 	}
 
 	@Override
-	public int getNumberOfOutputs(){
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		List<? extends Number> values = getValues();
 
-		return values.size();
-	}
+		if(inputFeatures.size() != 1){
+			throw new IllegalArgumentException();
+		}
 
-	@Override
-	public Expression encode(int index, FieldName name){
-		List<? extends Number> values = getValues();
+		ListFeature inputFeature = (ListFeature)inputFeatures.get(0);
 
-		Number value = values.get(index);
+		List<String> categories = new ArrayList<>();
 
-		NormDiscrete normDicrete = new NormDiscrete(name, ValueUtil.formatValue(value));
+		List<Feature> features = new ArrayList<>();
 
-		return normDicrete;
+		for(int i = 0; i < values.size(); i++){
+			Number value = values.get(i);
+
+			String category = inputFeature.getValue(ValueUtil.asInt(value));
+
+			categories.add(category);
+
+			features.add(new BinaryFeature(inputFeature.getName(), DataType.STRING, category));
+		}
+
+		featureMapper.updateValueSpace(inputFeature.getName(), categories);
+
+		return features;
 	}
 
 	public List<? extends Number> getValues(){

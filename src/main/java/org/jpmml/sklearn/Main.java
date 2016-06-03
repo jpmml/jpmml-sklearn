@@ -21,6 +21,9 @@ package org.jpmml.sklearn;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -28,9 +31,9 @@ import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.Extension;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.PMML;
-import org.jpmml.converter.Schema;
 import org.jpmml.model.MetroJAXBUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn_pandas.DataFrameMapper;
 
 public class Main {
@@ -105,25 +108,9 @@ public class Main {
 	private void run() throws Exception {
 		PMML pmml;
 
-		Schema schema;
+		FeatureMapper featureMapper = new FeatureMapper();
 
-		try(Storage storage = PickleUtil.createStorage(this.estimatorInput)){
-			Object object = PickleUtil.unpickle(storage);
-
-			if(!(object instanceof Estimator)){
-				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
-			}
-
-			Estimator estimator = (Estimator)object;
-
-			schema = estimator.createSchema();
-
-			pmml = estimator.encodePMML(schema);
-		}
-
-		if(this.estimatorRepr != null){
-			addObjectRepr(pmml, "estimator", this.estimatorRepr);
-		} // End if
+		Map<String, String> reprs = new LinkedHashMap<>();
 
 		if(this.mapperInput != null){
 
@@ -136,12 +123,33 @@ public class Main {
 
 				DataFrameMapper mapper = (DataFrameMapper)object;
 
-				mapper.updatePMML(schema, pmml);
+				mapper.encodeFeatures(featureMapper);
 			}
 
 			if(this.mapperRepr != null){
-				addObjectRepr(pmml, "mapper", this.mapperRepr);
+				reprs.put("mapper", this.mapperRepr);
 			}
+		}
+
+		try(Storage storage = PickleUtil.createStorage(this.estimatorInput)){
+			Object object = PickleUtil.unpickle(storage);
+
+			if(!(object instanceof Estimator)){
+				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
+			}
+
+			Estimator estimator = (Estimator)object;
+
+			pmml = EstimatorUtil.encodePMML(estimator, featureMapper);
+		}
+
+		if(this.estimatorRepr != null){
+			reprs.put("estimator", this.estimatorRepr);
+		}
+
+		Collection<Map.Entry<String, String>> entries = reprs.entrySet();
+		for(Map.Entry<String, String> entry : entries){
+			addObjectRepr(pmml, entry.getKey(), entry.getValue());
 		}
 
 		try(OutputStream os = new FileOutputStream(this.output)){

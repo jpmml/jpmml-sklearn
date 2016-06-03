@@ -28,16 +28,16 @@ import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Segmentation;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
@@ -49,22 +49,22 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, Schema schema){
+	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, FeatureSchema schema){
 		List<Model> models = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
 			E estimator = estimators.get(i);
 			List<Integer> estimatorFeatures = estimatorsFeatures.get(i);
 
-			List<FieldName> activeFields = new ArrayList<>();
+			List<Feature> selectedFeatures = new ArrayList<>();
 
 			for(Integer estimatorFeature : estimatorFeatures){
-				FieldName activeField = schema.getActiveField(estimatorFeature);
+				Feature feature = schema.getFeature(estimatorFeature);
 
-				activeFields.add(activeField);
+				selectedFeatures.add(feature);
 			}
 
-			Schema estimatorSchema = new Schema(null, schema.getTargetCategories(), activeFields);
+			FeatureSchema estimatorSchema = new FeatureSchema(null, schema.getTargetCategories(), schema.getActiveFields(), selectedFeatures);
 
 			Model model = estimator.encodeModel(estimatorSchema);
 

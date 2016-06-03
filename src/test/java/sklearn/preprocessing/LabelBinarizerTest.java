@@ -19,22 +19,32 @@
 package sklearn.preprocessing;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import numpy.core.NDArray;
-import org.dmg.pmml.Apply;
-import org.dmg.pmml.Expression;
+import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.NormDiscrete;
+import org.dmg.pmml.OpType;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.PseudoFeature;
+import org.jpmml.sklearn.FeatureMapper;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LabelBinarizerTest {
 
 	@Test
 	public void encode(){
-		FieldName name = FieldName.create("x");
+		FeatureMapper featureMapper = new FeatureMapper();
+
+		DataField dataField = featureMapper.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.STRING);
+
+		Feature inputFeature = new PseudoFeature(dataField);
 
 		NDArray array = new NDArray();
 		array.put("data", Arrays.asList("low", "medium", "high"));
@@ -45,15 +55,16 @@ public class LabelBinarizerTest {
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 
-		Expression expression = binarizer.encode(0, name);
-
-		assertTrue(expression instanceof Apply);
-		assertEquals("if", ((Apply)expression).getFunction());
+		List<Feature> outputFeatures = binarizer.encodeFeatures("apply", Collections.singletonList(inputFeature), featureMapper);
+		for(Feature outputFeature : outputFeatures){
+			assertTrue(outputFeature instanceof ContinuousFeature);
+		}
 
 		binarizer.put("neg_label", 0d);
 
-		expression = binarizer.encode(0, name);
-
-		assertTrue(expression instanceof NormDiscrete);
+		outputFeatures = binarizer.encodeFeatures("normDiscrete", Collections.singletonList(inputFeature), featureMapper);
+		for(Feature outputFeature : outputFeatures){
+			assertTrue(outputFeature instanceof BinaryFeature);
+		}
 	}
 }

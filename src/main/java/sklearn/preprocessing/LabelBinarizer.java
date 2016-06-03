@@ -18,20 +18,24 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.OneToManyTransformer;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
 
-public class LabelBinarizer extends OneToManyTransformer {
+public class LabelBinarizer extends Transformer {
 
 	public LabelBinarizer(String module, String name){
 		super(module, name);
@@ -48,29 +52,50 @@ public class LabelBinarizer extends OneToManyTransformer {
 	}
 
 	@Override
-	public int getNumberOfOutputs(){
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		List<?> classes = getClasses();
-
-		return classes.size();
-	}
-
-	@Override
-	public Expression encode(int index, FieldName name){
-		List<?> classes = getClasses();
-
-		Object value = classes.get(index);
 
 		Number posLabel = getPosLabel();
 		Number negLabel = getNegLabel();
 
-		if(ValueUtil.isOne(posLabel) && ValueUtil.isZero(negLabel)){
-			NormDiscrete normDiscrete = new NormDiscrete(name, String.valueOf(value));
-
-			return normDiscrete;
+		if(inputFeatures.size() != 1){
+			throw new IllegalArgumentException();
 		}
 
-		// "($name == value) ? pos_label : neg_label"
-		return PMMLUtil.createApply("if", PMMLUtil.createApply("equal", new FieldRef(name), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
+		Feature inputFeature = inputFeatures.get(0);
+
+		List<String> categories = new ArrayList<>();
+
+		List<Feature> features = new ArrayList<>();
+
+		for(int i = 0; i < classes.size(); i++){
+			Object value = classes.get(i);
+
+			Feature feature;
+
+			if(ValueUtil.isOne(posLabel) && ValueUtil.isZero(negLabel)){
+				String category = ValueUtil.formatValue(value);
+
+				categories.add(category);
+
+				feature = new BinaryFeature(inputFeature.getName(), DataType.STRING, category);
+			} else
+
+			{
+				// "($name == value) ? pos_label : neg_label"
+				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", new FieldRef(inputFeature.getName()), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
+
+				DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
+
+				feature = new ContinuousFeature(derivedField);
+			}
+
+			features.add(feature);
+		}
+
+		featureMapper.updateValueSpace(inputFeature.getName(), categories);
+
+		return features;
 	}
 
 	@Override

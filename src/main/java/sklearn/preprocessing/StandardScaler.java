@@ -18,59 +18,89 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.MultiTransformer;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
 
-public class StandardScaler extends MultiTransformer {
+public class StandardScaler extends Transformer {
 
 	public StandardScaler(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getMeanShape();
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+		Boolean withMean = getWithMean();
+		Boolean withStd = getWithStd();
 
-		return shape[0];
-	}
+		List<? extends Number> mean = (withMean ? getMean() : null);
+		List<? extends Number> std = (withStd ? getStd() : null);
 
-	@Override
-	public Expression encode(int index, FieldName name){
-		Expression expression = new FieldRef(name);
-
-		if(getWithMean()){
-			Number mean = Iterables.get(getMean(), index);
-
-			if(!ValueUtil.isZero(mean)){
-				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(mean));
-			}
+		if(mean == null && std == null){
+			return inputFeatures;
 		} // End if
 
-		if(gwtWithStd()){
-			Number std = Iterables.get(getStd(), index);
+		if(withMean && inputFeatures.size() != mean.size()){
+			throw new IllegalArgumentException();
+		} // End if
 
-			if(!ValueUtil.isOne(std)){
-				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(std));
-			}
+		if(withStd && inputFeatures.size() != std.size()){
+			throw new IllegalArgumentException();
 		}
 
-		// "($name - mean) / std"
-		return expression;
+		List<Feature> features = new ArrayList<>();
+
+		for(int i = 0; i < inputFeatures.size(); i++){
+			Feature inputFeature = inputFeatures.get(i);
+
+			// "($name - mean) / std"
+			Expression expression = new FieldRef(inputFeature.getName());
+
+			if(withMean){
+				Number meanValue = mean.get(i);
+
+				if(!ValueUtil.isZero(meanValue)){
+					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
+				}
+			} // End if
+
+			if(withStd){
+				Number stdValue = std.get(i);
+
+				if(!ValueUtil.isOne(stdValue)){
+					expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(stdValue));
+				}
+			} // End if
+
+			if(expression instanceof FieldRef){
+				features.add(inputFeature);
+
+				continue;
+			}
+
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), expression);
+
+			features.add(new ContinuousFeature(derivedField));
+		}
+
+		return features;
 	}
 
 	public Boolean getWithMean(){
 		return (Boolean)get("with_mean");
 	}
 
-	public Boolean gwtWithStd(){
+	public Boolean getWithStd(){
 		return (Boolean)get("with_std");
 	}
 
@@ -86,9 +116,5 @@ public class StandardScaler extends MultiTransformer {
 			// SkLearn 0.17
 			return (List)ClassDictUtil.getArray(this, "scale_");
 		}
-	}
-
-	private int[] getMeanShape(){
-		return ClassDictUtil.getShape(this, "mean_", 1);
 	}
 }

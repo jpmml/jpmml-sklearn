@@ -25,8 +25,8 @@ import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Output;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import sklearn.tree.TreeClassifier;
 
@@ -43,7 +43,7 @@ public class BaseForestClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public MiningModel encodeModel(FeatureSchema schema){
 		List<TreeClassifier> estimators = getEstimators();
 
 		Output output = ModelUtil.createProbabilityOutput(schema);

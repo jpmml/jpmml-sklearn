@@ -24,16 +24,14 @@ import java.util.List;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Value;
-import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.FeatureMapper;
 
 abstract
 public class Classifier extends Estimator {
@@ -42,14 +40,34 @@ public class Classifier extends Estimator {
 		super(module, name);
 	}
 
+	@Override
+	public Model encodeModel(FeatureMapper featureMapper){
+
+		if(featureMapper.isEmpty()){
+			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
+			featureMapper.initTargetField(SchemaUtil.createTargetField(), OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
+		} else
+
+		{
+			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
+			featureMapper.updateTargetField(OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
+		}
+
+		FeatureSchema schema = featureMapper.createSupervisedSchema();
+
+		return encodeModel(schema);
+	}
+
 	public boolean hasProbabilityDistribution(){
 		return true;
 	}
 
-	@Override
-	public Schema createSchema(){
-		FieldName targetField = SchemaUtil.createTargetField();
-		List<FieldName> activeFields = SchemaUtil.createActiveFields(getNumberOfFeatures());
+	public List<String> getTargetCategories(){
+		List<?> classes = getClasses();
+
+		if(classes == null || classes.isEmpty()){
+			throw new IllegalArgumentException();
+		}
 
 		Function<Object, String> function = new Function<Object, String>(){
 
@@ -65,25 +83,9 @@ public class Classifier extends Estimator {
 			}
 		};
 
-		List<String> targetCategories = new ArrayList<>(Lists.transform(getClasses(), function));
-		if(targetCategories.isEmpty()){
-			throw new IllegalArgumentException();
-		}
+		List<String> targetCategories = new ArrayList<>(Lists.transform(classes, function));
 
-		Schema schema = new Schema(targetField, targetCategories, activeFields);
-
-		return schema;
-	}
-
-	@Override
-	public DataField encodeTargetField(FieldName name, List<String> targetCategories){
-		DataField dataField = new DataField(name, OpType.CATEGORICAL, DataType.STRING);
-
-		List<Value> values = dataField.getValues();
-
-		values.addAll(PMMLUtil.createValues(targetCategories));
-
-		return dataField;
+		return targetCategories;
 	}
 
 	public List<?> getClasses(){

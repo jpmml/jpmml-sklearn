@@ -34,10 +34,10 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionNormalizationMethodType;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Classifier;
@@ -58,7 +58,7 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public MiningModel encodeModel(FeatureSchema schema){
 		int[] shape = getCoefShape();
 
 		int numberOfClasses = shape[0];
@@ -71,7 +71,7 @@ public class BaseLinearClassifier extends Classifier {
 
 		List<String> targetCategories = schema.getTargetCategories();
 
-		Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
+		FeatureSchema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
 
 		if(numberOfClasses == 1){
 
@@ -124,7 +124,7 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	static
-	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, String outputTransformation, Schema schema){
+	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, String outputTransformation, FeatureSchema schema){
 		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
 		Output output = new Output()

@@ -18,24 +18,40 @@
  */
 package sklearn.preprocessing;
 
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
-import org.jpmml.converter.PMMLUtil;
-import sklearn.OneToOneTransformer;
+import java.util.Collections;
+import java.util.List;
 
-public class Binarizer extends OneToOneTransformer {
+import org.dmg.pmml.Apply;
+import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
+import org.jpmml.sklearn.FeatureMapper;
+import sklearn.Transformer;
+
+public class Binarizer extends Transformer {
 
 	public Binarizer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public Expression encode(FieldName name){
+	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		Number threshold = getThreshold();
 
+		if(inputFeatures.size() != 1){
+			throw new IllegalArgumentException();
+		}
+
+		Feature inputFeature = inputFeatures.get(0);
+
 		// "($name <= threshold) ? 0 : 1"
-		return PMMLUtil.createApply("if", PMMLUtil.createApply("lessOrEqual", new FieldRef(name), PMMLUtil.createConstant(threshold)), PMMLUtil.createConstant(0), PMMLUtil.createConstant(1));
+		Apply apply = PMMLUtil.createApply("threshold", new FieldRef(inputFeature.getName()), PMMLUtil.createConstant(threshold));
+
+		DerivedField derivedField = featureMapper.createDerivedField(createName(id), apply);
+
+		return Collections.<Feature>singletonList(new ContinuousFeature(derivedField));
 	}
 
 	public Number getThreshold(){

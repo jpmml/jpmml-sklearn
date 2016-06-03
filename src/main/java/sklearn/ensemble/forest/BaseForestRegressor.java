@@ -24,7 +24,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
-import org.jpmml.converter.Schema;
+import org.jpmml.converter.FeatureSchema;
 import sklearn.Regressor;
 import sklearn.tree.TreeRegressor;
 
@@ -41,7 +41,7 @@ public class BaseForestRegressor extends Regressor {
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public MiningModel encodeModel(FeatureSchema schema){
 		List<TreeRegressor> estimators = getEstimators();
 
 		return BaseForestUtil.encodeBaseForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, schema);

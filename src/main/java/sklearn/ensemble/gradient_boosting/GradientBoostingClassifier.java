@@ -33,10 +33,10 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.RegressionNormalizationMethodType;
+import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
@@ -61,7 +61,7 @@ public class GradientBoostingClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public MiningModel encodeModel(FeatureSchema schema){
 		LossFunction loss = getLoss();
 
 		int numberOfClasses = loss.getK();
@@ -74,7 +74,7 @@ public class GradientBoostingClassifier extends Classifier {
 
 		List<String> targetCategories = schema.getTargetCategories();
 
-		Schema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
+		FeatureSchema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
 
 		if(numberOfClasses == 1){
 
@@ -160,7 +160,7 @@ public class GradientBoostingClassifier extends Classifier {
 	}
 
 	static
-	private MiningModel encodeCategoryRegressor(String targetCategory, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, String outputTransformation, Schema schema){
+	private MiningModel encodeCategoryRegressor(String targetCategory, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, String outputTransformation, FeatureSchema schema){
 		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
 
 		Output output = new Output()
