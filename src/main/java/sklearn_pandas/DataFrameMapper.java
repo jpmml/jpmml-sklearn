@@ -29,11 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.NormDiscrete;
-import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PseudoFeature;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -102,20 +98,6 @@ public class DataFrameMapper extends ClassDict {
 				}
 
 				features = transformer.encodeFeatures("(" + row + "," + column + ")", features, featureMapper);
-			} // End for
-
-			for(int i = 0; i < features.size(); i++){
-				Feature feature = features.get(i);
-
-				if(feature instanceof BinaryFeature){
-					BinaryFeature binaryFeature = (BinaryFeature)feature;
-
-					NormDiscrete normDiscrete = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
-
-					DerivedField derivedField = featureMapper.createDerivedField(FieldName.create((binaryFeature.getName()).getValue() + "[" + binaryFeature.getValue() + "]"), normDiscrete);
-
-					features.set(i, new ContinuousFeature(derivedField));
-				}
 			}
 
 			featureMapper.addStep(features);

@@ -58,6 +58,11 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	@Override
+	public boolean requiresContinuousInput(){
+		return false;
+	}
+
+	@Override
 	public MiningModel encodeModel(FeatureSchema schema){
 		int[] shape = getCoefShape();
 

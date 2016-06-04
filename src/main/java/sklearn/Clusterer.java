@@ -38,6 +38,10 @@ public class Clusterer extends Estimator {
 		} else
 
 		{
+			if(requiresContinuousInput()){
+				featureMapper.simplifyActiveFields(false, getOpType(), getDataType());
+			}
+
 			featureMapper.updateActiveFields(getNumberOfFeatures(), false, getOpType(), getDataType());
 		}
 

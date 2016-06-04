@@ -35,11 +35,13 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.TransformationDictionary;
 import org.dmg.pmml.TypeDefinitionField;
 import org.dmg.pmml.Value;
+import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureSchema;
@@ -194,18 +196,46 @@ public class FeatureMapper {
 		}
 	}
 
-	public void updateActiveFields(int numberOfFeatures, boolean supervised, OpType opType, DataType dataType){
-		int count = 0;
-
+	public void simplifyActiveFields(boolean supervised, OpType opType, DataType dataType){
 		List<List<Feature>> activeSteps = getActiveSteps(supervised);
+
 		for(List<Feature> activeStep : activeSteps){
 
 			for(ListIterator<Feature> featureIt = activeStep.listIterator(); featureIt.hasNext(); ){
 				Feature feature = featureIt.next();
 
-				updateType(feature.getName(), opType, dataType);
+				if(feature instanceof BinaryFeature){
+					BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+					NormDiscrete normDiscrete = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
+
+					DerivedField derivedField = createDerivedField(FieldName.create((binaryFeature.getName()).getValue() + "=" + binaryFeature.getValue()), opType, dataType, normDiscrete);
+
+					feature = new ContinuousFeature(derivedField);
+
+					featureIt.set(feature);
+				}
+			}
+		}
+	}
+
+	public void updateActiveFields(int numberOfFeatures, boolean supervised, OpType opType, DataType dataType){
+		List<List<Feature>> activeSteps = getActiveSteps(supervised);
+
+		int count = 0;
+
+		for(List<Feature> activeStep : activeSteps){
+
+			for(ListIterator<Feature> featureIt = activeStep.listIterator(); featureIt.hasNext(); ){
+				Feature feature = featureIt.next();
 
 				count++;
+
+				if(feature instanceof BinaryFeature){
+					continue;
+				}
+
+				updateType(feature.getName(), opType, dataType);
 
 				if(feature instanceof PseudoFeature){
 					DataField dataField = (DataField)getField(feature.getName());

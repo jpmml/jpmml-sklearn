@@ -42,6 +42,13 @@ public class BaggingClassifier extends Classifier {
 	}
 
 	@Override
+	public boolean requiresContinuousInput(){
+		Classifier baseEstimator = getBaseEstimator();
+
+		return baseEstimator.requiresContinuousInput();
+	}
+
+	@Override
 	public DataType getDataType(){
 		Classifier baseEstimator = getBaseEstimator();
 

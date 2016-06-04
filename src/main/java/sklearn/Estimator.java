@@ -46,6 +46,10 @@ public class Estimator extends BaseEstimator {
 		return ValueUtil.asInt((Number)get("n_features_"));
 	}
 
+	public boolean requiresContinuousInput(){
+		return true;
+	}
+
 	/**
 	 * The {@link OpType operational type} of active fields.
 	 */

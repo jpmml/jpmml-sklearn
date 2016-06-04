@@ -40,6 +40,13 @@ public class BaggingRegressor extends Regressor {
 	}
 
 	@Override
+	public boolean requiresContinuousInput(){
+		Regressor baseEstimator = getBaseEstimator();
+
+		return baseEstimator.requiresContinuousInput();
+	}
+
+	@Override
 	public DataType getDataType(){
 		Regressor baseEstimator = getBaseEstimator();
 

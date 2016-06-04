@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Node;
@@ -32,6 +31,8 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.TreeModel;
 import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
@@ -94,15 +95,38 @@ public class TreeModelUtil {
 
 			double threshold = thresholds[index];
 
-			String value = ValueUtil.formatValue(threshold);
+			Predicate leftPredicate;
+			Predicate rightPredicate;
 
-			FieldName name = feature.getName();
+			if(feature instanceof ContinuousFeature){
+				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
 
-			Predicate leftPredicate = new SimplePredicate(name, SimplePredicate.Operator.LESS_OR_EQUAL)
-				.setValue(value);
+				String value = ValueUtil.formatValue(threshold);
 
-			Predicate rightPredicate = new SimplePredicate(name, SimplePredicate.Operator.GREATER_THAN)
-				.setValue(value);
+				leftPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.LESS_OR_EQUAL)
+					.setValue(value);
+
+				rightPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.GREATER_THAN)
+					.setValue(value);
+			} else
+
+			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+				if(threshold < 0 || threshold > 1){
+					throw new IllegalArgumentException();
+				}
+
+				leftPredicate = new SimplePredicate(binaryFeature.getName(), SimplePredicate.Operator.NOT_EQUAL)
+					.setValue(binaryFeature.getValue());
+
+				rightPredicate = new SimplePredicate(binaryFeature.getName(), SimplePredicate.Operator.EQUAL)
+					.setValue(binaryFeature.getValue());
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
 
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];

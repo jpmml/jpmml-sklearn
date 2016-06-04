@@ -37,6 +37,11 @@ public class TreeRegressor extends Regressor implements HasTree {
 	}
 
 	@Override
+	public boolean requiresContinuousInput(){
+		return false;
+	}
+
+	@Override
 	public TreeModel encodeModel(FeatureSchema schema){
 		return TreeModelUtil.encodeTreeModel(this, MiningFunctionType.REGRESSION, schema);
 	}

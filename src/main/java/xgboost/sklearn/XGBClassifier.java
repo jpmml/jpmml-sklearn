@@ -39,6 +39,11 @@ public class XGBClassifier extends Classifier implements HasBooster {
 	}
 
 	@Override
+	public boolean requiresContinuousInput(){
+		return false;
+	}
+
+	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
 	}

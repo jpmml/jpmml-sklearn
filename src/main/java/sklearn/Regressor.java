@@ -41,6 +41,10 @@ public class Regressor extends Estimator {
 		} else
 
 		{
+			if(requiresContinuousInput()){
+				featureMapper.simplifyActiveFields(true, getOpType(), getDataType());
+			}
+
 			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
 			featureMapper.updateTargetField(OpType.CONTINUOUS, DataType.DOUBLE, null);
 		}

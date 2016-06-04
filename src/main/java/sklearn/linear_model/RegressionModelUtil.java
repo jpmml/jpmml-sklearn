@@ -21,12 +21,15 @@ package sklearn.linear_model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.CategoricalPredictor;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
@@ -68,17 +71,31 @@ public class RegressionModelUtil {
 			Number coefficient = coefficients.get(i);
 			Feature feature = features.get(i);
 
-			FieldName name = feature.getName();
-
 			if(ValueUtil.isZero(coefficient)){
-				unusedNames.add(name);
+				unusedNames.add(feature.getName());
 
 				continue;
+			} // End if
+
+			if(feature instanceof ContinuousFeature){
+				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
+
+				NumericPredictor numericPredictor = new NumericPredictor(continuousFeature.getName(), ValueUtil.asDouble(coefficient));
+
+				regressionTable.addNumericPredictors(numericPredictor);
+			} else
+
+			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+				CategoricalPredictor categoricalPredictor = new CategoricalPredictor(binaryFeature.getName(), binaryFeature.getValue(), ValueUtil.asDouble(coefficient));
+
+				regressionTable.addCategoricalPredictors(categoricalPredictor);
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
-
-			NumericPredictor numericPredictor = new NumericPredictor(name, ValueUtil.asDouble(coefficient));
-
-			regressionTable.addNumericPredictors(numericPredictor);
 		}
 
 		if(!unusedNames.isEmpty()){

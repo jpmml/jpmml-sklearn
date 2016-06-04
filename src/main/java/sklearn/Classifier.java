@@ -49,6 +49,10 @@ public class Classifier extends Estimator {
 		} else
 
 		{
+			if(requiresContinuousInput()){
+				featureMapper.simplifyActiveFields(true, getOpType(), getDataType());
+			}
+
 			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
 			featureMapper.updateTargetField(OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
 		}
