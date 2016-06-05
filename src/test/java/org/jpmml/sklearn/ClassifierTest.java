@@ -21,6 +21,7 @@ package org.jpmml.sklearn;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.Batch;
 import org.junit.Test;
@@ -80,6 +81,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateRidgeEnsembleAudit() throws Exception {
 		evaluate("RidgeEnsemble", "Audit");
+	}
+
+	@Test
+	public void evaluateVotingEnsembleAudit() throws Exception {
+		evaluate("VotingEnsemble", "Audit");
 	}
 
 	@Test
@@ -178,6 +184,16 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateNuSVCIris() throws Exception {
 		evaluate("NuSVC", "Iris");
+	}
+
+	@Test
+	public void evaluateVotingEnsembleIris() throws Exception {
+
+		try(Batch batch = createBatch("VotingEnsemble", "Iris")){
+			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("probability_setosa"), FieldName.create("probability_versicolor"), FieldName.create("probability_virginica"));
+
+			evaluate(batch, ignoredFields);
+		}
 	}
 
 	@Test

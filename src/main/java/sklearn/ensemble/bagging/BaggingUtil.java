@@ -64,7 +64,7 @@ public class BaggingUtil {
 				selectedFeatures.add(feature);
 			}
 
-			FeatureSchema estimatorSchema = new FeatureSchema(null, schema.getTargetCategories(), schema.getActiveFields(), selectedFeatures);
+			FeatureSchema estimatorSchema = new FeatureSchema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), selectedFeatures);
 
 			Model model = estimator.encodeModel(estimatorSchema);
 

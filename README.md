@@ -23,6 +23,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`ensemble.GradientBoostingRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
     * [`ensemble.RandomForestClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
     * [`ensemble.RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
+    * [`ensemble.VotingClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html)
   * Generalized Linear Models:
     * [`linear_model.ElasticNet`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
     * [`linear_model.ElasticNetCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html)

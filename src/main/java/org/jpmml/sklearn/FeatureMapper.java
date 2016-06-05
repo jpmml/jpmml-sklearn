@@ -35,6 +35,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
@@ -45,6 +46,7 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.ListFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PseudoFeature;
 
@@ -127,6 +129,66 @@ public class FeatureMapper {
 		return schema;
 	}
 
+	public FeatureSchema cast(OpType opType, DataType dataType, FeatureSchema schema){
+
+		if(opType != null && !(OpType.CONTINUOUS).equals(opType)){
+			throw new IllegalArgumentException();
+		}
+
+		String function = (dataType.name()).toLowerCase();
+
+		List<Feature> castFeatures = new ArrayList<>();
+
+		List<Feature> features = schema.getFeatures();
+		for(Feature feature : features){
+
+			cast:
+			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+				if(opType == null){
+					break cast;
+				}
+
+				FieldName name = FieldName.create(function + "(" + (binaryFeature.getName()).getValue() + "=" + binaryFeature.getValue() + ")");
+
+				DerivedField derivedField = this.derivedFields.get(name);
+				if(derivedField == null){
+					NormDiscrete normDiscrete = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
+
+					derivedField = createDerivedField(name, OpType.CONTINUOUS, dataType, normDiscrete);
+				}
+
+				feature = new ContinuousFeature(derivedField);
+			} else
+
+			if(feature instanceof ContinuousFeature){
+				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
+
+				if((continuousFeature instanceof ListFeature) || (continuousFeature.getDataType()).equals(dataType)){
+					break cast;
+				}
+
+				FieldName name = FieldName.create(function + "(" + (continuousFeature.getName()).getValue() + ")");
+
+				DerivedField derivedField = this.derivedFields.get(name);
+				if(derivedField == null){
+					FieldRef fieldRef = new FieldRef(continuousFeature.getName());
+
+					derivedField = createDerivedField(name, OpType.CONTINUOUS, dataType, fieldRef);
+				}
+
+				feature = new ContinuousFeature(derivedField);
+			}
+
+			castFeatures.add(feature);
+		}
+
+		FeatureSchema castSchema = new FeatureSchema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), castFeatures);
+
+		return castSchema;
+	}
+
 	public TypeDefinitionField getField(FieldName name){
 		DataField dataField = this.dataFields.get(name);
 		DerivedField derivedField = this.derivedFields.get(name);
@@ -187,43 +249,28 @@ public class FeatureMapper {
 
 	public void initActiveFields(List<FieldName> names, OpType opType, DataType dataType){
 
+		if(!(OpType.CONTINUOUS).equals(opType)){
+			throw new IllegalArgumentException();
+		}
+
 		for(FieldName name : names){
 			DataField dataField = createDataField(name, opType, dataType);
 
-			Feature feature = createActiveFeature(dataField);
+			Feature feature = new ContinuousFeature(dataField);
 
 			addStep(Collections.singletonList(feature));
 		}
 	}
 
-	public void simplifyActiveFields(boolean supervised, OpType opType, DataType dataType){
-		List<List<Feature>> activeSteps = getActiveSteps(supervised);
-
-		for(List<Feature> activeStep : activeSteps){
-
-			for(ListIterator<Feature> featureIt = activeStep.listIterator(); featureIt.hasNext(); ){
-				Feature feature = featureIt.next();
-
-				if(feature instanceof BinaryFeature){
-					BinaryFeature binaryFeature = (BinaryFeature)feature;
-
-					NormDiscrete normDiscrete = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
-
-					DerivedField derivedField = createDerivedField(FieldName.create((binaryFeature.getName()).getValue() + "=" + binaryFeature.getValue()), opType, dataType, normDiscrete);
-
-					feature = new ContinuousFeature(derivedField);
-
-					featureIt.set(feature);
-				}
-			}
-		}
-	}
-
 	public void updateActiveFields(int numberOfFeatures, boolean supervised, OpType opType, DataType dataType){
-		List<List<Feature>> activeSteps = getActiveSteps(supervised);
+
+		if(!(OpType.CONTINUOUS).equals(opType)){
+			throw new IllegalArgumentException();
+		}
 
 		int count = 0;
 
+		List<List<Feature>> activeSteps = getActiveSteps(supervised);
 		for(List<Feature> activeStep : activeSteps){
 
 			for(ListIterator<Feature> featureIt = activeStep.listIterator(); featureIt.hasNext(); ){
@@ -240,7 +287,7 @@ public class FeatureMapper {
 				if(feature instanceof PseudoFeature){
 					DataField dataField = (DataField)getField(feature.getName());
 
-					feature = createActiveFeature(dataField);
+					feature = new ContinuousFeature(dataField);
 
 					featureIt.set(feature);
 				}
@@ -322,17 +369,6 @@ public class FeatureMapper {
 
 		if(this.dataFields.containsKey(name) || this.derivedFields.containsKey(name)){
 			throw new IllegalArgumentException();
-		}
-	}
-
-	private Feature createActiveFeature(DataField dataField){
-		OpType opType = dataField.getOpType();
-
-		switch(opType){
-			case CONTINUOUS:
-				return new ContinuousFeature(dataField);
-			default:
-				return new PseudoFeature(dataField);
 		}
 	}
 

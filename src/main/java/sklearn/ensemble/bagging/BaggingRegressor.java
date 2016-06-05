@@ -21,8 +21,6 @@ package sklearn.ensemble.bagging;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunctionType;
@@ -30,7 +28,7 @@ import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.FeatureSchema;
-import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 public class BaggingRegressor extends Regressor {
@@ -62,7 +60,7 @@ public class BaggingRegressor extends Regressor {
 
 	@Override
 	public MiningModel encodeModel(FeatureSchema schema){
-		List<Regressor> estimators = getEstimators();
+		List<? extends Regressor> estimators = getEstimators();
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
 		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, schema);
@@ -80,13 +78,13 @@ public class BaggingRegressor extends Regressor {
 	public Regressor getBaseEstimator(){
 		Object baseEstimator = get("base_estimator_");
 
-		return BaggingRegressor.transformer.apply(baseEstimator);
+		return EstimatorUtil.asRegressor(baseEstimator);
 	}
 
-	public List<Regressor> getEstimators(){
+	public List<? extends Regressor> getEstimators(){
 		List<?> estimators = (List)get("estimators_");
 
-		return Lists.transform(estimators, BaggingRegressor.transformer);
+		return EstimatorUtil.asRegressorList(estimators);
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
@@ -94,21 +92,4 @@ public class BaggingRegressor extends Regressor {
 
 		return BaggingUtil.transformEstimatorsFeatures(estimatorsFeatures);
 	}
-
-	private static final Function<Object, Regressor> transformer = new Function<Object, Regressor>(){
-
-		@Override
-		public Regressor apply(Object object){
-
-			try {
-				if(object == null){
-					throw new NullPointerException();
-				}
-
-				return (Regressor)object;
-			} catch(RuntimeException re){
-				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not a Regressor or is not a supported Regressor subclass");
-			}
-		}
-	};
 }

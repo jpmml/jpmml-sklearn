@@ -41,13 +41,13 @@ public class OneHotEncoder extends Transformer {
 	}
 
 	@Override
-	public DataType getDataType(){
-		return DataType.INTEGER;
+	public OpType getOpType(){
+		return OpType.CATEGORICAL;
 	}
 
 	@Override
-	public OpType getOpType(){
-		return OpType.CATEGORICAL;
+	public DataType getDataType(){
+		return DataType.INTEGER;
 	}
 
 	@Override

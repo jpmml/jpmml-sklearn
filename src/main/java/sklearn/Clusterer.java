@@ -18,7 +18,7 @@
  */
 package sklearn;
 
-import org.dmg.pmml.Model;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.sklearn.FeatureMapper;
@@ -31,22 +31,22 @@ public class Clusterer extends Estimator {
 	}
 
 	@Override
-	public Model encodeModel(FeatureMapper featureMapper){
+	public FeatureSchema createSchema(FeatureMapper featureMapper){
 
 		if(featureMapper.isEmpty()){
 			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
 		} else
 
 		{
-			if(requiresContinuousInput()){
-				featureMapper.simplifyActiveFields(false, getOpType(), getDataType());
-			}
-
 			featureMapper.updateActiveFields(getNumberOfFeatures(), false, getOpType(), getDataType());
 		}
 
 		FeatureSchema schema = featureMapper.createUnsupervisedSchema();
 
-		return encodeModel(schema);
+		if(requiresContinuousInput()){
+			schema = featureMapper.cast(OpType.CONTINUOUS, getDataType(), schema);
+		}
+
+		return schema;
 	}
 }

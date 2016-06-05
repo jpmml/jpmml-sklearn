@@ -21,8 +21,6 @@ package sklearn.ensemble.bagging;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunctionType;
@@ -32,8 +30,8 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
 public class BaggingClassifier extends Classifier {
 
@@ -64,7 +62,7 @@ public class BaggingClassifier extends Classifier {
 
 	@Override
 	public MiningModel encodeModel(FeatureSchema schema){
-		List<Classifier> estimators = getEstimators();
+		List<? extends Classifier> estimators = getEstimators();
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
 		MultipleModelMethodType multipleModelMethod = MultipleModelMethodType.AVERAGE;
@@ -96,13 +94,13 @@ public class BaggingClassifier extends Classifier {
 	public Classifier getBaseEstimator(){
 		Object baseEstimator = get("base_estimator_");
 
-		return BaggingClassifier.transformer.apply(baseEstimator);
+		return EstimatorUtil.asClassifier(baseEstimator);
 	}
 
-	public List<Classifier> getEstimators(){
+	public List<? extends Classifier> getEstimators(){
 		List<?> estimators = (List)get("estimators_");
 
-		return Lists.transform(estimators, BaggingClassifier.transformer);
+		return EstimatorUtil.asClassifierList(estimators);
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
@@ -110,21 +108,4 @@ public class BaggingClassifier extends Classifier {
 
 		return BaggingUtil.transformEstimatorsFeatures(estimatorsFeatures);
 	}
-
-	private static final Function<Object, Classifier> transformer = new Function<Object, Classifier>(){
-
-		@Override
-		public Classifier apply(Object object){
-
-			try {
-				if(object == null){
-					throw new NullPointerException();
-				}
-
-				return (Classifier)object;
-			} catch(RuntimeException re){
-				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not a Classifier or is not a supported Classifier subclass", re);
-			}
-		}
-	};
 }

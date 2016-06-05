@@ -19,7 +19,6 @@
 package sklearn;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.SchemaUtil;
@@ -33,24 +32,27 @@ public class Regressor extends Estimator {
 	}
 
 	@Override
-	public Model encodeModel(FeatureMapper featureMapper){
+	public FeatureSchema createSchema(FeatureMapper featureMapper){
+		FeatureSchema result;
 
 		if(featureMapper.isEmpty()){
 			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
 			featureMapper.initTargetField(SchemaUtil.createTargetField(), OpType.CONTINUOUS, DataType.DOUBLE, null);
+
+			result = featureMapper.createSupervisedSchema();
 		} else
 
 		{
-			if(requiresContinuousInput()){
-				featureMapper.simplifyActiveFields(true, getOpType(), getDataType());
-			}
-
 			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
 			featureMapper.updateTargetField(OpType.CONTINUOUS, DataType.DOUBLE, null);
+
+			result = featureMapper.createSupervisedSchema();
+
+			if(requiresContinuousInput()){
+				result = featureMapper.cast(OpType.CONTINUOUS, getDataType(), result);
+			}
 		}
 
-		FeatureSchema schema = featureMapper.createSupervisedSchema();
-
-		return encodeModel(schema);
+		return result;
 	}
 }

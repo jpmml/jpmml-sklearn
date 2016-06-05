@@ -37,10 +37,10 @@ public class Estimator extends BaseEstimator {
 	}
 
 	abstract
-	public Model encodeModel(FeatureSchema schema);
+	public FeatureSchema createSchema(FeatureMapper featureMapper);
 
 	abstract
-	public Model encodeModel(FeatureMapper featureMapper);
+	public Model encodeModel(FeatureSchema schema);
 
 	public int getNumberOfFeatures(){
 		return ValueUtil.asInt((Number)get("n_features_"));

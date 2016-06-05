@@ -24,6 +24,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
@@ -47,6 +49,7 @@ import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.visitors.DictionaryCleaner;
 import org.jpmml.model.visitors.MiningSchemaCleaner;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 
 public class EstimatorUtil {
@@ -56,10 +59,9 @@ public class EstimatorUtil {
 
 	static
 	public PMML encodePMML(Estimator estimator, FeatureMapper featureMapper){
-		Model model = estimator.encodeModel(featureMapper);
+		FeatureSchema schema = estimator.createSchema(featureMapper);
 
-		PMML pmml = featureMapper.encodePMML()
-			.addModels(model);
+		PMML pmml = featureMapper.encodePMML();
 
 		Set<DefineFunction> defineFunctions = estimator.encodeDefineFunctions();
 		if(defineFunctions != null && defineFunctions.size() > 0){
@@ -75,6 +77,10 @@ public class EstimatorUtil {
 				transformationDictionary.addDefineFunctions(defineFunction);
 			}
 		}
+
+		Model model = estimator.encodeModel(schema);
+
+		pmml.addModels(model);
 
 		// XXX
 		MiningSchemaCleaner miningSchemaCleaner = new MiningSchemaCleaner(){
@@ -147,6 +153,26 @@ public class EstimatorUtil {
 	}
 
 	static
+	public Classifier asClassifier(Object object){
+		return EstimatorUtil.classifierTransformer.apply(object);
+	}
+
+	static
+	public List<? extends Classifier> asClassifierList(List<?> objects){
+		return Lists.transform(objects, EstimatorUtil.classifierTransformer);
+	}
+
+	static
+	public Regressor asRegressor(Object object){
+		return EstimatorUtil.regressorTransformer.apply(object);
+	}
+
+	static
+	public List<? extends Regressor> asRegressorList(List<?> objects){
+		return Lists.transform(objects, EstimatorUtil.regressorTransformer);
+	}
+
+	static
 	public DefineFunction encodeLogitFunction(){
 		return encodeLossFunction("logit", -1d);
 	}
@@ -175,4 +201,38 @@ public class EstimatorUtil {
 
 		return defineFunction;
 	}
+
+	private static final Function<Object, Classifier> classifierTransformer = new Function<Object, Classifier>(){
+
+		@Override
+		public Classifier apply(Object object){
+
+			try {
+				if(object == null){
+					throw new NullPointerException();
+				}
+
+				return (Classifier)object;
+			} catch(RuntimeException re){
+				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not a Classifier or is not a supported Classifier subclass", re);
+			}
+		}
+	};
+
+	private static final Function<Object, Regressor> regressorTransformer = new Function<Object, Regressor>(){
+
+		@Override
+		public Regressor apply(Object object){
+
+			try {
+				if(object == null){
+					throw new NullPointerException();
+				}
+
+				return (Regressor)object;
+			} catch(RuntimeException re){
+				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not a Regressor or is not a supported Regressor subclass", re);
+			}
+		}
+	};
 }

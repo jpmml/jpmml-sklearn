@@ -25,7 +25,6 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.SchemaUtil;
@@ -41,7 +40,7 @@ public class Classifier extends Estimator {
 	}
 
 	@Override
-	public Model encodeModel(FeatureMapper featureMapper){
+	public FeatureSchema createSchema(FeatureMapper featureMapper){
 
 		if(featureMapper.isEmpty()){
 			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
@@ -49,17 +48,17 @@ public class Classifier extends Estimator {
 		} else
 
 		{
-			if(requiresContinuousInput()){
-				featureMapper.simplifyActiveFields(true, getOpType(), getDataType());
-			}
-
 			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
 			featureMapper.updateTargetField(OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
 		}
 
 		FeatureSchema schema = featureMapper.createSupervisedSchema();
 
-		return encodeModel(schema);
+		if(requiresContinuousInput()){
+			schema = featureMapper.cast(OpType.CONTINUOUS, getDataType(), schema);
+		}
+
+		return schema;
 	}
 
 	public boolean hasProbabilityDistribution(){

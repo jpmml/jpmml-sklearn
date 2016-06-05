@@ -5,6 +5,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble.bagging import BaggingClassifier, BaggingRegressor
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
+from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
@@ -142,6 +143,7 @@ build_audit(GaussianNB(), "NaiveBayesAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
+build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 build_audit(XGBClassifier(objective = "binary:logistic"), "XGBAudit")
 
 versicolor_df = load_csv("Versicolor.csv")
@@ -234,6 +236,7 @@ build_iris(SGDClassifier(random_state = 13, n_iter = 100), "SGDIris", with_proba
 build_iris(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogIris")
 build_iris(SVC(), "SVCIris", with_proba = False)
 build_iris(NuSVC(), "NuSVCIris", with_proba = False)
+build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
 build_iris(XGBClassifier(objective = "multi:softmax"), "XGBIris")
 
 #
