@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.Visitor;
@@ -85,6 +87,11 @@ public class EstimatorTest extends IntegrationTest {
 		};
 
 		return result;
+	}
+
+	@Override
+	public void evaluate(Batch batch, Set<FieldName> ignoredFields) throws Exception {
+		super.evaluate(batch, ignoredFields, 1e-12, 1e-12);
 	}
 
 	static
