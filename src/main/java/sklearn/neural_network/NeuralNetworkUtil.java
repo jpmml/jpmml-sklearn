@@ -296,18 +296,15 @@ public class NeuralNetworkUtil {
 	static
 	private ActivationFunctionType parseActivationFunction(String activation){
 
-		if(("identity").equals(activation)){
-			return ActivationFunctionType.IDENTITY;
-		} else
-
-		if(("tanh").equals(activation)){
-			return ActivationFunctionType.TANH;
-		} else
-
-		if(("logistic").equals(activation)){
-			return ActivationFunctionType.LOGISTIC;
+		switch(activation){
+			case "identity":
+				return ActivationFunctionType.IDENTITY;
+			case "logistic":
+				return ActivationFunctionType.LOGISTIC;
+			case "tanh":
+				return ActivationFunctionType.TANH;
+			default:
+				throw new IllegalArgumentException(activation);
 		}
-
-		throw new IllegalArgumentException(activation);
 	}
 }

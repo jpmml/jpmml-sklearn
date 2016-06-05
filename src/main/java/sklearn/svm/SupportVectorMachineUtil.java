@@ -161,29 +161,24 @@ public class SupportVectorMachineUtil {
 	static
 	public Kernel encodeKernel(String kernel, Integer degree, Double gamma, Double coef0){
 
-		if(("linear").equals(kernel)){
-			return new LinearKernel();
-		} else
-
-		if(("poly").equals(kernel)){
-			return new PolynomialKernel()
-				.setDegree(ValueUtil.asDouble(degree))
-				.setCoef0(coef0)
-				.setGamma(gamma);
-		} else
-
-		if(("rbf").equals(kernel)){
-			return new RadialBasisKernel()
-				.setGamma(gamma);
-		} else
-
-		if(("sigmoid").equals(kernel)){
-			return new SigmoidKernel()
-				.setCoef0(coef0)
-				.setGamma(gamma);
+		switch(kernel){
+			case "linear":
+				return new LinearKernel();
+			case "poly":
+				return new PolynomialKernel()
+					.setDegree(ValueUtil.asDouble(degree))
+					.setCoef0(coef0)
+					.setGamma(gamma);
+			case "rbf":
+				return new RadialBasisKernel()
+					.setGamma(gamma);
+			case "sigmoid":
+				return new SigmoidKernel()
+					.setCoef0(coef0)
+					.setGamma(gamma);
+			default:
+				throw new IllegalArgumentException(kernel);
 		}
-
-		throw new IllegalArgumentException(kernel);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(SupportVectorMachineUtil.class);

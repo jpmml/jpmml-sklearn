@@ -150,30 +150,31 @@ public class KNeighborsUtil {
 	static
 	private ComparisonMeasure encodeComparisonMeasure(String metric, int p){
 
-		if(("minkowski").equals(metric)){
-			Measure measure;
+		switch(metric){
+			case "minkowski":
+				{
+					Measure measure;
 
-			switch(p){
-				case 1:
-					measure = new CityBlock();
-					break;
-				case 2:
-					measure = new Euclidean();
-					break;
-				default:
-					measure = new Minkowski(p);
-					break;
-			}
+					switch(p){
+						case 1:
+							measure = new CityBlock();
+							break;
+						case 2:
+							measure = new Euclidean();
+							break;
+						default:
+							measure = new Minkowski(p);
+							break;
+					}
 
-			ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
-				.setCompareFunction(CompareFunctionType.ABS_DIFF)
-				.setMeasure(measure);
+					ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
+						.setCompareFunction(CompareFunctionType.ABS_DIFF)
+						.setMeasure(measure);
 
-			return comparisonMeasure;
-		} else
-
-		{
-			throw new IllegalArgumentException(metric);
+					return comparisonMeasure;
+				}
+			default:
+				throw new IllegalArgumentException(metric);
 		}
 	}
 }

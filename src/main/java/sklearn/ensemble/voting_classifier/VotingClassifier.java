@@ -130,7 +130,7 @@ public class VotingClassifier extends Classifier {
 
 		String voting = getVoting();
 
-		MultipleModelMethodType multipleModelMethod = encodeMultipleModelMethod(voting, (weights != null && weights.size() > 0));
+		MultipleModelMethodType multipleModelMethod = parseVoting(voting, (weights != null && weights.size() > 0));
 
 		Segmentation segmentation = MiningModelUtil.createSegmentation(multipleModelMethod, models, weights);
 
@@ -166,18 +166,15 @@ public class VotingClassifier extends Classifier {
 	}
 
 	static
-	private MultipleModelMethodType encodeMultipleModelMethod(String voting, boolean weighted){
+	private MultipleModelMethodType parseVoting(String voting, boolean weighted){
 
-		if(("soft").equals(voting)){
-			return (weighted ? MultipleModelMethodType.WEIGHTED_AVERAGE : MultipleModelMethodType.AVERAGE);
-		} else
-
-		if(("hard").equals(voting)){
-			return (weighted ? MultipleModelMethodType.WEIGHTED_MAJORITY_VOTE : MultipleModelMethodType.MAJORITY_VOTE);
-		} else
-
-		{
-			throw new IllegalArgumentException(voting);
+		switch(voting){
+			case "hard":
+				return (weighted ? MultipleModelMethodType.WEIGHTED_MAJORITY_VOTE : MultipleModelMethodType.MAJORITY_VOTE);
+			case "soft":
+				return (weighted ? MultipleModelMethodType.WEIGHTED_AVERAGE : MultipleModelMethodType.AVERAGE);
+			default:
+				throw new IllegalArgumentException(voting);
 		}
 	}
 
