@@ -93,7 +93,7 @@ public class TreeModelUtil {
 		if(featureIndex >= 0){
 			Feature feature = schema.getFeature(featureIndex);
 
-			double threshold = thresholds[index];
+			float threshold = (float)thresholds[index];
 
 			Predicate leftPredicate;
 			Predicate rightPredicate;
