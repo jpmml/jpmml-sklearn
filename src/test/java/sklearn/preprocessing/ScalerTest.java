@@ -43,7 +43,7 @@ class ScalerTest {
 		DataField dataField = featureMapper.createDataField(FieldName.create("x"));
 
 		Feature inputFeature = new PseudoFeature(dataField);
-		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures("test", Collections.singletonList(inputFeature), featureMapper));
+		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), featureMapper));
 
 		assertSame(inputFeature, outputFeature);
 	}
@@ -54,7 +54,7 @@ class ScalerTest {
 		DataField dataField = featureMapper.createDataField(FieldName.create("x"));
 
 		Feature inputFeature = new PseudoFeature(dataField);
-		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures("test", Collections.singletonList(inputFeature), featureMapper));
+		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), featureMapper));
 
 		assertNotSame(inputFeature, outputFeature);
 

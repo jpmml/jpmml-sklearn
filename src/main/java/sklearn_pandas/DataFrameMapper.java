@@ -20,13 +20,10 @@ package sklearn_pandas;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.FieldName;
@@ -35,8 +32,6 @@ import org.jpmml.converter.PseudoFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.TupleUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sklearn.Transformer;
 
 public class DataFrameMapper extends ClassDict {
@@ -48,46 +43,21 @@ public class DataFrameMapper extends ClassDict {
 	public void encodeFeatures(FeatureMapper featureMapper){
 		List<Object[]> steps = getFeatures();
 
-		if(steps.size() < 1){
-			logger.warn("The list of mappings is empty");
-
-			return;
-		}
-
-		Set<FieldName> mappedNames = new LinkedHashSet<>();
-
 		for(int row = 0; row < steps.size(); row++){
 			Object[] step = steps.get(row);
 
 			List<Feature> features = new ArrayList<>();
 
-			Set<FieldName> uniqueNames = new LinkedHashSet<>();
-			Set<FieldName> duplicateNames = new LinkedHashSet<>();
-
-			List<FieldName> names = getNameList(step);
-			for(FieldName name : names){
-				DataField dataField = featureMapper.createDataField(name);
+			List<String> names = getNameList(step);
+			for(String name : names){
+				DataField dataField = featureMapper.createDataField(FieldName.create(name));
 
 				Feature feature = new PseudoFeature(dataField);
 
 				features.add(feature);
-
-				boolean unique = uniqueNames.add(name);
-				if(!unique){
-					duplicateNames.add(name);
-				}
 			}
 
-			Sets.SetView<FieldName> duplicateMappedNames = Sets.intersection(uniqueNames, mappedNames);
-			if(duplicateMappedNames.size() > 0){
-				duplicateMappedNames.copyInto(duplicateNames);
-			} // End if
-
-			if(duplicateNames.size() > 0){
-				logger.error("Duplicate mappings(s): {}", new ArrayList<>(duplicateNames));
-
-				throw new IllegalArgumentException();
-			}
+			List<String> ids = new ArrayList<>(names);
 
 			List<Transformer> transformers = getTransformerList(step);
 			for(int column = 0; column < transformers.size(); column++){
@@ -97,7 +67,7 @@ public class DataFrameMapper extends ClassDict {
 					featureMapper.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
 				}
 
-				features = transformer.encodeFeatures("(" + row + "," + column + ")", features, featureMapper);
+				features = transformer.encodeFeatures(ids, features, featureMapper);
 			}
 
 			featureMapper.addStep(features);
@@ -109,14 +79,14 @@ public class DataFrameMapper extends ClassDict {
 	}
 
 	static
-	private List<FieldName> getNameList(Object[] feature){
-		Function<Object, FieldName> function = new Function<Object, FieldName>(){
+	private List<String> getNameList(Object[] feature){
+		Function<Object, String> function = new Function<Object, String>(){
 
 			@Override
-			public FieldName apply(Object object){
+			public String apply(Object object){
 
 				if(object instanceof String){
-					return FieldName.create((String)object);
+					return (String)object;
 				}
 
 				throw new IllegalArgumentException("The key object (" + ClassDictUtil.formatClass(object) + ") is not a String");
@@ -171,6 +141,4 @@ public class DataFrameMapper extends ClassDict {
 			throw new IllegalArgumentException("Invalid mapping value", re);
 		}
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(DataFrameMapper.class);
 }

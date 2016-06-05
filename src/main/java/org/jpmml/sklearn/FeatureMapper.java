@@ -368,7 +368,7 @@ public class FeatureMapper {
 	private void checkName(FieldName name){
 
 		if(this.dataFields.containsKey(name) || this.derivedFields.containsKey(name)){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException((name.getValue()).toString());
 		}
 	}
 

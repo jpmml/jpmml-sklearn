@@ -55,14 +55,14 @@ public class LabelBinarizerTest {
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 
-		List<Feature> outputFeatures = binarizer.encodeFeatures("apply", Collections.singletonList(inputFeature), featureMapper);
+		List<Feature> outputFeatures = binarizer.encodeFeatures(Collections.singletonList("apply"), Collections.singletonList(inputFeature), featureMapper);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof ContinuousFeature);
 		}
 
 		binarizer.put("neg_label", 0d);
 
-		outputFeatures = binarizer.encodeFeatures("normDiscrete", Collections.singletonList(inputFeature), featureMapper);
+		outputFeatures = binarizer.encodeFeatures(Collections.singletonList("normDiscrete"), Collections.singletonList(inputFeature), featureMapper);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof BinaryFeature);
 		}

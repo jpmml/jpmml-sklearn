@@ -39,7 +39,7 @@ public class RobustScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		Boolean withCentering = getWithCentering();
 		Boolean withScaling = getWithScaling();
 
@@ -48,6 +48,10 @@ public class RobustScaler extends Transformer {
 
 		if(center == null && scale == null){
 			return inputFeatures;
+		} // End if
+
+		if(ids.size() != inputFeatures.size()){
+			throw new IllegalArgumentException();
 		} // End if
 
 		if(withCentering && inputFeatures.size() != center.size()){
@@ -61,6 +65,7 @@ public class RobustScaler extends Transformer {
 		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < inputFeatures.size(); i++){
+			String id = ids.get(i);
 			Feature inputFeature = inputFeatures.get(i);
 
 			// "($name - center) / scale"
@@ -88,7 +93,7 @@ public class RobustScaler extends Transformer {
 				continue;
 			}
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), expression);
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
 
 			features.add(new ContinuousFeature(derivedField));
 		}

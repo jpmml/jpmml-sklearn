@@ -20,6 +20,7 @@ package sklearn.decomposition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
@@ -41,15 +42,17 @@ public class PCA extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		int[] shape = getComponentsShape();
 
 		int numberOfComponents = shape[0];
 		int numberOfFeatures = shape[1];
 
-		if(inputFeatures.size() != numberOfFeatures){
+		if(ids.size() != numberOfFeatures || inputFeatures.size() != numberOfFeatures){
 			throw new IllegalArgumentException();
 		}
+
+		String id = String.valueOf(PCA.SEQUENCE.getAndIncrement());
 
 		List<? extends Number> components = getComponents();
 		List<? extends Number> mean = getMean();
@@ -57,6 +60,8 @@ public class PCA extends Transformer {
 		Boolean whiten = getWhiten();
 
 		List<? extends Number> explainedVariance = (whiten ? getExplainedVariance() : null);
+
+		ids.clear();
 
 		List<Feature> features = new ArrayList<>();
 
@@ -94,6 +99,8 @@ public class PCA extends Transformer {
 
 			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
 
+			ids.add((derivedField.getName()).getValue());
+
 			features.add(new ContinuousFeature(derivedField));
 		}
 
@@ -124,4 +131,6 @@ public class PCA extends Transformer {
 	private int[] getComponentsShape(){
 		return ClassDictUtil.getShape(this, "components_", 2);
 	}
+
+	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);
 }

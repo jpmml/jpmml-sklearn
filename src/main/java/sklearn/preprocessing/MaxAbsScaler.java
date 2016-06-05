@@ -39,16 +39,17 @@ public class MaxAbsScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		List<? extends Number> scale = getScale();
 
-		if(inputFeatures.size() != scale.size()){
+		if(ids.size() != inputFeatures.size() || scale.size() != inputFeatures.size()){
 			throw new IllegalArgumentException();
 		}
 
 		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < inputFeatures.size(); i++){
+			String id = ids.get(i);
 			Feature inputFeature = inputFeatures.get(i);
 
 			Number value = scale.get(i);
@@ -61,7 +62,7 @@ public class MaxAbsScaler extends Transformer {
 			// "$name / scale"
 			Apply apply = PMMLUtil.createApply("/", new FieldRef(inputFeature.getName()), PMMLUtil.createConstant(value));
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id), apply);
 
 			features.add(new ContinuousFeature(derivedField));
 		}

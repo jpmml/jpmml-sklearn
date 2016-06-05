@@ -38,10 +38,10 @@ public class Imputer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		List<? extends Number> statistics = getStatistics();
 
-		if(statistics.size() != inputFeatures.size()){
+		if(ids.size() != inputFeatures.size() || statistics.size() != inputFeatures.size()){
 			throw new IllegalArgumentException();
 		}
 
@@ -50,6 +50,7 @@ public class Imputer extends Transformer {
 		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < inputFeatures.size(); i++){
+			String id = ids.get(i);
 			Feature inputFeature = inputFeatures.get(i);
 
 			Expression expression = new FieldRef(inputFeature.getName());
@@ -73,7 +74,7 @@ public class Imputer extends Transformer {
 			// "($name == null) ? statistics : $name"
 			expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), new FieldRef(inputFeature.getName()));
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), expression);
+			DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
 
 			features.add(new ContinuousFeature(derivedField));
 		}

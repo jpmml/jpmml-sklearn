@@ -37,7 +37,7 @@ public class Transformer extends ClassDict {
 	}
 
 	abstract
-	public List<Feature> encodeFeatures(String id, List<Feature> features, FeatureMapper featureMapper);
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, FeatureMapper featureMapper);
 
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
@@ -60,10 +60,10 @@ public class Transformer extends ClassDict {
 	}
 
 	protected FieldName createName(String id){
-		return FieldName.create(name() + id);
+		return FieldName.create(name() + "(" + id + ")");
 	}
 
 	protected FieldName createName(String id, int index){
-		return FieldName.create(name() + id + "[" + index + "]");
+		return FieldName.create(name() + "(" + id + ")[" + index + "]");
 	}
 }

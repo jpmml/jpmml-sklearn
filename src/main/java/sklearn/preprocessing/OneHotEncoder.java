@@ -56,10 +56,10 @@ public class OneHotEncoder extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		List<? extends Number> values = getValues();
 
-		if(inputFeatures.size() != 1){
+		if(ids.size() != 1 || inputFeatures.size() != 1){
 			throw new IllegalArgumentException();
 		}
 

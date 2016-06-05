@@ -37,13 +37,14 @@ public class Binarizer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(String id, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
 		Number threshold = getThreshold();
 
-		if(inputFeatures.size() != 1){
+		if(ids.size() != 1 || inputFeatures.size() != 1){
 			throw new IllegalArgumentException();
 		}
 
+		String id = ids.get(0);
 		Feature inputFeature = inputFeatures.get(0);
 
 		// "($name <= threshold) ? 0 : 1"
