@@ -24,11 +24,15 @@ import java.util.List;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.MissingValueTreatmentMethodType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.PseudoFeature;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.MissingValueDecorator;
 import sklearn.Transformer;
 
 public class Imputer extends Transformer {
@@ -47,36 +51,52 @@ public class Imputer extends Transformer {
 
 		Object missingValues = getMissingValues();
 
+		Number targetValue = getTargetValue(missingValues);
+
 		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < inputFeatures.size(); i++){
 			String id = ids.get(i);
 			Feature inputFeature = inputFeatures.get(i);
 
-			Expression expression = new FieldRef(inputFeature.getName());
+			Number statisticValue = statistics.get(i);
 
-			if(missingValues instanceof String){
-				expression = PMMLUtil.createApply("isMissing", expression);
-			} else
+			if(inputFeature instanceof PseudoFeature){
+				PseudoFeature pseudoFeature = (PseudoFeature)inputFeature;
 
-			if(missingValues instanceof Number){
-				Number number = (Number)missingValues;
+				String strategy = getStrategy();
 
-				expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(number));
+				MissingValueDecorator decorator = new MissingValueDecorator()
+					.setMissingValueReplacement(ValueUtil.formatValue(statisticValue))
+					.setMissingValueTreatment(parseStrategy(strategy));
+
+				if(targetValue != null){
+					decorator.addMissingValues(ValueUtil.formatValue(targetValue));
+				}
+
+				featureMapper.addDecorator(pseudoFeature.getName(), decorator);
+
+				features.add(inputFeature);
 			} else
 
 			{
-				throw new IllegalArgumentException();
+				Expression expression = new FieldRef(inputFeature.getName());
+
+				if(targetValue == null){
+					expression = PMMLUtil.createApply("isMissing", expression);
+				} else
+
+				{
+					expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(targetValue));
+				}
+
+				// "($name == null) ? statistics : $name"
+				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), new FieldRef(inputFeature.getName()));
+
+				DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
+
+				features.add(new ContinuousFeature(derivedField));
 			}
-
-			Number statisticValue = statistics.get(i);
-
-			// "($name == null) ? statistics : $name"
-			expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), new FieldRef(inputFeature.getName()));
-
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
-
-			features.add(new ContinuousFeature(derivedField));
 		}
 
 		return features;
@@ -88,5 +108,40 @@ public class Imputer extends Transformer {
 
 	public List<? extends Number> getStatistics(){
 		return (List)ClassDictUtil.getArray(this, "statistics_");
+	}
+
+	public String getStrategy(){
+		return (String)get("strategy");
+	}
+
+	static
+	private Number getTargetValue(Object object){
+
+		if(object instanceof String){
+			return null;
+		} else
+
+		if(object instanceof Number){
+			return (Number)object;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	static
+	private MissingValueTreatmentMethodType parseStrategy(String strategy){
+
+		switch(strategy){
+			case "mean":
+				return MissingValueTreatmentMethodType.AS_MEAN;
+			case "median":
+				return MissingValueTreatmentMethodType.AS_MEDIAN;
+			case "most_frequent":
+				return MissingValueTreatmentMethodType.AS_MODE;
+			default:
+				throw new IllegalArgumentException(strategy);
+		}
 	}
 }

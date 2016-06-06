@@ -26,6 +26,7 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
@@ -51,6 +52,7 @@ import org.jpmml.model.visitors.DictionaryCleaner;
 import org.jpmml.model.visitors.MiningSchemaCleaner;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.MiningFieldDecorator;
 
 public class EstimatorUtil {
 
@@ -140,6 +142,24 @@ public class EstimatorUtil {
 		List<? extends Visitor> visitors = Arrays.asList(miningSchemaCleaner, dictionaryCleaner);
 		for(Visitor visitor : visitors){
 			visitor.applyTo(pmml);
+		}
+
+		MiningSchema miningSchema = model.getMiningSchema();
+
+		List<MiningField> miningFields = miningSchema.getMiningFields();
+		for(MiningField miningField : miningFields){
+			FieldName name = miningField.getName();
+
+			List<MiningFieldDecorator> decorators = featureMapper.getDecorators(name);
+			if(decorators == null){
+				continue;
+			}
+
+			DataField dataField = (DataField)featureMapper.getField(name);
+
+			for(MiningFieldDecorator decorator : decorators){
+				decorator.decorate(dataField, miningField);
+			}
 		}
 
 		return pmml;
