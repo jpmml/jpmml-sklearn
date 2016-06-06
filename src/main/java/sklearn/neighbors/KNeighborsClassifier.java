@@ -84,6 +84,8 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 
 	@Override
 	public List<?> getY(){
+		List<? extends Number> y = (List)ClassDictUtil.getArray(this, "_y");
+
 		final
 		List<?> classes = getClasses();
 
@@ -96,8 +98,6 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 				return classes.get(index);
 			}
 		};
-
-		List<? extends Number> y = (List)ClassDictUtil.getArray(this, "_y");
 
 		return Lists.transform(y, function);
 	}

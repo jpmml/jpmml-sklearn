@@ -257,8 +257,8 @@ print(auto_df.dtypes)
 auto_mapper = DataFrameMapper([
 	(["cylinders"], None),
 	(["displacement", "horsepower", "weight", "acceleration"], [Imputer(missing_values = "NaN"), StandardScaler()]),
-	("model_year", None),
-	(["origin"], Binarizer(threshold = 1)),
+	(["model_year"], Binarizer(threshold = 77)), # Pre/post 1973 oil crisis effects
+	(["origin"], OneHotEncoder()),
 	("mpg", None)
 ])
 
@@ -268,8 +268,8 @@ print(auto.shape)
 
 store_pkl(auto_mapper, "Auto.pkl")
 
-auto_X = auto[:, 0:7]
-auto_y = auto[:, 7]
+auto_X = auto[:, 0:9]
+auto_y = auto[:, 9]
 
 print(auto_X.dtype, auto_y.dtype)
 

@@ -29,6 +29,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ListFeature;
+import org.jpmml.converter.PseudoFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
@@ -63,16 +64,30 @@ public class OneHotEncoder extends Transformer {
 			throw new IllegalArgumentException();
 		}
 
-		ListFeature inputFeature = (ListFeature)inputFeatures.get(0);
+		Feature inputFeature = inputFeatures.get(0);
 
 		List<String> categories = new ArrayList<>();
 
 		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < values.size(); i++){
-			Number value = values.get(i);
+			int value = ValueUtil.asInt(values.get(i));
 
-			String category = inputFeature.getValue(ValueUtil.asInt(value));
+			String category;
+
+			if(inputFeature instanceof PseudoFeature){
+				category = ValueUtil.formatValue((Integer)value);
+			} else
+
+			if(inputFeature instanceof ListFeature){
+				ListFeature listFeature = (ListFeature)inputFeature;
+
+				category = listFeature.getValue(value);
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
 
 			categories.add(category);
 
