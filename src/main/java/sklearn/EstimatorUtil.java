@@ -52,7 +52,7 @@ import org.jpmml.model.visitors.DictionaryCleaner;
 import org.jpmml.model.visitors.MiningSchemaCleaner;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
-import org.jpmml.sklearn.MiningFieldDecorator;
+import org.jpmml.sklearn.FieldDecorator;
 
 public class EstimatorUtil {
 
@@ -150,14 +150,14 @@ public class EstimatorUtil {
 		for(MiningField miningField : miningFields){
 			FieldName name = miningField.getName();
 
-			List<MiningFieldDecorator> decorators = featureMapper.getDecorators(name);
+			List<FieldDecorator> decorators = featureMapper.getDecorators(name);
 			if(decorators == null){
 				continue;
 			}
 
 			DataField dataField = (DataField)featureMapper.getField(name);
 
-			for(MiningFieldDecorator decorator : decorators){
+			for(FieldDecorator decorator : decorators){
 				decorator.decorate(dataField, miningField);
 			}
 		}

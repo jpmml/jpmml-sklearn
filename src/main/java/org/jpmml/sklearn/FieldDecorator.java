@@ -21,7 +21,7 @@ package org.jpmml.sklearn;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.MiningField;
 
-public interface MiningFieldDecorator {
+public interface FieldDecorator {
 
 	void decorate(DataField dataField, MiningField miningField);
 }

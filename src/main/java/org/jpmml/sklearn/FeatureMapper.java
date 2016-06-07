@@ -54,7 +54,7 @@ public class FeatureMapper {
 
 	private List<List<Feature>> steps = new ArrayList<>();
 
-	private Map<FieldName, List<MiningFieldDecorator>> decorators = new LinkedHashMap<>();
+	private Map<FieldName, List<FieldDecorator>> decorators = new LinkedHashMap<>();
 
 	private Map<FieldName, DataField> dataFields = new LinkedHashMap<>();
 
@@ -191,12 +191,12 @@ public class FeatureMapper {
 		return castSchema;
 	}
 
-	public List<MiningFieldDecorator> getDecorators(FieldName name){
+	public List<FieldDecorator> getDecorators(FieldName name){
 		return this.decorators.get(name);
 	}
 
-	public void addDecorator(FieldName name, MiningFieldDecorator decorator){
-		List<MiningFieldDecorator> decorators = this.decorators.get(name);
+	public void addDecorator(FieldName name, FieldDecorator decorator){
+		List<FieldDecorator> decorators = this.decorators.get(name);
 
 		if(decorators == null){
 			decorators = new ArrayList<>();

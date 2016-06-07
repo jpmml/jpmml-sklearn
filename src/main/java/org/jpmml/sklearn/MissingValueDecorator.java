@@ -28,7 +28,7 @@ import org.dmg.pmml.MissingValueTreatmentMethodType;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.PMMLUtil;
 
-public class MissingValueDecorator implements MiningFieldDecorator {
+public class MissingValueDecorator implements FieldDecorator {
 
 	private String missingValueReplacement = null;
 

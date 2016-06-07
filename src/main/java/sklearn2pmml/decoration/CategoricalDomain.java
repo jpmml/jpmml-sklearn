@@ -33,7 +33,7 @@ import org.jpmml.converter.PseudoFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
-import org.jpmml.sklearn.MiningFieldDecorator;
+import org.jpmml.sklearn.FieldDecorator;
 import org.jpmml.sklearn.ValidValueDecorator;
 
 public class CategoricalDomain extends Domain {
@@ -71,7 +71,7 @@ public class CategoricalDomain extends Domain {
 		final
 		List<String> categories = Lists.transform(data, function);
 
-		MiningFieldDecorator decorator = new ValidValueDecorator(){
+		FieldDecorator decorator = new ValidValueDecorator(){
 
 			{
 				setInvalidValueTreatment(invalidValueTreatment);

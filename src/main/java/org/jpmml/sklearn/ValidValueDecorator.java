@@ -23,7 +23,7 @@ import org.dmg.pmml.InvalidValueTreatmentMethodType;
 import org.dmg.pmml.MiningField;
 
 abstract
-public class ValidValueDecorator implements MiningFieldDecorator {
+public class ValidValueDecorator implements FieldDecorator {
 
 	private InvalidValueTreatmentMethodType invalidValueTreatment = null;
 

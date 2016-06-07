@@ -31,7 +31,7 @@ import org.jpmml.converter.PseudoFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
-import org.jpmml.sklearn.MiningFieldDecorator;
+import org.jpmml.sklearn.FieldDecorator;
 import org.jpmml.sklearn.ValidValueDecorator;
 
 public class ContinuousDomain extends Domain {
@@ -65,7 +65,7 @@ public class ContinuousDomain extends Domain {
 				.setLeftMargin(ValueUtil.asDouble(dataMin.get(i)))
 				.setRightMargin(ValueUtil.asDouble(dataMax.get(i)));
 
-			MiningFieldDecorator decorator = new ValidValueDecorator(){
+			FieldDecorator decorator = new ValidValueDecorator(){
 
 				{
 					setInvalidValueTreatment(invalidValueTreatment);
