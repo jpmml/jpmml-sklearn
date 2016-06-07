@@ -18,6 +18,7 @@ from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, SVC, SVR
 from sklearn_pandas import DataFrameMapper
+from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from pandas import DataFrame
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -58,7 +59,7 @@ wheat_df = wheat_df.drop("Variety", axis = 1)
 print(wheat_df.dtypes)
 
 wheat_mapper = DataFrameMapper([
-	(["Area", "Perimeter", "Compactness", "Kernel.Length", "Kernel.Width", "Asymmetry", "Groove.Length"], MinMaxScaler())
+	(["Area", "Perimeter", "Compactness", "Kernel.Length", "Kernel.Width", "Asymmetry", "Groove.Length"], [ContinuousDomain(), MinMaxScaler()])
 ])
 
 wheat_X = wheat_mapper.fit_transform(wheat_df)
@@ -98,15 +99,15 @@ audit_df["Deductions"] = audit_df["Deductions"].replace(True, "TRUE").replace(Fa
 print(audit_df.dtypes)
 
 audit_mapper = DataFrameMapper([
-	("Age", None),
+	("Age", ContinuousDomain()),
 	("Employment", LabelBinarizer()),
 	("Education", LabelBinarizer()),
 	("Marital", LabelBinarizer()),
 	("Occupation", LabelBinarizer()),
-	("Income", None),
+	("Income", ContinuousDomain()),
 	("Gender", LabelEncoder()),
 	("Deductions", LabelEncoder()),
-	("Hours", None),
+	("Hours", ContinuousDomain()),
 	("Adjusted", None)
 ])
 
@@ -153,7 +154,7 @@ print(versicolor_df.dtypes)
 versicolor_columns = versicolor_df.columns.tolist()
 
 versicolor_mapper = DataFrameMapper([
-	(versicolor_columns[: -1], RobustScaler()),
+	(versicolor_columns[: -1], [ContinuousDomain(), RobustScaler()]),
 	(versicolor_columns[-1], None)
 ])
 
@@ -195,7 +196,7 @@ iris_df = load_csv("Iris.csv")
 print(iris_df.dtypes)
 
 iris_mapper = DataFrameMapper([
-	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [RobustScaler(), IncrementalPCA(n_components = 3, whiten = True)]),
+	(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), RobustScaler(), IncrementalPCA(n_components = 3, whiten = True)]),
 	("Species", None)
 ])
 
@@ -255,9 +256,9 @@ auto_df["acceleration"] = auto_df["acceleration"].astype(float)
 print(auto_df.dtypes)
 
 auto_mapper = DataFrameMapper([
-	(["cylinders"], None),
-	(["displacement", "horsepower", "weight", "acceleration"], [Imputer(missing_values = "NaN"), StandardScaler()]),
-	(["model_year"], Binarizer(threshold = 77)), # Pre/post 1973 oil crisis effects
+	(["cylinders"], CategoricalDomain()),
+	(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), Imputer(missing_values = "NaN"), StandardScaler()]),
+	(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)]), # Pre/post 1973 oil crisis effects
 	(["origin"], OneHotEncoder()),
 	("mpg", None)
 ])
@@ -303,7 +304,7 @@ print(housing_df.dtypes)
 housing_columns = housing_df.columns.tolist()
 
 housing_mapper = DataFrameMapper([
-	(housing_columns[: -1], StandardScaler()),
+	(housing_columns[: -1], [ContinuousDomain(), StandardScaler()]),
 	(housing_columns[-1], None)
 ])
 

@@ -93,6 +93,8 @@ import sklearn.tree.ExtraTreeRegressor;
 import sklearn.tree.PresortBestSplitter;
 import sklearn.tree.RegressionCriterion;
 import sklearn.tree.Tree;
+import sklearn2pmml.decoration.CategoricalDomain;
+import sklearn2pmml.decoration.ContinuousDomain;
 import sklearn_pandas.DataFrameMapper;
 import sklearn_pandas.TransformerPipeline;
 import xgboost.sklearn.Booster;
@@ -205,6 +207,8 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn_pandas", "DataFrameMapper", DataFrameMapper.class), // sklearn_pandas 0.X
 			new ObjectConstructor("sklearn_pandas.dataframe_mapper", "DataFrameMapper", DataFrameMapper.class), // sklearn_pandas 1.X
 			new ObjectConstructor("sklearn_pandas.pipeline", "TransformerPipeline", TransformerPipeline.class),
+			new ObjectConstructor("sklearn2pmml.decoration", "CategoricalDomain", CategoricalDomain.class),
+			new ObjectConstructor("sklearn2pmml.decoration", "ContinuousDomain", ContinuousDomain.class),
 			new ObjectConstructor("xgboost.core", "Booster", Booster.class),
 			new ObjectConstructor("xgboost.sklearn", "XGBClassifier", XGBClassifier.class),
 			new ObjectConstructor("xgboost.sklearn", "XGBRegressor", XGBRegressor.class),

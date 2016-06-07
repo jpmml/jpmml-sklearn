@@ -68,6 +68,9 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`tree.ExtraTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html)
     * [`tree.ExtraTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
+  * [SkLearn2PMML] (https://github.com/jpmml/sklearn2pmml):
+    * [`decoration.CategoricalDomain`]
+    * [`decoration.ContinuousDomain`]
   * [XGBoost] (https://github.com/dmlc/xgboost):
     * [`xgboost.XGBClassifier`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
     * [`xgboost.XGBRegressor`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
@@ -133,9 +136,10 @@ Describe data and data pre-processing actions by creating an appropriate `sklear
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn_pandas import DataFrameMapper
+from sklearn2pmml.decoration import ContinuousDomain
 
 iris_mapper = DataFrameMapper([
-    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [StandardScaler(), PCA(n_components = 3)]),
+    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), StandardScaler(), PCA(n_components = 3)]),
     ("Species", None)
 ])
 
