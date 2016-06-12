@@ -34,11 +34,10 @@ import org.dmg.pmml.True;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 
 public class TreeModelUtil {
 
@@ -46,10 +45,10 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final MiningFunctionType miningFunction, final FeatureSchema schema){
+	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final MiningFunctionType miningFunction, final Schema schema){
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
-			private FeatureSchema segmentSchema = EstimatorUtil.createSegmentSchema(schema);
+			private Schema segmentSchema = schema.toAnonymousSchema();
 
 
 			@Override
@@ -62,7 +61,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, FeatureSchema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -86,7 +85,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunctionType miningFunction, FeatureSchema schema){
+	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunctionType miningFunction, Schema schema){
 		int featureIndex = features[index];
 
 		// A non-leaf (binary split) node

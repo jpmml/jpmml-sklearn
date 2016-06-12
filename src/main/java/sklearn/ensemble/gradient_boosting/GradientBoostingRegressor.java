@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
@@ -50,7 +50,7 @@ public class GradientBoostingRegressor extends Regressor {
 	}
 
 	@Override
-	public MiningModel encodeModel(FeatureSchema schema){
+	public MiningModel encodeModel(Schema schema){
 		HasDefaultValue init = getInit();
 
 		List<DecisionTreeRegressor> estimators = getEstimators();

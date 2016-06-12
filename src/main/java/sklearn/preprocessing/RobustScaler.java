@@ -69,7 +69,7 @@ public class RobustScaler extends Transformer {
 			Feature inputFeature = inputFeatures.get(i);
 
 			// "($name - center) / scale"
-			Expression expression = new FieldRef(inputFeature.getName());
+			Expression expression = inputFeature.ref();
 
 			if(withCentering){
 				Number centerValue = center.get(i);

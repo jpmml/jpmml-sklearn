@@ -36,7 +36,7 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.SquaredEuclidean;
 import org.jpmml.converter.ClusteringModelUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
@@ -58,7 +58,7 @@ public class KMeans extends Clusterer {
 	}
 
 	@Override
-	public ClusteringModel encodeModel(FeatureSchema schema){
+	public ClusteringModel encodeModel(Schema schema){
 		int[] shape = getClusterCentersShape();
 
 		int numberOfClusters = shape[0];
@@ -86,14 +86,9 @@ public class KMeans extends Clusterer {
 			clusters.add(cluster);
 		}
 
-		List<FieldName> names = new ArrayList<>();
-
 		List<Feature> features = schema.getFeatures();
-		for(Feature feature : features){
-			names.add(feature.getName());
-		}
 
-		List<ClusteringField> clusteringFields = ClusteringModelUtil.createClusteringFields(names);
+		List<ClusteringField> clusteringFields = ClusteringModelUtil.createClusteringFields(features);
 
 		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
 			.setCompareFunction(CompareFunctionType.ABS_DIFF)

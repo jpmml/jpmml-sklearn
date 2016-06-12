@@ -20,7 +20,7 @@ package xgboost.sklearn;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
 public class XGBRegressor extends Regressor implements HasBooster {
@@ -45,7 +45,7 @@ public class XGBRegressor extends Regressor implements HasBooster {
 	}
 
 	@Override
-	public MiningModel encodeModel(FeatureSchema schema){
+	public MiningModel encodeModel(Schema schema){
 		return BoosterUtil.encodeBooster(this, schema);
 	}
 

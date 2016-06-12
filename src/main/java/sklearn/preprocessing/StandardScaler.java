@@ -69,7 +69,7 @@ public class StandardScaler extends Transformer {
 			Feature inputFeature = inputFeatures.get(i);
 
 			// "($name - mean) / std"
-			Expression expression = new FieldRef(inputFeature.getName());
+			Expression expression = inputFeature.ref();
 
 			if(withMean){
 				Number meanValue = mean.get(i);

@@ -31,7 +31,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PseudoFeature;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.FeatureMapper;
 import org.junit.Test;
 
@@ -45,7 +45,7 @@ public class OneHotEncoderTest {
 
 		DataField dataField = featureMapper.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.INTEGER);
 
-		Feature inputFeature = new PseudoFeature(dataField);
+		Feature inputFeature = new WildcardFeature(dataField);
 
 		assertEquals(Arrays.asList(), getValues(dataField));
 

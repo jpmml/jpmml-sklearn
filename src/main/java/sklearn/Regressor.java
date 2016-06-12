@@ -20,8 +20,7 @@ package sklearn;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.FeatureSchema;
-import org.jpmml.converter.SchemaUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FeatureMapper;
 
 abstract
@@ -32,12 +31,12 @@ public class Regressor extends Estimator {
 	}
 
 	@Override
-	public FeatureSchema createSchema(FeatureMapper featureMapper){
-		FeatureSchema result;
+	public Schema createSchema(FeatureMapper featureMapper){
+		Schema result;
 
 		if(featureMapper.isEmpty()){
-			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
-			featureMapper.initTargetField(SchemaUtil.createTargetField(), OpType.CONTINUOUS, DataType.DOUBLE, null);
+			featureMapper.initActiveFields(createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
+			featureMapper.initTargetField(createTargetField(), OpType.CONTINUOUS, DataType.DOUBLE, null);
 
 			result = featureMapper.createSupervisedSchema();
 		} else

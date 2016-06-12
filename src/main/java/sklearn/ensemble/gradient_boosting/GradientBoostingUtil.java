@@ -35,7 +35,7 @@ import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
@@ -49,7 +49,7 @@ public class GradientBoostingUtil {
 	}
 
 	static
-	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, FeatureSchema schema){
+	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
 		List<Model> models = new ArrayList<>();
 
 		FieldName sumField = FieldName.create("sum");

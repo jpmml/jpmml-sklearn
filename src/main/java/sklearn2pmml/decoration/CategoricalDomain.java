@@ -28,13 +28,13 @@ import org.dmg.pmml.MiningField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldDecorator;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.PseudoFeature;
+import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
-import org.jpmml.sklearn.FieldDecorator;
-import org.jpmml.sklearn.ValidValueDecorator;
 
 public class CategoricalDomain extends Domain {
 
@@ -58,7 +58,7 @@ public class CategoricalDomain extends Domain {
 		final
 		InvalidValueTreatmentMethodType invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
 
-		PseudoFeature inputFeature = (PseudoFeature)inputFeatures.get(0);
+		WildcardFeature inputFeature = (WildcardFeature)inputFeatures.get(0);
 
 		Function<Object, String> function = new Function<Object, String>(){
 

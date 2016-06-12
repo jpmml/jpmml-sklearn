@@ -23,16 +23,15 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MissingValueTreatmentMethodType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.PseudoFeature;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
-import org.jpmml.sklearn.MissingValueDecorator;
 import sklearn.Transformer;
 
 public class Imputer extends Transformer {
@@ -61,9 +60,7 @@ public class Imputer extends Transformer {
 
 			Number statisticValue = statistics.get(i);
 
-			if(inputFeature instanceof PseudoFeature){
-				PseudoFeature pseudoFeature = (PseudoFeature)inputFeature;
-
+			if(inputFeature instanceof WildcardFeature){
 				String strategy = getStrategy();
 
 				MissingValueDecorator decorator = new MissingValueDecorator()
@@ -74,13 +71,13 @@ public class Imputer extends Transformer {
 					decorator.addMissingValues(ValueUtil.formatValue(targetValue));
 				}
 
-				featureMapper.addDecorator(pseudoFeature.getName(), decorator);
+				featureMapper.addDecorator(inputFeature.getName(), decorator);
 
 				features.add(inputFeature);
 			} else
 
 			{
-				Expression expression = new FieldRef(inputFeature.getName());
+				Expression expression = inputFeature.ref();
 
 				if(targetValue == null){
 					expression = PMMLUtil.createApply("isMissing", expression);
@@ -91,7 +88,7 @@ public class Imputer extends Transformer {
 				}
 
 				// "($name == null) ? statistics : $name"
-				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), new FieldRef(inputFeature.getName()));
+				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), inputFeature.ref());
 
 				DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
 

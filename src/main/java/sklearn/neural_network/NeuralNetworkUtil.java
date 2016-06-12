@@ -42,7 +42,7 @@ import org.dmg.pmml.NnNormalizationMethodType;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.HasArray;
@@ -66,7 +66,7 @@ public class NeuralNetworkUtil {
 	}
 
 	static
-	public NeuralNetwork encodeNeuralNetwork(MiningFunctionType miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, FeatureSchema schema){
+	public NeuralNetwork encodeNeuralNetwork(MiningFunctionType miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, Schema schema){
 		ActivationFunctionType activationFunction = parseActivationFunction(activation);
 
 		if(coefs.size() != intercepts.size()){
@@ -80,7 +80,7 @@ public class NeuralNetworkUtil {
 			Feature feature = features.get(column);
 
 			DerivedField derivedField = new DerivedField(OpType.CONTINUOUS, DataType.DOUBLE)
-				.setExpression(new FieldRef(feature.getName()));
+				.setExpression(feature.ref());
 
 			NeuralInput neuralInput = new NeuralInput()
 				.setId("0/" + (column + 1))
@@ -220,7 +220,7 @@ public class NeuralNetworkUtil {
 	}
 
 	static
-	private NeuralOutputs encodeRegressionNeuralOutputs(List<? extends Entity> entities, FeatureSchema schema){
+	private NeuralOutputs encodeRegressionNeuralOutputs(List<? extends Entity> entities, Schema schema){
 		FieldName targetField = schema.getTargetField();
 
 		if(entities.size() != 1){
@@ -243,7 +243,7 @@ public class NeuralNetworkUtil {
 	}
 
 	static
-	private NeuralOutputs encodeClassificationNeuralOutputs(List<? extends Entity> entities, FeatureSchema schema){
+	private NeuralOutputs encodeClassificationNeuralOutputs(List<? extends Entity> entities, Schema schema){
 		FieldName targetField = schema.getTargetField();
 
 		List<String> targetCategories = schema.getTargetCategories();

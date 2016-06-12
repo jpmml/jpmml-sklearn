@@ -26,7 +26,7 @@ import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import sklearn.Estimator;
@@ -39,7 +39,7 @@ public class BaseForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, FeatureSchema schema){
+	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, Schema schema){
 		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimators, miningFunction, schema);
 
 		Segmentation segmentation = MiningModelUtil.createSegmentation(multipleModelMethod, treeModels);

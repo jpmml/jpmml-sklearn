@@ -43,10 +43,10 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Row;
 import org.dmg.pmml.TrainingInstances;
+import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.sklearn.DOMUtil;
 import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Estimator;
 
@@ -56,7 +56,7 @@ public class KNeighborsUtil {
 	}
 
 	static
-	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunctionType miningFunction, int numberOfInstances, int numberOfFeatures, FeatureSchema schema){
+	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunctionType miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
 		List<String> keys = new ArrayList<>();
 
 		InstanceFields instanceFields = new InstanceFields();

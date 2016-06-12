@@ -26,8 +26,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.FeatureSchema;
-import org.jpmml.converter.SchemaUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
@@ -40,11 +39,11 @@ public class Classifier extends Estimator {
 	}
 
 	@Override
-	public FeatureSchema createSchema(FeatureMapper featureMapper){
+	public Schema createSchema(FeatureMapper featureMapper){
 
 		if(featureMapper.isEmpty()){
-			featureMapper.initActiveFields(SchemaUtil.createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
-			featureMapper.initTargetField(SchemaUtil.createTargetField(), OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
+			featureMapper.initActiveFields(createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
+			featureMapper.initTargetField(createTargetField(), OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
 		} else
 
 		{
@@ -52,7 +51,7 @@ public class Classifier extends Estimator {
 			featureMapper.updateTargetField(OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
 		}
 
-		FeatureSchema schema = featureMapper.createSupervisedSchema();
+		Schema schema = featureMapper.createSupervisedSchema();
 
 		if(requiresContinuousInput()){
 			schema = featureMapper.cast(OpType.CONTINUOUS, getDataType(), schema);

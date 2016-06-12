@@ -19,76 +19,40 @@
 package org.jpmml.sklearn;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMML;
-import org.dmg.pmml.TransformationDictionary;
 import org.dmg.pmml.TypeDefinitionField;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.ListFeature;
+import org.jpmml.converter.PMMLMapper;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.PseudoFeature;
+import org.jpmml.converter.Schema;
+import org.jpmml.converter.WildcardFeature;
 
-public class FeatureMapper {
+public class FeatureMapper extends PMMLMapper {
 
-	private List<List<Feature>> steps = new ArrayList<>();
-
-	private Map<FieldName, List<FieldDecorator>> decorators = new LinkedHashMap<>();
-
-	private Map<FieldName, DataField> dataFields = new LinkedHashMap<>();
-
-	private Map<FieldName, DerivedField> derivedFields = new LinkedHashMap<>();
+	private List<List<Feature>> rows = new ArrayList<>();
 
 
-	public PMML encodePMML(){
+	public Schema createSupervisedSchema(){
+		Feature feature = getTargetFeature();
 
-		if(!Collections.disjoint(this.dataFields.keySet(), this.derivedFields.keySet())){
-			throw new IllegalArgumentException();
-		}
-
-		List<DataField> dataFields = new ArrayList<>(this.dataFields.values());
-		List<DerivedField> derivedFields = new ArrayList<>(this.derivedFields.values());
-
-		DataDictionary dataDictionary = new DataDictionary();
-		(dataDictionary.getDataFields()).addAll(dataFields);
-
-		TransformationDictionary transformationDictionary = null;
-		if(derivedFields.size() > 0){
-			transformationDictionary = new TransformationDictionary();
-			(transformationDictionary.getDerivedFields()).addAll(derivedFields);
-		}
-
-		PMML pmml = new PMML("4.2", PMMLUtil.createHeader("JPMML-SkLearn", "1.0-SNAPSHOT"), dataDictionary)
-			.setTransformationDictionary(transformationDictionary);
-
-		return pmml;
-	}
-
-	public FeatureSchema createSupervisedSchema(){
-		PseudoFeature feature = getTargetFeature();
-
-		DataField dataField = this.dataFields.get(feature.getName());
+		DataField dataField = getDataField(feature.getName());
 		if(dataField == null){
 			throw new IllegalArgumentException();
 		}
@@ -111,27 +75,27 @@ public class FeatureMapper {
 			targetCategories = new ArrayList<>(Lists.transform(values, function));
 		}
 
-		List<FieldName> activeFields = new ArrayList<>(this.dataFields.keySet());
+		List<FieldName> activeFields = new ArrayList<>(getDataFields().keySet());
 		activeFields.remove(targetField);
 
-		List<Feature> features = flatten(getActiveSteps(true));
+		List<Feature> features = getActiveFeatures(true);
 
-		FeatureSchema schema = new FeatureSchema(targetField, targetCategories, activeFields, features);
-
-		return schema;
-	}
-
-	public FeatureSchema createUnsupervisedSchema(){
-		List<FieldName> activeFields = new ArrayList<>(this.dataFields.keySet());
-
-		List<Feature> features = flatten(getActiveSteps(false));
-
-		FeatureSchema schema = new FeatureSchema(null, null, activeFields, features);
+		Schema schema = new Schema(targetField, targetCategories, activeFields, features);
 
 		return schema;
 	}
 
-	public FeatureSchema cast(OpType opType, DataType dataType, FeatureSchema schema){
+	public Schema createUnsupervisedSchema(){
+		List<FieldName> activeFields = new ArrayList<>(getDataFields().keySet());
+
+		List<Feature> features = getActiveFeatures(false);
+
+		Schema schema = new Schema(null, null, activeFields, features);
+
+		return schema;
+	}
+
+	public Schema cast(OpType opType, DataType dataType, Schema schema){
 
 		if(opType != null && !(OpType.CONTINUOUS).equals(opType)){
 			throw new IllegalArgumentException();
@@ -154,7 +118,7 @@ public class FeatureMapper {
 
 				FieldName name = FieldName.create(function + "(" + (binaryFeature.getName()).getValue() + "=" + binaryFeature.getValue() + ")");
 
-				DerivedField derivedField = this.derivedFields.get(name);
+				DerivedField derivedField = getDerivedField(name);
 				if(derivedField == null){
 					NormDiscrete normDiscrete = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
 
@@ -173,11 +137,9 @@ public class FeatureMapper {
 
 				FieldName name = FieldName.create(function + "(" + (continuousFeature.getName()).getValue() + ")");
 
-				DerivedField derivedField = this.derivedFields.get(name);
+				DerivedField derivedField = getDerivedField(name);
 				if(derivedField == null){
-					FieldRef fieldRef = new FieldRef(continuousFeature.getName());
-
-					derivedField = createDerivedField(name, OpType.CONTINUOUS, dataType, fieldRef);
+					derivedField = createDerivedField(name, OpType.CONTINUOUS, dataType, continuousFeature.ref());
 				}
 
 				feature = new ContinuousFeature(derivedField);
@@ -186,40 +148,9 @@ public class FeatureMapper {
 			castFeatures.add(feature);
 		}
 
-		FeatureSchema castSchema = new FeatureSchema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), castFeatures);
+		Schema castSchema = new Schema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), castFeatures);
 
 		return castSchema;
-	}
-
-	public List<FieldDecorator> getDecorators(FieldName name){
-		return this.decorators.get(name);
-	}
-
-	public void addDecorator(FieldName name, FieldDecorator decorator){
-		List<FieldDecorator> decorators = this.decorators.get(name);
-
-		if(decorators == null){
-			decorators = new ArrayList<>();
-
-			this.decorators.put(name, decorators);
-		}
-
-		decorators.add(decorator);
-	}
-
-	public TypeDefinitionField getField(FieldName name){
-		DataField dataField = this.dataFields.get(name);
-		DerivedField derivedField = this.derivedFields.get(name);
-
-		if(dataField != null && derivedField == null){
-			return dataField;
-		} else
-
-		if(dataField == null && derivedField != null){
-			return derivedField;
-		}
-
-		throw new IllegalArgumentException();
 	}
 
 	public void updateType(FieldName name, OpType opType, DataType dataType){
@@ -248,15 +179,15 @@ public class FeatureMapper {
 
 		updateValueSpace(dataField.getName(), targetCategories);
 
-		Feature feature = new PseudoFeature(dataField);
+		Feature feature = new WildcardFeature(dataField);
 
-		addStep(Collections.singletonList(feature));
+		addRow(Collections.singletonList(feature));
 	}
 
 	public void updateTargetField(OpType opType, DataType dataType, List<String> targetCategories){
-		PseudoFeature feature = getTargetFeature();
+		Feature feature = getTargetFeature();
 
-		DataField dataField = this.dataFields.get(feature.getName());
+		DataField dataField = getDataField(feature.getName());
 		if(dataField == null){
 			throw new IllegalArgumentException();
 		}
@@ -276,7 +207,7 @@ public class FeatureMapper {
 
 			Feature feature = new ContinuousFeature(dataField);
 
-			addStep(Collections.singletonList(feature));
+			addRow(Collections.singletonList(feature));
 		}
 	}
 
@@ -288,10 +219,10 @@ public class FeatureMapper {
 
 		int count = 0;
 
-		List<List<Feature>> activeSteps = getActiveSteps(supervised);
-		for(List<Feature> activeStep : activeSteps){
+		List<List<Feature>> activeRows = getActiveRows(supervised);
+		for(List<Feature> activeRow : activeRows){
 
-			for(ListIterator<Feature> featureIt = activeStep.listIterator(); featureIt.hasNext(); ){
+			for(ListIterator<Feature> featureIt = activeRow.listIterator(); featureIt.hasNext(); ){
 				Feature feature = featureIt.next();
 
 				count++;
@@ -302,7 +233,7 @@ public class FeatureMapper {
 
 				updateType(feature.getName(), opType, dataType);
 
-				if(feature instanceof PseudoFeature){
+				if(feature instanceof WildcardFeature){
 					DataField dataField = (DataField)getField(feature.getName());
 
 					feature = new ContinuousFeature(dataField);
@@ -321,79 +252,51 @@ public class FeatureMapper {
 		return createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
 	}
 
-	public DataField createDataField(FieldName name, OpType opType, DataType dataType){
-		checkName(name);
-
-		DataField dataField = new DataField(name, opType, dataType);
-
-		this.dataFields.put(dataField.getName(), dataField);
-
-		return dataField;
-	}
-
 	public DerivedField createDerivedField(FieldName name, Expression expression){
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
 	}
 
-	public DerivedField createDerivedField(FieldName name, OpType opType, DataType dataType, Expression expression){
-		checkName(name);
-
-		DerivedField derivedField = new DerivedField(opType, dataType)
-			.setName(name)
-			.setExpression(expression);
-
-		this.derivedFields.put(derivedField.getName(), derivedField);
-
-		return derivedField;
-	}
-
-	public void addStep(List<Feature> step){
-		this.steps.add(step);
-	}
-
-	public boolean isEmpty(){
-		return this.steps.isEmpty();
-	}
-
-	public PseudoFeature getTargetFeature(){
-		List<Feature> targetStep = getTargetStep();
-		if(targetStep.size() != 1){
+	public WildcardFeature getTargetFeature(){
+		List<Feature> targetRow = getTargetRow();
+		if(targetRow.size() != 1){
 			throw new IllegalArgumentException();
 		}
 
-		PseudoFeature feature = (PseudoFeature)targetStep.get(0);
+		WildcardFeature feature = (WildcardFeature)targetRow.get(0);
 
 		return feature;
 	}
 
-	public List<List<Feature>> getSteps(){
-		return this.steps;
+	public List<Feature> getActiveFeatures(boolean supervised){
+		List<List<Feature>> activeRows = getActiveRows(supervised);
+
+		List<Feature> features = Lists.newArrayList(Iterables.concat(activeRows));
+
+		return features;
 	}
 
-	public List<Feature> getTargetStep(){
-		return this.steps.get(this.steps.size() - 1);
+	public void addRow(List<Feature> row){
+		this.rows.add(row);
 	}
 
-	public List<List<Feature>> getActiveSteps(boolean supervised){
+	public boolean isEmpty(){
+		return this.rows.isEmpty();
+	}
+
+	public List<List<Feature>> getRows(){
+		return this.rows;
+	}
+
+	public List<Feature> getTargetRow(){
+		return this.rows.get(this.rows.size() - 1);
+	}
+
+	public List<List<Feature>> getActiveRows(boolean supervised){
 
 		if(supervised){
-			return this.steps.subList(0, this.steps.size() - 1);
+			return this.rows.subList(0, this.rows.size() - 1);
 		}
 
-		return this.steps;
-	}
-
-	private void checkName(FieldName name){
-
-		if(this.dataFields.containsKey(name) || this.derivedFields.containsKey(name)){
-			throw new IllegalArgumentException((name.getValue()).toString());
-		}
-	}
-
-	static
-	private <E> List<E> flatten(Collection<? extends Collection<E>> collections){
-		List<E> result = Lists.newArrayList(Iterables.concat(collections));
-
-		return result;
+		return this.rows;
 	}
 }

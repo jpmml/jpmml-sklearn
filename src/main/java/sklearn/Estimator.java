@@ -18,14 +18,17 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.FeatureMapper;
 
@@ -37,10 +40,10 @@ public class Estimator extends BaseEstimator {
 	}
 
 	abstract
-	public FeatureSchema createSchema(FeatureMapper featureMapper);
+	public Schema createSchema(FeatureMapper featureMapper);
 
 	abstract
-	public Model encodeModel(FeatureSchema schema);
+	public Model encodeModel(Schema schema);
 
 	public int getNumberOfFeatures(){
 		return ValueUtil.asInt((Number)get("n_features_"));
@@ -66,5 +69,21 @@ public class Estimator extends BaseEstimator {
 
 	public Set<DefineFunction> encodeDefineFunctions(){
 		return Collections.emptySet();
+	}
+
+	static
+	public FieldName createTargetField(){
+		return FieldName.create("y");
+	}
+
+	static
+	public List<FieldName> createActiveFields(int size){
+		List<FieldName> result = new ArrayList<>(size);
+
+		for(int i = 0; i < size; i++){
+			result.add(FieldName.create("x" + String.valueOf(i + 1)));
+		}
+
+		return result;
 	}
 }

@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -74,7 +73,7 @@ public class PCA extends Transformer {
 				Feature inputFeature = inputFeatures.get(j);
 
 				// "($name[i] - mean[i]) * component[i]"
-				Expression expression = new FieldRef(inputFeature.getName());
+				Expression expression = inputFeature.ref();
 
 				Number meanValue = mean.get(j);
 				if(!ValueUtil.isZero(meanValue)){

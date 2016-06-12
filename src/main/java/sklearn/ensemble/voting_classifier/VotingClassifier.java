@@ -37,7 +37,7 @@ import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.Segmentation;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -48,7 +48,7 @@ import sklearn.EstimatorUtil;
 
 public class VotingClassifier extends Classifier {
 
-	private Map<List<?>, FeatureSchema> schemas = new HashMap<>();
+	private Map<List<?>, Schema> schemas = new HashMap<>();
 
 
 	public VotingClassifier(String module, String name){
@@ -56,8 +56,8 @@ public class VotingClassifier extends Classifier {
 	}
 
 	@Override
-	public FeatureSchema createSchema(FeatureMapper featureMapper){
-		FeatureSchema schema = super.createSchema(featureMapper);
+	public Schema createSchema(FeatureMapper featureMapper){
+		Schema schema = super.createSchema(featureMapper);
 
 		this.schemas.put(createSchemaKey(this), schema);
 
@@ -65,7 +65,7 @@ public class VotingClassifier extends Classifier {
 		for(Classifier estimator : estimators){
 			List<?> schemaKey = createSchemaKey(estimator);
 
-			FeatureSchema estimatorSchema = this.schemas.get(schemaKey);
+			Schema estimatorSchema = this.schemas.get(schemaKey);
 			if(estimatorSchema == null){
 				estimatorSchema = featureMapper.cast((OpType)schemaKey.get(0), (DataType)schemaKey.get(1), schema);
 
@@ -109,7 +109,7 @@ public class VotingClassifier extends Classifier {
 	}
 
 	@Override
-	public Model encodeModel(FeatureSchema schema){
+	public Model encodeModel(Schema schema){
 		List<? extends Classifier> estimators = getEstimators();
 		List<? extends Number> weights = getWeights();
 
@@ -118,7 +118,7 @@ public class VotingClassifier extends Classifier {
 		for(Classifier estimator : estimators){
 			List<?> schemaKey = createSchemaKey(estimator);
 
-			FeatureSchema estimatorSchema = this.schemas.get(schemaKey);
+			Schema estimatorSchema = this.schemas.get(schemaKey);
 			if(estimatorSchema == null){
 				throw new IllegalArgumentException();
 			}

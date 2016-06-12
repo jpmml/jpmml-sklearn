@@ -27,7 +27,7 @@ import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
@@ -59,7 +59,7 @@ public class BaggingRegressor extends Regressor {
 	}
 
 	@Override
-	public MiningModel encodeModel(FeatureSchema schema){
+	public MiningModel encodeModel(Schema schema){
 		List<? extends Regressor> estimators = getEstimators();
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 

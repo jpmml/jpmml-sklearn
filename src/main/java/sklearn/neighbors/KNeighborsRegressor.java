@@ -24,7 +24,7 @@ import org.dmg.pmml.ContinuousScoringMethodType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.NearestNeighborModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
@@ -48,7 +48,7 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	}
 
 	@Override
-	public NearestNeighborModel encodeModel(FeatureSchema schema){
+	public NearestNeighborModel encodeModel(Schema schema){
 		int[] shape = getFitXShape();
 
 		int numberOfInstances = shape[0];

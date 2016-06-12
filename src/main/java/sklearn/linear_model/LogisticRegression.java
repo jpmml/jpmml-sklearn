@@ -19,7 +19,7 @@
 package sklearn.linear_model;
 
 import org.dmg.pmml.MiningModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 
 public class LogisticRegression extends BaseLinearClassifier {
 
@@ -28,7 +28,7 @@ public class LogisticRegression extends BaseLinearClassifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(FeatureSchema schema){
+	public MiningModel encodeModel(Schema schema){
 		String multiClass = getMultiClass();
 
 		if(!("ovr").equals(multiClass)){

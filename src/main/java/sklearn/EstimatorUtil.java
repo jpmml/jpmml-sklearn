@@ -18,41 +18,24 @@
  */
 package sklearn;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.MiningField;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.ParameterField;
-import org.dmg.pmml.Segment;
-import org.dmg.pmml.Segmentation;
-import org.dmg.pmml.TransformationDictionary;
-import org.dmg.pmml.Visitor;
-import org.jpmml.converter.FeatureSchema;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.model.visitors.DictionaryCleaner;
-import org.jpmml.model.visitors.MiningSchemaCleaner;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
-import org.jpmml.sklearn.FieldDecorator;
 
 public class EstimatorUtil {
 
@@ -61,115 +44,19 @@ public class EstimatorUtil {
 
 	static
 	public PMML encodePMML(Estimator estimator, FeatureMapper featureMapper){
-		FeatureSchema schema = estimator.createSchema(featureMapper);
-
-		PMML pmml = featureMapper.encodePMML();
+		Schema schema = estimator.createSchema(featureMapper);
 
 		Set<DefineFunction> defineFunctions = estimator.encodeDefineFunctions();
-		if(defineFunctions != null && defineFunctions.size() > 0){
-			TransformationDictionary transformationDictionary = pmml.getTransformationDictionary();
-
-			if(transformationDictionary == null){
-				transformationDictionary = new TransformationDictionary();
-
-				pmml.setTransformationDictionary(transformationDictionary);
-			}
-
-			for(DefineFunction defineFunction : defineFunctions){
-				transformationDictionary.addDefineFunctions(defineFunction);
-			}
+		for(DefineFunction defineFunction : defineFunctions){
+			featureMapper.addDefineFunction(defineFunction);
 		}
 
 		Model model = estimator.encodeModel(schema);
 
-		pmml.addModels(model);
-
-		// XXX
-		MiningSchemaCleaner miningSchemaCleaner = new MiningSchemaCleaner(){
-
-			@Override
-			public PMMLObject popParent(){
-				PMMLObject parent = super.popParent();
-
-				if(parent instanceof MiningModel){
-					cleanMiningSchema((MiningModel)parent);
-				}
-
-				return parent;
-			}
-
-			private void cleanMiningSchema(MiningModel miningModel){
-				Set<FieldName> outputFieldNames = collectSegmentationOutputFields(miningModel);
-
-				MiningSchema miningSchema = miningModel.getMiningSchema();
-
-				List<MiningField> miningFields = miningSchema.getMiningFields();
-				for(Iterator<MiningField> miningFieldIt = miningFields.iterator(); miningFieldIt.hasNext(); ){
-					MiningField miningField = miningFieldIt.next();
-
-					FieldName name = miningField.getName();
-					if(outputFieldNames.contains(name)){
-						miningFieldIt.remove();
-					}
-				}
-			}
-
-			private Set<FieldName> collectSegmentationOutputFields(MiningModel miningModel){
-				Segmentation segmentation = miningModel.getSegmentation();
-
-				Set<FieldName> names = new LinkedHashSet<>();
-
-				List<Segment> segments = segmentation.getSegments();
-				for(Segment segment : segments){
-					Model model = segment.getModel();
-
-					Output output = model.getOutput();
-					if(output != null && output.hasOutputFields()){
-						List<OutputField> outputFields = output.getOutputFields();
-
-						for(OutputField outputField : outputFields){
-							names.add(outputField.getName());
-						}
-					}
-				}
-
-				return names;
-			}
-		};
-
-		DictionaryCleaner dictionaryCleaner = new DictionaryCleaner();
-
-		List<? extends Visitor> visitors = Arrays.asList(miningSchemaCleaner, dictionaryCleaner);
-		for(Visitor visitor : visitors){
-			visitor.applyTo(pmml);
-		}
-
-		MiningSchema miningSchema = model.getMiningSchema();
-
-		List<MiningField> miningFields = miningSchema.getMiningFields();
-		for(MiningField miningField : miningFields){
-			FieldName name = miningField.getName();
-
-			List<FieldDecorator> decorators = featureMapper.getDecorators(name);
-			if(decorators == null){
-				continue;
-			}
-
-			DataField dataField = (DataField)featureMapper.getField(name);
-
-			for(FieldDecorator decorator : decorators){
-				decorator.decorate(dataField, miningField);
-			}
-		}
+		PMML pmml = featureMapper.encodePMML(model)
+			.setHeader(PMMLUtil.createHeader("JPMML-SkLearn", "1.0-SNAPSHOT"));
 
 		return pmml;
-	}
-
-	static
-	public FeatureSchema createSegmentSchema(FeatureSchema schema){
-		FeatureSchema result = new FeatureSchema(null, schema.getTargetCategories(), schema.getActiveFields(), schema.getFeatures());
-
-		return result;
 	}
 
 	static

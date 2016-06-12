@@ -26,7 +26,6 @@ import org.dmg.pmml.Array;
 import org.dmg.pmml.Coefficient;
 import org.dmg.pmml.Coefficients;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Kernel;
 import org.dmg.pmml.LinearKernel;
 import org.dmg.pmml.PolynomialKernel;
@@ -40,7 +39,7 @@ import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorFields;
 import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
@@ -54,7 +53,7 @@ public class SupportVectorMachineUtil {
 	}
 
 	static
-	public VectorDictionary encodeVectorDictionary(List<Integer> support, List<? extends Number> supportVectors, int numberOfVectors, int numberOfFeatures, FeatureSchema schema){
+	public VectorDictionary encodeVectorDictionary(List<Integer> support, List<? extends Number> supportVectors, int numberOfVectors, int numberOfFeatures, Schema schema){
 		BitSet features = new BitSet(numberOfFeatures);
 
 		Double defaultValue = Double.valueOf(0d);
@@ -79,17 +78,15 @@ public class SupportVectorMachineUtil {
 		for(int i = 0; i < numberOfFeatures; i++){
 			Feature feature = schema.getFeature(i);
 
-			FieldName name = feature.getName();
-
 			if(!features.get(i)){
+				FieldName name = feature.getName();
+
 				unusedNames.add(name);
 
 				continue;
 			}
 
-			FieldRef fieldRef = new FieldRef(name);
-
-			vectorFields.addFieldRefs(fieldRef);
+			vectorFields.addFieldRefs(feature.ref());
 		}
 
 		VectorDictionary vectorDictionary = new VectorDictionary(vectorFields);

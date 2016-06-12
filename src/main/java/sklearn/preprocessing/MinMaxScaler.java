@@ -57,7 +57,7 @@ public class MinMaxScaler extends Transformer {
 			Number scaleValue = scale.get(i);
 
 			// "($name * scale) + min"
-			Expression expression = new FieldRef(inputFeature.getName());
+			Expression expression = inputFeature.ref();
 
 			if(!ValueUtil.isOne(scaleValue)){
 				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scaleValue));

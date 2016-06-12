@@ -24,7 +24,6 @@ import java.util.List;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
@@ -84,7 +83,7 @@ public class LabelBinarizer extends Transformer {
 
 			{
 				// "($name == value) ? pos_label : neg_label"
-				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", new FieldRef(inputFeature.getName()), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
+				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", inputFeature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
 				DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
 

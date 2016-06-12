@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.HasArray;
 import sklearn.Classifier;
 
@@ -70,7 +70,7 @@ public class XGBClassifier extends Classifier implements HasBooster {
 	}
 
 	@Override
-	public MiningModel encodeModel(FeatureSchema schema){
+	public MiningModel encodeModel(Schema schema){
 		return BoosterUtil.encodeBooster(this, schema);
 	}
 

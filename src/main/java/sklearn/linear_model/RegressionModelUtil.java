@@ -31,7 +31,7 @@ import org.dmg.pmml.RegressionTable;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
@@ -44,7 +44,7 @@ public class RegressionModelUtil {
 	}
 
 	static
-	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, FeatureSchema schema){
+	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema){
 		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
 		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema, regressionTable);
@@ -56,7 +56,7 @@ public class RegressionModelUtil {
 	}
 
 	static
-	public RegressionTable encodeRegressionTable(List<? extends Number> coefficients, Number intercept, FeatureSchema schema){
+	public RegressionTable encodeRegressionTable(List<? extends Number> coefficients, Number intercept, Schema schema){
 		List<Feature> features = schema.getFeatures();
 
 		if(coefficients.size() != features.size()){

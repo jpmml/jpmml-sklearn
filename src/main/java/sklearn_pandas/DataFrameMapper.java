@@ -28,7 +28,7 @@ import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PseudoFeature;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.TupleUtil;
@@ -52,7 +52,7 @@ public class DataFrameMapper extends ClassDict {
 			for(String name : names){
 				DataField dataField = featureMapper.createDataField(FieldName.create(name));
 
-				Feature feature = new PseudoFeature(dataField);
+				Feature feature = new WildcardFeature(dataField);
 
 				features.add(feature);
 			}
@@ -70,7 +70,7 @@ public class DataFrameMapper extends ClassDict {
 				features = transformer.encodeFeatures(ids, features, featureMapper);
 			}
 
-			featureMapper.addStep(features);
+			featureMapper.addRow(features);
 		}
 	}
 

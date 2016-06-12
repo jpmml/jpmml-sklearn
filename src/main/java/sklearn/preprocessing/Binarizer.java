@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -48,7 +47,7 @@ public class Binarizer extends Transformer {
 		Feature inputFeature = inputFeatures.get(0);
 
 		// "($name <= threshold) ? 0 : 1"
-		Apply apply = PMMLUtil.createApply("threshold", new FieldRef(inputFeature.getName()), PMMLUtil.createConstant(threshold));
+		Apply apply = PMMLUtil.createApply("threshold", inputFeature.ref(), PMMLUtil.createConstant(threshold));
 
 		DerivedField derivedField = featureMapper.createDerivedField(createName(id), apply);
 

@@ -19,7 +19,7 @@
 package xgboost.sklearn;
 
 import org.dmg.pmml.MiningModel;
-import org.jpmml.converter.FeatureSchema;
+import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.Learner;
 
@@ -38,7 +38,7 @@ public class BoosterUtil {
 	}
 
 	static
-	public MiningModel encodeBooster(HasBooster hasBooster, FeatureSchema schema){
+	public MiningModel encodeBooster(HasBooster hasBooster, Schema schema){
 		Booster booster = hasBooster.getBooster();
 
 		Learner learner = booster.getLearner();

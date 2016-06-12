@@ -26,7 +26,7 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PseudoFeature;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.FeatureMapper;
 import sklearn.Transformer;
 
@@ -42,7 +42,7 @@ class ScalerTest {
 
 		DataField dataField = featureMapper.createDataField(FieldName.create("x"));
 
-		Feature inputFeature = new PseudoFeature(dataField);
+		Feature inputFeature = new WildcardFeature(dataField);
 		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), featureMapper));
 
 		assertSame(inputFeature, outputFeature);
@@ -53,7 +53,7 @@ class ScalerTest {
 
 		DataField dataField = featureMapper.createDataField(FieldName.create("x"));
 
-		Feature inputFeature = new PseudoFeature(dataField);
+		Feature inputFeature = new WildcardFeature(dataField);
 		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), featureMapper));
 
 		assertNotSame(inputFeature, outputFeature);
