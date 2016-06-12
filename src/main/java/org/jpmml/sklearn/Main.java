@@ -32,6 +32,8 @@ import org.dmg.pmml.Extension;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.MetroJAXBUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn_pandas.DataFrameMapper;
@@ -115,7 +117,21 @@ public class Main {
 		if(this.mapperInput != null){
 
 			try(Storage storage = PickleUtil.createStorage(this.mapperInput)){
-				Object object = PickleUtil.unpickle(storage);
+				Object object;
+
+				try {
+					logger.info("Parsing DataFrameMapper PKL..");
+
+					long start = System.currentTimeMillis();
+					object = PickleUtil.unpickle(storage);
+					long end = System.currentTimeMillis();
+
+					logger.info("Parsed DataFrameMapper PKL in {} ms.", (end - start));
+				} catch(Exception e){
+					logger.error("Failed to parse DataFrameMapper PKL", e);
+
+					throw e;
+				}
 
 				if(!(object instanceof DataFrameMapper)){
 					throw new IllegalArgumentException("The mapper object (" + ClassDictUtil.formatClass(object) + ") is not a DataFrameMapper");
@@ -123,7 +139,19 @@ public class Main {
 
 				DataFrameMapper mapper = (DataFrameMapper)object;
 
-				mapper.encodeFeatures(featureMapper);
+				try {
+					logger.info("Converting DataFrameMapper..");
+
+					long start = System.currentTimeMillis();
+					mapper.encodeFeatures(featureMapper);
+					long end = System.currentTimeMillis();
+
+					logger.info("Converted DataFrameMapper in {} ms.", (end - start));
+				} catch(Exception e){
+					logger.error("Failed to convert DataFrameMapper", e);
+
+					throw e;
+				}
 			}
 
 			if(this.mapperRepr != null){
@@ -132,7 +160,21 @@ public class Main {
 		}
 
 		try(Storage storage = PickleUtil.createStorage(this.estimatorInput)){
-			Object object = PickleUtil.unpickle(storage);
+			Object object;
+
+			try {
+				logger.info("Parsing Estimator PKL..");
+
+				long start = System.currentTimeMillis();
+				object = PickleUtil.unpickle(storage);
+				long end = System.currentTimeMillis();
+
+				logger.info("Parsed Estimator PKL in {} ms.", (end - start));
+			} catch(Exception e){
+				logger.error("Failed to parse Estimator PKL", e);
+
+				throw e;
+			}
 
 			if(!(object instanceof Estimator)){
 				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
@@ -140,7 +182,19 @@ public class Main {
 
 			Estimator estimator = (Estimator)object;
 
-			pmml = EstimatorUtil.encodePMML(estimator, featureMapper);
+			try {
+				logger.info("Converting Estimator..");
+
+				long start = System.currentTimeMillis();
+				pmml = EstimatorUtil.encodePMML(estimator, featureMapper);
+				long end = System.currentTimeMillis();
+
+				logger.info("Converted Estimator in {} ms.", (end - start));
+			} catch(Exception e){
+				logger.error("Failed to convert Estimator", e);
+
+				throw e;
+			}
 		}
 
 		if(this.estimatorRepr != null){
@@ -153,7 +207,17 @@ public class Main {
 		}
 
 		try(OutputStream os = new FileOutputStream(this.output)){
+			logger.info("Marshalling PMML..");
+
+			long start = System.currentTimeMillis();
 			MetroJAXBUtil.marshalPMML(pmml, os);
+			long end = System.currentTimeMillis();
+
+			logger.info("Marshalled PMML in {} ms.", (end - start));
+		} catch(Exception e){
+			logger.error("Failed to marshal PMML", e);
+
+			throw e;
 		}
 	}
 
@@ -198,4 +262,6 @@ public class Main {
 
 		miningBuildTask.addExtensions(extension);
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 }

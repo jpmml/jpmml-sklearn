@@ -21,7 +21,10 @@ package org.jpmml.sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.FieldName;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.Feature;
 
 public class LoggerUtil {
 
@@ -29,17 +32,33 @@ public class LoggerUtil {
 	}
 
 	static
-	public String formatNameList(List<FieldName> names){
-	
-		if(names.size() <= 10){
-			return names.toString();
+	public String formatNameList(List<Feature> features){
+		Function<Feature, String> function = new Function<Feature, String>(){
+
+			@Override
+			public String apply(Feature feature){
+
+				if(feature instanceof BinaryFeature){
+					BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+					return (binaryFeature.getName()).getValue() + "=" + binaryFeature.getValue();
+				}
+
+				return (feature.getName()).getValue();
+			}
+		};
+
+		List<String> ids = Lists.transform(features, function);
+
+		if(ids.size() <= 10){
+			return ids.toString();
 		}
-	
-		List<FieldName> result = new ArrayList<>();
-		result.addAll(names.subList(0, 2));
-		result.add(new FieldName("..."));
-		result.addAll(names.subList(names.size() - 2, names.size()));
-	
+
+		List<String> result = new ArrayList<>();
+		result.addAll(ids.subList(0, 2));
+		result.add("...");
+		result.addAll(ids.subList(ids.size() - 2, ids.size()));
+
 		return result.toString();
 	}
 }

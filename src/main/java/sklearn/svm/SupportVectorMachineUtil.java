@@ -25,7 +25,6 @@ import java.util.List;
 import org.dmg.pmml.Array;
 import org.dmg.pmml.Coefficient;
 import org.dmg.pmml.Coefficients;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Kernel;
 import org.dmg.pmml.LinearKernel;
 import org.dmg.pmml.PolynomialKernel;
@@ -39,8 +38,8 @@ import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorFields;
 import org.dmg.pmml.VectorInstance;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.MatrixUtil;
@@ -71,7 +70,7 @@ public class SupportVectorMachineUtil {
 
 		int numberOfUsedFeatures = features.cardinality();
 
-		List<FieldName> unusedNames = new ArrayList<>();
+		List<Feature> unusedFeatures = new ArrayList<>();
 
 		VectorFields vectorFields = new VectorFields();
 
@@ -79,9 +78,7 @@ public class SupportVectorMachineUtil {
 			Feature feature = schema.getFeature(i);
 
 			if(!features.get(i)){
-				FieldName name = feature.getName();
-
-				unusedNames.add(name);
+				unusedFeatures.add(feature);
 
 				continue;
 			}
@@ -117,8 +114,8 @@ public class SupportVectorMachineUtil {
 			vectorDictionary.addVectorInstances(vectorInstance);
 		}
 
-		if(!unusedNames.isEmpty()){
-			logger.info("Skipped {} active field(s): {}", unusedNames.size(), LoggerUtil.formatNameList(unusedNames));
+		if(!unusedFeatures.isEmpty()){
+			logger.info("Skipped {} feature(s): {}", unusedFeatures.size(), LoggerUtil.formatNameList(unusedFeatures));
 		}
 
 		return vectorDictionary;

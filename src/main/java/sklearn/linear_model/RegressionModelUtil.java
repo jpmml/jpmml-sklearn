@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.CategoricalPredictor;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NumericPredictor;
@@ -31,8 +30,8 @@ import org.dmg.pmml.RegressionTable;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.slf4j.Logger;
@@ -65,14 +64,14 @@ public class RegressionModelUtil {
 
 		RegressionTable regressionTable = new RegressionTable(ValueUtil.asDouble(intercept));
 
-		List<FieldName> unusedNames = new ArrayList<>();
+		List<Feature> unusedFeatures = new ArrayList<>();
 
 		for(int i = 0; i < coefficients.size(); i++){
 			Number coefficient = coefficients.get(i);
 			Feature feature = features.get(i);
 
 			if(ValueUtil.isZero(coefficient)){
-				unusedNames.add(feature.getName());
+				unusedFeatures.add(feature);
 
 				continue;
 			} // End if
@@ -98,8 +97,8 @@ public class RegressionModelUtil {
 			}
 		}
 
-		if(!unusedNames.isEmpty()){
-			logger.info("Skipped {} active field(s): {}", unusedNames.size(), LoggerUtil.formatNameList(unusedNames));
+		if(!unusedFeatures.isEmpty()){
+			logger.info("Skipped {} feature(s): {}", unusedFeatures.size(), LoggerUtil.formatNameList(unusedFeatures));
 		}
 
 		return regressionTable;
