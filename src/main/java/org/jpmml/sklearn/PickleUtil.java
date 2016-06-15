@@ -28,6 +28,7 @@ import net.razorvine.pickle.Unpickler;
 import numpy.DType;
 import numpy.core.NDArray;
 import numpy.core.Scalar;
+import numpy.core.UFunc;
 import numpy.random.RandomState;
 import scipy.sparse.CSRMatrix;
 import sklearn.cluster.KMeans;
@@ -73,6 +74,7 @@ import sklearn.neighbors.KNeighborsRegressor;
 import sklearn.neural_network.MLPClassifier;
 import sklearn.neural_network.MLPRegressor;
 import sklearn.preprocessing.Binarizer;
+import sklearn.preprocessing.FunctionTransformer;
 import sklearn.preprocessing.Imputer;
 import sklearn.preprocessing.LabelBinarizer;
 import sklearn.preprocessing.LabelEncoder;
@@ -129,6 +131,7 @@ public class PickleUtil {
 		ObjectConstructor[] constructors = {
 			new NDArrayWrapperConstructor("joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new ExtensionObjectConstructor("numpy", "dtype", DType.class),
+			new ExtensionObjectConstructor("numpy.core", "_ufunc_reconstruct", UFunc.class),
 			new ExtensionObjectConstructor("numpy.core.multiarray", "_reconstruct", NDArray.class),
 			new ExtensionObjectConstructor("numpy.core.multiarray", "scalar", Scalar.class),
 			new ExtensionObjectConstructor("numpy.random", "__RandomState_ctor", RandomState.class),
@@ -181,6 +184,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.neighbors.regression", "KNeighborsRegressor", KNeighborsRegressor.class),
 			new ObjectConstructor("sklearn.neural_network.multilayer_perceptron", "MLPClassifier", MLPClassifier.class),
 			new ObjectConstructor("sklearn.neural_network.multilayer_perceptron", "MLPRegressor", MLPRegressor.class),
+			new ObjectConstructor("sklearn.preprocessing._function_transformer", "FunctionTransformer", FunctionTransformer.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "Binarizer", Binarizer.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MaxAbsScaler", MaxAbsScaler.class),
 			new ObjectConstructor("sklearn.preprocessing.data", "MinMaxScaler", MinMaxScaler.class),

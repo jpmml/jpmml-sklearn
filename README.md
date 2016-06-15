@@ -48,6 +48,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`neural_network.MLPRegressor`] (http://scikit-learn.org/dev/modules/generated/sklearn.neural_network.MLPRegressor.html)
   * Preprocessing and Normalization:
     * [`preprocessing.Binarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Binarizer.html)
+    * [`preprocessing.FunctionTransformer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)
     * [`preprocessing.Imputer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Imputer.html)
     * [`preprocessing.LabelBinarizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelBinarizer.html)
     * [`preprocessing.LabelEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html)
