@@ -86,6 +86,7 @@ import sklearn.preprocessing.StandardScaler;
 import sklearn.svm.LinearSVR;
 import sklearn.svm.NuSVC;
 import sklearn.svm.NuSVR;
+import sklearn.svm.OneClassSVM;
 import sklearn.svm.SVC;
 import sklearn.svm.SVR;
 import sklearn.tree.DecisionTreeClassifier;
@@ -197,6 +198,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.svm.classes", "LinearSVR", LinearSVR.class),
 			new ObjectConstructor("sklearn.svm.classes", "NuSVC", NuSVC.class),
 			new ObjectConstructor("sklearn.svm.classes", "NuSVR", NuSVR.class),
+			new ObjectConstructor("sklearn.svm.classes", "OneClassSVM", OneClassSVM.class),
 			new ObjectConstructor("sklearn.svm.classes", "SVC", SVC.class),
 			new ObjectConstructor("sklearn.svm.classes", "SVR", SVR.class),
 			new ExtensionObjectConstructor("sklearn.tree._tree", "BestSplitter"),

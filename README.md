@@ -58,6 +58,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`preprocessing.RobustScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)
     * [`preprocessing.StandardScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
   * Support Vector Machines:
+    * [`svm.OneClassSVM`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html)
     * [`svm.SVC`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
     * [`svm.NuSVC`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVC.html)
     * [`svm.SVR`] (http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)

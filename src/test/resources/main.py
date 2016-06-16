@@ -16,7 +16,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
-from sklearn.svm import LinearSVR, NuSVC, NuSVR, SVC, SVR
+from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn_pandas import DataFrameMapper
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from pandas import DataFrame
@@ -336,3 +336,26 @@ build_housing(SGDRegressor(random_state = 13), "SGDHousing")
 build_housing(SVR(), "SVRHousing", to_sparse = True)
 build_housing(LinearSVR(random_state = 13), "LinearSVRHousing", to_sparse = True)
 build_housing(NuSVR(), "NuSVRHousing", to_sparse = True)
+
+housing_df = housing_df.drop("MEDV", axis = 1)
+
+housing_anomaly_columns = housing_df.columns.tolist()
+
+housing_anomaly_mapper = DataFrameMapper([
+	(housing_anomaly_columns, [ContinuousDomain(), MaxAbsScaler()])
+])
+
+housing_anomaly_X = housing_anomaly_mapper.fit_transform(housing_df)
+
+print(housing_anomaly_X.shape)
+
+store_pkl(housing_anomaly_mapper, "HousingAnomaly.pkl")
+
+def build_housing_anomaly(svm, name, with_distance = True):
+	svm = svm.fit(housing_anomaly_X)
+	store_pkl(svm, name + ".pkl")
+	distance = DataFrame(svm.decision_function(housing_anomaly_X), columns = ["distance"])
+	outlier = DataFrame(svm.predict(housing_anomaly_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
+	store_csv(pandas.concat([distance, outlier], axis = 1), name + ".csv")
+
+build_housing_anomaly(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousingAnomaly")

@@ -71,13 +71,11 @@ public class Estimator extends BaseEstimator {
 		return Collections.emptySet();
 	}
 
-	static
-	public FieldName createTargetField(){
+	protected FieldName createTargetField(){
 		return FieldName.create("y");
 	}
 
-	static
-	public List<FieldName> createActiveFields(int size){
+	protected List<FieldName> createActiveFields(int size){
 		List<FieldName> result = new ArrayList<>(size);
 
 		for(int i = 0; i < size; i++){
