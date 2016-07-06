@@ -71,8 +71,8 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`tree.ExtraTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
   * [SkLearn2PMML] (https://github.com/jpmml/sklearn2pmml):
-    * [`decoration.CategoricalDomain`]
-    * [`decoration.ContinuousDomain`]
+    * `decoration.CategoricalDomain`
+    * `decoration.ContinuousDomain`
   * [XGBoost] (https://github.com/dmlc/xgboost):
     * [`xgboost.XGBClassifier`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
     * [`xgboost.XGBRegressor`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)

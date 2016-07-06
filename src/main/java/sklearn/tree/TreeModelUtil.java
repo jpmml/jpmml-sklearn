@@ -18,6 +18,7 @@
  */
 package sklearn.tree;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -57,7 +58,7 @@ public class TreeModelUtil {
 			}
 		};
 
-		return Lists.newArrayList(Lists.transform(estimators, function));
+		return new ArrayList<>(Lists.transform(estimators, function));
 	}
 
 	static

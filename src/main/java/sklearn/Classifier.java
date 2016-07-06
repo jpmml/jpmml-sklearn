@@ -19,10 +19,15 @@
 package sklearn;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -40,15 +45,24 @@ public class Classifier extends Estimator {
 
 	@Override
 	public Schema createSchema(FeatureMapper featureMapper){
+		List<?> classes = getClasses();
+
+		if(classes == null || classes.isEmpty()){
+			throw new IllegalArgumentException();
+		}
+
+		DataType dataType = getDataType(classes);
+
+		List<String> targetCategories = formatTargetCategories(classes);
 
 		if(featureMapper.isEmpty()){
 			featureMapper.initActiveFields(createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
-			featureMapper.initTargetField(createTargetField(), OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
+			featureMapper.initTargetField(createTargetField(), OpType.CATEGORICAL, dataType, targetCategories);
 		} else
 
 		{
 			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
-			featureMapper.updateTargetField(OpType.CATEGORICAL, DataType.STRING, getTargetCategories());
+			featureMapper.updateTargetField(OpType.CATEGORICAL, dataType, targetCategories);
 		}
 
 		Schema schema = featureMapper.createSupervisedSchema();
@@ -64,13 +78,34 @@ public class Classifier extends Estimator {
 		return true;
 	}
 
-	public List<String> getTargetCategories(){
-		List<?> classes = getClasses();
+	public List<?> getClasses(){
+		return ClassDictUtil.getArray(this, "classes_");
+	}
 
-		if(classes == null || classes.isEmpty()){
-			throw new IllegalArgumentException();
+	static
+	private DataType getDataType(List<?> objects){
+		Function<Object, Class<?>> function = new Function<Object, Class<?>>(){
+
+			@Override
+			public Class<?> apply(Object object){
+				return object.getClass();
+			}
+		};
+
+		Set<Class<?>> clazzes = new HashSet<>(Lists.transform(objects, function));
+
+		Class<?> clazz = Iterables.getOnlyElement(clazzes);
+
+		DataType dataType = Classifier.dataTypes.get(clazz);
+		if(dataType != null){
+			return dataType;
 		}
 
+		return DataType.STRING;
+	}
+
+	static
+	private List<String> formatTargetCategories(List<?> objects){
 		Function<Object, String> function = new Function<Object, String>(){
 
 			@Override
@@ -85,12 +120,18 @@ public class Classifier extends Estimator {
 			}
 		};
 
-		List<String> targetCategories = new ArrayList<>(Lists.transform(classes, function));
-
-		return targetCategories;
+		return new ArrayList<>(Lists.transform(objects, function));
 	}
 
-	public List<?> getClasses(){
-		return ClassDictUtil.getArray(this, "classes_");
+	private static final Map<Class<?>, DataType> dataTypes = new LinkedHashMap<>();
+
+	static {
+		dataTypes.put(Boolean.class, DataType.BOOLEAN);
+		dataTypes.put(Byte.class, DataType.INTEGER);
+		dataTypes.put(Short.class, DataType.INTEGER);
+		dataTypes.put(Integer.class, DataType.INTEGER);
+		dataTypes.put(Long.class, DataType.INTEGER);
+		dataTypes.put(Float.class, DataType.FLOAT);
+		dataTypes.put(Double.class, DataType.DOUBLE);
 	}
 }
