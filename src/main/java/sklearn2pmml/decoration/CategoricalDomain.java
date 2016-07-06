@@ -23,6 +23,7 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.InvalidValueTreatmentMethodType;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.OpType;
@@ -35,6 +36,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
+import sklearn.TypeUtil;
 
 public class CategoricalDomain extends Domain {
 
@@ -45,6 +47,13 @@ public class CategoricalDomain extends Domain {
 	@Override
 	public OpType getOpType(){
 		return OpType.CATEGORICAL;
+	}
+
+	@Override
+	public DataType getDataType(){
+		List<?> data = getData();
+
+		return TypeUtil.getDataType(data, DataType.STRING);
 	}
 
 	@Override

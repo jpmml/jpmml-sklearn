@@ -29,11 +29,12 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ListFeature;
-import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 import sklearn.Transformer;
+import sklearn.TypeUtil;
 
 public class OneHotEncoder extends Transformer {
 
@@ -48,12 +49,9 @@ public class OneHotEncoder extends Transformer {
 
 	@Override
 	public DataType getDataType(){
-		return DataType.INTEGER;
-	}
+		List<? extends Number> values = getValues();
 
-	@Override
-	public List<?> getClasses(){
-		return getValues();
+		return TypeUtil.getDataType(values, DataType.INTEGER);
 	}
 
 	@Override

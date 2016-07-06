@@ -39,6 +39,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 import sklearn.Transformer;
+import sklearn.TypeUtil;
 
 public class LabelEncoder extends Transformer {
 
@@ -53,7 +54,9 @@ public class LabelEncoder extends Transformer {
 
 	@Override
 	public DataType getDataType(){
-		return DataType.STRING;
+		List<?> classes = getClasses();
+
+		return TypeUtil.getDataType(classes, DataType.STRING);
 	}
 
 	@Override
@@ -100,7 +103,6 @@ public class LabelEncoder extends Transformer {
 		return Collections.<Feature>singletonList(new ListFeature(derivedField, categories));
 	}
 
-	@Override
 	public List<?> getClasses(){
 		return ClassDictUtil.getArray(this, "classes_");
 	}

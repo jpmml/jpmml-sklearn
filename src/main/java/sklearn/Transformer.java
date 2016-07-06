@@ -18,7 +18,6 @@
  */
 package sklearn;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.CaseFormat;
@@ -45,10 +44,6 @@ public class Transformer extends ClassDict {
 
 	public DataType getDataType(){
 		return DataType.DOUBLE;
-	}
-
-	public List<?> getClasses(){
-		return Collections.emptyList();
 	}
 
 	protected String name(){

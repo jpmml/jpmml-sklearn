@@ -33,6 +33,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 import sklearn.Transformer;
+import sklearn.TypeUtil;
 
 public class LabelBinarizer extends Transformer {
 
@@ -47,7 +48,9 @@ public class LabelBinarizer extends Transformer {
 
 	@Override
 	public DataType getDataType(){
-		return DataType.STRING;
+		List<?> classes = getClasses();
+
+		return TypeUtil.getDataType(classes, DataType.STRING);
 	}
 
 	@Override
@@ -98,7 +101,6 @@ public class LabelBinarizer extends Transformer {
 		return features;
 	}
 
-	@Override
 	public List<?> getClasses(){
 		return (List)ClassDictUtil.getArray(this, "classes_");
 	}

@@ -19,15 +19,10 @@
 package sklearn;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -51,7 +46,7 @@ public class Classifier extends Estimator {
 			throw new IllegalArgumentException();
 		}
 
-		DataType dataType = getDataType(classes);
+		DataType dataType = TypeUtil.getDataType(classes, DataType.STRING);
 
 		List<String> targetCategories = formatTargetCategories(classes);
 
@@ -83,28 +78,6 @@ public class Classifier extends Estimator {
 	}
 
 	static
-	private DataType getDataType(List<?> objects){
-		Function<Object, Class<?>> function = new Function<Object, Class<?>>(){
-
-			@Override
-			public Class<?> apply(Object object){
-				return object.getClass();
-			}
-		};
-
-		Set<Class<?>> clazzes = new HashSet<>(Lists.transform(objects, function));
-
-		Class<?> clazz = Iterables.getOnlyElement(clazzes);
-
-		DataType dataType = Classifier.dataTypes.get(clazz);
-		if(dataType != null){
-			return dataType;
-		}
-
-		return DataType.STRING;
-	}
-
-	static
 	private List<String> formatTargetCategories(List<?> objects){
 		Function<Object, String> function = new Function<Object, String>(){
 
@@ -121,17 +94,5 @@ public class Classifier extends Estimator {
 		};
 
 		return new ArrayList<>(Lists.transform(objects, function));
-	}
-
-	private static final Map<Class<?>, DataType> dataTypes = new LinkedHashMap<>();
-
-	static {
-		dataTypes.put(Boolean.class, DataType.BOOLEAN);
-		dataTypes.put(Byte.class, DataType.INTEGER);
-		dataTypes.put(Short.class, DataType.INTEGER);
-		dataTypes.put(Integer.class, DataType.INTEGER);
-		dataTypes.put(Long.class, DataType.INTEGER);
-		dataTypes.put(Float.class, DataType.FLOAT);
-		dataTypes.put(Double.class, DataType.DOUBLE);
 	}
 }
