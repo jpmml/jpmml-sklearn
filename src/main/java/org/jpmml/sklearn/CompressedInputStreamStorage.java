@@ -30,11 +30,41 @@ import com.google.common.io.CountingInputStream;
 public class CompressedInputStreamStorage extends InputStreamStorage {
 
 	public CompressedInputStreamStorage(InputStream is) throws IOException {
-		super(init(new PushbackInputStream(is)));
+		super(init(new PushbackInputStream(is, 2)));
 	}
 
 	static
 	private InputStream init(PushbackInputStream is) throws IOException {
+		byte[] magic = new byte[2];
+
+		ByteStreams.readFully(is, magic);
+
+		is.unread(magic);
+
+		// Joblib 0.10.0 and newer
+		if(magic[0] == 'x'){
+			return initZlib(is);
+		} else
+
+		// Joblib 0.9.4 and earlier
+		if(magic[0] == 'Z' && magic[1] == 'F'){
+			return initCompat(is);
+		} else
+
+		{
+			throw new IOException();
+		}
+	}
+
+	static
+	private InputStream initZlib(PushbackInputStream is){
+		InflaterInputStream zlibIs = new InflaterInputStream(is);
+
+		return zlibIs;
+	}
+
+	static
+	private InputStream initCompat(PushbackInputStream is) throws IOException {
 		byte[] headerBytes = new byte[2 + 19];
 
 		ByteStreams.readFully(is, headerBytes);

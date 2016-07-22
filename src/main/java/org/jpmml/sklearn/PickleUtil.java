@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import joblib.NDArrayWrapperConstructor;
+import joblib.NumpyArrayWrapper;
+import net.razorvine.pickle.Opcodes;
 import net.razorvine.pickle.Unpickler;
 import numpy.DType;
 import numpy.core.NDArray;
@@ -131,6 +133,7 @@ public class PickleUtil {
 	public Object unpickle(Storage storage) throws IOException {
 		ObjectConstructor[] constructors = {
 			new NDArrayWrapperConstructor("joblib.numpy_pickle", "NDArrayWrapper", storage),
+			new ObjectConstructor("joblib.numpy_pickle", "NumpyArrayWrapper", NumpyArrayWrapper.class),
 			new ExtensionObjectConstructor("numpy", "dtype", DType.class),
 			new ExtensionObjectConstructor("numpy.core", "_ufunc_reconstruct", UFunc.class),
 			new ExtensionObjectConstructor("numpy.core.multiarray", "_reconstruct", NDArray.class),
@@ -161,6 +164,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ZeroEstimator", ZeroEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.voting_classifier", "VotingClassifier", VotingClassifier.class),
 			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),
+			new ObjectConstructor("sklearn.externals.joblib.numpy_pickle", "NumpyArrayWrapper", NumpyArrayWrapper.class),
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),
 			new ObjectConstructor("sklearn.linear_model.coordinate_descent", "ElasticNet", ElasticNet.class),
 			new ObjectConstructor("sklearn.linear_model.coordinate_descent", "ElasticNetCV", ElasticNet.class),
@@ -224,8 +228,31 @@ public class PickleUtil {
 			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
 		}
 
-		try(InputStream is = storage.getObject()){
-			Unpickler unpickler = new Unpickler();
+		try(final InputStream is = storage.getObject()){
+			Unpickler unpickler = new Unpickler(){
+
+				@Override
+				protected Object dispatch(short key) throws IOException {
+					Object result = super.dispatch(key);
+
+					if(key == Opcodes.BUILD){
+						Object head = super.stack.peek();
+
+						// Modify the stack by replacing NumpyArrayWrapper with NDArray
+						if(head instanceof NumpyArrayWrapper){
+							NumpyArrayWrapper arrayWrapper = (NumpyArrayWrapper)head;
+
+							super.stack.pop();
+
+							NDArray array = arrayWrapper.toArray(is);
+
+							super.stack.add(array);
+						}
+					}
+
+					return result;
+				}
+			};
 
 			return unpickler.load(is);
 		}
