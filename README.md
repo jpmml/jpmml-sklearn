@@ -114,7 +114,7 @@ Enter the project root directory and build using [Apache Maven] (http://maven.ap
 mvn clean install
 ```
 
-The build produces an executable uber-JAR file `target/converter-executable-1.0-SNAPSHOT.jar`.
+The build produces an executable uber-JAR file `target/converter-executable-1.1-SNAPSHOT.jar`.
 
 # Usage #
 
@@ -173,17 +173,17 @@ Please see the test script file [main.py] (https://github.com/jpmml/jpmml-sklear
 
 Converting the estimator pickle file `estimator.pkl` to a PMML file `estimator.pmml`:
 ```
-java -jar target/converter-executable-1.0-SNAPSHOT.jar --pkl-input estimator.pkl --pmml-output estimator.pmml
+java -jar target/converter-executable-1.1-SNAPSHOT.jar --pkl-input estimator.pkl --pmml-output estimator.pmml
 ```
 
 Converting the `sklearn_pandas.DataFrameMapper` pickle file `mapper.pkl` and the estimator pickle file `estimator.pkl` to a PMML file `mapper-estimator.pmml`:
 ```
-java -jar target/converter-executable-1.0-SNAPSHOT.jar --pkl-mapper-input mapper.pkl --pkl-estimator-input estimator.pkl --pmml-output mapper-estimator.pmml
+java -jar target/converter-executable-1.1-SNAPSHOT.jar --pkl-mapper-input mapper.pkl --pkl-estimator-input estimator.pkl --pmml-output mapper-estimator.pmml
 ```
 
 Getting help:
 ```
-java -jar target/converter-executable-1.0-SNAPSHOT.jar --help
+java -jar target/converter-executable-1.1-SNAPSHOT.jar --help
 ```
 
 # License #
