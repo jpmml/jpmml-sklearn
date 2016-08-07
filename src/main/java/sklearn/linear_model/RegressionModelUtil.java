@@ -46,7 +46,7 @@ public class RegressionModelUtil {
 	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema){
 		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema, regressionTable);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
 			.addRegressionTables(regressionTable);

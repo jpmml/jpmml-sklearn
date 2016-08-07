@@ -77,7 +77,7 @@ public class TreeModelUtil {
 
 		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema, root);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);

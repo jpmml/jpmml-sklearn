@@ -53,8 +53,7 @@ public class EstimatorUtil {
 
 		Model model = estimator.encodeModel(schema);
 
-		PMML pmml = featureMapper.encodePMML(model)
-			.setHeader(PMMLUtil.createHeader("JPMML-SkLearn", "1.0-SNAPSHOT"));
+		PMML pmml = featureMapper.encodePMML(model);
 
 		return pmml;
 	}

@@ -22,15 +22,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Value;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.FeatureMapper;
 import org.junit.Test;
@@ -47,7 +45,7 @@ public class OneHotEncoderTest {
 
 		Feature inputFeature = new WildcardFeature(dataField);
 
-		assertEquals(Arrays.asList(), getValues(dataField));
+		assertEquals(Arrays.asList(), PMMLUtil.getValues(dataField));
 
 		OneHotEncoder encoder = new OneHotEncoder("sklearn.preprocessing.data", "OneHotEncoder");
 		encoder.put("n_values_", 3);
@@ -61,21 +59,6 @@ public class OneHotEncoderTest {
 			assertEquals(String.valueOf(i), outputFeature.getValue());
 		}
 
-		assertEquals(Arrays.asList("0", "1", "2"), getValues(dataField));
-	}
-
-	static
-	private List<String> getValues(DataField dataField){
-		List<Value> values = dataField.getValues();
-
-		Function<Value, String> function = new Function<Value, String>(){
-
-			@Override
-			public String apply(Value value){
-				return value.getValue();
-			}
-		};
-
-		return Lists.transform(values, function);
+		assertEquals(Arrays.asList("0", "1", "2"), PMMLUtil.getValues(dataField));
 	}
 }

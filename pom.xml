@@ -8,7 +8,7 @@
 
 	<name>JPMML-SkLearn</name>
 	<description>Java library and command-line application for converting Scikit-Learn models to PMML</description>
-	<url>http://www.jpmml.org</url>
+	<url>https://github.com/jpmml/jpmml-sklearn</url>
 	
 	<licenses>
 		<license>
@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-converter</artifactId>
-			<version>1.0.7</version>
+			<version>1.0.8</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.sun.xml.fastinfoset</groupId>
@@ -70,7 +70,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-xgboost</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.6</version>
 		</dependency>
 
 		<dependency>
@@ -100,27 +100,15 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>1.2.14</version>
+			<version>1.2.15</version>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jpmml</groupId>
-					<artifactId>pmml-model</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>1.2.14</version>
+			<version>1.2.15</version>
 			<type>test-jar</type>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jpmml</groupId>
-					<artifactId>pmml-model</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -133,6 +121,37 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.4.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireJavaVersion>
+									<version>1.7</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -159,7 +178,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>

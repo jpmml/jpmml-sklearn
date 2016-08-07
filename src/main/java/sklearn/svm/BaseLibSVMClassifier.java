@@ -30,8 +30,8 @@ import org.dmg.pmml.SupportVectorMachineModel;
 import org.dmg.pmml.SvmClassificationMethodType;
 import org.dmg.pmml.VectorDictionary;
 import org.dmg.pmml.VectorInstance;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
@@ -110,7 +110,7 @@ public class BaseLibSVMClassifier extends Classifier {
 			}
 		}
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema, vectorDictionary);
+		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
 
 		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.CLASSIFICATION, miningSchema, vectorDictionary, supportVectorMachines)
 			.setClassificationMethod(SvmClassificationMethodType.ONE_AGAINST_ONE)

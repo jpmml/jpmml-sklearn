@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
@@ -62,17 +61,7 @@ public class FeatureMapper extends PMMLMapper {
 		List<String> targetCategories = null;
 
 		if(dataField.hasValues()){
-			List<Value> values = dataField.getValues();
-
-			Function<Value, String> function = new Function<Value, String>(){
-
-				@Override
-				public String apply(Value value){
-					return value.getValue();
-				}
-			};
-
-			targetCategories = new ArrayList<>(Lists.transform(values, function));
+			targetCategories = PMMLUtil.getValues(dataField);
 		}
 
 		List<FieldName> activeFields = new ArrayList<>(getDataFields().keySet());
