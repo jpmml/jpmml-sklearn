@@ -33,11 +33,10 @@ import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
-import org.dmg.pmml.Segmentation;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -55,17 +54,15 @@ public class GradientBoostingUtil {
 		FieldName sumField = FieldName.create("sum");
 
 		{
-			List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunctionType.REGRESSION, schema);
+			Schema segmentSchema = schema.toAnonymousSchema();
 
-			Segmentation segmentation = MiningModelUtil.createSegmentation(MultipleModelMethodType.SUM, treeModels);
+			List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunctionType.REGRESSION, schema);
 
 			Output output = new Output()
 				.addOutputFields(ModelUtil.createPredictedField(sumField));
 
-			MiningSchema miningSchema = ModelUtil.createMiningSchema(null, schema.getActiveFields());
-
-			MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, miningSchema)
-				.setSegmentation(segmentation)
+			MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, ModelUtil.createMiningSchema(segmentSchema))
+				.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethodType.SUM, treeModels))
 				.setOutput(output);
 
 			models.add(miningModel);
@@ -93,12 +90,8 @@ public class GradientBoostingUtil {
 			models.add(regressionModel);
 		}
 
-		Segmentation segmentation = MiningModelUtil.createSegmentation(MultipleModelMethodType.MODEL_CHAIN, models);
-
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, miningSchema)
-			.setSegmentation(segmentation);
+		MiningModel miningModel = new MiningModel(MiningFunctionType.REGRESSION, ModelUtil.createMiningSchema(schema))
+			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethodType.MODEL_CHAIN, models));
 
 		return miningModel;
 	}

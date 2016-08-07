@@ -20,10 +20,9 @@ package sklearn.tree;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.Output;
 import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 
 abstract
@@ -45,10 +44,8 @@ public class TreeClassifier extends Classifier implements HasTree {
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		Output output = ModelUtil.createProbabilityOutput(schema);
-
 		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunctionType.CLASSIFICATION, schema)
-			.setOutput(output);
+			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return treeModel;
 	}

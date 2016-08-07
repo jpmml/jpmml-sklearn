@@ -24,9 +24,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.MultipleModelMethodType;
-import org.dmg.pmml.Output;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import sklearn.tree.TreeClassifier;
 
@@ -51,10 +50,8 @@ public class BaseForestClassifier extends Classifier {
 	public MiningModel encodeModel(Schema schema){
 		List<TreeClassifier> estimators = getEstimators();
 
-		Output output = ModelUtil.createProbabilityOutput(schema);
-
 		MiningModel miningModel = BaseForestUtil.encodeBaseForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.CLASSIFICATION, schema)
-			.setOutput(output);
+			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return miningModel;
 	}

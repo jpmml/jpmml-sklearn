@@ -30,7 +30,6 @@ import org.dmg.pmml.Entity;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NeuralInput;
 import org.dmg.pmml.NeuralInputs;
 import org.dmg.pmml.NeuralLayer;
@@ -42,8 +41,8 @@ import org.dmg.pmml.NnNormalizationMethodType;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.MatrixUtil;
@@ -176,9 +175,7 @@ public class NeuralNetworkUtil {
 				break;
 		}
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, miningSchema, neuralInputs, neuralLayers)
+		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, ModelUtil.createMiningSchema(schema), neuralInputs, neuralLayers)
 			.setNeuralOutputs(neuralOutputs);
 
 		return neuralNetwork;

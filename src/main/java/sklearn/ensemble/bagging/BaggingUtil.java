@@ -31,10 +31,8 @@ import com.google.common.primitives.Ints;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.MultipleModelMethodType;
-import org.dmg.pmml.Segmentation;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -63,12 +61,8 @@ public class BaggingUtil {
 			models.add(model);
 		}
 
-		Segmentation segmentation = MiningModelUtil.createSegmentation(multipleModelMethod, models);
-
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		MiningModel miningModel = new MiningModel(miningFunction, miningSchema)
-			.setSegmentation(segmentation);
+		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema))
+			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models));
 
 		return miningModel;
 	}

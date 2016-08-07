@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.dmg.pmml.CategoricalPredictor;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.NumericPredictor;
 import org.dmg.pmml.RegressionModel;
 import org.dmg.pmml.RegressionTable;
@@ -46,9 +45,7 @@ public class RegressionModelUtil {
 	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema){
 		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, miningSchema, null)
+		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, ModelUtil.createMiningSchema(schema), null)
 			.addRegressionTables(regressionTable);
 
 		return regressionModel;

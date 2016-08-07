@@ -36,7 +36,6 @@ import org.dmg.pmml.KNNInput;
 import org.dmg.pmml.KNNInputs;
 import org.dmg.pmml.Measure;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Minkowski;
 import org.dmg.pmml.NearestNeighborModel;
 import org.dmg.pmml.Output;
@@ -45,8 +44,8 @@ import org.dmg.pmml.Row;
 import org.dmg.pmml.TrainingInstances;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Estimator;
 
@@ -139,9 +138,7 @@ public class KNeighborsUtil {
 
 		Output output = new Output(outputFields);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunctionType.REGRESSION, numberOfNeighbors, miningSchema, trainingInstances, comparisonMeasure, knnInputs)
+		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunctionType.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema), trainingInstances, comparisonMeasure, knnInputs)
 			.setOutput(output);
 
 		return nearestNeighborModel;

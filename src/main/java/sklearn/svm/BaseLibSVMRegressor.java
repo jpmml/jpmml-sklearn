@@ -18,13 +18,11 @@
  */
 package sklearn.svm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Kernel;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.SupportVectorMachine;
 import org.dmg.pmml.SupportVectorMachineModel;
 import org.dmg.pmml.VectorDictionary;
@@ -67,16 +65,11 @@ public class BaseLibSVMRegressor extends Regressor {
 
 		Kernel kernel = SupportVectorMachineUtil.encodeKernel(getKernel(), getDegree(), getGamma(), getCoef0());
 
-		List<SupportVectorMachine> supportVectorMachines = new ArrayList<>();
-
 		SupportVectorMachine supportVectorMachine = SupportVectorMachineUtil.encodeSupportVectorMachine(vectorInstances, dualCoef, Iterables.getOnlyElement(intercept));
 
-		supportVectorMachines.add(supportVectorMachine);
-
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.REGRESSION, miningSchema, vectorDictionary, supportVectorMachines)
-			.setKernel(kernel);
+		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.REGRESSION, ModelUtil.createMiningSchema(schema), vectorDictionary, null)
+			.setKernel(kernel)
+			.addSupportVectorMachines(supportVectorMachine);
 
 		return supportVectorMachineModel;
 	}

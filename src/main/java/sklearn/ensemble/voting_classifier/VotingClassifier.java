@@ -31,15 +31,12 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunctionType;
 import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.Segmentation;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.MiningModelUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 import sklearn.Classifier;
@@ -132,15 +129,9 @@ public class VotingClassifier extends Classifier {
 
 		MultipleModelMethodType multipleModelMethod = parseVoting(voting, (weights != null && weights.size() > 0));
 
-		Segmentation segmentation = MiningModelUtil.createSegmentation(multipleModelMethod, models, weights);
-
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		Output output = ModelUtil.createProbabilityOutput(schema);
-
-		MiningModel miningModel = new MiningModel(MiningFunctionType.CLASSIFICATION, miningSchema)
-			.setSegmentation(segmentation)
-			.setOutput(output);
+		MiningModel miningModel = new MiningModel(MiningFunctionType.CLASSIFICATION, ModelUtil.createMiningSchema(schema))
+			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models, weights))
+			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return miningModel;
 	}

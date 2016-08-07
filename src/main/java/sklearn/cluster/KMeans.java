@@ -31,14 +31,13 @@ import org.dmg.pmml.CompareFunctionType;
 import org.dmg.pmml.ComparisonMeasure;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.SquaredEuclidean;
 import org.jpmml.converter.ClusteringModelUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
@@ -94,11 +93,9 @@ public class KMeans extends Clusterer {
 			.setCompareFunction(CompareFunctionType.ABS_DIFF)
 			.setMeasure(new SquaredEuclidean());
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
 		Output output = ClusteringModelUtil.createOutput(FieldName.create("Cluster"), clusters);
 
-		ClusteringModel clusteringModel = new ClusteringModel(MiningFunctionType.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, miningSchema, comparisonMeasure, clusteringFields, clusters)
+		ClusteringModel clusteringModel = new ClusteringModel(MiningFunctionType.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema(schema), comparisonMeasure, clusteringFields, clusters)
 			.setOutput(output);
 
 		return clusteringModel;

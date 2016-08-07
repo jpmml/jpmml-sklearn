@@ -24,7 +24,6 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Node;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
@@ -77,9 +76,7 @@ public class TreeModelUtil {
 
 		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		TreeModel treeModel = new TreeModel(miningFunction, miningSchema, root)
+		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
 			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);
 
 		return treeModel;

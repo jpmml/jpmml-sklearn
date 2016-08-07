@@ -24,7 +24,6 @@ import java.util.List;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Kernel;
 import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.SupportVectorMachine;
 import org.dmg.pmml.SupportVectorMachineModel;
 import org.dmg.pmml.SvmClassificationMethodType;
@@ -110,9 +109,7 @@ public class BaseLibSVMClassifier extends Classifier {
 			}
 		}
 
-		MiningSchema miningSchema = ModelUtil.createMiningSchema(schema);
-
-		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.CLASSIFICATION, miningSchema, vectorDictionary, supportVectorMachines)
+		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.CLASSIFICATION, ModelUtil.createMiningSchema(schema), vectorDictionary, supportVectorMachines)
 			.setClassificationMethod(SvmClassificationMethodType.ONE_AGAINST_ONE)
 			.setKernel(kernel);
 
