@@ -74,7 +74,7 @@ public class LabelEncoder extends Transformer {
 
 		InlineTable inlineTable = new InlineTable();
 
-		List<String> keys = Arrays.asList("input", "output");
+		List<String> columns = Arrays.asList("input", "output");
 
 		List<String> categories = new ArrayList<>();
 
@@ -85,7 +85,7 @@ public class LabelEncoder extends Transformer {
 
 			List<String> values = Arrays.asList(category, String.valueOf(i));
 
-			Row row = DOMUtil.createRow(documentBuilder, keys, values);
+			Row row = DOMUtil.createRow(documentBuilder, columns, values);
 
 			inlineTable.addRows(row);
 		}
@@ -93,10 +93,9 @@ public class LabelEncoder extends Transformer {
 		featureMapper.updateValueSpace(inputFeature.getName(), categories);
 
 		MapValues mapValues = new MapValues()
-			.addFieldColumnPairs(new FieldColumnPair(inputFeature.getName(), keys.get(0)))
-			.setOutputColumn(keys.get(1));
-
-		mapValues.setInlineTable(inlineTable);
+			.addFieldColumnPairs(new FieldColumnPair(inputFeature.getName(), columns.get(0)))
+			.setOutputColumn(columns.get(1))
+			.setInlineTable(inlineTable);
 
 		DerivedField derivedField = featureMapper.createDerivedField(createName(id), OpType.CATEGORICAL, DataType.INTEGER, mapValues);
 
