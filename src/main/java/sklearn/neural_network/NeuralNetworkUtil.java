@@ -296,6 +296,8 @@ public class NeuralNetworkUtil {
 				return NeuralNetwork.ActivationFunction.IDENTITY;
 			case "logistic":
 				return NeuralNetwork.ActivationFunction.LOGISTIC;
+			case "relu":
+				return NeuralNetwork.ActivationFunction.RECTIFIER;
 			case "tanh":
 				return NeuralNetwork.ActivationFunction.TANH;
 			default:
