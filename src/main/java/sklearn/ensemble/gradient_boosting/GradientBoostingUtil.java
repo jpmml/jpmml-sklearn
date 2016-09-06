@@ -18,27 +18,16 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.MiningSchema;
-import org.dmg.pmml.Model;
-import org.dmg.pmml.Output;
+import org.dmg.pmml.Targets;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
-import org.dmg.pmml.regression.NumericPredictor;
-import org.dmg.pmml.regression.RegressionModel;
-import org.dmg.pmml.regression.RegressionTable;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
-import sklearn.linear_model.RegressionModelUtil;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.TreeModelUtil;
 
@@ -49,49 +38,14 @@ public class GradientBoostingUtil {
 
 	static
 	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
-		List<Model> models = new ArrayList<>();
+		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunction.REGRESSION, schema);
 
-		FieldName sumField = FieldName.create("sum");
-
-		{
-			Schema segmentSchema = schema.toAnonymousSchema();
-
-			List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunction.REGRESSION, schema);
-
-			Output output = new Output()
-				.addOutputFields(ModelUtil.createPredictedField(sumField, DataType.DOUBLE));
-
-			MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(segmentSchema))
-				.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
-				.setOutput(output);
-
-			models.add(miningModel);
-		} // End block
-
-		{
-			MiningField miningField = ModelUtil.createMiningField(sumField);
-
-			NumericPredictor numericPredictor = new NumericPredictor(miningField.getName(), ValueUtil.asDouble(learningRate));
-
-			RegressionTable regressionTable = RegressionModelUtil.encodeRegressionTable(numericPredictor, initialPrediction);
-
-			MiningSchema miningSchema = new MiningSchema();
-
-			FieldName targetField = schema.getTargetField();
-			if(targetField != null){
-				miningSchema.addMiningFields(ModelUtil.createMiningField(targetField, MiningField.FieldUsage.TARGET));
-			}
-
-			miningSchema.addMiningFields(miningField);
-
-			RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, miningSchema, null)
-				.addRegressionTables(regressionTable);
-
-			models.add(regressionModel);
-		}
+		Targets targets = new Targets()
+			.addTargets(ModelUtil.createRescaleTarget(schema.getTargetField(), learningRate.doubleValue(), initialPrediction.doubleValue()));
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
-			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.MODEL_CHAIN, models));
+			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
+			.setTargets(targets);
 
 		return miningModel;
 	}
