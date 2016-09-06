@@ -18,14 +18,14 @@
  */
 package xgboost.sklearn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.preprocessing.LabelEncoder;
 
 public class XGBClassifier extends Classifier implements HasBooster {
 
@@ -50,23 +50,9 @@ public class XGBClassifier extends Classifier implements HasBooster {
 
 	@Override
 	public List<?> getClasses(){
-		List<Object> result = new ArrayList<>();
+		LabelEncoder labelEncoder = getLabelEncoder();
 
-		List<?> values = (List<?>)get("classes_");
-		for(Object value : values){
-
-			if(value instanceof HasArray){
-				HasArray hasArray = (HasArray)value;
-
-				result.addAll(hasArray.getArrayContent());
-			} else
-
-			{
-				result.add(value);
-			}
-		}
-
-		return result;
+		return labelEncoder.getClasses();
 	}
 
 	@Override
@@ -77,5 +63,19 @@ public class XGBClassifier extends Classifier implements HasBooster {
 	@Override
 	public Booster getBooster(){
 		return (Booster)get("_Booster");
+	}
+
+	public LabelEncoder getLabelEncoder(){
+		Object object = get("_le");
+
+		try {
+			if(object == null){
+				throw new NullPointerException();
+			}
+
+			return (LabelEncoder)object;
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("The label encoder object (" + ClassDictUtil.formatClass(object) + ") is not a LabelEncoder", re);
+		}
 	}
 }
