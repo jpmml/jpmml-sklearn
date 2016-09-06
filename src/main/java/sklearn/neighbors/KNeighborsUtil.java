@@ -33,6 +33,7 @@ import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.Measure;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Minkowski;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
@@ -131,6 +132,7 @@ public class KNeighborsUtil {
 			int rank = (i + 1);
 
 			OutputField outputField = new OutputField(FieldName.create("neighbor_" + rank), DataType.STRING)
+				.setOpType(OpType.CATEGORICAL)
 				.setResultFeature(ResultFeature.ENTITY_ID)
 				.setRank(rank);
 

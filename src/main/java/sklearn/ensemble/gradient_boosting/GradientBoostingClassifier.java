@@ -33,7 +33,6 @@ import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
@@ -165,7 +164,10 @@ public class GradientBoostingClassifier extends Classifier {
 
 	static
 	private MiningModel encodeCategoryRegressor(String targetCategory, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, String outputTransformation, Schema schema){
-		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory), DataType.DOUBLE);
+		OutputField decisionFunction = new OutputField(FieldName.create("decisionFunction_" + targetCategory), DataType.DOUBLE)
+			.setOpType(OpType.CONTINUOUS)
+			.setResultFeature(ResultFeature.PREDICTED_VALUE)
+			.setFinalResult(false);
 
 		Output output = new Output()
 			.addOutputFields(decisionFunction);

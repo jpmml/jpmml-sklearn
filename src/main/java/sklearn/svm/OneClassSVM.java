@@ -26,7 +26,6 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FeatureMapper;
@@ -53,7 +52,10 @@ public class OneClassSVM extends BaseLibSVMRegressor {
 
 	@Override
 	public SupportVectorMachineModel encodeModel(Schema schema){
-		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction"), DataType.DOUBLE);
+		OutputField decisionFunction = new OutputField(FieldName.create("decisionFunction"), DataType.DOUBLE)
+			.setOpType(OpType.CONTINUOUS)
+			.setResultFeature(ResultFeature.PREDICTED_VALUE)
+			.setFinalResult(false);
 
 		OutputField outlier = new OutputField(FieldName.create("outlier"), DataType.BOOLEAN)
 			.setOpType(OpType.CATEGORICAL)
