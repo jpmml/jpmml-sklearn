@@ -22,24 +22,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.ActivationFunctionType;
-import org.dmg.pmml.Connection;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Entity;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.NeuralInput;
-import org.dmg.pmml.NeuralInputs;
-import org.dmg.pmml.NeuralLayer;
-import org.dmg.pmml.NeuralNetwork;
-import org.dmg.pmml.NeuralOutput;
-import org.dmg.pmml.NeuralOutputs;
-import org.dmg.pmml.Neuron;
-import org.dmg.pmml.NnNormalizationMethodType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.neural_network.Connection;
+import org.dmg.pmml.neural_network.NeuralInput;
+import org.dmg.pmml.neural_network.NeuralInputs;
+import org.dmg.pmml.neural_network.NeuralLayer;
+import org.dmg.pmml.neural_network.NeuralNetwork;
+import org.dmg.pmml.neural_network.NeuralOutput;
+import org.dmg.pmml.neural_network.NeuralOutputs;
+import org.dmg.pmml.neural_network.Neuron;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -65,8 +63,8 @@ public class NeuralNetworkUtil {
 	}
 
 	static
-	public NeuralNetwork encodeNeuralNetwork(MiningFunctionType miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, Schema schema){
-		ActivationFunctionType activationFunction = parseActivationFunction(activation);
+	public NeuralNetwork encodeNeuralNetwork(MiningFunction miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, Schema schema){
+		NeuralNetwork.ActivationFunction activationFunction = parseActivationFunction(activation);
 
 		if(coefs.size() != intercepts.size()){
 			throw new IllegalArgumentException();
@@ -128,7 +126,7 @@ public class NeuralNetworkUtil {
 			NeuralLayer neuralLayer = new NeuralLayer(neurons);
 
 			if(layer == (coefs.size() - 1)){
-				neuralLayer.setActivationFunction(ActivationFunctionType.IDENTITY);
+				neuralLayer.setActivationFunction(NeuralNetwork.ActivationFunction.IDENTITY);
 
 				switch(miningFunction){
 					case REGRESSION:
@@ -149,7 +147,7 @@ public class NeuralNetworkUtil {
 
 						// Multi-class classification
 						{
-							neuralLayer.setNormalizationMethod(NnNormalizationMethodType.SOFTMAX);
+							neuralLayer.setNormalizationMethod(NeuralNetwork.NormalizationMethod.SOFTMAX);
 						}
 						break;
 					default:
@@ -184,7 +182,7 @@ public class NeuralNetworkUtil {
 	static
 	private NeuralLayer encodeLogisticTransform(Neuron input){
 		NeuralLayer neuralLayer = new NeuralLayer()
-			.setActivationFunction(ActivationFunctionType.LOGISTIC);
+			.setActivationFunction(NeuralNetwork.ActivationFunction.LOGISTIC);
 
 		Neuron neuron = new Neuron()
 			.setId("logistic/1")
@@ -199,7 +197,7 @@ public class NeuralNetworkUtil {
 	static
 	private NeuralLayer encodeLabelBinarizerTransform(Neuron input){
 		NeuralLayer neuralLayer = new NeuralLayer()
-			.setActivationFunction(ActivationFunctionType.IDENTITY);
+			.setActivationFunction(NeuralNetwork.ActivationFunction.IDENTITY);
 
 		Neuron noEventNeuron = new Neuron()
 			.setId("event/false")
@@ -291,15 +289,15 @@ public class NeuralNetworkUtil {
 	}
 
 	static
-	private ActivationFunctionType parseActivationFunction(String activation){
+	private NeuralNetwork.ActivationFunction parseActivationFunction(String activation){
 
 		switch(activation){
 			case "identity":
-				return ActivationFunctionType.IDENTITY;
+				return NeuralNetwork.ActivationFunction.IDENTITY;
 			case "logistic":
-				return ActivationFunctionType.LOGISTIC;
+				return NeuralNetwork.ActivationFunction.LOGISTIC;
 			case "tanh":
-				return ActivationFunctionType.TANH;
+				return NeuralNetwork.ActivationFunction.TANH;
 			default:
 				throw new IllegalArgumentException(activation);
 		}

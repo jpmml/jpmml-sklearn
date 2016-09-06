@@ -21,7 +21,7 @@ package sklearn.linear_model;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.RegressionModel;
+import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;

@@ -29,14 +29,14 @@ import java.util.Set;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.MultipleModelMethodType;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.MiningModelUtil;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.FeatureMapper;
 import sklearn.Classifier;
@@ -127,9 +127,9 @@ public class VotingClassifier extends Classifier {
 
 		String voting = getVoting();
 
-		MultipleModelMethodType multipleModelMethod = parseVoting(voting, (weights != null && weights.size() > 0));
+		Segmentation.MultipleModelMethod multipleModelMethod = parseVoting(voting, (weights != null && weights.size() > 0));
 
-		MiningModel miningModel = new MiningModel(MiningFunctionType.CLASSIFICATION, ModelUtil.createMiningSchema(schema))
+		MiningModel miningModel = new MiningModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models, weights))
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
@@ -157,13 +157,13 @@ public class VotingClassifier extends Classifier {
 	}
 
 	static
-	private MultipleModelMethodType parseVoting(String voting, boolean weighted){
+	private Segmentation.MultipleModelMethod parseVoting(String voting, boolean weighted){
 
 		switch(voting){
 			case "hard":
-				return (weighted ? MultipleModelMethodType.WEIGHTED_MAJORITY_VOTE : MultipleModelMethodType.MAJORITY_VOTE);
+				return (weighted ? Segmentation.MultipleModelMethod.WEIGHTED_MAJORITY_VOTE : Segmentation.MultipleModelMethod.MAJORITY_VOTE);
 			case "soft":
-				return (weighted ? MultipleModelMethodType.WEIGHTED_AVERAGE : MultipleModelMethodType.AVERAGE);
+				return (weighted ? Segmentation.MultipleModelMethod.WEIGHTED_AVERAGE : Segmentation.MultipleModelMethod.AVERAGE);
 			default:
 				throw new IllegalArgumentException(voting);
 		}

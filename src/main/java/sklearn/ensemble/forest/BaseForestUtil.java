@@ -20,13 +20,13 @@ package sklearn.ensemble.forest;
 
 import java.util.List;
 
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MultipleModelMethodType;
-import org.dmg.pmml.TreeModel;
-import org.jpmml.converter.MiningModelUtil;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
+import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
 import sklearn.tree.HasTree;
 import sklearn.tree.TreeModelUtil;
@@ -37,7 +37,7 @@ public class BaseForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, Schema schema){
+	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
 		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimators, miningFunction, schema);
 
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema))

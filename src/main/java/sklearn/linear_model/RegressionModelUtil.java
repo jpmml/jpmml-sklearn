@@ -21,11 +21,11 @@ package sklearn.linear_model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.CategoricalPredictor;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.NumericPredictor;
-import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.RegressionTable;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.regression.CategoricalPredictor;
+import org.dmg.pmml.regression.NumericPredictor;
+import org.dmg.pmml.regression.RegressionModel;
+import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -45,7 +45,7 @@ public class RegressionModelUtil {
 	public RegressionModel encodeRegressionModel(List<? extends Number> coefficients, Number intercept, Schema schema){
 		RegressionTable regressionTable = encodeRegressionTable(coefficients, intercept, schema);
 
-		RegressionModel regressionModel = new RegressionModel(MiningFunctionType.REGRESSION, ModelUtil.createMiningSchema(schema), null)
+		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), null)
 			.addRegressionTables(regressionTable);
 
 		return regressionModel;

@@ -20,8 +20,8 @@ package sklearn.neural_network;
 
 import java.util.List;
 
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.NeuralNetwork;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.HasArray;
@@ -47,7 +47,7 @@ public class MLPClassifier extends Classifier {
 		List<? extends HasArray> coefs = getCoefs();
 		List<? extends HasArray> intercepts = getIntercepts();
 
-		NeuralNetwork neuralNetwork = NeuralNetworkUtil.encodeNeuralNetwork(MiningFunctionType.CLASSIFICATION, activation, coefs, intercepts, schema)
+		NeuralNetwork neuralNetwork = NeuralNetworkUtil.encodeNeuralNetwork(MiningFunction.CLASSIFICATION, activation, coefs, intercepts, schema)
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return neuralNetwork;

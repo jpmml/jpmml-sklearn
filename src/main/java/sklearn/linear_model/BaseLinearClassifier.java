@@ -25,19 +25,18 @@ import java.util.Set;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.FeatureType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.MiningModel;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
-import org.dmg.pmml.RegressionModel;
-import org.dmg.pmml.RegressionNormalizationMethodType;
-import org.jpmml.converter.MiningModelUtil;
+import org.dmg.pmml.ResultFeature;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Classifier;
@@ -103,7 +102,7 @@ public class BaseLinearClassifier extends Classifier {
 				regressionModels.add(regressionModel);
 			}
 
-			return MiningModelUtil.createClassification(schema, regressionModels, RegressionNormalizationMethodType.SIMPLEMAX, hasProbabilityDistribution);
+			return MiningModelUtil.createClassification(schema, regressionModels, RegressionModel.NormalizationMethod.SIMPLEMAX, hasProbabilityDistribution);
 		} else
 
 		{
@@ -130,16 +129,15 @@ public class BaseLinearClassifier extends Classifier {
 
 	static
 	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, String outputTransformation, Schema schema){
-		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory));
+		OutputField decisionFunction = ModelUtil.createPredictedField(FieldName.create("decisionFunction_" + targetCategory), DataType.DOUBLE);
 
 		Output output = new Output()
 			.addOutputFields(decisionFunction);
 
 		if(outputTransformation != null){
-			OutputField transformedDecisionFunction = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory))
-				.setFeature(FeatureType.TRANSFORMED_VALUE)
-				.setDataType(DataType.DOUBLE)
+			OutputField transformedDecisionFunction = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory), DataType.DOUBLE)
 				.setOpType(OpType.CONTINUOUS)
+				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())));
 
 			output.addOutputFields(transformedDecisionFunction);

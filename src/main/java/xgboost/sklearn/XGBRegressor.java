@@ -19,7 +19,7 @@
 package xgboost.sklearn;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 

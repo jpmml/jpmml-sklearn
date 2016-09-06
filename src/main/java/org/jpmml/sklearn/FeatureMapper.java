@@ -30,8 +30,10 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMML;
 import org.dmg.pmml.TypeDefinitionField;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.BinaryFeature;
@@ -47,6 +49,14 @@ public class FeatureMapper extends PMMLMapper {
 
 	private List<List<Feature>> rows = new ArrayList<>();
 
+
+	@Override
+	public PMML encodePMML(Model model){
+		PMML pmml = super.encodePMML(model)
+			.setVersion("4.3");
+
+		return pmml;
+	}
 
 	public Schema createSupervisedSchema(){
 		Feature feature = getTargetFeature();

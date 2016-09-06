@@ -29,14 +29,14 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.MultipleModelMethodType;
-import org.jpmml.converter.MiningModelUtil;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import sklearn.Estimator;
@@ -47,7 +47,7 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, MultipleModelMethodType multipleModelMethod, MiningFunctionType miningFunction, Schema schema){
+	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
 		List<Model> models = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){

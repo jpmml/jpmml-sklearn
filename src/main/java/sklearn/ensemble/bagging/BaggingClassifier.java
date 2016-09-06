@@ -23,10 +23,10 @@ import java.util.Set;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MultipleModelMethodType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
@@ -64,18 +64,18 @@ public class BaggingClassifier extends Classifier {
 		List<? extends Classifier> estimators = getEstimators();
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
-		MultipleModelMethodType multipleModelMethod = MultipleModelMethodType.AVERAGE;
+		Segmentation.MultipleModelMethod multipleModelMethod = Segmentation.MultipleModelMethod.AVERAGE;
 
 		for(Classifier estimator : estimators){
 
 			if(!estimator.hasProbabilityDistribution()){
-				multipleModelMethod = MultipleModelMethodType.MAJORITY_VOTE;
+				multipleModelMethod = Segmentation.MultipleModelMethod.MAJORITY_VOTE;
 
 				break;
 			}
 		}
 
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, multipleModelMethod, MiningFunctionType.CLASSIFICATION, schema)
+		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, multipleModelMethod, MiningFunction.CLASSIFICATION, schema)
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return miningModel;

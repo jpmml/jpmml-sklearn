@@ -23,14 +23,13 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.Node;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
-import org.dmg.pmml.TreeModel;
-import org.dmg.pmml.TreeModel.SplitCharacteristic;
 import org.dmg.pmml.True;
+import org.dmg.pmml.tree.Node;
+import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -45,7 +44,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final MiningFunctionType miningFunction, final Schema schema){
+	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final MiningFunction miningFunction, final Schema schema){
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
 			private Schema segmentSchema = schema.toAnonymousSchema();
@@ -61,7 +60,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunctionType miningFunction, Schema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -77,13 +76,13 @@ public class TreeModelUtil {
 		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
-			.setSplitCharacteristic(SplitCharacteristic.BINARY_SPLIT);
+			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
 
 		return treeModel;
 	}
 
 	static
-	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunctionType miningFunction, Schema schema){
+	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
 		int featureIndex = features[index];
 
 		// A non-leaf (binary split) node
@@ -145,7 +144,7 @@ public class TreeModelUtil {
 
 		// A leaf node
 		{
-			if((MiningFunctionType.CLASSIFICATION).equals(miningFunction)){
+			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
 				List<String> targetCategories = schema.getTargetCategories();
 
 				double[] scoreRecordCounts = getRow(values, leftChildren.length, targetCategories.size(), index);
@@ -181,7 +180,7 @@ public class TreeModelUtil {
 				node.setScore(score);
 			} else
 
-			if((MiningFunctionType.REGRESSION).equals(miningFunction)){
+			if((MiningFunction.REGRESSION).equals(miningFunction)){
 				String score = ValueUtil.formatValue(values[index]);
 
 				node.setScore(score);

@@ -23,20 +23,20 @@ import java.util.BitSet;
 import java.util.List;
 
 import org.dmg.pmml.Array;
-import org.dmg.pmml.Coefficient;
-import org.dmg.pmml.Coefficients;
-import org.dmg.pmml.Kernel;
-import org.dmg.pmml.LinearKernel;
-import org.dmg.pmml.PolynomialKernel;
-import org.dmg.pmml.RadialBasisKernel;
 import org.dmg.pmml.RealSparseArray;
-import org.dmg.pmml.SigmoidKernel;
-import org.dmg.pmml.SupportVector;
-import org.dmg.pmml.SupportVectorMachine;
-import org.dmg.pmml.SupportVectors;
-import org.dmg.pmml.VectorDictionary;
-import org.dmg.pmml.VectorFields;
-import org.dmg.pmml.VectorInstance;
+import org.dmg.pmml.support_vector_machine.Coefficient;
+import org.dmg.pmml.support_vector_machine.Coefficients;
+import org.dmg.pmml.support_vector_machine.Kernel;
+import org.dmg.pmml.support_vector_machine.LinearKernel;
+import org.dmg.pmml.support_vector_machine.PolynomialKernel;
+import org.dmg.pmml.support_vector_machine.RadialBasisKernel;
+import org.dmg.pmml.support_vector_machine.SigmoidKernel;
+import org.dmg.pmml.support_vector_machine.SupportVector;
+import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
+import org.dmg.pmml.support_vector_machine.SupportVectors;
+import org.dmg.pmml.support_vector_machine.VectorDictionary;
+import org.dmg.pmml.support_vector_machine.VectorFields;
+import org.dmg.pmml.support_vector_machine.VectorInstance;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
@@ -83,7 +83,7 @@ public class SupportVectorMachineUtil {
 				continue;
 			}
 
-			vectorFields.addFieldRefs(feature.ref());
+			vectorFields.addContent(feature.ref());
 		}
 
 		VectorDictionary vectorDictionary = new VectorDictionary(vectorFields);

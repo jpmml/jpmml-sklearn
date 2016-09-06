@@ -24,7 +24,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.InvalidValueTreatmentMethodType;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Value;
@@ -65,7 +65,7 @@ public class CategoricalDomain extends Domain {
 		}
 
 		final
-		InvalidValueTreatmentMethodType invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
 
 		WildcardFeature inputFeature = (WildcardFeature)inputFeatures.get(0);
 

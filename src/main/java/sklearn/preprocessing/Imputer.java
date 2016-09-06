@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.MissingValueTreatmentMethodType;
+import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueDecorator;
@@ -128,15 +128,15 @@ public class Imputer extends Transformer {
 	}
 
 	static
-	private MissingValueTreatmentMethodType parseStrategy(String strategy){
+	private MissingValueTreatmentMethod parseStrategy(String strategy){
 
 		switch(strategy){
 			case "mean":
-				return MissingValueTreatmentMethodType.AS_MEAN;
+				return MissingValueTreatmentMethod.AS_MEAN;
 			case "median":
-				return MissingValueTreatmentMethodType.AS_MEDIAN;
+				return MissingValueTreatmentMethod.AS_MEDIAN;
 			case "most_frequent":
-				return MissingValueTreatmentMethodType.AS_MODE;
+				return MissingValueTreatmentMethod.AS_MODE;
 			default:
 				throw new IllegalArgumentException(strategy);
 		}

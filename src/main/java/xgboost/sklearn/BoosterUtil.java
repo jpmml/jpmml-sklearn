@@ -18,7 +18,7 @@
  */
 package xgboost.sklearn;
 
-import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.Learner;

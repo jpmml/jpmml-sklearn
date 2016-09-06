@@ -20,10 +20,9 @@ package sklearn.neighbors;
 
 import java.util.List;
 
-import org.dmg.pmml.ContinuousScoringMethodType;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.NearestNeighborModel;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -54,8 +53,8 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
-		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunctionType.REGRESSION, numberOfInstances, numberOfFeatures, schema)
-			.setContinuousScoringMethod(ContinuousScoringMethodType.AVERAGE);
+		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunction.REGRESSION, numberOfInstances, numberOfFeatures, schema)
+			.setContinuousScoringMethod(NearestNeighborModel.ContinuousScoringMethod.AVERAGE);
 
 		return nearestNeighborModel;
 	}

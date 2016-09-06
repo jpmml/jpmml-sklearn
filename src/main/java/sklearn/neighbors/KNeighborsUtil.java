@@ -24,24 +24,25 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.dmg.pmml.CityBlock;
-import org.dmg.pmml.CompareFunctionType;
+import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Euclidean;
-import org.dmg.pmml.FeatureType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InlineTable;
-import org.dmg.pmml.InstanceField;
-import org.dmg.pmml.InstanceFields;
-import org.dmg.pmml.KNNInput;
-import org.dmg.pmml.KNNInputs;
 import org.dmg.pmml.Measure;
-import org.dmg.pmml.MiningFunctionType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Minkowski;
-import org.dmg.pmml.NearestNeighborModel;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.Row;
-import org.dmg.pmml.TrainingInstances;
+import org.dmg.pmml.nearest_neighbor.InstanceField;
+import org.dmg.pmml.nearest_neighbor.InstanceFields;
+import org.dmg.pmml.nearest_neighbor.KNNInput;
+import org.dmg.pmml.nearest_neighbor.KNNInputs;
+import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
+import org.dmg.pmml.nearest_neighbor.TrainingInstances;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
@@ -55,7 +56,7 @@ public class KNeighborsUtil {
 	}
 
 	static
-	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunctionType miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
+	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunction miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
 		List<String> keys = new ArrayList<>();
 
 		InstanceFields instanceFields = new InstanceFields();
@@ -129,8 +130,8 @@ public class KNeighborsUtil {
 		for(int i = 0; i < numberOfNeighbors; i++){
 			int rank = (i + 1);
 
-			OutputField outputField = new OutputField(FieldName.create("neighbor_" + rank))
-				.setFeature(FeatureType.ENTITY_ID)
+			OutputField outputField = new OutputField(FieldName.create("neighbor_" + rank), DataType.STRING)
+				.setResultFeature(ResultFeature.ENTITY_ID)
 				.setRank(rank);
 
 			outputFields.add(outputField);
@@ -138,7 +139,7 @@ public class KNeighborsUtil {
 
 		Output output = new Output(outputFields);
 
-		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunctionType.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema), trainingInstances, comparisonMeasure, knnInputs)
+		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunction.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema), trainingInstances, comparisonMeasure, knnInputs)
 			.setOutput(output);
 
 		return nearestNeighborModel;
@@ -165,7 +166,7 @@ public class KNeighborsUtil {
 					}
 
 					ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
-						.setCompareFunction(CompareFunctionType.ABS_DIFF)
+						.setCompareFunction(CompareFunction.ABS_DIFF)
 						.setMeasure(measure);
 
 					return comparisonMeasure;

@@ -23,10 +23,10 @@ import java.util.Set;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MultipleModelMethodType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Schema;
 import sklearn.EstimatorUtil;
 import sklearn.Regressor;
@@ -63,7 +63,7 @@ public class BaggingRegressor extends Regressor {
 		List<? extends Regressor> estimators = getEstimators();
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, schema);
+		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
 
 		return miningModel;
 	}

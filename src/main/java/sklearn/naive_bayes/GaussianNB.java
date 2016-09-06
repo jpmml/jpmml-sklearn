@@ -20,17 +20,17 @@ package sklearn.naive_bayes;
 
 import java.util.List;
 
-import org.dmg.pmml.BayesInput;
-import org.dmg.pmml.BayesInputs;
-import org.dmg.pmml.BayesOutput;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.GaussianDistribution;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.NaiveBayesModel;
-import org.dmg.pmml.TargetValueCount;
-import org.dmg.pmml.TargetValueCounts;
-import org.dmg.pmml.TargetValueStat;
-import org.dmg.pmml.TargetValueStats;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.naive_bayes.BayesInput;
+import org.dmg.pmml.naive_bayes.BayesInputs;
+import org.dmg.pmml.naive_bayes.BayesOutput;
+import org.dmg.pmml.naive_bayes.NaiveBayesModel;
+import org.dmg.pmml.naive_bayes.TargetValueCount;
+import org.dmg.pmml.naive_bayes.TargetValueCounts;
+import org.dmg.pmml.naive_bayes.TargetValueStat;
+import org.dmg.pmml.naive_bayes.TargetValueStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -88,7 +88,7 @@ public class GaussianNB extends Classifier {
 		BayesOutput bayesOutput = new BayesOutput(targetField, null)
 			.setTargetValueCounts(encodeTargetValueCounts(targetCategories, classCount));
 
-		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunctionType.CLASSIFICATION, ModelUtil.createMiningSchema(schema), bayesInputs, bayesOutput)
+		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), bayesInputs, bayesOutput)
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return naiveBayesModel;

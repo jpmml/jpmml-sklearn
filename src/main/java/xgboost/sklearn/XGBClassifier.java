@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningModel;
+import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.HasArray;
 import sklearn.Classifier;

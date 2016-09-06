@@ -22,13 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.Kernel;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.SupportVectorMachine;
-import org.dmg.pmml.SupportVectorMachineModel;
-import org.dmg.pmml.SvmClassificationMethodType;
-import org.dmg.pmml.VectorDictionary;
-import org.dmg.pmml.VectorInstance;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.support_vector_machine.Kernel;
+import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
+import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
+import org.dmg.pmml.support_vector_machine.VectorDictionary;
+import org.dmg.pmml.support_vector_machine.VectorInstance;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
@@ -109,8 +108,8 @@ public class BaseLibSVMClassifier extends Classifier {
 			}
 		}
 
-		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.CLASSIFICATION, ModelUtil.createMiningSchema(schema), vectorDictionary, supportVectorMachines)
-			.setClassificationMethod(SvmClassificationMethodType.ONE_AGAINST_ONE)
+		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), vectorDictionary, supportVectorMachines)
+			.setClassificationMethod(SupportVectorMachineModel.ClassificationMethod.ONE_AGAINST_ONE)
 			.setKernel(kernel);
 
 		return supportVectorMachineModel;

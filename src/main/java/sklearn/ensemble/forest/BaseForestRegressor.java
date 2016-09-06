@@ -21,9 +21,9 @@ package sklearn.ensemble.forest;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.MiningModel;
-import org.dmg.pmml.MultipleModelMethodType;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 import sklearn.tree.TreeRegressor;
@@ -49,7 +49,7 @@ public class BaseForestRegressor extends Regressor {
 	public MiningModel encodeModel(Schema schema){
 		List<TreeRegressor> estimators = getEstimators();
 
-		return BaseForestUtil.encodeBaseForest(estimators, MultipleModelMethodType.AVERAGE, MiningFunctionType.REGRESSION, schema);
+		return BaseForestUtil.encodeBaseForest(estimators, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
 	}
 
 	public List<TreeRegressor> getEstimators(){

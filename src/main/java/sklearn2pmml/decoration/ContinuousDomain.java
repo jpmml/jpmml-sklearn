@@ -23,7 +23,7 @@ import java.util.List;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Interval;
-import org.dmg.pmml.InvalidValueTreatmentMethodType;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
@@ -55,7 +55,7 @@ public class ContinuousDomain extends Domain {
 		}
 
 		final
-		InvalidValueTreatmentMethodType invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
 
 		for(int i = 0; i < inputFeatures.size(); i++){
 			WildcardFeature inputFeature = (WildcardFeature)inputFeatures.get(i);

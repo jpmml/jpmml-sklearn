@@ -18,7 +18,7 @@
  */
 package sklearn2pmml.decoration;
 
-import org.dmg.pmml.InvalidValueTreatmentMethodType;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 
 public class DomainUtil {
 
@@ -26,15 +26,15 @@ public class DomainUtil {
 	}
 
 	static
-	public InvalidValueTreatmentMethodType parseInvalidValueTreatment(String invalidValueTreatment){
+	public InvalidValueTreatmentMethod parseInvalidValueTreatment(String invalidValueTreatment){
 
 		switch(invalidValueTreatment){
 			case "as_is":
-				return InvalidValueTreatmentMethodType.AS_IS;
+				return InvalidValueTreatmentMethod.AS_IS;
 			case "as_missing":
-				return InvalidValueTreatmentMethodType.AS_MISSING;
+				return InvalidValueTreatmentMethod.AS_MISSING;
 			case "return_invalid":
-				return InvalidValueTreatmentMethodType.RETURN_INVALID;
+				return InvalidValueTreatmentMethod.RETURN_INVALID;
 			default:
 				throw new IllegalArgumentException(invalidValueTreatment);
 		}

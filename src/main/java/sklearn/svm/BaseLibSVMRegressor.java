@@ -21,12 +21,12 @@ package sklearn.svm;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.Kernel;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.SupportVectorMachine;
-import org.dmg.pmml.SupportVectorMachineModel;
-import org.dmg.pmml.VectorDictionary;
-import org.dmg.pmml.VectorInstance;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.support_vector_machine.Kernel;
+import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
+import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
+import org.dmg.pmml.support_vector_machine.VectorDictionary;
+import org.dmg.pmml.support_vector_machine.VectorInstance;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
@@ -67,7 +67,7 @@ public class BaseLibSVMRegressor extends Regressor {
 
 		SupportVectorMachine supportVectorMachine = SupportVectorMachineUtil.encodeSupportVectorMachine(vectorInstances, dualCoef, Iterables.getOnlyElement(intercept));
 
-		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunctionType.REGRESSION, ModelUtil.createMiningSchema(schema), vectorDictionary, null)
+		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), vectorDictionary, null)
 			.setKernel(kernel)
 			.addSupportVectorMachines(supportVectorMachine);
 

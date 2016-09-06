@@ -22,10 +22,9 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.CategoricalScoringMethodType;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunctionType;
-import org.dmg.pmml.NearestNeighborModel;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -56,8 +55,8 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
-		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunctionType.CLASSIFICATION, numberOfInstances, numberOfFeatures, schema)
-			.setCategoricalScoringMethod(CategoricalScoringMethodType.MAJORITY_VOTE);
+		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunction.CLASSIFICATION, numberOfInstances, numberOfFeatures, schema)
+			.setCategoricalScoringMethod(NearestNeighborModel.CategoricalScoringMethod.MAJORITY_VOTE);
 
 		return nearestNeighborModel;
 	}
