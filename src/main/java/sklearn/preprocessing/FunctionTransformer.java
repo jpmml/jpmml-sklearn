@@ -22,9 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import numpy.core.UFunc;
-import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -54,17 +55,15 @@ public class FunctionTransformer extends Transformer {
 			throw new IllegalArgumentException("The function object (" + ClassDictUtil.formatClass(func) + ") is not a Numpy universal function", cce);
 		}
 
-		String function = parseUFunc(ufunc);
-
 		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < inputFeatures.size(); i++){
 			String id = ids.get(i);
 			Feature inputFeature = inputFeatures.get(i);
 
-			Apply apply = PMMLUtil.createApply(function, inputFeature.ref());
+			Expression expression = encodeUFunc(ufunc, inputFeature.ref());
 
-			DerivedField derivedField = featureMapper.createDerivedField(FieldName.create(function + "(" + id + ")"), apply);
+			DerivedField derivedField = featureMapper.createDerivedField(FieldName.create(ufunc.getName() + "(" + id + ")"), expression);
 
 			features.add(new ContinuousFeature(derivedField));
 		}
@@ -77,7 +76,7 @@ public class FunctionTransformer extends Transformer {
 	}
 
 	static
-	private String parseUFunc(UFunc ufunc){
+	Expression encodeUFunc(UFunc ufunc, FieldRef fieldRef){
 		String module = ufunc.getModule();
 		String name = ufunc.getName();
 
@@ -85,21 +84,42 @@ public class FunctionTransformer extends Transformer {
 			case "numpy":
 			case "numpy.core.numeric":
 			case "numpy.lib.function_base":
-				switch(name){
-					case "absolute":
-						return "abs";
-					case "exp":
-						return name;
-					case "log":
-						return "ln";
-					case "log10":
-					case "sqrt":
-						return name;
-					default:
-						throw new IllegalArgumentException(name);
-				}
+				break;
 			default:
 				throw new IllegalArgumentException(module);
+		}
+
+		switch(name){
+			case "absolute":
+				return PMMLUtil.createApply("abs", fieldRef);
+			case "ceil":
+			case "exp":
+			case "floor":
+				return PMMLUtil.createApply(name, fieldRef);
+			case "log":
+				return PMMLUtil.createApply("ln", fieldRef);
+			case "log10":
+				return PMMLUtil.createApply(name, fieldRef);
+			case "negative":
+				return PMMLUtil.createApply("*", PMMLUtil.createConstant(-1), fieldRef);
+			case "reciprocal":
+				return PMMLUtil.createApply("/", PMMLUtil.createConstant(1), fieldRef);
+			case "rint":
+				return PMMLUtil.createApply("round", fieldRef);
+			case "sign":
+				return PMMLUtil.createApply("if", PMMLUtil.createApply("lessThan", fieldRef, PMMLUtil.createConstant(0)),
+					PMMLUtil.createConstant(-1), // x < 0
+					PMMLUtil.createApply("if", PMMLUtil.createApply("greaterThan", fieldRef, PMMLUtil.createConstant(0)),
+						PMMLUtil.createConstant(+1), // x > 0
+						PMMLUtil.createConstant(0) // x == 0
+					)
+				);
+			case "sqrt":
+				return PMMLUtil.createApply(name, fieldRef);
+			case "square":
+				return PMMLUtil.createApply("*", fieldRef, fieldRef);
+			default:
+				throw new IllegalArgumentException(name);
 		}
 	}
 }
