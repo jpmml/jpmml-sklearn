@@ -144,6 +144,7 @@ build_audit(GaussianNB(), "NaiveBayesAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
+build_audit(SVC(), "SVCAudit", with_proba = False)
 build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 build_audit(XGBClassifier(objective = "binary:logistic"), "XGBAudit")
 

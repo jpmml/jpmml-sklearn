@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.dmg.pmml.Array;
 import org.dmg.pmml.RealSparseArray;
+import org.dmg.pmml.regression.CategoricalPredictor;
 import org.dmg.pmml.support_vector_machine.Coefficient;
 import org.dmg.pmml.support_vector_machine.Coefficients;
 import org.dmg.pmml.support_vector_machine.Kernel;
@@ -37,6 +38,8 @@ import org.dmg.pmml.support_vector_machine.SupportVectors;
 import org.dmg.pmml.support_vector_machine.VectorDictionary;
 import org.dmg.pmml.support_vector_machine.VectorFields;
 import org.dmg.pmml.support_vector_machine.VectorInstance;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
@@ -81,9 +84,25 @@ public class SupportVectorMachineUtil {
 				unusedFeatures.add(feature);
 
 				continue;
-			}
+			} // End if
 
-			vectorFields.addContent(feature.ref());
+			if(feature instanceof ContinuousFeature){
+				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
+
+				vectorFields.addContent(continuousFeature.ref());
+			} else
+
+			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+				CategoricalPredictor categoricalPredictor = new CategoricalPredictor(binaryFeature.getName(), binaryFeature.getValue(), 1d);
+
+				vectorFields.addContent(categoricalPredictor);
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
 		}
 
 		VectorDictionary vectorDictionary = new VectorDictionary(vectorFields);

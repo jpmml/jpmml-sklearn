@@ -50,6 +50,11 @@ public class BaseLibSVMClassifier extends Classifier {
 	}
 
 	@Override
+	public boolean requiresContinuousInput(){
+		return false;
+	}
+
+	@Override
 	public boolean hasProbabilityDistribution(){
 		return false;
 	}

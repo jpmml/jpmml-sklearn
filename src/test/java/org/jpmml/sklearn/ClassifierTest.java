@@ -84,6 +84,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateSVCAudit() throws Exception {
+		evaluate("SVC", "Audit");
+	}
+
+	@Test
 	public void evaluateVotingEnsembleAudit() throws Exception {
 		evaluate("VotingEnsemble", "Audit");
 	}
