@@ -77,17 +77,7 @@ public class FunctionTransformer extends Transformer {
 
 	static
 	Expression encodeUFunc(UFunc ufunc, FieldRef fieldRef){
-		String module = ufunc.getModule();
 		String name = ufunc.getName();
-
-		switch(module){
-			case "numpy":
-			case "numpy.core.numeric":
-			case "numpy.lib.function_base":
-				break;
-			default:
-				throw new IllegalArgumentException(module);
-		}
 
 		switch(name){
 			case "absolute":
