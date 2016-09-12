@@ -176,6 +176,7 @@ public class GradientBoostingClassifier extends Classifier {
 			OutputField transformedDecisionField = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory), DataType.DOUBLE)
 				.setOpType(OpType.CONTINUOUS)
 				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+				.setFinalResult(false)
 				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())));
 
 			output.addOutputFields(transformedDecisionField);

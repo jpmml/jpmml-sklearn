@@ -140,8 +140,8 @@ public class BaseLinearClassifier extends Classifier {
 			OutputField transformedDecisionFunction = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory), DataType.DOUBLE)
 				.setOpType(OpType.CONTINUOUS)
 				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())))
-				.setFinalResult(false);
+				.setFinalResult(false)
+				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())));
 
 			output.addOutputFields(transformedDecisionFunction);
 		}
