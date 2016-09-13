@@ -19,44 +19,19 @@
 package sklearn.ensemble.bagging;
 
 import java.util.List;
-import java.util.Set;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
+import sklearn.ensemble.EnsembleClassifier;
 
-public class BaggingClassifier extends Classifier {
+public class BaggingClassifier extends EnsembleClassifier {
 
 	public BaggingClassifier(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public boolean requiresContinuousInput(){
-		Classifier baseEstimator = getBaseEstimator();
-
-		return baseEstimator.requiresContinuousInput();
-	}
-
-	@Override
-	public DataType getDataType(){
-		Classifier baseEstimator = getBaseEstimator();
-
-		return baseEstimator.getDataType();
-	}
-
-	@Override
-	public OpType getOpType(){
-		Classifier baseEstimator = getBaseEstimator();
-
-		return baseEstimator.getOpType();
 	}
 
 	@Override
@@ -79,25 +54,6 @@ public class BaggingClassifier extends Classifier {
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return miningModel;
-	}
-
-	@Override
-	public Set<DefineFunction> encodeDefineFunctions(){
-		Classifier baseEstimator = getBaseEstimator();
-
-		return baseEstimator.encodeDefineFunctions();
-	}
-
-	public Classifier getBaseEstimator(){
-		Object baseEstimator = get("base_estimator_");
-
-		return EstimatorUtil.asClassifier(baseEstimator);
-	}
-
-	public List<? extends Classifier> getEstimators(){
-		List<?> estimators = (List)get("estimators_");
-
-		return EstimatorUtil.asClassifierList(estimators);
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
