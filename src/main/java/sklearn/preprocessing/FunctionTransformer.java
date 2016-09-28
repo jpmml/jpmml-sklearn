@@ -94,8 +94,6 @@ public class FunctionTransformer extends Transformer {
 				return PMMLUtil.createApply("*", PMMLUtil.createConstant(-1), fieldRef);
 			case "reciprocal":
 				return PMMLUtil.createApply("/", PMMLUtil.createConstant(1), fieldRef);
-			case "rint":
-				return PMMLUtil.createApply("round", fieldRef);
 			case "sign":
 				return PMMLUtil.createApply("if", PMMLUtil.createApply("lessThan", fieldRef, PMMLUtil.createConstant(0)),
 					PMMLUtil.createConstant(-1), // x < 0
@@ -108,6 +106,26 @@ public class FunctionTransformer extends Transformer {
 				return PMMLUtil.createApply(name, fieldRef);
 			case "square":
 				return PMMLUtil.createApply("*", fieldRef, fieldRef);
+			default:
+				break;
+		}
+
+		switch(name){
+			case "asin":
+			case "acos":
+			case "atan":
+			case "atan2":
+			case "cos":
+			case "cosh":
+			case "expm1":
+			case "hypot":
+			case "ln1p":
+			case "rint":
+			case "sin":
+			case "sinh":
+			case "tan":
+			case "tanh":
+				return PMMLUtil.createApply("x-" + name, fieldRef);
 			default:
 				throw new IllegalArgumentException(name);
 		}
