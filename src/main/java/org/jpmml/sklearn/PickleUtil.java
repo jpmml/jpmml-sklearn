@@ -56,6 +56,7 @@ import sklearn.ensemble.gradient_boosting.QuantileEstimator;
 import sklearn.ensemble.gradient_boosting.ScaledLogOddsEstimator;
 import sklearn.ensemble.gradient_boosting.ZeroEstimator;
 import sklearn.ensemble.voting_classifier.VotingClassifier;
+import sklearn.ensemble.weight_boosting.AdaBoostRegressor;
 import sklearn.linear_model.LinearRegression;
 import sklearn.linear_model.LogisticRegression;
 import sklearn.linear_model.coordinate_descent.ElasticNet;
@@ -163,6 +164,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ScaledLogOddsEstimator", ScaledLogOddsEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ZeroEstimator", ZeroEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.voting_classifier", "VotingClassifier", VotingClassifier.class),
+			new ObjectConstructor("sklearn.ensemble.weight_boosting", "AdaBoostRegressor", AdaBoostRegressor.class),
 			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),
 			new ObjectConstructor("sklearn.externals.joblib.numpy_pickle", "NumpyArrayWrapper", NumpyArrayWrapper.class),
 			new ObjectConstructor("sklearn.linear_model.base", "LinearRegression", LinearRegression.class),

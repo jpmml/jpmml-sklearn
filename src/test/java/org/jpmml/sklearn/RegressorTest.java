@@ -28,6 +28,11 @@ import org.junit.Test;
 public class RegressorTest extends EstimatorTest {
 
 	@Test
+	public void evaluateAdaBoostAuto() throws Exception {
+		evaluate("AdaBoost", "Auto");
+	}
+
+	@Test
 	public void evaluateDecisionTreeAuto() throws Exception {
 		evaluate("DecisionTree", "Auto");
 	}
@@ -83,6 +88,11 @@ public class RegressorTest extends EstimatorTest {
 		try(Batch batch = createBatch("XGB", "Auto")){
 			evaluate(batch, null, 1e-6, 1e-6);
 		}
+	}
+
+	@Test
+	public void evaluateAdaBoostHousing() throws Exception {
+		evaluate("AdaBoost", "Housing");
 	}
 
 	@Test

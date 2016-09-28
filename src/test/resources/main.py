@@ -2,6 +2,7 @@ from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble.bagging import BaggingClassifier, BaggingRegressor
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
@@ -281,6 +282,7 @@ def build_auto(regressor, name):
 	mpg = DataFrame(regressor.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name + ".csv")
 
+build_auto(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostAuto")
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
 build_auto(BaggingRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAuto")
 build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
@@ -331,6 +333,7 @@ def build_housing(regressor, name, to_sparse = False, with_kneighbors = False):
 		medv = pandas.concat((medv, medv_ids), axis = 1)
 	store_csv(medv, name + ".csv")
 
+build_housing(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostHousing")
 build_housing(KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), algorithm = "l-bfgs", random_state = 13, tol = 0.001, max_iter = 1000), "MLPHousing")
 build_housing(SGDRegressor(random_state = 13), "SGDHousing")
