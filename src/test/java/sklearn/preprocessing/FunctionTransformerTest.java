@@ -63,7 +63,7 @@ public class FunctionTransformerTest {
 		FieldName name = new FieldName("x");
 
 		EvaluationContext context = new ModelEvaluationContext(null); // XXX
-		context.declare(name, FieldValueUtil.create(value));
+		context.declare(name, FieldValueUtil.create(null, null, value));
 
 		Expression expression = FunctionTransformer.encodeUFunc(ufunc, new FieldRef(name));
 
