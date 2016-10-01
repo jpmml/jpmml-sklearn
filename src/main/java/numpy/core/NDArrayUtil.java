@@ -31,6 +31,7 @@ import java.util.Map;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.UnsignedInts;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
@@ -470,6 +471,16 @@ public class NDArrayUtil {
 								return readInt(is, byteOrder);
 							case 8:
 								return readLong(is, byteOrder);
+							default:
+								break;
+						}
+					}
+					break;
+				case UNSIGNED_INTEGER:
+					{
+						switch(size){
+							case 4:
+								return UnsignedInts.toLong(readInt(is, byteOrder));
 							default:
 								break;
 						}

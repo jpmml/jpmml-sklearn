@@ -55,10 +55,16 @@ public class DType extends CClassDict {
 			String order = getOrder();
 
 			return formatDescr(obj, order);
-		} // End if
+		}
 
-		if((TREE_KEYS).equals(values.keySet())){
+		Set<String> valueKeys = values.keySet();
+
+		if((TREE_KEYS).equals(valueKeys)){
 			return formatDescr(TREE_KEYS, values);
+		} else
+
+		if((NODEDATA_KEYS).equals(valueKeys)){
+			return formatDescr(NODEDATA_KEYS, values);
 		}
 
 		throw new IllegalArgumentException();
@@ -119,4 +125,5 @@ public class DType extends CClassDict {
 	};
 
 	private static final Set<String> TREE_KEYS = new LinkedHashSet<>(Arrays.asList("left_child", "right_child", "feature", "threshold", "impurity", "n_node_samples", "weighted_n_node_samples"));
+	private static final Set<String> NODEDATA_KEYS = new LinkedHashSet<>(Arrays.asList("idx_start", "idx_end", "is_leaf", "radius"));
 }
