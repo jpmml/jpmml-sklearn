@@ -6,6 +6,7 @@ from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble.bagging import BaggingClassifier, BaggingRegressor
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
+from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.externals import joblib
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
@@ -355,11 +356,20 @@ print(housing_anomaly_X.shape)
 
 store_pkl(housing_anomaly_mapper, "HousingAnomaly.pkl")
 
-def build_housing_anomaly(svm, name, with_distance = True):
+def build_iforest_housing_anomaly(iforest, name):
+	iforest = iforest.fit(housing_anomaly_X)
+	store_pkl(iforest, name + ".pkl")
+	decisionFunction = DataFrame(iforest.decision_function(housing_anomaly_X), columns = ["decisionFunction"])
+	outlier = DataFrame(iforest.predict(housing_anomaly_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
+	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
+
+build_iforest_housing_anomaly(IsolationForest(random_state = 13), "IsolationForestHousingAnomaly")
+
+def build_svm_housing_anomaly(svm, name):
 	svm = svm.fit(housing_anomaly_X)
 	store_pkl(svm, name + ".pkl")
 	distance = DataFrame(svm.decision_function(housing_anomaly_X), columns = ["distance"])
 	outlier = DataFrame(svm.predict(housing_anomaly_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([distance, outlier], axis = 1), name + ".csv")
 
-build_housing_anomaly(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousingAnomaly")
+build_svm_housing_anomaly(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousingAnomaly")

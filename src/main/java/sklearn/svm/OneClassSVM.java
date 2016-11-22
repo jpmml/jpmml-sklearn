@@ -39,15 +39,16 @@ public class OneClassSVM extends BaseLibSVMRegressor {
 	@Override
 	public Schema createSchema(FeatureMapper featureMapper){
 
-		if(featureMapper.isEmpty()){
-			// Ignored
-		} else
-
-		{
+		if(!featureMapper.isEmpty()){
 			featureMapper.initTargetField(createTargetField(), OpType.CONTINUOUS, DataType.DOUBLE, null);
 		}
 
 		return super.createSchema(featureMapper);
+	}
+
+	@Override
+	protected FieldName createTargetField(){
+		return FieldName.create("distance");
 	}
 
 	@Override
@@ -69,10 +70,5 @@ public class OneClassSVM extends BaseLibSVMRegressor {
 			.setOutput(output);
 
 		return supportVectorMachineModel;
-	}
-
-	@Override
-	protected FieldName createTargetField(){
-		return FieldName.create("distance");
 	}
 }

@@ -55,6 +55,7 @@ import sklearn.ensemble.gradient_boosting.PriorProbabilityEstimator;
 import sklearn.ensemble.gradient_boosting.QuantileEstimator;
 import sklearn.ensemble.gradient_boosting.ScaledLogOddsEstimator;
 import sklearn.ensemble.gradient_boosting.ZeroEstimator;
+import sklearn.ensemble.iforest.IsolationForest;
 import sklearn.ensemble.voting_classifier.VotingClassifier;
 import sklearn.ensemble.weight_boosting.AdaBoostRegressor;
 import sklearn.linear_model.LinearRegression;
@@ -163,6 +164,7 @@ public class PickleUtil {
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "QuantileEstimator", QuantileEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ScaledLogOddsEstimator", ScaledLogOddsEstimator.class),
 			new ObjectConstructor("sklearn.ensemble.gradient_boosting", "ZeroEstimator", ZeroEstimator.class),
+			new ObjectConstructor("sklearn.ensemble.iforest", "IsolationForest", IsolationForest.class),
 			new ObjectConstructor("sklearn.ensemble.voting_classifier", "VotingClassifier", VotingClassifier.class),
 			new ObjectConstructor("sklearn.ensemble.weight_boosting", "AdaBoostRegressor", AdaBoostRegressor.class),
 			new NDArrayWrapperConstructor("sklearn.externals.joblib.numpy_pickle", "NDArrayWrapper", storage),

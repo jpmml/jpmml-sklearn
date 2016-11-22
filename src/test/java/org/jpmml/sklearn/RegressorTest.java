@@ -126,6 +126,16 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateIsolationForestHousingAnomaly() throws Exception {
+
+		try(Batch batch = createBatch("IsolationForest", "HousingAnomaly")){
+			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("distance"), FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore"));
+
+			evaluate(batch, ignoredFields);
+		}
+	}
+
+	@Test
 	public void evaluateOneClassSVMHousingAnomaly() throws Exception {
 
 		try(Batch batch = createBatch("OneClassSVM", "HousingAnomaly")){
