@@ -20,7 +20,6 @@ package xgboost.sklearn;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.Learner;
 
 public class BoosterUtil {
@@ -43,9 +42,7 @@ public class BoosterUtil {
 
 		Learner learner = booster.getLearner();
 
-		GBTree gbt = learner.getGBTree();
-
-		MiningModel miningModel = gbt.encodeMiningModel(learner.getObj(), learner.getBaseScore(), schema);
+		MiningModel miningModel = learner.encodeMiningModel(schema);
 
 		return miningModel;
 	}

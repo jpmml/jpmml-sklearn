@@ -73,14 +73,14 @@ public class OneHotEncoder extends Transformer {
 
 			String category;
 
-			if(inputFeature instanceof WildcardFeature){
-				category = ValueUtil.formatValue((Integer)value);
-			} else
-
 			if(inputFeature instanceof ListFeature){
 				ListFeature listFeature = (ListFeature)inputFeature;
 
 				category = listFeature.getValue(value);
+			} else
+
+			if(inputFeature instanceof WildcardFeature){
+				category = ValueUtil.formatValue((Integer)value);
 			} else
 
 			{

@@ -94,18 +94,6 @@ public class TreeModelUtil {
 			Predicate leftPredicate;
 			Predicate rightPredicate;
 
-			if(feature instanceof ContinuousFeature){
-				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
-
-				String value = ValueUtil.formatValue(threshold);
-
-				leftPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.LESS_OR_EQUAL)
-					.setValue(value);
-
-				rightPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.GREATER_THAN)
-					.setValue(value);
-			} else
-
 			if(feature instanceof BinaryFeature){
 				BinaryFeature binaryFeature = (BinaryFeature)feature;
 
@@ -118,6 +106,18 @@ public class TreeModelUtil {
 
 				rightPredicate = new SimplePredicate(binaryFeature.getName(), SimplePredicate.Operator.EQUAL)
 					.setValue(binaryFeature.getValue());
+			} else
+
+			if(feature instanceof ContinuousFeature){
+				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
+
+				String value = ValueUtil.formatValue(threshold);
+
+				leftPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.LESS_OR_EQUAL)
+					.setValue(value);
+
+				rightPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.GREATER_THAN)
+					.setValue(value);
 			} else
 
 			{

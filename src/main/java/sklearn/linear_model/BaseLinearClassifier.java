@@ -146,7 +146,7 @@ public class BaseLinearClassifier extends Classifier {
 			output.addOutputFields(transformedDecisionFunction);
 		}
 
-		RegressionModel regressionModel = RegressionModelUtil.encodeRegressionModel(coefficients, intercept, schema)
+		RegressionModel regressionModel = BaseLinearUtil.encodeRegressionModel(intercept, coefficients, schema)
 			.setOutput(output);
 
 		return regressionModel;
