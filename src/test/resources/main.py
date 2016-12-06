@@ -1,3 +1,4 @@
+from pandas import DataFrame
 from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
@@ -19,9 +20,8 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
-from sklearn_pandas import DataFrameMapper
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
-from pandas import DataFrame
+from sklearn_pandas import DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
 import numpy
@@ -107,8 +107,8 @@ audit_mapper = DataFrameMapper([
 	("Marital", LabelBinarizer()),
 	("Occupation", LabelBinarizer()),
 	("Income", ContinuousDomain()),
-	("Gender", LabelEncoder()),
-	("Deductions", LabelEncoder()),
+	("Gender", [CategoricalDomain(), LabelEncoder()]),
+	("Deductions", [CategoricalDomain(), LabelEncoder()]),
 	("Hours", ContinuousDomain()),
 	("Adjusted", None)
 ])
@@ -262,7 +262,7 @@ auto_mapper = DataFrameMapper([
 	(["cylinders"], CategoricalDomain()),
 	(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), Imputer(missing_values = "NaN"), StandardScaler()]),
 	(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)]), # Pre/post 1973 oil crisis effects
-	(["origin"], OneHotEncoder()),
+	(["origin"], [CategoricalDomain(), OneHotEncoder()]),
 	("mpg", None)
 ])
 
