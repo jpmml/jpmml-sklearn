@@ -118,7 +118,7 @@ public class Main {
 		main.run();
 	}
 
-	private void run() throws Exception {
+	public void run() throws Exception {
 		PMML pmml;
 
 		FeatureMapper featureMapper = new FeatureMapper();
@@ -240,12 +240,28 @@ public class Main {
 		this.estimatorInput = estimatorInput;
 	}
 
+	public String getEstimatorRepr(){
+		return this.estimatorRepr;
+	}
+
+	public void setEstimatorRepr(String estimatorRepr){
+		this.estimatorRepr = estimatorRepr;
+	}
+
 	public File getMapperInput(){
 		return this.mapperInput;
 	}
 
 	public void setMapperInput(File mapperInput){
 		this.mapperInput = mapperInput;
+	}
+
+	public String getMapperRepr(){
+		return this.mapperRepr;
+	}
+
+	public void setMapperRepr(String mapperRepr){
+		this.mapperRepr = mapperRepr;
 	}
 
 	public File getOutput(){
