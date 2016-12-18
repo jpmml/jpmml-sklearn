@@ -16,29 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.linear_model;
+package sklearn.linear_model.base;
 
-import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.Schema;
+import sklearn.linear_model.BaseLinearRegressor;
 
-public class LogisticRegression extends BaseLinearClassifier {
+public class LinearRegression extends BaseLinearRegressor {
 
-	public LogisticRegression(String module, String name){
+	public LinearRegression(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		String multiClass = getMultiClass();
-
-		if(!("ovr").equals(multiClass)){
-			throw new IllegalArgumentException();
-		}
-
-		return super.encodeModel(schema);
-	}
-
-	public String getMultiClass(){
-		return (String)get("multi_class");
 	}
 }
