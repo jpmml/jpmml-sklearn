@@ -59,23 +59,33 @@ public class EstimatorUtil {
 	}
 
 	static
+	public Estimator asEstimator(Object object){
+		return EstimatorUtil.estimatorFunction.apply(object);
+	}
+
+	static
+	public List<Estimator> asEstimatorList(List<?> objects){
+		return Lists.transform(objects, EstimatorUtil.estimatorFunction);
+	}
+
+	static
 	public Classifier asClassifier(Object object){
-		return EstimatorUtil.classifierTransformer.apply(object);
+		return EstimatorUtil.classifierFunction.apply(object);
 	}
 
 	static
 	public List<? extends Classifier> asClassifierList(List<?> objects){
-		return Lists.transform(objects, EstimatorUtil.classifierTransformer);
+		return Lists.transform(objects, EstimatorUtil.classifierFunction);
 	}
 
 	static
 	public Regressor asRegressor(Object object){
-		return EstimatorUtil.regressorTransformer.apply(object);
+		return EstimatorUtil.regressorFunction.apply(object);
 	}
 
 	static
 	public List<? extends Regressor> asRegressorList(List<?> objects){
-		return Lists.transform(objects, EstimatorUtil.regressorTransformer);
+		return Lists.transform(objects, EstimatorUtil.regressorFunction);
 	}
 
 	static
@@ -108,7 +118,24 @@ public class EstimatorUtil {
 		return defineFunction;
 	}
 
-	private static final Function<Object, Classifier> classifierTransformer = new Function<Object, Classifier>(){
+	private static final Function<Object, Estimator> estimatorFunction = new Function<Object, Estimator>(){
+
+		@Override
+		public Estimator apply(Object object){
+
+			try {
+				if(object == null){
+					throw new NullPointerException();
+				}
+
+				return (Estimator)object;
+			} catch(RuntimeException re){
+				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass", re);
+			}
+		}
+	};
+
+	private static final Function<Object, Classifier> classifierFunction = new Function<Object, Classifier>(){
 
 		@Override
 		public Classifier apply(Object object){
@@ -125,7 +152,7 @@ public class EstimatorUtil {
 		}
 	};
 
-	private static final Function<Object, Regressor> regressorTransformer = new Function<Object, Regressor>(){
+	private static final Function<Object, Regressor> regressorFunction = new Function<Object, Regressor>(){
 
 		@Override
 		public Regressor apply(Object object){

@@ -17,6 +17,7 @@ from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.pipeline import Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
@@ -363,7 +364,7 @@ def build_iforest_housing_anomaly(iforest, name):
 	outlier = DataFrame(iforest.predict(housing_anomaly_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
 
-build_iforest_housing_anomaly(IsolationForest(random_state = 13), "IsolationForestHousingAnomaly")
+build_iforest_housing_anomaly(Pipeline([("estimator", IsolationForest(random_state = 13))]), "IsolationForestHousingAnomaly")
 
 def build_svm_housing_anomaly(svm, name):
 	svm = svm.fit(housing_anomaly_X)
@@ -372,4 +373,4 @@ def build_svm_housing_anomaly(svm, name):
 	outlier = DataFrame(svm.predict(housing_anomaly_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([distance, outlier], axis = 1), name + ".csv")
 
-build_svm_housing_anomaly(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousingAnomaly")
+build_svm_housing_anomaly(Pipeline([("estimator", OneClassSVM(nu = 0.10, random_state = 13))]), "OneClassSVMHousingAnomaly")

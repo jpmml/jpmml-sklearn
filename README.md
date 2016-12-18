@@ -45,6 +45,8 @@ Java library and command-line application for converting [Scikit-Learn] (http://
   * Nearest Neighbors:
     * [`neighbors.KNeighborsClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html)
     * [`neighbors.KNeighborsRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html)
+  * Pipelines:
+    * [`pipeline.Pipeline`] (http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html)
   * Neural network models:
     * [`neural_network.MLPClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html)
     * [`neural_network.MLPRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html)
