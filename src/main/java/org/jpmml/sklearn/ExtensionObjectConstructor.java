@@ -20,10 +20,6 @@ package org.jpmml.sklearn;
 
 public class ExtensionObjectConstructor extends ObjectConstructor {
 
-	public ExtensionObjectConstructor(String module, String name){
-		super(module, name, CClassDict.class);
-	}
-
 	public ExtensionObjectConstructor(String module, String name, Class<? extends CClassDict> clazz){
 		super(module, name, clazz);
 	}

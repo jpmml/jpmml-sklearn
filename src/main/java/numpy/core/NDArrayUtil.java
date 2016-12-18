@@ -157,11 +157,10 @@ public class NDArrayUtil {
 
 		byte[] data = ByteStreams.toByteArray(is);
 
-		NDArray result = new NDArray();
+		NDArray array = new NDArray();
+		array.__setstate__(new Object[]{Arrays.asList(majorVersion, minorVersion), shape, descr, fortranOrder, data});
 
-		result.__setstate__(new Object[]{Arrays.asList(majorVersion, minorVersion), shape, descr, fortranOrder, data});
-
-		return result;
+		return array;
 	}
 
 	static

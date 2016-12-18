@@ -30,7 +30,7 @@ public class NDArrayWrapperConstructor extends ObjectConstructor {
 
 
 	public NDArrayWrapperConstructor(String module, String name, Storage storage){
-		super(module, name);
+		super(module, name, NDArrayWrapper.class);
 
 		setStorage(storage);
 	}

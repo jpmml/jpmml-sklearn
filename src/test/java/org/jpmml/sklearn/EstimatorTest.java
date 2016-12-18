@@ -110,4 +110,13 @@ public class EstimatorTest extends IntegrationTest {
 			visitor.applyTo(pmml);
 		}
 	}
+
+	static {
+
+		try {
+			PickleUtil.init();
+		} catch(Exception e){
+			throw new AssertionError(e);
+		}
+	}
 }

@@ -125,6 +125,8 @@ public class Main {
 
 		Map<String, String> reprs = new LinkedHashMap<>();
 
+		PickleUtil.init();
+
 		if(this.mapperInput != null){
 
 			try(Storage storage = PickleUtil.createStorage(this.mapperInput)){

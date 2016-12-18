@@ -35,7 +35,11 @@ public class NDArray extends CClassDict implements HasArray {
 
 
 	public NDArray(){
-		super("numpy", "ndarray");
+		this("numpy", "ndarray");
+	}
+
+	public NDArray(String module, String name){
+		super(module, name);
 	}
 
 	@Override

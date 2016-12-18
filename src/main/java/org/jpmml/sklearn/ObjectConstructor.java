@@ -37,10 +37,6 @@ public class ObjectConstructor implements IObjectConstructor {
 	private Class<? extends ClassDict> clazz = null;
 
 
-	public ObjectConstructor(String module, String name){
-		this(module, name, null);
-	}
-
 	public ObjectConstructor(String module, String name, Class<? extends ClassDict> clazz){
 		setModule(module);
 		setName(name);
