@@ -28,12 +28,13 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.FeatureMapper;
 
 abstract
-public class Estimator extends BaseEstimator {
+public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 
 	public Estimator(String module, String name){
 		super(module, name);
@@ -69,6 +70,14 @@ public class Estimator extends BaseEstimator {
 
 	public Set<DefineFunction> encodeDefineFunctions(){
 		return Collections.emptySet();
+	}
+
+	public boolean validateSchema(Schema schema){
+		int numberOfFeatures = getNumberOfFeatures();
+
+		List<Feature> features = schema.getFeatures();
+
+		return (features.size() == numberOfFeatures);
 	}
 
 	protected FieldName createTargetField(){

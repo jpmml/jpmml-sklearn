@@ -37,7 +37,7 @@ public class Clusterer extends Estimator {
 		} else
 
 		{
-			featureMapper.updateActiveFields(getNumberOfFeatures(), false, getOpType(), getDataType());
+			featureMapper.updateActiveFields(false, getOpType(), getDataType());
 		}
 
 		Schema schema = featureMapper.createUnsupervisedSchema();

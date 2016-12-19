@@ -42,7 +42,7 @@ public class Regressor extends Estimator {
 		} else
 
 		{
-			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
+			featureMapper.updateActiveFields(true, getOpType(), getDataType());
 			featureMapper.updateTargetField(OpType.CONTINUOUS, DataType.DOUBLE, null);
 
 			result = featureMapper.createSupervisedSchema();

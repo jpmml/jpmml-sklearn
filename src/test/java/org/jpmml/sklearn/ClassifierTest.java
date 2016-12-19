@@ -210,6 +210,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateDecisionTreeVersicolor() throws Exception {
+		evaluate("DecisionTree", "Versicolor");
+	}
+
+	@Test
 	public void evaluateKNNVersicolor() throws Exception {
 
 		try(Batch batch = createBatch("KNN", "Versicolor")){

@@ -200,7 +200,7 @@ public class FeatureMapper extends PMMLMapper {
 		}
 	}
 
-	public void updateActiveFields(int numberOfFeatures, boolean supervised, OpType opType, DataType dataType){
+	public void updateActiveFields(boolean supervised, OpType opType, DataType dataType){
 
 		if(!(OpType.CONTINUOUS).equals(opType)){
 			throw new IllegalArgumentException();
@@ -230,10 +230,6 @@ public class FeatureMapper extends PMMLMapper {
 					featureIt.set(feature);
 				}
 			}
-		}
-
-		if(count != numberOfFeatures){
-			throw new IllegalArgumentException();
 		}
 	}
 

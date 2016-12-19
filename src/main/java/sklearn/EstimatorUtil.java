@@ -46,6 +46,11 @@ public class EstimatorUtil {
 	public PMML encodePMML(Estimator estimator, FeatureMapper featureMapper){
 		Schema schema = estimator.createSchema(featureMapper);
 
+		boolean valid = estimator.validateSchema(schema);
+		if(!valid){
+			throw new IllegalArgumentException();
+		}
+
 		Set<DefineFunction> defineFunctions = estimator.encodeDefineFunctions();
 		for(DefineFunction defineFunction : defineFunctions){
 			featureMapper.addDefineFunction(defineFunction);

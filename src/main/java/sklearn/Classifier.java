@@ -56,7 +56,7 @@ public class Classifier extends Estimator {
 		} else
 
 		{
-			featureMapper.updateActiveFields(getNumberOfFeatures(), true, getOpType(), getDataType());
+			featureMapper.updateActiveFields(true, getOpType(), getDataType());
 			featureMapper.updateTargetField(OpType.CATEGORICAL, dataType, targetCategories);
 		}
 

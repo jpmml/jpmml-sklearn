@@ -10,6 +10,7 @@ from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, Gradi
 from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.externals import joblib
+from sklearn.feature_selection import SelectKBest
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
@@ -184,6 +185,7 @@ def build_versicolor(classifier, name, to_sparse = False, with_proba = True):
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name + ".csv")
 
+build_versicolor(Pipeline([("selector", SelectKBest(k = 3)), ("estimator", DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5))]), "DecisionTreeVersicolor")
 build_versicolor(KNeighborsClassifier(), "KNNVersicolor", with_proba = False)
 build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPVersicolor")
 build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)

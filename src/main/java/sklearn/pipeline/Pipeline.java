@@ -21,11 +21,13 @@ package sklearn.pipeline;
 import java.util.List;
 
 import org.dmg.pmml.Model;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
@@ -36,11 +38,28 @@ public class Pipeline extends Estimator {
 	}
 
 	@Override
-	public Schema createSchema(FeatureMapper featureMapper){
+	public int getNumberOfFeatures(){
 		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 
 		if(transformers.size() > 0){
+
+			for(Transformer transformer : transformers){
+				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
+
+				return hasNumberOfFeatures.getNumberOfFeatures();
+			}
+		}
+
+		return estimator.getNumberOfFeatures();
+	}
+
+	@Override
+	public Schema createSchema(FeatureMapper featureMapper){
+		List<Transformer> transformers = getTransformers();
+		Estimator estimator = getEstimator();
+
+		if(transformers.size() > 0 && featureMapper.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 
@@ -49,7 +68,24 @@ public class Pipeline extends Estimator {
 
 	@Override
 	public Model encodeModel(Schema schema){
+		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
+
+		if(transformers.size() > 0){
+			List<Feature> features = schema.getFeatures();
+
+			for(Transformer transformer : transformers){
+				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
+
+				if(features.size() != hasNumberOfFeatures.getNumberOfFeatures()){
+					throw new IllegalArgumentException();
+				}
+
+				features = transformer.encodeFeatures(null, features, null);
+			}
+
+			schema = new Schema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), features);
+		}
 
 		return estimator.encodeModel(schema);
 	}
