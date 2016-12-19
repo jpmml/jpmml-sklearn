@@ -39,6 +39,16 @@ public class TransformerUtil {
 		return Lists.transform(objects, TransformerUtil.transformerFunction);
 	}
 
+	static
+	public Selector asSelector(Object object){
+		return TransformerUtil.selectorFunction.apply(object);
+	}
+
+	static
+	public List<Selector> asSelectorList(List<?> objects){
+		return Lists.transform(objects, TransformerUtil.selectorFunction);
+	}
+
 	private static final Function<Object, Transformer> transformerFunction = new Function<Object, Transformer>(){
 
 		@Override
@@ -52,6 +62,23 @@ public class TransformerUtil {
 				return (Transformer)object;
 			} catch(RuntimeException re){
 				throw new IllegalArgumentException("The transformer object (" + ClassDictUtil.formatClass(object) + ") is not a Transformer or is not a supported Transformer subclass", re);
+			}
+		}
+	};
+
+	private static final Function<Object, Selector> selectorFunction = new Function<Object, Selector>(){
+
+		@Override
+		public Selector apply(Object object){
+
+			try {
+				if(object == null){
+					throw new NullPointerException();
+				}
+
+				return (Selector)object;
+			} catch(RuntimeException re){
+				throw new IllegalArgumentException("The transformer object (" + ClassDictUtil.formatClass(object) + ") is not a Selector or is not a supported Selector subclass");
 			}
 		}
 	};

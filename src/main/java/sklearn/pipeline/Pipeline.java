@@ -27,8 +27,7 @@ import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
-import sklearn.HasNumberOfFeatures;
-import sklearn.Transformer;
+import sklearn.Selector;
 import sklearn.TransformerUtil;
 
 public class Pipeline extends Estimator {
@@ -39,15 +38,13 @@ public class Pipeline extends Estimator {
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<Transformer> transformers = getTransformers();
+		List<Selector> selectors = getSelectors();
 		Estimator estimator = getEstimator();
 
-		if(transformers.size() > 0){
+		if(selectors.size() > 0){
 
-			for(Transformer transformer : transformers){
-				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
-
-				return hasNumberOfFeatures.getNumberOfFeatures();
+			for(Selector selector : selectors){
+				return selector.getNumberOfFeatures();
 			}
 		}
 
@@ -56,10 +53,10 @@ public class Pipeline extends Estimator {
 
 	@Override
 	public Schema createSchema(FeatureMapper featureMapper){
-		List<Transformer> transformers = getTransformers();
+		List<Selector> selectors = getSelectors();
 		Estimator estimator = getEstimator();
 
-		if(transformers.size() > 0 && featureMapper.isEmpty()){
+		if(selectors.size() > 0 && featureMapper.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 
@@ -68,20 +65,20 @@ public class Pipeline extends Estimator {
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<Transformer> transformers = getTransformers();
+		List<Selector> selectors = getSelectors();
 		Estimator estimator = getEstimator();
 
-		if(transformers.size() > 0){
+		if(selectors.size() > 0){
 			List<Feature> features = schema.getFeatures();
 
-			for(Transformer transformer : transformers){
-				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
+			for(Selector selector : selectors){
+				int numberOfFeatures = selector.getNumberOfFeatures();
 
-				if(features.size() != hasNumberOfFeatures.getNumberOfFeatures()){
+				if(features.size() != numberOfFeatures){
 					throw new IllegalArgumentException();
 				}
 
-				features = transformer.encodeFeatures(null, features, null);
+				features = selector.selectFeatures(features);
 			}
 
 			schema = new Schema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), features);
@@ -90,16 +87,16 @@ public class Pipeline extends Estimator {
 		return estimator.encodeModel(schema);
 	}
 
-	public List<Transformer> getTransformers(){
+	public List<Selector> getSelectors(){
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){
 			throw new IllegalArgumentException();
 		}
 
-		List<Object[]> transformerSteps = steps.subList(0, steps.size() - 1);
+		List<Object[]> selectorSteps = steps.subList(0, steps.size() - 1);
 
-		return TransformerUtil.asTransformerList(TupleUtil.extractElement(transformerSteps, 1));
+		return TransformerUtil.asSelectorList(TupleUtil.extractElement(selectorSteps, 1));
 	}
 
 	public Estimator getEstimator(){

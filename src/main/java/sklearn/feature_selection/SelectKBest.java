@@ -25,11 +25,9 @@ import java.util.List;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
-import sklearn.HasNumberOfFeatures;
-import sklearn.Transformer;
+import sklearn.Selector;
 
-public class SelectKBest extends Transformer implements HasNumberOfFeatures {
+public class SelectKBest extends Selector {
 
 	public SelectKBest(String module, String name){
 		super(module, name);
@@ -43,7 +41,7 @@ public class SelectKBest extends Transformer implements HasNumberOfFeatures {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> selectFeatures(List<Feature> inputFeatures){
 		Object k = getK();
 		List<? extends Number> scores = getScores();
 
