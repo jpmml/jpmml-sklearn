@@ -156,13 +156,18 @@ iris = iris_mapper.fit_transform(iris_df)
 
 Train an appropriate estimator object:
 ```python
+from sklearn.feature_selection import SelectKBest
 from sklearn.ensemble.forest import RandomForestClassifier
+from sklearn.pipeline import Pipeline
 
 iris_X = iris[:, 0:3]
 iris_y = iris[:, 3]
 
-iris_forest = RandomForestClassifier(min_samples_leaf = 5)
-iris_forest.fit(iris_X, iris_y)
+iris_estimator = Pipeline([
+    ("selector", SelectKBest(k = 2)),
+    ("estimator", RandomForestClassifier(min_samples_leaf = 5))
+])
+iris_estimator.fit(iris_X, iris_y)
 ```
 
 Serialize the `sklearn_pandas.DataFrameMapper` object and estimator object in `pickle` data format:
@@ -170,7 +175,7 @@ Serialize the `sklearn_pandas.DataFrameMapper` object and estimator object in `p
 from sklearn.externals import joblib
 
 joblib.dump(iris_mapper, "mapper.pkl", compress = 9)
-joblib.dump(iris_forest, "estimator.pkl", compress = 9)
+joblib.dump(iris_estimator, "estimator.pkl", compress = 9)
 ```
 
 Please see the test script file [main.py] (https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.
