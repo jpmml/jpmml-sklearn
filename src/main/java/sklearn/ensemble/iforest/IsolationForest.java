@@ -44,7 +44,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
-import org.jpmml.sklearn.FeatureMapper;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.tree.ExtraTreeRegressor;
@@ -60,21 +59,6 @@ public class IsolationForest extends EnsembleRegressor {
 	@Override
 	public boolean isSupervised(){
 		return false;
-	}
-
-	@Override
-	public Schema createSchema(FeatureMapper featureMapper){
-
-		if(!featureMapper.isEmpty()){
-			featureMapper.initTargetField(createTargetField(), OpType.CONTINUOUS, DataType.DOUBLE, null);
-		}
-
-		return super.createSchema(featureMapper);
-	}
-
-	@Override
-	protected FieldName createTargetField(){
-		return FieldName.create("distance");
 	}
 
 	@Override

@@ -28,7 +28,6 @@ import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.FeatureMapper;
 
 public class OneClassSVM extends BaseLibSVMRegressor {
 
@@ -39,21 +38,6 @@ public class OneClassSVM extends BaseLibSVMRegressor {
 	@Override
 	public boolean isSupervised(){
 		return false;
-	}
-
-	@Override
-	public Schema createSchema(FeatureMapper featureMapper){
-
-		if(!featureMapper.isEmpty()){
-			featureMapper.initTargetField(createTargetField(), OpType.CONTINUOUS, DataType.DOUBLE, null);
-		}
-
-		return super.createSchema(featureMapper);
-	}
-
-	@Override
-	protected FieldName createTargetField(){
-		return FieldName.create("distance");
 	}
 
 	@Override

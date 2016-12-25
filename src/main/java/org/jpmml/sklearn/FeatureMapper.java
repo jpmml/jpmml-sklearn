@@ -23,8 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.google.common.base.Function;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -45,41 +44,17 @@ import org.jpmml.converter.WildcardFeature;
 
 public class FeatureMapper extends PMMLMapper {
 
-	private List<List<Feature>> rows = new ArrayList<>();
+	private List<Row> rows = new ArrayList<>();
 
 
-	public Schema createSupervisedSchema(){
-		Feature feature = getTargetFeature();
-
-		DataField dataField = getDataField(feature.getName());
-		if(dataField == null){
-			throw new IllegalArgumentException();
-		}
-
-		FieldName targetField = dataField.getName();
-
-		List<String> targetCategories = null;
-
-		if(dataField.hasValues()){
-			targetCategories = PMMLUtil.getValues(dataField);
-		}
-
-		List<FieldName> activeFields = new ArrayList<>(getDataFields().keySet());
-		activeFields.remove(targetField);
-
-		List<Feature> features = getActiveFeatures(true);
-
-		Schema schema = new Schema(targetField, targetCategories, activeFields, features);
-
-		return schema;
-	}
-
-	public Schema createUnsupervisedSchema(){
+	public Schema createSchema(FieldName targetField, List<String> targetCategories){
 		List<FieldName> activeFields = new ArrayList<>(getDataFields().keySet());
 
-		List<Feature> features = getActiveFeatures(false);
+		if(targetField != null){
+			activeFields.remove(targetField);
+		}
 
-		Schema schema = new Schema(null, null, activeFields, features);
+		Schema schema = new Schema(targetField, targetCategories, activeFields, getFeatures());
 
 		return schema;
 	}
@@ -145,6 +120,10 @@ public class FeatureMapper extends PMMLMapper {
 	public void updateType(FieldName name, OpType opType, DataType dataType){
 		TypeDefinitionField field = getField(name);
 
+		updateType(field, opType, dataType);
+	}
+
+	public void updateType(TypeDefinitionField field, OpType opType, DataType dataType){
 		field
 			.setOpType(opType)
 			.setDataType(dataType);
@@ -153,7 +132,13 @@ public class FeatureMapper extends PMMLMapper {
 	public void updateValueSpace(FieldName name, List<String> categories){
 		TypeDefinitionField field = getField(name);
 
-		List<Value> values = field.getValues();
+		updateValueSpace(field, categories);
+	}
+
+	public void updateValueSpace(TypeDefinitionField field, List<String> categories){
+		DataField dataField = (DataField)field;
+
+		List<Value> values = dataField.getValues();
 		if(values.size() > 0){
 			throw new IllegalArgumentException();
 		} // End if
@@ -163,58 +148,35 @@ public class FeatureMapper extends PMMLMapper {
 		}
 	}
 
-	public void initTargetField(FieldName name, OpType opType, DataType dataType, List<String> targetCategories){
-		DataField dataField = createDataField(name, opType, dataType);
-
-		updateValueSpace(dataField.getName(), targetCategories);
-
-		Feature feature = new WildcardFeature(dataField);
-
-		addRow(Collections.singletonList(feature));
-	}
-
-	public void updateTargetField(OpType opType, DataType dataType, List<String> targetCategories){
-		Feature feature = getTargetFeature();
-
-		DataField dataField = getDataField(feature.getName());
-		if(dataField == null){
-			throw new IllegalArgumentException();
-		}
-
-		updateType(dataField.getName(), opType, dataType);
-		updateValueSpace(dataField.getName(), targetCategories);
-	}
-
-	public void initActiveFields(List<FieldName> names, OpType opType, DataType dataType){
+	public void initFeatures(List<FieldName> names, OpType opType, DataType dataType){
 
 		if(!(OpType.CONTINUOUS).equals(opType)){
 			throw new IllegalArgumentException();
 		}
 
 		for(FieldName name : names){
+			String id = name.getValue();
+
 			DataField dataField = createDataField(name, opType, dataType);
 
 			Feature feature = new ContinuousFeature(dataField);
 
-			addRow(Collections.singletonList(feature));
+			addRow(Collections.singletonList(id), Collections.singletonList(feature));
 		}
 	}
 
-	public void updateActiveFields(boolean supervised, OpType opType, DataType dataType){
+	public void updateFeatures(OpType opType, DataType dataType){
 
 		if(!(OpType.CONTINUOUS).equals(opType)){
 			throw new IllegalArgumentException();
 		}
 
-		int count = 0;
+		List<Row> rows = this.rows;
+		for(Row row : rows){
+			List<Feature> features = row.getFeatures();
 
-		List<List<Feature>> activeRows = getActiveRows(supervised);
-		for(List<Feature> activeRow : activeRows){
-
-			for(ListIterator<Feature> featureIt = activeRow.listIterator(); featureIt.hasNext(); ){
+			for(ListIterator<Feature> featureIt = features.listIterator(); featureIt.hasNext(); ){
 				Feature feature = featureIt.next();
-
-				count++;
 
 				if(feature instanceof BinaryFeature){
 					continue;
@@ -241,47 +203,74 @@ public class FeatureMapper extends PMMLMapper {
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
 	}
 
-	public WildcardFeature getTargetFeature(){
-		List<Feature> targetRow = getTargetRow();
-		if(targetRow.size() != 1){
-			throw new IllegalArgumentException();
-		}
+	public List<String> getIds(){
+		Function<Row, List<String>> function = new Function<Row, List<String>>(){
 
-		WildcardFeature feature = (WildcardFeature)targetRow.get(0);
+			@Override
+			public List<String> apply(Row row){
+				return row.getIds();
+			}
+		};
 
-		return feature;
+		return getRowData(function);
 	}
 
-	public List<Feature> getActiveFeatures(boolean supervised){
-		List<List<Feature>> activeRows = getActiveRows(supervised);
+	public List<Feature> getFeatures(){
+		Function<Row, List<Feature>> function = new Function<Row, List<Feature>>(){
 
-		List<Feature> features = Lists.newArrayList(Iterables.concat(activeRows));
+			@Override
+			public List<Feature> apply(Row row){
+				return row.getFeatures();
+			}
+		};
 
-		return features;
+		return getRowData(function);
 	}
 
-	public void addRow(List<Feature> row){
+	public void addRow(List<String> ids, List<Feature> features){
+		Row row = new Row(ids, features);
+
 		this.rows.add(row);
 	}
 
-	public boolean isEmpty(){
-		return this.rows.isEmpty();
-	}
+	private <E> List<E> getRowData(Function<Row, List<E>> function){
+		List<E> result = new ArrayList<>();
 
-	public List<List<Feature>> getRows(){
-		return this.rows;
-	}
-
-	public List<Feature> getTargetRow(){
-		return this.rows.get(this.rows.size() - 1);
-	}
-
-	public List<List<Feature>> getActiveRows(boolean supervised){
-
-		if(supervised){
-			return this.rows.subList(0, this.rows.size() - 1);
+		List<Row> rows = this.rows;
+		for(Row row : rows){
+			result.addAll(function.apply(row));
 		}
 
-		return this.rows;
+		return result;
+	}
+
+	static
+	private class Row {
+
+		private List<String> ids = null;
+
+		private List<Feature> features = null;
+
+
+		private Row(List<String> ids, List<Feature> features){
+			setIds(ids);
+			setFeatures(features);
+		}
+
+		public List<String> getIds(){
+			return this.ids;
+		}
+
+		private void setIds(List<String> ids){
+			this.ids = new ArrayList<>(ids);
+		}
+
+		public List<Feature> getFeatures(){
+			return this.features;
+		}
+
+		private void setFeatures(List<Feature> features){
+			this.features = new ArrayList<>(features);
+		}
 	}
 }

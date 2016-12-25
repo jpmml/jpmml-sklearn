@@ -129,7 +129,7 @@ public class RegressorTest extends EstimatorTest {
 	public void evaluateIsolationForestHousingAnomaly() throws Exception {
 
 		try(Batch batch = createBatch("IsolationForest", "HousingAnomaly")){
-			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("distance"), FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore"));
+			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore"));
 
 			evaluate(batch, ignoredFields);
 		}
@@ -139,7 +139,7 @@ public class RegressorTest extends EstimatorTest {
 	public void evaluateOneClassSVMHousingAnomaly() throws Exception {
 
 		try(Batch batch = createBatch("OneClassSVM", "HousingAnomaly")){
-			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("decisionFunction"));
+			Set<FieldName> ignoredFields = ImmutableSet.of();
 
 			evaluate(batch, ignoredFields);
 		}

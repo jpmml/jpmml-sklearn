@@ -340,8 +340,8 @@ def build_svm_housing_anomaly(svm, name):
 	])
 	pipeline.fit(housing_X)
 	store_pkl(pipeline, name + ".pkl")
-	distance = DataFrame(pipeline.decision_function(housing_X), columns = ["distance"])
+	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(housing_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
-	store_csv(pandas.concat([distance, outlier], axis = 1), name + ".csv")
+	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
 
 build_svm_housing_anomaly(Pipeline([("estimator", OneClassSVM(nu = 0.10, random_state = 13))]), "OneClassSVMHousingAnomaly")

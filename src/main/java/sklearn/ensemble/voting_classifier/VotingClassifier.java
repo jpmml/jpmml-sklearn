@@ -53,27 +53,6 @@ public class VotingClassifier extends Classifier {
 	}
 
 	@Override
-	public Schema createSchema(FeatureMapper featureMapper){
-		Schema schema = super.createSchema(featureMapper);
-
-		this.schemas.put(createSchemaKey(this), schema);
-
-		List<? extends Classifier> estimators = getEstimators();
-		for(Classifier estimator : estimators){
-			List<?> schemaKey = createSchemaKey(estimator);
-
-			Schema estimatorSchema = this.schemas.get(schemaKey);
-			if(estimatorSchema == null){
-				estimatorSchema = featureMapper.cast((OpType)schemaKey.get(0), (DataType)schemaKey.get(1), schema);
-
-				this.schemas.put(schemaKey, estimatorSchema);
-			}
-		}
-
-		return schema;
-	}
-
-	@Override
 	public int getNumberOfFeatures(){
 		List<? extends Classifier> estimators = getEstimators();
 
@@ -89,9 +68,10 @@ public class VotingClassifier extends Classifier {
 
 	@Override
 	public Set<DefineFunction> encodeDefineFunctions(){
+		List<? extends Classifier> estimators = getEstimators();
+
 		Map<String, DefineFunction> uniqueDefineFunctions = new LinkedHashMap<>();
 
-		List<? extends Classifier> estimators = getEstimators();
 		for(Classifier estimator : estimators){
 			Set<DefineFunction> defineFunctions = estimator.encodeDefineFunctions();
 
@@ -117,7 +97,7 @@ public class VotingClassifier extends Classifier {
 
 			Schema estimatorSchema = this.schemas.get(schemaKey);
 			if(estimatorSchema == null){
-				throw new IllegalArgumentException();
+				throw new IllegalStateException();
 			}
 
 			Model model = estimator.encodeModel(estimatorSchema);
@@ -134,6 +114,26 @@ public class VotingClassifier extends Classifier {
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return miningModel;
+	}
+
+	@Override
+	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
+		List<? extends Classifier> estimators = getEstimators();
+
+		this.schemas.put(createSchemaKey(this), schema);
+
+		for(Classifier estimator : estimators){
+			List<?> schemaKey = createSchemaKey(estimator);
+
+			Schema estimatorSchema = this.schemas.get(schemaKey);
+			if(estimatorSchema == null){
+				estimatorSchema = featureMapper.cast((OpType)schemaKey.get(0), (DataType)schemaKey.get(1), schema);
+
+				this.schemas.put(schemaKey, estimatorSchema);
+			}
+		}
+
+		return super.encodeModel(schema, featureMapper);
 	}
 
 	public List<? extends Classifier> getEstimators(){

@@ -18,18 +18,9 @@
  */
 package sklearn;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
-import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
 
 abstract
 public class Classifier extends Estimator {
@@ -43,61 +34,11 @@ public class Classifier extends Estimator {
 		return true;
 	}
 
-	@Override
-	public Schema createSchema(FeatureMapper featureMapper){
-		List<?> classes = getClasses();
-
-		if(classes == null || classes.isEmpty()){
-			throw new IllegalArgumentException();
-		}
-
-		DataType dataType = TypeUtil.getDataType(classes, DataType.STRING);
-
-		List<String> targetCategories = formatTargetCategories(classes);
-
-		if(featureMapper.isEmpty()){
-			featureMapper.initActiveFields(createActiveFields(getNumberOfFeatures()), getOpType(), getDataType());
-			featureMapper.initTargetField(createTargetField(), OpType.CATEGORICAL, dataType, targetCategories);
-		} else
-
-		{
-			featureMapper.updateActiveFields(true, getOpType(), getDataType());
-			featureMapper.updateTargetField(OpType.CATEGORICAL, dataType, targetCategories);
-		}
-
-		Schema schema = featureMapper.createSupervisedSchema();
-
-		if(requiresContinuousInput()){
-			schema = featureMapper.cast(OpType.CONTINUOUS, getDataType(), schema);
-		}
-
-		return schema;
-	}
-
 	public boolean hasProbabilityDistribution(){
 		return true;
 	}
 
 	public List<?> getClasses(){
 		return ClassDictUtil.getArray(this, "classes_");
-	}
-
-	static
-	private List<String> formatTargetCategories(List<?> objects){
-		Function<Object, String> function = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object object){
-				String targetCategory = ValueUtil.formatValue(object);
-
-				if(targetCategory == null || CharMatcher.WHITESPACE.matchesAnyOf(targetCategory)){
-					throw new IllegalArgumentException(targetCategory);
-				}
-
-				return targetCategory;
-			}
-		};
-
-		return new ArrayList<>(Lists.transform(objects, function));
 	}
 }

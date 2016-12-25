@@ -18,14 +18,11 @@
  */
 package sklearn;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
@@ -43,10 +40,11 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	public boolean isSupervised();
 
 	abstract
-	public Schema createSchema(FeatureMapper featureMapper);
-
-	abstract
 	public Model encodeModel(Schema schema);
+
+	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
+		return encodeModel(schema);
+	}
 
 	@Override
 	public int getNumberOfFeatures(){
@@ -73,19 +71,5 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 
 	public Set<DefineFunction> encodeDefineFunctions(){
 		return Collections.emptySet();
-	}
-
-	protected FieldName createTargetField(){
-		return FieldName.create("y");
-	}
-
-	protected List<FieldName> createActiveFields(int size){
-		List<FieldName> result = new ArrayList<>(size);
-
-		for(int i = 0; i < size; i++){
-			result.add(FieldName.create("x" + String.valueOf(i + 1)));
-		}
-
-		return result;
 	}
 }

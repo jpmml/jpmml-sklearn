@@ -70,7 +70,7 @@ public class DataFrameMapper extends ClassDict {
 				features = transformer.encodeFeatures(ids, features, featureMapper);
 			}
 
-			featureMapper.addRow(features);
+			featureMapper.addRow(ids, features);
 		}
 	}
 

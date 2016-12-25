@@ -21,8 +21,10 @@ package sklearn.pipeline;
 import java.util.List;
 import java.util.Set;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FeatureMapper;
@@ -61,6 +63,27 @@ public class Pipeline extends Estimator {
 	}
 
 	@Override
+	public boolean requiresContinuousInput(){
+		Estimator estimator = getEstimator();
+
+		return estimator.requiresContinuousInput();
+	}
+
+	@Override
+	public OpType getOpType(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getOpType();
+	}
+
+	@Override
+	public DataType getDataType(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getDataType();
+	}
+
+	@Override
 	public Set<DefineFunction> encodeDefineFunctions(){
 		Estimator estimator = getEstimator();
 
@@ -68,19 +91,12 @@ public class Pipeline extends Estimator {
 	}
 
 	@Override
-	public Schema createSchema(FeatureMapper featureMapper){
-		List<Selector> selectors = getSelectors();
-		Estimator estimator = getEstimator();
-
-		if(selectors.size() > 0 && featureMapper.isEmpty()){
-			throw new IllegalArgumentException();
-		}
-
-		return estimator.createSchema(featureMapper);
+	public Model encodeModel(Schema schema){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
+	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
 		List<Selector> selectors = getSelectors();
 		Estimator estimator = getEstimator();
 
@@ -107,7 +123,7 @@ public class Pipeline extends Estimator {
 			throw new IllegalArgumentException();
 		}
 
-		return estimator.encodeModel(schema);
+		return estimator.encodeModel(schema, featureMapper);
 	}
 
 	public List<Selector> getSelectors(){
