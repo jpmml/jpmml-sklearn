@@ -92,21 +92,18 @@ Java library and command-line application for converting [Scikit-Learn] (http://
 
 * Python 2.7, 3.4 or newer.
 * [`scikit-learn`] (https://pypi.python.org/pypi/scikit-learn) 0.16.0 or newer.
-* [`pandas`] (https://pypi.python.org/pypi/pandas) 0.16.2 or newer.
 * [`sklearn-pandas`] (https://pypi.python.org/pypi/sklearn-pandas) 0.0.10 or newer.
-* [`joblib`] (https://pypi.python.org/pypi/joblib) 0.8.4 or newer.
-* [`numpy`] (https://pypi.python.org/pypi/numpy) 1.9.2 or newer.
+* [`sklearn2pmml`] (https://github.com/jpmml/sklearn2pmml) 0.14.0 or newer.
 
 Python installation can be validated as follows:
 
 ```python
-import sklearn, pandas, sklearn_pandas, joblib, numpy
+import sklearn, sklearn.externals.joblib, sklearn_pandas, sklearn2pmml
 
 print(sklearn.__version__)
-print(pandas.__version__)
+print(sklearn.externals.joblib.__version__)
 print(sklearn_pandas.__version__)
-print(joblib.__version__)
-print(numpy.__version__)
+print(sklearn2pmml.__version__)
 ```
 
 ### The JPMML-SkLearn side of operations
