@@ -21,9 +21,6 @@ package org.jpmml.sklearn;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -34,25 +31,9 @@ import org.dmg.pmml.PMML;
 import org.jpmml.model.MetroJAXBUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sklearn.Estimator;
-import sklearn.EstimatorUtil;
-import sklearn_pandas.DataFrameMapper;
+import sklearn2pmml.PMMLPipeline;
 
 public class Main {
-
-	@Parameter (
-		names = {"--pkl-input", "--pkl-estimator-input"},
-		description = "Estimator pickle input file",
-		required = true
-	)
-	private File estimatorInput = null;
-
-	@Parameter (
-		names = "--repr-estimator",
-		description = "Estimator string representation",
-		hidden = true
-	)
-	private String estimatorRepr = null;
 
 	@Parameter (
 		names = "--help",
@@ -62,18 +43,11 @@ public class Main {
 	private boolean help = false;
 
 	@Parameter (
-		names = "--pkl-mapper-input",
-		description = "DataFrameMapper pickle input file",
-		required = false
+		names = {"--pkl-pipeline-input", "--pkl-input"},
+		description = "Pickle input file",
+		required = true
 	)
-	private File mapperInput = null;
-
-	@Parameter (
-		names = "--repr-mapper",
-		description = "DataFrameMapper string representation",
-		hidden = true
-	)
-	private String mapperRepr = null;
+	private File input = null;
 
 	@Parameter (
 		names = "--pmml-output",
@@ -81,6 +55,13 @@ public class Main {
 		required = true
 	)
 	private File output = null;
+
+	@Parameter (
+		names = {"--repr-pipeline", "--repr"},
+		description = "String representation",
+		hidden = true
+	)
+	private String repr = null;
 
 
 	static
@@ -119,104 +100,59 @@ public class Main {
 	}
 
 	public void run() throws Exception {
-		PMML pmml;
-
-		FeatureMapper featureMapper = new FeatureMapper();
-
-		Map<String, String> reprs = new LinkedHashMap<>();
-
 		PickleUtil.init();
 
-		if(this.mapperInput != null){
+		Object object;
 
-			try(Storage storage = PickleUtil.createStorage(this.mapperInput)){
-				Object object;
+		try(Storage storage = PickleUtil.createStorage(this.input)){
+			logger.info("Parsing PKL..");
 
-				try {
-					logger.info("Parsing DataFrameMapper PKL..");
+			long start = System.currentTimeMillis();
+			object = PickleUtil.unpickle(storage);
+			long end = System.currentTimeMillis();
 
-					long start = System.currentTimeMillis();
-					object = PickleUtil.unpickle(storage);
-					long end = System.currentTimeMillis();
+			logger.info("Parsed PKL in {} ms.", (end - start));
+		} catch(Exception e){
+			logger.error("Failed to parse PKL", e);
 
-					logger.info("Parsed DataFrameMapper PKL in {} ms.", (end - start));
-				} catch(Exception e){
-					logger.error("Failed to parse DataFrameMapper PKL", e);
-
-					throw e;
-				}
-
-				if(!(object instanceof DataFrameMapper)){
-					throw new IllegalArgumentException("The mapper object (" + ClassDictUtil.formatClass(object) + ") is not a DataFrameMapper");
-				}
-
-				DataFrameMapper mapper = (DataFrameMapper)object;
-
-				try {
-					logger.info("Converting DataFrameMapper..");
-
-					long start = System.currentTimeMillis();
-					mapper.encodeFeatures(featureMapper);
-					long end = System.currentTimeMillis();
-
-					logger.info("Converted DataFrameMapper in {} ms.", (end - start));
-				} catch(Exception e){
-					logger.error("Failed to convert DataFrameMapper", e);
-
-					throw e;
-				}
-			}
-
-			if(this.mapperRepr != null){
-				reprs.put("mapper", this.mapperRepr);
-			}
+			throw e;
 		}
 
-		try(Storage storage = PickleUtil.createStorage(this.estimatorInput)){
-			Object object;
-
-			try {
-				logger.info("Parsing Estimator PKL..");
-
-				long start = System.currentTimeMillis();
-				object = PickleUtil.unpickle(storage);
-				long end = System.currentTimeMillis();
-
-				logger.info("Parsed Estimator PKL in {} ms.", (end - start));
-			} catch(Exception e){
-				logger.error("Failed to parse Estimator PKL", e);
-
-				throw e;
-			}
-
-			if(!(object instanceof Estimator)){
-				throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(object) + ") is not an Estimator or is not a supported Estimator subclass");
-			}
-
-			Estimator estimator = (Estimator)object;
-
-			try {
-				logger.info("Converting Estimator..");
-
-				long start = System.currentTimeMillis();
-				pmml = EstimatorUtil.encodePMML(estimator, featureMapper);
-				long end = System.currentTimeMillis();
-
-				logger.info("Converted Estimator in {} ms.", (end - start));
-			} catch(Exception e){
-				logger.error("Failed to convert Estimator", e);
-
-				throw e;
-			}
+		if(!(object instanceof PMMLPipeline)){
+			throw new IllegalArgumentException("The object (" + ClassDictUtil.formatClass(object) + ") is not a PMMLPipeline");
 		}
 
-		if(this.estimatorRepr != null){
-			reprs.put("estimator", this.estimatorRepr);
+		PMMLPipeline pipeline = (PMMLPipeline)object;
+
+		PMML pmml;
+
+		try {
+			logger.info("Converting..");
+
+			long begin = System.currentTimeMillis();
+			pmml = pipeline.encodePMML();
+			long end = System.currentTimeMillis();
+
+			logger.info("Converted in {} ms.", (end - begin));
+		} catch(Exception e){
+			logger.error("Failed to convert", e);
+
+			throw e;
 		}
 
-		Collection<Map.Entry<String, String>> entries = reprs.entrySet();
-		for(Map.Entry<String, String> entry : entries){
-			addObjectRepr(pmml, entry.getKey(), entry.getValue());
+		if(this.repr != null){
+			MiningBuildTask miningBuildTask = pmml.getMiningBuildTask();
+
+			if(miningBuildTask == null){
+				miningBuildTask = new MiningBuildTask();
+
+				pmml.setMiningBuildTask(miningBuildTask);
+			}
+
+			Extension extension = new Extension()
+				.addContent(this.repr);
+
+			miningBuildTask.addExtensions(extension);
 		}
 
 		try(OutputStream os = new FileOutputStream(this.output)){
@@ -234,36 +170,12 @@ public class Main {
 		}
 	}
 
-	public File getEstimatorInput(){
-		return this.estimatorInput;
+	public File getInput(){
+		return this.input;
 	}
 
-	public void setEstimatorInput(File estimatorInput){
-		this.estimatorInput = estimatorInput;
-	}
-
-	public String getEstimatorRepr(){
-		return this.estimatorRepr;
-	}
-
-	public void setEstimatorRepr(String estimatorRepr){
-		this.estimatorRepr = estimatorRepr;
-	}
-
-	public File getMapperInput(){
-		return this.mapperInput;
-	}
-
-	public void setMapperInput(File mapperInput){
-		this.mapperInput = mapperInput;
-	}
-
-	public String getMapperRepr(){
-		return this.mapperRepr;
-	}
-
-	public void setMapperRepr(String mapperRepr){
-		this.mapperRepr = mapperRepr;
+	public void setInput(File input){
+		this.input = input;
 	}
 
 	public File getOutput(){
@@ -274,22 +186,12 @@ public class Main {
 		this.output = output;
 	}
 
-	static
-	private void addObjectRepr(PMML pmml, String name, String content){
-		MiningBuildTask miningBuildTask = pmml.getMiningBuildTask();
+	public String getRepr(){
+		return this.repr;
+	}
 
-		if(miningBuildTask == null){
-			miningBuildTask = new MiningBuildTask();
-
-			pmml.setMiningBuildTask(miningBuildTask);
-		}
-
-		Extension extension = new Extension()
-			.setName(name)
-			.setValue("repr(" + name + ")")
-			.addContent(content);
-
-		miningBuildTask.addExtensions(extension);
+	public void setRepr(String repr){
+		this.repr = repr;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);

@@ -28,7 +28,6 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.FeatureMapper;
@@ -41,11 +40,15 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	}
 
 	abstract
+	public boolean isSupervised();
+
+	abstract
 	public Schema createSchema(FeatureMapper featureMapper);
 
 	abstract
 	public Model encodeModel(Schema schema);
 
+	@Override
 	public int getNumberOfFeatures(){
 		return ValueUtil.asInt((Number)get("n_features_"));
 	}
@@ -70,14 +73,6 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 
 	public Set<DefineFunction> encodeDefineFunctions(){
 		return Collections.emptySet();
-	}
-
-	public boolean validateSchema(Schema schema){
-		int numberOfFeatures = getNumberOfFeatures();
-
-		List<Feature> features = schema.getFeatures();
-
-		return (features.size() == numberOfFeatures);
 	}
 
 	protected FieldName createTargetField(){

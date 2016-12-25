@@ -58,6 +58,11 @@ public class IsolationForest extends EnsembleRegressor {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return false;
+	}
+
+	@Override
 	public Schema createSchema(FeatureMapper featureMapper){
 
 		if(!featureMapper.isEmpty()){

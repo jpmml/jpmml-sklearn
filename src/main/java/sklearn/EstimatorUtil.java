@@ -19,7 +19,6 @@
 package sklearn;
 
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -28,39 +27,14 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMML;
 import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
 
 public class EstimatorUtil {
 
 	private EstimatorUtil(){
-	}
-
-	static
-	public PMML encodePMML(Estimator estimator, FeatureMapper featureMapper){
-		Schema schema = estimator.createSchema(featureMapper);
-
-		boolean valid = estimator.validateSchema(schema);
-		if(!valid){
-			throw new IllegalArgumentException();
-		}
-
-		Set<DefineFunction> defineFunctions = estimator.encodeDefineFunctions();
-		for(DefineFunction defineFunction : defineFunctions){
-			featureMapper.addDefineFunction(defineFunction);
-		}
-
-		Model model = estimator.encodeModel(schema);
-
-		PMML pmml = featureMapper.encodePMML(model);
-
-		return pmml;
 	}
 
 	static

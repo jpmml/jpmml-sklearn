@@ -186,12 +186,12 @@ public class NDArrayUtil {
 
 		Map<String, List<?>> result = new LinkedHashMap<>();
 
-		List<Object[]> objects = parseMultiArray(is, (List<String>)TupleUtil.extractElement(dims, 1), length);
+		List<Object[]> objects = parseMultiArray(is, (List)TupleUtil.extractElementList(dims, 1), length);
 
 		for(int i = 0; i < dims.size(); i++){
 			Object[] dim = dims.get(i);
 
-			result.put((String)dim[0], TupleUtil.extractElement(objects, i));
+			result.put((String)dim[0], TupleUtil.extractElementList(objects, i));
 		}
 
 		return result;

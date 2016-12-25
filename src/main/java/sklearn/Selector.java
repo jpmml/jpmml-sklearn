@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2016 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *

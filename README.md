@@ -139,57 +139,58 @@ import pandas
 iris_df = pandas.read_csv("Iris.csv")
 ```
 
-Describe data and data pre-processing actions by creating an appropriate `sklearn_pandas.DataFrameMapper` object:
+First, instantiate a `sklearn_pandas.DataFrameMapper` object, which performs feature engineering work:
 ```python
+from sklearn_pandas import DataFrameMapper
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from sklearn_pandas import DataFrameMapper
 from sklearn2pmml.decoration import ContinuousDomain
 
 iris_mapper = DataFrameMapper([
-    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), StandardScaler(), PCA(n_components = 3)]),
-    ("Species", None)
+    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), StandardScaler(), PCA(n_components = 3)])
 ])
-
-iris = iris_mapper.fit_transform(iris_df)
 ```
 
-Train an appropriate estimator object:
+Second, instantiate a `Selector` object, which performs feature selection work:
 ```python
 from sklearn.feature_selection import SelectKBest
-from sklearn.ensemble.forest import RandomForestClassifier
-from sklearn.pipeline import Pipeline
 
-iris_X = iris[:, 0:3]
-iris_y = iris[:, 3]
-
-iris_estimator = Pipeline([
-    ("selector", SelectKBest(k = 2)),
-    ("estimator", RandomForestClassifier(min_samples_leaf = 5))
-])
-iris_estimator.fit(iris_X, iris_y)
+iris_selector = SelectKBest(k = 2)
 ```
 
-Serialize the `sklearn_pandas.DataFrameMapper` object and estimator object in `pickle` data format:
+Third, instantiate an `Estimator` object:
+```python
+from sklearn.tree import DecisionTreeClassifier
+
+iris_classifier = DecisionTreeClassifier(min_samples_leaf = 5)
+```
+
+Combine the above three objects into a `sklearn2pmml.PMMLPipeline` object, and run the experiment:
+```python
+from sklearn2pmml import PMMLPipeline
+
+iris_pipeline = PMMLPipeline([
+    ("mapper", iris_mapper),
+    ("selector", iris_selector),
+    ("estimator", iris_classifier)
+])
+iris_pipeline.fit(iris_df, iris_df["Species"])
+```
+
+Store the fitted `sklearn2pmml.PMMLPipeline` object in `pickle` data format:
 ```python
 from sklearn.externals import joblib
 
-joblib.dump(iris_mapper, "mapper.pkl", compress = 9)
-joblib.dump(iris_estimator, "estimator.pkl", compress = 9)
+joblib.dump(iris_pipeline, "pipeline.pkl.z", compress = 9)
 ```
 
 Please see the test script file [main.py] (https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.
 
 ### The JPMML-SkLearn side of operations
 
-Converting the estimator pickle file `estimator.pkl` to a PMML file `estimator.pmml`:
+Converting the pipeline pickle file `pipeline.pkl.z` to a PMML file `pipeline.pmml`:
 ```
-java -jar target/converter-executable-1.2-SNAPSHOT.jar --pkl-input estimator.pkl --pmml-output estimator.pmml
-```
-
-Converting the `sklearn_pandas.DataFrameMapper` pickle file `mapper.pkl` and the estimator pickle file `estimator.pkl` to a PMML file `mapper-estimator.pmml`:
-```
-java -jar target/converter-executable-1.2-SNAPSHOT.jar --pkl-mapper-input mapper.pkl --pkl-estimator-input estimator.pkl --pmml-output mapper-estimator.pmml
+java -jar target/converter-executable-1.2-SNAPSHOT.jar --pkl-input pipeline.pkl.z --pmml-output pipeline.pmml
 ```
 
 Getting help:

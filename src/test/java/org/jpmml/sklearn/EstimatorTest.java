@@ -33,9 +33,7 @@ import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
 import org.jpmml.evaluator.visitors.InvalidFeatureInspector;
 import org.jpmml.evaluator.visitors.UnsupportedFeatureInspector;
-import sklearn.Estimator;
-import sklearn.EstimatorUtil;
-import sklearn_pandas.DataFrameMapper;
+import sklearn2pmml.PMMLPipeline;
 
 abstract
 public class EstimatorTest extends IntegrationTest {
@@ -63,21 +61,13 @@ public class EstimatorTest extends IntegrationTest {
 
 			@Override
 			public PMML getPMML() throws IOException {
-				PMML pmml;
-
-				FeatureMapper featureMapper = new FeatureMapper();
-
-				try(Storage storage = openStorage("/pkl/" + getDataset() + ".pkl")){
-					DataFrameMapper mapper = (DataFrameMapper)PickleUtil.unpickle(storage);
-
-					mapper.encodeFeatures(featureMapper);
-				} // End try
+				PMMLPipeline pipeline;
 
 				try(Storage storage = openStorage("/pkl/" + getName() + getDataset() + ".pkl")){
-					Estimator estimator = (Estimator)PickleUtil.unpickle(storage);
-
-					pmml = EstimatorUtil.encodePMML(estimator, featureMapper);
+					pipeline = (PMMLPipeline)PickleUtil.unpickle(storage);
 				}
+
+				PMML pmml = pipeline.encodePMML();
 
 				ensureValidity(pmml);
 

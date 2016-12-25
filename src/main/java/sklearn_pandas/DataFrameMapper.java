@@ -129,7 +129,7 @@ public class DataFrameMapper extends ClassDict {
 
 				List<Object[]> steps = transformerPipeline.getSteps();
 
-				return new ArrayList<>(Lists.transform((List)TupleUtil.extractElement(steps, 1), function));
+				return new ArrayList<>(Lists.transform((List)TupleUtil.extractElementList(steps, 1), function));
 			} // End if
 
 			if(feature[1] instanceof List){

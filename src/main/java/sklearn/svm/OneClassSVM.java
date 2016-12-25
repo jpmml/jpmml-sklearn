@@ -37,6 +37,11 @@ public class OneClassSVM extends BaseLibSVMRegressor {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return false;
+	}
+
+	@Override
 	public Schema createSchema(FeatureMapper featureMapper){
 
 		if(!featureMapper.isEmpty()){

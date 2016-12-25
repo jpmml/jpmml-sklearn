@@ -19,7 +19,9 @@
 package sklearn.pipeline;
 
 import java.util.List;
+import java.util.Set;
 
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
@@ -37,6 +39,13 @@ public class Pipeline extends Estimator {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		Estimator estimator = getEstimator();
+
+		return estimator.isSupervised();
+	}
+
+	@Override
 	public int getNumberOfFeatures(){
 		List<Selector> selectors = getSelectors();
 		Estimator estimator = getEstimator();
@@ -49,6 +58,13 @@ public class Pipeline extends Estimator {
 		}
 
 		return estimator.getNumberOfFeatures();
+	}
+
+	@Override
+	public Set<DefineFunction> encodeDefineFunctions(){
+		Estimator estimator = getEstimator();
+
+		return estimator.encodeDefineFunctions();
 	}
 
 	@Override
@@ -84,34 +100,46 @@ public class Pipeline extends Estimator {
 			schema = new Schema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), features);
 		}
 
+		List<Feature> features = schema.getFeatures();
+
+		int numberOfFeatures = estimator.getNumberOfFeatures();
+		if(features.size() != numberOfFeatures){
+			throw new IllegalArgumentException();
+		}
+
 		return estimator.encodeModel(schema);
 	}
 
 	public List<Selector> getSelectors(){
+		List<Object[]> selectorSteps = getSelectorSteps();
+
+		return TransformerUtil.asSelectorList(TupleUtil.extractElementList(selectorSteps, 1));
+	}
+
+	public List<Object[]> getSelectorSteps(){
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){
 			throw new IllegalArgumentException();
 		}
 
-		List<Object[]> selectorSteps = steps.subList(0, steps.size() - 1);
-
-		return TransformerUtil.asSelectorList(TupleUtil.extractElement(selectorSteps, 1));
+		return steps.subList(0, steps.size() - 1);
 	}
 
 	public Estimator getEstimator(){
+		Object[] estimatorStep = getEstimatorStep();
+
+		return EstimatorUtil.asEstimator(TupleUtil.extractElement(estimatorStep, 1));
+	}
+
+	protected Object[] getEstimatorStep(){
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){
 			throw new IllegalArgumentException();
 		}
 
-		Object[] estimatorStep = steps.get(steps.size() - 1);
-
-		String name = (String)estimatorStep[0];
-		Estimator estimator = EstimatorUtil.asEstimator(estimatorStep[1]);
-
-		return estimator;
+		return steps.get(steps.size() - 1);
 	}
 
 	public List<Object[]> getSteps(){

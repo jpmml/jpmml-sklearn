@@ -30,6 +30,11 @@ public class Clusterer extends Estimator {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return false;
+	}
+
+	@Override
 	public Schema createSchema(FeatureMapper featureMapper){
 
 		if(featureMapper.isEmpty()){

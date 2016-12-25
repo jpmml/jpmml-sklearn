@@ -29,7 +29,12 @@ public class TupleUtil {
 	}
 
 	static
-	public List<?> extractElement(List<Object[]> tuples, final int i){
+	public Object extractElement(Object[] tuple, int i){
+		return tuple[i];
+	}
+
+	static
+	public List<?> extractElementList(List<Object[]> tuples, final int i){
 		Function<Object[], Object> function = new Function<Object[], Object>(){
 
 			@Override

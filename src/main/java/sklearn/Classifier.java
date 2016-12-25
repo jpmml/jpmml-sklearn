@@ -39,6 +39,11 @@ public class Classifier extends Estimator {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return true;
+	}
+
+	@Override
 	public Schema createSchema(FeatureMapper featureMapper){
 		List<?> classes = getClasses();
 
