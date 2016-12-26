@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.google.common.base.Function;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -44,7 +43,9 @@ import org.jpmml.converter.WildcardFeature;
 
 public class FeatureMapper extends PMMLMapper {
 
-	private List<Row> rows = new ArrayList<>();
+	private List<String> ids = new ArrayList<>();
+
+	private List<Feature> features = new ArrayList<>();
 
 
 	public Schema createSchema(FieldName targetField, List<String> targetCategories){
@@ -107,6 +108,20 @@ public class FeatureMapper extends PMMLMapper {
 				}
 
 				feature = new ContinuousFeature(derivedField);
+			} else
+
+			if(feature instanceof WildcardFeature){
+				WildcardFeature wildcardFeature = (WildcardFeature)feature;
+
+				DataField dataField = (DataField)getField(wildcardFeature.getName());
+
+				updateType(dataField, opType, dataType);
+
+				feature = new ContinuousFeature(dataField);
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
 
 			castFeatures.add(feature);
@@ -124,9 +139,14 @@ public class FeatureMapper extends PMMLMapper {
 	}
 
 	public void updateType(TypeDefinitionField field, OpType opType, DataType dataType){
-		field
-			.setOpType(opType)
-			.setDataType(dataType);
+
+		if(opType != null){
+			field.setOpType(opType);
+		} // End if
+
+		if(dataType != null){
+			field.setDataType(dataType);
+		}
 	}
 
 	public void updateValueSpace(FieldName name, List<String> categories){
@@ -159,7 +179,7 @@ public class FeatureMapper extends PMMLMapper {
 
 			DataField dataField = createDataField(name, opType, dataType);
 
-			Feature feature = new ContinuousFeature(dataField);
+			Feature feature = new WildcardFeature(dataField);
 
 			addRow(Collections.singletonList(id), Collections.singletonList(feature));
 		}
@@ -171,26 +191,22 @@ public class FeatureMapper extends PMMLMapper {
 			throw new IllegalArgumentException();
 		}
 
-		List<Row> rows = this.rows;
-		for(Row row : rows){
-			List<Feature> features = row.getFeatures();
+		List<Feature> features = getFeatures();
+		for(ListIterator<Feature> featureIt = features.listIterator(); featureIt.hasNext(); ){
+			Feature feature = featureIt.next();
 
-			for(ListIterator<Feature> featureIt = features.listIterator(); featureIt.hasNext(); ){
-				Feature feature = featureIt.next();
+			if(feature instanceof BinaryFeature){
+				continue;
+			}
 
-				if(feature instanceof BinaryFeature){
-					continue;
-				}
+			updateType(feature.getName(), opType, dataType);
 
-				updateType(feature.getName(), opType, dataType);
+			if(feature instanceof WildcardFeature){
+				DataField dataField = (DataField)getField(feature.getName());
 
-				if(feature instanceof WildcardFeature){
-					DataField dataField = (DataField)getField(feature.getName());
+				feature = new ContinuousFeature(dataField);
 
-					feature = new ContinuousFeature(dataField);
-
-					featureIt.set(feature);
-				}
+				featureIt.set(feature);
 			}
 		}
 	}
@@ -203,74 +219,21 @@ public class FeatureMapper extends PMMLMapper {
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
 	}
 
+	public void addRow(List<String> ids, List<Feature> features){
+
+		if(ids.size() != features.size()){
+			throw new IllegalArgumentException();
+		}
+
+		this.ids.addAll(ids);
+		this.features.addAll(features);
+	}
+
 	public List<String> getIds(){
-		Function<Row, List<String>> function = new Function<Row, List<String>>(){
-
-			@Override
-			public List<String> apply(Row row){
-				return row.getIds();
-			}
-		};
-
-		return getRowData(function);
+		return this.ids;
 	}
 
 	public List<Feature> getFeatures(){
-		Function<Row, List<Feature>> function = new Function<Row, List<Feature>>(){
-
-			@Override
-			public List<Feature> apply(Row row){
-				return row.getFeatures();
-			}
-		};
-
-		return getRowData(function);
-	}
-
-	public void addRow(List<String> ids, List<Feature> features){
-		Row row = new Row(ids, features);
-
-		this.rows.add(row);
-	}
-
-	private <E> List<E> getRowData(Function<Row, List<E>> function){
-		List<E> result = new ArrayList<>();
-
-		List<Row> rows = this.rows;
-		for(Row row : rows){
-			result.addAll(function.apply(row));
-		}
-
-		return result;
-	}
-
-	static
-	private class Row {
-
-		private List<String> ids = null;
-
-		private List<Feature> features = null;
-
-
-		private Row(List<String> ids, List<Feature> features){
-			setIds(ids);
-			setFeatures(features);
-		}
-
-		public List<String> getIds(){
-			return this.ids;
-		}
-
-		private void setIds(List<String> ids){
-			this.ids = new ArrayList<>(ids);
-		}
-
-		public List<Feature> getFeatures(){
-			return this.features;
-		}
-
-		private void setFeatures(List<Feature> features){
-			this.features = new ArrayList<>(features);
-		}
+		return this.features;
 	}
 }

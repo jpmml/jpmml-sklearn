@@ -31,7 +31,8 @@ import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
-import sklearn.Selector;
+import sklearn.HasNumberOfFeatures;
+import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
 public class Pipeline extends Estimator {
@@ -49,13 +50,15 @@ public class Pipeline extends Estimator {
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<Selector> selectors = getSelectors();
+		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 
-		if(selectors.size() > 0){
+		for(Transformer transformer : transformers){
 
-			for(Selector selector : selectors){
-				return selector.getNumberOfFeatures();
+			if(transformer instanceof HasNumberOfFeatures){
+				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
+
+				return hasNumberOfFeatures.getNumberOfFeatures();
 			}
 		}
 
@@ -71,14 +74,32 @@ public class Pipeline extends Estimator {
 
 	@Override
 	public OpType getOpType(){
+		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
+
+		for(Transformer transformer : transformers){
+			OpType opType = transformer.getOpType();
+
+			if(opType != null){
+				return opType;
+			}
+		}
 
 		return estimator.getOpType();
 	}
 
 	@Override
 	public DataType getDataType(){
+		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
+
+		for(Transformer transformer : transformers){
+			DataType dataType = transformer.getDataType();
+
+			if(dataType != null){
+				return dataType;
+			}
+		}
 
 		return estimator.getDataType();
 	}
@@ -97,20 +118,29 @@ public class Pipeline extends Estimator {
 
 	@Override
 	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
-		List<Selector> selectors = getSelectors();
+		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 
-		if(selectors.size() > 0){
-			List<Feature> features = schema.getFeatures();
+		if(transformers.size() > 0){
+			List<String> ids = featureMapper.getIds();
+			List<Feature> features = featureMapper.getFeatures();
 
-			for(Selector selector : selectors){
-				int numberOfFeatures = selector.getNumberOfFeatures();
+			for(Transformer transformer : transformers){
 
-				if(features.size() != numberOfFeatures){
-					throw new IllegalArgumentException();
+				if(transformer instanceof HasNumberOfFeatures){
+					HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
+
+					int numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
+					if(ids.size() != numberOfFeatures || features.size() != numberOfFeatures){
+						throw new IllegalArgumentException();
+					}
 				}
 
-				features = selector.selectFeatures(features);
+				for(Feature feature : features){
+					featureMapper.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
+				}
+
+				features = transformer.encodeFeatures(ids, features, featureMapper);
 			}
 
 			schema = new Schema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), features);
@@ -126,13 +156,13 @@ public class Pipeline extends Estimator {
 		return estimator.encodeModel(schema, featureMapper);
 	}
 
-	public List<Selector> getSelectors(){
-		List<Object[]> selectorSteps = getSelectorSteps();
+	public List<Transformer> getTransformers(){
+		List<Object[]> transformerSteps = getTransformerSteps();
 
-		return TransformerUtil.asSelectorList(TupleUtil.extractElementList(selectorSteps, 1));
+		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(transformerSteps, 1));
 	}
 
-	public List<Object[]> getSelectorSteps(){
+	public List<Object[]> getTransformerSteps(){
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){

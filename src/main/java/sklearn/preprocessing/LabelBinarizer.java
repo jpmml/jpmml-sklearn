@@ -69,6 +69,8 @@ public class LabelBinarizer extends Transformer {
 
 		List<String> categories = new ArrayList<>();
 
+		ids.clear();
+
 		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < classes.size(); i++){
@@ -92,6 +94,8 @@ public class LabelBinarizer extends Transformer {
 
 				feature = new ContinuousFeature(derivedField);
 			}
+
+			ids.add(id + "=" + ValueUtil.formatValue(value));
 
 			features.add(feature);
 		}

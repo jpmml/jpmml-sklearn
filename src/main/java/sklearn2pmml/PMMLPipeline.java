@@ -128,10 +128,6 @@ public class PMMLPipeline extends Pipeline {
 
 		{
 			schema = featureMapper.createSchema(null, null);
-		} // End if
-
-		if(estimator.requiresContinuousInput()){
-			schema = featureMapper.cast(OpType.CONTINUOUS, estimator.getDataType(), schema);
 		}
 
 		Set<DefineFunction> defineFunctions = encodeDefineFunctions();
@@ -155,13 +151,13 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public Object[] getMapperStep(){
-		List<Object[]> selectorSteps = super.getSelectorSteps();
+		List<Object[]> transformerSteps = super.getTransformerSteps();
 
-		if(selectorSteps.size() > 0){
-			Object object = TupleUtil.extractElement(selectorSteps.get(0), 1);
+		if(transformerSteps.size() > 0){
+			Object object = TupleUtil.extractElement(transformerSteps.get(0), 1);
 
 			if(object instanceof DataFrameMapper){
-				return selectorSteps.get(0);
+				return transformerSteps.get(0);
 			}
 		}
 
@@ -169,18 +165,18 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	@Override
-	public List<Object[]> getSelectorSteps(){
-		List<Object[]> selectorSteps = super.getSelectorSteps();
+	public List<Object[]> getTransformerSteps(){
+		List<Object[]> transformerSteps = super.getTransformerSteps();
 
-		if(selectorSteps.size() > 0){
-			Object object = TupleUtil.extractElement(selectorSteps.get(0), 1);
+		if(transformerSteps.size() > 0){
+			Object object = TupleUtil.extractElement(transformerSteps.get(0), 1);
 
 			if(object instanceof DataFrameMapper){
-				selectorSteps = selectorSteps.subList(1, selectorSteps.size());
+				transformerSteps = transformerSteps.subList(1, transformerSteps.size());
 			}
 		}
 
-		return selectorSteps;
+		return transformerSteps;
 	}
 
 	public List<String> getActiveFields(){

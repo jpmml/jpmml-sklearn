@@ -62,9 +62,12 @@ public class OneHotEncoder extends Transformer {
 			throw new IllegalArgumentException();
 		}
 
+		String id = ids.get(0);
 		Feature inputFeature = inputFeatures.get(0);
 
 		List<String> categories = new ArrayList<>();
+
+		ids.clear();
 
 		List<Feature> features = new ArrayList<>();
 
@@ -88,6 +91,8 @@ public class OneHotEncoder extends Transformer {
 			}
 
 			categories.add(category);
+
+			ids.add(id + "=" + category);
 
 			features.add(new BinaryFeature(inputFeature.getName(), DataType.STRING, category));
 		}

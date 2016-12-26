@@ -46,18 +46,19 @@ public class DataFrameMapper extends ClassDict {
 		for(int row = 0; row < steps.size(); row++){
 			Object[] step = steps.get(row);
 
+			List<String> ids = new ArrayList<>();
 			List<Feature> features = new ArrayList<>();
 
 			List<String> names = getNameList(step);
 			for(String name : names){
+				ids.add(name);
+
 				DataField dataField = featureMapper.createDataField(FieldName.create(name));
 
 				Feature feature = new WildcardFeature(dataField);
 
 				features.add(feature);
 			}
-
-			List<String> ids = new ArrayList<>(names);
 
 			List<Transformer> transformers = getTransformerList(step);
 			for(int column = 0; column < transformers.size(); column++){

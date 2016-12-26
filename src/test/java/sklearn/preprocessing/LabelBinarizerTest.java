@@ -18,6 +18,7 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,10 +31,12 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.FeatureMapper;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LabelBinarizerTest {
@@ -55,16 +58,28 @@ public class LabelBinarizerTest {
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 
-		List<Feature> outputFeatures = binarizer.encodeFeatures(Collections.singletonList("apply"), Collections.singletonList(inputFeature), featureMapper);
+		List<String> ids = new ArrayList<>();
+		ids.add("apply");
+
+		List<Feature> outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), featureMapper);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof ContinuousFeature);
 		}
 
+		assertEquals(Arrays.asList("apply=low", "apply=medium", "apply=high"), ids);
+		assertEquals(Arrays.asList(), PMMLUtil.getValues(dataField));
+
 		binarizer.put("neg_label", 0d);
 
-		outputFeatures = binarizer.encodeFeatures(Collections.singletonList("normDiscrete"), Collections.singletonList(inputFeature), featureMapper);
+		ids = new ArrayList<>();
+		ids.add("normDiscrete");
+
+		outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), featureMapper);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof BinaryFeature);
 		}
+
+		assertEquals(Arrays.asList("normDiscrete=low", "normDiscrete=medium", "normDiscrete=high"), ids);
+		assertEquals(Arrays.asList("low", "medium", "high"), PMMLUtil.getValues(dataField));
 	}
 }

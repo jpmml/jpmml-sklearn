@@ -19,6 +19,7 @@
 package sklearn.feature_selection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class SelectKBest extends Selector {
 	}
 
 	@Override
-	public List<Feature> selectFeatures(List<Feature> inputFeatures){
+	public int[] selectFeatures(List<Feature> inputFeatures){
 		Object k = getK();
 		List<? extends Number> scores = getScores();
 
@@ -50,33 +51,32 @@ public class SelectKBest extends Selector {
 		} // End if
 
 		if(("all").equals(k)){
-			return inputFeatures;
+			return null;
 		}
 
-		List<FeatureScore> featureScores = new ArrayList<>();
+		List<Entry<Integer>> entries = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
-			Feature inputFeature = inputFeatures.get(i);
+		for(int i = 0; i < scores.size(); i++){
 			Number score = scores.get(i);
 
-			FeatureScore featureScore = new FeatureScore(inputFeature, score.doubleValue());
+			Entry<Integer> entry = new Entry<>(i, score.doubleValue());
 
-			featureScores.add(featureScore);
+			entries.add(entry);
 		}
 
-		Collections.sort(featureScores, Collections.reverseOrder());
+		Collections.sort(entries, Collections.reverseOrder());
 
-		List<Feature> features = new ArrayList<>();
+		int[] result = new int[ValueUtil.asInt((Number)k)];
 
-		for(int i = 0, max = ValueUtil.asInt((Number)k); i < max; i++){
-			FeatureScore featureScore = featureScores.get(i);
+		for(int i = 0; i < result.length; i++){
+			Entry<Integer> entry = entries.get(i);
 
-			Feature feature = featureScore.getFeature();
-
-			features.add(feature);
+			result[i] = entry.getId();
 		}
 
-		return features;
+		Arrays.sort(result);
+
+		return result;
 	}
 
 	public Object getK(){
@@ -88,29 +88,29 @@ public class SelectKBest extends Selector {
 	}
 
 	static
-	private class FeatureScore implements Comparable<FeatureScore> {
+	private class Entry<E> implements Comparable<Entry<E>> {
 
-		private Feature feature;
+		private E id;
 
 		private double score;
 
 
-		public FeatureScore(Feature feature, double score){
-			setFeature(feature);
+		public Entry(E id, double score){
+			setId(id);
 			setScore(score);
 		}
 
 		@Override
-		public int compareTo(FeatureScore that){
+		public int compareTo(Entry<E> that){
 			return Double.compare(this.getScore(), that.getScore());
 		}
 
-		public Feature getFeature(){
-			return this.feature;
+		public E getId(){
+			return this.id;
 		}
 
-		private void setFeature(Feature feature){
-			this.feature = feature;
+		private void setId(E id){
+			this.id = id;
 		}
 
 		public double getScore(){

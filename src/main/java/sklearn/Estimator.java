@@ -43,6 +43,8 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	public Model encodeModel(Schema schema);
 
 	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
+		schema = featureMapper.cast(requiresContinuousInput() ? OpType.CONTINUOUS : null, getDataType(), schema);
+
 		return encodeModel(schema);
 	}
 

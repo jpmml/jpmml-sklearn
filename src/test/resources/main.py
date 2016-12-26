@@ -41,6 +41,10 @@ def store_csv(df, name):
 def store_pkl(obj, name):
 	joblib.dump(obj, "pkl/" + name, compress = 9)
 
+def pipeline_transform(pipeline, X):
+	identity_pipeline = Pipeline(pipeline.steps[: -1] + [("estimator", None)])
+	return identity_pipeline._transform(X)
+
 # Pickle dump
 #def store_pkl(obj, name):
 #	con = open("pkl/" + name, "wb")
@@ -67,20 +71,22 @@ def kmeans_distance(kmeans, center, X):
 
 def build_wheat(kmeans, name, with_affinity = True):
 	mapper = DataFrameMapper([
-		(["Area", "Perimeter", "Compactness", "Kernel.Length", "Kernel.Width", "Asymmetry", "Groove.Length"], [ContinuousDomain(), FunctionTransformer(numpy.log10), MinMaxScaler()])
+		(["Area", "Perimeter", "Compactness", "Kernel.Length", "Kernel.Width", "Asymmetry", "Groove.Length"], ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
+		("transformer", FunctionTransformer(numpy.log10)),
+		("scaler", MinMaxScaler()),
 		("clusterer", kmeans)
 	])
 	pipeline.fit(wheat_X)
 	store_pkl(pipeline, name + ".pkl")
 	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["Cluster"])
 	if(with_affinity == True):
-		X = mapper.transform(wheat_X)
-		affinity_0 = kmeans_distance(kmeans, 0, X)
-		affinity_1 = kmeans_distance(kmeans, 1, X)
-		affinity_2 = kmeans_distance(kmeans, 2, X)
+		Xt = pipeline_transform(pipeline, wheat_X)
+		affinity_0 = kmeans_distance(kmeans, 0, Xt)
+		affinity_1 = kmeans_distance(kmeans, 1, Xt)
+		affinity_2 = kmeans_distance(kmeans, 2, Xt)
 		cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity_0", "affinity_1", "affinity_2"])
 		cluster = pandas.concat((cluster, cluster_affinity), axis = 1)
 	store_csv(cluster, name + ".csv")
@@ -107,13 +113,13 @@ audit_y = audit_y.astype(int)
 def build_audit(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
 		("Age", ContinuousDomain()),
-		("Employment", LabelBinarizer()),
-		("Education", LabelBinarizer()),
-		("Marital", LabelBinarizer()),
-		("Occupation", LabelBinarizer()),
+		("Employment", [LabelBinarizer(), SelectKBest(k = 3)]),
+		("Education", [LabelBinarizer(), SelectKBest(k = 3)]),
+		("Marital", [LabelBinarizer(), SelectKBest(k = 3)]),
+		("Occupation", [LabelBinarizer(), SelectKBest(k = 3)]),
 		("Income", ContinuousDomain()),
-		("Gender", [CategoricalDomain(), LabelEncoder()]),
-		("Deductions", [CategoricalDomain(), LabelEncoder()]),
+		("Gender", LabelEncoder()),
+		("Deductions", LabelEncoder()),
 		("Hours", ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
@@ -159,6 +165,7 @@ def build_versicolor(classifier, name, with_proba = True):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
+		("selector", SelectKBest(k = 3)),
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
@@ -169,7 +176,7 @@ def build_versicolor(classifier, name, with_proba = True):
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name + ".csv")
 
-build_versicolor(Pipeline([("selector", SelectKBest(k = 3)), ("estimator", DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5))]), "DecisionTreeVersicolor")
+build_versicolor(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeVersicolor")
 build_versicolor(KNeighborsClassifier(), "KNNVersicolor", with_proba = False)
 build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPVersicolor")
 build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)
@@ -190,10 +197,12 @@ iris_y = iris_df["Species"]
 
 def build_iris(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
-		(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), RobustScaler(), IncrementalPCA(n_components = 3, whiten = True)])
+		(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
+		("scaler", RobustScaler()),
+		("pca", IncrementalPCA(n_components = 3, whiten = True)),
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)
@@ -247,7 +256,7 @@ def build_auto(regressor, name):
 		(["cylinders"], CategoricalDomain()),
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), Imputer(missing_values = "NaN"), StandardScaler()]),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)]), # Pre/post 1973 oil crisis effects
-		(["origin"], [CategoricalDomain(), OneHotEncoder()])
+		(["origin"], OneHotEncoder())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -287,17 +296,21 @@ housing_y = housing_df[housing_columns[-1]]
 
 def build_housing(regressor, name, with_kneighbors = False):
 	mapper = DataFrameMapper([
-		(housing_columns[: -1], [ContinuousDomain(), StandardScaler()])
+		(housing_columns[: -1], ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
+		("selector(7)", SelectKBest(k = 7)),
+		("scaler", StandardScaler()),
+		("selector(5)", SelectKBest(k = 5)),
 		("regressor", regressor)
 	])
 	pipeline.fit(housing_X, housing_y)
 	store_pkl(pipeline, name + ".pkl")
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
 	if(with_kneighbors == True):
-		kneighbors = regressor.kneighbors(mapper.transform(housing_X))
+		Xt = pipeline_transform(pipeline, housing_X)
+		kneighbors = regressor.kneighbors(Xt)
 		medv_ids = DataFrame(kneighbors[1] + 1, columns = ["neighbor_" + str(x + 1) for x in range(regressor.n_neighbors)])
 		medv = pandas.concat((medv, medv_ids), axis = 1)
 	store_csv(medv, name + ".csv")
@@ -316,11 +329,11 @@ build_housing(NuSVR(), "NuSVRHousing")
 
 def build_iforest_housing_anomaly(iforest, name):
 	mapper = DataFrameMapper([
-		(housing_columns[: -1], [ContinuousDomain(), MaxAbsScaler()])
+		(housing_columns[: -1], ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("estimator", iforest)
+		("estimator", Pipeline([("first", iforest)]))
 	])
 	pipeline.fit(housing_X)
 	store_pkl(pipeline, name + ".pkl")
@@ -328,15 +341,15 @@ def build_iforest_housing_anomaly(iforest, name):
 	outlier = DataFrame(pipeline.predict(housing_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
 
-build_iforest_housing_anomaly(Pipeline([("estimator", IsolationForest(random_state = 13))]), "IsolationForestHousingAnomaly")
+build_iforest_housing_anomaly(IsolationForest(random_state = 13), "IsolationForestHousingAnomaly")
 
 def build_svm_housing_anomaly(svm, name):
 	mapper = DataFrameMapper([
-		(housing_columns[: -1], [ContinuousDomain(), MaxAbsScaler()])
+		(housing_columns[: -1], ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("estimator", svm)
+		("estimator", Pipeline([("first", MaxAbsScaler()), ("second", svm)]))
 	])
 	pipeline.fit(housing_X)
 	store_pkl(pipeline, name + ".pkl")
@@ -344,4 +357,4 @@ def build_svm_housing_anomaly(svm, name):
 	outlier = DataFrame(pipeline.predict(housing_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
 
-build_svm_housing_anomaly(Pipeline([("estimator", OneClassSVM(nu = 0.10, random_state = 13))]), "OneClassSVMHousingAnomaly")
+build_svm_housing_anomaly(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousingAnomaly")
