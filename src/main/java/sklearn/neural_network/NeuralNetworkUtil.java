@@ -25,7 +25,6 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Entity;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.NormDiscrete;
@@ -38,6 +37,8 @@ import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.dmg.pmml.neural_network.NeuralOutput;
 import org.dmg.pmml.neural_network.NeuralOutputs;
 import org.dmg.pmml.neural_network.Neuron;
+import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -132,10 +133,10 @@ public class NeuralNetworkUtil {
 					case REGRESSION:
 						break;
 					case CLASSIFICATION:
-						List<String> targetCategories = schema.getTargetCategories();
+						CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 						// Binary classification
-						if(targetCategories.size() == 2){
+						if(categoricalLabel.size() == 2){
 							neuralLayers.add(neuralLayer);
 
 							neuralLayer = encodeLogisticTransform(getOnlyNeuron(neuralLayer));
@@ -146,8 +147,12 @@ public class NeuralNetworkUtil {
 						} else
 
 						// Multi-class classification
-						{
+						if(categoricalLabel.size() > 2){
 							neuralLayer.setNormalizationMethod(NeuralNetwork.NormalizationMethod.SOFTMAX);
+						} else
+
+						{
+							throw new IllegalArgumentException();
 						}
 						break;
 					default:
@@ -216,7 +221,7 @@ public class NeuralNetworkUtil {
 
 	static
 	private NeuralOutputs encodeRegressionNeuralOutputs(List<? extends Entity> entities, Schema schema){
-		FieldName targetField = schema.getTargetField();
+		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
 		if(entities.size() != 1){
 			throw new IllegalArgumentException();
@@ -225,7 +230,7 @@ public class NeuralNetworkUtil {
 		Entity entity = Iterables.getOnlyElement(entities);
 
 		DerivedField derivedField = new DerivedField(OpType.CONTINUOUS, DataType.DOUBLE)
-			.setExpression(new FieldRef(targetField));
+			.setExpression(new FieldRef(continuousLabel.getName()));
 
 		NeuralOutput neuralOutput = new NeuralOutput()
 			.setOutputNeuron(entity.getId())
@@ -239,22 +244,19 @@ public class NeuralNetworkUtil {
 
 	static
 	private NeuralOutputs encodeClassificationNeuralOutputs(List<? extends Entity> entities, Schema schema){
-		FieldName targetField = schema.getTargetField();
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		List<String> targetCategories = schema.getTargetCategories();
-		if(entities.size() != targetCategories.size()){
+		if(categoricalLabel.size() != entities.size()){
 			throw new IllegalArgumentException();
 		}
 
 		NeuralOutputs neuralOutputs = new NeuralOutputs();
 
-		for(int i = 0; i < targetCategories.size(); i++){
-			String targetCategory = targetCategories.get(i);
-
+		for(int i = 0; i < categoricalLabel.size(); i++){
 			Entity entity = entities.get(i);
 
 			DerivedField derivedField = new DerivedField(OpType.CATEGORICAL, DataType.STRING)
-				.setExpression(new NormDiscrete(targetField, targetCategory));
+				.setExpression(new NormDiscrete(categoricalLabel.getName(), categoricalLabel.getValue(i)));
 
 			NeuralOutput neuralOutput = new NeuralOutput()
 				.setOutputNeuron(entity.getId())

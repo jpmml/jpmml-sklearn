@@ -27,12 +27,12 @@ import com.google.common.collect.Range;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ListFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.TypeUtil;
 
@@ -55,7 +55,7 @@ public class OneHotEncoder extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<? extends Number> values = getValues();
 
 		if(ids.size() != 1 || inputFeatures.size() != 1){
@@ -76,13 +76,15 @@ public class OneHotEncoder extends Transformer {
 
 			String category;
 
-			if(inputFeature instanceof ListFeature){
-				ListFeature listFeature = (ListFeature)inputFeature;
+			if(inputFeature instanceof CategoricalFeature){
+				CategoricalFeature categoricalFeature = (CategoricalFeature)inputFeature;
 
-				category = listFeature.getValue(value);
+				category = categoricalFeature.getValue(value);
 			} else
 
 			if(inputFeature instanceof WildcardFeature){
+				WildcardFeature wildcardFeature = (WildcardFeature)inputFeature;
+
 				category = ValueUtil.formatValue((Integer)value);
 			} else
 
@@ -94,10 +96,10 @@ public class OneHotEncoder extends Transformer {
 
 			ids.add(id + "=" + category);
 
-			features.add(new BinaryFeature(inputFeature.getName(), DataType.STRING, category));
+			features.add(new BinaryFeature(encoder, inputFeature.getName(), DataType.STRING, category));
 		}
 
-		featureMapper.updateValueSpace(inputFeature.getName(), categories);
+		encoder.updateValueSpace(inputFeature.getName(), categories);
 
 		return features;
 	}

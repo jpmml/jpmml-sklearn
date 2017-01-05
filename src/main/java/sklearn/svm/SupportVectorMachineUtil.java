@@ -94,14 +94,10 @@ public class SupportVectorMachineUtil {
 				vectorFields.addContent(categoricalPredictor);
 			} else
 
-			if(feature instanceof ContinuousFeature){
-				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
+			{
+				ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 				vectorFields.addContent(continuousFeature.ref());
-			} else
-
-			{
-				throw new IllegalArgumentException();
 			}
 		}
 

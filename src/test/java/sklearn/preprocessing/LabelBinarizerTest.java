@@ -33,7 +33,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -43,11 +43,11 @@ public class LabelBinarizerTest {
 
 	@Test
 	public void encode(){
-		FeatureMapper featureMapper = new FeatureMapper();
+		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = featureMapper.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.STRING);
+		DataField dataField = encoder.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.STRING);
 
-		Feature inputFeature = new WildcardFeature(dataField);
+		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
 		NDArray array = new NDArray();
 		array.put("data", Arrays.asList("low", "medium", "high"));
@@ -61,7 +61,7 @@ public class LabelBinarizerTest {
 		List<String> ids = new ArrayList<>();
 		ids.add("apply");
 
-		List<Feature> outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), featureMapper);
+		List<Feature> outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof ContinuousFeature);
 		}
@@ -74,7 +74,7 @@ public class LabelBinarizerTest {
 		ids = new ArrayList<>();
 		ids.add("normDiscrete");
 
-		outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), featureMapper);
+		outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof BinaryFeature);
 		}

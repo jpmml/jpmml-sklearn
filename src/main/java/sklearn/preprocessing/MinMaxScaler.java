@@ -29,7 +29,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class MinMaxScaler extends Transformer {
@@ -39,7 +39,7 @@ public class MinMaxScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<? extends Number> min = getMin();
 		List<? extends Number> scale = getScale();
 
@@ -57,7 +57,7 @@ public class MinMaxScaler extends Transformer {
 			Number scaleValue = scale.get(i);
 
 			// "($name * scale) + min"
-			Expression expression = inputFeature.ref();
+			Expression expression = (inputFeature.toContinuousFeature()).ref();
 
 			if(!ValueUtil.isOne(scaleValue)){
 				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scaleValue));
@@ -73,9 +73,9 @@ public class MinMaxScaler extends Transformer {
 				continue;
 			}
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
+			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-			features.add(new ContinuousFeature(derivedField));
+			features.add(new ContinuousFeature(encoder, derivedField));
 		}
 
 		return features;

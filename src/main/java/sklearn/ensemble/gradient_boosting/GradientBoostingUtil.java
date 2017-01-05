@@ -41,7 +41,7 @@ public class GradientBoostingUtil {
 		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunction.REGRESSION, schema);
 
 		Targets targets = new Targets()
-			.addTargets(ModelUtil.createRescaleTarget(schema.getTargetField(), learningRate.doubleValue(), initialPrediction.doubleValue()));
+			.addTargets(ModelUtil.createRescaleTarget(schema, learningRate.doubleValue(), initialPrediction.doubleValue()));
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))

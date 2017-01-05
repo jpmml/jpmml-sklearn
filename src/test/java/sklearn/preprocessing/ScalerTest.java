@@ -27,7 +27,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 import static org.junit.Assert.assertEquals;
@@ -38,27 +38,27 @@ abstract
 class ScalerTest {
 
 	void assertSameFeature(Transformer transformer){
-		FeatureMapper featureMapper = new FeatureMapper();
+		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = featureMapper.createDataField(FieldName.create("x"));
+		DataField dataField = encoder.createDataField(FieldName.create("x"));
 
-		Feature inputFeature = new WildcardFeature(dataField);
-		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), featureMapper));
+		Feature inputFeature = new WildcardFeature(encoder, dataField);
+		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), encoder));
 
 		assertSame(inputFeature, outputFeature);
 	}
 
 	void assertTransformedFeature(Transformer transformer, String function){
-		FeatureMapper featureMapper = new FeatureMapper();
+		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = featureMapper.createDataField(FieldName.create("x"));
+		DataField dataField = encoder.createDataField(FieldName.create("x"));
 
-		Feature inputFeature = new WildcardFeature(dataField);
-		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), featureMapper));
+		Feature inputFeature = new WildcardFeature(encoder, dataField);
+		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList("x"), Collections.singletonList(inputFeature), encoder));
 
 		assertNotSame(inputFeature, outputFeature);
 
-		DerivedField derivedField = (DerivedField)featureMapper.getField(outputFeature.getName());
+		DerivedField derivedField = (DerivedField)encoder.getField(outputFeature.getName());
 
 		Apply apply = (Apply)derivedField.getExpression();
 

@@ -30,8 +30,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
 import org.jpmml.sklearn.MatrixUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class PCA extends Transformer {
@@ -41,7 +41,7 @@ public class PCA extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		int[] shape = getComponentsShape();
 
 		int numberOfComponents = shape[0];
@@ -73,7 +73,7 @@ public class PCA extends Transformer {
 				Feature inputFeature = inputFeatures.get(j);
 
 				// "($name[i] - mean[i]) * component[i]"
-				Expression expression = inputFeature.ref();
+				Expression expression = (inputFeature.toContinuousFeature()).ref();
 
 				Number meanValue = mean.get(j);
 				if(!ValueUtil.isZero(meanValue)){
@@ -96,11 +96,11 @@ public class PCA extends Transformer {
 				}
 			}
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
+			DerivedField derivedField = encoder.createDerivedField(createName(id, i), apply);
 
 			ids.add((derivedField.getName()).getValue());
 
-			features.add(new ContinuousFeature(derivedField));
+			features.add(new ContinuousFeature(encoder, derivedField));
 		}
 
 		return features;

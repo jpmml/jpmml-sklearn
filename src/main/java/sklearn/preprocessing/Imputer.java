@@ -31,7 +31,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class Imputer extends Transformer {
@@ -41,7 +41,7 @@ public class Imputer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<? extends Number> statistics = getStatistics();
 
 		if(ids.size() != inputFeatures.size() || statistics.size() != inputFeatures.size()){
@@ -71,7 +71,7 @@ public class Imputer extends Transformer {
 					decorator.addMissingValues(ValueUtil.formatValue(targetValue));
 				}
 
-				featureMapper.addDecorator(inputFeature.getName(), decorator);
+				encoder.addDecorator(inputFeature.getName(), decorator);
 
 				features.add(inputFeature);
 			} else
@@ -90,9 +90,9 @@ public class Imputer extends Transformer {
 				// "($name == null) ? statistics : $name"
 				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), inputFeature.ref());
 
-				DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
+				DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-				features.add(new ContinuousFeature(derivedField));
+				features.add(new ContinuousFeature(encoder, derivedField));
 			}
 		}
 

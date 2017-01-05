@@ -27,7 +27,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
 public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
@@ -42,8 +42,8 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	abstract
 	public Model encodeModel(Schema schema);
 
-	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
-		schema = featureMapper.cast(requiresContinuousInput() ? OpType.CONTINUOUS : null, getDataType(), schema);
+	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
+		schema = encoder.cast(requiresContinuousInput() ? OpType.CONTINUOUS : null, getDataType(), schema);
 
 		return encodeModel(schema);
 	}

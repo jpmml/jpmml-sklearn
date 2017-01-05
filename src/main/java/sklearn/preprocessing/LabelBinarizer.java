@@ -31,7 +31,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.TypeUtil;
 
@@ -54,7 +54,7 @@ public class LabelBinarizer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
 		Number posLabel = getPosLabel();
@@ -83,16 +83,16 @@ public class LabelBinarizer extends Transformer {
 
 				categories.add(category);
 
-				feature = new BinaryFeature(inputFeature.getName(), DataType.STRING, category);
+				feature = new BinaryFeature(encoder, inputFeature.getName(), DataType.STRING, category);
 			} else
 
 			{
 				// "($name == value) ? pos_label : neg_label"
 				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", inputFeature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
-				DerivedField derivedField = featureMapper.createDerivedField(createName(id, i), apply);
+				DerivedField derivedField = encoder.createDerivedField(createName(id, i), apply);
 
-				feature = new ContinuousFeature(derivedField);
+				feature = new ContinuousFeature(encoder, derivedField);
 			}
 
 			ids.add(id + "=" + ValueUtil.formatValue(value));
@@ -100,7 +100,7 @@ public class LabelBinarizer extends Transformer {
 			features.add(feature);
 		}
 
-		featureMapper.updateValueSpace(inputFeature.getName(), categories);
+		encoder.updateValueSpace(inputFeature.getName(), categories);
 
 		return features;
 	}

@@ -29,7 +29,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class StandardScaler extends Transformer {
@@ -39,7 +39,7 @@ public class StandardScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		Boolean withMean = getWithMean();
 		Boolean withStd = getWithStd();
 
@@ -69,7 +69,7 @@ public class StandardScaler extends Transformer {
 			Feature inputFeature = inputFeatures.get(i);
 
 			// "($name - mean) / std"
-			Expression expression = inputFeature.ref();
+			Expression expression = (inputFeature.toContinuousFeature()).ref();
 
 			if(withMean){
 				Number meanValue = mean.get(i);
@@ -93,9 +93,9 @@ public class StandardScaler extends Transformer {
 				continue;
 			}
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
+			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-			features.add(new ContinuousFeature(derivedField));
+			features.add(new ContinuousFeature(encoder, derivedField));
 		}
 
 		return features;

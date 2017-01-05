@@ -26,7 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
 public class Transformer extends ClassDict {
@@ -36,7 +36,7 @@ public class Transformer extends ClassDict {
 	}
 
 	abstract
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, FeatureMapper featureMapper);
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder);
 
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;

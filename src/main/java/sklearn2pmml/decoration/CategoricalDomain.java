@@ -18,24 +18,22 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
-import org.dmg.pmml.MiningField;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Value;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldDecorator;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.TypeUtil;
 
 public class CategoricalDomain extends Domain {
@@ -57,7 +55,7 @@ public class CategoricalDomain extends Domain {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<?> data = getData();
 
 		if(ids.size() != 1 || inputFeatures.size() != 1){
@@ -77,7 +75,6 @@ public class CategoricalDomain extends Domain {
 			}
 		};
 
-		final
 		List<String> categories = Lists.transform(data, function);
 
 		FieldDecorator decorator = new ValidValueDecorator(){
@@ -85,22 +82,13 @@ public class CategoricalDomain extends Domain {
 			{
 				setInvalidValueTreatment(invalidValueTreatment);
 			}
-
-			@Override
-			public void decorate(DataField dataField, MiningField miningField){
-				List<Value> values = dataField.getValues();
-
-				if(categories.size() > 0){
-					values.addAll(PMMLUtil.createValues(categories));
-				}
-
-				super.decorate(dataField, miningField);
-			}
 		};
 
-		featureMapper.addDecorator(inputFeature.getName(), decorator);
+		CategoricalFeature feature = inputFeature.toCategoricalFeature(categories);
 
-		return inputFeatures;
+		encoder.addDecorator(feature.getName(), decorator);
+
+		return Collections.<Feature>singletonList(feature);
 	}
 
 	public List<?> getData(){

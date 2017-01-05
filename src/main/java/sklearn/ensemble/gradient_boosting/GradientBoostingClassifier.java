@@ -33,6 +33,7 @@ import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
@@ -75,33 +76,33 @@ public class GradientBoostingClassifier extends Classifier {
 
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		List<String> targetCategories = schema.getTargetCategories();
-
 		Schema segmentSchema = schema.toAnonymousSchema();
+
+		CategoricalLabel categoricalLabel = (CategoricalLabel)segmentSchema.getLabel();
 
 		if(numberOfClasses == 1){
 
-			if(targetCategories.size() != 2){
+			if(categoricalLabel.size() != 2){
 				throw new IllegalArgumentException();
 			}
 
 			double coefficient = loss.getCoefficient();
 
-			MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(1), estimators, init.getPriorProbability(0), learningRate, null, segmentSchema);
+			MiningModel miningModel = encodeCategoryRegressor(categoricalLabel.getValue(1), estimators, init.getPriorProbability(0), learningRate, null, segmentSchema);
 
 			return MiningModelUtil.createBinaryLogisticClassification(schema, miningModel, coefficient, true);
 		} else
 
 		if(numberOfClasses >= 2){
 
-			if(targetCategories.size() != numberOfClasses){
+			if(categoricalLabel.size() != numberOfClasses){
 				throw new IllegalArgumentException();
 			}
 
 			List<MiningModel> miningModels = new ArrayList<>();
 
-			for(int i = 0; i < targetCategories.size(); i++){
-				MiningModel miningModel = encodeCategoryRegressor(targetCategories.get(i), MatrixUtil.getColumn(estimators, estimators.size() / numberOfClasses, numberOfClasses, i), init.getPriorProbability(i), learningRate, loss.getFunction(), segmentSchema);
+			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
+				MiningModel miningModel = encodeCategoryRegressor(categoricalLabel.getValue(i), MatrixUtil.getColumn(estimators, rows, columns, i), init.getPriorProbability(i), learningRate, loss.getFunction(), segmentSchema);
 
 				miningModels.add(miningModel);
 			}

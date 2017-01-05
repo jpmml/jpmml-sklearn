@@ -32,12 +32,12 @@ import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Row;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ListFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.TypeUtil;
 
@@ -60,7 +60,7 @@ public class LabelEncoder extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
 		if(ids.size() != 1 || inputFeatures.size() != 1){
@@ -90,16 +90,16 @@ public class LabelEncoder extends Transformer {
 			inlineTable.addRows(row);
 		}
 
-		featureMapper.updateValueSpace(inputFeature.getName(), categories);
+		encoder.updateValueSpace(inputFeature.getName(), categories);
 
 		MapValues mapValues = new MapValues()
 			.addFieldColumnPairs(new FieldColumnPair(inputFeature.getName(), columns.get(0)))
 			.setOutputColumn(columns.get(1))
 			.setInlineTable(inlineTable);
 
-		DerivedField derivedField = featureMapper.createDerivedField(createName(id), OpType.CATEGORICAL, DataType.INTEGER, mapValues);
+		DerivedField derivedField = encoder.createDerivedField(createName(id), OpType.CATEGORICAL, DataType.INTEGER, mapValues);
 
-		return Collections.<Feature>singletonList(new ListFeature(derivedField, categories));
+		return Collections.<Feature>singletonList(new CategoricalFeature(encoder, derivedField, categories));
 	}
 
 	public List<?> getClasses(){

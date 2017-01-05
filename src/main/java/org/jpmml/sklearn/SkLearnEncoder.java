@@ -28,45 +28,28 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.TypeDefinitionField;
-import org.dmg.pmml.Value;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ListFeature;
-import org.jpmml.converter.PMMLMapper;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.WildcardFeature;
 
-public class FeatureMapper extends PMMLMapper {
+public class SkLearnEncoder extends ModelEncoder {
 
 	private List<String> ids = new ArrayList<>();
 
 	private List<Feature> features = new ArrayList<>();
 
 
-	public Schema createSchema(FieldName targetField, List<String> targetCategories){
-		List<FieldName> activeFields = new ArrayList<>(getDataFields().keySet());
-
-		if(targetField != null){
-			activeFields.remove(targetField);
-		}
-
-		Schema schema = new Schema(targetField, targetCategories, activeFields, getFeatures());
-
-		return schema;
-	}
-
 	public Schema cast(OpType opType, DataType dataType, Schema schema){
 
 		if(opType != null && !(OpType.CONTINUOUS).equals(opType)){
 			throw new IllegalArgumentException();
 		}
-
-		String function = (dataType.name()).toLowerCase();
 
 		List<Feature> castFeatures = new ArrayList<>();
 
@@ -81,53 +64,19 @@ public class FeatureMapper extends PMMLMapper {
 					break cast;
 				}
 
-				FieldName name = FieldName.create(function + "(" + (binaryFeature.getName()).getValue() + "=" + binaryFeature.getValue() + ")");
-
-				DerivedField derivedField = getDerivedField(name);
-				if(derivedField == null){
-					NormDiscrete normDiscrete = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
-
-					derivedField = createDerivedField(name, OpType.CONTINUOUS, dataType, normDiscrete);
-				}
-
-				feature = new ContinuousFeature(derivedField);
-			} else
-
-			if(feature instanceof ContinuousFeature){
-				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
-
-				if((continuousFeature instanceof ListFeature) || (continuousFeature.getDataType()).equals(dataType)){
-					break cast;
-				}
-
-				FieldName name = FieldName.create(function + "(" + (continuousFeature.getName()).getValue() + ")");
-
-				DerivedField derivedField = getDerivedField(name);
-				if(derivedField == null){
-					derivedField = createDerivedField(name, OpType.CONTINUOUS, dataType, continuousFeature.ref());
-				}
-
-				feature = new ContinuousFeature(derivedField);
-			} else
-
-			if(feature instanceof WildcardFeature){
-				WildcardFeature wildcardFeature = (WildcardFeature)feature;
-
-				DataField dataField = (DataField)getField(wildcardFeature.getName());
-
-				updateType(dataField, opType, dataType);
-
-				feature = new ContinuousFeature(dataField);
+				feature = binaryFeature.toContinuousFeature(dataType);
 			} else
 
 			{
-				throw new IllegalArgumentException();
+				ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+				feature = continuousFeature.toContinuousFeature(dataType);
 			}
 
 			castFeatures.add(feature);
 		}
 
-		Schema castSchema = new Schema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), castFeatures);
+		Schema castSchema = new Schema(schema.getLabel(), castFeatures);
 
 		return castSchema;
 	}
@@ -150,22 +99,23 @@ public class FeatureMapper extends PMMLMapper {
 	}
 
 	public void updateValueSpace(FieldName name, List<String> categories){
-		TypeDefinitionField field = getField(name);
+		DataField dataField = getDataField(name);
 
-		updateValueSpace(field, categories);
-	}
-
-	public void updateValueSpace(TypeDefinitionField field, List<String> categories){
-		DataField dataField = (DataField)field;
-
-		List<Value> values = dataField.getValues();
-		if(values.size() > 0){
+		if(dataField == null){
 			throw new IllegalArgumentException();
-		} // End if
-
-		if(categories != null && categories.size() > 0){
-			values.addAll(PMMLUtil.createValues(categories));
 		}
+
+		List<String> existingCategories = PMMLUtil.getValues(dataField);
+		if(existingCategories != null && existingCategories.size() > 0){
+
+			if((existingCategories).equals(categories)){
+				return;
+			}
+
+			throw new IllegalArgumentException();
+		}
+
+		PMMLUtil.addValues(dataField, categories);
 	}
 
 	public void initFeatures(List<FieldName> names, OpType opType, DataType dataType){
@@ -179,7 +129,7 @@ public class FeatureMapper extends PMMLMapper {
 
 			DataField dataField = createDataField(name, opType, dataType);
 
-			Feature feature = new WildcardFeature(dataField);
+			Feature feature = new WildcardFeature(this, dataField);
 
 			addRow(Collections.singletonList(id), Collections.singletonList(feature));
 		}
@@ -196,15 +146,17 @@ public class FeatureMapper extends PMMLMapper {
 			Feature feature = featureIt.next();
 
 			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
 				continue;
 			}
 
 			updateType(feature.getName(), opType, dataType);
 
 			if(feature instanceof WildcardFeature){
-				DataField dataField = (DataField)getField(feature.getName());
+				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				feature = new ContinuousFeature(dataField);
+				feature = wildcardFeature.toContinuousFeature();
 
 				featureIt.set(feature);
 			}

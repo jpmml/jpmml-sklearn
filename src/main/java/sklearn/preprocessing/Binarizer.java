@@ -26,7 +26,7 @@ import org.dmg.pmml.DerivedField;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class Binarizer extends Transformer {
@@ -36,7 +36,7 @@ public class Binarizer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		Number threshold = getThreshold();
 
 		if(ids.size() != 1 || inputFeatures.size() != 1){
@@ -47,11 +47,11 @@ public class Binarizer extends Transformer {
 		Feature inputFeature = inputFeatures.get(0);
 
 		// "($name <= threshold) ? 0 : 1"
-		Apply apply = PMMLUtil.createApply("threshold", inputFeature.ref(), PMMLUtil.createConstant(threshold));
+		Apply apply = PMMLUtil.createApply("threshold", (inputFeature.toContinuousFeature()).ref(), PMMLUtil.createConstant(threshold));
 
-		DerivedField derivedField = featureMapper.createDerivedField(createName(id), apply);
+		DerivedField derivedField = encoder.createDerivedField(createName(id), apply);
 
-		return Collections.<Feature>singletonList(new ContinuousFeature(derivedField));
+		return Collections.<Feature>singletonList(new ContinuousFeature(encoder, derivedField));
 	}
 
 	public Number getThreshold(){

@@ -30,7 +30,7 @@ import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Transformer;
 
@@ -40,7 +40,7 @@ public class DataFrameMapper extends ClassDict {
 		super(module, name);
 	}
 
-	public void encodeFeatures(FeatureMapper featureMapper){
+	public void encodeFeatures(SkLearnEncoder encoder){
 		List<Object[]> steps = getFeatures();
 
 		for(int row = 0; row < steps.size(); row++){
@@ -53,9 +53,9 @@ public class DataFrameMapper extends ClassDict {
 			for(String name : names){
 				ids.add(name);
 
-				DataField dataField = featureMapper.createDataField(FieldName.create(name));
+				DataField dataField = encoder.createDataField(FieldName.create(name));
 
-				Feature feature = new WildcardFeature(dataField);
+				Feature feature = new WildcardFeature(encoder, dataField);
 
 				features.add(feature);
 			}
@@ -65,13 +65,13 @@ public class DataFrameMapper extends ClassDict {
 				Transformer transformer = transformers.get(column);
 
 				for(Feature feature : features){
-					featureMapper.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
+					encoder.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
 				}
 
-				features = transformer.encodeFeatures(ids, features, featureMapper);
+				features = transformer.encodeFeatures(ids, features, encoder);
 			}
 
-			featureMapper.addRow(ids, features);
+			encoder.addRow(ids, features);
 		}
 	}
 

@@ -20,7 +20,6 @@ package sklearn.naive_bayes;
 
 import java.util.List;
 
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.GaussianDistribution;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.naive_bayes.BayesInput;
@@ -31,6 +30,7 @@ import org.dmg.pmml.naive_bayes.TargetValueCount;
 import org.dmg.pmml.naive_bayes.TargetValueCounts;
 import org.dmg.pmml.naive_bayes.TargetValueStat;
 import org.dmg.pmml.naive_bayes.TargetValueStats;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -59,10 +59,10 @@ public class GaussianNB extends Classifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<String> targetCategories = schema.getTargetCategories();
-
 		List<? extends Number> theta = getTheta();
 		List<? extends Number> sigma = getSigma();
+
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		BayesInputs bayesInputs = new BayesInputs();
 
@@ -73,20 +73,15 @@ public class GaussianNB extends Classifier {
 			List<? extends Number> variances = MatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
 
 			BayesInput bayesInput = new BayesInput(feature.getName())
-				.setTargetValueStats(encodeTargetValueStats(targetCategories, means, variances));
+				.setTargetValueStats(encodeTargetValueStats(categoricalLabel.getValues(), means, variances));
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}
 
-		FieldName targetField = schema.getTargetField();
-		if(targetField == null){
-			throw new IllegalArgumentException();
-		}
-
 		List<Integer> classCount = getClassCount();
 
-		BayesOutput bayesOutput = new BayesOutput(targetField, null)
-			.setTargetValueCounts(encodeTargetValueCounts(targetCategories, classCount));
+		BayesOutput bayesOutput = new BayesOutput(categoricalLabel.getName(), null)
+			.setTargetValueCounts(encodeTargetValueCounts(categoricalLabel.getValues(), classCount));
 
 		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), bayesInputs, bayesOutput)
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
@@ -111,18 +106,18 @@ public class GaussianNB extends Classifier {
 	}
 
 	static
-	private TargetValueStats encodeTargetValueStats(List<String> targetCategories, List<? extends Number> means, List<? extends Number> variances){
+	private TargetValueStats encodeTargetValueStats(List<String> values, List<? extends Number> means, List<? extends Number> variances){
 
-		if((targetCategories.size() != means.size()) || (targetCategories.size() != variances.size())){
+		if((values.size() != means.size()) || (values.size() != variances.size())){
 			throw new IllegalArgumentException();
 		}
 
 		TargetValueStats targetValueStats = new TargetValueStats();
 
-		for(int i = 0; i < targetCategories.size(); i++){
+		for(int i = 0; i < values.size(); i++){
 			GaussianDistribution gaussianDistribution = new GaussianDistribution(ValueUtil.asDouble(means.get(i)), ValueUtil.asDouble(variances.get(i)));
 
-			TargetValueStat targetValueStat = new TargetValueStat(targetCategories.get(i))
+			TargetValueStat targetValueStat = new TargetValueStat(values.get(i))
 				.setContinuousDistribution(gaussianDistribution);
 
 			targetValueStats.addTargetValueStats(targetValueStat);
@@ -132,16 +127,16 @@ public class GaussianNB extends Classifier {
 	}
 
 	static
-	public TargetValueCounts encodeTargetValueCounts(List<String> targetCategories, List<Integer> counts){
+	public TargetValueCounts encodeTargetValueCounts(List<String> values, List<Integer> counts){
 
-		if(targetCategories.size() != counts.size()){
+		if(values.size() != counts.size()){
 			throw new IllegalArgumentException();
 		}
 
 		TargetValueCounts targetValueCounts = new TargetValueCounts();
 
-		for(int i = 0; i < targetCategories.size(); i++){
-			TargetValueCount targetValueCount = new TargetValueCount(targetCategories.get(i), counts.get(i));
+		for(int i = 0; i < values.size(); i++){
+			TargetValueCount targetValueCount = new TargetValueCount(values.get(i), counts.get(i));
 
 			targetValueCounts.addTargetValueCounts(targetValueCount);
 		}

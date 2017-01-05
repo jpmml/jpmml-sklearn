@@ -32,12 +32,13 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.Value;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Classifier;
 import sklearn.Estimator;
@@ -61,9 +62,9 @@ public class PMMLPipeline extends Pipeline {
 			estimator = pipeline.getEstimator();
 		}
 
-		FeatureMapper featureMapper = new FeatureMapper();
+		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = null;
+		Label label = null;
 
 		if(estimator.isSupervised()){
 			String targetField = getTargetField();
@@ -91,19 +92,21 @@ public class PMMLPipeline extends Pipeline {
 				targetCategories = formatTargetCategories(classes);
 			}
 
-			dataField = featureMapper.createDataField(PMMLPipeline.nameFunction.apply(targetField), opType, dataType);
+			DataField dataField = encoder.createDataField(PMMLPipeline.nameFunction.apply(targetField), opType, dataType, targetCategories);
 
 			if(targetCategories != null && targetCategories.size() > 0){
-				List<Value> values = dataField.getValues();
+				label = new CategoricalLabel(dataField);
+			} else
 
-				values.addAll(PMMLUtil.createValues(targetCategories));
+			{
+				label = new ContinuousLabel(dataField);
 			}
 		} // End if
 
 		if(dataFrameMapper != null){
-			dataFrameMapper.encodeFeatures(featureMapper);
+			dataFrameMapper.encodeFeatures(encoder);
 
-			featureMapper.updateFeatures(getOpType(), getDataType());
+			encoder.updateFeatures(getOpType(), getDataType());
 		} else
 
 		{
@@ -117,27 +120,19 @@ public class PMMLPipeline extends Pipeline {
 				}
 			}
 
-			featureMapper.initFeatures(Lists.transform(activeFields, PMMLPipeline.nameFunction), getOpType(), getDataType());
-		}
-
-		Schema schema;
-
-		if(estimator.isSupervised()){
-			schema = featureMapper.createSchema(dataField.getName(), PMMLUtil.getValues(dataField));
-		} else
-
-		{
-			schema = featureMapper.createSchema(null, null);
+			encoder.initFeatures(Lists.transform(activeFields, PMMLPipeline.nameFunction), getOpType(), getDataType());
 		}
 
 		Set<DefineFunction> defineFunctions = encodeDefineFunctions();
 		for(DefineFunction defineFunction : defineFunctions){
-			featureMapper.addDefineFunction(defineFunction);
+			encoder.addDefineFunction(defineFunction);
 		}
 
-		Model model = encodeModel(schema, featureMapper);
+		Schema schema = new Schema(label, encoder.getFeatures());
 
-		return featureMapper.encodePMML(model);
+		Model model = encodeModel(schema, encoder);
+
+		return encoder.encodePMML(model);
 	}
 
 	public DataFrameMapper getMapper(){

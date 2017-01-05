@@ -30,7 +30,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class FunctionTransformer extends Transformer {
@@ -40,7 +40,7 @@ public class FunctionTransformer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		Object func = getFunc();
 
 		if(ids.size() != inputFeatures.size()){
@@ -61,11 +61,11 @@ public class FunctionTransformer extends Transformer {
 			String id = ids.get(i);
 			Feature inputFeature = inputFeatures.get(i);
 
-			Expression expression = encodeUFunc(ufunc, inputFeature.ref());
+			Expression expression = encodeUFunc(ufunc, (inputFeature.toContinuousFeature()).ref());
 
-			DerivedField derivedField = featureMapper.createDerivedField(FieldName.create(ufunc.getName() + "(" + id + ")"), expression);
+			DerivedField derivedField = encoder.createDerivedField(FieldName.create(ufunc.getName() + "(" + id + ")"), expression);
 
-			features.add(new ContinuousFeature(derivedField));
+			features.add(new ContinuousFeature(encoder, derivedField));
 		}
 
 		return features;

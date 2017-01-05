@@ -29,7 +29,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class RobustScaler extends Transformer {
@@ -39,7 +39,7 @@ public class RobustScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		Boolean withCentering = getWithCentering();
 		Boolean withScaling = getWithScaling();
 
@@ -69,7 +69,7 @@ public class RobustScaler extends Transformer {
 			Feature inputFeature = inputFeatures.get(i);
 
 			// "($name - center) / scale"
-			Expression expression = inputFeature.ref();
+			Expression expression = (inputFeature.toContinuousFeature()).ref();
 
 			if(withCentering){
 				Number centerValue = center.get(i);
@@ -93,9 +93,9 @@ public class RobustScaler extends Transformer {
 				continue;
 			}
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id), expression);
+			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-			features.add(new ContinuousFeature(derivedField));
+			features.add(new ContinuousFeature(encoder, derivedField));
 		}
 
 		return features;

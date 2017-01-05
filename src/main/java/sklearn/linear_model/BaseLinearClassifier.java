@@ -33,6 +33,7 @@ import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -72,31 +73,31 @@ public class BaseLinearClassifier extends Classifier {
 		List<? extends Number> coefficients = getCoef();
 		List<? extends Number> intercepts = getIntercept();
 
-		List<String> targetCategories = schema.getTargetCategories();
-
 		Schema segmentSchema = schema.toAnonymousSchema();
+
+		CategoricalLabel categoricalLabel = (CategoricalLabel)segmentSchema.getLabel();
 
 		if(numberOfClasses == 1){
 
-			if(targetCategories.size() != 2){
+			if(categoricalLabel.size() != 2){
 				throw new IllegalArgumentException();
 			}
 
-			RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(1), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
+			RegressionModel regressionModel = encodeCategoryRegressor(categoricalLabel.getValue(1), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
 
 			return MiningModelUtil.createBinaryLogisticClassification(schema, regressionModel, -1d, hasProbabilityDistribution);
 		} else
 
 		if(numberOfClasses >= 2){
 
-			if(targetCategories.size() != numberOfClasses){
+			if(categoricalLabel.size() != numberOfClasses){
 				throw new IllegalArgumentException();
 			}
 
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
-			for(int i = 0; i < targetCategories.size(); i++){
-				RegressionModel regressionModel = encodeCategoryRegressor(targetCategories.get(i), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), "logit", segmentSchema);
+			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
+				RegressionModel regressionModel = encodeCategoryRegressor(categoricalLabel.getValue(i), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), "logit", segmentSchema);
 
 				regressionModels.add(regressionModel);
 			}

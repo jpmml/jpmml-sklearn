@@ -31,6 +31,7 @@ import org.dmg.pmml.True;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
@@ -108,8 +109,8 @@ public class TreeModelUtil {
 					.setValue(binaryFeature.getValue());
 			} else
 
-			if(feature instanceof ContinuousFeature){
-				ContinuousFeature continuousFeature = (ContinuousFeature)feature;
+			{
+				ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 				String value = ValueUtil.formatValue(threshold);
 
@@ -118,10 +119,6 @@ public class TreeModelUtil {
 
 				rightPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.GREATER_THAN)
 					.setValue(value);
-			} else
-
-			{
-				throw new IllegalArgumentException();
 			}
 
 			int leftIndex = leftChildren[index];
@@ -145,9 +142,9 @@ public class TreeModelUtil {
 		// A leaf node
 		{
 			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
-				List<String> targetCategories = schema.getTargetCategories();
+				CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-				double[] scoreRecordCounts = getRow(values, leftChildren.length, targetCategories.size(), index);
+				double[] scoreRecordCounts = getRow(values, leftChildren.length, categoricalLabel.size(), index);
 
 				double recordCount = 0;
 
@@ -161,10 +158,10 @@ public class TreeModelUtil {
 
 				Double probability = null;
 
-				for(int i = 0; i < targetCategories.size(); i++){
-					String targetCategory = targetCategories.get(i);
+				for(int i = 0; i < categoricalLabel.size(); i++){
+					String value = categoricalLabel.getValue(i);
 
-					ScoreDistribution scoreDistribution = new ScoreDistribution(targetCategory, scoreRecordCounts[i]);
+					ScoreDistribution scoreDistribution = new ScoreDistribution(value, scoreRecordCounts[i]);
 
 					node.addScoreDistributions(scoreDistribution);
 

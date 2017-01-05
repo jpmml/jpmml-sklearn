@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
@@ -26,13 +27,14 @@ import org.dmg.pmml.Interval;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldDecorator;
 import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 public class ContinuousDomain extends Domain {
 
@@ -46,7 +48,7 @@ public class ContinuousDomain extends Domain {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<? extends Number> dataMin = getDataMin();
 		List<? extends Number> dataMax = getDataMax();
 
@@ -56,6 +58,8 @@ public class ContinuousDomain extends Domain {
 
 		final
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+
+		List<Feature> features = new ArrayList<>();
 
 		for(int i = 0; i < inputFeatures.size(); i++){
 			WildcardFeature inputFeature = (WildcardFeature)inputFeatures.get(i);
@@ -101,10 +105,14 @@ public class ContinuousDomain extends Domain {
 				}
 			};
 
-			featureMapper.addDecorator(inputFeature.getName(), decorator);
+			ContinuousFeature feature = inputFeature.toContinuousFeature();
+
+			encoder.addDecorator(feature.getName(), decorator);
+
+			features.add(feature);
 		}
 
-		return inputFeatures;
+		return features;
 	}
 
 	public List<? extends Number> getDataMin(){

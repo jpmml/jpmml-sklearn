@@ -24,7 +24,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
 public class Selector extends Transformer implements HasNumberOfFeatures {
@@ -47,7 +47,7 @@ public class Selector extends Transformer implements HasNumberOfFeatures {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		int[] selection = selectFeatures(features);
 
 		if(selection == null){

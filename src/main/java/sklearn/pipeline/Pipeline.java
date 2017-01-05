@@ -27,7 +27,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -117,13 +117,13 @@ public class Pipeline extends Estimator {
 	}
 
 	@Override
-	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
+	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
 		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 
 		if(transformers.size() > 0){
-			List<String> ids = featureMapper.getIds();
-			List<Feature> features = featureMapper.getFeatures();
+			List<String> ids = encoder.getIds();
+			List<Feature> features = encoder.getFeatures();
 
 			for(Transformer transformer : transformers){
 
@@ -137,13 +137,13 @@ public class Pipeline extends Estimator {
 				}
 
 				for(Feature feature : features){
-					featureMapper.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
+					encoder.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
 				}
 
-				features = transformer.encodeFeatures(ids, features, featureMapper);
+				features = transformer.encodeFeatures(ids, features, encoder);
 			}
 
-			schema = new Schema(schema.getTargetField(), schema.getTargetCategories(), schema.getActiveFields(), features);
+			schema = new Schema(schema.getLabel(), features);
 		}
 
 		List<Feature> features = schema.getFeatures();
@@ -153,7 +153,7 @@ public class Pipeline extends Estimator {
 			throw new IllegalArgumentException();
 		}
 
-		return estimator.encodeModel(schema, featureMapper);
+		return estimator.encodeModel(schema, encoder);
 	}
 
 	public List<Transformer> getTransformers(){

@@ -31,7 +31,7 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,21 +40,21 @@ public class OneHotEncoderTest {
 
 	@Test
 	public void encode(){
-		FeatureMapper featureMapper = new FeatureMapper();
+		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = featureMapper.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.INTEGER);
+		DataField dataField = encoder.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.INTEGER);
 
-		Feature inputFeature = new WildcardFeature(dataField);
+		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
 		assertEquals(Arrays.asList(), PMMLUtil.getValues(dataField));
 
-		OneHotEncoder encoder = new OneHotEncoder("sklearn.preprocessing.data", "OneHotEncoder");
-		encoder.put("n_values_", 3);
+		OneHotEncoder oneHotEncoder = new OneHotEncoder("sklearn.preprocessing.data", "OneHotEncoder");
+		oneHotEncoder.put("n_values_", 3);
 
 		List<String> ids = new ArrayList<>();
 		ids.add("x");
 
-		List<Feature> outputFeatures = encoder.encodeFeatures(ids, Collections.singletonList(inputFeature), featureMapper);
+		List<Feature> outputFeatures = oneHotEncoder.encodeFeatures(ids, Collections.singletonList(inputFeature), encoder);
 		for(int i = 0; i < 3; i++){
 			BinaryFeature outputFeature = (BinaryFeature)outputFeatures.get(i);
 

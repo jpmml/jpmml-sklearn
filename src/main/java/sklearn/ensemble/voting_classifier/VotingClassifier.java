@@ -38,7 +38,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -117,7 +117,7 @@ public class VotingClassifier extends Classifier {
 	}
 
 	@Override
-	public Model encodeModel(Schema schema, FeatureMapper featureMapper){
+	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
 		List<? extends Classifier> estimators = getEstimators();
 
 		this.schemas.put(createSchemaKey(this), schema);
@@ -127,13 +127,13 @@ public class VotingClassifier extends Classifier {
 
 			Schema estimatorSchema = this.schemas.get(schemaKey);
 			if(estimatorSchema == null){
-				estimatorSchema = featureMapper.cast((OpType)schemaKey.get(0), (DataType)schemaKey.get(1), schema);
+				estimatorSchema = encoder.cast((OpType)schemaKey.get(0), (DataType)schemaKey.get(1), schema);
 
 				this.schemas.put(schemaKey, estimatorSchema);
 			}
 		}
 
-		return super.encodeModel(schema, featureMapper);
+		return super.encodeModel(schema, encoder);
 	}
 
 	public List<? extends Classifier> getEstimators(){

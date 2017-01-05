@@ -46,6 +46,7 @@ import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.dmg.pmml.nearest_neighbor.TrainingInstances;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.MatrixUtil;
@@ -64,9 +65,9 @@ public class KNeighborsUtil {
 
 		KNNInputs knnInputs = new KNNInputs();
 
-		FieldName targetField = schema.getTargetField();
-		if(targetField != null){
-			InstanceField instanceField = new InstanceField(targetField)
+		Label label = schema.getLabel();
+		if(label != null){
+			InstanceField instanceField = new InstanceField(label.getName())
 				.setColumn("y");
 
 			instanceFields.addInstanceFields(instanceField);

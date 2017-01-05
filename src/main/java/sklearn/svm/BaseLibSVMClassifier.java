@@ -28,6 +28,7 @@ import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.dmg.pmml.support_vector_machine.VectorDictionary;
 import org.dmg.pmml.support_vector_machine.VectorInstance;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
@@ -88,24 +89,24 @@ public class BaseLibSVMClassifier extends Classifier {
 
 		int i = 0;
 
-		List<String> targetCategories = schema.getTargetCategories();
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		for(int first = 0; first < targetCategories.size(); first++){
+		for(int first = 0, size = categoricalLabel.size(); first < size; first++){
 
-			for(int second = first + 1; second < targetCategories.size(); second++){
+			for(int second = first + 1; second < size; second++){
 				List<VectorInstance> svmVectorInstances = new ArrayList<>();
 				svmVectorInstances.addAll(slice(vectorInstances, offsets, first));
 				svmVectorInstances.addAll(slice(vectorInstances, offsets, second));
 
 				List<Number> svmDualCoef = new ArrayList<>();
-				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, second - 1), offsets, first));
-				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, targetCategories.size() - 1, numberOfVectors, first), offsets, second));
+				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, size - 1, numberOfVectors, second - 1), offsets, first));
+				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, size - 1, numberOfVectors, first), offsets, second));
 
 				// LibSVM: (decisionFunction > 0 ? first : second)
 				// PMML: (decisionFunction < 0 ? first : second)
 				SupportVectorMachine supportVectorMachine = SupportVectorMachineUtil.encodeSupportVectorMachine(svmVectorInstances, svmDualCoef, Iterables.get(intercept, i))
-					.setTargetCategory(targetCategories.get(second))
-					.setAlternateTargetCategory(targetCategories.get(first));
+					.setTargetCategory(categoricalLabel.getValue(second))
+					.setAlternateTargetCategory(categoricalLabel.getValue(first));
 
 				supportVectorMachines.add(supportVectorMachine);
 

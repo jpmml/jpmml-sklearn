@@ -28,7 +28,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.FeatureMapper;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 public class MaxAbsScaler extends Transformer {
@@ -38,7 +38,7 @@ public class MaxAbsScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, FeatureMapper featureMapper){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
 		List<? extends Number> scale = getScale();
 
 		if(ids.size() != inputFeatures.size() || scale.size() != inputFeatures.size()){
@@ -59,11 +59,11 @@ public class MaxAbsScaler extends Transformer {
 			}
 
 			// "$name / scale"
-			Apply apply = PMMLUtil.createApply("/", inputFeature.ref(), PMMLUtil.createConstant(value));
+			Apply apply = PMMLUtil.createApply("/", (inputFeature.toContinuousFeature()).ref(), PMMLUtil.createConstant(value));
 
-			DerivedField derivedField = featureMapper.createDerivedField(createName(id), apply);
+			DerivedField derivedField = encoder.createDerivedField(createName(id), apply);
 
-			features.add(new ContinuousFeature(derivedField));
+			features.add(new ContinuousFeature(encoder, derivedField));
 		}
 
 		return features;

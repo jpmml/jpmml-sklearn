@@ -23,8 +23,8 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.HasDerivedName;
 
 public class LoggerUtil {
 
@@ -38,10 +38,10 @@ public class LoggerUtil {
 			@Override
 			public String apply(Feature feature){
 
-				if(feature instanceof BinaryFeature){
-					BinaryFeature binaryFeature = (BinaryFeature)feature;
+				if(feature instanceof HasDerivedName){
+					HasDerivedName hasDerivedName = (HasDerivedName)feature;
 
-					return (binaryFeature.getName()).getValue() + "=" + binaryFeature.getValue();
+					return (hasDerivedName.getDerivedName()).getValue();
 				}
 
 				return (feature.getName()).getValue();
