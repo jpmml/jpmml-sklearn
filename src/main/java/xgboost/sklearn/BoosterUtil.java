@@ -21,6 +21,7 @@ package xgboost.sklearn;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.Learner;
+import org.jpmml.xgboost.XGBoostUtil;
 
 public class BoosterUtil {
 
@@ -42,7 +43,9 @@ public class BoosterUtil {
 
 		Learner learner = booster.getLearner();
 
-		MiningModel miningModel = learner.encodeMiningModel(schema);
+		Schema xgbSchema = XGBoostUtil.toXGBoostSchema(schema);
+
+		MiningModel miningModel = learner.encodeMiningModel(xgbSchema);
 
 		return miningModel;
 	}
