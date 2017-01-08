@@ -44,6 +44,7 @@ import org.dmg.pmml.nearest_neighbor.KNNInput;
 import org.dmg.pmml.nearest_neighbor.KNNInputs;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.dmg.pmml.nearest_neighbor.TrainingInstances;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
@@ -80,7 +81,9 @@ public class KNeighborsUtil {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			FieldName name = feature.getName();
+			ContinuousFeature continuousFeature = feature.toContinuousFeature(estimator.getDataType());
+
+			FieldName name = continuousFeature.getName();
 
 			InstanceField instanceField = new InstanceField(name)
 				.setColumn("x" + String.valueOf(i + 1));

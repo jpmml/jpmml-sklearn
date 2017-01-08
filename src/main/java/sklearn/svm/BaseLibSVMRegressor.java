@@ -48,11 +48,6 @@ public class BaseLibSVMRegressor extends Regressor {
 	}
 
 	@Override
-	public boolean requiresContinuousInput(){
-		return false;
-	}
-
-	@Override
 	public SupportVectorMachineModel encodeModel(Schema schema){
 		int[] shape = getSupportVectorsShape();
 

@@ -33,11 +33,6 @@ public class TreeClassifier extends Classifier implements HasTree {
 	}
 
 	@Override
-	public boolean requiresContinuousInput(){
-		return false;
-	}
-
-	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
 	}

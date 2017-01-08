@@ -43,18 +43,12 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	public Model encodeModel(Schema schema);
 
 	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
-		schema = encoder.cast(requiresContinuousInput() ? OpType.CONTINUOUS : null, getDataType(), schema);
-
 		return encodeModel(schema);
 	}
 
 	@Override
 	public int getNumberOfFeatures(){
 		return ValueUtil.asInt((Number)get("n_features_"));
-	}
-
-	public boolean requiresContinuousInput(){
-		return true;
 	}
 
 	/**

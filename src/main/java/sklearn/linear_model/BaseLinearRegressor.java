@@ -41,11 +41,6 @@ public class BaseLinearRegressor extends Regressor {
 	}
 
 	@Override
-	public boolean requiresContinuousInput(){
-		return false;
-	}
-
-	@Override
 	public RegressionModel encodeModel(Schema schema){
 		return BaseLinearUtil.encodeRegressionModel(Iterables.getOnlyElement(getIntercept()), getCoef(), schema);
 	}

@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
@@ -48,12 +49,11 @@ public class TreeModelUtil {
 	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final MiningFunction miningFunction, final Schema schema){
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
-			private Schema segmentSchema = schema.toAnonymousSchema();
-
-
 			@Override
 			public TreeModel apply(E estimator){
-				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, this.segmentSchema);
+				Schema treeModelSchema = toTreeModelSchema(schema.toAnonymousSchema(), estimator.getDataType());
+
+				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, treeModelSchema);
 			}
 		};
 
@@ -110,7 +110,7 @@ public class TreeModelUtil {
 			} else
 
 			{
-				ContinuousFeature continuousFeature = feature.toContinuousFeature();
+				ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.FLOAT);
 
 				String value = ValueUtil.formatValue(threshold);
 
@@ -187,6 +187,31 @@ public class TreeModelUtil {
 				throw new IllegalArgumentException();
 			}
 		}
+	}
+
+	static
+	public Schema toTreeModelSchema(Schema schema, DataType dataType){
+		List<Feature> castFeatures = new ArrayList<>();
+
+		List<Feature> features = schema.getFeatures();
+		for(Feature feature : features){
+
+			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+				castFeatures.add(binaryFeature);
+			} else
+
+			{
+				ContinuousFeature continuousFeature = feature.toContinuousFeature(dataType);
+
+				castFeatures.add(continuousFeature);
+			}
+		}
+
+		schema = new Schema(schema.getLabel(), castFeatures);
+
+		return schema;
 	}
 
 	static

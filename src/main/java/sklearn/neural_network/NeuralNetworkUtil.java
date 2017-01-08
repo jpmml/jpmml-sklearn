@@ -38,6 +38,7 @@ import org.dmg.pmml.neural_network.NeuralOutput;
 import org.dmg.pmml.neural_network.NeuralOutputs;
 import org.dmg.pmml.neural_network.Neuron;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
@@ -76,8 +77,10 @@ public class NeuralNetworkUtil {
 		for(int column = 0; column < features.size(); column++){
 			Feature feature = features.get(column);
 
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
 			DerivedField derivedField = new DerivedField(OpType.CONTINUOUS, DataType.DOUBLE)
-				.setExpression(feature.ref());
+				.setExpression(continuousFeature.ref());
 
 			NeuralInput neuralInput = new NeuralInput()
 				.setId("0/" + (column + 1))

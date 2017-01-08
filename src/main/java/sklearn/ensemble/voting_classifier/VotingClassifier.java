@@ -19,34 +19,26 @@
 package sklearn.ensemble.voting_classifier;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 
 public class VotingClassifier extends Classifier {
-
-	private Map<List<?>, Schema> schemas = new HashMap<>();
-
 
 	public VotingClassifier(String module, String name){
 		super(module, name);
@@ -59,11 +51,6 @@ public class VotingClassifier extends Classifier {
 		Estimator estimator = estimators.get(0);
 
 		return estimator.getNumberOfFeatures();
-	}
-
-	@Override
-	public boolean requiresContinuousInput(){
-		return false;
 	}
 
 	@Override
@@ -93,14 +80,7 @@ public class VotingClassifier extends Classifier {
 		List<Model> models = new ArrayList<>();
 
 		for(Classifier estimator : estimators){
-			List<?> schemaKey = createSchemaKey(estimator);
-
-			Schema estimatorSchema = this.schemas.get(schemaKey);
-			if(estimatorSchema == null){
-				throw new IllegalStateException();
-			}
-
-			Model model = estimator.encodeModel(estimatorSchema);
+			Model model = estimator.encodeModel(schema);
 
 			models.add(model);
 		}
@@ -114,26 +94,6 @@ public class VotingClassifier extends Classifier {
 			.setOutput(ModelUtil.createProbabilityOutput(schema));
 
 		return miningModel;
-	}
-
-	@Override
-	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
-		List<? extends Classifier> estimators = getEstimators();
-
-		this.schemas.put(createSchemaKey(this), schema);
-
-		for(Classifier estimator : estimators){
-			List<?> schemaKey = createSchemaKey(estimator);
-
-			Schema estimatorSchema = this.schemas.get(schemaKey);
-			if(estimatorSchema == null){
-				estimatorSchema = encoder.cast((OpType)schemaKey.get(0), (DataType)schemaKey.get(1), schema);
-
-				this.schemas.put(schemaKey, estimatorSchema);
-			}
-		}
-
-		return super.encodeModel(schema, encoder);
 	}
 
 	public List<? extends Classifier> getEstimators(){
@@ -167,12 +127,5 @@ public class VotingClassifier extends Classifier {
 			default:
 				throw new IllegalArgumentException(voting);
 		}
-	}
-
-	static
-	private List<?> createSchemaKey(Estimator estimator){
-		List<?> result = Arrays.asList(estimator.requiresContinuousInput() ? OpType.CONTINUOUS : null, estimator.getDataType());
-
-		return result;
 	}
 }

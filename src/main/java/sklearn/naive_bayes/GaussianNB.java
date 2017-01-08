@@ -31,6 +31,7 @@ import org.dmg.pmml.naive_bayes.TargetValueCounts;
 import org.dmg.pmml.naive_bayes.TargetValueStat;
 import org.dmg.pmml.naive_bayes.TargetValueStats;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -72,7 +73,9 @@ public class GaussianNB extends Classifier {
 			List<? extends Number> means = MatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
 			List<? extends Number> variances = MatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
 
-			BayesInput bayesInput = new BayesInput(feature.getName())
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+			BayesInput bayesInput = new BayesInput(continuousFeature.getName())
 				.setTargetValueStats(encodeTargetValueStats(categoricalLabel.getValues(), means, variances));
 
 			bayesInputs.addBayesInputs(bayesInput);

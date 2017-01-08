@@ -57,7 +57,7 @@ public class SupportVectorMachineUtil {
 
 	static
 	public VectorDictionary encodeVectorDictionary(List<Integer> support, List<? extends Number> supportVectors, int numberOfVectors, int numberOfFeatures, Schema schema){
-		BitSet features = new BitSet(numberOfFeatures);
+		BitSet featureMask = new BitSet(numberOfFeatures);
 
 		Double defaultValue = Double.valueOf(0d);
 
@@ -69,10 +69,10 @@ public class SupportVectorMachineUtil {
 			// Set bits that correspond to non-default values
 			vectorFeatures.flip(0, numberOfFeatures);
 
-			features.or(vectorFeatures);
+			featureMask.or(vectorFeatures);
 		}
 
-		int numberOfUsedFeatures = features.cardinality();
+		int numberOfUsedFeatures = featureMask.cardinality();
 
 		List<Feature> unusedFeatures = new ArrayList<>();
 
@@ -81,7 +81,7 @@ public class SupportVectorMachineUtil {
 		for(int i = 0; i < numberOfFeatures; i++){
 			Feature feature = schema.getFeature(i);
 
-			if(!features.get(i)){
+			if(!featureMask.get(i)){
 				unusedFeatures.add(feature);
 
 				continue;
@@ -112,7 +112,7 @@ public class SupportVectorMachineUtil {
 			List<? extends Number> values = MatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
 
 			if(numberOfUsedFeatures < numberOfFeatures){
-				values = ValueUtil.filterByIndices(values, features);
+				values = ValueUtil.filterByIndices(values, featureMask);
 			} // End if
 
 			if(ValueUtil.isSparse(values, defaultValue, 0.75d)){

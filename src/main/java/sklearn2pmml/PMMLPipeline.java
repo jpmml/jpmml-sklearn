@@ -19,6 +19,7 @@
 package sklearn2pmml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -34,9 +35,11 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
@@ -92,7 +95,7 @@ public class PMMLPipeline extends Pipeline {
 				targetCategories = formatTargetCategories(classes);
 			}
 
-			DataField dataField = encoder.createDataField(PMMLPipeline.nameFunction.apply(targetField), opType, dataType, targetCategories);
+			DataField dataField = encoder.createDataField(FieldName.create(targetField), opType, dataType, targetCategories);
 
 			if(targetCategories != null && targetCategories.size() > 0){
 				label = new CategoricalLabel(dataField);
@@ -105,8 +108,6 @@ public class PMMLPipeline extends Pipeline {
 
 		if(dataFrameMapper != null){
 			dataFrameMapper.encodeFeatures(encoder);
-
-			encoder.updateFeatures(getOpType(), getDataType());
 		} else
 
 		{
@@ -120,7 +121,14 @@ public class PMMLPipeline extends Pipeline {
 				}
 			}
 
-			encoder.initFeatures(Lists.transform(activeFields, PMMLPipeline.nameFunction), getOpType(), getDataType());
+			OpType opType = getOpType();
+			DataType dataType = getDataType();
+
+			for(String activeField : activeFields){
+				DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
+
+				encoder.addRow(Collections.singletonList(activeField), Collections.<Feature>singletonList(new WildcardFeature(encoder, dataField)));
+			}
 		}
 
 		Set<DefineFunction> defineFunctions = encodeDefineFunctions();
@@ -200,12 +208,4 @@ public class PMMLPipeline extends Pipeline {
 
 		return new ArrayList<>(Lists.transform(objects, function));
 	}
-
-	private static final Function<String, FieldName> nameFunction = new Function<String, FieldName>(){
-
-		@Override
-		public FieldName apply(String string){
-			return FieldName.create(string);
-		}
-	};
 }

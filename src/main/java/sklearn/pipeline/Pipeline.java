@@ -67,13 +67,6 @@ public class Pipeline extends Estimator {
 	}
 
 	@Override
-	public boolean requiresContinuousInput(){
-		Estimator estimator = getEstimator();
-
-		return estimator.requiresContinuousInput();
-	}
-
-	@Override
 	public OpType getOpType(){
 		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();

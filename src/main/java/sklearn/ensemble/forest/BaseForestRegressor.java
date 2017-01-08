@@ -36,11 +36,6 @@ public class BaseForestRegressor extends Regressor {
 	}
 
 	@Override
-	public boolean requiresContinuousInput(){
-		return false;
-	}
-
-	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
 	}
