@@ -36,18 +36,18 @@ public class Binarizer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		Number threshold = getThreshold();
 
-		if(ids.size() != 1 || inputFeatures.size() != 1){
+		if(ids.size() != 1 || features.size() != 1){
 			throw new IllegalArgumentException();
 		}
 
 		String id = ids.get(0);
-		Feature inputFeature = inputFeatures.get(0);
+		Feature feature = features.get(0);
 
 		// "($name <= threshold) ? 0 : 1"
-		Apply apply = PMMLUtil.createApply("threshold", (inputFeature.toContinuousFeature()).ref(), PMMLUtil.createConstant(threshold));
+		Apply apply = PMMLUtil.createApply("threshold", (feature.toContinuousFeature()).ref(), PMMLUtil.createConstant(threshold));
 
 		DerivedField derivedField = encoder.createDerivedField(createName(id), apply);
 

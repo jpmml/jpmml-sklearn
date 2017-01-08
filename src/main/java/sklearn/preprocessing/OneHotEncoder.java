@@ -55,35 +55,35 @@ public class OneHotEncoder extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> values = getValues();
 
-		if(ids.size() != 1 || inputFeatures.size() != 1){
+		if(ids.size() != 1 || features.size() != 1){
 			throw new IllegalArgumentException();
 		}
 
 		String id = ids.get(0);
-		Feature inputFeature = inputFeatures.get(0);
+		Feature feature = features.get(0);
 
 		List<String> categories = new ArrayList<>();
 
 		ids.clear();
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < values.size(); i++){
 			int value = ValueUtil.asInt(values.get(i));
 
 			String category;
 
-			if(inputFeature instanceof CategoricalFeature){
-				CategoricalFeature categoricalFeature = (CategoricalFeature)inputFeature;
+			if(feature instanceof CategoricalFeature){
+				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
 				category = categoricalFeature.getValue(value);
 			} else
 
-			if(inputFeature instanceof WildcardFeature){
-				WildcardFeature wildcardFeature = (WildcardFeature)inputFeature;
+			if(feature instanceof WildcardFeature){
+				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
 				category = ValueUtil.formatValue((Integer)value);
 			} else
@@ -96,12 +96,12 @@ public class OneHotEncoder extends Transformer {
 
 			ids.add(id + "=" + category);
 
-			features.add(new BinaryFeature(encoder, inputFeature.getName(), DataType.STRING, category));
+			result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
 		}
 
-		encoder.updateValueSpace(inputFeature.getName(), categories);
+		encoder.updateValueSpace(feature.getName(), categories);
 
-		return features;
+		return result;
 	}
 
 	public List<? extends Number> getValues(){

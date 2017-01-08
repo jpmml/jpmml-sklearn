@@ -41,13 +41,13 @@ public class PCA extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		int[] shape = getComponentsShape();
 
 		int numberOfComponents = shape[0];
 		int numberOfFeatures = shape[1];
 
-		if(ids.size() != numberOfFeatures || inputFeatures.size() != numberOfFeatures){
+		if(ids.size() != numberOfFeatures || features.size() != numberOfFeatures){
 			throw new IllegalArgumentException();
 		}
 
@@ -62,7 +62,7 @@ public class PCA extends Transformer {
 
 		ids.clear();
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < numberOfComponents; i++){
 			List<? extends Number> component = MatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
@@ -70,10 +70,10 @@ public class PCA extends Transformer {
 			Apply apply = new Apply("sum");
 
 			for(int j = 0; j < numberOfFeatures; j++){
-				Feature inputFeature = inputFeatures.get(j);
+				Feature feature = features.get(j);
 
 				// "($name[i] - mean[i]) * component[i]"
-				Expression expression = (inputFeature.toContinuousFeature()).ref();
+				Expression expression = (feature.toContinuousFeature()).ref();
 
 				Number meanValue = mean.get(j);
 				if(!ValueUtil.isZero(meanValue)){
@@ -100,10 +100,10 @@ public class PCA extends Transformer {
 
 			ids.add((derivedField.getName()).getValue());
 
-			features.add(new ContinuousFeature(encoder, derivedField));
+			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 
-		return features;
+		return result;
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public class RobustScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		Boolean withCentering = getWithCentering();
 		Boolean withScaling = getWithScaling();
 
@@ -47,29 +47,29 @@ public class RobustScaler extends Transformer {
 		List<? extends Number> scale = (withScaling ? getScale() : null);
 
 		if(center == null && scale == null){
-			return inputFeatures;
+			return features;
 		} // End if
 
-		if(ids.size() != inputFeatures.size()){
+		if(ids.size() != features.size()){
 			throw new IllegalArgumentException();
 		} // End if
 
-		if(withCentering && inputFeatures.size() != center.size()){
+		if(withCentering && features.size() != center.size()){
 			throw new IllegalArgumentException();
 		} // End if
 
-		if(withScaling && inputFeatures.size() != scale.size()){
+		if(withScaling && features.size() != scale.size()){
 			throw new IllegalArgumentException();
 		}
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
+		for(int i = 0; i < features.size(); i++){
 			String id = ids.get(i);
-			Feature inputFeature = inputFeatures.get(i);
+			Feature feature = features.get(i);
 
 			// "($name - center) / scale"
-			Expression expression = (inputFeature.toContinuousFeature()).ref();
+			Expression expression = (feature.toContinuousFeature()).ref();
 
 			if(withCentering){
 				Number centerValue = center.get(i);
@@ -88,17 +88,17 @@ public class RobustScaler extends Transformer {
 			} // End if
 
 			if(expression instanceof FieldRef){
-				features.add(inputFeature);
+				result.add(feature);
 
 				continue;
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-			features.add(new ContinuousFeature(encoder, derivedField));
+			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 
-		return features;
+		return result;
 	}
 
 	public Boolean getWithCentering(){

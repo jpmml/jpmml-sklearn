@@ -38,35 +38,35 @@ public class MaxAbsScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> scale = getScale();
 
-		if(ids.size() != inputFeatures.size() || scale.size() != inputFeatures.size()){
+		if(ids.size() != features.size() || scale.size() != features.size()){
 			throw new IllegalArgumentException();
 		}
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
+		for(int i = 0; i < features.size(); i++){
 			String id = ids.get(i);
-			Feature inputFeature = inputFeatures.get(i);
+			Feature feature = features.get(i);
 
 			Number value = scale.get(i);
 			if(ValueUtil.isOne(value)){
-				features.add(inputFeature);
+				result.add(feature);
 
 				continue;
 			}
 
 			// "$name / scale"
-			Apply apply = PMMLUtil.createApply("/", (inputFeature.toContinuousFeature()).ref(), PMMLUtil.createConstant(value));
+			Apply apply = PMMLUtil.createApply("/", (feature.toContinuousFeature()).ref(), PMMLUtil.createConstant(value));
 
 			DerivedField derivedField = encoder.createDerivedField(createName(id), apply);
 
-			features.add(new ContinuousFeature(encoder, derivedField));
+			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 
-		return features;
+		return result;
 	}
 
 	public List<? extends Number> getScale(){

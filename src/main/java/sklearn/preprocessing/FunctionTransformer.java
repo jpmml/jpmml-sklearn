@@ -40,10 +40,10 @@ public class FunctionTransformer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		Object func = getFunc();
 
-		if(ids.size() != inputFeatures.size()){
+		if(ids.size() != features.size()){
 			throw new IllegalArgumentException();
 		}
 
@@ -55,20 +55,20 @@ public class FunctionTransformer extends Transformer {
 			throw new IllegalArgumentException("The function object (" + ClassDictUtil.formatClass(func) + ") is not a Numpy universal function", cce);
 		}
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
+		for(int i = 0; i < features.size(); i++){
 			String id = ids.get(i);
-			Feature inputFeature = inputFeatures.get(i);
+			Feature feature = features.get(i);
 
-			Expression expression = encodeUFunc(ufunc, (inputFeature.toContinuousFeature()).ref());
+			Expression expression = encodeUFunc(ufunc, (feature.toContinuousFeature()).ref());
 
 			DerivedField derivedField = encoder.createDerivedField(FieldName.create(ufunc.getName() + "(" + id + ")"), expression);
 
-			features.add(new ContinuousFeature(encoder, derivedField));
+			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 
-		return features;
+		return result;
 	}
 
 	public Object getFunc(){

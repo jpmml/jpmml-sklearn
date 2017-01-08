@@ -42,11 +42,11 @@ public class SelectKBest extends Selector {
 	}
 
 	@Override
-	public int[] selectFeatures(List<Feature> inputFeatures){
+	public int[] selectFeatures(List<Feature> features){
 		Object k = getK();
 		List<? extends Number> scores = getScores();
 
-		if(inputFeatures.size() != scores.size()){
+		if(features.size() != scores.size()){
 			throw new IllegalArgumentException();
 		} // End if
 

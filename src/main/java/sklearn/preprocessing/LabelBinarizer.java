@@ -54,55 +54,51 @@ public class LabelBinarizer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
 		Number posLabel = getPosLabel();
 		Number negLabel = getNegLabel();
 
-		if(ids.size() != 1 || inputFeatures.size() != 1){
+		if(ids.size() != 1 || features.size() != 1){
 			throw new IllegalArgumentException();
 		}
 
 		String id = ids.get(0);
-		Feature inputFeature = inputFeatures.get(0);
+		Feature feature = features.get(0);
 
 		List<String> categories = new ArrayList<>();
 
 		ids.clear();
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < classes.size(); i++){
 			Object value = classes.get(i);
 
-			Feature feature;
+			ids.add(id + "=" + ValueUtil.formatValue(value));
 
 			if(ValueUtil.isOne(posLabel) && ValueUtil.isZero(negLabel)){
 				String category = ValueUtil.formatValue(value);
 
 				categories.add(category);
 
-				feature = new BinaryFeature(encoder, inputFeature.getName(), DataType.STRING, category);
+				result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
 			} else
 
 			{
 				// "($name == value) ? pos_label : neg_label"
-				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", inputFeature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
+				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", feature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
 				DerivedField derivedField = encoder.createDerivedField(createName(id, i), apply);
 
-				feature = new ContinuousFeature(encoder, derivedField);
+				result.add(new ContinuousFeature(encoder, derivedField));
 			}
-
-			ids.add(id + "=" + ValueUtil.formatValue(value));
-
-			features.add(feature);
 		}
 
-		encoder.updateValueSpace(inputFeature.getName(), categories);
+		encoder.updateValueSpace(feature.getName(), categories);
 
-		return features;
+		return result;
 	}
 
 	public List<?> getClasses(){

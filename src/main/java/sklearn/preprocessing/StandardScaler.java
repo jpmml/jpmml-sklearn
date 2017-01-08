@@ -39,7 +39,7 @@ public class StandardScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		Boolean withMean = getWithMean();
 		Boolean withStd = getWithStd();
 
@@ -47,29 +47,29 @@ public class StandardScaler extends Transformer {
 		List<? extends Number> std = (withStd ? getStd() : null);
 
 		if(mean == null && std == null){
-			return inputFeatures;
+			return features;
 		} // End if
 
-		if(ids.size() != inputFeatures.size()){
+		if(ids.size() != features.size()){
 			throw new IllegalArgumentException();
 		} // End if
 
-		if(withMean && inputFeatures.size() != mean.size()){
+		if(withMean && features.size() != mean.size()){
 			throw new IllegalArgumentException();
 		} // End if
 
-		if(withStd && inputFeatures.size() != std.size()){
+		if(withStd && features.size() != std.size()){
 			throw new IllegalArgumentException();
 		}
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
+		for(int i = 0; i < features.size(); i++){
 			String id = ids.get(i);
-			Feature inputFeature = inputFeatures.get(i);
+			Feature feature = features.get(i);
 
 			// "($name - mean) / std"
-			Expression expression = (inputFeature.toContinuousFeature()).ref();
+			Expression expression = (feature.toContinuousFeature()).ref();
 
 			if(withMean){
 				Number meanValue = mean.get(i);
@@ -88,17 +88,17 @@ public class StandardScaler extends Transformer {
 			} // End if
 
 			if(expression instanceof FieldRef){
-				features.add(inputFeature);
+				result.add(feature);
 
 				continue;
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-			features.add(new ContinuousFeature(encoder, derivedField));
+			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 
-		return features;
+		return result;
 	}
 
 	public Boolean getWithMean(){

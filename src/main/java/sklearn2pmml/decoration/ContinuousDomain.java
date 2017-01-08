@@ -48,21 +48,21 @@ public class ContinuousDomain extends Domain {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> dataMin = getDataMin();
 		List<? extends Number> dataMax = getDataMax();
 
-		if(ids.size() != inputFeatures.size() || dataMin.size() != inputFeatures.size() || dataMax.size() != inputFeatures.size()){
+		if(ids.size() != features.size() || dataMin.size() != features.size() || dataMax.size() != features.size()){
 			throw new IllegalArgumentException();
 		}
 
 		final
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
-			WildcardFeature inputFeature = (WildcardFeature)inputFeatures.get(i);
+		for(int i = 0; i < features.size(); i++){
+			WildcardFeature wildcardFeature = (WildcardFeature)features.get(i);
 
 			final
 			Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED)
@@ -105,14 +105,14 @@ public class ContinuousDomain extends Domain {
 				}
 			};
 
-			ContinuousFeature feature = inputFeature.toContinuousFeature();
+			ContinuousFeature continuousFeature = wildcardFeature.toContinuousFeature();
 
-			encoder.addDecorator(feature.getName(), decorator);
+			encoder.addDecorator(continuousFeature.getName(), decorator);
 
-			features.add(feature);
+			result.add(continuousFeature);
 		}
 
-		return features;
+		return result;
 	}
 
 	public List<? extends Number> getDataMin(){

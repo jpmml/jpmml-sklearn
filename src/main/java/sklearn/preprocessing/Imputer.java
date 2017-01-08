@@ -41,10 +41,10 @@ public class Imputer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> statistics = getStatistics();
 
-		if(ids.size() != inputFeatures.size() || statistics.size() != inputFeatures.size()){
+		if(ids.size() != features.size() || statistics.size() != features.size()){
 			throw new IllegalArgumentException();
 		}
 
@@ -52,15 +52,15 @@ public class Imputer extends Transformer {
 
 		Number targetValue = getTargetValue(missingValues);
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
+		for(int i = 0; i < features.size(); i++){
 			String id = ids.get(i);
-			Feature inputFeature = inputFeatures.get(i);
+			Feature feature = features.get(i);
 
 			Number statisticValue = statistics.get(i);
 
-			if(inputFeature instanceof WildcardFeature){
+			if(feature instanceof WildcardFeature){
 				String strategy = getStrategy();
 
 				MissingValueDecorator decorator = new MissingValueDecorator()
@@ -71,13 +71,13 @@ public class Imputer extends Transformer {
 					decorator.addMissingValues(ValueUtil.formatValue(targetValue));
 				}
 
-				encoder.addDecorator(inputFeature.getName(), decorator);
+				encoder.addDecorator(feature.getName(), decorator);
 
-				features.add(inputFeature);
+				result.add(feature);
 			} else
 
 			{
-				Expression expression = inputFeature.ref();
+				Expression expression = feature.ref();
 
 				if(targetValue == null){
 					expression = PMMLUtil.createApply("isMissing", expression);
@@ -88,15 +88,15 @@ public class Imputer extends Transformer {
 				}
 
 				// "($name == null) ? statistics : $name"
-				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), inputFeature.ref());
+				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), feature.ref());
 
 				DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-				features.add(new ContinuousFeature(encoder, derivedField));
+				result.add(new ContinuousFeature(encoder, derivedField));
 			}
 		}
 
-		return features;
+		return result;
 	}
 
 	public Object getMissingValues(){

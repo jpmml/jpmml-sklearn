@@ -55,17 +55,17 @@ public class CategoricalDomain extends Domain {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<?> data = getData();
 
-		if(ids.size() != 1 || inputFeatures.size() != 1){
+		if(ids.size() != 1 || features.size() != 1){
 			throw new IllegalArgumentException();
 		}
 
 		final
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
 
-		WildcardFeature inputFeature = (WildcardFeature)inputFeatures.get(0);
+		WildcardFeature wildcardFeature = (WildcardFeature)features.get(0);
 
 		Function<Object, String> function = new Function<Object, String>(){
 
@@ -84,11 +84,11 @@ public class CategoricalDomain extends Domain {
 			}
 		};
 
-		CategoricalFeature feature = inputFeature.toCategoricalFeature(categories);
+		CategoricalFeature categoricalFeature = wildcardFeature.toCategoricalFeature(categories);
 
-		encoder.addDecorator(feature.getName(), decorator);
+		encoder.addDecorator(categoricalFeature.getName(), decorator);
 
-		return Collections.<Feature>singletonList(feature);
+		return Collections.<Feature>singletonList(categoricalFeature);
 	}
 
 	public List<?> getData(){

@@ -39,25 +39,25 @@ public class MinMaxScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> inputFeatures, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> min = getMin();
 		List<? extends Number> scale = getScale();
 
-		if(ids.size() != inputFeatures.size() || min.size() != inputFeatures.size() || scale.size() != inputFeatures.size()){
+		if(ids.size() != features.size() || min.size() != features.size() || scale.size() != features.size()){
 			throw new IllegalArgumentException();
 		}
 
-		List<Feature> features = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < inputFeatures.size(); i++){
+		for(int i = 0; i < features.size(); i++){
 			String id = ids.get(i);
-			Feature inputFeature = inputFeatures.get(i);
+			Feature feature = features.get(i);
 
 			Number minValue = min.get(i);
 			Number scaleValue = scale.get(i);
 
 			// "($name * scale) + min"
-			Expression expression = (inputFeature.toContinuousFeature()).ref();
+			Expression expression = (feature.toContinuousFeature()).ref();
 
 			if(!ValueUtil.isOne(scaleValue)){
 				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scaleValue));
@@ -68,17 +68,17 @@ public class MinMaxScaler extends Transformer {
 			} // End if
 
 			if(expression instanceof FieldRef){
-				features.add(inputFeature);
+				result.add(feature);
 
 				continue;
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
 
-			features.add(new ContinuousFeature(encoder, derivedField));
+			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 
-		return features;
+		return result;
 	}
 
 	public List<? extends Number> getMin(){
