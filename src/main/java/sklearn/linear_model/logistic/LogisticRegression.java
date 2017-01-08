@@ -33,7 +33,7 @@ public class LogisticRegression extends BaseLinearClassifier {
 		String multiClass = getMultiClass();
 
 		if(!("ovr").equals(multiClass)){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(multiClass);
 		}
 
 		return super.encodeModel(schema);

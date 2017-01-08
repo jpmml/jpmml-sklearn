@@ -41,6 +41,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeRegressor;
 
 public class GradientBoostingClassifier extends Classifier {
@@ -81,10 +82,7 @@ public class GradientBoostingClassifier extends Classifier {
 		CategoricalLabel categoricalLabel = (CategoricalLabel)segmentSchema.getLabel();
 
 		if(numberOfClasses == 1){
-
-			if(categoricalLabel.size() != 2){
-				throw new IllegalArgumentException();
-			}
+			EstimatorUtil.checkSize(2, categoricalLabel);
 
 			double coefficient = loss.getCoefficient();
 
@@ -94,10 +92,7 @@ public class GradientBoostingClassifier extends Classifier {
 		} else
 
 		if(numberOfClasses >= 2){
-
-			if(categoricalLabel.size() != numberOfClasses){
-				throw new IllegalArgumentException();
-			}
+			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
 
 			List<MiningModel> miningModels = new ArrayList<>();
 

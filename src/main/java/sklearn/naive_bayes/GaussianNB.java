@@ -107,12 +107,9 @@ public class GaussianNB extends Classifier {
 
 	static
 	private TargetValueStats encodeTargetValueStats(List<String> values, List<? extends Number> means, List<? extends Number> variances){
-
-		if((values.size() != means.size()) || (values.size() != variances.size())){
-			throw new IllegalArgumentException();
-		}
-
 		TargetValueStats targetValueStats = new TargetValueStats();
+
+		ClassDictUtil.checkSize(values, means, variances);
 
 		for(int i = 0; i < values.size(); i++){
 			GaussianDistribution gaussianDistribution = new GaussianDistribution(ValueUtil.asDouble(means.get(i)), ValueUtil.asDouble(variances.get(i)));
@@ -127,13 +124,10 @@ public class GaussianNB extends Classifier {
 	}
 
 	static
-	public TargetValueCounts encodeTargetValueCounts(List<String> values, List<Integer> counts){
-
-		if(values.size() != counts.size()){
-			throw new IllegalArgumentException();
-		}
-
+	private TargetValueCounts encodeTargetValueCounts(List<String> values, List<Integer> counts){
 		TargetValueCounts targetValueCounts = new TargetValueCounts();
+
+		ClassDictUtil.checkSize(values, counts);
 
 		for(int i = 0; i < values.size(); i++){
 			TargetValueCount targetValueCount = new TargetValueCount(values.get(i), counts.get(i));

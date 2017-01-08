@@ -29,6 +29,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.ParameterField;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 
@@ -65,6 +66,14 @@ public class EstimatorUtil {
 	static
 	public List<? extends Regressor> asRegressorList(List<?> objects){
 		return Lists.transform(objects, EstimatorUtil.regressorFunction);
+	}
+
+	static
+	public void checkSize(int size, CategoricalLabel categoricalLabel){
+
+		if(categoricalLabel.size() != size){
+			throw new IllegalArgumentException("Expected " + size + " class(es), got " + categoricalLabel.size() + " class(es)");
+		}
 	}
 
 	static

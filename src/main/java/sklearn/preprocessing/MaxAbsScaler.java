@@ -41,9 +41,7 @@ public class MaxAbsScaler extends Transformer {
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> scale = getScale();
 
-		if(ids.size() != features.size() || scale.size() != features.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(ids, features, scale);
 
 		List<Feature> result = new ArrayList<>();
 

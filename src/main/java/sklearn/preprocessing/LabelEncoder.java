@@ -63,9 +63,7 @@ public class LabelEncoder extends Transformer {
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
-		if(ids.size() != 1 || features.size() != 1){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(1, ids, features);
 
 		String id = ids.get(0);
 		Feature feature = features.get(0);

@@ -44,9 +44,7 @@ public class Imputer extends Transformer {
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> statistics = getStatistics();
 
-		if(ids.size() != features.size() || statistics.size() != features.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(ids, features, statistics);
 
 		Object missingValues = getMissingValues();
 

@@ -43,6 +43,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.MatrixUtil;
 
@@ -67,9 +68,7 @@ public class NeuralNetworkUtil {
 	public NeuralNetwork encodeNeuralNetwork(MiningFunction miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, Schema schema){
 		NeuralNetwork.ActivationFunction activationFunction = parseActivationFunction(activation);
 
-		if(coefs.size() != intercepts.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(coefs, intercepts);
 
 		NeuralInputs neuralInputs = new NeuralInputs();
 
@@ -223,9 +222,7 @@ public class NeuralNetworkUtil {
 	private NeuralOutputs encodeRegressionNeuralOutputs(List<? extends Entity> entities, Schema schema){
 		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
-		if(entities.size() != 1){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(1, entities);
 
 		Entity entity = Iterables.getOnlyElement(entities);
 
@@ -246,9 +243,7 @@ public class NeuralNetworkUtil {
 	private NeuralOutputs encodeClassificationNeuralOutputs(List<? extends Entity> entities, Schema schema){
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		if(categoricalLabel.size() != entities.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(categoricalLabel.size(), entities);
 
 		NeuralOutputs neuralOutputs = new NeuralOutputs();
 
@@ -270,10 +265,7 @@ public class NeuralNetworkUtil {
 
 	static
 	private void connect(Entity input, List<Neuron> neurons, List<?> weights){
-
-		if(neurons.size() != weights.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(neurons, weights);
 
 		for(int i = 0; i < neurons.size(); i++){
 			Neuron neuron = neurons.get(i);

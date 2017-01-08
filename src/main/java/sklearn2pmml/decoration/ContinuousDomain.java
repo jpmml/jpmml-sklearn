@@ -52,9 +52,7 @@ public class ContinuousDomain extends Domain {
 		List<? extends Number> dataMin = getDataMin();
 		List<? extends Number> dataMax = getDataMax();
 
-		if(ids.size() != features.size() || dataMin.size() != features.size() || dataMax.size() != features.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(ids, features, dataMin, dataMax);
 
 		final
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());

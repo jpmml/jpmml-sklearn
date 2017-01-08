@@ -48,19 +48,9 @@ public class StandardScaler extends Transformer {
 
 		if(mean == null && std == null){
 			return features;
-		} // End if
-
-		if(ids.size() != features.size()){
-			throw new IllegalArgumentException();
-		} // End if
-
-		if(withMean && features.size() != mean.size()){
-			throw new IllegalArgumentException();
-		} // End if
-
-		if(withStd && features.size() != std.size()){
-			throw new IllegalArgumentException();
 		}
+
+		ClassDictUtil.checkSize(ids, features, mean, std);
 
 		List<Feature> result = new ArrayList<>();
 

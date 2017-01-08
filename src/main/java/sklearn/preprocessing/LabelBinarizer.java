@@ -60,9 +60,7 @@ public class LabelBinarizer extends Transformer {
 		Number posLabel = getPosLabel();
 		Number negLabel = getNegLabel();
 
-		if(ids.size() != 1 || features.size() != 1){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(1, ids, features);
 
 		String id = ids.get(0);
 		Feature feature = features.get(0);

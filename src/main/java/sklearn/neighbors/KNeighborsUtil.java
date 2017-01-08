@@ -49,6 +49,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Estimator;
 
@@ -98,11 +99,9 @@ public class KNeighborsUtil {
 		InlineTable inlineTable = new InlineTable();
 
 		List<?> y = estimator.getY();
-		if(y.size() != numberOfInstances){
-			throw new IllegalArgumentException();
-		}
-
 		List<? extends Number> fitX = estimator.getFitX();
+
+		ClassDictUtil.checkSize(numberOfInstances, y);
 
 		for(int i = 0; i < numberOfInstances; i++){
 			List<Object> values = new ArrayList<>(1 + numberOfFeatures);

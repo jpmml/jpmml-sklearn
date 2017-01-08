@@ -58,9 +58,7 @@ public class CategoricalDomain extends Domain {
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<?> data = getData();
 
-		if(ids.size() != 1 || features.size() != 1){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(1, ids, features);
 
 		final
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());

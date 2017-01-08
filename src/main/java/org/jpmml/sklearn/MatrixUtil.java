@@ -31,10 +31,7 @@ public class MatrixUtil {
 	 */
 	static
 	public <E> List<E> getRow(List<E> values, int rows, int columns, int row){
-
-		if(values.size() != (rows * columns)){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize((rows * columns), values);
 
 		int offset = (row * columns);
 
@@ -46,10 +43,7 @@ public class MatrixUtil {
 	 */
 	static
 	public <E> List<E> getColumn(List<E> values, int rows, int columns, int column){
-
-		if(values.size() != (rows * columns)){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize((rows * columns), values);
 
 		List<E> result = new ArrayList<>(rows);
 

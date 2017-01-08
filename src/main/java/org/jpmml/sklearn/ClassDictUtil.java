@@ -19,6 +19,7 @@
 package org.jpmml.sklearn;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -96,6 +97,39 @@ public class ClassDictUtil {
 		}
 
 		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
+	}
+
+	static
+	public void checkSize(Collection<?>... collections){
+		Collection<?> prevCollection = null;
+
+		for(Collection<?> collection : collections){
+
+			if(collection == null){
+				continue;
+			} // End if
+
+			if(prevCollection != null && collection.size() != prevCollection.size()){
+				throw new IllegalArgumentException("Expected the same number of elements, got different numbers of elements");
+			}
+
+			prevCollection = collection;
+		}
+	}
+
+	static
+	public void checkSize(int size, Collection<?>... collections){
+
+		for(Collection<?> collection : collections){
+
+			if(collection == null){
+				continue;
+			} // End if
+
+			if(collection.size() != size){
+				throw new IllegalArgumentException("Expected " + size + " element(s), got " + collection.size() + " element(s)");
+			}
+		}
 	}
 
 	static

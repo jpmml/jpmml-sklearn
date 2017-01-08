@@ -29,6 +29,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +43,7 @@ public class BaseLinearUtil {
 	public RegressionModel encodeRegressionModel(Number intercept, List<? extends Number> coefficients, Schema schema){
 		List<Feature> features = schema.getFeatures();
 
-		if(features.size() != coefficients.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(features, coefficients);
 
 		List<Feature> unusedFeatures = new ArrayList<>();
 

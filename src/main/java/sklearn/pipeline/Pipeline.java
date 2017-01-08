@@ -27,6 +27,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
@@ -131,9 +132,8 @@ public class Pipeline extends Estimator {
 					HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
 
 					int numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
-					if(ids.size() != numberOfFeatures || features.size() != numberOfFeatures){
-						throw new IllegalArgumentException();
-					}
+
+					ClassDictUtil.checkSize(numberOfFeatures, ids, features);
 				}
 
 				for(Feature feature : features){
@@ -149,9 +149,8 @@ public class Pipeline extends Estimator {
 		List<Feature> features = schema.getFeatures();
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();
-		if(features.size() != numberOfFeatures){
-			throw new IllegalArgumentException();
-		}
+
+		ClassDictUtil.checkSize(numberOfFeatures, features);
 
 		return estimator.encodeModel(schema, encoder);
 	}
@@ -166,7 +165,7 @@ public class Pipeline extends Estimator {
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Missing estimator step");
 		}
 
 		return steps.subList(0, steps.size() - 1);
@@ -182,7 +181,7 @@ public class Pipeline extends Estimator {
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Missing estimator step");
 		}
 
 		return steps.get(steps.size() - 1);

@@ -47,18 +47,18 @@ public class PCA extends Transformer {
 		int numberOfComponents = shape[0];
 		int numberOfFeatures = shape[1];
 
-		if(ids.size() != numberOfFeatures || features.size() != numberOfFeatures){
-			throw new IllegalArgumentException();
-		}
-
-		String id = String.valueOf(PCA.SEQUENCE.getAndIncrement());
-
 		List<? extends Number> components = getComponents();
 		List<? extends Number> mean = getMean();
+
+		ClassDictUtil.checkSize(numberOfFeatures, ids, features, mean);
 
 		Boolean whiten = getWhiten();
 
 		List<? extends Number> explainedVariance = (whiten ? getExplainedVariance() : null);
+
+		ClassDictUtil.checkSize(numberOfComponents, explainedVariance);
+
+		String id = String.valueOf(PCA.SEQUENCE.getAndIncrement());
 
 		ids.clear();
 

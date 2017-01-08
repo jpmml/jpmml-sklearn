@@ -44,6 +44,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.LoggerUtil;
 import org.jpmml.sklearn.MatrixUtil;
 import org.slf4j.Logger;
@@ -138,10 +139,7 @@ public class SupportVectorMachineUtil {
 
 	static
 	public SupportVectorMachine encodeSupportVectorMachine(List<VectorInstance> vectorInstances, List<? extends Number> dualCoef, Number intercept){
-
-		if(vectorInstances.size() != dualCoef.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(vectorInstances, dualCoef);
 
 		Coefficients coefficients = new Coefficients()
 			.setAbsoluteValue(ValueUtil.asDouble(intercept));

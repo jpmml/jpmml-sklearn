@@ -58,9 +58,7 @@ public class OneHotEncoder extends Transformer {
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> values = getValues();
 
-		if(ids.size() != 1 || features.size() != 1){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(1, ids, features);
 
 		String id = ids.get(0);
 		Feature feature = features.get(0);
@@ -107,9 +105,7 @@ public class OneHotEncoder extends Transformer {
 	public List<? extends Number> getValues(){
 		List<Integer> featureSizes = getFeatureSizes();
 
-		if(featureSizes.size() != 1){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(1, featureSizes);
 
 		Object numberOfValues = get("n_values");
 

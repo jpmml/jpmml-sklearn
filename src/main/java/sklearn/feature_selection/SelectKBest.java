@@ -46,9 +46,7 @@ public class SelectKBest extends Selector {
 		Object k = getK();
 		List<? extends Number> scores = getScores();
 
-		if(features.size() != scores.size()){
-			throw new IllegalArgumentException();
-		} // End if
+		ClassDictUtil.checkSize(features, scores);
 
 		if(("all").equals(k)){
 			return null;

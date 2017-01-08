@@ -43,9 +43,7 @@ public class MinMaxScaler extends Transformer {
 		List<? extends Number> min = getMin();
 		List<? extends Number> scale = getScale();
 
-		if(ids.size() != features.size() || min.size() != features.size() || scale.size() != features.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(ids, features, min, scale);
 
 		List<Feature> result = new ArrayList<>();
 

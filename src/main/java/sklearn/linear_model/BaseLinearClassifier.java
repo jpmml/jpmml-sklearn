@@ -78,10 +78,7 @@ public class BaseLinearClassifier extends Classifier {
 		CategoricalLabel categoricalLabel = (CategoricalLabel)segmentSchema.getLabel();
 
 		if(numberOfClasses == 1){
-
-			if(categoricalLabel.size() != 2){
-				throw new IllegalArgumentException();
-			}
+			EstimatorUtil.checkSize(2, categoricalLabel);
 
 			RegressionModel regressionModel = encodeCategoryRegressor(categoricalLabel.getValue(1), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
 
@@ -89,10 +86,7 @@ public class BaseLinearClassifier extends Classifier {
 		} else
 
 		if(numberOfClasses >= 2){
-
-			if(categoricalLabel.size() != numberOfClasses){
-				throw new IllegalArgumentException();
-			}
+			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
 
 			List<RegressionModel> regressionModels = new ArrayList<>();
 

@@ -78,7 +78,7 @@ public class CClassDict extends ClassDict {
 	public HashMap<String, Object> createAttributeMap(String[] attributes, Object[] args){
 
 		if(attributes.length != args.length){
-			throw new PickleException("Expected " + attributes.length + " attributes, got " + args.length + " attributes");
+			throw new PickleException("Expected " + attributes.length + " attribute(s), got " + args.length + " attribute(s)");
 		}
 
 		HashMap<String, Object> result = new LinkedHashMap<>();

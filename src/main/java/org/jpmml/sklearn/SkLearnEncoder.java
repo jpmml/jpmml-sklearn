@@ -102,7 +102,7 @@ public class SkLearnEncoder extends ModelEncoder {
 		DataField dataField = getDataField(name);
 
 		if(dataField == null){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(name.getValue());
 		}
 
 		List<String> existingCategories = PMMLUtil.getValues(dataField);
@@ -112,7 +112,7 @@ public class SkLearnEncoder extends ModelEncoder {
 				return;
 			}
 
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Data field " + name.getValue() + " has valid values " + existingCategories);
 		}
 
 		PMMLUtil.addValues(dataField, categories);
@@ -172,10 +172,7 @@ public class SkLearnEncoder extends ModelEncoder {
 	}
 
 	public void addRow(List<String> ids, List<Feature> features){
-
-		if(ids.size() != features.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(ids, features);
 
 		this.ids.addAll(ids);
 		this.features.addAll(features);

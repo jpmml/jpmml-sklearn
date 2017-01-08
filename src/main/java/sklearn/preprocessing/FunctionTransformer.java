@@ -43,9 +43,7 @@ public class FunctionTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		Object func = getFunc();
 
-		if(ids.size() != features.size()){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(ids, features);
 
 		UFunc ufunc;
 

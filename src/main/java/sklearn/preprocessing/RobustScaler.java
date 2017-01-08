@@ -48,19 +48,9 @@ public class RobustScaler extends Transformer {
 
 		if(center == null && scale == null){
 			return features;
-		} // End if
-
-		if(ids.size() != features.size()){
-			throw new IllegalArgumentException();
-		} // End if
-
-		if(withCentering && features.size() != center.size()){
-			throw new IllegalArgumentException();
-		} // End if
-
-		if(withScaling && features.size() != scale.size()){
-			throw new IllegalArgumentException();
 		}
+
+		ClassDictUtil.checkSize(ids, features, center, scale);
 
 		List<Feature> result = new ArrayList<>();
 
