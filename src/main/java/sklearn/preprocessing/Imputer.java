@@ -21,15 +21,16 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.dmg.pmml.TypeDefinitionField;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
@@ -58,7 +59,8 @@ public class Imputer extends Transformer {
 
 			Number statisticValue = statistics.get(i);
 
-			if(feature instanceof WildcardFeature){
+			TypeDefinitionField field = encoder.getField(feature.getName());
+			if(field instanceof DataField){
 				String strategy = getStrategy();
 
 				MissingValueDecorator decorator = new MissingValueDecorator()
