@@ -63,6 +63,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLGBMAuto() throws Exception {
+		evaluate("LGBM", "Auto");
+	}
+
+	@Test
 	public void evaluateLinearRegressionAuto() throws Exception {
 		evaluate("LinearRegression", "Auto");
 	}

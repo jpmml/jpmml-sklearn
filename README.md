@@ -76,6 +76,8 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`tree.ExtraTreeClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html)
     * [`tree.ExtraTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
+  * [LightGBM] (https://github.com/Microsoft/LightGBM):
+    * `lightgbm.LGBMRegressor`
   * [SkLearn2PMML] (https://github.com/jpmml/sklearn2pmml):
     * `sklearn2pmml.PMMLPipeline`
     * `sklearn2pmml.decoration.CategoricalDomain`

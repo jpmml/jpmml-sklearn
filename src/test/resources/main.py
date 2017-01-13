@@ -1,3 +1,4 @@
+from lightgbm import LGBMRegressor
 from pandas import DataFrame
 from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -274,6 +275,7 @@ build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
 build_auto(LassoCV(random_state = 13), "LassoAuto")
+build_auto(LGBMRegressor(seed = 13, n_estimators = 17), "LGBMAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.5), "LinearRegressionEnsembleAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
