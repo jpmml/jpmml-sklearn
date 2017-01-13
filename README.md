@@ -77,8 +77,9 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`tree.ExtraTreeRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
   * [SkLearn2PMML] (https://github.com/jpmml/sklearn2pmml):
-    * `decoration.CategoricalDomain`
-    * `decoration.ContinuousDomain`
+    * `sklearn2pmml.PMMLPipeline`
+    * `sklearn2pmml.decoration.CategoricalDomain`
+    * `sklearn2pmml.decoration.ContinuousDomain`
   * [XGBoost] (https://github.com/dmlc/xgboost):
     * [`xgboost.XGBClassifier`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
     * [`xgboost.XGBRegressor`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
@@ -136,22 +137,23 @@ import pandas
 iris_df = pandas.read_csv("Iris.csv")
 ```
 
-First, instantiate a `sklearn_pandas.DataFrameMapper` object, which performs feature engineering work:
+First, instantiate a `sklearn_pandas.DataFrameMapper` object, which performs **data column-wise** feature engineering and selection work:
 ```python
 from sklearn_pandas import DataFrameMapper
-from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn2pmml.decoration import ContinuousDomain
 
 iris_mapper = DataFrameMapper([
-    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), StandardScaler(), PCA(n_components = 3)])
+    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), StandardScaler()])
 ])
 ```
 
-Second, instantiate a `Selector` object, which performs feature selection work:
+Second, instantiate any number of `Transformer` and `Selector` objects, which perform **dataset-wise** feature engineering and selection work:
 ```python
+from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest
 
+iris_pca = PCA(n_components = 3)
 iris_selector = SelectKBest(k = 2)
 ```
 
@@ -162,12 +164,13 @@ from sklearn.tree import DecisionTreeClassifier
 iris_classifier = DecisionTreeClassifier(min_samples_leaf = 5)
 ```
 
-Combine the above three objects into a `sklearn2pmml.PMMLPipeline` object, and run the experiment:
+Combine the above objects into a `sklearn2pmml.PMMLPipeline` object, and run the experiment:
 ```python
 from sklearn2pmml import PMMLPipeline
 
 iris_pipeline = PMMLPipeline([
     ("mapper", iris_mapper),
+    ("pca", iris_pca),
     ("selector", iris_selector),
     ("estimator", iris_classifier)
 ])
