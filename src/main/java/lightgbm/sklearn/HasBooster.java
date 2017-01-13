@@ -18,28 +18,7 @@
  */
 package lightgbm.sklearn;
 
-import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+public interface HasBooster {
 
-public class LGBMRegressor extends Regressor implements HasBooster {
-
-	public LGBMRegressor(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		return BoosterUtil.getNumberOfFeatures(this);
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		return BoosterUtil.encodeModel(this, schema);
-	}
-
-	@Override
-	public Booster getBooster(){
-		return (Booster)get("_Booster");
-	}
+	Booster getBooster();
 }

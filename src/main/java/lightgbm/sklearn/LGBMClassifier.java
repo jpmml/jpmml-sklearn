@@ -18,19 +18,27 @@
  */
 package lightgbm.sklearn;
 
+import java.util.List;
+
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.Classifier;
 
-public class LGBMRegressor extends Regressor implements HasBooster {
+public class LGBMClassifier extends Classifier implements HasBooster {
 
-	public LGBMRegressor(String module, String name){
+	public LGBMClassifier(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public int getNumberOfFeatures(){
 		return BoosterUtil.getNumberOfFeatures(this);
+	}
+
+	@Override
+	public List<?> getClasses(){
+		return ClassDictUtil.getArray(this, "classes");
 	}
 
 	@Override

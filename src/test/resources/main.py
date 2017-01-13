@@ -1,4 +1,4 @@
-from lightgbm import LGBMRegressor
+from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
 from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -139,6 +139,7 @@ build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "De
 build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAudit")
 build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
+build_audit(LGBMClassifier(seed = 13, objective = "binary"), "LGBMAudit")
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 build_audit(LogisticRegressionCV(), "LogisticRegressionAudit")
 build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
