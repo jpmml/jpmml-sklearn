@@ -18,12 +18,10 @@
  */
 package lightgbm.sklearn;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
 import net.razorvine.pickle.objects.ClassDict;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
@@ -49,22 +47,15 @@ public class Booster extends ClassDict {
 	private GBDT loadGBDT(){
 		List<String> handle = getHandle();
 
-		try {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
+		Function<String, String> function = new Function<String, String>(){
 
-			List<String> lines = handle;
-			for(String line : lines){
-				os.write(line.getBytes("US-ASCII"));
+			@Override
+			public String apply(String string){
+				return string.trim(); // XXX
 			}
+		};
 
-			byte[] buffer = os.toByteArray();
-
-			try(InputStream is = new ByteArrayInputStream(buffer)){
-				return LightGBMUtil.loadGBDT(is);
-			}
-		} catch(IOException ioe){
-			throw new RuntimeException(ioe);
-		}
+		return LightGBMUtil.loadGBDT(Iterators.transform(handle.iterator(), function));
 	}
 
 	public List<String> getHandle(){

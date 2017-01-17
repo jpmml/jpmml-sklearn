@@ -28,11 +28,11 @@ import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Output;
 import org.dmg.pmml.SquaredEuclidean;
 import org.dmg.pmml.clustering.Cluster;
 import org.dmg.pmml.clustering.ClusteringField;
 import org.dmg.pmml.clustering.ClusteringModel;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
@@ -40,7 +40,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.clustering.ClusteringModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Clusterer;
 
 public class KMeans extends Clusterer {
@@ -75,7 +74,7 @@ public class KMeans extends Clusterer {
 		List<Cluster> clusters = new ArrayList<>();
 
 		for(int i = 0; i < numberOfClusters; i++){
-			Array array = PMMLUtil.createRealArray(MatrixUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
+			Array array = PMMLUtil.createRealArray(CMatrixUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i));
 
 			Cluster cluster = new Cluster()
 				.setId(String.valueOf(i))
@@ -93,10 +92,8 @@ public class KMeans extends Clusterer {
 			.setCompareFunction(CompareFunction.ABS_DIFF)
 			.setMeasure(new SquaredEuclidean());
 
-		Output output = ClusteringModelUtil.createOutput(FieldName.create("Cluster"), clusters);
-
 		ClusteringModel clusteringModel = new ClusteringModel(MiningFunction.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema(schema), comparisonMeasure, clusteringFields, clusters)
-			.setOutput(output);
+			.setOutput(ClusteringModelUtil.createOutput(FieldName.create("Cluster"), clusters));
 
 		return clusteringModel;
 	}

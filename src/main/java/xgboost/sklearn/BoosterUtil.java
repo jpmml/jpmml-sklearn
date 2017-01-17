@@ -18,15 +18,8 @@
  */
 package xgboost.sklearn;
 
-import java.util.List;
-
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.TypeDefinitionField;
 import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
 
@@ -37,38 +30,26 @@ public class BoosterUtil {
 
 	static
 	public int getNumberOfFeatures(HasBooster hasBooster){
-		Booster booster = hasBooster.getBooster();
-
-		Learner learner = booster.getLearner();
+		Learner learner = getLearner(hasBooster);
 
 		return learner.getNumFeatures();
 	}
 
 	static
 	public MiningModel encodeBooster(HasBooster hasBooster, Schema schema){
-		Booster booster = hasBooster.getBooster();
-
-		Learner learner = booster.getLearner();
+		Learner learner = getLearner(hasBooster);
 
 		Schema xgbSchema = XGBoostUtil.toXGBoostSchema(schema);
-
-		// XXX
-		List<Feature> features = xgbSchema.getFeatures();
-		for(Feature feature : features){
-
-			if(feature instanceof ContinuousFeature){
-				SkLearnEncoder encoder = (SkLearnEncoder)feature.getEncoder();
-
-				TypeDefinitionField field = encoder.getField(feature.getName());
-
-				if(!(OpType.CONTINUOUS).equals(field.getOpType())){
-					field.setOpType(OpType.CONTINUOUS);
-				}
-			}
-		}
 
 		MiningModel miningModel = learner.encodeMiningModel(xgbSchema);
 
 		return miningModel;
+	}
+
+	static
+	private Learner getLearner(HasBooster hasBooster){
+		Booster booster = hasBooster.getBooster();
+
+		return booster.getLearner();
 	}
 }

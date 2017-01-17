@@ -28,7 +28,7 @@ import org.dmg.pmml.FieldName;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldDecorator;
+import org.jpmml.converter.Decorator;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class ImputerTest {
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
 
-		List<FieldDecorator> decorators = encoder.getDecorators(name);
+		List<Decorator> decorators = encoder.getDecorators(name);
 
 		assertEquals(1, decorators.size());
 
@@ -106,7 +106,7 @@ public class ImputerTest {
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
 
-		List<FieldDecorator> decorators = encoder.getDecorators(name);
+		List<Decorator> decorators = encoder.getDecorators(name);
 
 		assertEquals(1, decorators.size());
 
@@ -127,7 +127,7 @@ public class ImputerTest {
 
 		decorators = encoder.getDecorators(name);
 
-		assertEquals(2, decorators.size());
+		assertEquals(3, decorators.size());
 
 		feature = Iterables.getOnlyElement(encoder.getFeatures());
 
@@ -145,7 +145,7 @@ public class ImputerTest {
 
 		decorators = encoder.getDecorators(name);
 
-		assertEquals(1, decorators.size());
+		assertEquals(2, decorators.size());
 
 		feature = Iterables.getOnlyElement(encoder.getFeatures());
 

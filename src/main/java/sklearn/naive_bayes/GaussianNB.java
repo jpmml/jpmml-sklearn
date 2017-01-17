@@ -30,6 +30,7 @@ import org.dmg.pmml.naive_bayes.TargetValueCount;
 import org.dmg.pmml.naive_bayes.TargetValueCounts;
 import org.dmg.pmml.naive_bayes.TargetValueStat;
 import org.dmg.pmml.naive_bayes.TargetValueStats;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -37,7 +38,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Classifier;
 
 public class GaussianNB extends Classifier {
@@ -70,8 +70,8 @@ public class GaussianNB extends Classifier {
 		for(int i = 0; i < numberOfFeatures; i++){
 			Feature feature = schema.getFeature(i);
 
-			List<? extends Number> means = MatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
-			List<? extends Number> variances = MatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
+			List<? extends Number> means = CMatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
+			List<? extends Number> variances = CMatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 

@@ -25,12 +25,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -65,7 +65,7 @@ public class PCA extends Transformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < numberOfComponents; i++){
-			List<? extends Number> component = MatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
+			List<? extends Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
 			Apply apply = new Apply("sum");
 

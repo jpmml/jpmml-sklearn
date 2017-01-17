@@ -28,12 +28,12 @@ import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.dmg.pmml.support_vector_machine.VectorDictionary;
 import org.dmg.pmml.support_vector_machine.VectorInstance;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Classifier;
 
 abstract
@@ -94,8 +94,8 @@ public class BaseLibSVMClassifier extends Classifier {
 				svmVectorInstances.addAll(slice(vectorInstances, offsets, second));
 
 				List<Number> svmDualCoef = new ArrayList<>();
-				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, size - 1, numberOfVectors, second - 1), offsets, first));
-				svmDualCoef.addAll(slice(MatrixUtil.getRow(dualCoef, size - 1, numberOfVectors, first), offsets, second));
+				svmDualCoef.addAll(slice(CMatrixUtil.getRow(dualCoef, size - 1, numberOfVectors, second - 1), offsets, first));
+				svmDualCoef.addAll(slice(CMatrixUtil.getRow(dualCoef, size - 1, numberOfVectors, first), offsets, second));
 
 				// LibSVM: (decisionFunction > 0 ? first : second)
 				// PMML: (decisionFunction < 0 ? first : second)

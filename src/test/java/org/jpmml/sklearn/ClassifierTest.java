@@ -137,6 +137,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLGBMIris() throws Exception {
+		evaluate("LGBM", "Iris");
+	}
+
+	@Test
 	public void evaluateLinearDiscriminantAnalysisIris() throws Exception {
 		evaluate("LinearDiscriminantAnalysis", "Iris");
 	}

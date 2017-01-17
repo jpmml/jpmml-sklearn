@@ -190,28 +190,27 @@ public class TreeModelUtil {
 	}
 
 	static
-	public Schema toTreeModelSchema(Schema schema, DataType dataType){
-		List<Feature> castFeatures = new ArrayList<>();
+	public Schema toTreeModelSchema(Schema schema, final DataType dataType){
+		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
-		List<Feature> features = schema.getFeatures();
-		for(Feature feature : features){
+			@Override
+			public Feature apply(Feature feature){
 
-			if(feature instanceof BinaryFeature){
-				BinaryFeature binaryFeature = (BinaryFeature)feature;
+				if(feature instanceof BinaryFeature){
+					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
-				castFeatures.add(binaryFeature);
-			} else
+					return binaryFeature;
+				} else
 
-			{
-				ContinuousFeature continuousFeature = feature.toContinuousFeature(dataType);
+				{
+					ContinuousFeature continuousFeature = feature.toContinuousFeature(dataType);
 
-				castFeatures.add(continuousFeature);
+					return continuousFeature;
+				}
 			}
-		}
+		};
 
-		schema = new Schema(schema.getLabel(), castFeatures);
-
-		return schema;
+		return schema.toTransformedSchema(function);
 	}
 
 	static

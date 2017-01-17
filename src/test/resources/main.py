@@ -220,6 +220,7 @@ build_iris(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_sampl
 build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
 build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
+build_iris(LGBMClassifier(seed = 13, objective = "multiclass"), "LGBMIris")
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
 build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")

@@ -24,26 +24,27 @@ import java.util.List;
 
 import numpy.core.Scalar;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMMLObject;
-import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.AbstractTransformation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.OutlierTransformation;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.tree.ExtraTreeRegressor;
@@ -111,35 +112,45 @@ public class IsolationForest extends EnsembleRegressor {
 			treeModels.add(treeModel);
 		}
 
-		OutputField rawAnomalyScore = new OutputField(FieldName.create("rawAnomalyScore"), DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setResultFeature(ResultFeature.PREDICTED_VALUE)
-			.setFinalResult(false);
+		// "rawAnomalyScore / averagePathLength(maxSamples)"
+		Transformation normalizedAnomalyScore = new AbstractTransformation(){
 
-		OutputField normalizedAnomalyScore = new OutputField(FieldName.create("normalizedAnomalyScore"), DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setFinalResult(false)
-			.setExpression(PMMLUtil.createApply("/", new FieldRef(rawAnomalyScore.getName()), PMMLUtil.createConstant(averagePathLength(getMaxSamples()))));
+			@Override
+			public FieldName getName(FieldName name){
+				return FieldName.create("normalizedAnomalyScore");
+			}
+
+			@Override
+			public Expression createExpression(FieldRef fieldRef){
+				return PMMLUtil.createApply("/", fieldRef, PMMLUtil.createConstant(averagePathLength(getMaxSamples())));
+			}
+		};
 
 		// "0.5 - 2 ^ (-1 * normalizedAnomalyScore)"
-		OutputField decisionFunction = new OutputField(FieldName.create("decisionFunction"), DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setFinalResult(false)
-			.setExpression(PMMLUtil.createApply("-", PMMLUtil.createConstant(0.5d), PMMLUtil.createApply("pow", PMMLUtil.createConstant(2d), PMMLUtil.createApply("*", PMMLUtil.createConstant(-1d), new FieldRef(normalizedAnomalyScore.getName())))));
+		Transformation decisionFunction = new AbstractTransformation(){
 
-		OutputField outlier = new OutputField(FieldName.create("outlier"), DataType.BOOLEAN)
-			.setOpType(OpType.CATEGORICAL)
-			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(PMMLUtil.createApply("lessOrEqual", new FieldRef(decisionFunction.getName()), PMMLUtil.createConstant(getThreshold())));
+			@Override
+			public FieldName getName(FieldName name){
+				return FieldName.create("decisionFunction");
+			}
 
-		Output output = new Output()
-			.addOutputFields(rawAnomalyScore, normalizedAnomalyScore, decisionFunction, outlier);
+			@Override
+			public Expression createExpression(FieldRef fieldRef){
+				return PMMLUtil.createApply("-", PMMLUtil.createConstant(0.5d), PMMLUtil.createApply("pow", PMMLUtil.createConstant(2d), PMMLUtil.createApply("*", PMMLUtil.createConstant(-1d), fieldRef)));
+			}
+		};
+
+		Transformation outlier = new OutlierTransformation(){
+
+			@Override
+			public Expression createExpression(FieldRef fieldRef){
+				return PMMLUtil.createApply("lessOrEqual", fieldRef, PMMLUtil.createConstant(getThreshold()));
+			}
+		};
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, treeModels))
-			.setOutput(output);
+			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier));
 
 		return miningModel;
 	}

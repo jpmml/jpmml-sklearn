@@ -21,7 +21,6 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Targets;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.TreeModel;
@@ -40,12 +39,9 @@ public class GradientBoostingUtil {
 	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
 		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunction.REGRESSION, schema);
 
-		Targets targets = new Targets()
-			.addTargets(ModelUtil.createRescaleTarget(schema, learningRate.doubleValue(), initialPrediction.doubleValue()));
-
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
-			.setTargets(targets);
+			.setTargets(ModelUtil.createRescaleTargets(schema, learningRate, initialPrediction));
 
 		return miningModel;
 	}

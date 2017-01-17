@@ -19,15 +19,16 @@
 package sklearn.svm;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
-import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.Transformation;
+import org.jpmml.sklearn.OutlierTransformation;
 
 public class OneClassSVM extends BaseLibSVMRegressor {
 
@@ -42,21 +43,16 @@ public class OneClassSVM extends BaseLibSVMRegressor {
 
 	@Override
 	public SupportVectorMachineModel encodeModel(Schema schema){
-		OutputField decisionFunction = new OutputField(FieldName.create("decisionFunction"), DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setResultFeature(ResultFeature.PREDICTED_VALUE)
-			.setFinalResult(false);
+		Transformation outlier = new OutlierTransformation(){
 
-		OutputField outlier = new OutputField(FieldName.create("outlier"), DataType.BOOLEAN)
-			.setOpType(OpType.CATEGORICAL)
-			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(PMMLUtil.createApply("lessOrEqual", new FieldRef(decisionFunction.getName()), PMMLUtil.createConstant(0d)));
-
-		Output output = new Output()
-			.addOutputFields(decisionFunction, outlier);
+			@Override
+			public Expression createExpression(FieldRef fieldRef){
+				return PMMLUtil.createApply("lessOrEqual", fieldRef, PMMLUtil.createConstant(0d));
+			}
+		};
 
 		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
-			.setOutput(output);
+			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE, outlier));
 
 		return supportVectorMachineModel;
 	}

@@ -68,7 +68,7 @@ public class Imputer extends Transformer {
 					.setMissingValueTreatment(parseStrategy(strategy));
 
 				if(targetValue != null){
-					decorator.addMissingValues(ValueUtil.formatValue(targetValue));
+					decorator.addValues(ValueUtil.formatValue(targetValue));
 				}
 
 				encoder.addDecorator(feature.getName(), decorator);

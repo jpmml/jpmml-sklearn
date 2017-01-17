@@ -26,19 +26,17 @@ import java.util.Set;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
-import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.FunctionTransformation;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 
@@ -68,16 +66,17 @@ public class BaseLinearClassifier extends Classifier {
 		List<? extends Number> coefficients = getCoef();
 		List<? extends Number> intercepts = getIntercept();
 
-		Schema segmentSchema = schema.toAnonymousSchema();
+		Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), schema.getFeatures());
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)segmentSchema.getLabel();
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		if(numberOfClasses == 1){
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
-			RegressionModel regressionModel = encodeCategoryRegressor(categoricalLabel.getValue(1), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema);
+			RegressionModel regressionModel = BaseLinearUtil.encodeRegressionModel(intercepts.get(0), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), segmentSchema)
+				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
-			return MiningModelUtil.createBinaryLogisticClassification(schema, regressionModel, -1d, hasProbabilityDistribution);
+			return MiningModelUtil.createBinaryLogisticClassification(schema, regressionModel, RegressionModel.NormalizationMethod.SOFTMAX, 0d, 1d, hasProbabilityDistribution);
 		} else
 
 		if(numberOfClasses >= 2){
@@ -86,7 +85,8 @@ public class BaseLinearClassifier extends Classifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionModel regressionModel = encodeCategoryRegressor(categoricalLabel.getValue(i), MatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), intercepts.get(i), "logit", segmentSchema);
+				RegressionModel regressionModel = BaseLinearUtil.encodeRegressionModel(intercepts.get(i), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), segmentSchema)
+					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, new FunctionTransformation("logit")));
 
 				regressionModels.add(regressionModel);
 			}
@@ -114,31 +114,5 @@ public class BaseLinearClassifier extends Classifier {
 
 	private int[] getCoefShape(){
 		return ClassDictUtil.getShape(this, "coef_", 2);
-	}
-
-	static
-	private RegressionModel encodeCategoryRegressor(String targetCategory, List<? extends Number> coefficients, Number intercept, String outputTransformation, Schema schema){
-		OutputField decisionFunction = new OutputField(FieldName.create("decisionFunction_" + targetCategory), DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setResultFeature(ResultFeature.PREDICTED_VALUE)
-			.setFinalResult(false);
-
-		Output output = new Output()
-			.addOutputFields(decisionFunction);
-
-		if(outputTransformation != null){
-			OutputField transformedDecisionFunction = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory), DataType.DOUBLE)
-				.setOpType(OpType.CONTINUOUS)
-				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-				.setFinalResult(false)
-				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())));
-
-			output.addOutputFields(transformedDecisionFunction);
-		}
-
-		RegressionModel regressionModel = BaseLinearUtil.encodeRegressionModel(intercept, coefficients, schema)
-			.setOutput(output);
-
-		return regressionModel;
 	}
 }

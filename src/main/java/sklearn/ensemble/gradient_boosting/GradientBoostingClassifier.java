@@ -26,20 +26,18 @@ import java.util.Set;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
-import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.FunctionTransformation;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeRegressor;
@@ -72,27 +70,31 @@ public class GradientBoostingClassifier extends Classifier {
 
 		List<DecisionTreeRegressor> estimators = getEstimators();
 
-		Schema segmentSchema = schema.toAnonymousSchema();
+		Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), schema.getFeatures());
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)segmentSchema.getLabel();
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		if(numberOfClasses == 1){
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
 			double coefficient = loss.getCoefficient();
 
-			MiningModel miningModel = encodeCategoryRegressor(categoricalLabel.getValue(1), estimators, init.getPriorProbability(0), learningRate, null, segmentSchema);
+			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, init.getPriorProbability(0), learningRate, segmentSchema)
+				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
-			return MiningModelUtil.createBinaryLogisticClassification(schema, miningModel, coefficient, true);
+			return MiningModelUtil.createBinaryLogisticClassification(schema, miningModel, RegressionModel.NormalizationMethod.SOFTMAX, 0d, -coefficient, true);
 		} else
 
 		if(numberOfClasses >= 2){
 			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
 
+			String function = loss.getFunction();
+
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
-				MiningModel miningModel = encodeCategoryRegressor(categoricalLabel.getValue(i), MatrixUtil.getColumn(estimators, rows, columns, i), init.getPriorProbability(i), learningRate, loss.getFunction(), segmentSchema);
+				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(CMatrixUtil.getColumn(estimators, rows, columns, i), init.getPriorProbability(i), learningRate, segmentSchema)
+					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, new FunctionTransformation(function)));
 
 				miningModels.add(miningModel);
 			}
@@ -151,31 +153,5 @@ public class GradientBoostingClassifier extends Classifier {
 
 	public List<DecisionTreeRegressor> getEstimators(){
 		return (List)ClassDictUtil.getArray(this, "estimators_");
-	}
-
-	static
-	private MiningModel encodeCategoryRegressor(String targetCategory, List<DecisionTreeRegressor> estimators, Number priorProbability, Number learningRate, String outputTransformation, Schema schema){
-		OutputField decisionFunction = new OutputField(FieldName.create("decisionFunction_" + targetCategory), DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.setResultFeature(ResultFeature.PREDICTED_VALUE)
-			.setFinalResult(false);
-
-		Output output = new Output()
-			.addOutputFields(decisionFunction);
-
-		if(outputTransformation != null){
-			OutputField transformedDecisionField = new OutputField(FieldName.create(outputTransformation + "DecisionFunction_" + targetCategory), DataType.DOUBLE)
-				.setOpType(OpType.CONTINUOUS)
-				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-				.setFinalResult(false)
-				.setExpression(PMMLUtil.createApply(outputTransformation, new FieldRef(decisionFunction.getName())));
-
-			output.addOutputFields(transformedDecisionField);
-		}
-
-		MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, priorProbability, learningRate, schema)
-			.setOutput(output);
-
-		return miningModel;
 	}
 }

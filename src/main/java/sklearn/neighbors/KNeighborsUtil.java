@@ -44,6 +44,7 @@ import org.dmg.pmml.nearest_neighbor.KNNInput;
 import org.dmg.pmml.nearest_neighbor.KNNInputs;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.dmg.pmml.nearest_neighbor.TrainingInstances;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
@@ -51,7 +52,6 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import sklearn.Estimator;
 
 public class KNeighborsUtil {
@@ -109,7 +109,7 @@ public class KNeighborsUtil {
 		for(int i = 0; i < numberOfInstances; i++){
 			List<Object> values = new ArrayList<>(1 + numberOfFeatures);
 			values.add(y.get(i));
-			values.addAll(MatrixUtil.getRow(fitX, numberOfInstances, numberOfFeatures, i));
+			values.addAll(CMatrixUtil.getRow(fitX, numberOfInstances, numberOfFeatures, i));
 
 			Row row = DOMUtil.createRow(documentBuilder, keys, values);
 

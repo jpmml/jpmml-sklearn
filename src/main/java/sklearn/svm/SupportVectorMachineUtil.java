@@ -39,6 +39,7 @@ import org.dmg.pmml.support_vector_machine.VectorDictionary;
 import org.dmg.pmml.support_vector_machine.VectorFields;
 import org.dmg.pmml.support_vector_machine.VectorInstance;
 import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -46,7 +47,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.LoggerUtil;
-import org.jpmml.sklearn.MatrixUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ public class SupportVectorMachineUtil {
 		Double defaultValue = Double.valueOf(0d);
 
 		for(int i = 0; i < numberOfVectors; i++){
-			List<? extends Number> values = MatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
+			List<? extends Number> values = CMatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
 
 			BitSet vectorFeatures = ValueUtil.getIndices(values, defaultValue);
 
@@ -109,7 +109,7 @@ public class SupportVectorMachineUtil {
 
 			VectorInstance vectorInstance = new VectorInstance(id);
 
-			List<? extends Number> values = MatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
+			List<? extends Number> values = CMatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
 
 			if(numberOfUsedFeatures < numberOfFeatures){
 				values = ValueUtil.filterByIndices(values, featureMask);

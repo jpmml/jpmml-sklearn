@@ -21,15 +21,12 @@ package sklearn2pmml.decoration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
-import org.dmg.pmml.MiningField;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldDecorator;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -54,58 +51,27 @@ public class ContinuousDomain extends Domain {
 
 		ClassDictUtil.checkSize(ids, features, dataMin, dataMax);
 
-		final
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+
+		InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator()
+			.setInvalidValueTreatment(invalidValueTreatment);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			WildcardFeature wildcardFeature = (WildcardFeature)features.get(i);
 
-			final
+			ContinuousFeature continuousFeature = wildcardFeature.toContinuousFeature();
+
 			Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED)
 				.setLeftMargin(ValueUtil.asDouble(dataMin.get(i)))
 				.setRightMargin(ValueUtil.asDouble(dataMax.get(i)));
 
-			FieldDecorator decorator = new ValidValueDecorator(){
+			ValidValueDecorator validValueDecorator = new ValidValueDecorator()
+				.addIntervals(interval);
 
-				{
-					setInvalidValueTreatment(invalidValueTreatment);
-				}
-
-				@Override
-				public void decorate(DataField dataField, MiningField miningField){
-					DataType dataType = dataField.getDataType();
-
-					switch(dataType){
-						case FLOAT:
-							{
-								interval.setLeftMargin(toFloat(interval.getLeftMargin()));
-								interval.setRightMargin(toFloat(interval.getRightMargin()));
-							}
-							break;
-						default:
-							break;
-					}
-
-					dataField.addIntervals(interval);
-
-					super.decorate(dataField, miningField);
-				}
-
-				private Double toFloat(Double value){
-
-					if((value != null) && (value.doubleValue() != value.floatValue())){
-						return (double)value.floatValue();
-					}
-
-					return value;
-				}
-			};
-
-			ContinuousFeature continuousFeature = wildcardFeature.toContinuousFeature();
-
-			encoder.addDecorator(continuousFeature.getName(), decorator);
+			encoder.addDecorator(continuousFeature.getName(), validValueDecorator);
+			encoder.addDecorator(continuousFeature.getName(), invalidValueDecorator);
 
 			result.add(continuousFeature);
 		}

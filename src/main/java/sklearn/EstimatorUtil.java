@@ -24,13 +24,12 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.SigmoidTransformation;
 import org.jpmml.sklearn.ClassDictUtil;
 
 public class EstimatorUtil {
@@ -78,30 +77,27 @@ public class EstimatorUtil {
 
 	static
 	public DefineFunction encodeLogitFunction(){
-		return encodeLossFunction("logit", -1d);
+		return encodeSigmoidFunction("logit", -1d);
 	}
 
 	static
 	public DefineFunction encodeAdaBoostFunction(){
-		return encodeLossFunction("adaboost", -2d);
+		return encodeSigmoidFunction("adaboost", -2d);
 	}
 
 	static
-	private DefineFunction encodeLossFunction(String function, double multiplier){
+	private DefineFunction encodeSigmoidFunction(String function, double multiplier){
 		FieldName name = FieldName.create("value");
 
 		ParameterField parameterField = new ParameterField(name)
 			.setDataType(DataType.DOUBLE)
 			.setOpType(OpType.CONTINUOUS);
 
-		// "1 / (1 + exp($multiplier * $name))"
-		Expression expression = PMMLUtil.createApply("/", PMMLUtil.createConstant(1d), PMMLUtil.createApply("+", PMMLUtil.createConstant(1d), PMMLUtil.createApply("exp", PMMLUtil.createApply("*", PMMLUtil.createConstant(multiplier), new FieldRef(name)))));
-
 		DefineFunction defineFunction = new DefineFunction(function, OpType.CONTINUOUS, null)
 			.setDataType(DataType.DOUBLE)
 			.setOpType(OpType.CONTINUOUS)
 			.addParameterFields(parameterField)
-			.setExpression(expression);
+			.setExpression(SigmoidTransformation.createExpression(multiplier, new FieldRef(name)));
 
 		return defineFunction;
 	}

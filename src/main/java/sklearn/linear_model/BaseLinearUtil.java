@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
-import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -60,10 +59,8 @@ public class BaseLinearUtil {
 			}
 		}
 
-		RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, ValueUtil.asDouble(intercept), featureCoefficients);
-
 		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), null)
-			.addRegressionTables(regressionTable);
+			.addRegressionTables(RegressionModelUtil.createRegressionTable(features, ValueUtil.asDouble(intercept), featureCoefficients));
 
 		if(!unusedFeatures.isEmpty()){
 			logger.info("Skipped {} feature(s): {}", unusedFeatures.size(), LoggerUtil.formatNameList(unusedFeatures));

@@ -28,8 +28,7 @@ import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldDecorator;
-import org.jpmml.converter.ValidValueDecorator;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -60,8 +59,10 @@ public class CategoricalDomain extends Domain {
 
 		ClassDictUtil.checkSize(1, ids, features);
 
-		final
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+
+		InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator()
+			.setInvalidValueTreatment(invalidValueTreatment);
 
 		WildcardFeature wildcardFeature = (WildcardFeature)features.get(0);
 
@@ -75,16 +76,9 @@ public class CategoricalDomain extends Domain {
 
 		List<String> categories = Lists.transform(data, function);
 
-		FieldDecorator decorator = new ValidValueDecorator(){
-
-			{
-				setInvalidValueTreatment(invalidValueTreatment);
-			}
-		};
-
 		CategoricalFeature categoricalFeature = wildcardFeature.toCategoricalFeature(categories);
 
-		encoder.addDecorator(categoricalFeature.getName(), decorator);
+		encoder.addDecorator(categoricalFeature.getName(), invalidValueDecorator);
 
 		return Collections.<Feature>singletonList(categoricalFeature);
 	}

@@ -37,6 +37,7 @@ import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.dmg.pmml.neural_network.NeuralOutput;
 import org.dmg.pmml.neural_network.NeuralOutputs;
 import org.dmg.pmml.neural_network.Neuron;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
@@ -46,7 +47,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
-import org.jpmml.sklearn.MatrixUtil;
 
 public class NeuralNetworkUtil {
 
@@ -121,7 +121,7 @@ public class NeuralNetworkUtil {
 			List<?> coefMatrix = coef.getArrayContent();
 
 			for(int row = 0; row < rows; row++){
-				List<?> weights = MatrixUtil.getRow(coefMatrix, rows, columns, row);
+				List<?> weights = CMatrixUtil.getRow(coefMatrix, rows, columns, row);
 
 				connect(entities.get(row), neurons, weights);
 			}
