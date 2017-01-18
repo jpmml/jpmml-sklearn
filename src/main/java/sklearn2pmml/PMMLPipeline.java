@@ -21,14 +21,12 @@ package sklearn2pmml;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
@@ -129,11 +127,6 @@ public class PMMLPipeline extends Pipeline {
 
 				encoder.addRow(Collections.singletonList(activeField), Collections.<Feature>singletonList(new WildcardFeature(encoder, dataField)));
 			}
-		}
-
-		Set<DefineFunction> defineFunctions = encodeDefineFunctions();
-		for(DefineFunction defineFunction : defineFunctions){
-			encoder.addDefineFunction(defineFunction);
 		}
 
 		Schema schema = new Schema(label, encoder.getFeatures());

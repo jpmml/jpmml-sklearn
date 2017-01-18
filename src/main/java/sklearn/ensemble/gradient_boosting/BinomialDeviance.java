@@ -18,8 +18,7 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
-import org.dmg.pmml.DefineFunction;
-import sklearn.EstimatorUtil;
+import org.jpmml.converter.SigmoidTransformation;
 
 public class BinomialDeviance extends LossFunction {
 
@@ -28,17 +27,7 @@ public class BinomialDeviance extends LossFunction {
 	}
 
 	@Override
-	public double getCoefficient(){
-		return -1d;
-	}
-
-	@Override
-	public String getFunction(){
-		return "logit";
-	}
-
-	@Override
-	public DefineFunction encodeFunction(){
-		return EstimatorUtil.encodeLogitFunction();
+	public SigmoidTransformation createTransformation(){
+		return new SigmoidTransformation(-1d);
 	}
 }

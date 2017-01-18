@@ -19,10 +19,8 @@
 package sklearn.pipeline;
 
 import java.util.List;
-import java.util.Set;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
@@ -96,13 +94,6 @@ public class Pipeline extends Estimator {
 		}
 
 		return estimator.getDataType();
-	}
-
-	@Override
-	public Set<DefineFunction> encodeDefineFunctions(){
-		Estimator estimator = getEstimator();
-
-		return estimator.encodeDefineFunctions();
 	}
 
 	@Override

@@ -18,7 +18,7 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
-import org.dmg.pmml.DefineFunction;
+import org.jpmml.converter.ExpTransformation;
 
 public class MultinomialDeviance extends LossFunction {
 
@@ -27,17 +27,7 @@ public class MultinomialDeviance extends LossFunction {
 	}
 
 	@Override
-	public double getCoefficient(){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getFunction(){
-		return "exp";
-	}
-
-	@Override
-	public DefineFunction encodeFunction(){
-		return null;
+	public ExpTransformation createTransformation(){
+		return new ExpTransformation();
 	}
 }

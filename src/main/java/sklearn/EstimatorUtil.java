@@ -22,14 +22,7 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.SigmoidTransformation;
 import org.jpmml.sklearn.ClassDictUtil;
 
 public class EstimatorUtil {
@@ -73,33 +66,6 @@ public class EstimatorUtil {
 		if(categoricalLabel.size() != size){
 			throw new IllegalArgumentException("Expected " + size + " class(es), got " + categoricalLabel.size() + " class(es)");
 		}
-	}
-
-	static
-	public DefineFunction encodeLogitFunction(){
-		return encodeSigmoidFunction("logit", -1d);
-	}
-
-	static
-	public DefineFunction encodeAdaBoostFunction(){
-		return encodeSigmoidFunction("adaboost", -2d);
-	}
-
-	static
-	private DefineFunction encodeSigmoidFunction(String function, double multiplier){
-		FieldName name = FieldName.create("value");
-
-		ParameterField parameterField = new ParameterField(name)
-			.setDataType(DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS);
-
-		DefineFunction defineFunction = new DefineFunction(function, OpType.CONTINUOUS, null)
-			.setDataType(DataType.DOUBLE)
-			.setOpType(OpType.CONTINUOUS)
-			.addParameterFields(parameterField)
-			.setExpression(SigmoidTransformation.createExpression(multiplier, new FieldRef(name)));
-
-		return defineFunction;
 	}
 
 	private static final Function<Object, Estimator> estimatorFunction = new Function<Object, Estimator>(){

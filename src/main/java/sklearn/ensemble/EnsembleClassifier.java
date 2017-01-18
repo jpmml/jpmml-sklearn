@@ -19,10 +19,8 @@
 package sklearn.ensemble;
 
 import java.util.List;
-import java.util.Set;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.OpType;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
@@ -46,13 +44,6 @@ public class EnsembleClassifier extends Classifier {
 		Classifier baseEstimator = getBaseEstimator();
 
 		return baseEstimator.getOpType();
-	}
-
-	@Override
-	public Set<DefineFunction> encodeDefineFunctions(){
-		Classifier baseEstimator = getBaseEstimator();
-
-		return baseEstimator.encodeDefineFunctions();
 	}
 
 	public Classifier getBaseEstimator(){

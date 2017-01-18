@@ -18,8 +18,7 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
-import org.dmg.pmml.DefineFunction;
-import sklearn.EstimatorUtil;
+import org.jpmml.converter.SigmoidTransformation;
 
 public class ExponentialLoss extends LossFunction {
 
@@ -28,17 +27,7 @@ public class ExponentialLoss extends LossFunction {
 	}
 
 	@Override
-	public double getCoefficient(){
-		return -2d;
-	}
-
-	@Override
-	public String getFunction(){
-		return "adaboost";
-	}
-
-	@Override
-	public DefineFunction encodeFunction(){
-		return EstimatorUtil.encodeAdaBoostFunction();
+	public SigmoidTransformation createTransformation(){
+		return new SigmoidTransformation(-2d);
 	}
 }

@@ -19,13 +19,8 @@
 package sklearn.ensemble.voting_classifier;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
@@ -51,25 +46,6 @@ public class VotingClassifier extends Classifier {
 		Estimator estimator = estimators.get(0);
 
 		return estimator.getNumberOfFeatures();
-	}
-
-	@Override
-	public Set<DefineFunction> encodeDefineFunctions(){
-		List<? extends Classifier> estimators = getEstimators();
-
-		Map<String, DefineFunction> uniqueDefineFunctions = new LinkedHashMap<>();
-
-		for(Classifier estimator : estimators){
-			Set<DefineFunction> defineFunctions = estimator.encodeDefineFunctions();
-
-			for(DefineFunction defineFunction : defineFunctions){
-				uniqueDefineFunctions.put(defineFunction.getName(), defineFunction);
-			}
-		}
-
-		Set<DefineFunction> result = new LinkedHashSet<>(uniqueDefineFunctions.values());
-
-		return result;
 	}
 
 	@Override

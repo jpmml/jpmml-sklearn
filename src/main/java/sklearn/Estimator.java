@@ -18,11 +18,7 @@
  */
 package sklearn;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
@@ -63,9 +59,5 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	 */
 	public DataType getDataType(){
 		return DataType.DOUBLE;
-	}
-
-	public Set<DefineFunction> encodeDefineFunctions(){
-		return Collections.emptySet();
 	}
 }

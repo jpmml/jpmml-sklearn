@@ -19,7 +19,7 @@
 package sklearn.ensemble.gradient_boosting;
 
 import net.razorvine.pickle.objects.ClassDict;
-import org.dmg.pmml.DefineFunction;
+import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
 
 abstract
@@ -30,14 +30,7 @@ public class LossFunction extends ClassDict {
 	}
 
 	abstract
-	public double getCoefficient();
-
-	abstract
-	public String getFunction();
-
-	public DefineFunction encodeFunction(){
-		return null;
-	}
+	public Transformation createTransformation();
 
 	public Integer getK(){
 		return ValueUtil.asInteger((Number)get("K"));

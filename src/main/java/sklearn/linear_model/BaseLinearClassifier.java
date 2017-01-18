@@ -19,12 +19,9 @@
 package sklearn.linear_model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
@@ -32,9 +29,9 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.FunctionTransformation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SigmoidTransformation;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
@@ -79,14 +76,14 @@ public class BaseLinearClassifier extends Classifier {
 			return MiningModelUtil.createBinaryLogisticClassification(schema, regressionModel, RegressionModel.NormalizationMethod.SOFTMAX, 0d, 1d, hasProbabilityDistribution);
 		} else
 
-		if(numberOfClasses >= 2){
+		if(numberOfClasses >= 3){
 			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
 
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
 				RegressionModel regressionModel = BaseLinearUtil.encodeRegressionModel(intercepts.get(i), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, new FunctionTransformation("logit")));
+					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, new SigmoidTransformation(-1d)));
 
 				regressionModels.add(regressionModel);
 			}
@@ -97,11 +94,6 @@ public class BaseLinearClassifier extends Classifier {
 		{
 			throw new IllegalArgumentException();
 		}
-	}
-
-	@Override
-	public Set<DefineFunction> encodeDefineFunctions(){
-		return Collections.singleton(EstimatorUtil.encodeLogitFunction());
 	}
 
 	public List<? extends Number> getCoef(){
