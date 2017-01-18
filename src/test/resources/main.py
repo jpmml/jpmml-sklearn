@@ -4,7 +4,7 @@ from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.dummy import DummyRegressor
+from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble.bagging import BaggingClassifier, BaggingRegressor
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
@@ -138,6 +138,7 @@ def build_audit(classifier, name, with_proba = True):
 
 build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAudit")
 build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAudit")
+build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
 build_audit(LGBMClassifier(seed = 13, objective = "binary"), "LGBMAudit")
@@ -180,6 +181,7 @@ def build_versicolor(classifier, name, with_proba = True):
 	store_csv(species, name + ".csv")
 
 build_versicolor(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeVersicolor")
+build_versicolor(DummyClassifier(strategy = "prior"), "DummyVersicolor")
 build_versicolor(KNeighborsClassifier(), "KNNVersicolor", with_proba = False)
 build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPVersicolor")
 build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)
@@ -218,6 +220,7 @@ def build_iris(classifier, name, with_proba = True):
 
 build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris")
 build_iris(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleIris")
+build_iris(DummyClassifier(strategy = "constant", constant = "versicolor"), "DummyIris")
 build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
 build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)

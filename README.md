@@ -15,6 +15,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
   * Discriminant Analysis:
     * [`discriminant_analysis.LinearDiscriminantAnalysis`] (http://scikit-learn.org/stable/modules/generated/sklearn.discriminant_analysis.LinearDiscriminantAnalysis.html)
   * Dummies:
+    * [`dummy.DummyClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html)
     * [`dummy.DummyRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyRegressor.html)
   * Ensemble Methods:
     * [`ensemble.AdaBoostRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html)

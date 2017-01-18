@@ -39,6 +39,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateDummyAudit() throws Exception {
+		evaluate("Dummy", "Audit");
+	}
+
+	@Test
 	public void evaluatExtraTreesAudit() throws Exception {
 		evaluate("ExtraTrees", "Audit");
 	}
@@ -114,6 +119,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateDecisionTreeEnsembleIris() throws Exception {
 		evaluate("DecisionTreeEnsemble", "Iris");
+	}
+
+	@Test
+	public void evaluateDummyIris() throws Exception {
+		evaluate("Dummy", "Iris");
 	}
 
 	@Test
@@ -222,6 +232,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateDecisionTreeVersicolor() throws Exception {
 		evaluate("DecisionTree", "Versicolor");
+	}
+
+	@Test
+	public void evaluateDummyVersicolor() throws Exception {
+		evaluate("Dummy", "Versicolor");
 	}
 
 	@Test
