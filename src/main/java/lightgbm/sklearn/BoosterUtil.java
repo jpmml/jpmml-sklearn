@@ -41,7 +41,7 @@ public class BoosterUtil {
 	public MiningModel encodeModel(HasBooster hasBooster, Schema schema){
 		GBDT gbdt = getGBDT(hasBooster);
 
-		Schema lgbmSchema = LightGBMUtil.toLightGBMSchema(schema);
+		Schema lgbmSchema = LightGBMUtil.toLightGBMSchema(gbdt, schema);
 
 		MiningModel miningModel = gbdt.encodeMiningModel(lgbmSchema);
 
