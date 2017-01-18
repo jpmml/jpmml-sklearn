@@ -4,6 +4,7 @@ from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble.bagging import BaggingClassifier, BaggingRegressor
 from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
@@ -273,6 +274,7 @@ def build_auto(regressor, name):
 build_auto(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostAuto")
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
 build_auto(BaggingRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAuto")
+build_auto(DummyRegressor(strategy = "median"), "DummyAuto")
 build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")

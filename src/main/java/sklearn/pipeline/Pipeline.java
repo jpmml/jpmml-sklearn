@@ -142,8 +142,9 @@ public class Pipeline extends Estimator {
 		List<Feature> features = schema.getFeatures();
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();
-
-		ClassDictUtil.checkSize(numberOfFeatures, features);
+		if(numberOfFeatures > -1){
+			ClassDictUtil.checkSize(numberOfFeatures, features);
+		}
 
 		return estimator.encodeModel(schema, encoder);
 	}
