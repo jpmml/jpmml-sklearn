@@ -162,9 +162,7 @@ public class IsolationForest extends EnsembleRegressor {
 	public double getThreshold(){
 		Scalar threshold = (Scalar)get("threshold_");
 
-		List<?> content = threshold.getContent();
-
-		return ValueUtil.asDouble((Number)content.get(0));
+		return ValueUtil.asDouble((Number)threshold.getOnlyElement());
 	}
 
 	static

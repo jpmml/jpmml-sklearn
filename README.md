@@ -30,6 +30,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`ensemble.RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
     * [`ensemble.VotingClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html)
   * Feature Selection:
+    * [`feature_selection.SelectFromModel`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFromModel.html)
     * [`feature_selection.SelectKBest`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html)
   * Generalized Linear Models:
     * [`linear_model.ElasticNet`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)

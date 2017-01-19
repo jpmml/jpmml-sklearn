@@ -12,7 +12,7 @@ from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, Gradi
 from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.externals import joblib
-from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import SelectFromModel, SelectKBest
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
@@ -24,6 +24,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
+from sklearn2pmml import EstimatorProxy
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn_pandas import DataFrameMapper
@@ -115,8 +116,8 @@ audit_y = audit_y.astype(int)
 def build_audit(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
 		("Age", ContinuousDomain()),
-		("Employment", [LabelBinarizer(), SelectKBest(k = 3)]),
-		("Education", [LabelBinarizer(), SelectKBest(k = 3)]),
+		("Employment", [LabelBinarizer(), SelectFromModel(EstimatorProxy(DecisionTreeClassifier(random_state = 13)), threshold = "1.25 * mean")]),
+		("Education", [LabelBinarizer(), SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "median")]),
 		("Marital", [LabelBinarizer(), SelectKBest(k = 3)]),
 		("Occupation", [LabelBinarizer(), SelectKBest(k = 3)]),
 		("Income", ContinuousDomain()),

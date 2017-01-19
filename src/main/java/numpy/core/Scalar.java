@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Iterables;
 import numpy.DType;
 import org.jpmml.sklearn.CClassDict;
 import org.jpmml.sklearn.HasArray;
@@ -54,6 +55,12 @@ public class Scalar extends CClassDict implements HasArray {
 		List<?> content = getContent();
 
 		return new int[]{content.size()};
+	}
+
+	public Object getOnlyElement(){
+		List<?> content = getContent();
+
+		return Iterables.getOnlyElement(content);
 	}
 
 	public List<?> getContent(){
