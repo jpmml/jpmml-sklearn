@@ -83,6 +83,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * `lightgbm.LGBMClassifier`
     * `lightgbm.LGBMRegressor`
   * [SkLearn2PMML] (https://github.com/jpmml/sklearn2pmml):
+    * `sklearn2pmml.EstimatorProxy`
     * `sklearn2pmml.PMMLPipeline`
     * `sklearn2pmml.decoration.CategoricalDomain`
     * `sklearn2pmml.decoration.ContinuousDomain`
