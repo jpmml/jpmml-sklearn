@@ -18,11 +18,18 @@
  */
 package sklearn;
 
+import org.dmg.pmml.MiningFunction;
+
 abstract
 public class Regressor extends Estimator {
 
 	public Regressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public MiningFunction getMiningFunction(){
+		return MiningFunction.REGRESSION;
 	}
 
 	@Override

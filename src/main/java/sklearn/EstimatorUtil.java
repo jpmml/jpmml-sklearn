@@ -31,6 +31,13 @@ public class EstimatorUtil {
 	}
 
 	static
+	public List<?> getClasses(Estimator estimator){
+		HasClasses hasClasses = (HasClasses)estimator;
+
+		return hasClasses.getClasses();
+	}
+
+	static
 	public Estimator asEstimator(Object object){
 		return EstimatorUtil.estimatorFunction.apply(object);
 	}

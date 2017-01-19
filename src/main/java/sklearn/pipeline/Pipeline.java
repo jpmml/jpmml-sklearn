@@ -21,6 +21,7 @@ package sklearn.pipeline;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
@@ -30,14 +31,22 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasClasses;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
-public class Pipeline extends Estimator {
+public class Pipeline extends Estimator implements HasClasses {
 
 	public Pipeline(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public MiningFunction getMiningFunction(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getMiningFunction();
 	}
 
 	@Override
@@ -94,6 +103,13 @@ public class Pipeline extends Estimator {
 		}
 
 		return estimator.getDataType();
+	}
+
+	@Override
+	public List<?> getClasses(){
+		Estimator estimator = getEstimator();
+
+		return EstimatorUtil.getClasses(estimator);
 	}
 
 	@Override

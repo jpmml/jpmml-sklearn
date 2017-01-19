@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2017 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -20,32 +20,7 @@ package sklearn;
 
 import java.util.List;
 
-import org.dmg.pmml.MiningFunction;
-import org.jpmml.sklearn.ClassDictUtil;
+public interface HasClasses {
 
-abstract
-public class Classifier extends Estimator implements HasClasses {
-
-	public Classifier(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public MiningFunction getMiningFunction(){
-		return MiningFunction.CLASSIFICATION;
-	}
-
-	@Override
-	public boolean isSupervised(){
-		return true;
-	}
-
-	public boolean hasProbabilityDistribution(){
-		return true;
-	}
-
-	@Override
-	public List<?> getClasses(){
-		return ClassDictUtil.getArray(this, "classes_");
-	}
+	List<?> getClasses();
 }

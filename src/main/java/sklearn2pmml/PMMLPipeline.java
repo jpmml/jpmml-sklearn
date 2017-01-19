@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
@@ -41,8 +42,8 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
-import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.TypeUtil;
 import sklearn.pipeline.Pipeline;
 import sklearn_pandas.DataFrameMapper;
@@ -74,33 +75,26 @@ public class PMMLPipeline extends Pipeline {
 				targetField = "y";
 			}
 
-			OpType opType = OpType.CONTINUOUS;
-			DataType dataType = DataType.DOUBLE;
+			MiningFunction miningFunction = estimator.getMiningFunction();
+			switch(miningFunction){
+				case CLASSIFICATION:
+					{
+						List<?> classes = EstimatorUtil.getClasses(estimator);
 
-			List<String> targetCategories = null;
+						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, TypeUtil.getDataType(classes, DataType.STRING), formatTargetCategories(classes));
 
-			if(estimator instanceof Classifier){
-				Classifier classifier = (Classifier)estimator;
+						label = new CategoricalLabel(dataField);
+					}
+					break;
+				case REGRESSION:
+					{
+						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CONTINUOUS, DataType.DOUBLE);
 
-				List<?> classes = classifier.getClasses();
-				if(classes == null || classes.isEmpty()){
+						label = new ContinuousLabel(dataField);
+					}
+					break;
+				default:
 					throw new IllegalArgumentException();
-				}
-
-				opType = OpType.CATEGORICAL;
-				dataType = TypeUtil.getDataType(classes, DataType.STRING);
-
-				targetCategories = formatTargetCategories(classes);
-			}
-
-			DataField dataField = encoder.createDataField(FieldName.create(targetField), opType, dataType, targetCategories);
-
-			if(targetCategories != null && targetCategories.size() > 0){
-				label = new CategoricalLabel(dataField);
-			} else
-
-			{
-				label = new ContinuousLabel(dataField);
 			}
 		} // End if
 

@@ -18,11 +18,18 @@
  */
 package sklearn;
 
+import org.dmg.pmml.MiningFunction;
+
 abstract
 public class Clusterer extends Estimator {
 
 	public Clusterer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public MiningFunction getMiningFunction(){
+		return MiningFunction.CLUSTERING;
 	}
 
 	@Override

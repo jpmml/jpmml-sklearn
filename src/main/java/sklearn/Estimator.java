@@ -19,6 +19,7 @@
 package sklearn;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
@@ -31,6 +32,9 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	public Estimator(String module, String name){
 		super(module, name);
 	}
+
+	abstract
+	public MiningFunction getMiningFunction();
 
 	abstract
 	public boolean isSupervised();
