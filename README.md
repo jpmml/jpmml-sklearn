@@ -30,8 +30,16 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`ensemble.RandomForestRegressor`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
     * [`ensemble.VotingClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html)
   * Feature Selection:
-    * [`feature_selection.SelectFromModel`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFromModel.html)
-    * [`feature_selection.SelectKBest`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html)
+    * [`feature_selection.GenericUnivariateSelect`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.GenericUnivariateSelect.html) (only via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.RFE`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html) (only via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.RFECV`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFECV.html) (only via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.SelectFdr`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFdr.html) (only via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.SelectFpr`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFpr.html) (only via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.SelectFromModel`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFromModel.html) (either directly or via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.SelectFwe`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFwe.html) (only via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.SelectKBest`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html) (either directly or via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.SelectPercentile`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectPercentile.html) (only via `sklearn2pmml.SelectorProxy`)
+    * [`feature_selection.VarianceThreshold`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.VarianceThreshold.html) (only via `sklearn2pmml.SelectorProxy`)
   * Generalized Linear Models:
     * [`linear_model.ElasticNet`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
     * [`linear_model.ElasticNetCV`] (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html)
