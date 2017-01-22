@@ -40,7 +40,13 @@ public class SkLearnEncoder extends ModelEncoder {
 
 
 	public void updateType(FieldName name, OpType opType, DataType dataType){
-		TypeDefinitionField field = getField(name);
+		TypeDefinitionField field;
+
+		try {
+			field = getField(name);
+		} catch(IllegalArgumentException iae){
+			return;
+		}
 
 		if(opType != null){
 			field.setOpType(opType);

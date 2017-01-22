@@ -65,6 +65,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`preprocessing.MaxAbsScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MaxAbsScaler.html)
     * [`preprocessing.MinMaxScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html)
     * [`preprocessing.OneHotEncoder`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html)
+    * [`preprocessing.PolynomialFeatures`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PolynomialFeatures.html)
     * [`preprocessing.RobustScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)
     * [`preprocessing.StandardScaler`] (http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
   * Support Vector Machines:

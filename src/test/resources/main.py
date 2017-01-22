@@ -22,7 +22,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, RobustScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import EstimatorProxy
 from sklearn2pmml import PMMLPipeline
@@ -166,11 +166,12 @@ versicolor_y = versicolor_y.astype(int)
 
 def build_versicolor(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
-		(versicolor_columns[: -1], [ContinuousDomain(), RobustScaler()])
+		((versicolor_columns[: -1], [ContinuousDomain(), RobustScaler()]))
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("selector", SelectKBest(k = 3)),
+		("transformer", PolynomialFeatures(degree = 3)),
+		("selector", SelectKBest(k = "all")),
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
@@ -310,9 +311,9 @@ def build_housing(regressor, name, with_kneighbors = False):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("selector(7)", SelectKBest(k = 7)),
+		("transformer", PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)),
 		("scaler", StandardScaler()),
-		("selector(5)", SelectKBest(k = 5)),
+		("selector", SelectKBest(k = 7)),
 		("regressor", regressor)
 	])
 	pipeline.fit(housing_X, housing_y)

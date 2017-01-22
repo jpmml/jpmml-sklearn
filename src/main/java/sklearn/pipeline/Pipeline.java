@@ -132,8 +132,9 @@ public class Pipeline extends Estimator implements HasClasses {
 					HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
 
 					int numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
-
-					ClassDictUtil.checkSize(numberOfFeatures, ids, features);
+					if(numberOfFeatures > -1){
+						ClassDictUtil.checkSize(numberOfFeatures, ids, features);
+					}
 				}
 
 				for(Feature feature : features){
