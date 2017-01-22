@@ -36,9 +36,9 @@ public class SelectKBest extends Selector {
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<? extends Number> scores = getScores();
+		int[] shape = getScoresShape();
 
-		return scores.size();
+		return shape[0];
 	}
 
 	@Override
@@ -83,6 +83,10 @@ public class SelectKBest extends Selector {
 
 	public List<? extends Number> getScores(){
 		return (List)ClassDictUtil.getArray(this, "scores_");
+	}
+
+	private int[] getScoresShape(){
+		return ClassDictUtil.getShape(this, "scores_", 1);
 	}
 
 	static

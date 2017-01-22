@@ -12,7 +12,8 @@ from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, Gradi
 from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.externals import joblib
-from sklearn.feature_selection import SelectFromModel, SelectKBest
+from sklearn.feature_selection import f_regression
+from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
@@ -24,7 +25,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
-from sklearn2pmml import EstimatorProxy
+from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn_pandas import DataFrameMapper
@@ -117,9 +118,9 @@ def build_audit(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
 		("Age", ContinuousDomain()),
 		("Employment", [LabelBinarizer(), SelectFromModel(EstimatorProxy(DecisionTreeClassifier(random_state = 13)), threshold = "1.25 * mean")]),
-		("Education", [LabelBinarizer(), SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "median")]),
+		("Education", [LabelBinarizer(), SelectorProxy(SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "median"))]),
 		("Marital", [LabelBinarizer(), SelectKBest(k = 3)]),
-		("Occupation", [LabelBinarizer(), SelectKBest(k = 3)]),
+		("Occupation", [LabelBinarizer(), SelectorProxy(SelectKBest(k = 3))]),
 		("Income", ContinuousDomain()),
 		("Gender", LabelEncoder()),
 		("Deductions", LabelEncoder()),
@@ -313,7 +314,7 @@ def build_housing(regressor, name, with_kneighbors = False):
 		("mapper", mapper),
 		("transformer", PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)),
 		("scaler", StandardScaler()),
-		("selector", SelectKBest(k = 7)),
+		("selector", SelectorProxy(SelectPercentile(score_func = f_regression, percentile = 35))),
 		("regressor", regressor)
 	])
 	pipeline.fit(housing_X, housing_y)
