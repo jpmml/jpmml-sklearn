@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -34,7 +35,7 @@ public class Selector extends Transformer implements HasNumberOfFeatures {
 	}
 
 	abstract
-	public int[] selectFeatures(List<Feature> features);
+	public List<Boolean> getSupportMask();
 
 	@Override
 	public OpType getOpType(){
@@ -48,20 +49,23 @@ public class Selector extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
-		int[] selection = selectFeatures(features);
+		List<Boolean> supportMask = getSupportMask();
 
-		if(selection == null){
+		if(supportMask == null){
 			return features;
 		}
+
+		ClassDictUtil.checkSize(supportMask, ids, features);
 
 		List<String> selectedIds = new ArrayList<>();
 		List<Feature> selectedFeatures = new ArrayList<>();
 
-		for(int i = 0; i < selection.length; i++){
-			int index = selection[i];
+		for(int i = 0; i < supportMask.size(); i++){
 
-			selectedIds.add(ids.get(index));
-			selectedFeatures.add(features.get(index));
+			if(supportMask.get(i)){
+				selectedIds.add(ids.get(i));
+				selectedFeatures.add(features.get(i));
+			}
 		}
 
 		ids.clear();

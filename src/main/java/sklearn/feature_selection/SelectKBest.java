@@ -19,11 +19,10 @@
 package sklearn.feature_selection;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jpmml.converter.Feature;
+import com.google.common.primitives.Booleans;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Selector;
@@ -42,11 +41,9 @@ public class SelectKBest extends Selector {
 	}
 
 	@Override
-	public int[] selectFeatures(List<Feature> features){
+	public List<Boolean> getSupportMask(){
 		Object k = getK();
 		List<? extends Number> scores = getScores();
-
-		ClassDictUtil.checkSize(features, scores);
 
 		if(("all").equals(k)){
 			return null;
@@ -64,17 +61,15 @@ public class SelectKBest extends Selector {
 
 		Collections.sort(entries, Collections.reverseOrder());
 
-		int[] result = new int[ValueUtil.asInt((Number)k)];
+		boolean[] result = new boolean[scores.size()];
 
-		for(int i = 0; i < result.length; i++){
+		for(int i = 0, max = ValueUtil.asInt((Number)k); i < max; i++){
 			Entry<Integer> entry = entries.get(i);
 
-			result[i] = entry.getId();
+			result[entry.getId()] = true;
 		}
 
-		Arrays.sort(result);
-
-		return result;
+		return Booleans.asList(result);
 	}
 
 	public Object getK(){

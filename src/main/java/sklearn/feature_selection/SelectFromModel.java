@@ -21,10 +21,8 @@ package sklearn.feature_selection;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.primitives.Ints;
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.Scalar;
-import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -44,7 +42,7 @@ public class SelectFromModel extends Selector {
 	}
 
 	@Override
-	public int[] selectFeatures(List<Feature> features){
+	public List<Boolean> getSupportMask(){
 		Estimator estimator = getEstimator();
 		Number threshold = getThreshold();
 
@@ -53,17 +51,15 @@ public class SelectFromModel extends Selector {
 			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute");
 		}
 
-		List<Integer> result = new ArrayList<>();
+		List<Boolean> result = new ArrayList<>();
 
 		for(int i = 0; i < featureImportances.size(); i++){
 			Number featureImportance = featureImportances.get(i);
 
-			if(featureImportance.doubleValue() >= threshold.doubleValue()){
-				result.add(i);
-			}
+			result.add(featureImportance.doubleValue() >= threshold.doubleValue());
 		}
 
-		return Ints.toArray(result);
+		return result;
 	}
 
 	public Estimator getEstimator(){

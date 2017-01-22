@@ -18,11 +18,8 @@
  */
 package sklearn2pmml;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.primitives.Ints;
-import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Selector;
 
@@ -40,21 +37,6 @@ public class SelectorProxy extends Selector {
 	}
 
 	@Override
-	public int[] selectFeatures(List<Feature> features){
-		List<Boolean> supportMask = getSupportMask();
-
-		List<Integer> result = new ArrayList<>();
-
-		for(int i = 0; i < supportMask.size(); i++){
-
-			if(supportMask.get(i)){
-				result.add(i);
-			}
-		}
-
-		return Ints.toArray(result);
-	}
-
 	public List<Boolean> getSupportMask(){
 		return (List)ClassDictUtil.getArray(this, "support_mask_");
 	}
