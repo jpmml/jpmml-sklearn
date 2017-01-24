@@ -22,10 +22,13 @@ import java.util.List;
 
 import com.google.common.base.CaseFormat;
 import net.razorvine.pickle.objects.ClassDict;
+import net.razorvine.pickle.objects.ClassDictConstructor;
+import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.sklearn.ClassDictConstructorUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -44,6 +47,18 @@ public class Transformer extends ClassDict {
 
 	public DataType getDataType(){
 		return DataType.DOUBLE;
+	}
+
+	public DType getDType(){
+		Object dtype = get("dtype");
+
+		if(dtype instanceof ClassDictConstructor){
+			ClassDictConstructor classDictConstructor = (ClassDictConstructor)dtype;
+
+			dtype = ClassDictConstructorUtil.construct(classDictConstructor, DType.class);
+		}
+
+		return (DType)dtype;
 	}
 
 	protected String name(){

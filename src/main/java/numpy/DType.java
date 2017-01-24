@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dmg.pmml.DataType;
 import org.jpmml.sklearn.CClassDict;
 
 public class DType extends CClassDict {
@@ -45,6 +46,28 @@ public class DType extends CClassDict {
 	@Override
 	public void __setstate__(Object[] args){
 		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
+	}
+
+	public DataType getDataType(){
+		String className = getClassName();
+
+		switch(className){
+			case "numpy.bool_":
+				return DataType.BOOLEAN;
+			case "numpy.int_":
+			case "numpy.int8":
+			case "numpy.int16":
+			case "numpy.int32":
+			case "numpy.int64":
+				return DataType.INTEGER;
+			case "numpy.float32":
+				return DataType.FLOAT;
+			case "numpy.float_":
+			case "numpy.float64":
+				return DataType.DOUBLE;
+			default:
+				throw new IllegalArgumentException(className);
+		}
 	}
 
 	public Object toDescr(){

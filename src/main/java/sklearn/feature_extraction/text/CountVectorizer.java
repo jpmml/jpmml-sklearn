@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import numpy.DType;
 import numpy.core.Scalar;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
@@ -118,6 +119,8 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 		encoder.addDefineFunction(defineFunction);
 
+		DType dtype = getDType();
+
 		if(lowercase){
 			DerivedField derivedField = encoder.createDerivedField(FieldName.create("lowercase(" + (feature.getName()).getValue() + ")"), OpType.CATEGORICAL, DataType.STRING, PMMLUtil.createApply("lowercase", feature.ref()));
 
@@ -140,7 +143,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			final
 			Apply apply = PMMLUtil.createApply(defineFunction.getName(), feature.ref(), PMMLUtil.createConstant(term));
 
-			Feature termFrequencyFeature = new Feature(encoder, FieldName.create("tf(" + term + ")"), DataType.DOUBLE){
+			Feature termFrequencyFeature = new Feature(encoder, FieldName.create("tf(" + term + ")"), dtype != null ? dtype.getDataType() : DataType.DOUBLE){
 
 				@Override
 				public ContinuousFeature toContinuousFeature(){
