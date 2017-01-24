@@ -27,10 +27,10 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import numpy.DType;
 import numpy.core.Scalar;
-import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
@@ -92,7 +92,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		} // End if
 
 		if(tokenPattern != null && !("(?u)\\b\\w\\w+\\b").equals(tokenPattern)){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(tokenPattern);
 		}
 
 		BiMap<String, Integer> termIndexMap = HashBiMap.create(vocabulary.size());
@@ -140,10 +140,12 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		for(int i = 0, max = indexTermMap.size(); i < max; i++){
 			String term = indexTermMap.get(i);
 
-			final
-			Apply apply = PMMLUtil.createApply(defineFunction.getName(), feature.ref(), PMMLUtil.createConstant(term));
+			Expression termFrequency = PMMLUtil.createApply(defineFunction.getName(), feature.ref(), PMMLUtil.createConstant(term));
 
-			Feature termFrequencyFeature = new Feature(encoder, FieldName.create("tf(" + term + ")"), dtype != null ? dtype.getDataType() : DataType.DOUBLE){
+			final
+			Expression weightedTermFrequency = encodeWeight(termFrequency, i);
+
+			Feature termFeature = new Feature(encoder, FieldName.create("tf" + ((weightedTermFrequency != termFrequency) ? "-idf" : "") + "(" + term + ")"), dtype != null ? dtype.getDataType() : DataType.DOUBLE){
 
 				@Override
 				public ContinuousFeature toContinuousFeature(){
@@ -151,19 +153,23 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 					DerivedField derivedField = encoder.getDerivedField(getName());
 					if(derivedField == null){
-						derivedField = encoder.createDerivedField(getName(), OpType.CONTINUOUS, getDataType(), apply);
+						derivedField = encoder.createDerivedField(getName(), OpType.CONTINUOUS, getDataType(), weightedTermFrequency);
 					}
 
 					return new ContinuousFeature(encoder, derivedField);
 				}
 			};
 
-			ids.add((termFrequencyFeature.getName()).getValue());
+			ids.add((termFeature.getName()).getValue());
 
-			result.add(termFrequencyFeature);
+			result.add(termFeature);
 		}
 
 		return result;
+	}
+
+	public Expression encodeWeight(Expression expression, int index){
+		return expression;
 	}
 
 	public String getAnalyzer(){

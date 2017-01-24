@@ -34,6 +34,14 @@ public class CSRMatrixUtil {
 	public int[] getShape(CSRMatrix matrix){
 		Object[] shape = matrix.getShape();
 
+		if(shape.length == 1){
+			return new int[]{ValueUtil.asInt((Number)shape[0])};
+		} else
+
+		if(shape.length == 2){
+			return new int[]{ValueUtil.asInt((Number)shape[0]), ValueUtil.asInt((Number)shape[1])};
+		}
+
 		List<? extends Number> values = (List)Arrays.asList(shape);
 
 		return Ints.toArray(ValueUtil.asIntegers(values));

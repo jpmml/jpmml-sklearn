@@ -31,6 +31,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * [`ensemble.VotingClassifier`] (http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html)
   * Feature Extraction:
     * [`feature_extraction.text.CountVectorizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html)
+    * [`feature_extraction.text.TfidfVectorizer`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html)
   * Feature Selection:
     * [`feature_selection.GenericUnivariateSelect`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.GenericUnivariateSelect.html) (only via `sklearn2pmml.SelectorProxy`)
     * [`feature_selection.RFE`] (http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html) (only via `sklearn2pmml.SelectorProxy`)
