@@ -155,11 +155,11 @@ public class PolynomialFeatures extends Transformer {
 		return ValueUtil.asInt((Number)get("degree"));
 	}
 
-	public boolean getIncludeBias(){
+	public Boolean getIncludeBias(){
 		return (Boolean)get("include_bias");
 	}
 
-	public boolean getInteractionOnly(){
+	public Boolean getInteractionOnly(){
 		return (Boolean)get("interaction_only");
 	}
 
