@@ -170,6 +170,11 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public List<String> getActiveFields(){
+
+		if(!containsKey("active_fields")){
+			return null;
+		}
+
 		return (List)ClassDictUtil.getArray(this, "active_fields");
 	}
 
