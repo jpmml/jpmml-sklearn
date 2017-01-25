@@ -27,10 +27,10 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import numpy.DType;
 import numpy.core.Scalar;
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
@@ -69,16 +69,78 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 	@Override
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
-		String analyzer = getAnalyzer();
-		Boolean binary = getBinary();
 		Boolean lowercase = getLowercase();
-		String stripAccents = getStripAccents();
-		String tokenPattern = getTokenPattern();
 		Map<String, Scalar> vocabulary = getVocabulary();
 
 		ClassDictUtil.checkSize(1, ids, features);
 
 		Feature feature = features.get(0);
+
+		BiMap<String, Integer> termIndexMap = HashBiMap.create(vocabulary.size());
+
+		Collection<Map.Entry<String, Scalar>> entries = vocabulary.entrySet();
+		for(Map.Entry<String, Scalar> entry : entries){
+			termIndexMap.put(entry.getKey(), ValueUtil.asInt((Number)(entry.getValue()).getOnlyElement()));
+		}
+
+		BiMap<Integer, String> indexTermMap = termIndexMap.inverse();
+
+		DType dtype = getDType();
+
+		if(lowercase){
+			DerivedField derivedField = encoder.createDerivedField(FieldName.create("lowercase(" + (feature.getName()).getValue() + ")"), OpType.CATEGORICAL, DataType.STRING, PMMLUtil.createApply("lowercase", feature.ref()));
+
+			feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
+
+				@Override
+				public ContinuousFeature toContinuousFeature(){
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
+
+		DefineFunction defineFunction = encodeDefineFunction();
+
+		encoder.addDefineFunction(defineFunction);
+
+		ids.clear();
+
+		List<Feature> result = new ArrayList<>();
+
+		for(int i = 0, max = indexTermMap.size(); i < max; i++){
+			String term = indexTermMap.get(i);
+
+			final
+			Apply apply = encodeApply(defineFunction.getName(), feature, i, term);
+
+			Feature termFeature = new Feature(encoder, FieldName.create(defineFunction.getName() + "(" + term + ")"), dtype != null ? dtype.getDataType() : DataType.DOUBLE){
+
+				@Override
+				public ContinuousFeature toContinuousFeature(){
+					PMMLEncoder encoder = ensureEncoder();
+
+					DerivedField derivedField = encoder.getDerivedField(getName());
+					if(derivedField == null){
+						derivedField = encoder.createDerivedField(getName(), OpType.CONTINUOUS, getDataType(), apply);
+					}
+
+					return new ContinuousFeature(encoder, derivedField);
+				}
+			};
+
+			ids.add((termFeature.getName()).getValue());
+
+			result.add(termFeature);
+		}
+
+		return result;
+	}
+
+	public DefineFunction encodeDefineFunction(){
+		String analyzer = getAnalyzer();
+		Boolean binary = getBinary();
+		String stripAccents = getStripAccents();
+		String tokenPattern = getTokenPattern();
 
 		switch(analyzer){
 			case "word":
@@ -95,81 +157,25 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			throw new IllegalArgumentException(tokenPattern);
 		}
 
-		BiMap<String, Integer> termIndexMap = HashBiMap.create(vocabulary.size());
-
-		Collection<Map.Entry<String, Scalar>> entries = vocabulary.entrySet();
-		for(Map.Entry<String, Scalar> entry : entries){
-			termIndexMap.put(entry.getKey(), ValueUtil.asInt((Number)(entry.getValue()).getOnlyElement()));
-		}
-
-		BiMap<Integer, String> indexTermMap = termIndexMap.inverse();
-
 		ParameterField documentField = new ParameterField(FieldName.create("document"));
 
 		ParameterField termField = new ParameterField(FieldName.create("term"));
 
 		TextIndex textIndex = new TextIndex(documentField.getName())
+			.setTokenize(Boolean.TRUE)
 			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null)
 			.setExpression(new FieldRef(termField.getName()));
 
-		DefineFunction defineFunction = new DefineFunction("termFrequency", OpType.CONTINUOUS, null)
+		DefineFunction defineFunction = new DefineFunction("tf", OpType.CONTINUOUS, null)
 			.setDataType(DataType.DOUBLE)
 			.addParameterFields(documentField, termField)
 			.setExpression(textIndex);
 
-		encoder.addDefineFunction(defineFunction);
-
-		DType dtype = getDType();
-
-		if(lowercase){
-			DerivedField derivedField = encoder.createDerivedField(FieldName.create("lowercase(" + (feature.getName()).getValue() + ")"), OpType.CATEGORICAL, DataType.STRING, PMMLUtil.createApply("lowercase", feature.ref()));
-
-			feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
-
-				@Override
-				public ContinuousFeature toContinuousFeature(){
-					throw new UnsupportedOperationException();
-				}
-			};
-		}
-
-		ids.clear();
-
-		List<Feature> result = new ArrayList<>();
-
-		for(int i = 0, max = indexTermMap.size(); i < max; i++){
-			String term = indexTermMap.get(i);
-
-			Expression termFrequency = PMMLUtil.createApply(defineFunction.getName(), feature.ref(), PMMLUtil.createConstant(term));
-
-			final
-			Expression weightedTermFrequency = encodeWeight(termFrequency, i);
-
-			Feature termFeature = new Feature(encoder, FieldName.create("tf" + ((weightedTermFrequency != termFrequency) ? "-idf" : "") + "(" + term + ")"), dtype != null ? dtype.getDataType() : DataType.DOUBLE){
-
-				@Override
-				public ContinuousFeature toContinuousFeature(){
-					PMMLEncoder encoder = ensureEncoder();
-
-					DerivedField derivedField = encoder.getDerivedField(getName());
-					if(derivedField == null){
-						derivedField = encoder.createDerivedField(getName(), OpType.CONTINUOUS, getDataType(), weightedTermFrequency);
-					}
-
-					return new ContinuousFeature(encoder, derivedField);
-				}
-			};
-
-			ids.add((termFeature.getName()).getValue());
-
-			result.add(termFeature);
-		}
-
-		return result;
+		return defineFunction;
 	}
 
-	public Expression encodeWeight(Expression expression, int index){
-		return expression;
+	public Apply encodeApply(String function, Feature feature, int index, String term){
+		return PMMLUtil.createApply(function, feature.ref(), PMMLUtil.createConstant(term));
 	}
 
 	public String getAnalyzer(){

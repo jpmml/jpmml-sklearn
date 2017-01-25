@@ -20,7 +20,12 @@ package sklearn.feature_extraction.text;
 
 import java.util.List;
 
+import org.dmg.pmml.Apply;
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldName;
+import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -44,8 +49,12 @@ public class TfidfVectorizer extends CountVectorizer {
 	}
 
 	@Override
-	public Expression encodeWeight(Expression expression, int index){
+	public DefineFunction encodeDefineFunction(){
 		TfidfTransformer transformer = getTransformer();
+
+		DefineFunction defineFunction = super.encodeDefineFunction();
+
+		Expression expression = defineFunction.getExpression();
 
 		Boolean sublinearTf = transformer.getSublinearTf();
 		if(sublinearTf){
@@ -54,12 +63,34 @@ public class TfidfVectorizer extends CountVectorizer {
 
 		Boolean useIdf = transformer.getUseIdf();
 		if(useIdf){
-			Number weight = transformer.getWeight(index);
+			defineFunction.setName("tf-idf");
 
-			expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(weight));
+			ParameterField weight = new ParameterField(FieldName.create("weight"));
+
+			defineFunction.addParameterFields(weight);
+
+			expression = PMMLUtil.createApply("*", expression, new FieldRef(weight.getName()));
 		}
 
-		return expression;
+		defineFunction.setExpression(expression);
+
+		return defineFunction;
+	}
+
+	@Override
+	public Apply encodeApply(String function, Feature feature, int index, String term){
+		TfidfTransformer transformer = getTransformer();
+
+		Apply apply = super.encodeApply(function, feature, index, term);
+
+		Boolean useIdf = transformer.getUseIdf();
+		if(useIdf){
+			Number weight = transformer.getWeight(index);
+
+			apply.addExpressions(PMMLUtil.createConstant(weight));
+		}
+
+		return apply;
 	}
 
 	public TfidfTransformer getTransformer(){
