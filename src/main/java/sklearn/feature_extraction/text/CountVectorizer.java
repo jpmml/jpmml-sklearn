@@ -45,6 +45,7 @@ import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
+import sklearn2pmml.feature_extraction.text.Splitter;
 
 public class CountVectorizer extends Transformer implements HasNumberOfFeatures {
 
@@ -139,8 +140,9 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	public DefineFunction encodeDefineFunction(){
 		String analyzer = getAnalyzer();
 		Boolean binary = getBinary();
+		Object preprocessor = getPreprocessor();
 		String stripAccents = getStripAccents();
-		String tokenPattern = getTokenPattern();
+		Splitter tokenizer = getTokenizer();
 
 		switch(analyzer){
 			case "word":
@@ -149,20 +151,21 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 				throw new IllegalArgumentException(analyzer);
 		}
 
-		if(stripAccents != null){
-			throw new IllegalArgumentException(stripAccents);
+		if(preprocessor != null){
+			throw new IllegalArgumentException();
 		} // End if
 
-		if(tokenPattern != null && !("(?u)\\b\\w\\w+\\b").equals(tokenPattern)){
-			throw new IllegalArgumentException(tokenPattern);
+		if(stripAccents != null){
+			throw new IllegalArgumentException(stripAccents);
 		}
 
-		ParameterField documentField = new ParameterField(FieldName.create("document"));
+		ParameterField documentField = new ParameterField(FieldName.create("text"));
 
 		ParameterField termField = new ParameterField(FieldName.create("term"));
 
 		TextIndex textIndex = new TextIndex(documentField.getName())
 			.setTokenize(Boolean.TRUE)
+			.setWordSeparatorCharacterRE(tokenizer.getSeparatorRE())
 			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null)
 			.setExpression(new FieldRef(termField.getName()));
 
@@ -190,8 +193,26 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		return (Boolean)get("lowercase");
 	}
 
+	public Object getPreprocessor(){
+		return get("preprocessor");
+	}
+
 	public String getStripAccents(){
 		return (String)get("strip_accents");
+	}
+
+	public Splitter getTokenizer(){
+		Object tokenizer = get("tokenizer");
+
+		try {
+			if(tokenizer == null){
+				throw new NullPointerException();
+			}
+
+			return (Splitter)tokenizer;
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("The tokenizer object (" + ClassDictUtil.formatClass(tokenizer) + ") is not Splitter");
+		}
 	}
 
 	public String getTokenPattern(){
