@@ -117,7 +117,9 @@ public class FunctionTransformer extends Transformer {
 			case "cosh":
 			case "expm1":
 			case "hypot":
-			case "ln1p":
+				return PMMLUtil.createApply("x-" + name, fieldRef);
+			case "log1p":
+				return PMMLUtil.createApply("x-ln1p", fieldRef);
 			case "rint":
 			case "sin":
 			case "sinh":
