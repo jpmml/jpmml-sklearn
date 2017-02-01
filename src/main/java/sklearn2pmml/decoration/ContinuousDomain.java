@@ -22,11 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.Interval;
-import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -51,11 +49,6 @@ public class ContinuousDomain extends Domain {
 
 		ClassDictUtil.checkSize(ids, features, dataMin, dataMax);
 
-		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
-
-		InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator()
-			.setInvalidValueTreatment(invalidValueTreatment);
-
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
@@ -71,12 +64,11 @@ public class ContinuousDomain extends Domain {
 				.addIntervals(interval);
 
 			encoder.addDecorator(continuousFeature.getName(), validValueDecorator);
-			encoder.addDecorator(continuousFeature.getName(), invalidValueDecorator);
 
 			result.add(continuousFeature);
 		}
 
-		return result;
+		return super.encodeFeatures(ids, result, encoder);
 	}
 
 	public List<? extends Number> getDataMin(){

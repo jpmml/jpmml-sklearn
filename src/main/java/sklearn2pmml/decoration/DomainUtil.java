@@ -19,6 +19,7 @@
 package sklearn2pmml.decoration;
 
 import org.dmg.pmml.InvalidValueTreatmentMethod;
+import org.dmg.pmml.MissingValueTreatmentMethod;
 
 public class DomainUtil {
 
@@ -26,7 +27,34 @@ public class DomainUtil {
 	}
 
 	static
+	public MissingValueTreatmentMethod parseMissingValueTreatment(String missingValueTreatment){
+
+		if(missingValueTreatment == null){
+			return null;
+		}
+
+		switch(missingValueTreatment){
+			case "as_is":
+				return MissingValueTreatmentMethod.AS_IS;
+			case "as_mean":
+				return MissingValueTreatmentMethod.AS_MEAN;
+			case "as_mode":
+				return MissingValueTreatmentMethod.AS_MODE;
+			case "as_median":
+				return MissingValueTreatmentMethod.AS_MEDIAN;
+			case "as_value":
+				return MissingValueTreatmentMethod.AS_VALUE;
+			default:
+				throw new IllegalArgumentException(missingValueTreatment);
+		}
+	}
+
+	static
 	public InvalidValueTreatmentMethod parseInvalidValueTreatment(String invalidValueTreatment){
+
+		if(invalidValueTreatment == null){
+			return null;
+		}
 
 		switch(invalidValueTreatment){
 			case "as_is":

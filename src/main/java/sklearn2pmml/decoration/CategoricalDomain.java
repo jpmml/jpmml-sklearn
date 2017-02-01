@@ -24,11 +24,9 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -59,11 +57,6 @@ public class CategoricalDomain extends Domain {
 
 		ClassDictUtil.checkSize(1, ids, features);
 
-		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
-
-		InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator()
-			.setInvalidValueTreatment(invalidValueTreatment);
-
 		WildcardFeature wildcardFeature = (WildcardFeature)features.get(0);
 
 		Function<Object, String> function = new Function<Object, String>(){
@@ -78,9 +71,7 @@ public class CategoricalDomain extends Domain {
 
 		CategoricalFeature categoricalFeature = wildcardFeature.toCategoricalFeature(categories);
 
-		encoder.addDecorator(categoricalFeature.getName(), invalidValueDecorator);
-
-		return Collections.<Feature>singletonList(categoricalFeature);
+		return super.encodeFeatures(ids, Collections.<Feature>singletonList(categoricalFeature), encoder);
 	}
 
 	public List<?> getData(){

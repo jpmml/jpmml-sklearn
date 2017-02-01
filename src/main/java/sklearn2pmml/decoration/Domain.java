@@ -18,6 +18,16 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.List;
+
+import org.dmg.pmml.FieldName;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
+import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.InvalidValueDecorator;
+import org.jpmml.converter.MissingValueDecorator;
+import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 abstract
@@ -25,6 +35,50 @@ public class Domain extends Transformer {
 
 	public Domain(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+		MissingValueTreatmentMethod missingValueTreatment = DomainUtil.parseMissingValueTreatment(getMissingValueTreatment());
+		Object missingValueReplacement = getMissingValueReplacement();
+
+		if(missingValueReplacement != null){
+
+			if(missingValueTreatment == null){
+				missingValueTreatment = MissingValueTreatmentMethod.AS_VALUE;
+			}
+		}
+
+		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+
+		for(Feature feature : features){
+			FieldName name = feature.getName();
+
+			if(missingValueTreatment != null){
+				MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
+					.setMissingValueTreatment(missingValueTreatment)
+					.setMissingValueReplacement(missingValueReplacement != null ? ValueUtil.formatValue(missingValueReplacement) : null);
+
+				encoder.addDecorator(name, missingValueDecorator);
+			} // End if
+
+			if(invalidValueTreatment != null){
+				InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator()
+					.setInvalidValueTreatment(invalidValueTreatment);
+
+				encoder.addDecorator(name, invalidValueDecorator);
+			}
+		}
+
+		return features;
+	}
+
+	public String getMissingValueTreatment(){
+		return (String)get("missing_value_treatment");
+	}
+
+	public Object getMissingValueReplacement(){
+		return get("missing_value_replacement");
 	}
 
 	public String getInvalidValueTreatment(){
