@@ -22,16 +22,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.reflect.ClassPath;
 import joblib.NDArrayWrapperConstructor;
 import joblib.NumpyArrayWrapper;
-import net.razorvine.pickle.IObjectConstructor;
 import net.razorvine.pickle.Opcodes;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.pickle.objects.ClassDict;
@@ -136,16 +133,7 @@ public class PickleUtil {
 
 				@Override
 				protected Object dispatch(short key) throws IOException {
-					Object result;
-
-					switch(key){
-						case Opcodes.OBJ:
-							result = load_obj();
-							break;
-						default:
-							result = super.dispatch(key);
-							break;
-					}
+					Object result = super.dispatch(key);;
 
 					if(key == Opcodes.BUILD){
 						Object head = super.stack.peek();
@@ -163,35 +151,6 @@ public class PickleUtil {
 					}
 
 					return result;
-				}
-
-				private Object load_obj(){
-					List<Object> args = super.stack.pop_all_since_marker();
-
-					IObjectConstructor constructor = (IObjectConstructor)args.get(0);
-
-					args = args.subList(1, args.size());
-
-					Object object = constructor.construct(args.toArray());
-
-					super.stack.add(object);
-
-					return noReturnValue();
-				}
-
-				private Object noReturnValue(){
-
-					try {
-						Field field = Unpickler.class.getDeclaredField("NO_RETURN_VALUE");
-
-						if(!field.isAccessible()){
-							field.setAccessible(true);
-						}
-
-						return field.get(null);
-					} catch(Exception e){
-						throw new RuntimeException(e);
-					}
 				}
 			};
 
