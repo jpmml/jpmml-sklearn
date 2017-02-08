@@ -160,7 +160,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			throw new IllegalArgumentException(stripAccents);
 		}
 
-		ParameterField documentField = new ParameterField(FieldName.create("text"));
+		ParameterField documentField = new ParameterField(FieldName.create("document"));
 
 		ParameterField termField = new ParameterField(FieldName.create("term"));
 
