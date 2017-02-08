@@ -28,6 +28,7 @@ import com.google.common.collect.HashBiMap;
 import numpy.DType;
 import numpy.core.Scalar;
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
@@ -178,7 +179,10 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public Apply encodeApply(String function, Feature feature, int index, String term){
-		return PMMLUtil.createApply(function, feature.ref(), PMMLUtil.createConstant(term));
+		Constant constant = PMMLUtil.createConstant(term)
+			.setDataType(DataType.STRING);
+
+		return PMMLUtil.createApply(function, feature.ref(), constant);
 	}
 
 	public String getAnalyzer(){
