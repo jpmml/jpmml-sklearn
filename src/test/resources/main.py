@@ -12,7 +12,8 @@ from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, Gradi
 from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.externals import joblib
-from sklearn.feature_selection import f_regression
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_selection import chi2, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
@@ -28,6 +29,7 @@ from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
+from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn_pandas import DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -242,6 +244,34 @@ build_iris(SVC(), "SVCIris", with_proba = False)
 build_iris(NuSVC(), "NuSVCIris", with_proba = False)
 build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
 build_iris(XGBClassifier(objective = "multi:softmax"), "XGBIris")
+
+#
+# Text classification
+#
+
+sentiment_df = load_csv("Sentiment.csv")
+
+print(sentiment_df.dtypes)
+
+sentiment_X = sentiment_df["Sentence"]
+sentiment_y = sentiment_df["Score"]
+
+def build_sentiment(classifier, name, dtype = numpy.float64, with_proba = True):
+	pipeline = PMMLPipeline([
+		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 1), norm = None, dtype = dtype)),
+		("selector", SelectorProxy(SelectPercentile(chi2, percentile = 10))),
+		("classifier", classifier)
+	])
+	pipeline.fit(sentiment_X, sentiment_y)
+	store_pkl(pipeline, name + ".pkl")
+	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
+	if(with_proba == True):
+		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability_0", "probability_1"])
+		score = pandas.concat((score, score_proba), axis = 1)
+	store_csv(score, name + ".csv")
+
+build_sentiment(LogisticRegressionCV(), "LogisticRegressionSentiment")
+build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestSentiment", dtype = numpy.float32)
 
 #
 # Regression

@@ -230,6 +230,16 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLogisticRegressionSentiment() throws Exception {
+		evaluate("LogisticRegression", "Sentiment");
+	}
+
+	@Test
+	public void evaluateRandomForestSentiment() throws Exception {
+		evaluate("RandomForest", "Sentiment");
+	}
+
+	@Test
 	public void evaluateDecisionTreeVersicolor() throws Exception {
 		evaluate("DecisionTree", "Versicolor");
 	}
