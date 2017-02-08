@@ -256,9 +256,9 @@ print(sentiment_df.dtypes)
 sentiment_X = sentiment_df["Sentence"]
 sentiment_y = sentiment_df["Score"]
 
-def build_sentiment(classifier, name, dtype = numpy.float64, with_proba = True):
+def build_sentiment(classifier, name, with_proba = True):
 	pipeline = PMMLPipeline([
-		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 1), norm = None, dtype = dtype)),
+		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 1), norm = None, dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
 		("selector", SelectorProxy(SelectPercentile(chi2, percentile = 10))),
 		("classifier", classifier)
 	])
@@ -271,7 +271,7 @@ def build_sentiment(classifier, name, dtype = numpy.float64, with_proba = True):
 	store_csv(score, name + ".csv")
 
 build_sentiment(LogisticRegressionCV(), "LogisticRegressionSentiment")
-build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestSentiment", dtype = numpy.float32)
+build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestSentiment")
 
 #
 # Regression
