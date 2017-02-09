@@ -25,8 +25,6 @@ import java.io.OutputStream;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import org.dmg.pmml.Extension;
-import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.MetroJAXBUtil;
 import org.slf4j.Logger;
@@ -55,13 +53,6 @@ public class Main {
 		required = true
 	)
 	private File output = null;
-
-	@Parameter (
-		names = {"--repr-pipeline", "--repr"},
-		description = "String representation",
-		hidden = true
-	)
-	private String repr = null;
 
 
 	static
@@ -140,21 +131,6 @@ public class Main {
 			throw e;
 		}
 
-		if(this.repr != null){
-			MiningBuildTask miningBuildTask = pmml.getMiningBuildTask();
-
-			if(miningBuildTask == null){
-				miningBuildTask = new MiningBuildTask();
-
-				pmml.setMiningBuildTask(miningBuildTask);
-			}
-
-			Extension extension = new Extension()
-				.addContent(this.repr);
-
-			miningBuildTask.addExtensions(extension);
-		}
-
 		try(OutputStream os = new FileOutputStream(this.output)){
 			logger.info("Marshalling PMML..");
 
@@ -184,14 +160,6 @@ public class Main {
 
 	public void setOutput(File output){
 		this.output = output;
-	}
-
-	public String getRepr(){
-		return this.repr;
-	}
-
-	public void setRepr(String repr){
-		this.repr = repr;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);

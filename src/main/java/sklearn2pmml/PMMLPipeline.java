@@ -27,7 +27,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Extension;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
@@ -57,6 +59,7 @@ public class PMMLPipeline extends Pipeline {
 	public PMML encodePMML(){
 		DataFrameMapper dataFrameMapper = getMapper();
 		Estimator estimator = getEstimator();
+		String repr = getRepr();
 
 		while(estimator instanceof Pipeline){
 			Pipeline pipeline = (Pipeline)estimator;
@@ -127,7 +130,19 @@ public class PMMLPipeline extends Pipeline {
 
 		Model model = encodeModel(schema, encoder);
 
-		return encoder.encodePMML(model);
+		PMML pmml = encoder.encodePMML(model);
+
+		if(repr != null){
+			Extension extension = new Extension()
+				.addContent(repr);
+
+			MiningBuildTask miningBuildTask = new MiningBuildTask()
+				.addExtensions(extension);
+
+			pmml.setMiningBuildTask(miningBuildTask);
+		}
+
+		return pmml;
 	}
 
 	public DataFrameMapper getMapper(){
@@ -167,6 +182,10 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		return transformerSteps;
+	}
+
+	public String getRepr(){
+		return (String)get("repr_");
 	}
 
 	public List<String> getActiveFields(){
