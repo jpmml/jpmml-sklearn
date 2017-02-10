@@ -166,7 +166,7 @@ public class Pipeline extends Estimator implements HasClasses {
 	public List<Object[]> getTransformerSteps(){
 		List<Object[]> steps = getSteps();
 
-		if(steps.size() < 1){
+		if(steps == null || steps.size() < 1){
 			throw new IllegalArgumentException("Missing estimator step");
 		}
 
@@ -182,7 +182,7 @@ public class Pipeline extends Estimator implements HasClasses {
 	protected Object[] getEstimatorStep(){
 		List<Object[]> steps = getSteps();
 
-		if(steps.size() < 1){
+		if(steps == null || steps.size() < 1){
 			throw new IllegalArgumentException("Missing estimator step");
 		}
 

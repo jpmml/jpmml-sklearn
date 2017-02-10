@@ -25,6 +25,7 @@ import java.util.List;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import numpy.core.NDArray;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Extension;
@@ -51,6 +52,10 @@ import sklearn.pipeline.Pipeline;
 import sklearn_pandas.DataFrameMapper;
 
 public class PMMLPipeline extends Pipeline {
+
+	public PMMLPipeline(){
+		super("sklearn2pmml", "PMMLPipeline");
+	}
 
 	public PMMLPipeline(String module, String name){
 		super(module, name);
@@ -184,8 +189,25 @@ public class PMMLPipeline extends Pipeline {
 		return transformerSteps;
 	}
 
+	@Override
+	public List<Object[]> getSteps(){
+		return super.getSteps();
+	}
+
+	public PMMLPipeline setSteps(List<Object[]> steps){
+		put("steps", steps);
+
+		return this;
+	}
+
 	public String getRepr(){
 		return (String)get("repr_");
+	}
+
+	public PMMLPipeline setRepr(String repr){
+		put("repr_", repr);
+
+		return this;
 	}
 
 	public List<String> getActiveFields(){
@@ -197,8 +219,24 @@ public class PMMLPipeline extends Pipeline {
 		return (List)ClassDictUtil.getArray(this, "active_fields");
 	}
 
+	public PMMLPipeline setActiveFields(List<String> activeFields){
+		NDArray array = new NDArray();
+		array.put("data", activeFields);
+		array.put("fortran_order", Boolean.FALSE);
+
+		put("active_fields", array);
+
+		return this;
+	}
+
 	public String getTargetField(){
 		return (String)get("target_field");
+	}
+
+	public PMMLPipeline setTargetField(String targetField){
+		put("target_field", targetField);
+
+		return this;
 	}
 
 	static

@@ -21,6 +21,7 @@ package org.jpmml.sklearn;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -29,6 +30,8 @@ import org.dmg.pmml.PMML;
 import org.jpmml.model.MetroJAXBUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sklearn.Estimator;
+import sklearn.pipeline.Pipeline;
 import sklearn2pmml.PMMLPipeline;
 
 public class Main {
@@ -110,7 +113,26 @@ public class Main {
 		}
 
 		if(!(object instanceof PMMLPipeline)){
-			throw new IllegalArgumentException("The object (" + ClassDictUtil.formatClass(object) + ") is not a PMMLPipeline");
+
+			// Create a single- or multi-step PMMLPipeline from a Pipeline
+			if(object instanceof Pipeline){
+				Pipeline pipeline = (Pipeline)object;
+
+				object = new PMMLPipeline()
+					.setSteps(pipeline.getSteps());
+			} else
+
+			// Create a single-step PMMLPipeline from an Estimator
+			if(object instanceof Estimator){
+				Estimator estimator = (Estimator)object;
+
+				object = new PMMLPipeline()
+					.setSteps(Collections.<Object[]>singletonList(new Object[]{"estimator", estimator}));
+			} else
+
+			{
+				throw new IllegalArgumentException("The object (" + ClassDictUtil.formatClass(object) + ") is not a PMMLPipeline");
+			}
 		}
 
 		PMMLPipeline pipeline = (PMMLPipeline)object;
