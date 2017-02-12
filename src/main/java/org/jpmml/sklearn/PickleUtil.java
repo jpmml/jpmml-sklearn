@@ -23,10 +23,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 
-import com.google.common.reflect.ClassPath;
 import joblib.NDArrayWrapperConstructor;
 import joblib.NumpyArrayWrapper;
 import net.razorvine.pickle.Opcodes;
@@ -43,59 +43,60 @@ public class PickleUtil {
 	public void init() throws Exception {
 		Thread thread = Thread.currentThread();
 
-		init(thread.getContextClassLoader());
+		ClassLoader classLoader = thread.getContextClassLoader();
+		if(classLoader == null){
+			classLoader = ClassLoader.getSystemClassLoader();
+		}
+
+		Enumeration<URL> urls = classLoader.getResources("META-INF/sklearn2pmml.properties");
+		while(urls.hasMoreElements()){
+			URL url = urls.nextElement();
+
+			try(InputStream is = url.openStream()){
+				Properties properties = new Properties();
+				properties.load(is);
+
+				init(classLoader, properties);
+			}
+		}
 	}
 
 	static
-	public void init(ClassLoader classLoader) throws Exception {
-		ClassPath classPath = ClassPath.from(classLoader);
+	public void init(ClassLoader classLoader, Properties properties) throws ClassNotFoundException {
 
-		Set<ClassPath.ResourceInfo> resources = classPath.getResources();
-		for(ClassPath.ResourceInfo resource : resources){
-			String resourceName = resource.getResourceName();
+		if(properties.isEmpty()){
+			return;
+		}
 
-			if(!("META-INF/sklearn2pmml.properties").equals(resourceName)){
-				continue;
+		Set<String> keys = properties.stringPropertyNames();
+		for(String key : keys){
+			String value = properties.getProperty(key);
+
+			int dot = key.lastIndexOf('.');
+			if(dot < 0){
+				throw new IllegalArgumentException(key);
 			}
 
-			Properties properties = new Properties();
+			String module = key.substring(0, dot);
+			String name = key.substring(dot + 1);
 
-			URL url = resource.url();
+			Class<?> clazz = classLoader.loadClass(value);
 
-			try(InputStream is = url.openStream()){
-				properties.load(is);
+			ObjectConstructor constructor;
+
+			if((CClassDict.class).isAssignableFrom(clazz)){
+				constructor = new ExtensionObjectConstructor(module, name, (Class<? extends CClassDict>)clazz);
+			} else
+
+			if((ClassDict.class).isAssignableFrom(clazz)){
+				constructor = new ObjectConstructor(module, name, (Class<? extends ClassDict>)clazz);
+			} else
+
+			{
+				throw new IllegalArgumentException(value);
 			}
 
-			Set<String> keys = properties.stringPropertyNames();
-			for(String key : keys){
-				String value = properties.getProperty(key);
-
-				int dot = key.lastIndexOf('.');
-				if(dot < 0){
-					throw new IllegalArgumentException(key);
-				}
-
-				String module = key.substring(0, dot);
-				String name = key.substring(dot + 1);
-
-				Class<?> clazz = classLoader.loadClass(value);
-
-				ObjectConstructor constructor;
-
-				if((CClassDict.class).isAssignableFrom(clazz)){
-					constructor = new ExtensionObjectConstructor(module, name, (Class<? extends CClassDict>)clazz);
-				} else
-
-				if((ClassDict.class).isAssignableFrom(clazz)){
-					constructor = new ObjectConstructor(module, name, (Class<? extends ClassDict>)clazz);
-				} else
-
-				{
-					throw new IllegalArgumentException(value);
-				}
-
-				Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
-			}
+			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
 		}
 	}
 
