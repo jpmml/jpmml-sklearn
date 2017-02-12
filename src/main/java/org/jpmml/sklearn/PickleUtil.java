@@ -80,6 +80,10 @@ public class PickleUtil {
 			String module = key.substring(0, dot);
 			String name = key.substring(dot + 1);
 
+			if(value == null || ("").equals(value)){
+				value = key;
+			}
+
 			Class<?> clazz = classLoader.loadClass(value);
 
 			ObjectConstructor constructor;
