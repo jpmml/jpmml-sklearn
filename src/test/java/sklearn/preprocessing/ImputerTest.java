@@ -162,8 +162,9 @@ public class ImputerTest {
 	private SkLearnEncoder encode(List<Object[]> features){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataFrameMapper dataFrameMapper = new DataFrameMapper("sklearn_pandas.dataframe_mapper", "DataFrameMapper");
-		dataFrameMapper.put("features", features);
+		DataFrameMapper dataFrameMapper = new DataFrameMapper("sklearn_pandas.dataframe_mapper", "DataFrameMapper")
+			.setDefault(Boolean.FALSE)
+			.setFeatures(features);
 
 		dataFrameMapper.encodeFeatures(encoder);
 

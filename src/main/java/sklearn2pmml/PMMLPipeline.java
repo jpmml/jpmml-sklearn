@@ -255,6 +255,6 @@ public class PMMLPipeline extends Pipeline {
 			}
 		};
 
-		return new ArrayList<>(Lists.transform(objects, function));
+		return Lists.transform(objects, function);
 	}
 }

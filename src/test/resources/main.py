@@ -77,7 +77,7 @@ def kmeans_distance(kmeans, center, X):
 
 def build_wheat(kmeans, name, with_affinity = True):
 	mapper = DataFrameMapper([
-		(["Area", "Perimeter", "Compactness", "Kernel.Length", "Kernel.Width", "Asymmetry", "Groove.Length"], ContinuousDomain())
+		(wheat_X.columns.values, ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -169,7 +169,7 @@ versicolor_y = versicolor_y.astype(int)
 
 def build_versicolor(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
-		((versicolor_columns[: -1], [ContinuousDomain(), RobustScaler()]))
+		(versicolor_X.columns.values, [ContinuousDomain(), RobustScaler()])
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -207,7 +207,7 @@ iris_y = iris_df["Species"]
 
 def build_iris(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
-		(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], ContinuousDomain())
+		(iris_X.columns.values, ContinuousDomain()),
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -338,7 +338,7 @@ housing_y = housing_df[housing_columns[-1]]
 
 def build_housing(regressor, name, with_kneighbors = False):
 	mapper = DataFrameMapper([
-		(housing_columns[: -1], ContinuousDomain())
+		(housing_X.columns.values, ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -371,7 +371,7 @@ build_housing(NuSVR(), "NuSVRHousing")
 
 def build_iforest_housing_anomaly(iforest, name):
 	mapper = DataFrameMapper([
-		(housing_columns[: -1], ContinuousDomain())
+		(housing_X.columns.values, ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -387,7 +387,7 @@ build_iforest_housing_anomaly(IsolationForest(random_state = 13), "IsolationFore
 
 def build_svm_housing_anomaly(svm, name):
 	mapper = DataFrameMapper([
-		(housing_columns[: -1], ContinuousDomain())
+		(housing_X.columns.values, ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),

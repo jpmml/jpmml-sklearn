@@ -30,6 +30,7 @@ import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Transformer;
@@ -41,28 +42,35 @@ public class DataFrameMapper extends ClassDict {
 	}
 
 	public void encodeFeatures(SkLearnEncoder encoder){
-		List<Object[]> steps = getFeatures();
+		Object _default = getDefault();
+		List<Object[]> rows = getFeatures();
 
-		for(int row = 0; row < steps.size(); row++){
-			Object[] step = steps.get(row);
+		if(!(Boolean.FALSE).equals(_default)){
+			throw new IllegalArgumentException();
+		}
 
+		for(Object[] row : rows){
 			List<String> ids = new ArrayList<>();
 			List<Feature> features = new ArrayList<>();
 
-			List<String> names = getNameList(step);
-			for(String name : names){
-				ids.add(name);
+			List<String> columns = getColumnList(row);
+			for(String column : columns){
+				FieldName name = FieldName.create(column);
 
-				DataField dataField = encoder.createDataField(FieldName.create(name));
+				ids.add(name.getValue());
+
+				DataField dataField = encoder.getDataField(name);
+				if(dataField == null){
+					dataField = encoder.createDataField(name);
+				}
 
 				Feature feature = new WildcardFeature(encoder, dataField);
 
 				features.add(feature);
 			}
 
-			List<Transformer> transformers = getTransformerList(step);
-			for(int column = 0; column < transformers.size(); column++){
-				Transformer transformer = transformers.get(column);
+			List<Transformer> transformers = getTransformerList(row);
+			for(Transformer transformer : transformers){
 
 				for(Feature feature : features){
 					encoder.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
@@ -75,12 +83,28 @@ public class DataFrameMapper extends ClassDict {
 		}
 	}
 
+	public Object getDefault(){
+		return get("default");
+	}
+
+	public DataFrameMapper setDefault(Object _default){
+		put("default", _default);
+
+		return this;
+	}
+
 	public List<Object[]> getFeatures(){
 		return (List)get("features");
 	}
 
+	public DataFrameMapper setFeatures(List<Object[]> features){
+		put("features", features);
+
+		return this;
+	}
+
 	static
-	private List<String> getNameList(Object[] feature){
+	private List<String> getColumnList(Object[] feature){
 		Function<Object, String> function = new Function<Object, String>(){
 
 			@Override
@@ -95,8 +119,14 @@ public class DataFrameMapper extends ClassDict {
 		};
 
 		try {
+			if(feature[0] instanceof HasArray){
+				HasArray hasArray = (HasArray)feature[0];
+
+				return (List)hasArray.getArrayContent();
+			} // End if
+
 			if(feature[0] instanceof List){
-				return new ArrayList<>(Lists.transform(((List)feature[0]), function));
+				return Lists.transform(((List)feature[0]), function);
 			}
 
 			return Collections.singletonList(function.apply(feature[0]));
@@ -130,11 +160,11 @@ public class DataFrameMapper extends ClassDict {
 
 				List<Object[]> steps = transformerPipeline.getSteps();
 
-				return new ArrayList<>(Lists.transform((List)TupleUtil.extractElementList(steps, 1), function));
+				return Lists.transform((List)TupleUtil.extractElementList(steps, 1), function);
 			} // End if
 
 			if(feature[1] instanceof List){
-				return new ArrayList<>(Lists.transform((List)feature[1], function));
+				return Lists.transform((List)feature[1], function);
 			}
 
 			return Collections.singletonList(function.apply(feature[1]));
