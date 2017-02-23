@@ -21,11 +21,8 @@ package sklearn.linear_model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.regression.RegressionModel;
+import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -38,9 +35,7 @@ public class BaseLinearUtil {
 	}
 
 	static
-	public RegressionModel encodeRegressionModel(Number intercept, List<? extends Number> coefficients, Schema schema){
-		List<Feature> features = schema.getFeatures();
-
+	public RegressionTable encodeRegressionTable(List<Feature> features, Number intercept, List<? extends Number> coefficients){
 		ClassDictUtil.checkSize(features, coefficients);
 
 		List<Feature> unusedFeatures = new ArrayList<>();
@@ -58,14 +53,11 @@ public class BaseLinearUtil {
 			}
 		}
 
-		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), null)
-			.addRegressionTables(RegressionModelUtil.createRegressionTable(features, ValueUtil.asDouble(intercept), featureCoefficients));
-
 		if(!unusedFeatures.isEmpty()){
 			logger.info("Skipped {} feature(s): {}", unusedFeatures.size(), ClassDictUtil.formatFeatureList(unusedFeatures));
 		}
 
-		return regressionModel;
+		return RegressionModelUtil.createRegressionTable(features, ValueUtil.asDouble(intercept), featureCoefficients);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(BaseLinearUtil.class);

@@ -19,20 +19,18 @@
 package sklearn.linear_model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
+import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SigmoidTransformation;
-import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
@@ -52,7 +50,7 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public RegressionModel encodeModel(Schema schema){
 		int[] shape = getCoefShape();
 
 		int numberOfClasses = shape[0];
@@ -63,32 +61,44 @@ public class BaseLinearClassifier extends Classifier {
 		List<? extends Number> coefficients = getCoef();
 		List<? extends Number> intercepts = getIntercept();
 
-		Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), schema.getFeatures());
-
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+		List<Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
-			RegressionModel regressionModel = BaseLinearUtil.encodeRegressionModel(intercepts.get(0), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0), segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
+			RegressionTable activeRegressionTable = BaseLinearUtil.encodeRegressionTable(features, intercepts.get(0), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0))
+				.setTargetCategory(categoricalLabel.getValue(1));
 
-			return MiningModelUtil.createBinaryLogisticClassification(schema, regressionModel, RegressionModel.NormalizationMethod.SOFTMAX, 0d, 1d, hasProbabilityDistribution);
+			RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.<Feature>emptyList(), null, Collections.<Double>emptyList())
+				.setTargetCategory(categoricalLabel.getValue(0));
+
+			RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), null)
+				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
+				.addRegressionTables(activeRegressionTable, passiveRegressionTable)
+				.setOutput(hasProbabilityDistribution ? ModelUtil.createProbabilityOutput(categoricalLabel) : null);
+
+			return regressionModel;
 		} else
 
 		if(numberOfClasses >= 3){
 			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
 
-			List<RegressionModel> regressionModels = new ArrayList<>();
+			List<RegressionTable> regressionTables = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionModel regressionModel = BaseLinearUtil.encodeRegressionModel(intercepts.get(i), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i), segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, new SigmoidTransformation(-1d)));
+				RegressionTable regressionTable = BaseLinearUtil.encodeRegressionTable(features, intercepts.get(i), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i))
+					.setTargetCategory(categoricalLabel.getValue(i));
 
-				regressionModels.add(regressionModel);
+				regressionTables.add(regressionTable);
 			}
 
-			return MiningModelUtil.createClassification(schema, regressionModels, RegressionModel.NormalizationMethod.SIMPLEMAX, hasProbabilityDistribution);
+			RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), regressionTables)
+				.setNormalizationMethod(RegressionModel.NormalizationMethod.LOGIT)
+				.setOutput(hasProbabilityDistribution ? ModelUtil.createProbabilityOutput(categoricalLabel) : null);
+
+			return regressionModel;
 		} else
 
 		{
