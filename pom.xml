@@ -163,6 +163,9 @@
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 					</archive>
+					<excludes>
+						<exclude>*.py</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>
