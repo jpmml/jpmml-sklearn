@@ -18,13 +18,22 @@
  */
 package sklearn.feature_extraction.text;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+
+import com.google.common.base.Joiner;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.io.CharStreams;
 import numpy.DType;
 import numpy.core.Scalar;
 import org.dmg.pmml.Apply;
@@ -34,10 +43,13 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.TextIndex;
+import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
@@ -140,6 +152,8 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 	public DefineFunction encodeDefineFunction(){
 		String analyzer = getAnalyzer();
+		List<String> stopWords = getStopWords();
+		Object[] nGramRange = getNGramRange();
 		Boolean binary = getBinary();
 		Object preprocessor = getPreprocessor();
 		String stripAccents = getStripAccents();
@@ -170,6 +184,19 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null)
 			.setExpression(new FieldRef(termField.getName()));
 
+		if((stopWords != null && stopWords.size() > 0) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){
+			DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
+
+			InlineTable inlineTable = new InlineTable()
+				.addRows(DOMUtil.createRow(documentBuilder, Arrays.asList("string", "stem", "regex"), Arrays.asList("(^|\\s+)\\p{Punct}*(" + JOINER.join(stopWords) + ")\\p{Punct}*(\\s+|$)", " ", "true")));
+
+			TextIndexNormalization textIndexNormalization = new TextIndexNormalization()
+				.setRecursive(Boolean.TRUE) // Handles consecutive matches. See http://stackoverflow.com/a/25085385
+				.setInlineTable(inlineTable);
+
+			textIndex.addTextIndexNormalizations(textIndexNormalization);
+		}
+
 		DefineFunction defineFunction = new DefineFunction("tf", OpType.CONTINUOUS, null)
 			.setDataType(DataType.DOUBLE)
 			.addParameterFields(documentField, termField)
@@ -197,8 +224,22 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		return (Boolean)get("lowercase");
 	}
 
+	public Object[] getNGramRange(){
+		return (Object[])get("ngram_range");
+	}
+
 	public Object getPreprocessor(){
 		return get("preprocessor");
+	}
+
+	public List<String> getStopWords(){
+		Object stopWords = get("stop_words");
+
+		if(stopWords instanceof String){
+			return loadStopWords((String)stopWords);
+		}
+
+		return (List)stopWords;
 	}
 
 	public String getStripAccents(){
@@ -226,4 +267,21 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	public Map<String, Scalar> getVocabulary(){
 		return (Map)get("vocabulary_");
 	}
+
+	static
+	private List<String> loadStopWords(String stopWords){
+		InputStream is = CountVectorizer.class.getResourceAsStream("/stop_words/" + stopWords + ".txt");
+
+		if(is == null){
+			throw new IllegalArgumentException(stopWords);
+		}
+
+		try(Reader reader = new InputStreamReader(is, "UTF-8")){
+			return CharStreams.readLines(reader);
+		} catch(IOException ioe){
+			throw new IllegalArgumentException(stopWords, ioe);
+		}
+	}
+
+	private static final Joiner JOINER = Joiner.on("|");
 }
