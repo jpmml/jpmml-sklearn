@@ -36,6 +36,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import sklearn.Estimator;
@@ -46,14 +47,21 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final MiningFunction miningFunction, final Schema schema){
+	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, MiningFunction miningFunction, Schema schema){
+		PredicateManager predicateManager = new PredicateManager();
+
+		return encodeTreeModelSegmentation(estimators, predicateManager, miningFunction, schema);
+	}
+
+	static
+	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final PredicateManager predicateManager, final MiningFunction miningFunction, final Schema schema){
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
 			@Override
 			public TreeModel apply(E estimator){
 				Schema treeModelSchema = toTreeModelSchema(schema.toAnonymousSchema(), estimator.getDataType());
 
-				return TreeModelUtil.encodeTreeModel(estimator, miningFunction, treeModelSchema);
+				return TreeModelUtil.encodeTreeModel(estimator, predicateManager, miningFunction, treeModelSchema);
 			}
 		};
 
@@ -62,6 +70,13 @@ public class TreeModelUtil {
 
 	static
 	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Schema schema){
+		PredicateManager predicateManager = new PredicateManager();
+
+		return encodeTreeModel(estimator, predicateManager, miningFunction, schema);
+	}
+
+	static
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, PredicateManager predicateManager, MiningFunction miningFunction, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -74,7 +89,7 @@ public class TreeModelUtil {
 			.setId("1")
 			.setPredicate(new True());
 
-		encodeNode(root, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+		encodeNode(root, predicateManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
@@ -83,7 +98,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	private void encodeNode(Node node, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
+	private void encodeNode(Node node, PredicateManager predicateManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
 		int featureIndex = features[index];
 
 		// A non-leaf (binary split) node
@@ -102,11 +117,10 @@ public class TreeModelUtil {
 					throw new IllegalArgumentException();
 				}
 
-				leftPredicate = new SimplePredicate(binaryFeature.getName(), SimplePredicate.Operator.NOT_EQUAL)
-					.setValue(binaryFeature.getValue());
+				String value = binaryFeature.getValue();
 
-				rightPredicate = new SimplePredicate(binaryFeature.getName(), SimplePredicate.Operator.EQUAL)
-					.setValue(binaryFeature.getValue());
+				leftPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.NOT_EQUAL, value);
+				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
 			} else
 
 			{
@@ -114,11 +128,8 @@ public class TreeModelUtil {
 
 				String value = ValueUtil.formatValue(threshold);
 
-				leftPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.LESS_OR_EQUAL)
-					.setValue(value);
-
-				rightPredicate = new SimplePredicate(continuousFeature.getName(), SimplePredicate.Operator.GREATER_THAN)
-					.setValue(value);
+				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
+				rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);
 			}
 
 			int leftIndex = leftChildren[index];
@@ -128,13 +139,13 @@ public class TreeModelUtil {
 				.setId(String.valueOf(leftIndex + 1))
 				.setPredicate(leftPredicate);
 
-			encodeNode(leftChild, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			encodeNode(leftChild, predicateManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			Node rightChild = new Node()
 				.setId(String.valueOf(rightIndex + 1))
 				.setPredicate(rightPredicate);
 
-			encodeNode(rightChild, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			encodeNode(rightChild, predicateManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			node.addNodes(leftChild, rightChild);
 		} else

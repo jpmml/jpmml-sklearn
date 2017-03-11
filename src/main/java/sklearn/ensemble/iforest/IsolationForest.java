@@ -39,6 +39,7 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.AbstractTransformation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
@@ -66,6 +67,8 @@ public class IsolationForest extends EnsembleRegressor {
 	public MiningModel encodeModel(Schema schema){
 		List<? extends Regressor> estimators = getEstimators();
 
+		PredicateManager predicateManager = new PredicateManager();
+
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<TreeModel> treeModels = new ArrayList<>();
@@ -76,7 +79,7 @@ public class IsolationForest extends EnsembleRegressor {
 			final
 			Tree tree = treeRegressor.getTree();
 
-			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, segmentSchema);
+			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, predicateManager, MiningFunction.REGRESSION, segmentSchema);
 
 			Visitor visitor = new AbstractVisitor(){
 
