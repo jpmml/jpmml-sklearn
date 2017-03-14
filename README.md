@@ -101,6 +101,7 @@ Java library and command-line application for converting [Scikit-Learn] (http://
     * `sklearn2pmml.SelectorProxy`
     * `sklearn2pmml.decoration.CategoricalDomain`
     * `sklearn2pmml.decoration.ContinuousDomain`
+    * `sklearn2pmml.preprocessing.PMMLLabelEncoder`
   * [XGBoost] (https://github.com/dmlc/xgboost):
     * [`xgboost.XGBClassifier`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
     * [`xgboost.XGBRegressor`] (http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
