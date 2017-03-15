@@ -65,6 +65,9 @@ public class Transformer extends ClassDict {
 		Class<? extends Transformer> clazz = getClass();
 
 		String name = clazz.getSimpleName();
+		if(name.startsWith("PMML")){
+			name = name.substring("PMML".length());
+		}
 
 		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
 	}
