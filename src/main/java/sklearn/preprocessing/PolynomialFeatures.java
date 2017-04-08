@@ -27,7 +27,6 @@ import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.TypeDefinitionField;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InteractionFeature;
@@ -90,10 +89,10 @@ public class PolynomialFeatures extends Transformer {
 
 				features[0] = feature;
 
-				TypeDefinitionField field = encoder.getField(feature.getName());
+				ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 				for(int i = 2; i <= degree; i++){
-					features[i - 1] = new PowerFeature(encoder, field, i);
+					features[i - 1] = new PowerFeature(encoder, continuousFeature.getName(), continuousFeature.getDataType(), i);
 				}
 
 				return features;
