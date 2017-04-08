@@ -29,7 +29,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -63,11 +63,11 @@ public class LabelBinarizerTest {
 
 		List<Feature> outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
-			assertTrue(outputFeature instanceof ContinuousFeature);
+			assertTrue(outputFeature instanceof CategoricalFeature);
 		}
 
 		assertEquals(Arrays.asList("apply=low", "apply=medium", "apply=high"), ids);
-		assertEquals(Arrays.asList(), PMMLUtil.getValues(dataField));
+		assertEquals(Arrays.asList("low", "medium", "high"), PMMLUtil.getValues(dataField));
 
 		binarizer.put("neg_label", 0d);
 

@@ -26,7 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
@@ -57,8 +57,8 @@ public class LabelBinarizer extends Transformer {
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
-		Number posLabel = getPosLabel();
 		Number negLabel = getNegLabel();
+		Number posLabel = getPosLabel();
 
 		ClassDictUtil.checkSize(1, ids, features);
 
@@ -67,20 +67,39 @@ public class LabelBinarizer extends Transformer {
 
 		List<String> categories = new ArrayList<>();
 
+		for(int i = 0; i < classes.size(); i++){
+			Object value = classes.get(i);
+
+			String category = ValueUtil.formatValue(value);
+
+			categories.add(category);
+		}
+
+		List<String> labelCategories = new ArrayList<>();
+		labelCategories.add(ValueUtil.formatValue(negLabel));
+		labelCategories.add(ValueUtil.formatValue(posLabel));
+
 		ids.clear();
 
 		List<Feature> result = new ArrayList<>();
 
+		if(classes.size() < 2){
+			throw new IllegalArgumentException();
+		} else
+
+		// [negValue, posValue] -> [posValue]
+		if(classes.size() == 2){
+			classes = classes.subList(1, 2);
+		}
+
 		for(int i = 0; i < classes.size(); i++){
 			Object value = classes.get(i);
 
-			ids.add(id + "=" + ValueUtil.formatValue(value));
+			String category = ValueUtil.formatValue(value);
 
-			if(ValueUtil.isOne(posLabel) && ValueUtil.isZero(negLabel)){
-				String category = ValueUtil.formatValue(value);
+			ids.add(id + "=" + category);
 
-				categories.add(category);
-
+			if(ValueUtil.isZero(negLabel) && ValueUtil.isOne(posLabel)){
 				result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
 			} else
 
@@ -88,9 +107,9 @@ public class LabelBinarizer extends Transformer {
 				// "($name == value) ? pos_label : neg_label"
 				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", feature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
-				DerivedField derivedField = encoder.createDerivedField(createName(id, i), apply);
+				DerivedField derivedField = encoder.createDerivedField(classes.size() > 1 ? createName(id, i) : createName(id), apply);
 
-				result.add(new ContinuousFeature(encoder, derivedField));
+				result.add(new CategoricalFeature(encoder, derivedField, labelCategories));
 			}
 		}
 

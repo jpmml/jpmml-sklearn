@@ -119,13 +119,13 @@ audit_y = audit_y.astype(int)
 def build_audit(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
 		("Age", ContinuousDomain()),
-		("Employment", [LabelBinarizer(), SelectFromModel(EstimatorProxy(DecisionTreeClassifier(random_state = 13)), threshold = "1.25 * mean")]),
-		("Education", [LabelBinarizer(), SelectorProxy(SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "median"))]),
-		("Marital", [LabelBinarizer(), SelectKBest(k = 3)]),
-		("Occupation", [LabelBinarizer(), SelectorProxy(SelectKBest(k = 3))]),
+		("Employment", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(EstimatorProxy(DecisionTreeClassifier(random_state = 13)), threshold = "1.25 * mean")]),
+		("Education", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "median"))]),
+		("Marital", [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
+		("Occupation", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectKBest(k = 3))]),
 		("Income", ContinuousDomain()),
-		("Gender", LabelEncoder()),
-		("Deductions", LabelEncoder()),
+		("Gender", [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
+		("Deductions", [CategoricalDomain(), LabelEncoder()]),
 		("Hours", ContinuousDomain())
 	])
 	pipeline = PMMLPipeline([
