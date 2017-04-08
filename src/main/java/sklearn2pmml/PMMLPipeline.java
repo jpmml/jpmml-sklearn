@@ -127,7 +127,9 @@ public class PMMLPipeline extends Pipeline {
 			for(String activeField : activeFields){
 				DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
 
-				encoder.addRow(Collections.singletonList(activeField), Collections.<Feature>singletonList(new WildcardFeature(encoder, dataField)));
+				Feature feature = new WildcardFeature(encoder, dataField);
+
+				encoder.addRow(Collections.singletonList(activeField), Collections.<Feature>singletonList(feature));
 			}
 		}
 

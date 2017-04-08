@@ -71,10 +71,7 @@ public class DataFrameMapper extends ClassDict {
 
 			List<Transformer> transformers = getTransformerList(row);
 			for(Transformer transformer : transformers){
-
-				for(Feature feature : features){
-					encoder.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
-				}
+				encoder.updateFeatures(features, transformer.getOpType(), transformer.getDataType());
 
 				features = transformer.encodeFeatures(ids, features, encoder);
 			}

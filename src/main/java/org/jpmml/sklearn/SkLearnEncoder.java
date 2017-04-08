@@ -27,10 +27,10 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.TypeDefinitionField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.WildcardFeature;
 
 public class SkLearnEncoder extends ModelEncoder {
 
@@ -39,22 +39,27 @@ public class SkLearnEncoder extends ModelEncoder {
 	private List<Feature> features = new ArrayList<>();
 
 
+	public void updateFeatures(List<Feature> features, OpType opType, DataType dataType){
+
+		for(Feature feature : features){
+
+			if(feature instanceof WildcardFeature){
+				WildcardFeature wildcardFeature = (WildcardFeature)feature;
+
+				updateType(wildcardFeature.getName(), opType, dataType);
+			}
+		}
+	}
+
 	public void updateType(FieldName name, OpType opType, DataType dataType){
-		TypeDefinitionField field;
+		DataField dataField = getDataField(name);
 
-		try {
-			field = getField(name);
-		} catch(IllegalArgumentException iae){
-			return;
+		if(dataField == null){
+			throw new IllegalArgumentException(name.getValue());
 		}
 
-		if(opType != null){
-			field.setOpType(opType);
-		} // End if
-
-		if(dataType != null){
-			field.setDataType(dataType);
-		}
+		dataField.setOpType(opType);
+		dataField.setDataType(dataType);
 	}
 
 	public void updateValueSpace(FieldName name, List<String> categories){

@@ -137,9 +137,7 @@ public class Pipeline extends Estimator implements HasClasses {
 					}
 				}
 
-				for(Feature feature : features){
-					encoder.updateType(feature.getName(), transformer.getOpType(), transformer.getDataType());
-				}
+				encoder.updateFeatures(features, transformer.getOpType(), transformer.getDataType());
 
 				features = transformer.encodeFeatures(ids, features, encoder);
 			}
