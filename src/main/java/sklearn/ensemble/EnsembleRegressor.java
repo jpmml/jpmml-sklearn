@@ -33,17 +33,17 @@ public class EnsembleRegressor extends Regressor {
 	}
 
 	@Override
-	public DataType getDataType(){
-		Regressor baseEstimator = getBaseEstimator();
-
-		return baseEstimator.getDataType();
-	}
-
-	@Override
 	public OpType getOpType(){
 		Regressor baseEstimator = getBaseEstimator();
 
 		return baseEstimator.getOpType();
+	}
+
+	@Override
+	public DataType getDataType(){
+		Regressor baseEstimator = getBaseEstimator();
+
+		return baseEstimator.getDataType();
 	}
 
 	public Regressor getBaseEstimator(){

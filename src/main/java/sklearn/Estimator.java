@@ -51,16 +51,10 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 		return ValueUtil.asInt((Number)get("n_features_"));
 	}
 
-	/**
-	 * The {@link OpType operational type} of active fields.
-	 */
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
 	}
 
-	/**
-	 * The {@link DataType data type} of active fields.
-	 */
 	public DataType getDataType(){
 		return DataType.DOUBLE;
 	}

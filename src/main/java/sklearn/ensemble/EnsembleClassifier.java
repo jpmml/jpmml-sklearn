@@ -33,17 +33,17 @@ public class EnsembleClassifier extends Classifier {
 	}
 
 	@Override
-	public DataType getDataType(){
-		Classifier baseEstimator = getBaseEstimator();
-
-		return baseEstimator.getDataType();
-	}
-
-	@Override
 	public OpType getOpType(){
 		Classifier baseEstimator = getBaseEstimator();
 
 		return baseEstimator.getOpType();
+	}
+
+	@Override
+	public DataType getDataType(){
+		Classifier baseEstimator = getBaseEstimator();
+
+		return baseEstimator.getDataType();
 	}
 
 	public Classifier getBaseEstimator(){
