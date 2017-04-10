@@ -44,7 +44,6 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.TypeUtil;
@@ -62,80 +61,26 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public PMML encodePMML(){
-		DataFrameMapper dataFrameMapper = getMapper();
 		Estimator estimator = getEstimator();
 		String repr = getRepr();
 
-		while(estimator instanceof Pipeline){
-			Pipeline pipeline = (Pipeline)estimator;
-
-			estimator = pipeline.getEstimator();
+		if(estimator == null){
+			throw new IllegalArgumentException();
 		}
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		Label label = null;
+		Label label = encodeLabel(encoder);
+		List<Feature> features = encodeFeatures(encoder);
 
-		if(estimator.isSupervised()){
-			String targetField = getTargetField();
-
-			if(targetField == null){
-				targetField = "y";
-			}
-
-			MiningFunction miningFunction = estimator.getMiningFunction();
-			switch(miningFunction){
-				case CLASSIFICATION:
-					{
-						List<?> classes = EstimatorUtil.getClasses(estimator);
-
-						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, TypeUtil.getDataType(classes, DataType.STRING), formatTargetCategories(classes));
-
-						label = new CategoricalLabel(dataField);
-					}
-					break;
-				case REGRESSION:
-					{
-						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CONTINUOUS, DataType.DOUBLE);
-
-						label = new ContinuousLabel(dataField);
-					}
-					break;
-				default:
-					throw new IllegalArgumentException();
-			}
-		} // End if
-
-		if(dataFrameMapper != null){
-			dataFrameMapper.encodeFeatures(encoder);
-		} else
-
-		{
-			List<String> activeFields = getActiveFields();
-
-			if(activeFields == null){
-				activeFields = new ArrayList<>();
-
-				for(int i = 0, max = getNumberOfFeatures(); i < max; i++){
-					activeFields.add("x" + String.valueOf(i + 1));
-				}
-			}
-
-			OpType opType = getOpType();
-			DataType dataType = getDataType();
-
-			for(String activeField : activeFields){
-				DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
-
-				Feature feature = new WildcardFeature(encoder, dataField);
-
-				encoder.addRow(Collections.singletonList(activeField), Collections.<Feature>singletonList(feature));
-			}
+		int numberOfFeatures = estimator.getNumberOfFeatures();
+		if(numberOfFeatures > -1){
+			ClassDictUtil.checkSize(numberOfFeatures, features);
 		}
 
-		Schema schema = new Schema(label, encoder.getFeatures());
+		Schema schema = new Schema(label, features);
 
-		Model model = encodeModel(schema, encoder);
+		Model model = estimator.encodeModel(schema, encoder);
 
 		PMML pmml = encoder.encodePMML(model);
 
@@ -152,24 +97,34 @@ public class PMMLPipeline extends Pipeline {
 		return pmml;
 	}
 
-	public DataFrameMapper getMapper(){
-		Object[] mapperStep = getMapperStep();
+	public Label encodeLabel(SkLearnEncoder encoder){
+		Estimator estimator = getEstimator();
 
-		if(mapperStep != null){
-			return (DataFrameMapper)TupleUtil.extractElement(mapperStep, 1);
-		}
+		if(estimator.isSupervised()){
+			String targetField = getTargetField();
 
-		return null;
-	}
+			if(targetField == null){
+				targetField = "y";
+			}
 
-	public Object[] getMapperStep(){
-		List<Object[]> transformerSteps = super.getTransformerSteps();
+			MiningFunction miningFunction = estimator.getMiningFunction();
+			switch(miningFunction){
+				case CLASSIFICATION:
+					{
+						List<?> classes = EstimatorUtil.getClasses(estimator);
 
-		if(transformerSteps.size() > 0){
-			Object object = TupleUtil.extractElement(transformerSteps.get(0), 1);
+						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, TypeUtil.getDataType(classes, DataType.STRING), formatTargetCategories(classes));
 
-			if(object instanceof DataFrameMapper){
-				return transformerSteps.get(0);
+						return new CategoricalLabel(dataField);
+					}
+				case REGRESSION:
+					{
+						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CONTINUOUS, DataType.DOUBLE);
+
+						return new ContinuousLabel(dataField);
+					}
+				default:
+					throw new IllegalArgumentException();
 			}
 		}
 
@@ -177,18 +132,38 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	@Override
-	public List<Object[]> getTransformerSteps(){
-		List<Object[]> transformerSteps = super.getTransformerSteps();
+	public List<Feature> encodeFeatures(SkLearnEncoder encoder){
+		DataFrameMapper mapper = getMapper();
 
-		if(transformerSteps.size() > 0){
-			Object object = TupleUtil.extractElement(transformerSteps.get(0), 1);
+		if(mapper == null){
+			List<String> activeFields = getActiveFields();
 
-			if(object instanceof DataFrameMapper){
-				transformerSteps = transformerSteps.subList(1, transformerSteps.size());
+			if(activeFields == null){
+				activeFields = new ArrayList<>();
+
+				int numberOfFeatures = getNumberOfFeatures();
+				if(numberOfFeatures < 0){
+					throw new IllegalArgumentException();
+				}
+
+				for(int i = 0, max = numberOfFeatures; i < max; i++){
+					activeFields.add("x" + String.valueOf(i + 1));
+				}
+			}
+
+			OpType opType = getOpType();
+			DataType dataType = getDataType();
+
+			for(String activeField : activeFields){
+				DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
+
+				Feature feature = new WildcardFeature(encoder, dataField);
+
+				encoder.addRow(Collections.singletonList(activeField), Collections.<Feature>singletonList(feature));
 			}
 		}
 
-		return transformerSteps;
+		return super.encodeFeatures(encoder);
 	}
 
 	@Override
@@ -212,6 +187,16 @@ public class PMMLPipeline extends Pipeline {
 		return this;
 	}
 
+	public String getTargetField(){
+		return (String)get("target_field");
+	}
+
+	public PMMLPipeline setTargetField(String targetField){
+		put("target_field", targetField);
+
+		return this;
+	}
+
 	public List<String> getActiveFields(){
 
 		if(!containsKey("active_fields")){
@@ -227,16 +212,6 @@ public class PMMLPipeline extends Pipeline {
 		array.put("fortran_order", Boolean.FALSE);
 
 		put("active_fields", array);
-
-		return this;
-	}
-
-	public String getTargetField(){
-		return (String)get("target_field");
-	}
-
-	public PMMLPipeline setTargetField(String targetField){
-		put("target_field", targetField);
 
 		return this;
 	}

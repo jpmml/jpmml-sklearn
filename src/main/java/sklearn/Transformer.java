@@ -41,6 +41,13 @@ public class Transformer extends ClassDict {
 	abstract
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder);
 
+	public List<Feature> encodeFeatures(SkLearnEncoder encoder){
+		List<String> ids = encoder.getIds();
+		List<Feature> features = encoder.getFeatures();
+
+		return encodeFeatures(ids, features, encoder);
+	}
+
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
 	}

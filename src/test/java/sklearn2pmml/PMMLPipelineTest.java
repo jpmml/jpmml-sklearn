@@ -28,37 +28,12 @@ import sklearn.dummy.DummyClassifier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class PMMLPipelineTest {
 
 	@Test
 	public void construct(){
 		PMMLPipeline pipeline = new PMMLPipeline();
-
-		try {
-			pipeline.getMapper();
-
-			fail();
-		} catch(IllegalArgumentException iae){
-			// Ingored
-		}
-
-		try {
-			pipeline.getTransformers();
-
-			fail();
-		} catch(IllegalArgumentException iae){
-			// Ignored
-		}
-
-		try {
-			pipeline.getEstimator();
-
-			fail();
-		} catch(IllegalArgumentException iae){
-			// Ignored
-		}
 
 		assertNull(pipeline.getSteps());
 		assertNull(pipeline.getRepr());
@@ -76,12 +51,6 @@ public class PMMLPipelineTest {
 		assertEquals(null, pipeline.getMapper());
 		assertEquals(Collections.emptyList(), pipeline.getTransformers());
 		assertEquals(estimator, pipeline.getEstimator());
-
-		assertEquals(estimator.getMiningFunction(), pipeline.getMiningFunction());
-		assertEquals(estimator.isSupervised(), pipeline.isSupervised());
-		assertEquals(estimator.getNumberOfFeatures(), pipeline.getNumberOfFeatures());
-		assertEquals(estimator.getOpType(), pipeline.getOpType());
-		assertEquals(estimator.getDataType(), pipeline.getDataType());
 
 		assertNotNull(pipeline.getRepr());
 		assertEquals("y", pipeline.getTargetField());

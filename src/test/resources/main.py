@@ -81,8 +81,10 @@ def build_wheat(kmeans, name, with_affinity = True):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("transformer", FunctionTransformer(numpy.log10)),
-		("scaler", MinMaxScaler()),
+		("transformer-pipeline", Pipeline([
+			("function", FunctionTransformer(numpy.log10)),
+			("scaler", MinMaxScaler())
+		])),
 		("clusterer", kmeans)
 	])
 	pipeline.fit(wheat_X)
@@ -173,8 +175,10 @@ def build_versicolor(classifier, name, with_proba = True):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("transformer", PolynomialFeatures(degree = 3)),
-		("selector", SelectKBest(k = "all")),
+		("transformer-pipeline", Pipeline([
+			("polynomial", PolynomialFeatures(degree = 3)),
+			("selector", SelectKBest(k = "all"))
+		])),
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
@@ -211,8 +215,10 @@ def build_iris(classifier, name, with_proba = True):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("scaler", RobustScaler()),
-		("pca", IncrementalPCA(n_components = 3, whiten = True)),
+		("transformer-pipeline", Pipeline([
+			("scaler", RobustScaler()),
+			("pca", IncrementalPCA(n_components = 3, whiten = True))
+		])),
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)
@@ -342,9 +348,11 @@ def build_housing(regressor, name, with_kneighbors = False):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("transformer", PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)),
-		("scaler", StandardScaler()),
-		("selector", SelectorProxy(SelectPercentile(score_func = f_regression, percentile = 35))),
+		("transformer-pipeline", Pipeline([
+			("polynomial", PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)),
+			("scaler", StandardScaler()),
+			("selector", SelectorProxy(SelectPercentile(score_func = f_regression, percentile = 35))),
+		])),
 		("regressor", regressor)
 	])
 	pipeline.fit(housing_X, housing_y)
@@ -375,7 +383,7 @@ def build_iforest_housing_anomaly(iforest, name):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("estimator", Pipeline([("first", iforest)]))
+		("estimator", iforest)
 	])
 	pipeline.fit(housing_X)
 	store_pkl(pipeline, name + ".pkl")
@@ -391,7 +399,8 @@ def build_svm_housing_anomaly(svm, name):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("estimator", Pipeline([("first", MaxAbsScaler()), ("second", svm)]))
+		("scaler", MaxAbsScaler()),
+		("estimator", svm)
 	])
 	pipeline.fit(housing_X)
 	store_pkl(pipeline, name + ".pkl")
