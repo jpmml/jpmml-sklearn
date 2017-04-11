@@ -31,7 +31,6 @@ import sklearn.EstimatorUtil;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
-import sklearn_pandas.DataFrameMapper;
 
 public class Pipeline extends Transformer {
 
@@ -91,14 +90,7 @@ public class Pipeline extends Transformer {
 				}
 			}
 
-			update:
-			{
-				if(index == 0 && (transformer instanceof DataFrameMapper)){
-					break update;
-				}
-
-				encoder.updateFeatures(features, transformer);
-			}
+			encoder.updateFeatures(features, transformer, (index == 0));
 
 			features = transformer.encodeFeatures(ids, features, encoder);
 

@@ -63,6 +63,8 @@ public class FunctionTransformer extends Transformer {
 
 			DerivedField derivedField = encoder.createDerivedField(FieldName.create(ufunc.getName() + "(" + id + ")"), expression);
 
+			ids.set(i, (derivedField.getName()).getValue());
+
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 

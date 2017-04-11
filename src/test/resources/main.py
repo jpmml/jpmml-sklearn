@@ -22,7 +22,7 @@ from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
@@ -81,10 +81,7 @@ def build_wheat(kmeans, name, with_affinity = True):
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("transformer-pipeline", Pipeline([
-			("function", FunctionTransformer(numpy.log10)),
-			("scaler", MinMaxScaler())
-		])),
+		("scaler", MinMaxScaler()),
 		("clusterer", kmeans)
 	])
 	pipeline.fit(wheat_X)
@@ -119,19 +116,28 @@ audit_y = audit_df["Adjusted"]
 audit_y = audit_y.astype(int)
 
 def build_audit(classifier, name, with_proba = True):
-	mapper = DataFrameMapper([
+	continuous_mapper = DataFrameMapper([
 		("Age", ContinuousDomain()),
-		("Employment", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(EstimatorProxy(DecisionTreeClassifier(random_state = 13)), threshold = "1.25 * mean")]),
-		("Education", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "median"))]),
-		("Marital", [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
-		("Occupation", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectKBest(k = 3))]),
 		("Income", ContinuousDomain()),
-		("Gender", [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
-		("Deductions", [CategoricalDomain(), LabelEncoder()]),
 		("Hours", ContinuousDomain())
 	])
+	categorical_mapper = DataFrameMapper([
+		("Employment", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(EstimatorProxy(DecisionTreeClassifier(random_state = 13)), threshold = "1.25 * mean")]),
+		("Education", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "1.25 * mean"))]),
+		("Marital", [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
+		("Occupation", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectKBest(k = 3))]),
+
+		("Gender", [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
+		("Deductions", [CategoricalDomain(), LabelEncoder()]),
+	])
 	pipeline = PMMLPipeline([
-		("mapper", mapper),
+		("union", FeatureUnion([
+			("continuous", continuous_mapper),
+			("categorical", Pipeline([
+				("mapper", categorical_mapper),
+				("polynomial", PolynomialFeatures())
+			]))
+		])),
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, audit_y)
@@ -210,15 +216,17 @@ iris_X = iris_df[["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"]]
 iris_y = iris_df["Species"]
 
 def build_iris(classifier, name, with_proba = True):
-	mapper = DataFrameMapper([
-		(iris_X.columns.values, ContinuousDomain()),
-	])
 	pipeline = PMMLPipeline([
-		("mapper", mapper),
-		("transformer-pipeline", Pipeline([
-			("scaler", RobustScaler()),
-			("pca", IncrementalPCA(n_components = 3, whiten = True))
+		("union", FeatureUnion([
+			("normal_scale", DataFrameMapper([
+				(iris_X.columns.values, ContinuousDomain()),
+			])),
+			("log_scale", DataFrameMapper([
+				(iris_X.columns.values, FunctionTransformer(numpy.log10))
+			]))
 		])),
+		("scaler", RobustScaler()),
+		("pca", IncrementalPCA(n_components = 3, whiten = True)),
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)

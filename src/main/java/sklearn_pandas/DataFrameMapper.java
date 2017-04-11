@@ -83,7 +83,7 @@ public class DataFrameMapper extends Transformer {
 
 			List<Transformer> transformers = getTransformerList(row);
 			for(Transformer transformer : transformers){
-				encoder.updateFeatures(rowFeatures, transformer);
+				encoder.updateFeatures(rowFeatures, transformer, false);
 
 				rowFeatures = transformer.encodeFeatures(rowIds, rowFeatures, encoder);
 			}

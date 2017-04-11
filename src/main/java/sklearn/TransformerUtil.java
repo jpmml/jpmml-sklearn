@@ -23,6 +23,7 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.pipeline.FeatureUnion;
 import sklearn.pipeline.Pipeline;
 
 public class TransformerUtil {
@@ -56,15 +57,21 @@ public class TransformerUtil {
 		while(transformers.size() > 0){
 			Transformer transformer = transformers.get(0);
 
+			if(transformer instanceof FeatureUnion){
+				FeatureUnion featureUnion = (FeatureUnion)transformer;
+
+				transformers = featureUnion.getTransformers();
+			} else
+
 			if(transformer instanceof Pipeline){
 				Pipeline pipeline = (Pipeline)transformer;
 
 				transformers = pipeline.getTransformers();
+			} else
 
-				continue;
+			{
+				return transformer;
 			}
-
-			return transformer;
 		}
 
 		return null;
