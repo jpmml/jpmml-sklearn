@@ -19,12 +19,12 @@
 package sklearn2pmml;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -46,6 +46,9 @@ import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasNumberOfFeatures;
+import sklearn.Transformer;
+import sklearn.TransformerUtil;
 import sklearn.TypeUtil;
 import sklearn.pipeline.Pipeline;
 import sklearn_pandas.DataFrameMapper;
@@ -53,14 +56,15 @@ import sklearn_pandas.DataFrameMapper;
 public class PMMLPipeline extends Pipeline {
 
 	public PMMLPipeline(){
-		super("sklearn2pmml", "PMMLPipeline");
+		this("sklearn2pmml", "PMMLPipeline");
 	}
 
 	public PMMLPipeline(String module, String name){
-		super(module, name);
+		super(module, name, true);
 	}
 
 	public PMML encodePMML(){
+		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 		String repr = getRepr();
 
@@ -70,12 +74,60 @@ public class PMMLPipeline extends Pipeline {
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		Label label = encodeLabel(encoder);
-		List<Feature> features = encodeFeatures(encoder);
+		Label label = null;
+
+		if(estimator.isSupervised()){
+			String targetField = getTargetField();
+
+			if(targetField == null){
+				targetField = "y";
+			}
+
+			MiningFunction miningFunction = estimator.getMiningFunction();
+			switch(miningFunction){
+				case CLASSIFICATION:
+					{
+						List<?> classes = EstimatorUtil.getClasses(estimator);
+
+						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, TypeUtil.getDataType(classes, DataType.STRING), formatTargetCategories(classes));
+
+						label = new CategoricalLabel(dataField);
+					}
+					break;
+				case REGRESSION:
+					{
+						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CONTINUOUS, DataType.DOUBLE);
+
+						label = new ContinuousLabel(dataField);
+					}
+					break;
+				default:
+					throw new IllegalArgumentException();
+			}
+		}
+
+		List<String> ids = new ArrayList<>();
+		List<Feature> features = new ArrayList<>();
+
+		Transformer transformer = TransformerUtil.getHead(transformers);
+		if(transformer != null){
+
+			if(!(transformer instanceof DataFrameMapper)){
+				ids = initIds(transformer, encoder);
+				features = initFeatures(ids, transformer.getOpType(), transformer.getDataType(), encoder);
+			}
+
+			features = encodeFeatures(ids, features, encoder);
+		} else
+
+		{
+			ids = initIds(estimator, encoder);
+			features = initFeatures(ids, estimator.getOpType(), estimator.getDataType(), encoder);
+		}
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();
 		if(numberOfFeatures > -1){
-			ClassDictUtil.checkSize(numberOfFeatures, features);
+			ClassDictUtil.checkSize(numberOfFeatures, ids, features);
 		}
 
 		Schema schema = new Schema(label, features);
@@ -97,73 +149,37 @@ public class PMMLPipeline extends Pipeline {
 		return pmml;
 	}
 
-	public Label encodeLabel(SkLearnEncoder encoder){
-		Estimator estimator = getEstimator();
+	private List<String> initIds(ClassDict object, SkLearnEncoder encoder){
+		List<String> activeFields = getActiveFields();
 
-		if(estimator.isSupervised()){
-			String targetField = getTargetField();
+		if(activeFields == null){
+			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)object;
 
-			if(targetField == null){
-				targetField = "y";
+			int numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
+			if(numberOfFeatures < 0){
+				throw new IllegalArgumentException();
 			}
 
-			MiningFunction miningFunction = estimator.getMiningFunction();
-			switch(miningFunction){
-				case CLASSIFICATION:
-					{
-						List<?> classes = EstimatorUtil.getClasses(estimator);
+			activeFields = new ArrayList<>(numberOfFeatures);
 
-						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, TypeUtil.getDataType(classes, DataType.STRING), formatTargetCategories(classes));
-
-						return new CategoricalLabel(dataField);
-					}
-				case REGRESSION:
-					{
-						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CONTINUOUS, DataType.DOUBLE);
-
-						return new ContinuousLabel(dataField);
-					}
-				default:
-					throw new IllegalArgumentException();
+			for(int i = 0, max = numberOfFeatures; i < max; i++){
+				activeFields.add("x" + String.valueOf(i + 1));
 			}
 		}
 
-		return null;
+		return activeFields;
 	}
 
-	@Override
-	public List<Feature> encodeFeatures(SkLearnEncoder encoder){
-		DataFrameMapper mapper = getMapper();
+	private List<Feature> initFeatures(List<String> ids, OpType opType, DataType dataType, SkLearnEncoder encoder){
+		List<Feature> result = new ArrayList<>();
 
-		if(mapper == null){
-			List<String> activeFields = getActiveFields();
+		for(String id : ids){
+			DataField dataField = encoder.createDataField(FieldName.create(id), opType, dataType);
 
-			if(activeFields == null){
-				activeFields = new ArrayList<>();
-
-				int numberOfFeatures = getNumberOfFeatures();
-				if(numberOfFeatures < 0){
-					throw new IllegalArgumentException();
-				}
-
-				for(int i = 0, max = numberOfFeatures; i < max; i++){
-					activeFields.add("x" + String.valueOf(i + 1));
-				}
-			}
-
-			OpType opType = getOpType();
-			DataType dataType = getDataType();
-
-			for(String activeField : activeFields){
-				DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
-
-				Feature feature = new WildcardFeature(encoder, dataField);
-
-				encoder.addRow(Collections.singletonList(activeField), Collections.<Feature>singletonList(feature));
-			}
+			result.add(new WildcardFeature(encoder, dataField));
 		}
 
-		return super.encodeFeatures(encoder);
+		return result;
 	}
 
 	@Override

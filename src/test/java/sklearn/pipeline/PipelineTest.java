@@ -16,43 +16,48 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml;
+package sklearn.pipeline;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 import sklearn.Estimator;
+import sklearn.Transformer;
 import sklearn.dummy.DummyClassifier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
-public class PMMLPipelineTest {
+public class PipelineTest {
 
 	@Test
 	public void construct(){
-		PMMLPipeline pipeline = new PMMLPipeline();
+		Pipeline pipeline = new Pipeline();
+		pipeline.put("steps", Collections.emptyList());
 
-		assertNull(pipeline.getSteps());
-		assertNull(pipeline.getRepr());
-		assertNull(pipeline.getActiveFields());
-		assertNull(pipeline.getTargetField());
+		assertEquals(Collections.emptyList(), pipeline.getTransformers());
+		assertNull(pipeline.getEstimator());
 
 		Estimator estimator = new DummyClassifier(null, null);
 
-		pipeline
-			.setSteps(Collections.singletonList(new Object[]{"estimator", estimator}))
-			.setRepr("PMMLPipeline([steps=(\"estimator\", DummyClassifier())])")
-			.setTargetField("y")
-			.setActiveFields(Arrays.asList("x1", "x2", "x3"));
+		pipeline.put("steps", Collections.singletonList(new Object[]{"estimator", estimator}));
 
-		assertEquals(Collections.emptyList(), pipeline.getTransformers());
-		assertEquals(estimator, pipeline.getEstimator());
+		try {
+			List<Transformer> transformers = pipeline.getTransformers();
 
-		assertNotNull(pipeline.getRepr());
-		assertEquals("y", pipeline.getTargetField());
-		assertEquals(Arrays.asList("x1", "x2", "x3"), pipeline.getActiveFields());
+			// Consume elements
+			for(Transformer transformer : transformers){
+				assertNotNull(transformer);
+			}
+
+			fail();
+		} catch(IllegalArgumentException iae){
+			// Ignored
+		}
+
+		assertNull(pipeline.getEstimator());
 	}
 }

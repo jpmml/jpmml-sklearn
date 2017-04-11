@@ -24,9 +24,10 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -35,13 +36,24 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Transformer;
 
-public class DataFrameMapper extends ClassDict {
+public class DataFrameMapper extends Transformer {
 
 	public DataFrameMapper(String module, String name){
 		super(module, name);
 	}
 
-	public void encodeFeatures(SkLearnEncoder encoder){
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		Object _default = getDefault();
 		List<Object[]> rows = getFeatures();
 
@@ -49,35 +61,40 @@ public class DataFrameMapper extends ClassDict {
 			throw new IllegalArgumentException();
 		}
 
+		features = new ArrayList<>(features);
+
 		for(Object[] row : rows){
-			List<String> ids = new ArrayList<>();
-			List<Feature> features = new ArrayList<>();
+			List<String> rowIds = new ArrayList<>();
+			List<Feature> rowFeatures = new ArrayList<>();
 
 			List<String> columns = getColumnList(row);
 			for(String column : columns){
 				FieldName name = FieldName.create(column);
 
-				ids.add(name.getValue());
+				rowIds.add(name.getValue());
 
 				DataField dataField = encoder.getDataField(name);
 				if(dataField == null){
 					dataField = encoder.createDataField(name);
 				}
 
-				Feature feature = new WildcardFeature(encoder, dataField);
-
-				features.add(feature);
+				rowFeatures.add(new WildcardFeature(encoder, dataField));
 			}
 
 			List<Transformer> transformers = getTransformerList(row);
 			for(Transformer transformer : transformers){
-				encoder.updateFeatures(features, transformer.getOpType(), transformer.getDataType());
+				encoder.updateFeatures(rowFeatures, transformer);
 
-				features = transformer.encodeFeatures(ids, features, encoder);
+				rowFeatures = transformer.encodeFeatures(rowIds, rowFeatures, encoder);
 			}
 
-			encoder.addRow(ids, features);
+			ClassDictUtil.checkSize(rowIds, rowFeatures);
+
+			ids.addAll(rowIds);
+			features.addAll(rowFeatures);
 		}
+
+		return features;
 	}
 
 	public Object getDefault(){

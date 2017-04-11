@@ -18,7 +18,6 @@
  */
 package org.jpmml.sklearn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
@@ -31,15 +30,13 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
+import sklearn.Transformer;
 
 public class SkLearnEncoder extends ModelEncoder {
 
-	private List<String> ids = new ArrayList<>();
-
-	private List<Feature> features = new ArrayList<>();
-
-
-	public void updateFeatures(List<Feature> features, OpType opType, DataType dataType){
+	public void updateFeatures(List<Feature> features, Transformer transformer){
+		OpType opType = transformer.getOpType();
+		DataType dataType = transformer.getDataType();
 
 		for(Feature feature : features){
 
@@ -88,20 +85,5 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public DerivedField createDerivedField(FieldName name, Expression expression){
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
-	}
-
-	public void addRow(List<String> ids, List<Feature> features){
-		ClassDictUtil.checkSize(ids, features);
-
-		this.ids.addAll(ids);
-		this.features.addAll(features);
-	}
-
-	public List<String> getIds(){
-		return this.ids;
-	}
-
-	public List<Feature> getFeatures(){
-		return this.features;
 	}
 }

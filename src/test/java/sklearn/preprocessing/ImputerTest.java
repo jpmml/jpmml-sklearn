@@ -18,6 +18,7 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +55,9 @@ public class ImputerTest {
 		imputer.put("missing_values", "N/A");
 		imputer.put("statistics_", 0);
 
-		SkLearnEncoder encoder = encode(name.getValue(), Arrays.asList(imputer));
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
+		Feature feature = encodeFeature(name.getValue(), Arrays.asList(imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -62,8 +65,6 @@ public class ImputerTest {
 		List<Decorator> decorators = encoder.getDecorators(name);
 
 		assertEquals(1, decorators.size());
-
-		Feature feature = Iterables.getOnlyElement(encoder.getFeatures());
 
 		assertTrue(feature instanceof WildcardFeature);
 		assertEquals(name, feature.getName());
@@ -76,7 +77,9 @@ public class ImputerTest {
 		categoricalDomain.put("invalid_value_treatment", "as_is");
 		categoricalDomain.put("data_", array);
 
-		encoder = encode(name.getValue(), Arrays.asList(categoricalDomain, imputer));
+		encoder = new SkLearnEncoder();
+
+		feature = encodeFeature(name.getValue(), Arrays.asList(categoricalDomain, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -84,8 +87,6 @@ public class ImputerTest {
 		decorators = encoder.getDecorators(name);
 
 		assertEquals(2, decorators.size());
-
-		feature = Iterables.getOnlyElement(encoder.getFeatures());
 
 		assertTrue(feature instanceof CategoricalFeature);
 		assertEquals(name, feature.getName());
@@ -101,7 +102,9 @@ public class ImputerTest {
 		imputer.put("missing_values", -999);
 		imputer.put("statistics_", 0.5d);
 
-		SkLearnEncoder encoder = encode(name.getValue(), Arrays.asList(imputer));
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
+		Feature feature = encodeFeature(name.getValue(), Arrays.asList(imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -109,8 +112,6 @@ public class ImputerTest {
 		List<Decorator> decorators = encoder.getDecorators(name);
 
 		assertEquals(1, decorators.size());
-
-		Feature feature = Iterables.getOnlyElement(encoder.getFeatures());
 
 		assertTrue(feature instanceof WildcardFeature);
 		assertEquals(name, feature.getName());
@@ -120,7 +121,9 @@ public class ImputerTest {
 		continuousDomain.put("data_min_", 0d);
 		continuousDomain.put("data_max_", 1d);
 
-		encoder = encode(name.getValue(), Arrays.asList(continuousDomain, imputer));
+		encoder = new SkLearnEncoder();
+
+		feature = encodeFeature(name.getValue(), Arrays.asList(continuousDomain, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -129,15 +132,15 @@ public class ImputerTest {
 
 		assertEquals(3, decorators.size());
 
-		feature = Iterables.getOnlyElement(encoder.getFeatures());
-
 		assertTrue(feature instanceof ContinuousFeature);
 		assertEquals(name, feature.getName());
 
 		Binarizer binarizer = new Binarizer("sklearn.preprocessing.data", "Binarizer");
 		binarizer.put("threshold", 1d / 3d);
 
-		encoder = encode(name.getValue(), Arrays.asList(continuousDomain, binarizer, imputer));
+		encoder = new SkLearnEncoder();
+
+		feature = encodeFeature(name.getValue(), Arrays.asList(continuousDomain, binarizer, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNotNull(encoder.getDerivedField(FieldName.create("binarizer(x)")));
@@ -147,27 +150,18 @@ public class ImputerTest {
 
 		assertEquals(2, decorators.size());
 
-		feature = Iterables.getOnlyElement(encoder.getFeatures());
-
 		assertTrue(feature instanceof ContinuousFeature);
 		assertEquals(imputedName, feature.getName());
 	}
 
 	static
-	private SkLearnEncoder encode(String name, List<? extends Transformer> transformers){
-		return encode(Collections.singletonList(new Object[]{name, transformers}));
-	}
-
-	static
-	private SkLearnEncoder encode(List<Object[]> features){
-		SkLearnEncoder encoder = new SkLearnEncoder();
-
+	private Feature encodeFeature(String name, List<? extends Transformer> transformers, SkLearnEncoder encoder){
 		DataFrameMapper dataFrameMapper = new DataFrameMapper("sklearn_pandas.dataframe_mapper", "DataFrameMapper")
 			.setDefault(Boolean.FALSE)
-			.setFeatures(features);
+			.setFeatures(Collections.singletonList(new Object[]{name, transformers}));
 
-		dataFrameMapper.encodeFeatures(encoder);
+		List<Feature> features = dataFrameMapper.encodeFeatures(new ArrayList<String>(), new ArrayList<Feature>(), encoder);
 
-		return encoder;
+		return Iterables.getOnlyElement(features);
 	}
 }

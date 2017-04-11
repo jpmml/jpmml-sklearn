@@ -33,28 +33,31 @@ import sklearn.Transformer;
 import sklearn.TransformerUtil;
 import sklearn_pandas.DataFrameMapper;
 
-public class Pipeline extends Transformer implements HasNumberOfFeatures {
+public class Pipeline extends Transformer {
+
+	private boolean flexible = false;
+
+
+	public Pipeline(){
+		this("sklearn.pipeline", "Pipeline");
+	}
 
 	public Pipeline(String module, String name){
+		this(module, name, false);
+	}
+
+	protected Pipeline(String module, String name, boolean flexible){
 		super(module, name);
+
+		setFlexible(flexible);
 	}
 
 	@Override
 	public OpType getOpType(){
-		DataFrameMapper mapper = getMapper();
 		List<Transformer> transformers = getTransformers();
-		Estimator estimator = getEstimator();
-
-		if(mapper != null){
-			throw new IllegalArgumentException();
-		}
 
 		for(Transformer transformer : transformers){
 			return transformer.getOpType();
-		}
-
-		if(estimator != null){
-			return estimator.getOpType();
 		}
 
 		throw new IllegalArgumentException();
@@ -62,48 +65,10 @@ public class Pipeline extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public DataType getDataType(){
-		DataFrameMapper mapper = getMapper();
 		List<Transformer> transformers = getTransformers();
-		Estimator estimator = getEstimator();
-
-		if(mapper != null){
-			throw new IllegalArgumentException();
-		}
 
 		for(Transformer transformer : transformers){
 			return transformer.getDataType();
-		}
-
-		if(estimator != null){
-			return estimator.getDataType();
-		}
-
-		throw new IllegalArgumentException();
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		DataFrameMapper mapper = getMapper();
-		List<Transformer> transformers = getTransformers();
-		Estimator estimator = getEstimator();
-
-		if(mapper != null){
-			return -1;
-		}
-
-		for(Transformer transformer : transformers){
-
-			if(transformer instanceof HasNumberOfFeatures){
-				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
-
-				return hasNumberOfFeatures.getNumberOfFeatures();
-			}
-
-			return -1;
-		}
-
-		if(estimator != null){
-			return estimator.getNumberOfFeatures();
 		}
 
 		throw new IllegalArgumentException();
@@ -111,32 +76,9 @@ public class Pipeline extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
-		DataFrameMapper mapper = getMapper();
-		Estimator estimator = getEstimator();
-
-		if(mapper != null || estimator != null){
-			throw new IllegalArgumentException();
-		}
-
-		return applyTransformers(ids, features, encoder);
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(SkLearnEncoder encoder){
-		DataFrameMapper mapper = getMapper();
-
-		if(mapper != null){
-			mapper.encodeFeatures(encoder);
-		}
-
-		List<String> ids = encoder.getIds();
-		List<Feature> features = encoder.getFeatures();
-
-		return applyTransformers(ids, features, encoder);
-	}
-
-	public List<Feature> applyTransformers(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
 		List<Transformer> transformers = getTransformers();
+
+		int index = 0;
 
 		for(Transformer transformer : transformers){
 
@@ -149,84 +91,49 @@ public class Pipeline extends Transformer implements HasNumberOfFeatures {
 				}
 			}
 
-			encoder.updateFeatures(features, transformer.getOpType(), transformer.getDataType());
+			update:
+			{
+				if(index == 0 && (transformer instanceof DataFrameMapper)){
+					break update;
+				}
+
+				encoder.updateFeatures(features, transformer);
+			}
 
 			features = transformer.encodeFeatures(ids, features, encoder);
+
+			index++;
 		}
 
 		return features;
 	}
 
-	public DataFrameMapper getMapper(){
-		Object[] mapperStep = getMapperStep();
-
-		if(mapperStep != null){
-			return (DataFrameMapper)TupleUtil.extractElement(mapperStep, 1);
-		}
-
-		return null;
-	}
-
-	protected Object[] getMapperStep(){
-		List<Object[]> steps = getSteps();
-
-		if(steps.size() > 0){
-			Object firstStep = TupleUtil.extractElement(steps.get(0), 1);
-
-			if(firstStep instanceof DataFrameMapper){
-				return steps.get(0);
-			}
-		}
-
-		return null;
-	}
-
 	public List<Transformer> getTransformers(){
-		List<Object[]> transformerSteps = getTransformerSteps();
-
-		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(transformerSteps, 1));
-	}
-
-	protected List<Object[]> getTransformerSteps(){
 		List<Object[]> steps = getSteps();
+		boolean flexible = isFlexible();
 
-		if(steps.size() > 0){
-			Object firstStep = TupleUtil.extractElement(steps.get(0), 1);
+		if(flexible && steps.size() > 0){
+			Estimator estimator = getEstimator();
 
-			if(firstStep instanceof DataFrameMapper){
-				steps = steps.subList(1, steps.size());
-			}
-		} // End if
-
-		if(steps.size() > 0){
-			Object lastStep = TupleUtil.extractElement(steps.get(steps.size() - 1), 1);
-
-			if(lastStep instanceof Estimator){
+			if(estimator != null){
 				steps = steps.subList(0, steps.size() - 1);
 			}
 		}
 
-		return steps;
+		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(steps, 1));
 	}
 
 	public Estimator getEstimator(){
-		Object[] estimatorStep = getEstimatorStep();
-
-		if(estimatorStep != null){
-			return EstimatorUtil.asEstimator(TupleUtil.extractElement(estimatorStep, 1));
-		}
-
-		return null;
-	}
-
-	protected Object[] getEstimatorStep(){
 		List<Object[]> steps = getSteps();
+		boolean flexible = isFlexible();
 
-		if(steps.size() > 0){
+		if(flexible && steps.size() > 0){
 			Object lastStep = TupleUtil.extractElement(steps.get(steps.size() - 1), 1);
 
-			if(lastStep instanceof Estimator){
-				return steps.get(steps.size() - 1);
+			try {
+				return EstimatorUtil.asEstimator(lastStep);
+			} catch(IllegalArgumentException iae){
+				// Ignored
 			}
 		}
 
@@ -235,5 +142,13 @@ public class Pipeline extends Transformer implements HasNumberOfFeatures {
 
 	public List<Object[]> getSteps(){
 		return (List)get("steps");
+	}
+
+	private boolean isFlexible(){
+		return this.flexible;
+	}
+
+	private void setFlexible(boolean flexible){
+		this.flexible = flexible;
 	}
 }
