@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -39,7 +38,7 @@ public class StandardScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Boolean withMean = getWithMean();
 		Boolean withStd = getWithStd();
 
@@ -50,40 +49,36 @@ public class StandardScaler extends Transformer {
 			return features;
 		}
 
-		ClassDictUtil.checkSize(ids, features, mean, std);
+		ClassDictUtil.checkSize(features, mean, std);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			String id = ids.get(i);
 			Feature feature = features.get(i);
 
-			// "($name - mean) / std"
-			Expression expression = (feature.toContinuousFeature()).ref();
+			Number meanValue = (withMean ? mean.get(i) : 0d);
+			Number stdValue = (withStd ? std.get(i) : 1d);
 
-			if(withMean){
-				Number meanValue = mean.get(i);
-
-				if(!ValueUtil.isZero(meanValue)){
-					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
-				}
-			} // End if
-
-			if(withStd){
-				Number stdValue = std.get(i);
-
-				if(!ValueUtil.isOne(stdValue)){
-					expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(stdValue));
-				}
-			} // End if
-
-			if(expression instanceof FieldRef){
+			if(ValueUtil.isZero(meanValue) && ValueUtil.isOne(stdValue)){
 				result.add(feature);
 
 				continue;
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+			// "($name - mean) / std"
+			Expression expression = continuousFeature.ref();
+
+			if(!ValueUtil.isZero(meanValue)){
+				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
+			} // End if
+
+			if(!ValueUtil.isOne(stdValue)){
+				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(stdValue));
+			}
+
+			DerivedField derivedField = encoder.createDerivedField(createName(continuousFeature), expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

@@ -38,15 +38,14 @@ public class MaxAbsScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> scale = getScale();
 
-		ClassDictUtil.checkSize(ids, features, scale);
+		ClassDictUtil.checkSize(features, scale);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			String id = ids.get(i);
 			Feature feature = features.get(i);
 
 			Number value = scale.get(i);
@@ -56,10 +55,12 @@ public class MaxAbsScaler extends Transformer {
 				continue;
 			}
 
-			// "$name / scale"
-			Apply apply = PMMLUtil.createApply("/", (feature.toContinuousFeature()).ref(), PMMLUtil.createConstant(value));
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-			DerivedField derivedField = encoder.createDerivedField(createName(id), apply);
+			// "$name / scale"
+			Apply apply = PMMLUtil.createApply("/", continuousFeature.ref(), PMMLUtil.createConstant(value));
+
+			DerivedField derivedField = encoder.createDerivedField(createName(continuousFeature), apply);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

@@ -96,6 +96,8 @@ public class ImputerTest {
 	public void encodeContinuous(){
 		FieldName name = FieldName.create("x");
 		FieldName imputedName = FieldName.create("imputer(x)");
+		FieldName binarizedName = FieldName.create("binarizer(x)");
+		FieldName imputedBinarizedName = FieldName.create("imputer(" + binarizedName.getValue() + ")");
 
 		Imputer imputer = new Imputer("sklearn.preprocessing.imputation", "Imputer");
 		imputer.put("strategy", "mean");
@@ -143,15 +145,15 @@ public class ImputerTest {
 		feature = encodeFeature(name.getValue(), Arrays.asList(continuousDomain, binarizer, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
-		assertNotNull(encoder.getDerivedField(FieldName.create("binarizer(x)")));
-		assertNotNull(encoder.getDerivedField(imputedName));
+		assertNotNull(encoder.getDerivedField(binarizedName));
+		assertNotNull(encoder.getDerivedField(imputedBinarizedName));
 
 		decorators = encoder.getDecorators(name);
 
 		assertEquals(2, decorators.size());
 
 		assertTrue(feature instanceof ContinuousFeature);
-		assertEquals(imputedName, feature.getName());
+		assertEquals(imputedBinarizedName, feature.getName());
 	}
 
 	static
@@ -160,7 +162,7 @@ public class ImputerTest {
 			.setDefault(Boolean.FALSE)
 			.setFeatures(Collections.singletonList(new Object[]{name, transformers}));
 
-		List<Feature> features = dataFrameMapper.encodeFeatures(new ArrayList<String>(), new ArrayList<Feature>(), encoder);
+		List<Feature> features = dataFrameMapper.encodeFeatures(new ArrayList<Feature>(), encoder);
 
 		return Iterables.getOnlyElement(features);
 	}

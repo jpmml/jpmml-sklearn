@@ -54,15 +54,14 @@ public class LabelBinarizer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
 		Number negLabel = getNegLabel();
 		Number posLabel = getPosLabel();
 
-		ClassDictUtil.checkSize(1, ids, features);
+		ClassDictUtil.checkSize(1, features);
 
-		String id = ids.get(0);
 		Feature feature = features.get(0);
 
 		List<String> categories = new ArrayList<>();
@@ -78,8 +77,6 @@ public class LabelBinarizer extends Transformer {
 		List<String> labelCategories = new ArrayList<>();
 		labelCategories.add(ValueUtil.formatValue(negLabel));
 		labelCategories.add(ValueUtil.formatValue(posLabel));
-
-		ids.clear();
 
 		List<Feature> result = new ArrayList<>();
 
@@ -97,8 +94,6 @@ public class LabelBinarizer extends Transformer {
 
 			String category = ValueUtil.formatValue(value);
 
-			ids.add(id + "=" + category);
-
 			if(ValueUtil.isZero(negLabel) && ValueUtil.isOne(posLabel)){
 				result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
 			} else
@@ -107,7 +102,7 @@ public class LabelBinarizer extends Transformer {
 				// "($name == value) ? pos_label : neg_label"
 				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", feature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
-				DerivedField derivedField = encoder.createDerivedField(classes.size() > 1 ? createName(id, i) : createName(id), apply);
+				DerivedField derivedField = encoder.createDerivedField((classes.size() > 1 ? createName(feature, i) : createName(feature)), apply);
 
 				result.add(new CategoricalFeature(encoder, derivedField, labelCategories));
 			}

@@ -65,7 +65,7 @@ public class TfidfVectorizer extends CountVectorizer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		TfidfTransformer transformer = getTransformer();
 
 		String norm = transformer.getNorm();
@@ -73,7 +73,7 @@ public class TfidfVectorizer extends CountVectorizer {
 			throw new IllegalArgumentException(norm);
 		}
 
-		return super.encodeFeatures(ids, features, encoder);
+		return super.encodeFeatures(features, encoder);
 	}
 
 	@Override

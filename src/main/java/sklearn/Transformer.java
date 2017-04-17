@@ -29,6 +29,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ClassDictConstructorUtil;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -39,7 +40,7 @@ public class Transformer extends ClassDict {
 	}
 
 	abstract
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder);
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder);
 
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
@@ -72,11 +73,21 @@ public class Transformer extends ClassDict {
 		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
 	}
 
-	protected FieldName createName(String id){
-		return FieldName.create(name() + "(" + id + ")");
+	protected FieldName createName(Feature feature){
+		return createName(name(), feature);
 	}
 
-	protected FieldName createName(String id, int index){
-		return FieldName.create(name() + "(" + id + ")[" + index + "]");
+	protected FieldName createName(Feature feature, int index){
+		return createName(name(), feature, index);
+	}
+
+	static
+	protected FieldName createName(String function, Feature feature){
+		return FieldName.create(function + "(" + (ClassDictUtil.getName(feature)).getValue() + ")");
+	}
+
+	static
+	protected FieldName createName(String function, Feature feature, int index){
+		return FieldName.create(function + "(" + (ClassDictUtil.getName(feature)).getValue() + ")" + "[" + index + "]");
 	}
 }

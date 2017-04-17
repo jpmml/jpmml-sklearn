@@ -46,31 +46,22 @@ public class FeatureUnion extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Transformer> transformers = getTransformers();
 
-		List<String> resultIds = new ArrayList<>();
-		List<Feature> resultFeatures = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
 		for(Transformer transformer : transformers){
 			encoder.updateFeatures(features, transformer, true);
 
-			List<String> transformerIds = new ArrayList<>(ids);
 			List<Feature> transformerFeatures = new ArrayList<>(features);
 
-			transformerFeatures = transformer.encodeFeatures(transformerIds, transformerFeatures, encoder);
+			transformerFeatures = transformer.encodeFeatures(transformerFeatures, encoder);
 
-			resultIds.addAll(transformerIds);
-			resultFeatures.addAll(transformerFeatures);
+			result.addAll(transformerFeatures);
 		}
 
-		ids.clear();
-
-		if(resultIds.size() > 0){
-			ids.addAll(resultIds);
-		}
-
-		return resultFeatures;
+		return result;
 	}
 
 	public List<Transformer> getTransformers(){

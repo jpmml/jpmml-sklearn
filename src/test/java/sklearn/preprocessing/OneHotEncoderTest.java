@@ -18,7 +18,6 @@
  */
 package sklearn.preprocessing;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -51,17 +50,13 @@ public class OneHotEncoderTest {
 		OneHotEncoder oneHotEncoder = new OneHotEncoder("sklearn.preprocessing.data", "OneHotEncoder");
 		oneHotEncoder.put("n_values_", 3);
 
-		List<String> ids = new ArrayList<>();
-		ids.add("x");
-
-		List<Feature> outputFeatures = oneHotEncoder.encodeFeatures(ids, Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = oneHotEncoder.encodeFeatures(Collections.singletonList(inputFeature), encoder);
 		for(int i = 0; i < 3; i++){
 			BinaryFeature outputFeature = (BinaryFeature)outputFeatures.get(i);
 
 			assertEquals(String.valueOf(i), outputFeature.getValue());
 		}
 
-		assertEquals(Arrays.asList("x=0", "x=1", "x=2"), ids);
 		assertEquals(Arrays.asList("0", "1", "2"), PMMLUtil.getValues(dataField));
 	}
 }

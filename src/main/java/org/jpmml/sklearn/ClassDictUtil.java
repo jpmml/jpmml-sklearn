@@ -166,19 +166,24 @@ public class ClassDictUtil {
 	}
 
 	static
+	public FieldName getName(Feature feature){
+
+		if(feature instanceof HasDerivedName){
+			HasDerivedName hasDerivedName = (HasDerivedName)feature;
+
+			return hasDerivedName.getDerivedName();
+		}
+
+		return feature.getName();
+	}
+
+	static
 	public String formatFeatureList(List<Feature> features){
 		Function<Feature, FieldName> function = new Function<Feature, FieldName>(){
 
 			@Override
 			public FieldName apply(Feature feature){
-
-				if(feature instanceof HasDerivedName){
-					HasDerivedName hasDerivedName = (HasDerivedName)feature;
-
-					return hasDerivedName.getDerivedName();
-				}
-
-				return feature.getName();
+				return getName(feature);
 			}
 		};
 

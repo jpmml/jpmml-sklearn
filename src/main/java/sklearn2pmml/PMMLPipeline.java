@@ -106,28 +106,25 @@ public class PMMLPipeline extends Pipeline {
 			}
 		}
 
-		List<String> ids = new ArrayList<>();
 		List<Feature> features = new ArrayList<>();
 
 		Transformer transformer = TransformerUtil.getHead(transformers);
 		if(transformer != null){
 
 			if(!(transformer instanceof DataFrameMapper)){
-				ids = initIds(transformer, encoder);
-				features = initFeatures(ids, transformer.getOpType(), transformer.getDataType(), encoder);
+				features = initFeatures(transformer, transformer.getOpType(), transformer.getDataType(), encoder);
 			}
 
-			features = encodeFeatures(ids, features, encoder);
+			features = encodeFeatures(features, encoder);
 		} else
 
 		{
-			ids = initIds(estimator, encoder);
-			features = initFeatures(ids, estimator.getOpType(), estimator.getDataType(), encoder);
+			features = initFeatures(estimator, estimator.getOpType(), estimator.getDataType(), encoder);
 		}
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();
 		if(numberOfFeatures > -1){
-			ClassDictUtil.checkSize(numberOfFeatures, ids, features);
+			ClassDictUtil.checkSize(numberOfFeatures, features);
 		}
 
 		Schema schema = new Schema(label, features);
@@ -149,7 +146,7 @@ public class PMMLPipeline extends Pipeline {
 		return pmml;
 	}
 
-	private List<String> initIds(ClassDict object, SkLearnEncoder encoder){
+	private List<Feature> initFeatures(ClassDict object, OpType opType, DataType dataType, SkLearnEncoder encoder){
 		List<String> activeFields = getActiveFields();
 
 		if(activeFields == null){
@@ -167,14 +164,10 @@ public class PMMLPipeline extends Pipeline {
 			}
 		}
 
-		return activeFields;
-	}
-
-	private List<Feature> initFeatures(List<String> ids, OpType opType, DataType dataType, SkLearnEncoder encoder){
 		List<Feature> result = new ArrayList<>();
 
-		for(String id : ids){
-			DataField dataField = encoder.createDataField(FieldName.create(id), opType, dataType);
+		for(String activeField : activeFields){
+			DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
 
 			result.add(new WildcardFeature(encoder, dataField));
 		}

@@ -82,11 +82,11 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Boolean lowercase = getLowercase();
 		Map<String, Scalar> vocabulary = getVocabulary();
 
-		ClassDictUtil.checkSize(1, ids, features);
+		ClassDictUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
 
@@ -102,7 +102,14 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		DType dtype = getDType();
 
 		if(lowercase){
-			DerivedField derivedField = encoder.createDerivedField(FieldName.create("lowercase(" + (feature.getName()).getValue() + ")"), OpType.CATEGORICAL, DataType.STRING, PMMLUtil.createApply("lowercase", feature.ref()));
+			FieldName name = createName("lowercase", feature);
+
+			DerivedField derivedField = encoder.getDerivedField(name);
+			if(derivedField == null){
+				Apply apply = PMMLUtil.createApply("lowercase", feature.ref());
+
+				derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.STRING, apply);
+			}
 
 			feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
 
@@ -116,8 +123,6 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		DefineFunction defineFunction = encodeDefineFunction();
 
 		encoder.addDefineFunction(defineFunction);
-
-		ids.clear();
 
 		List<Feature> result = new ArrayList<>();
 
@@ -141,8 +146,6 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 					return new ContinuousFeature(encoder, derivedField);
 				}
 			};
-
-			ids.add((termFeature.getName()).getValue());
 
 			result.add(termFeature);
 		}

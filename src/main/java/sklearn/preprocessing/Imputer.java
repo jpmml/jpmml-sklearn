@@ -42,10 +42,10 @@ public class Imputer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> statistics = getStatistics();
 
-		ClassDictUtil.checkSize(ids, features, statistics);
+		ClassDictUtil.checkSize(features, statistics);
 
 		Object missingValues = getMissingValues();
 
@@ -54,29 +54,29 @@ public class Imputer extends Transformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			String id = ids.get(i);
 			Feature feature = features.get(i);
 
 			Number statisticValue = statistics.get(i);
 
 			TypeDefinitionField field = encoder.getField(feature.getName());
+
 			if(field instanceof DataField){
 				String strategy = getStrategy();
 
-				MissingValueDecorator decorator = new MissingValueDecorator()
+				MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
 					.setMissingValueReplacement(ValueUtil.formatValue(statisticValue))
 					.setMissingValueTreatment(parseStrategy(strategy));
 
 				if(targetValue != null){
-					decorator.addValues(ValueUtil.formatValue(targetValue));
+					missingValueDecorator.addValues(ValueUtil.formatValue(targetValue));
 				}
 
-				encoder.addDecorator(feature.getName(), decorator);
+				encoder.addDecorator(feature.getName(), missingValueDecorator);
 
 				result.add(feature);
 			} else
 
-			{
+			if(field instanceof DerivedField){
 				Expression expression = feature.ref();
 
 				if(targetValue == null){
@@ -90,9 +90,13 @@ public class Imputer extends Transformer {
 				// "($name == null) ? statistics : $name"
 				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), feature.ref());
 
-				DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
+				DerivedField derivedField = encoder.createDerivedField(createName(feature), expression);
 
 				result.add(new ContinuousFeature(encoder, derivedField));
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
 		}
 

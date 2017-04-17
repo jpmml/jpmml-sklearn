@@ -43,11 +43,11 @@ public class ContinuousDomain extends Domain {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> dataMin = getDataMin();
 		List<? extends Number> dataMax = getDataMax();
 
-		ClassDictUtil.checkSize(ids, features, dataMin, dataMax);
+		ClassDictUtil.checkSize(features, dataMin, dataMax);
 
 		List<Feature> result = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public class ContinuousDomain extends Domain {
 			result.add(continuousFeature);
 		}
 
-		return super.encodeFeatures(ids, result, encoder);
+		return super.encodeFeatures(result, encoder);
 	}
 
 	public List<? extends Number> getDataMin(){

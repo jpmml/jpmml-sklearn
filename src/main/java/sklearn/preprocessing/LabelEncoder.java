@@ -28,6 +28,7 @@ import javax.xml.parsers.DocumentBuilder;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldColumnPair;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
@@ -60,19 +61,12 @@ public class LabelEncoder extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
-		ClassDictUtil.checkSize(1, ids, features);
+		ClassDictUtil.checkSize(1, features);
 
-		String id = ids.get(0);
 		Feature feature = features.get(0);
-
-		DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
-
-		InlineTable inlineTable = new InlineTable();
-
-		List<String> columns = Arrays.asList("input", "output");
 
 		List<String> categories = new ArrayList<>();
 
@@ -80,22 +74,35 @@ public class LabelEncoder extends Transformer {
 			String category = ValueUtil.formatValue(classes.get(i));
 
 			categories.add(category);
-
-			List<String> values = Arrays.asList(category, String.valueOf(i));
-
-			Row row = DOMUtil.createRow(documentBuilder, columns, values);
-
-			inlineTable.addRows(row);
 		}
 
-		encoder.updateValueSpace(feature.getName(), categories);
+		FieldName name = createName(feature);
 
-		MapValues mapValues = new MapValues()
-			.addFieldColumnPairs(new FieldColumnPair(feature.getName(), columns.get(0)))
-			.setOutputColumn(columns.get(1))
-			.setInlineTable(inlineTable);
+		DerivedField derivedField = encoder.getDerivedField(name);
+		if(derivedField == null){
+			DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
 
-		DerivedField derivedField = encoder.createDerivedField(createName(id), OpType.CATEGORICAL, DataType.INTEGER, mapValues);
+			InlineTable inlineTable = new InlineTable();
+
+			List<String> columns = Arrays.asList("input", "output");
+
+			for(int i = 0; i < categories.size(); i++){
+				List<String> values = Arrays.asList(categories.get(i), String.valueOf(i));
+
+				Row row = DOMUtil.createRow(documentBuilder, columns, values);
+
+				inlineTable.addRows(row);
+			}
+
+			encoder.updateValueSpace(feature.getName(), categories);
+
+			MapValues mapValues = new MapValues()
+				.addFieldColumnPairs(new FieldColumnPair(feature.getName(), columns.get(0)))
+				.setOutputColumn(columns.get(1))
+				.setInlineTable(inlineTable);
+
+			derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, mapValues);
+		}
 
 		return Collections.<Feature>singletonList(new CategoricalFeature(encoder, derivedField, categories));
 	}

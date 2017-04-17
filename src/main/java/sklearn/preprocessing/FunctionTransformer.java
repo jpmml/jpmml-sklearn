@@ -40,10 +40,8 @@ public class FunctionTransformer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Object func = getFunc();
-
-		ClassDictUtil.checkSize(ids, features);
 
 		UFunc ufunc;
 
@@ -56,14 +54,16 @@ public class FunctionTransformer extends Transformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			String id = ids.get(i);
-			Feature feature = features.get(i);
+			ContinuousFeature continuousFeature = (features.get(i)).toContinuousFeature();
 
-			Expression expression = encodeUFunc(ufunc, (feature.toContinuousFeature()).ref());
+			FieldName name = createName(ufunc.getName(), continuousFeature);
 
-			DerivedField derivedField = encoder.createDerivedField(FieldName.create(ufunc.getName() + "(" + id + ")"), expression);
+			DerivedField derivedField = encoder.getDerivedField(name);
+			if(derivedField == null){
+				Expression expression = encodeUFunc(ufunc, continuousFeature.ref());
 
-			ids.set(i, (derivedField.getName()).getValue());
+				derivedField = encoder.createDerivedField(name, expression);
+			}
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

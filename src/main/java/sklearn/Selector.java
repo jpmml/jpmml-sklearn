@@ -48,32 +48,25 @@ public class Selector extends Transformer implements HasNumberOfFeatures {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Boolean> supportMask = getSupportMask();
 
 		if(supportMask == null){
 			return features;
 		}
 
-		ClassDictUtil.checkSize(supportMask, ids, features);
+		ClassDictUtil.checkSize(features, supportMask);
 
-		List<String> selectedIds = new ArrayList<>();
-		List<Feature> selectedFeatures = new ArrayList<>();
+		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < supportMask.size(); i++){
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
 
 			if(supportMask.get(i)){
-				selectedIds.add(ids.get(i));
-				selectedFeatures.add(features.get(i));
+				result.add(feature);
 			}
 		}
 
-		ids.clear();
-
-		if(selectedIds.size() > 0){
-			ids.addAll(selectedIds);
-		}
-
-		return selectedFeatures;
+		return result;
 	}
 }

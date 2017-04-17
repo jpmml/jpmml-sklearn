@@ -53,7 +53,7 @@ public class DataFrameMapper extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Object _default = getDefault();
 		List<Object[]> rows = getFeatures();
 
@@ -61,17 +61,14 @@ public class DataFrameMapper extends Transformer {
 			throw new IllegalArgumentException();
 		}
 
-		features = new ArrayList<>(features);
+		List<Feature> result = new ArrayList<>(features);
 
 		for(Object[] row : rows){
-			List<String> rowIds = new ArrayList<>();
 			List<Feature> rowFeatures = new ArrayList<>();
 
 			List<String> columns = getColumnList(row);
 			for(String column : columns){
 				FieldName name = FieldName.create(column);
-
-				rowIds.add(name.getValue());
 
 				DataField dataField = encoder.getDataField(name);
 				if(dataField == null){
@@ -85,16 +82,13 @@ public class DataFrameMapper extends Transformer {
 			for(Transformer transformer : transformers){
 				encoder.updateFeatures(rowFeatures, transformer, false);
 
-				rowFeatures = transformer.encodeFeatures(rowIds, rowFeatures, encoder);
+				rowFeatures = transformer.encodeFeatures(rowFeatures, encoder);
 			}
 
-			ClassDictUtil.checkSize(rowIds, rowFeatures);
-
-			ids.addAll(rowIds);
-			features.addAll(rowFeatures);
+			result.addAll(rowFeatures);
 		}
 
-		return features;
+		return result;
 	}
 
 	public Object getDefault(){

@@ -55,17 +55,14 @@ public class OneHotEncoder extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> values = getValues();
 
-		ClassDictUtil.checkSize(1, ids, features);
+		ClassDictUtil.checkSize(1, features);
 
-		String id = ids.get(0);
 		Feature feature = features.get(0);
 
 		List<String> categories = new ArrayList<>();
-
-		ids.clear();
 
 		List<Feature> result = new ArrayList<>();
 
@@ -91,8 +88,6 @@ public class OneHotEncoder extends Transformer {
 			}
 
 			categories.add(category);
-
-			ids.add(id + "=" + category);
 
 			result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
 		}

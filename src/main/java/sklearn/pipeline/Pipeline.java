@@ -74,7 +74,7 @@ public class Pipeline extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Transformer> transformers = getTransformers();
 
 		int index = 0;
@@ -86,13 +86,13 @@ public class Pipeline extends Transformer {
 
 				int numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
 				if(numberOfFeatures > -1){
-					ClassDictUtil.checkSize(numberOfFeatures, ids, features);
+					ClassDictUtil.checkSize(numberOfFeatures, features);
 				}
 			}
 
 			encoder.updateFeatures(features, transformer, (index == 0));
 
-			features = transformer.encodeFeatures(ids, features, encoder);
+			features = transformer.encodeFeatures(features, encoder);
 
 			index++;
 		}

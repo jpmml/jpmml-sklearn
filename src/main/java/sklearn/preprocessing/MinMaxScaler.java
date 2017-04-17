@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -39,23 +38,30 @@ public class MinMaxScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> min = getMin();
 		List<? extends Number> scale = getScale();
 
-		ClassDictUtil.checkSize(ids, features, min, scale);
+		ClassDictUtil.checkSize(features, min, scale);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			String id = ids.get(i);
 			Feature feature = features.get(i);
 
 			Number minValue = min.get(i);
 			Number scaleValue = scale.get(i);
 
+			if(ValueUtil.isOne(scaleValue) && ValueUtil.isZero(minValue)){
+				result.add(feature);
+
+				continue;
+			}
+
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
 			// "($name * scale) + min"
-			Expression expression = (feature.toContinuousFeature()).ref();
+			Expression expression = continuousFeature.ref();
 
 			if(!ValueUtil.isOne(scaleValue)){
 				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scaleValue));
@@ -63,15 +69,9 @@ public class MinMaxScaler extends Transformer {
 
 			if(!ValueUtil.isZero(minValue)){
 				expression = PMMLUtil.createApply("+", expression, PMMLUtil.createConstant(minValue));
-			} // End if
-
-			if(expression instanceof FieldRef){
-				result.add(feature);
-
-				continue;
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
+			DerivedField derivedField = encoder.createDerivedField(createName(continuousFeature), expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

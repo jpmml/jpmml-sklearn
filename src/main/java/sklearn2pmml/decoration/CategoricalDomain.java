@@ -52,10 +52,10 @@ public class CategoricalDomain extends Domain {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<?> data = getData();
 
-		ClassDictUtil.checkSize(1, ids, features);
+		ClassDictUtil.checkSize(1, features);
 
 		WildcardFeature wildcardFeature = (WildcardFeature)features.get(0);
 
@@ -71,7 +71,7 @@ public class CategoricalDomain extends Domain {
 
 		CategoricalFeature categoricalFeature = wildcardFeature.toCategoricalFeature(categories);
 
-		return super.encodeFeatures(ids, Collections.<Feature>singletonList(categoricalFeature), encoder);
+		return super.encodeFeatures(Collections.<Feature>singletonList(categoricalFeature), encoder);
 	}
 
 	public List<?> getData(){

@@ -44,11 +44,11 @@ public class PolynomialFeatures extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, final SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, final SkLearnEncoder encoder){
 		int numberOfInputFeatures = getNumberOfInputFeatures();
 		int numberOfOutputFeatures = getNumberOfOutputFeatures();
 
-		ClassDictUtil.checkSize(numberOfInputFeatures, ids, features);
+		ClassDictUtil.checkSize(numberOfInputFeatures, features);
 
 		final
 		int degree = getDegree();
@@ -108,44 +108,37 @@ public class PolynomialFeatures extends Transformer {
 
 			String sep = "";
 
-			List<String> powerIds = new ArrayList<>();
 			List<Feature> powerFeatures = new ArrayList<>();
 
 			for(int i = 0; i < power.length; i++){
-				String id = ids.get(i);
-				Feature feature = features.get(i);
 
 				if(power[i] >= 1){
+					Feature transformedFeature = transformedFeatures.get(i)[power[i] - 1];
+
 					sb.append(sep);
 
 					sep = ":";
 
-					sb.append(id).append(power[i] > 1 ? ("^" + power[i]) : "");
+					sb.append((ClassDictUtil.getName(transformedFeature)).getValue());
 
-					powerIds.add(id);
-					powerFeatures.add(transformedFeatures.get(i)[power[i] - 1]);
+					powerFeatures.add(transformedFeature);
 				}
 			}
 
 			if(powerFeatures.size() == 0){
-				ids.add(unitName.getValue());
 				result.add(new ContinuousFeature(encoder, unitField));
 			} else
 
 			if(powerFeatures.size() == 1){
-				ids.add(Iterables.getOnlyElement(powerIds));
 				result.add(Iterables.getOnlyElement(powerFeatures));
 			} else
 
 			{
 				String id = sb.toString();
 
-				ids.add(id);
 				result.add(new InteractionFeature(encoder, FieldName.create(id), DataType.DOUBLE, powerFeatures));
 			}
 		}
-
-		ids.subList(0, features.size()).clear();
 
 		return result;
 	}

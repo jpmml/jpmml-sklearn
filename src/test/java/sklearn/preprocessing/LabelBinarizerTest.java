@@ -18,7 +18,6 @@
  */
 package sklearn.preprocessing;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -58,28 +57,20 @@ public class LabelBinarizerTest {
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 
-		List<String> ids = new ArrayList<>();
-		ids.add("apply");
-
-		List<Feature> outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = binarizer.encodeFeatures(Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof CategoricalFeature);
 		}
 
-		assertEquals(Arrays.asList("apply=low", "apply=medium", "apply=high"), ids);
 		assertEquals(Arrays.asList("low", "medium", "high"), PMMLUtil.getValues(dataField));
 
 		binarizer.put("neg_label", 0d);
 
-		ids = new ArrayList<>();
-		ids.add("normDiscrete");
-
-		outputFeatures = binarizer.encodeFeatures(ids, Collections.singletonList(inputFeature), encoder);
+		outputFeatures = binarizer.encodeFeatures(Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof BinaryFeature);
 		}
 
-		assertEquals(Arrays.asList("normDiscrete=low", "normDiscrete=medium", "normDiscrete=high"), ids);
 		assertEquals(Arrays.asList("low", "medium", "high"), PMMLUtil.getValues(dataField));
 	}
 }

@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldName;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -41,7 +42,7 @@ public class PCA extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		int[] shape = getComponentsShape();
 
 		int numberOfComponents = shape[0];
@@ -50,7 +51,7 @@ public class PCA extends Transformer {
 		List<? extends Number> components = getComponents();
 		List<? extends Number> mean = getMean();
 
-		ClassDictUtil.checkSize(numberOfFeatures, ids, features, mean);
+		ClassDictUtil.checkSize(numberOfFeatures, features, mean);
 
 		Boolean whiten = getWhiten();
 
@@ -58,9 +59,7 @@ public class PCA extends Transformer {
 
 		ClassDictUtil.checkSize(numberOfComponents, explainedVariance);
 
-		String id = String.valueOf(PCA.SEQUENCE.getAndIncrement());
-
-		ids.clear();
+		String id = name() + "@" + String.valueOf(PCA.SEQUENCE.getAndIncrement());
 
 		List<Feature> result = new ArrayList<>();
 
@@ -72,15 +71,24 @@ public class PCA extends Transformer {
 			for(int j = 0; j < numberOfFeatures; j++){
 				Feature feature = features.get(j);
 
-				// "($name[i] - mean[i]) * component[i]"
-				Expression expression = (feature.toContinuousFeature()).ref();
-
 				Number meanValue = mean.get(j);
-				if(!ValueUtil.isZero(meanValue)){
-					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
+				Number componentValue = component.get(j);
+
+				if(ValueUtil.isZero(meanValue) && ValueUtil.isOne(componentValue)){
+					apply.addExpressions(feature.ref());
+
+					continue;
 				}
 
-				Number componentValue = component.get(j);
+				ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+				// "($name[i] - mean[i]) * component[i]"
+				Expression expression = continuousFeature.ref();
+
+				if(!ValueUtil.isZero(meanValue)){
+					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
+				} // End if
+
 				if(!ValueUtil.isOne(componentValue)){
 					expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(componentValue));
 				}
@@ -96,9 +104,7 @@ public class PCA extends Transformer {
 				}
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createName(id, i), apply);
-
-			ids.add((derivedField.getName()).getValue());
+			DerivedField derivedField = encoder.createDerivedField(FieldName.create(id + "[" + String.valueOf(i) + "]"), apply);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

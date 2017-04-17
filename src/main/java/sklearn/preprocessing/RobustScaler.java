@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -39,7 +38,7 @@ public class RobustScaler extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<String> ids, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Boolean withCentering = getWithCentering();
 		Boolean withScaling = getWithScaling();
 
@@ -50,40 +49,36 @@ public class RobustScaler extends Transformer {
 			return features;
 		}
 
-		ClassDictUtil.checkSize(ids, features, center, scale);
+		ClassDictUtil.checkSize(features, center, scale);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			String id = ids.get(i);
 			Feature feature = features.get(i);
 
-			// "($name - center) / scale"
-			Expression expression = (feature.toContinuousFeature()).ref();
+			Number centerValue = (withCentering ? center.get(i) : 0d);
+			Number scaleValue = (withScaling ? scale.get(i) : 1d);
 
-			if(withCentering){
-				Number centerValue = center.get(i);
-
-				if(!ValueUtil.isZero(centerValue)){
-					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(centerValue));
-				}
-			} // End if
-
-			if(withScaling){
-				Number scaleValue = scale.get(i);
-
-				if(!ValueUtil.isOne(scaleValue)){
-					expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(scaleValue));
-				}
-			} // End if
-
-			if(expression instanceof FieldRef){
+			if(ValueUtil.isZero(centerValue) && ValueUtil.isOne(scaleValue)){
 				result.add(feature);
 
 				continue;
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createName(id), expression);
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+			// "($name - center) / scale"
+			Expression expression = continuousFeature.ref();
+
+			if(!ValueUtil.isZero(centerValue)){
+				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(centerValue));
+			} // End if
+
+			if(!ValueUtil.isOne(scaleValue)){
+				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(scaleValue));
+			}
+
+			DerivedField derivedField = encoder.createDerivedField(createName(continuousFeature), expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
