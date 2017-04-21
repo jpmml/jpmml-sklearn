@@ -215,7 +215,7 @@ public class ClassifierTest extends EstimatorTest {
 	public void evaluateVotingEnsembleIris() throws Exception {
 
 		try(Batch batch = createBatch("VotingEnsemble", "Iris")){
-			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("probability_setosa"), FieldName.create("probability_versicolor"), FieldName.create("probability_virginica"));
+			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)"));
 
 			evaluate(batch, ignoredFields);
 		}
@@ -289,7 +289,7 @@ public class ClassifierTest extends EstimatorTest {
 		Set<FieldName> result = new LinkedHashSet<>();
 
 		for(int i = 0; i < count; i++){
-			result.add(FieldName.create(prefix + "_" + (i + 1)));
+			result.add(FieldName.create(prefix + "(" + (i + 1) + ")"));
 		}
 
 		return result;

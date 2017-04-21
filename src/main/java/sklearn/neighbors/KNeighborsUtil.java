@@ -134,7 +134,7 @@ public class KNeighborsUtil {
 		for(int i = 0; i < numberOfNeighbors; i++){
 			int rank = (i + 1);
 
-			OutputField outputField = new OutputField(FieldName.create("neighbor_" + rank), DataType.STRING)
+			OutputField outputField = new OutputField(FieldName.create("neighbor(" + rank + ")"), DataType.STRING)
 				.setOpType(OpType.CATEGORICAL)
 				.setResultFeature(ResultFeature.ENTITY_ID)
 				.setRank(rank);

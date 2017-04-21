@@ -19,7 +19,6 @@
 package sklearn.linear_model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
@@ -30,6 +29,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
@@ -68,18 +68,7 @@ public class BaseLinearClassifier extends Classifier {
 		if(numberOfClasses == 1){
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
-			RegressionTable activeRegressionTable = BaseLinearUtil.encodeRegressionTable(features, intercepts.get(0), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0))
-				.setTargetCategory(categoricalLabel.getValue(1));
-
-			RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.<Feature>emptyList(), null, Collections.<Double>emptyList())
-				.setTargetCategory(categoricalLabel.getValue(0));
-
-			RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), null)
-				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
-				.addRegressionTables(activeRegressionTable, passiveRegressionTable)
-				.setOutput(hasProbabilityDistribution ? ModelUtil.createProbabilityOutput(categoricalLabel) : null);
-
-			return regressionModel;
+			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDouble(intercepts.get(0)), ValueUtil.asDoubles(CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0)), RegressionModel.NormalizationMethod.SOFTMAX, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 3){
@@ -88,7 +77,7 @@ public class BaseLinearClassifier extends Classifier {
 			List<RegressionTable> regressionTables = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionTable regressionTable = BaseLinearUtil.encodeRegressionTable(features, intercepts.get(i), CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i))
+				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, ValueUtil.asDouble(intercepts.get(i)), ValueUtil.asDoubles(CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i)))
 					.setTargetCategory(categoricalLabel.getValue(i));
 
 				regressionTables.add(regressionTable);

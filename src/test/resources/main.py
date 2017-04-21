@@ -92,7 +92,7 @@ def build_wheat(kmeans, name, with_affinity = True):
 		affinity_0 = kmeans_distance(kmeans, 0, Xt)
 		affinity_1 = kmeans_distance(kmeans, 1, Xt)
 		affinity_2 = kmeans_distance(kmeans, 2, Xt)
-		cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity_0", "affinity_1", "affinity_2"])
+		cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity(0)", "affinity(1)", "affinity(2)"])
 		cluster = pandas.concat((cluster, cluster_affinity), axis = 1)
 	store_csv(cluster, name + ".csv")
 
@@ -144,7 +144,7 @@ def build_audit(classifier, name, with_proba = True):
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
 	if(with_proba == True):
-		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability_0", "probability_1"])
+		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name + ".csv")
 
@@ -191,7 +191,7 @@ def build_versicolor(classifier, name, with_proba = True):
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
 	if(with_proba == True):
-		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability_0", "probability_1"])
+		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name + ".csv")
 
@@ -233,7 +233,7 @@ def build_iris(classifier, name, with_proba = True):
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
 	if(with_proba == True):
-		species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability_setosa", "probability_versicolor", "probability_virginica"])
+		species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name + ".csv")
 
@@ -280,7 +280,7 @@ def build_sentiment(classifier, name, with_proba = True):
 	store_pkl(pipeline, name + ".pkl")
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
 	if(with_proba == True):
-		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability_0", "probability_1"])
+		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability(0)", "probability(1)"])
 		score = pandas.concat((score, score_proba), axis = 1)
 	store_csv(score, name + ".csv")
 
@@ -369,7 +369,7 @@ def build_housing(regressor, name, with_kneighbors = False):
 	if(with_kneighbors == True):
 		Xt = pipeline_transform(pipeline, housing_X)
 		kneighbors = regressor.kneighbors(Xt)
-		medv_ids = DataFrame(kneighbors[1] + 1, columns = ["neighbor_" + str(x + 1) for x in range(regressor.n_neighbors)])
+		medv_ids = DataFrame(kneighbors[1] + 1, columns = ["neighbor(" + str(x + 1) + ")" for x in range(regressor.n_neighbors)])
 		medv = pandas.concat((medv, medv_ids), axis = 1)
 	store_csv(medv, name + ".csv")
 

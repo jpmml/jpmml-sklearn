@@ -94,7 +94,7 @@ public class LabelEncoder extends Transformer {
 				inlineTable.addRows(row);
 			}
 
-			encoder.updateValueSpace(feature.getName(), categories);
+			encoder.toCategorical(feature.getName(), categories);
 
 			MapValues mapValues = new MapValues()
 				.addFieldColumnPairs(new FieldColumnPair(feature.getName(), columns.get(0)))

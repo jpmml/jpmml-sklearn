@@ -25,6 +25,8 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
 
@@ -48,7 +50,7 @@ public class BaseLinearRegressor extends Regressor {
 		List<? extends Number> intercept = getIntercept();
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), null)
-			.addRegressionTables(BaseLinearUtil.encodeRegressionTable(schema.getFeatures(), Iterables.getOnlyElement(intercept), coef));
+			.addRegressionTables(RegressionModelUtil.createRegressionTable(schema.getFeatures(), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), ValueUtil.asDoubles(coef)));
 
 		return regressionModel;
 	}

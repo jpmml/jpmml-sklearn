@@ -74,9 +74,9 @@ public class GradientBoostingClassifier extends Classifier {
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
 			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, init.getPriorProbability(0), learningRate, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
-			return MiningModelUtil.createBinaryLogisticClassification(schema, miningModel, RegressionModel.NormalizationMethod.NONE, 0d, 1d, true);
+			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 0d, 1d, RegressionModel.NormalizationMethod.NONE, true, schema);
 		} else
 
 		if(numberOfClasses >= 3){
@@ -86,12 +86,12 @@ public class GradientBoostingClassifier extends Classifier {
 
 			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
 				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(CMatrixUtil.getColumn(estimators, rows, columns, i), init.getPriorProbability(i), learningRate, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction_" + categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 				miningModels.add(miningModel);
 			}
 
-			return MiningModelUtil.createClassification(schema, miningModels, RegressionModel.NormalizationMethod.SIMPLEMAX, true);
+			return MiningModelUtil.createClassification(miningModels, RegressionModel.NormalizationMethod.SIMPLEMAX, true, schema);
 		} else
 
 		{

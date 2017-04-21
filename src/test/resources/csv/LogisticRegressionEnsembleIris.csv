@@ -1,4 +1,4 @@
-Species,probability_setosa,probability_versicolor,probability_virginica
+Species,probability(setosa),probability(versicolor),probability(virginica)
 setosa,0.6911534674045091,0.20898299513971755,0.0998635374557733
 setosa,0.6483593790433163,0.28572652257279557,0.06591409838388813
 setosa,0.6881467094531493,0.2525597390877485,0.059293551459102166

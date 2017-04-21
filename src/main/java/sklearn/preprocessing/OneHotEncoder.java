@@ -92,7 +92,7 @@ public class OneHotEncoder extends Transformer {
 			result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
 		}
 
-		encoder.updateValueSpace(feature.getName(), categories);
+		encoder.toCategorical(feature.getName(), categories);
 
 		return result;
 	}

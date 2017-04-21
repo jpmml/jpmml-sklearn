@@ -28,7 +28,6 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
 import sklearn.Transformer;
 
@@ -69,26 +68,6 @@ public class SkLearnEncoder extends ModelEncoder {
 
 		dataField.setOpType(opType);
 		dataField.setDataType(dataType);
-	}
-
-	public void updateValueSpace(FieldName name, List<String> categories){
-		DataField dataField = getDataField(name);
-
-		if(dataField == null){
-			throw new IllegalArgumentException(name.getValue());
-		}
-
-		List<String> existingCategories = PMMLUtil.getValues(dataField);
-		if(existingCategories != null && existingCategories.size() > 0){
-
-			if((existingCategories).equals(categories)){
-				return;
-			}
-
-			throw new IllegalArgumentException("Data field " + name.getValue() + " has valid values " + existingCategories);
-		}
-
-		PMMLUtil.addValues(dataField, categories);
 	}
 
 	public DataField createDataField(FieldName name){

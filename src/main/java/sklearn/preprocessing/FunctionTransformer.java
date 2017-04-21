@@ -28,6 +28,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -56,7 +57,7 @@ public class FunctionTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			ContinuousFeature continuousFeature = (features.get(i)).toContinuousFeature();
 
-			FieldName name = createName(ufunc.getName(), continuousFeature);
+			FieldName name = FeatureUtil.createName(ufunc.getName(), continuousFeature);
 
 			DerivedField derivedField = encoder.getDerivedField(name);
 			if(derivedField == null){

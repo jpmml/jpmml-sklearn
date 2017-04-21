@@ -16,33 +16,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package collections;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.OpType;
-import org.jpmml.converter.Transformation;
+import org.jpmml.sklearn.CClassDict;
 
-abstract
-public class OutlierTransformation implements Transformation {
+public class DefaultDict extends CClassDict {
 
-	@Override
-	public FieldName getName(FieldName name){
-		return FieldName.create("outlier");
+	public DefaultDict(String module, String name){
+		super(module, name);
 	}
 
 	@Override
-	public OpType getOpType(OpType opType){
-		return OpType.CATEGORICAL;
+	public void __init__(Object[] args){
+		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
 	}
 
-	@Override
-	public DataType getDataType(DataType dataType){
-		return DataType.BOOLEAN;
-	}
-
-	@Override
-	public boolean isFinalResult(){
-		return true;
-	}
+	private static final String[] INIT_ATTRIBUTES = {
+		"default_factory"
+	};
 }

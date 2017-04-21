@@ -51,6 +51,7 @@ import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
@@ -102,7 +103,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		DType dtype = getDType();
 
 		if(lowercase){
-			FieldName name = createName("lowercase", feature);
+			FieldName name = FeatureUtil.createName("lowercase", feature);
 
 			DerivedField derivedField = encoder.getDerivedField(name);
 			if(derivedField == null){

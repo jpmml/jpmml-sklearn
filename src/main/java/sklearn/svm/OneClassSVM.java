@@ -25,10 +25,10 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.OutlierTransformation;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
-import org.jpmml.sklearn.OutlierTransformation;
 
 public class OneClassSVM extends BaseLibSVMRegressor {
 

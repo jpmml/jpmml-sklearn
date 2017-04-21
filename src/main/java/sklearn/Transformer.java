@@ -28,8 +28,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.sklearn.ClassDictConstructorUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -74,20 +74,10 @@ public class Transformer extends ClassDict {
 	}
 
 	protected FieldName createName(Feature feature){
-		return createName(name(), feature);
+		return FeatureUtil.createName(name(), feature);
 	}
 
 	protected FieldName createName(Feature feature, int index){
-		return createName(name(), feature, index);
-	}
-
-	static
-	protected FieldName createName(String function, Feature feature){
-		return FieldName.create(function + "(" + (ClassDictUtil.getName(feature)).getValue() + ")");
-	}
-
-	static
-	protected FieldName createName(String function, Feature feature, int index){
-		return FieldName.create(function + "(" + (ClassDictUtil.getName(feature)).getValue() + ")" + "[" + index + "]");
+		return FeatureUtil.createName(name(), feature, index);
 	}
 }

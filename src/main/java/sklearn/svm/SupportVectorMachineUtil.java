@@ -18,36 +18,16 @@
  */
 package sklearn.svm;
 
-import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
-import org.dmg.pmml.Array;
-import org.dmg.pmml.RealSparseArray;
-import org.dmg.pmml.regression.CategoricalPredictor;
-import org.dmg.pmml.support_vector_machine.Coefficient;
-import org.dmg.pmml.support_vector_machine.Coefficients;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.support_vector_machine.Kernel;
 import org.dmg.pmml.support_vector_machine.LinearKernel;
 import org.dmg.pmml.support_vector_machine.PolynomialKernel;
 import org.dmg.pmml.support_vector_machine.RadialBasisKernel;
 import org.dmg.pmml.support_vector_machine.SigmoidKernel;
-import org.dmg.pmml.support_vector_machine.SupportVector;
-import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
-import org.dmg.pmml.support_vector_machine.SupportVectors;
-import org.dmg.pmml.support_vector_machine.VectorDictionary;
-import org.dmg.pmml.support_vector_machine.VectorFields;
-import org.dmg.pmml.support_vector_machine.VectorInstance;
-import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.CMatrixUtil;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SupportVectorMachineUtil {
 
@@ -55,137 +35,38 @@ public class SupportVectorMachineUtil {
 	}
 
 	static
-	public VectorDictionary encodeVectorDictionary(List<Integer> support, List<? extends Number> supportVectors, int numberOfVectors, int numberOfFeatures, Schema schema){
-		BitSet featureMask = new BitSet(numberOfFeatures);
+	public List<String> formatIds(List<Integer> values){
+		Function<Integer, String> function = new Function<Integer, String>(){
 
-		Double defaultValue = Double.valueOf(0d);
-
-		for(int i = 0; i < numberOfVectors; i++){
-			List<? extends Number> values = CMatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
-
-			BitSet vectorFeatures = ValueUtil.getIndices(values, defaultValue);
-
-			// Set bits that correspond to non-default values
-			vectorFeatures.flip(0, numberOfFeatures);
-
-			featureMask.or(vectorFeatures);
-		}
-
-		int numberOfUsedFeatures = featureMask.cardinality();
-
-		List<Feature> unusedFeatures = new ArrayList<>();
-
-		VectorFields vectorFields = new VectorFields();
-
-		for(int i = 0; i < numberOfFeatures; i++){
-			Feature feature = schema.getFeature(i);
-
-			if(!featureMask.get(i)){
-				unusedFeatures.add(feature);
-
-				continue;
-			} // End if
-
-			if(feature instanceof BinaryFeature){
-				BinaryFeature binaryFeature = (BinaryFeature)feature;
-
-				CategoricalPredictor categoricalPredictor = new CategoricalPredictor(binaryFeature.getName(), binaryFeature.getValue(), 1d);
-
-				vectorFields.addContent(categoricalPredictor);
-			} else
-
-			{
-				ContinuousFeature continuousFeature = feature.toContinuousFeature();
-
-				vectorFields.addContent(continuousFeature.ref());
+			@Override
+			public String apply(Integer value){
+				return value.toString();
 			}
-		}
+		};
 
-		VectorDictionary vectorDictionary = new VectorDictionary(vectorFields);
-
-		for(int i = 0; i < numberOfVectors; i++){
-			String id = String.valueOf(support.get(i));
-
-			VectorInstance vectorInstance = new VectorInstance(id);
-
-			List<? extends Number> values = CMatrixUtil.getRow(supportVectors, numberOfVectors, numberOfFeatures, i);
-
-			if(numberOfUsedFeatures < numberOfFeatures){
-				values = ValueUtil.filterByIndices(values, featureMask);
-			} // End if
-
-			if(ValueUtil.isSparse(values, defaultValue, 0.75d)){
-				RealSparseArray sparseArray = PMMLUtil.createRealSparseArray(values, defaultValue);
-
-				vectorInstance.setRealSparseArray(sparseArray);
-			} else
-
-			{
-				Array array = PMMLUtil.createRealArray(values);
-
-				vectorInstance.setArray(array);
-			}
-
-			vectorDictionary.addVectorInstances(vectorInstance);
-		}
-
-		if(!unusedFeatures.isEmpty()){
-			logger.info("Skipped {} feature(s): {}", unusedFeatures.size(), ClassDictUtil.formatFeatureList(unusedFeatures));
-		}
-
-		return vectorDictionary;
+		return Lists.transform(values, function);
 	}
 
 	static
-	public SupportVectorMachine encodeSupportVectorMachine(List<VectorInstance> vectorInstances, List<? extends Number> dualCoef, Number intercept){
-		ClassDictUtil.checkSize(vectorInstances, dualCoef);
-
-		Coefficients coefficients = new Coefficients()
-			.setAbsoluteValue(ValueUtil.asDouble(intercept));
-
-		SupportVectors supportVectors = new SupportVectors();
-
-		for(int i = 0; i < vectorInstances.size(); i++){
-			VectorInstance vectorInstance = vectorInstances.get(i);
-
-			Coefficient coefficient = new Coefficient()
-				.setValue(ValueUtil.asDouble(dualCoef.get(i)));
-
-			coefficients.addCoefficients(coefficient);
-
-			SupportVector supportVector = new SupportVector(vectorInstance.getId());
-
-			supportVectors.addSupportVectors(supportVector);
-		}
-
-		SupportVectorMachine supportVectorMachine = new SupportVectorMachine(coefficients)
-			.setSupportVectors(supportVectors);
-
-		return supportVectorMachine;
-	}
-
-	static
-	public Kernel encodeKernel(String kernel, Integer degree, Double gamma, Double coef0){
+	public Kernel createKernel(String kernel, Integer degree, Double gamma, Double coef0){
 
 		switch(kernel){
 			case "linear":
 				return new LinearKernel();
 			case "poly":
 				return new PolynomialKernel()
-					.setDegree(ValueUtil.asDouble(degree))
+					.setGamma(gamma)
 					.setCoef0(coef0)
-					.setGamma(gamma);
+					.setDegree(ValueUtil.asDouble(degree));
 			case "rbf":
 				return new RadialBasisKernel()
 					.setGamma(gamma);
 			case "sigmoid":
 				return new SigmoidKernel()
-					.setCoef0(coef0)
-					.setGamma(gamma);
+					.setGamma(gamma)
+					.setCoef0(coef0);
 			default:
 				throw new IllegalArgumentException(kernel);
 		}
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(SupportVectorMachineUtil.class);
 }

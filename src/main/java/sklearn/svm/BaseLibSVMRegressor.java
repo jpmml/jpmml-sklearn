@@ -21,15 +21,11 @@ package sklearn.svm;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.support_vector_machine.Kernel;
-import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
-import org.dmg.pmml.support_vector_machine.VectorDictionary;
-import org.dmg.pmml.support_vector_machine.VectorInstance;
-import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.CMatrix;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
 
@@ -59,17 +55,8 @@ public class BaseLibSVMRegressor extends Regressor {
 		List<? extends Number> dualCoef = getDualCoef();
 		List<? extends Number> intercept = getIntercept();
 
-		VectorDictionary vectorDictionary = SupportVectorMachineUtil.encodeVectorDictionary(support, supportVectors, numberOfVectors, numberOfFeatures, schema);
-
-		List<VectorInstance> vectorInstances = vectorDictionary.getVectorInstances();
-
-		Kernel kernel = SupportVectorMachineUtil.encodeKernel(getKernel(), getDegree(), getGamma(), getCoef0());
-
-		SupportVectorMachine supportVectorMachine = SupportVectorMachineUtil.encodeSupportVectorMachine(vectorInstances, dualCoef, Iterables.getOnlyElement(intercept));
-
-		SupportVectorMachineModel supportVectorMachineModel = new SupportVectorMachineModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), vectorDictionary, null)
-			.setKernel(kernel)
-			.addSupportVectorMachines(supportVectorMachine);
+		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createRegression(new CMatrix<>(ValueUtil.asDoubles(supportVectors), numberOfVectors, numberOfFeatures), SupportVectorMachineUtil.formatIds(support), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), ValueUtil.asDoubles(dualCoef), schema)
+			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0()));
 
 		return supportVectorMachineModel;
 	}

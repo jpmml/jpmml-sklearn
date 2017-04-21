@@ -108,7 +108,7 @@ public class LabelBinarizer extends Transformer {
 			}
 		}
 
-		encoder.updateValueSpace(feature.getName(), categories);
+		encoder.toCategorical(feature.getName(), categories);
 
 		return result;
 	}

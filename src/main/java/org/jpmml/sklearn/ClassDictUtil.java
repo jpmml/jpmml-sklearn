@@ -25,16 +25,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import joblib.NDArrayWrapper;
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
-import org.dmg.pmml.FieldName;
-import org.jpmml.converter.Feature;
-import org.jpmml.converter.HasDerivedName;
 
 public class ClassDictUtil {
 
@@ -166,59 +160,6 @@ public class ClassDictUtil {
 	}
 
 	static
-	public FieldName getName(Feature feature){
-
-		if(feature instanceof HasDerivedName){
-			HasDerivedName hasDerivedName = (HasDerivedName)feature;
-
-			return hasDerivedName.getDerivedName();
-		}
-
-		return feature.getName();
-	}
-
-	static
-	public String formatFeatureList(List<Feature> features){
-		Function<Feature, FieldName> function = new Function<Feature, FieldName>(){
-
-			@Override
-			public FieldName apply(Feature feature){
-				return getName(feature);
-			}
-		};
-
-		return formatNameList(Lists.transform(features, function));
-	}
-
-	static
-	public String formatNameList(List<FieldName> names){
-		Function<FieldName, String> function = new Function<FieldName, String>(){
-
-			@Override
-			public String apply(FieldName name){
-				return name.getValue();
-			}
-		};
-
-		return formatIdList(Lists.transform(names, function));
-	}
-
-	static
-	public String formatIdList(List<String> ids){
-
-		if(ids.size() > 5){
-			List<String> headTailValues = new ArrayList<>(5);
-			headTailValues.addAll(ids.subList(0, 2));
-			headTailValues.add("..");
-			headTailValues.addAll(ids.subList(ids.size() - 2, ids.size()));
-
-			ids = headTailValues;
-		}
-
-		return JOINER.join(ids);
-	}
-
-	static
 	public String toString(ClassDict dict){
 		StringBuffer sb = new StringBuffer();
 
@@ -252,6 +193,4 @@ public class ClassDictUtil {
 
 		return sb.toString();
 	}
-
-	private static final Joiner JOINER = Joiner.on(", ");
 }

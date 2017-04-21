@@ -1,4 +1,4 @@
-MEDV,neighbor_1,neighbor_2,neighbor_3,neighbor_4,neighbor_5
+MEDV,neighbor(1),neighbor(2),neighbor(3),neighbor(4),neighbor(5)
 27.32,1,178,179,176,90
 22.78,2,237,273,82,36
 32.019999999999996,3,277,276,238,90

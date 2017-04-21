@@ -25,12 +25,12 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
+import org.jpmml.converter.ConstantFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.InteractionFeature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PowerFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -74,12 +74,7 @@ public class PolynomialFeatures extends Transformer {
 
 		ClassDictUtil.checkSize(numberOfOutputFeatures, powers);
 
-		FieldName unitName = FieldName.create("constant(1.0d)");
-
-		DerivedField unitField = encoder.getDerivedField(unitName);
-		if(unitField == null){
-			unitField = encoder.createDerivedField(unitName, PMMLUtil.createConstant(1d));
-		}
+		Feature unitFeature = new ConstantFeature(encoder, 1.0d);
 
 		Function<Feature, Feature[]> function = new Function<Feature, Feature[]>(){
 
@@ -119,14 +114,14 @@ public class PolynomialFeatures extends Transformer {
 
 					sep = ":";
 
-					sb.append((ClassDictUtil.getName(transformedFeature)).getValue());
+					sb.append((FeatureUtil.getName(transformedFeature)).getValue());
 
 					powerFeatures.add(transformedFeature);
 				}
 			}
 
 			if(powerFeatures.size() == 0){
-				result.add(new ContinuousFeature(encoder, unitField));
+				result.add(unitFeature);
 			} else
 
 			if(powerFeatures.size() == 1){
