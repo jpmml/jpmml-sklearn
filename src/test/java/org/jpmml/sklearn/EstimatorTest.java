@@ -69,13 +69,4 @@ public class EstimatorTest extends IntegrationTest {
 
 		return result;
 	}
-
-	static {
-
-		try {
-			PickleUtil.init();
-		} catch(Exception e){
-			throw new AssertionError(e);
-		}
-	}
 }

@@ -94,8 +94,6 @@ public class Main {
 	}
 
 	public void run() throws Exception {
-		PickleUtil.init();
-
 		Object object;
 
 		try(Storage storage = PickleUtil.createStorage(this.input)){

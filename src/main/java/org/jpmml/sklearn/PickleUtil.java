@@ -33,75 +33,12 @@ import net.razorvine.pickle.Opcodes;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PickleUtil {
 
 	private PickleUtil(){
-	}
-
-	static
-	public void init() throws Exception {
-		Thread thread = Thread.currentThread();
-
-		ClassLoader classLoader = thread.getContextClassLoader();
-		if(classLoader == null){
-			classLoader = ClassLoader.getSystemClassLoader();
-		}
-
-		Enumeration<URL> urls = classLoader.getResources("META-INF/sklearn2pmml.properties");
-		while(urls.hasMoreElements()){
-			URL url = urls.nextElement();
-
-			try(InputStream is = url.openStream()){
-				Properties properties = new Properties();
-				properties.load(is);
-
-				init(classLoader, properties);
-			}
-		}
-	}
-
-	static
-	public void init(ClassLoader classLoader, Properties properties) throws ClassNotFoundException {
-
-		if(properties.isEmpty()){
-			return;
-		}
-
-		Set<String> keys = properties.stringPropertyNames();
-		for(String key : keys){
-			String value = properties.getProperty(key);
-
-			int dot = key.lastIndexOf('.');
-			if(dot < 0){
-				throw new IllegalArgumentException(key);
-			}
-
-			String module = key.substring(0, dot);
-			String name = key.substring(dot + 1);
-
-			if(value == null || ("").equals(value)){
-				value = key;
-			}
-
-			Class<?> clazz = classLoader.loadClass(value);
-
-			ObjectConstructor constructor;
-
-			if((CClassDict.class).isAssignableFrom(clazz)){
-				constructor = new ExtensionObjectConstructor(module, name, (Class<? extends CClassDict>)clazz);
-			} else
-
-			if((ClassDict.class).isAssignableFrom(clazz)){
-				constructor = new ObjectConstructor(module, name, (Class<? extends ClassDict>)clazz);
-			} else
-
-			{
-				throw new IllegalArgumentException(value);
-			}
-
-			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
-		}
 	}
 
 	static
@@ -161,5 +98,103 @@ public class PickleUtil {
 
 			return unpickler.load(is);
 		}
+	}
+
+	static
+	private void init(){
+		Thread thread = Thread.currentThread();
+
+		ClassLoader classLoader = thread.getContextClassLoader();
+		if(classLoader == null){
+			classLoader = ClassLoader.getSystemClassLoader();
+		}
+
+		Enumeration<URL> urls;
+
+		try {
+			urls = classLoader.getResources("META-INF/sklearn2pmml.properties");
+		} catch(IOException ioe){
+			logger.warn("Failed to find resources", ioe);
+
+			return;
+		}
+
+		while(urls.hasMoreElements()){
+			URL url = urls.nextElement();
+
+			logger.debug("Loading resource {}", url);
+
+			try(InputStream is = url.openStream()){
+				Properties properties = new Properties();
+				properties.load(is);
+
+				init(classLoader, properties);
+			} catch(IOException ioe){
+				logger.warn("Failed to load resource", ioe);
+			}
+		}
+	}
+
+	static
+	private void init(ClassLoader classLoader, Properties properties){
+
+		if(properties.isEmpty()){
+			return;
+		}
+
+		Set<String> keys = properties.stringPropertyNames();
+		for(String key : keys){
+			String value = properties.getProperty(key);
+
+			if(value == null || ("").equals(value)){
+				value = key;
+			}
+
+			logger.debug("Mapping Python class {} to Java class {}", key, value);
+
+			int dot = key.lastIndexOf('.');
+			if(dot < 0){
+				logger.warn("Failed to identify the module and name parts of Python class {}", key);
+
+				continue;
+			}
+
+			String module = key.substring(0, dot);
+			String name = key.substring(dot + 1);
+
+			Class<?> clazz;
+
+			try {
+				clazz = classLoader.loadClass(value);
+			} catch(ClassNotFoundException cnfe){
+				logger.warn("Failed to load Java class {}", value);
+
+				continue;
+			}
+
+			ObjectConstructor constructor;
+
+			if((CClassDict.class).isAssignableFrom(clazz)){
+				constructor = new ExtensionObjectConstructor(module, name, (Class<? extends CClassDict>)clazz);
+			} else
+
+			if((ClassDict.class).isAssignableFrom(clazz)){
+				constructor = new ObjectConstructor(module, name, (Class<? extends ClassDict>)clazz);
+			} else
+
+			{
+				logger.warn("Failed to identify the type of Java class {}", value);
+
+				continue;
+			}
+
+			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
+		}
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(PickleUtil.class);
+
+	static {
+		PickleUtil.init();
 	}
 }
