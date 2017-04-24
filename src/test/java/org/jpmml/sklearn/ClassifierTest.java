@@ -34,6 +34,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateDecisionTreeDictAudit() throws Exception {
+		evaluate("DecisionTreeDict", "Audit");
+	}
+
+	@Test
 	public void evaluateDecisionTreeEnsembleAudit() throws Exception {
 		evaluate("DecisionTreeEnsemble", "Audit");
 	}
@@ -66,6 +71,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateLogisticRegressionAudit() throws Exception {
 		evaluate("LogisticRegression", "Audit");
+	}
+
+	@Test
+	public void evaluateLogisticRegressionDictAudit() throws Exception {
+		evaluate("LogisticRegressionDict", "Audit");
 	}
 
 	@Test

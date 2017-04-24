@@ -12,6 +12,7 @@ from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, Gradi
 from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.externals import joblib
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
@@ -164,6 +165,24 @@ build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state =
 build_audit(SVC(), "SVCAudit", with_proba = False)
 build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 build_audit(XGBClassifier(objective = "binary:logistic"), "XGBAudit")
+
+audit_dict_X = audit_X.to_dict("records")
+
+def build_dict_audit(classifier, name, with_proba = True):
+	pipeline = PMMLPipeline([
+		("dict-transformer", DictVectorizer()),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_dict_X, audit_y)
+	store_pkl(pipeline, name + ".pkl")
+	adjusted = DataFrame(pipeline.predict(audit_dict_X), columns = ["Adjusted"])
+	if(with_proba == True):
+		adjusted_proba = DataFrame(pipeline.predict_proba(audit_dict_X), columns = ["probability(0)", "probability(1)"])
+		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name + ".csv")
+
+build_dict_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeDictAudit")
+build_dict_audit(LogisticRegression(), "LogisticRegressionDictAudit")
 
 versicolor_df = load_csv("Versicolor.csv")
 
