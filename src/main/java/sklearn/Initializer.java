@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Villu Ruusmann
+ * Copyright (c) 2017 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,7 +18,6 @@
  */
 package sklearn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -28,14 +27,14 @@ import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Selector extends Transformer implements HasNumberOfFeatures {
+public class Initializer extends Transformer {
 
-	public Selector(String module, String name){
+	public Initializer(String module, String name){
 		super(module, name);
 	}
 
 	abstract
-	public List<Boolean> getSupportMask();
+	public List<Feature> initializeFeatures(SkLearnEncoder encoder);
 
 	@Override
 	public OpType getOpType(){
@@ -49,24 +48,8 @@ public class Selector extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<Boolean> supportMask = getSupportMask();
+		ClassDictUtil.checkSize(0, features);
 
-		if(supportMask == null){
-			return features;
-		}
-
-		ClassDictUtil.checkSize(features, supportMask);
-
-		List<Feature> result = new ArrayList<>();
-
-		for(int i = 0; i < features.size(); i++){
-			Feature feature = features.get(i);
-
-			if(supportMask.get(i)){
-				result.add(feature);
-			}
-		}
-
-		return result;
+		return initializeFeatures(encoder);
 	}
 }

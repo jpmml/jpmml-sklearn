@@ -77,8 +77,6 @@ public class Pipeline extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Transformer> transformers = getTransformers();
 
-		int index = 0;
-
 		for(Transformer transformer : transformers){
 
 			if(transformer instanceof HasNumberOfFeatures){
@@ -90,11 +88,9 @@ public class Pipeline extends Transformer {
 				}
 			}
 
-			encoder.updateFeatures(features, transformer, (index == 0));
+			encoder.updateFeatures(features, transformer);
 
 			features = transformer.encodeFeatures(features, encoder);
-
-			index++;
 		}
 
 		return features;

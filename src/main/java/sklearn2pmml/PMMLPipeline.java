@@ -47,12 +47,11 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasNumberOfFeatures;
+import sklearn.Initializer;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 import sklearn.TypeUtil;
-import sklearn.feature_extraction.DictVectorizer;
 import sklearn.pipeline.Pipeline;
-import sklearn_pandas.DataFrameMapper;
 
 public class PMMLPipeline extends Pipeline {
 
@@ -112,7 +111,7 @@ public class PMMLPipeline extends Pipeline {
 		Transformer transformer = TransformerUtil.getHead(transformers);
 		if(transformer != null){
 
-			if(!(transformer instanceof DictVectorizer) && !(transformer instanceof DataFrameMapper)){
+			if(!(transformer instanceof Initializer)){
 				features = initFeatures(transformer, transformer.getOpType(), transformer.getDataType(), encoder);
 			}
 

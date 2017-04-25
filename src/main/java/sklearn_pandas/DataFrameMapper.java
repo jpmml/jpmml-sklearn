@@ -25,35 +25,24 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
+import sklearn.Initializer;
 import sklearn.Transformer;
 
-public class DataFrameMapper extends Transformer {
+public class DataFrameMapper extends Initializer {
 
 	public DataFrameMapper(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public OpType getOpType(){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public DataType getDataType(){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> initializeFeatures(SkLearnEncoder encoder){
 		Object _default = getDefault();
 		List<Object[]> rows = getFeatures();
 
@@ -61,7 +50,7 @@ public class DataFrameMapper extends Transformer {
 			throw new IllegalArgumentException();
 		}
 
-		List<Feature> result = new ArrayList<>(features);
+		List<Feature> result = new ArrayList<>();
 
 		for(Object[] row : rows){
 			List<Feature> rowFeatures = new ArrayList<>();
@@ -80,7 +69,7 @@ public class DataFrameMapper extends Transformer {
 
 			List<Transformer> transformers = getTransformerList(row);
 			for(Transformer transformer : transformers){
-				encoder.updateFeatures(rowFeatures, transformer, false);
+				encoder.updateFeatures(rowFeatures, transformer);
 
 				rowFeatures = transformer.encodeFeatures(rowFeatures, encoder);
 			}

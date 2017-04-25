@@ -33,26 +33,16 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.Initializer;
 
-public class DictVectorizer extends Transformer {
+public class DictVectorizer extends Initializer {
 
 	public DictVectorizer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public OpType getOpType(){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public DataType getDataType(){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> initializeFeatures(SkLearnEncoder encoder){
 		List<String> featureNames = getFeatureNames();
 		String separator = getSeparator();
 		Map<String, Integer> vocabulary = getVocabulary();
@@ -98,7 +88,7 @@ public class DictVectorizer extends Transformer {
 			featureArray[vocabulary.get(featureName)] = feature;
 		}
 
-		List<Feature> result = new ArrayList<>(features);
+		List<Feature> result = new ArrayList<>();
 		result.addAll(Arrays.asList(featureArray));
 
 		return result;

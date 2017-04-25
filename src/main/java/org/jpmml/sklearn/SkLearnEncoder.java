@@ -33,7 +33,7 @@ import sklearn.Transformer;
 
 public class SkLearnEncoder extends ModelEncoder {
 
-	public void updateFeatures(List<Feature> features, Transformer transformer, boolean safe){
+	public void updateFeatures(List<Feature> features, Transformer transformer){
 		OpType opType;
 		DataType dataType;
 
@@ -41,12 +41,7 @@ public class SkLearnEncoder extends ModelEncoder {
 			opType = transformer.getOpType();
 			dataType = transformer.getDataType();
 		} catch(UnsupportedOperationException uoe){
-
-			if(safe){
-				return;
-			}
-
-			throw uoe;
+			return;
 		}
 
 		for(Feature feature : features){

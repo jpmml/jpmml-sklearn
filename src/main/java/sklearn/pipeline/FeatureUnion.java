@@ -52,7 +52,7 @@ public class FeatureUnion extends Transformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(Transformer transformer : transformers){
-			encoder.updateFeatures(features, transformer, true);
+			encoder.updateFeatures(features, transformer);
 
 			List<Feature> transformerFeatures = new ArrayList<>(features);
 
