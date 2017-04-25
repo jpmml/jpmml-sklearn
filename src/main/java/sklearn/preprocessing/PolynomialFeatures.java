@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -26,6 +27,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
+import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ConstantFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -82,12 +84,20 @@ public class PolynomialFeatures extends Transformer {
 			public Feature[] apply(Feature feature){
 				Feature[] features = new Feature[degree];
 
-				features[0] = feature;
+				if(feature instanceof BinaryFeature){
+					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
-				ContinuousFeature continuousFeature = feature.toContinuousFeature();
+					Arrays.fill(features, binaryFeature);
+				} else
 
-				for(int i = 2; i <= degree; i++){
-					features[i - 1] = new PowerFeature(encoder, continuousFeature.getName(), continuousFeature.getDataType(), i);
+				{
+					features[0] = feature;
+
+					ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+					for(int i = 2; i <= degree; i++){
+						features[i - 1] = new PowerFeature(encoder, continuousFeature.getName(), continuousFeature.getDataType(), i);
+					}
 				}
 
 				return features;
