@@ -58,7 +58,7 @@ public class BaseLinearClassifier extends Classifier {
 
 		boolean hasProbabilityDistribution = hasProbabilityDistribution();
 
-		List<? extends Number> coefficients = getCoef();
+		List<? extends Number> coef = getCoef();
 		List<? extends Number> intercepts = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
@@ -68,7 +68,7 @@ public class BaseLinearClassifier extends Classifier {
 		if(numberOfClasses == 1){
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
-			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDouble(intercepts.get(0)), ValueUtil.asDoubles(CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, 0)), RegressionModel.NormalizationMethod.SOFTMAX, hasProbabilityDistribution, schema);
+			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDouble(intercepts.get(0)), ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0)), RegressionModel.NormalizationMethod.SOFTMAX, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 3){
@@ -77,7 +77,7 @@ public class BaseLinearClassifier extends Classifier {
 			List<RegressionTable> regressionTables = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, ValueUtil.asDouble(intercepts.get(i)), ValueUtil.asDoubles(CMatrixUtil.getRow(coefficients, numberOfClasses, numberOfFeatures, i)))
+				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, ValueUtil.asDouble(intercepts.get(i)), ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i)))
 					.setTargetCategory(categoricalLabel.getValue(i));
 
 				regressionTables.add(regressionTable);
