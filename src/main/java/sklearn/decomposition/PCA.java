@@ -33,12 +33,20 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class PCA extends Transformer {
+public class PCA extends Transformer implements HasNumberOfFeatures {
 
 	public PCA(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		int[] shape = getComponentsShape();
+
+		return shape[1];
 	}
 
 	@Override

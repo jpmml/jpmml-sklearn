@@ -37,12 +37,18 @@ import org.jpmml.converter.PowerFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class PolynomialFeatures extends Transformer {
+public class PolynomialFeatures extends Transformer implements HasNumberOfFeatures {
 
 	public PolynomialFeatures(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		return getNumberOfInputFeatures();
 	}
 
 	@Override

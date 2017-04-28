@@ -29,12 +29,35 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class StandardScaler extends Transformer {
+public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 
 	public StandardScaler(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		Boolean withMean = getWithMean();
+		Boolean withStd = getWithStd();
+
+		int[] shape;
+
+		if(withMean){
+			shape = getMeanShape();
+		} else
+
+		if(withStd){
+			shape = getStdShape();
+		} else
+
+		{
+			return -1;
+		}
+
+		return shape[0];
 	}
 
 	@Override
@@ -103,8 +126,22 @@ public class StandardScaler extends Transformer {
 			// SkLearn 0.16
 			return (List)ClassDictUtil.getArray(this, "std_");
 		} catch(IllegalArgumentException iae){
-			// SkLearn 0.17
+			// SkLearn 0.17+
 			return (List)ClassDictUtil.getArray(this, "scale_");
+		}
+	}
+
+	private int[] getMeanShape(){
+		return ClassDictUtil.getShape(this, "mean_", 1);
+	}
+
+	private int[] getStdShape(){
+		try {
+			// SkLearn 0.16
+			return ClassDictUtil.getShape(this, "std_", 1);
+		} catch(IllegalArgumentException iae){
+			// SkLearn 0.17+
+			return ClassDictUtil.getShape(this, "scale_", 1);
 		}
 	}
 }

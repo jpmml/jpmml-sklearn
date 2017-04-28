@@ -29,12 +29,35 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class RobustScaler extends Transformer {
+public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 
 	public RobustScaler(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		Boolean withCentering = getWithCentering();
+		Boolean withScaling = getWithScaling();
+
+		int[] shape;
+
+		if(withCentering){
+			shape = getCenterShape();
+		} else
+
+		if(withScaling){
+			shape = getScaleShape();
+		} else
+
+		{
+			return -1;
+		}
+
+		return shape[0];
 	}
 
 	@Override
@@ -100,5 +123,13 @@ public class RobustScaler extends Transformer {
 
 	public List<? extends Number> getScale(){
 		return (List)ClassDictUtil.getArray(this, "scale_");
+	}
+
+	private int[] getCenterShape(){
+		return ClassDictUtil.getShape(this, "center_", 1);
+	}
+
+	private int[] getScaleShape(){
+		return ClassDictUtil.getShape(this, "scale_", 1);
 	}
 }

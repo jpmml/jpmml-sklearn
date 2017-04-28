@@ -33,12 +33,20 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class Imputer extends Transformer {
+public class Imputer extends Transformer implements HasNumberOfFeatures {
 
 	public Imputer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		int[] shape = getStatisticsShape();
+
+		return shape[0];
 	}
 
 	@Override
@@ -113,6 +121,10 @@ public class Imputer extends Transformer {
 
 	public String getStrategy(){
 		return (String)get("strategy");
+	}
+
+	private int[] getStatisticsShape(){
+		return ClassDictUtil.getShape(this, "statistics", 1);
 	}
 
 	static

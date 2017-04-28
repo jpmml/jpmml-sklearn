@@ -29,12 +29,20 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class MaxAbsScaler extends Transformer {
+public class MaxAbsScaler extends Transformer implements HasNumberOfFeatures {
 
 	public MaxAbsScaler(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		int[] shape = getScaleShape();
+
+		return shape[0];
 	}
 
 	@Override
@@ -70,5 +78,9 @@ public class MaxAbsScaler extends Transformer {
 
 	public List<? extends Number> getScale(){
 		return (List)ClassDictUtil.getArray(this, "scale_");
+	}
+
+	private int[] getScaleShape(){
+		return ClassDictUtil.getShape(this, "scale_", 1);
 	}
 }
