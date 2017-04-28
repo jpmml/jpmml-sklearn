@@ -150,11 +150,16 @@ public class PMMLPipeline extends Pipeline {
 		List<String> activeFields = getActiveFields();
 
 		if(activeFields == null){
-			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)object;
+			int numberOfFeatures = -1;
 
-			int numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
+			if(object instanceof HasNumberOfFeatures){
+				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)object;
+
+				numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
+			} // End if
+
 			if(numberOfFeatures < 0){
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("The first transformer or estimator object (" + ClassDictUtil.formatClass(object) + ") does not specify the number of input features");
 			}
 
 			activeFields = new ArrayList<>(numberOfFeatures);
