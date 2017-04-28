@@ -44,6 +44,8 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasNumberOfFeatures;
@@ -81,6 +83,8 @@ public class PMMLPipeline extends Pipeline {
 
 			if(targetField == null){
 				targetField = "y";
+
+				logger.warn("The 'target_field' attribute is not set. Assuming {} as the name of the target field", targetField);
 			}
 
 			MiningFunction miningFunction = estimator.getMiningFunction();
@@ -167,6 +171,8 @@ public class PMMLPipeline extends Pipeline {
 			for(int i = 0, max = numberOfFeatures; i < max; i++){
 				activeFields.add("x" + String.valueOf(i + 1));
 			}
+
+			logger.warn("The 'active_fields' attribute is not set. Assuming {} as the names of active fields", activeFields);
 		}
 
 		List<Feature> result = new ArrayList<>();
@@ -248,4 +254,6 @@ public class PMMLPipeline extends Pipeline {
 
 		return Lists.transform(objects, function);
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(PMMLPipeline.class);
 }
