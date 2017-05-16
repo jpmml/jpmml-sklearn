@@ -348,7 +348,7 @@ def build_auto(regressor, name):
 	mapper = DataFrameMapper([
 		(["cylinders"], CategoricalDomain()),
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), Imputer(missing_values = "NaN"), StandardScaler()]),
-		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)]), # Pre/post 1973 oil crisis effects
+		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
 		(["origin"], OneHotEncoder())
 	])
 	pipeline = PMMLPipeline([

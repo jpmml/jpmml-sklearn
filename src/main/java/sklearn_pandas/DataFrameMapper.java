@@ -21,6 +21,7 @@ package sklearn_pandas;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -72,6 +73,20 @@ public class DataFrameMapper extends Initializer {
 				encoder.updateFeatures(rowFeatures, transformer);
 
 				rowFeatures = transformer.encodeFeatures(rowFeatures, encoder);
+			}
+
+			if(row.length > 2){
+				Map<String, ?> options = (Map)row[2];
+
+				String alias = (String)options.get("alias");
+				if(alias != null){
+
+					for(int i = 0; i < rowFeatures.size(); i++){
+						Feature rowFeature = rowFeatures.get(i);
+
+						encoder.renameField(rowFeature.getName(), rowFeatures.size() > 1 ? FieldName.create(alias + "_" + i) : FieldName.create(alias));
+					}
+				}
 			}
 
 			result.addAll(rowFeatures);

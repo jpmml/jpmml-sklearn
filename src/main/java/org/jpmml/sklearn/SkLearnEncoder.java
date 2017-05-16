@@ -18,20 +18,43 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.model.visitors.FieldRenamer;
 import sklearn.Transformer;
 
 public class SkLearnEncoder extends ModelEncoder {
+
+	private Map<FieldName, FieldName> renamedFields = new LinkedHashMap<>();
+
+
+	@Override
+	public PMML encodePMML(Model model){
+		PMML pmml = super.encodePMML(model);
+
+		Collection<Map.Entry<FieldName, FieldName>> entries = this.renamedFields.entrySet();
+		for(Map.Entry<FieldName, FieldName> entry : entries){
+			FieldRenamer renamer = new FieldRenamer(entry.getKey(), entry.getValue());
+
+			renamer.applyTo(pmml);
+		}
+
+		return pmml;
+	}
 
 	public void updateFeatures(List<Feature> features, Transformer transformer){
 		OpType opType;
@@ -71,5 +94,9 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public DerivedField createDerivedField(FieldName name, Expression expression){
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
+	}
+
+	public void renameField(FieldName from, FieldName to){
+		this.renamedFields.put(from, to);
 	}
 }
