@@ -31,7 +31,7 @@ from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.feature_extraction.text import Splitter
-from sklearn_pandas import DataFrameMapper
+from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
 import numpy
@@ -185,6 +185,28 @@ def build_audit_dict(classifier, name, with_proba = True):
 
 build_audit_dict(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditDict")
 build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
+
+audit_na_X, audit_na_y = load_audit("AuditNA.csv")
+
+def build_audit_na(classifier, name, with_proba = True):
+	mapper = DataFrameMapper(
+		[([column], [ContinuousDomain(), Imputer()]) for column in ["Age", "Income", "Hours"]] +
+		[([column], [CategoricalDomain(), CategoricalImputer(), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_na_X, audit_na_y)
+	store_pkl(pipeline, name + ".pkl")
+	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
+	if(with_proba == True):
+		adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
+		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name + ".csv")
+
+build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA")
+build_audit_na(LogisticRegression(), "LogisticRegressionAuditNA")
 
 def load_versicolor(name):
 	df = load_csv(name)

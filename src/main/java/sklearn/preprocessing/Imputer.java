@@ -21,16 +21,8 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.DataField;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Expression;
 import org.dmg.pmml.MissingValueTreatmentMethod;
-import org.dmg.pmml.TypeDefinitionField;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.MissingValueDecorator;
-import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
@@ -51,61 +43,25 @@ public class Imputer extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Object missingValues = getMissingValues();
 		List<? extends Number> statistics = getStatistics();
+		String strategy = getStrategy();
 
 		ClassDictUtil.checkSize(features, statistics);
 
-		Object missingValues = getMissingValues();
+		if(("NaN").equals(missingValues)){
+			missingValues = null;
+		}
 
-		Number targetValue = getTargetValue(missingValues);
+		MissingValueTreatmentMethod missingValueTreatment = parseStrategy(strategy);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
+			Number statistic = statistics.get(i);
 
-			Number statisticValue = statistics.get(i);
-
-			TypeDefinitionField field = encoder.getField(feature.getName());
-
-			if(field instanceof DataField){
-				String strategy = getStrategy();
-
-				MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
-					.setMissingValueReplacement(ValueUtil.formatValue(statisticValue))
-					.setMissingValueTreatment(parseStrategy(strategy));
-
-				if(targetValue != null){
-					missingValueDecorator.addValues(ValueUtil.formatValue(targetValue));
-				}
-
-				encoder.addDecorator(feature.getName(), missingValueDecorator);
-
-				result.add(feature);
-			} else
-
-			if(field instanceof DerivedField){
-				Expression expression = feature.ref();
-
-				if(targetValue == null){
-					expression = PMMLUtil.createApply("isMissing", expression);
-				} else
-
-				{
-					expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(targetValue));
-				}
-
-				// "($name == null) ? statistics : $name"
-				expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(statisticValue), feature.ref());
-
-				DerivedField derivedField = encoder.createDerivedField(createName(feature), expression);
-
-				result.add(new ContinuousFeature(encoder, derivedField));
-			} else
-
-			{
-				throw new IllegalArgumentException();
-			}
+			result.add(ImputerUtil.encodeFeature(feature, (Number)missingValues, statistic, missingValueTreatment, encoder));
 		}
 
 		return result;
@@ -125,22 +81,6 @@ public class Imputer extends Transformer implements HasNumberOfFeatures {
 
 	private int[] getStatisticsShape(){
 		return ClassDictUtil.getShape(this, "statistics", 1);
-	}
-
-	static
-	private Number getTargetValue(Object object){
-
-		if(object instanceof String){
-			return null;
-		} else
-
-		if(object instanceof Number){
-			return (Number)object;
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
 	}
 
 	static

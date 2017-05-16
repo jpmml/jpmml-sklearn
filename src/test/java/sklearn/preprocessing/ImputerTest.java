@@ -52,7 +52,7 @@ public class ImputerTest {
 
 		Imputer imputer = new Imputer("sklearn.preprocessing.imputation", "Imputer");
 		imputer.put("strategy", "most_frequent");
-		imputer.put("missing_values", "N/A");
+		imputer.put("missing_values", "NaN");
 		imputer.put("statistics_", 0);
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
