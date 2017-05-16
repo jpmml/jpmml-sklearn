@@ -41,6 +41,10 @@ import pandas
 def load_csv(name):
 	return pandas.read_csv("csv/" + name, na_values = ["N/A", "NA"])
 
+def split_csv(df):
+	columns = df.columns.tolist()
+	return (df[columns[: -1]], df[columns[-1]])
+
 def store_csv(df, name):
 	df.to_csv("csv/" + name, index = False)
 
@@ -66,12 +70,12 @@ def dump(obj):
 # Clustering
 #
 
-wheat_df = load_csv("Wheat.csv")
+def load_wheat(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	return split_csv(df)
 
-print(wheat_df.dtypes)
-
-wheat_X = wheat_df[["Area", "Perimeter", "Compactness", "Kernel.Length", "Kernel.Width", "Asymmetry", "Groove.Length"]]
-wheat_y = wheat_df["Variety"]
+wheat_X, wheat_y = load_wheat("Wheat.csv")
 
 def kmeans_distance(kmeans, center, X):
 	return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - X, 2), axis = 1)
@@ -104,17 +108,15 @@ build_wheat(MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state
 # Binary classification
 #
 
-audit_df = load_csv("Audit.csv")
+def load_audit(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	df["Deductions"] = df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
+	df["Adjusted"] = df["Adjusted"].astype(int)
+	print(df.dtypes)
+	return split_csv(df)
 
-print(audit_df.dtypes)
-
-audit_df["Deductions"] = audit_df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
-
-print(audit_df.dtypes)
-
-audit_X = audit_df[["Age", "Employment", "Education", "Marital", "Occupation", "Income", "Gender", "Deductions", "Hours"]]
-audit_y = audit_df["Adjusted"]
-audit_y = audit_y.astype(int)
+audit_X, audit_y = load_audit("Audit.csv")
 
 def build_audit(classifier, name, with_proba = True):
 	continuous_mapper = DataFrameMapper([
@@ -168,7 +170,7 @@ build_audit(XGBClassifier(objective = "binary:logistic"), "XGBAudit")
 
 audit_dict_X = audit_X.to_dict("records")
 
-def build_dict_audit(classifier, name, with_proba = True):
+def build_audit_dict(classifier, name, with_proba = True):
 	pipeline = PMMLPipeline([
 		("dict-transformer", DictVectorizer()),
 		("classifier", classifier)
@@ -181,18 +183,16 @@ def build_dict_audit(classifier, name, with_proba = True):
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name + ".csv")
 
-build_dict_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeDictAudit")
-build_dict_audit(LogisticRegression(), "LogisticRegressionDictAudit")
+build_audit_dict(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditDict")
+build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
 
-versicolor_df = load_csv("Versicolor.csv")
+def load_versicolor(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	df["Species"] = df["Species"].astype(int)
+	return split_csv(df)
 
-print(versicolor_df.dtypes)
-
-versicolor_columns = versicolor_df.columns.tolist()
-
-versicolor_X = versicolor_df[versicolor_columns[: -1]]
-versicolor_y = versicolor_df[versicolor_columns[-1]]
-versicolor_y = versicolor_y.astype(int)
+versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
 def build_versicolor(classifier, name, with_proba = True):
 	mapper = DataFrameMapper([
@@ -227,12 +227,12 @@ build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
 # Multi-class classification
 #
 
-iris_df = load_csv("Iris.csv")
+def load_iris(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	return split_csv(df)
 
-print(iris_df.dtypes)
-
-iris_X = iris_df[["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"]]
-iris_y = iris_df["Species"]
+iris_X, iris_y = load_iris("Iris.csv")
 
 def build_iris(classifier, name, with_proba = True):
 	pipeline = PMMLPipeline([
@@ -282,12 +282,12 @@ build_iris(XGBClassifier(objective = "multi:softmax"), "XGBIris")
 # Text classification
 #
 
-sentiment_df = load_csv("Sentiment.csv")
+def load_sentiment(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	return (df["Sentence"], df["Score"])
 
-print(sentiment_df.dtypes)
-
-sentiment_X = sentiment_df["Sentence"]
-sentiment_y = sentiment_df["Score"]
+sentiment_X, sentiment_y = load_sentiment("Sentiment.csv")
 
 def build_sentiment(classifier, name, with_proba = True):
 	pipeline = PMMLPipeline([
@@ -310,19 +310,17 @@ build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 5),
 # Regression
 #
 
-auto_df = load_csv("Auto.csv")
+def load_auto(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	df["displacement"] = df["displacement"].astype(float)
+	df["horsepower"] = df["horsepower"].astype(float)
+	df["weight"] = df["weight"].astype(float)
+	df["acceleration"] = df["acceleration"].astype(float)
+	print(df.dtypes)
+	return split_csv(df)
 
-print(auto_df.dtypes)
-
-auto_df["displacement"] = auto_df["displacement"].astype(float)
-auto_df["horsepower"] = auto_df["horsepower"].astype(float)
-auto_df["weight"] = auto_df["weight"].astype(float)
-auto_df["acceleration"] = auto_df["acceleration"].astype(float)
-
-print(auto_df.dtypes)
-
-auto_X = auto_df[["cylinders", "displacement", "horsepower", "weight", "acceleration", "model_year", "origin"]]
-auto_y = auto_df["mpg"]
+auto_X, auto_y = load_auto("Auto.csv")
 
 def build_auto(regressor, name):
 	mapper = DataFrameMapper([
@@ -355,19 +353,15 @@ build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "Rand
 build_auto(RidgeCV(), "RidgeAuto")
 build_auto(XGBRegressor(objective = "reg:linear"), "XGBAuto")
 
-housing_df = load_csv("Housing.csv")
+def load_housing(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	df["CHAS"] = df["CHAS"].astype(float)
+	df["RAD"] = df["RAD"].astype(float)
+	print(df.dtypes)
+	return split_csv(df)
 
-print(housing_df.dtypes)
-
-housing_df["CHAS"] = housing_df["CHAS"].astype(float)
-housing_df["RAD"] = housing_df["RAD"].astype(float)
-
-print(housing_df.dtypes)
-
-housing_columns = housing_df.columns.tolist()
-
-housing_X = housing_df[housing_columns[: -1]]
-housing_y = housing_df[housing_columns[-1]]
+housing_X, housing_y = load_housing("Housing.csv")
 
 def build_housing(regressor, name, with_kneighbors = False):
 	mapper = DataFrameMapper([

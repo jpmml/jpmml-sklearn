@@ -15,7 +15,7 @@
 	<name>JPMML-SkLearn</name>
 	<description>Java library and command-line application for converting Scikit-Learn models to PMML</description>
 	<url>https://github.com/jpmml/jpmml-sklearn</url>
-	
+
 	<licenses>
 		<license>
 			<name>GNU Affero General Public License (AGPL) version 3.0</name>
@@ -23,14 +23,14 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	
+
 	<developers>
 		<developer>
 			<id>villu.ruusmann</id>
 			<name>Villu Ruusmann</name>
 		</developer>
 	</developers>
-	
+
 	<scm>
 		<connection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</connection>
 		<developerConnection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</developerConnection>

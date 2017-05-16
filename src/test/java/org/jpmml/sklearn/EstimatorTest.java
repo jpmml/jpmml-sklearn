@@ -20,8 +20,13 @@ package org.jpmml.sklearn;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
+import org.jpmml.evaluator.ArchiveBatch;
 import org.jpmml.evaluator.Batch;
 import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
@@ -64,6 +69,32 @@ public class EstimatorTest extends IntegrationTest {
 				ensureValidity(pmml);
 
 				return pmml;
+			}
+
+			@Override
+			public List<Map<FieldName, String>> getInput(){
+				String dataset = super.getDataset();
+
+				if(dataset.endsWith("Dict")){
+					dataset = dataset.substring(0, dataset.length() - "Dict".length());
+				}
+
+				return loadRecords("/csv/" + dataset + ".csv");
+			}
+
+			private List<Map<FieldName, String>> loadRecords(String path){
+
+				try {
+					Method method = ArchiveBatch.class.getDeclaredMethod("loadRecords", String.class);
+
+					if(!method.isAccessible()){
+						method.setAccessible(true);
+					}
+
+					return (List)method.invoke(this, path);
+				} catch(ReflectiveOperationException roe){
+					throw new RuntimeException(roe);
+				}
 			}
 		};
 
