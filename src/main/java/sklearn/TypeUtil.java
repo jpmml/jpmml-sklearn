@@ -46,6 +46,11 @@ public class TypeUtil {
 
 		Set<Class<?>> clazzes = new HashSet<>(Lists.transform(objects, function));
 
+		// A String value can be parsed to any other value
+		if(clazzes.size() > 1){
+			clazzes.remove(String.class);
+		}
+
 		Class<?> clazz = Iterables.getOnlyElement(clazzes);
 
 		DataType dataType = TypeUtil.dataTypes.get(clazz);
