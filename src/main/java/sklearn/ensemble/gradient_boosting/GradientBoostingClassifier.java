@@ -76,7 +76,7 @@ public class GradientBoostingClassifier extends Classifier {
 			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, init.getPriorProbability(0), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
-			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 0d, 1d, RegressionModel.NormalizationMethod.NONE, true, schema);
+			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.NONE, true, schema);
 		} else
 
 		if(numberOfClasses >= 3){

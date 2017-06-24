@@ -21,9 +21,7 @@ package sklearn.linear_model;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
@@ -49,10 +47,7 @@ public class BaseLinearRegressor extends Regressor {
 		List<? extends Number> coef = getCoef();
 		List<? extends Number> intercept = getIntercept();
 
-		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), null)
-			.addRegressionTables(RegressionModelUtil.createRegressionTable(schema.getFeatures(), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), ValueUtil.asDoubles(coef)));
-
-		return regressionModel;
+		return RegressionModelUtil.createRegression(schema.getFeatures(), ValueUtil.asDoubles(coef), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), schema);
 	}
 
 	public List<? extends Number> getCoef(){

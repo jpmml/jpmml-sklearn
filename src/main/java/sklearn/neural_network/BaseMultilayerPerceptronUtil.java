@@ -23,34 +23,29 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Entity;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.NormDiscrete;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.neural_network.Connection;
-import org.dmg.pmml.neural_network.NeuralInput;
 import org.dmg.pmml.neural_network.NeuralInputs;
 import org.dmg.pmml.neural_network.NeuralLayer;
 import org.dmg.pmml.neural_network.NeuralNetwork;
-import org.dmg.pmml.neural_network.NeuralOutput;
 import org.dmg.pmml.neural_network.NeuralOutputs;
 import org.dmg.pmml.neural_network.Neuron;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.neural_network.NeuralNetworkUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 
-public class NeuralNetworkUtil {
+public class BaseMultilayerPerceptronUtil {
 
-	private NeuralNetworkUtil(){
+	private BaseMultilayerPerceptronUtil(){
 	}
 
 	static
@@ -71,23 +66,11 @@ public class NeuralNetworkUtil {
 
 		ClassDictUtil.checkSize(coefs, intercepts);
 
-		NeuralInputs neuralInputs = new NeuralInputs();
-
 		List<Feature> features = schema.getFeatures();
-		for(int column = 0; column < features.size(); column++){
-			Feature feature = features.get(column);
 
-			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+		Label label = schema.getLabel();
 
-			DerivedField derivedField = new DerivedField(OpType.CONTINUOUS, DataType.DOUBLE)
-				.setExpression(continuousFeature.ref());
-
-			NeuralInput neuralInput = new NeuralInput()
-				.setId("0/" + (column + 1))
-				.setDerivedField(derivedField);
-
-			neuralInputs.addNeuralInputs(neuralInput);
-		}
+		NeuralInputs neuralInputs = NeuralNetworkUtil.createNeuralInputs(features, DataType.DOUBLE);
 
 		List<? extends Entity> entities = neuralInputs.getNeuralInputs();
 
@@ -102,31 +85,20 @@ public class NeuralNetworkUtil {
 			int rows = shape[0];
 			int columns = shape[1];
 
-			List<Neuron> neurons = new ArrayList<>();
+			NeuralLayer neuralLayer = new NeuralLayer();
 
+			List<?> coefMatrix = coef.getArrayContent();
 			List<?> interceptVector = intercept.getArrayContent();
 
 			for(int column = 0; column < columns; column++){
-				Neuron neuron = new Neuron()
-					.setId((layer + 1) + "/" + (column + 1));
-
+				List<Double> weights = (List)CMatrixUtil.getColumn(coefMatrix, rows, columns, column);
 				Double bias = ValueUtil.asDouble((Number)interceptVector.get(column));
-				if(!ValueUtil.isZero(bias)){
-					neuron.setBias(bias);
-				}
 
-				neurons.add(neuron);
+				Neuron neuron = NeuralNetworkUtil.createNeuron(entities, weights, bias)
+					.setId(String.valueOf(layer + 1) + "/" + String.valueOf(column + 1));
+
+				neuralLayer.addNeurons(neuron);
 			}
-
-			List<?> coefMatrix = coef.getArrayContent();
-
-			for(int row = 0; row < rows; row++){
-				List<?> weights = CMatrixUtil.getRow(coefMatrix, rows, columns, row);
-
-				connect(entities.get(row), neurons, weights);
-			}
-
-			NeuralLayer neuralLayer = new NeuralLayer(neurons);
 
 			if(layer == (coefs.size() - 1)){
 				neuralLayer.setActivationFunction(NeuralNetwork.ActivationFunction.IDENTITY);
@@ -135,7 +107,7 @@ public class NeuralNetworkUtil {
 					case REGRESSION:
 						break;
 					case CLASSIFICATION:
-						CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+						CategoricalLabel categoricalLabel = (CategoricalLabel)label;
 
 						// Binary classification
 						if(categoricalLabel.size() == 2){
@@ -171,10 +143,10 @@ public class NeuralNetworkUtil {
 
 		switch(miningFunction){
 			case REGRESSION:
-				neuralOutputs = encodeRegressionNeuralOutputs(entities, schema);
+				neuralOutputs = NeuralNetworkUtil.createRegressionNeuralOutputs(entities, (ContinuousLabel)label);
 				break;
 			case CLASSIFICATION:
-				neuralOutputs = encodeClassificationNeuralOutputs(entities, schema);
+				neuralOutputs = NeuralNetworkUtil.createClassificationNeuralOutputs(entities, (CategoricalLabel)label);
 				break;
 			default:
 				break;
@@ -219,63 +191,6 @@ public class NeuralNetworkUtil {
 		neuralLayer.addNeurons(noEventNeuron, eventNeuron);
 
 		return neuralLayer;
-	}
-
-	static
-	private NeuralOutputs encodeRegressionNeuralOutputs(List<? extends Entity> entities, Schema schema){
-		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
-
-		ClassDictUtil.checkSize(1, entities);
-
-		Entity entity = Iterables.getOnlyElement(entities);
-
-		DerivedField derivedField = new DerivedField(OpType.CONTINUOUS, DataType.DOUBLE)
-			.setExpression(new FieldRef(continuousLabel.getName()));
-
-		NeuralOutput neuralOutput = new NeuralOutput()
-			.setOutputNeuron(entity.getId())
-			.setDerivedField(derivedField);
-
-		NeuralOutputs neuralOutputs = new NeuralOutputs()
-			.addNeuralOutputs(neuralOutput);
-
-		return neuralOutputs;
-	}
-
-	static
-	private NeuralOutputs encodeClassificationNeuralOutputs(List<? extends Entity> entities, Schema schema){
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-
-		ClassDictUtil.checkSize(categoricalLabel.size(), entities);
-
-		NeuralOutputs neuralOutputs = new NeuralOutputs();
-
-		for(int i = 0; i < categoricalLabel.size(); i++){
-			Entity entity = entities.get(i);
-
-			DerivedField derivedField = new DerivedField(OpType.CATEGORICAL, DataType.STRING)
-				.setExpression(new NormDiscrete(categoricalLabel.getName(), categoricalLabel.getValue(i)));
-
-			NeuralOutput neuralOutput = new NeuralOutput()
-				.setOutputNeuron(entity.getId())
-				.setDerivedField(derivedField);
-
-			neuralOutputs.addNeuralOutputs(neuralOutput);
-		}
-
-		return neuralOutputs;
-	}
-
-	static
-	private void connect(Entity input, List<Neuron> neurons, List<?> weights){
-		ClassDictUtil.checkSize(neurons, weights);
-
-		for(int i = 0; i < neurons.size(); i++){
-			Neuron neuron = neurons.get(i);
-			Double weight = ValueUtil.asDouble((Number)weights.get(i));
-
-			neuron.addConnections(new Connection(input.getId(), weight));
-		}
 	}
 
 	static

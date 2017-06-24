@@ -90,9 +90,7 @@ public class DummyClassifier extends Classifier {
 			.setScore(ValueUtil.formatValue(classes.get(index)));
 
 		for(int i = 0; i < classes.size(); i++){
-			ScoreDistribution scoreDistribution = new ScoreDistribution()
-				.setValue(ValueUtil.formatValue(classes.get(i)))
-				.setRecordCount(probabilities[i]);
+			ScoreDistribution scoreDistribution = new ScoreDistribution(ValueUtil.formatValue(classes.get(i)), probabilities[i]);
 
 			root.addScoreDistributions(scoreDistribution);
 		}

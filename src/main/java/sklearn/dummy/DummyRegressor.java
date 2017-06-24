@@ -22,10 +22,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -48,10 +46,7 @@ public class DummyRegressor extends Regressor {
 
 		Number intercept = Iterables.getOnlyElement(constant);
 
-		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), null)
-			.addRegressionTables(RegressionModelUtil.createRegressionTable(Collections.<Feature>emptyList(), intercept.doubleValue(), Collections.<Double>emptyList()));
-
-		return regressionModel;
+		return RegressionModelUtil.createRegression(Collections.<Feature>emptyList(), Collections.<Double>emptyList(), intercept.doubleValue(), schema);
 	}
 
 	public List<? extends Number> getConstant(){
