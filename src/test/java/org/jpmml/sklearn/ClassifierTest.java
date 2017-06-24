@@ -18,12 +18,8 @@
  */
 package org.jpmml.sklearn;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 import org.dmg.pmml.FieldName;
-import org.jpmml.evaluator.Batch;
+import org.jpmml.evaluator.PMMLEquivalence;
 import org.junit.Test;
 
 public class ClassifierTest extends EstimatorTest {
@@ -125,10 +121,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-
-		try(Batch batch = createBatch("XGB", "Audit")){
-			evaluate(batch, null, 1e-5, 1e-5);
-		}
+		evaluate("XGB", "Audit", new PMMLEquivalence(1e-5, 1e-5));
 	}
 
 	@Test
@@ -158,12 +151,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateKNNIris() throws Exception {
-
-		try(Batch batch = createBatch("KNN", "Iris")){
-			Set<FieldName> ignoredFields = createFieldList("neighbor", 5);
-
-			evaluate(batch, ignoredFields);
-		}
+		evaluate("KNN", "Iris", excludeFields(ClassifierTest.neighborFields));
 	}
 
 	@Test
@@ -233,20 +221,14 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateVotingEnsembleIris() throws Exception {
+		FieldName[] probabilityFields = {FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)")};
 
-		try(Batch batch = createBatch("VotingEnsemble", "Iris")){
-			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)"));
-
-			evaluate(batch, ignoredFields);
-		}
+		evaluate("VotingEnsemble", "Iris", excludeFields(probabilityFields));
 	}
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-
-		try(Batch batch = createBatch("XGB", "Iris")){
-			evaluate(batch, null, 1e-5, 1e-5);
-		}
+		evaluate("XGB", "Iris", new PMMLEquivalence(1e-5, 1e-5));
 	}
 
 	@Test
@@ -271,12 +253,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateKNNVersicolor() throws Exception {
-
-		try(Batch batch = createBatch("KNN", "Versicolor")){
-			Set<FieldName> ignoredFields = createFieldList("neighbor", 5);
-
-			evaluate(batch, ignoredFields);
-		}
+		evaluate("KNN", "Versicolor", excludeFields(ClassifierTest.neighborFields));
 	}
 
 	@Test
@@ -305,13 +282,15 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	static
-	private Set<FieldName> createFieldList(String prefix, int count){
-		Set<FieldName> result = new LinkedHashSet<>();
+	private FieldName[] createFields(String prefix, int count){
+		FieldName[] result = new FieldName[count];
 
 		for(int i = 0; i < count; i++){
-			result.add(FieldName.create(prefix + "(" + (i + 1) + ")"));
+			result[i] = FieldName.create(prefix + "(" + (i + 1) + ")");
 		}
 
 		return result;
 	}
+
+	private static final FieldName[] neighborFields = createFields("neighbor", 5);
 }

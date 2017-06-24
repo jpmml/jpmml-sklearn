@@ -68,7 +68,7 @@ public class BaseLinearClassifier extends Classifier {
 		if(numberOfClasses == 1){
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
-			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), RegressionModel.NormalizationMethod.SOFTMAX, hasProbabilityDistribution, schema);
+			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 3){

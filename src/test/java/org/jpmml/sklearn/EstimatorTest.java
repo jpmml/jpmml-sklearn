@@ -20,24 +20,28 @@ package org.jpmml.sklearn;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Predicate;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
-import org.jpmml.evaluator.ArchiveBatch;
 import org.jpmml.evaluator.Batch;
 import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
+import org.jpmml.evaluator.PMMLEquivalence;
 import sklearn2pmml.PMMLPipeline;
 
 abstract
 public class EstimatorTest extends IntegrationTest {
 
+	public EstimatorTest(){
+		super(new PMMLEquivalence(1e-12, 1e-12));
+	}
+
 	@Override
-	protected Batch createBatch(String name, String dataset){
-		Batch result = new IntegrationTestBatch(name, dataset){
+	protected Batch createBatch(String name, String dataset, Predicate<FieldName> predicate){
+		Batch result = new IntegrationTestBatch(name, dataset, predicate){
 
 			@Override
 			public IntegrationTest getIntegrationTest(){
@@ -72,7 +76,7 @@ public class EstimatorTest extends IntegrationTest {
 			}
 
 			@Override
-			public List<Map<FieldName, String>> getInput(){
+			public List<Map<FieldName, String>> getInput() throws IOException {
 				String dataset = super.getDataset();
 
 				if(dataset.endsWith("Dict")){
@@ -80,21 +84,6 @@ public class EstimatorTest extends IntegrationTest {
 				}
 
 				return loadRecords("/csv/" + dataset + ".csv");
-			}
-
-			private List<Map<FieldName, String>> loadRecords(String path){
-
-				try {
-					Method method = ArchiveBatch.class.getDeclaredMethod("loadRecords", String.class);
-
-					if(!method.isAccessible()){
-						method.setAccessible(true);
-					}
-
-					return (List)method.invoke(this, path);
-				} catch(ReflectiveOperationException roe){
-					throw new RuntimeException(roe);
-				}
 			}
 		};
 

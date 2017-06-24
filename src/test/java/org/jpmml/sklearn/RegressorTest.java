@@ -18,11 +18,8 @@
  */
 package org.jpmml.sklearn;
 
-import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 import org.dmg.pmml.FieldName;
-import org.jpmml.evaluator.Batch;
+import org.jpmml.evaluator.PMMLEquivalence;
 import org.junit.Test;
 
 public class RegressorTest extends EstimatorTest {
@@ -94,10 +91,7 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBAuto() throws Exception {
-
-		try(Batch batch = createBatch("XGB", "Auto")){
-			evaluate(batch, null, 1e-6, 1e-6);
-		}
+		evaluate("XGB", "Auto", new PMMLEquivalence(1e-6, 1e-6));
 	}
 
 	@Test
@@ -137,21 +131,13 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateIsolationForestHousingAnomaly() throws Exception {
-
-		try(Batch batch = createBatch("IsolationForest", "HousingAnomaly")){
-			Set<FieldName> ignoredFields = ImmutableSet.of(FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore"));
-
-			evaluate(batch, ignoredFields);
-		}
+		evaluate("IsolationForest", "HousingAnomaly", excludeFields(RegressorTest.anomalyScoreFields));
 	}
 
 	@Test
 	public void evaluateOneClassSVMHousingAnomaly() throws Exception {
-
-		try(Batch batch = createBatch("OneClassSVM", "HousingAnomaly")){
-			Set<FieldName> ignoredFields = ImmutableSet.of();
-
-			evaluate(batch, ignoredFields);
-		}
+		evaluate("OneClassSVM", "HousingAnomaly");
 	}
+
+	private static final FieldName[] anomalyScoreFields = {FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore")};
 }
