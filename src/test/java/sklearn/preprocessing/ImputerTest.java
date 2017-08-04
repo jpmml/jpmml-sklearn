@@ -54,6 +54,8 @@ public class ImputerTest {
 		imputer.put("strategy", "most_frequent");
 		imputer.put("missing_values", "NaN");
 		imputer.put("statistics_", 0);
+                
+                assertEquals(1, imputer.getNumberOfFeatures());
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
