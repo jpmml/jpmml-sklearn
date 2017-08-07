@@ -80,7 +80,7 @@ public class Imputer extends Transformer implements HasNumberOfFeatures {
 	}
 
 	private int[] getStatisticsShape(){
-		return ClassDictUtil.getShape(this, "statistics", 1);
+		return ClassDictUtil.getShape(this, "statistics_", 1);
 	}
 
 	static
