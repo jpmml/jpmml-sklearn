@@ -36,7 +36,7 @@ abstract
 public class EstimatorTest extends IntegrationTest {
 
 	public EstimatorTest(){
-		super(new PMMLEquivalence(1e-12, 1e-12));
+		super(new PMMLEquivalence(1e-13, 1e-13));
 	}
 
 	@Override

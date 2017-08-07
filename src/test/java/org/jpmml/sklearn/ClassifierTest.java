@@ -91,7 +91,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateNaiveBayesAudit() throws Exception {
-		evaluate("NaiveBayes", "Audit");
+		evaluate("NaiveBayes", "Audit", new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
@@ -228,7 +228,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", "Iris", new PMMLEquivalence(1e-5, 1e-5));
+		evaluate("XGB", "Iris", new PMMLEquivalence(1e-6, 1e-6));
 	}
 
 	@Test
