@@ -55,11 +55,14 @@ public class TreeModelUtil {
 
 	static
 	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final PredicateManager predicateManager, final MiningFunction miningFunction, final Schema schema){
+		final
+		Schema segmentSchema = schema.toAnonymousSchema();
+
 		Function<E, TreeModel> function = new Function<E, TreeModel>(){
 
 			@Override
 			public TreeModel apply(E estimator){
-				Schema treeModelSchema = toTreeModelSchema(schema.toAnonymousSchema(), estimator.getDataType());
+				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), segmentSchema);
 
 				return TreeModelUtil.encodeTreeModel(estimator, predicateManager, miningFunction, treeModelSchema);
 			}
@@ -91,7 +94,7 @@ public class TreeModelUtil {
 
 		encodeNode(root, predicateManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
+		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
 
 		return treeModel;
@@ -201,7 +204,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public Schema toTreeModelSchema(Schema schema, final DataType dataType){
+	public Schema toTreeModelSchema(final DataType dataType, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override

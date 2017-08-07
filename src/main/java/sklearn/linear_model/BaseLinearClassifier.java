@@ -21,6 +21,7 @@ package sklearn.linear_model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
@@ -83,9 +84,9 @@ public class BaseLinearClassifier extends Classifier {
 				regressionTables.add(regressionTable);
 			}
 
-			RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), regressionTables)
+			RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
 				.setNormalizationMethod(RegressionModel.NormalizationMethod.LOGIT)
-				.setOutput(hasProbabilityDistribution ? ModelUtil.createProbabilityOutput(categoricalLabel) : null);
+				.setOutput(hasProbabilityDistribution ? ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel) : null);
 
 			return regressionModel;
 		} else

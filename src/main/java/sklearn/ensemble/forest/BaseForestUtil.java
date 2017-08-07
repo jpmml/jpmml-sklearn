@@ -40,7 +40,7 @@ public class BaseForestUtil {
 	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
 		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimators, miningFunction, schema);
 
-		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema))
+		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, treeModels));
 
 		return miningModel;

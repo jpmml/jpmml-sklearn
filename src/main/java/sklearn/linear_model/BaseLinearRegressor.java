@@ -47,7 +47,7 @@ public class BaseLinearRegressor extends Regressor {
 		List<? extends Number> coef = getCoef();
 		List<? extends Number> intercept = getIntercept();
 
-		return RegressionModelUtil.createRegression(schema.getFeatures(), ValueUtil.asDoubles(coef), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), schema);
+		return RegressionModelUtil.createRegression(schema.getFeatures(), ValueUtil.asDoubles(coef), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), null, schema);
 	}
 
 	public List<? extends Number> getCoef(){

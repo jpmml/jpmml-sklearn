@@ -144,7 +144,7 @@ public class KNeighborsUtil {
 
 		Output output = new Output(outputFields);
 
-		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunction.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema), trainingInstances, comparisonMeasure, knnInputs)
+		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunction.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs)
 			.setOutput(output);
 
 		return nearestNeighborModel;

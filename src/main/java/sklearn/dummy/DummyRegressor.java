@@ -46,7 +46,7 @@ public class DummyRegressor extends Regressor {
 
 		Number intercept = Iterables.getOnlyElement(constant);
 
-		return RegressionModelUtil.createRegression(Collections.<Feature>emptyList(), Collections.<Double>emptyList(), intercept.doubleValue(), schema);
+		return RegressionModelUtil.createRegression(Collections.<Feature>emptyList(), Collections.<Double>emptyList(), intercept.doubleValue(), null, schema);
 	}
 
 	public List<? extends Number> getConstant(){

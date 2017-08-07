@@ -24,6 +24,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
@@ -46,7 +47,7 @@ public class BaseForestClassifier extends Classifier {
 		List<TreeClassifier> estimators = getEstimators();
 
 		MiningModel miningModel = BaseForestUtil.encodeBaseForest(estimators, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.CLASSIFICATION, schema)
-			.setOutput(ModelUtil.createProbabilityOutput(schema));
+			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
 
 		return miningModel;
 	}

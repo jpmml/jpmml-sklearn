@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-converter</artifactId>
-			<version>1.2.4</version>
+			<version>1.2.5</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.sun.xml.fastinfoset</groupId>
@@ -76,13 +76,13 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-lightgbm</artifactId>
-			<version>1.0.8</version>
+			<version>1.0.9</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-xgboost</artifactId>
-			<version>1.2.0</version>
+			<version>1.2.1</version>
 		</dependency>
 
 		<dependency>

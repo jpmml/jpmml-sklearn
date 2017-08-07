@@ -152,7 +152,7 @@ public class BaseMultilayerPerceptronUtil {
 				break;
 		}
 
-		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, ModelUtil.createMiningSchema(schema), neuralInputs, neuralLayers)
+		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, ModelUtil.createMiningSchema(schema.getLabel()), neuralInputs, neuralLayers)
 			.setNeuralOutputs(neuralOutputs);
 
 		return neuralNetwork;

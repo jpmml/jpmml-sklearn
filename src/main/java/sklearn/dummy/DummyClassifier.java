@@ -22,11 +22,13 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.primitives.Doubles;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.True;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
@@ -52,6 +54,8 @@ public class DummyClassifier extends Classifier {
 		String strategy = getStrategy();
 
 		ClassDictUtil.checkSize(classes, classPrior);
+
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		int index;
 
@@ -95,8 +99,8 @@ public class DummyClassifier extends Classifier {
 			root.addScoreDistributions(scoreDistribution);
 		}
 
-		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), root)
-			.setOutput(ModelUtil.createProbabilityOutput(schema));
+		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root)
+			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
 
 		return treeModel;
 	}

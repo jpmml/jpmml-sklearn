@@ -21,10 +21,12 @@ package sklearn.ensemble.voting_classifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -53,6 +55,8 @@ public class VotingClassifier extends Classifier {
 		List<? extends Classifier> estimators = getEstimators();
 		List<? extends Number> weights = getWeights();
 
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
 		List<Model> models = new ArrayList<>();
 
 		for(Classifier estimator : estimators){
@@ -65,9 +69,9 @@ public class VotingClassifier extends Classifier {
 
 		Segmentation.MultipleModelMethod multipleModelMethod = parseVoting(voting, (weights != null && weights.size() > 0));
 
-		MiningModel miningModel = new MiningModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema))
+		MiningModel miningModel = new MiningModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models, weights))
-			.setOutput(ModelUtil.createProbabilityOutput(schema));
+			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
 
 		return miningModel;
 	}

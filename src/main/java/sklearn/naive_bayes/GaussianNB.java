@@ -20,6 +20,7 @@ package sklearn.naive_bayes;
 
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.GaussianDistribution;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.naive_bayes.BayesInput;
@@ -86,8 +87,8 @@ public class GaussianNB extends Classifier {
 		BayesOutput bayesOutput = new BayesOutput(categoricalLabel.getName(), null)
 			.setTargetValueCounts(encodeTargetValueCounts(categoricalLabel.getValues(), classCount));
 
-		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), bayesInputs, bayesOutput)
-			.setOutput(ModelUtil.createProbabilityOutput(schema));
+		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), bayesInputs, bayesOutput)
+			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
 
 		return naiveBayesModel;
 	}

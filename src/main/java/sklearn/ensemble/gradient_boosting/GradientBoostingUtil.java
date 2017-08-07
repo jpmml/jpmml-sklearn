@@ -24,6 +24,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -37,11 +38,13 @@ public class GradientBoostingUtil {
 
 	static
 	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
+		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
+
 		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunction.REGRESSION, schema);
 
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
+		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
-			.setTargets(ModelUtil.createRescaleTargets(schema, learningRate, initialPrediction));
+			.setTargets(ModelUtil.createRescaleTargets(learningRate, initialPrediction, continuousLabel));
 
 		return miningModel;
 	}
