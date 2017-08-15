@@ -18,20 +18,57 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
+import org.dmg.pmml.ModelStats;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMML;
+import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.WildcardFeature;
 import sklearn.Transformer;
 
 public class SkLearnEncoder extends ModelEncoder {
+
+	private Map<FieldName, UnivariateStats> univariateStats = new LinkedHashMap<>();
+
+
+	@Override
+	public PMML encodePMML(Model model){
+		PMML pmml = super.encodePMML(model);
+
+		DataDictionary dataDictionary = pmml.getDataDictionary();
+
+		List<DataField> dataFields = dataDictionary.getDataFields();
+		for(DataField dataField : dataFields){
+			UnivariateStats univariateStats = getUnivariateStats(dataField.getName());
+
+			if(univariateStats == null){
+				continue;
+			}
+
+			ModelStats modelStats = model.getModelStats();
+			if(modelStats == null){
+				modelStats = new ModelStats();
+
+				model.setModelStats(modelStats);
+			}
+
+			modelStats.addUnivariateStats(univariateStats);
+		}
+
+		return pmml;
+	}
 
 	public void updateFeatures(List<Feature> features, Transformer transformer){
 		OpType opType;
@@ -71,5 +108,17 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public DerivedField createDerivedField(FieldName name, Expression expression){
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
+	}
+
+	public UnivariateStats getUnivariateStats(FieldName name){
+		return this.univariateStats.get(name);
+	}
+
+	public void putUnivariateStats(UnivariateStats univariateStats){
+		putUnivariateStats(univariateStats.getField(), univariateStats);
+	}
+
+	public void putUnivariateStats(FieldName name, UnivariateStats univariateStats){
+		this.univariateStats.put(name, univariateStats);
 	}
 }

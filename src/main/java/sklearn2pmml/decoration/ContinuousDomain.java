@@ -20,9 +20,12 @@ package sklearn2pmml.decoration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.Interval;
+import org.dmg.pmml.NumericInfo;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValidValueDecorator;
@@ -46,6 +49,7 @@ public class ContinuousDomain extends Domain {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> dataMin = getDataMin();
 		List<? extends Number> dataMax = getDataMax();
+		Boolean withStatistics = getWithStatistics();
 
 		ClassDictUtil.checkSize(features, dataMin, dataMax);
 
@@ -65,6 +69,18 @@ public class ContinuousDomain extends Domain {
 
 			encoder.addDecorator(continuousFeature.getName(), validValueDecorator);
 
+			if(withStatistics){
+				Map<String, ?> counts = extractMap(getCounts(), i);
+				Map<String, ?> numericInfo = extractMap(getNumericInfo(), i);
+
+				UnivariateStats univariateStats = new UnivariateStats()
+					.setField(continuousFeature.getName())
+					.setCounts(createCounts(counts))
+					.setNumericInfo(createNumericInfo(numericInfo));
+
+				encoder.putUnivariateStats(univariateStats);
+			}
+
 			result.add(continuousFeature);
 		}
 
@@ -77,5 +93,22 @@ public class ContinuousDomain extends Domain {
 
 	public List<? extends Number> getDataMax(){
 		return (List)ClassDictUtil.getArray(this, "data_max_");
+	}
+
+	public Map<String, ?> getNumericInfo(){
+		return (Map)get("numeric_info_");
+	}
+
+	static
+	public NumericInfo createNumericInfo(Map<String, ?> values){
+		NumericInfo numericInfo = new NumericInfo()
+			.setMinimum(selectValue(values, "minimum"))
+			.setMaximum(selectValue(values, "maximum"))
+			.setMean(selectValue(values, "mean"))
+			.setStandardDeviation(selectValue(values, "standardDeviation"))
+			.setMedian(selectValue(values, "median"))
+			.setInterQuartileRange(selectValue(values, "interQuartileRange"));
+
+		return numericInfo;
 	}
 }

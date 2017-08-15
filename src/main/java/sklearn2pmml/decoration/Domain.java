@@ -18,8 +18,13 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.dmg.pmml.Counts;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MissingValueTreatmentMethod;
@@ -27,6 +32,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -83,5 +90,76 @@ public class Domain extends Transformer {
 
 	public String getInvalidValueTreatment(){
 		return (String)get("invalid_value_treatment");
+	}
+
+	public Boolean getWithStatistics(){
+		Boolean withStatistics = (Boolean)get("with_statistics");
+
+		if(withStatistics == null){
+			return Boolean.FALSE;
+		}
+
+		return withStatistics;
+	}
+
+	public Map<String, ?> getCounts(){
+		return (Map)get("counts_");
+	}
+
+	static
+	public Counts createCounts(Map<String, ?> values){
+		Counts counts = new Counts()
+			.setTotalFreq(selectValue(values, "totalFreq", 0d))
+			.setMissingFreq(selectValue(values, "missingFreq"))
+			.setInvalidFreq(selectValue(values, "invalidFreq"));
+
+		return counts;
+	}
+
+	static
+	protected Map<String, ?> extractMap(Map<String, ?> map, int index){
+		Map<String, Object> result = new LinkedHashMap<>();
+
+		Collection<? extends Map.Entry<String, ?>> entries = map.entrySet();
+		for(Map.Entry<String, ?> entry : entries){
+			String key = entry.getKey();
+			List<?> value = asArray(entry.getValue());
+
+			result.put(key, value.get(index));
+		}
+
+		return result;
+	}
+
+	static
+	protected Double selectValue(Map<String, ?> values, String key){
+		return selectValue(values, key, null);
+	}
+
+	static
+	protected Double selectValue(Map<String, ?> values, String key, Double defaultValue){
+		Number value = (Number)values.get(key);
+
+		if(value == null){
+			return defaultValue;
+		}
+
+		return ValueUtil.asDouble(value);
+	}
+
+	static
+	protected List<?> asArray(Object object){
+
+		if(object instanceof HasArray){
+			HasArray hasArray = (HasArray)object;
+
+			return hasArray.getArrayContent();
+		} // End if
+
+		if(object instanceof Number){
+			return Collections.singletonList(object);
+		}
+
+		throw new IllegalArgumentException(ClassDictUtil.formatClass(object) + " is not a supported array type");
 	}
 }
