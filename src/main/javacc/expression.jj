@@ -1,0 +1,312 @@
+/*
+ * Copyright (c) 2017 Villu Ruusmann
+ *
+ * This file is part of JPMML-SkLearn
+ *
+ * JPMML-SkLearn is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * JPMML-SkLearn is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
+ */
+options {
+	JAVA_TEMPLATE_TYPE = "modern";
+	JDK_VERSION = "1.5";
+	STATIC = false;
+}
+
+PARSER_BEGIN(ExpressionTranslator)
+package org.jpmml.sklearn;
+
+import java.util.List;
+
+import org.dmg.pmml.Apply;
+import org.dmg.pmml.Constant;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldRef;
+import org.jpmml.converter.Feature;
+
+public class ExpressionTranslator {
+
+	private List<Feature> features = null;
+
+
+	public List<Feature> getFeatures(){
+		return this.features;
+	}
+
+	private void setFeatures(List<Feature> features){
+		this.features = features;
+	}
+
+	static
+	public Expression translate(String string, List<Feature> features){
+		Expression expression;
+		
+		try {
+			ExpressionTranslator expressionTranslator = new ExpressionTranslator(string);
+			expressionTranslator.setFeatures(features);
+
+			expression = expressionTranslator.translateExpressionInternal();
+		} catch(ParseException pe){
+			throw new IllegalArgumentException(string, pe);
+		}
+
+		return expression;
+	}
+
+	static
+	private Apply createApply(String function, Expression... expressions){
+		Apply apply = new Apply(function);
+		
+		for(Expression expression : expressions){
+			apply.addExpressions(expression);
+		}
+		
+		return apply;
+	}
+
+	static
+	private String translateValue(Token value){
+		String image = value.image;
+
+		switch(value.kind){
+			case INT:
+				if(image.endsWith("l") || image.endsWith("L")){
+					image = image.substring(0, image.length() - 1);
+				}
+				break;
+			default:
+				break;
+		}
+
+		return image;
+	}
+}
+PARSER_END(ExpressionTranslator)
+
+SPECIAL_TOKEN:
+{
+	" "
+	|
+	"\t"
+}
+
+TOKEN:
+{
+	< MULTIPLY: "*" >
+	|
+	< DIVIDE: "/" >
+	|
+	< LPAREN: "(" >
+	|
+	< RPAREN: ")" >
+	|
+	< LBRACKET: "[" >
+	|
+	< RBRACKET: "]" >
+	|
+	< PLUS: "+" >
+	|
+	< MINUS: "-" >
+}
+
+TOKEN:
+{
+	< COMMA: "," >
+	|
+	< COLON: ":" >
+}
+
+TOKEN:
+{
+	< INT:
+		"0"
+		|
+		<NONZERO_DIGIT> (<DIGIT>)* ( ["l", "L"] )?
+	>
+	|
+	< FLOAT:
+		(<DIGIT>)+ "." (<DIGIT>)* (<EXPONENT>)?
+		|
+		"." (<DIGIT>)+ (<EXPONENT>)?
+		|
+		(<DIGIT>)+ <EXPONENT>
+	>
+	|
+	< NAME: <LETTER> (<LETTER> | <DIGIT>)* >
+	|
+	< #DIGIT: ["0" - "9"] >
+	|
+	< #NONZERO_DIGIT: ["1" - "9"] >
+	|
+	< #LETTER: ["a" - "z", "A" - "Z", "_"]>
+	|
+	< #EXPONENT: ["e", "E"] (["+", "-"])? (<DIGIT>)+ >
+}
+
+private Expression translateExpressionInternal():
+{
+	Expression expression;
+}
+{
+	expression = Expression() <EOF>
+	
+	{
+		return expression;
+	}
+}
+
+Expression Expression():
+{
+	Expression expression;
+}
+{
+	expression = AdditiveExpression()
+
+	{
+		return expression;
+	}
+}
+
+Expression AdditiveExpression():
+{
+	Expression left;
+	Token operator;
+	Expression right;
+}
+{
+	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = createApply(operator.image, left, right); } )*
+
+	{
+		return left;
+	}
+}
+
+Expression MultiplicativeExpression():
+{
+	Expression left;
+	Token operator;
+	Expression right;
+}
+{
+	left = UnaryExpression() ((operator = <MULTIPLY> | operator = <DIVIDE>) right = UnaryExpression() { left = createApply(operator.image, left, right); } )*
+
+	{
+		return left;
+	}
+}
+
+Expression UnaryExpression():
+{
+	Token sign = null;
+	Expression expression;
+}
+{
+	(sign = <PLUS> | sign = <MINUS>)? expression = PrimaryExpression()
+
+	{
+		if(sign != null && sign.kind == MINUS){
+			
+			if(expression instanceof Constant){
+				Constant constant = (Constant)expression;
+
+				constant.setValue("-" + constant.getValue());
+			} else
+
+			{
+				Constant constant = new Constant()
+					.setValue("-1");
+
+				expression = createApply("*", constant, expression);
+			}
+		}
+
+		return expression;
+	}
+}
+
+Expression PrimaryExpression():
+{
+	Expression expression;
+}
+{
+	(
+		expression = ParenthesizedExpression()
+		|
+		expression = FeatureInvocationExpression()
+		|
+		expression = LiteralExpression()
+	)
+
+	{
+		return expression;
+	}
+}
+
+Expression ParenthesizedExpression():
+{
+	Expression expression;
+}
+{
+	<LPAREN> expression = Expression() <RPAREN>
+
+	{
+		return expression;
+	}
+}
+
+FieldRef FeatureInvocationExpression():
+{
+	Token variable;
+	Token column;
+}
+{
+	variable = <NAME> <LBRACKET> <COLON> <COMMA> column = <INT> <RBRACKET>
+
+	{
+		List<Feature> features = getFeatures();
+
+		if(!("X").equals(variable.image)){
+			throw new IllegalArgumentException(variable.image);
+		}
+
+		int index = Integer.parseInt(column.image);
+		if(index < 0 || index >= features.size()){
+			throw new IllegalArgumentException(token.image);
+		}
+
+		Feature feature = features.get(index);
+
+		return feature.ref();
+	}
+}
+
+Constant LiteralExpression():
+{
+	Token value;
+	DataType dataType;
+}
+{
+	(
+		value = <INT> { dataType = DataType.INTEGER; }
+		|
+		value = <FLOAT> { dataType = DataType.DOUBLE; }
+	)
+
+	{
+		Constant constant = new Constant()
+			.setValue(translateValue(value))
+			.setDataType(dataType);
+
+		return constant;
+	}
+}

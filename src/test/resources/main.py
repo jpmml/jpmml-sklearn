@@ -31,6 +31,7 @@ from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.feature_extraction.text import Splitter
+from sklearn2pmml.preprocessing import ExpressionTransformer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -348,7 +349,8 @@ def build_auto(regressor, name):
 		(["cylinders"], CategoricalDomain()),
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), Imputer(missing_values = "NaN"), StandardScaler()]),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
-		(["origin"], OneHotEncoder())
+		(["origin"], OneHotEncoder()),
+		(["weight", "displacement"], ExpressionTransformer("(X[:, 0] / X[:, 1]) + 0.5"))
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -369,7 +371,7 @@ build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientB
 build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(LGBMRegressor(seed = 13, n_estimators = 17), "LGBMAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
-build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.5), "LinearRegressionEnsembleAuto")
+build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
 build_auto(RidgeCV(), "RidgeAuto")
 build_auto(XGBRegressor(objective = "reg:linear"), "XGBAuto")
