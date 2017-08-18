@@ -201,7 +201,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
 		}
 
-		DefineFunction defineFunction = new DefineFunction("tf", OpType.CONTINUOUS, null)
+		DefineFunction defineFunction = new DefineFunction("tf-" + String.valueOf(System.currentTimeMillis()), OpType.CONTINUOUS, null)
 			.setDataType(DataType.DOUBLE)
 			.addParameterFields(documentField, termField)
 			.setExpression(textIndex);
