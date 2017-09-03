@@ -46,7 +46,14 @@ public class GradientBoostingClassifier extends Classifier {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return ValueUtil.asInt((Number)get("n_features"));
+
+		// SkLearn 0.18
+		if(containsKey("n_features")){
+			return ValueUtil.asInt((Number)get("n_features"));
+		}
+
+		// SkLearn 0.19+
+		return super.getNumberOfFeatures();
 	}
 
 	@Override

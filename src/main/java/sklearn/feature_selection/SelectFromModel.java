@@ -71,6 +71,11 @@ public class SelectFromModel extends Selector {
 	public Number getThreshold(){
 		Scalar threshold = (Scalar)get("threshold_");
 
+		// SkLearn 0.19+
+		if(threshold == null){
+			throw new IllegalArgumentException("The selector object does not have a persistent \'threshold_\' attribute");
+		}
+
 		return (Number)threshold.getOnlyElement();
 	}
 }

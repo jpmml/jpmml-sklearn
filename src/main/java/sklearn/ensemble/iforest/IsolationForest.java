@@ -46,6 +46,7 @@ import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.tree.ExtraTreeRegressor;
@@ -65,7 +66,12 @@ public class IsolationForest extends EnsembleRegressor {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
+		String sklearnVersion = getSkLearnVersion();
 		List<? extends Regressor> estimators = getEstimators();
+
+		// See https://github.com/scikit-learn/scikit-learn/issues/8549
+		final
+		boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.19") >= 0);
 
 		PredicateManager predicateManager = new PredicateManager();
 
@@ -104,7 +110,9 @@ public class IsolationForest extends EnsembleRegressor {
 
 						double nodeSample = this.nodeSamples[Integer.parseInt(node.getId()) - 1];
 
-						node.setScore(ValueUtil.formatValue(nodeDepth + averagePathLength(nodeSample)));
+						double averagePathLength = (corrected ? correctedAveragePathLength(nodeSample) : averagePathLength(nodeSample));
+
+						node.setScore(ValueUtil.formatValue(nodeDepth + averagePathLength));
 					}
 
 					return super.visit(node);
@@ -125,7 +133,11 @@ public class IsolationForest extends EnsembleRegressor {
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return PMMLUtil.createApply("/", fieldRef, PMMLUtil.createConstant(averagePathLength(getMaxSamples())));
+				double maxSamples = getMaxSamples();
+
+				double averagePathLength = (corrected ? correctedAveragePathLength(maxSamples) : averagePathLength(maxSamples));
+
+				return PMMLUtil.createApply("/", fieldRef, PMMLUtil.createConstant(averagePathLength));
 			}
 		};
 
@@ -158,6 +170,10 @@ public class IsolationForest extends EnsembleRegressor {
 		return miningModel;
 	}
 
+	public String getSkLearnVersion(){
+		return (String)get("_sklearn_version");
+	}
+
 	public int getMaxSamples(){
 		return ValueUtil.asInt((Number)get("max_samples_"));
 	}
@@ -176,5 +192,15 @@ public class IsolationForest extends EnsembleRegressor {
 		}
 
 		return 2d * (Math.log(n) + 0.5772156649) - 2d * ((n - 1d) / n);
+	}
+
+	static
+	private double correctedAveragePathLength(double n){
+
+		if(n <= 1d){
+			return 1d;
+		}
+
+		return 2d * (Math.log(n - 1d) + 0.577215664901532860606512090082402431d) - 2d * ((n - 1d) / n);
 	}
 }

@@ -43,7 +43,17 @@ public class SGDClassifier extends BaseLinearClassifier {
 	}
 
 	public LossFunction getLossFunction(){
-		Object lossFunction = get("loss_function");
+		Object lossFunction;
+
+		// SkLearn 0.18
+		if(containsKey("loss_function")){
+			lossFunction = get("loss_function");
+		} else
+
+		// SkLearn 0.19+
+		{
+			lossFunction = get("loss_function_");
+		}
 
 		try {
 			if(lossFunction == null){

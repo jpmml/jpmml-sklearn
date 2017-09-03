@@ -122,13 +122,14 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getStd(){
-		try {
-			// SkLearn 0.16
+
+		// SkLearn 0.16
+		if(containsKey("std_")){
 			return (List)ClassDictUtil.getArray(this, "std_");
-		} catch(IllegalArgumentException iae){
-			// SkLearn 0.17+
-			return (List)ClassDictUtil.getArray(this, "scale_");
 		}
+
+		// SkLearn 0.17+
+		return (List)ClassDictUtil.getArray(this, "scale_");
 	}
 
 	private int[] getMeanShape(){
@@ -136,12 +137,13 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	private int[] getStdShape(){
-		try {
-			// SkLearn 0.16
+
+		// SkLearn 0.16
+		if(containsKey("std_")){
 			return ClassDictUtil.getShape(this, "std_", 1);
-		} catch(IllegalArgumentException iae){
-			// SkLearn 0.17+
-			return ClassDictUtil.getShape(this, "scale_", 1);
 		}
+
+		// SkLearn 0.17+
+		return ClassDictUtil.getShape(this, "scale_", 1);
 	}
 }
