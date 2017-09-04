@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -201,7 +202,9 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
 		}
 
-		DefineFunction defineFunction = new DefineFunction("tf", OpType.CONTINUOUS, null)
+		String name = functionName() + "@" + String.valueOf(CountVectorizer.SEQUENCE.getAndIncrement());
+
+		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, null)
 			.setDataType(DataType.DOUBLE)
 			.addParameterFields(documentField, termField)
 			.setExpression(textIndex);
@@ -214,6 +217,10 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			.setDataType(DataType.STRING);
 
 		return PMMLUtil.createApply(function, feature.ref(), constant);
+	}
+
+	public String functionName(){
+		return "tf";
 	}
 
 	public String getAnalyzer(){
@@ -288,4 +295,6 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	private static final Joiner JOINER = Joiner.on("|");
+
+	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);
 }

@@ -91,8 +91,6 @@ public class TfidfVectorizer extends CountVectorizer {
 
 		Boolean useIdf = transformer.getUseIdf();
 		if(useIdf){
-			defineFunction.setName("tf-idf");
-
 			ParameterField weight = new ParameterField(FieldName.create("weight"));
 
 			defineFunction.addParameterFields(weight);
@@ -119,6 +117,18 @@ public class TfidfVectorizer extends CountVectorizer {
 		}
 
 		return apply;
+	}
+
+	@Override
+	public String functionName(){
+		TfidfTransformer transformer = getTransformer();
+
+		Boolean useIdf = transformer.getUseIdf();
+		if(useIdf){
+			return "tf-idf";
+		}
+
+		return super.functionName();
 	}
 
 	public TfidfTransformer getTransformer(){
