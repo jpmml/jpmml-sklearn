@@ -108,7 +108,7 @@ public class TreeModelUtil {
 		if(featureIndex >= 0){
 			Feature feature = schema.getFeature(featureIndex);
 
-			float threshold = (float)thresholds[index];
+			double threshold = thresholds[index];
 
 			Predicate leftPredicate;
 			Predicate rightPredicate;
@@ -127,7 +127,9 @@ public class TreeModelUtil {
 			} else
 
 			{
-				ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.FLOAT);
+				ContinuousFeature continuousFeature = feature
+					.toContinuousFeature(DataType.FLOAT) // First, cast from any numeric type (including numpy.float64) to numpy.float32
+					.toContinuousFeature(DataType.DOUBLE); // Second, cast from numpy.float32 to numpy.float64
 
 				String value = ValueUtil.formatValue(threshold);
 
