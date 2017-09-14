@@ -24,13 +24,13 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.Array;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -106,19 +106,8 @@ public class CategoricalDomain extends Domain {
 
 		ClassDictUtil.checkSize(values, counts);
 
-		Function<Object, String> function = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object value){
-				return ValueUtil.formatValue(value);
-			}
-		};
-
-		Array valueArray = new Array(Array.Type.STRING, ValueUtil.formatArrayValue(Lists.transform(values, function)));
-		Array countArray = new Array(Array.Type.INT, ValueUtil.formatArrayValue(Lists.transform(counts, function)));
-
 		DiscrStats discrStats = new DiscrStats()
-			.addArrays(valueArray, countArray);
+			.addArrays(PMMLUtil.createStringArray(values), PMMLUtil.createIntArray(counts));
 
 		return discrStats;
 	}
