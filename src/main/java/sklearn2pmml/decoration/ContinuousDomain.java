@@ -26,7 +26,6 @@ import org.dmg.pmml.Interval;
 import org.dmg.pmml.NumericInfo;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.UnivariateStats;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
@@ -47,41 +46,52 @@ public class ContinuousDomain extends Domain {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Number> dataMin = getDataMin();
-		List<? extends Number> dataMax = getDataMax();
+		Boolean withData = getWithData();
 		Boolean withStatistics = getWithStatistics();
 
-		ClassDictUtil.checkSize(features, dataMin, dataMax);
+		List<? extends Number> dataMin = null;
+		List<? extends Number> dataMax = null;
+
+		if(withData){
+			dataMin = getDataMin();
+			dataMax = getDataMax();
+
+			ClassDictUtil.checkSize(features, dataMin, dataMax);
+		}
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			WildcardFeature wildcardFeature = (WildcardFeature)features.get(i);
+			Feature feature = features.get(i);
 
-			ContinuousFeature continuousFeature = wildcardFeature.toContinuousFeature();
+			WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-			Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED)
-				.setLeftMargin(ValueUtil.asDouble(dataMin.get(i)))
-				.setRightMargin(ValueUtil.asDouble(dataMax.get(i)));
+			if(withData){
+				Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED)
+					.setLeftMargin(ValueUtil.asDouble(dataMin.get(i)))
+					.setRightMargin(ValueUtil.asDouble(dataMax.get(i)));
 
-			ValidValueDecorator validValueDecorator = new ValidValueDecorator()
-				.addIntervals(interval);
+				ValidValueDecorator validValueDecorator = new ValidValueDecorator()
+					.addIntervals(interval);
 
-			encoder.addDecorator(continuousFeature.getName(), validValueDecorator);
+				feature = wildcardFeature.toContinuousFeature();
+
+				encoder.addDecorator(wildcardFeature.getName(), validValueDecorator);
+			} // End if
 
 			if(withStatistics){
 				Map<String, ?> counts = extractMap(getCounts(), i);
 				Map<String, ?> numericInfo = extractMap(getNumericInfo(), i);
 
 				UnivariateStats univariateStats = new UnivariateStats()
-					.setField(continuousFeature.getName())
+					.setField(wildcardFeature.getName())
 					.setCounts(createCounts(counts))
 					.setNumericInfo(createNumericInfo(numericInfo));
 
 				encoder.putUnivariateStats(univariateStats);
 			}
 
-			result.add(continuousFeature);
+			result.add(feature);
 		}
 
 		return super.encodeFeatures(result, encoder);

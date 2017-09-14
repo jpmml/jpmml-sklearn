@@ -190,8 +190,8 @@ audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
 def build_audit_na(classifier, name, with_proba = True):
 	mapper = DataFrameMapper(
-		[([column], [ContinuousDomain(), Imputer()]) for column in ["Age", "Income", "Hours"]] +
-		[([column], [CategoricalDomain(), CategoricalImputer(), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+		[([column], [ContinuousDomain(with_data = False), Imputer()]) for column in ["Age", "Income", "Hours"]] +
+		[([column], [CategoricalDomain(with_data = False), CategoricalImputer(), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),

@@ -28,7 +28,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.UnivariateStats;
-import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
@@ -50,45 +49,57 @@ public class CategoricalDomain extends Domain {
 
 	@Override
 	public DataType getDataType(){
-		List<?> data = getData();
+		Boolean withData = getWithData();
 
-		return TypeUtil.getDataType(data, DataType.STRING);
+		if(withData){
+			List<?> data = getData();
+
+			return TypeUtil.getDataType(data, DataType.STRING);
+		}
+
+		return DataType.STRING;
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<?> data = getData();
+		Boolean withData = getWithData();
 		Boolean withStatistics = getWithStatistics();
 
 		ClassDictUtil.checkSize(1, features);
 
-		WildcardFeature wildcardFeature = (WildcardFeature)features.get(0);
+		Feature feature = features.get(0);
 
-		Function<Object, String> function = new Function<Object, String>(){
+		WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-			@Override
-			public String apply(Object object){
-				return ValueUtil.formatValue(object);
-			}
-		};
+		if(withData){
+			List<?> data = getData();
 
-		List<String> categories = Lists.transform(data, function);
+			Function<Object, String> function = new Function<Object, String>(){
 
-		CategoricalFeature categoricalFeature = wildcardFeature.toCategoricalFeature(categories);
+				@Override
+				public String apply(Object object){
+					return ValueUtil.formatValue(object);
+				}
+			};
+
+			List<String> categories = Lists.transform(data, function);
+
+			feature = wildcardFeature.toCategoricalFeature(categories);
+		} // End if
 
 		if(withStatistics){
 			Map<String, ?> counts = extractMap(getCounts(), 0);
 			Object[] discrStats = getDiscrStats();
 
 			UnivariateStats univariateStats = new UnivariateStats()
-				.setField(categoricalFeature.getName())
+				.setField(wildcardFeature.getName())
 				.setCounts(createCounts(counts))
 				.setDiscrStats(createDiscrStats(discrStats));
 
 			encoder.putUnivariateStats(univariateStats);
 		}
 
-		return super.encodeFeatures(Collections.<Feature>singletonList(categoricalFeature), encoder);
+		return super.encodeFeatures(Collections.<Feature>singletonList(feature), encoder);
 	}
 
 	public List<?> getData(){

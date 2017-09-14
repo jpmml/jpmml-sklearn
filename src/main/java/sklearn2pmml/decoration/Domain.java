@@ -92,6 +92,16 @@ public class Domain extends Transformer {
 		return (String)get("invalid_value_treatment");
 	}
 
+	public Boolean getWithData(){
+		Boolean withData = (Boolean)get("with_data");
+
+		if(withData == null){
+			return Boolean.TRUE;
+		}
+
+		return withData;
+	}
+
 	public Boolean getWithStatistics(){
 		Boolean withStatistics = (Boolean)get("with_statistics");
 
