@@ -26,29 +26,18 @@ import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
-import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
 public class Pipeline extends Transformer {
 
-	private boolean flexible = false;
-
-
 	public Pipeline(){
 		this("sklearn.pipeline", "Pipeline");
 	}
 
 	public Pipeline(String module, String name){
-		this(module, name, false);
-	}
-
-	protected Pipeline(String module, String name, boolean flexible){
 		super(module, name);
-
-		setFlexible(flexible);
 	}
 
 	@Override
@@ -98,45 +87,11 @@ public class Pipeline extends Transformer {
 
 	public List<Transformer> getTransformers(){
 		List<Object[]> steps = getSteps();
-		boolean flexible = isFlexible();
-
-		if(flexible && steps.size() > 0){
-			Estimator estimator = getEstimator();
-
-			if(estimator != null){
-				steps = steps.subList(0, steps.size() - 1);
-			}
-		}
 
 		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(steps, 1));
 	}
 
-	public Estimator getEstimator(){
-		List<Object[]> steps = getSteps();
-		boolean flexible = isFlexible();
-
-		if(flexible && steps.size() > 0){
-			Object lastStep = TupleUtil.extractElement(steps.get(steps.size() - 1), 1);
-
-			try {
-				return EstimatorUtil.asEstimator(lastStep);
-			} catch(IllegalArgumentException iae){
-				// Ignored
-			}
-		}
-
-		return null;
-	}
-
 	public List<Object[]> getSteps(){
 		return (List)get("steps");
-	}
-
-	private boolean isFlexible(){
-		return this.flexible;
-	}
-
-	private void setFlexible(boolean flexible){
-		this.flexible = flexible;
 	}
 }

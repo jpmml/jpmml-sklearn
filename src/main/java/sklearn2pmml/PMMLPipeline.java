@@ -44,6 +44,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.TupleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Estimator;
@@ -62,17 +63,13 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public PMMLPipeline(String module, String name){
-		super(module, name, true);
+		super(module, name);
 	}
 
 	public PMML encodePMML(){
 		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 		String repr = getRepr();
-
-		if(estimator == null){
-			throw new IllegalArgumentException();
-		}
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
@@ -184,6 +181,29 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		return result;
+	}
+
+	@Override
+	public List<Transformer> getTransformers(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.size() > 0){
+			steps = steps.subList(0, steps.size() - 1);
+		}
+
+		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(steps, 1));
+	}
+
+	public Estimator getEstimator(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.size() < 1){
+			throw new IllegalArgumentException("Expected one or more elements, got zero elements");
+		}
+
+		Object[] lastStep = steps.get(steps.size() - 1);
+
+		return EstimatorUtil.asEstimator(TupleUtil.extractElement(lastStep, 1));
 	}
 
 	@Override
