@@ -31,7 +31,7 @@ from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.feature_extraction.text import Splitter
-from sklearn2pmml.preprocessing import ExpressionTransformer
+from sklearn2pmml.preprocessing import ExpressionTransformer, PMMLLabelBinarizer, PMMLLabelEncoder
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -219,7 +219,7 @@ audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 def build_audit_na(classifier, name, with_proba = True):
 	mapper = DataFrameMapper(
 		[([column], [ContinuousDomain(with_data = False), Imputer()]) for column in ["Age", "Income", "Hours"]] +
-		[([column], [CategoricalDomain(with_data = False), CategoricalImputer(), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+		[([column], [CategoricalDomain(with_data = False), CategoricalImputer(), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),

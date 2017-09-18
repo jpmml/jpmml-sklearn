@@ -18,12 +18,24 @@
  */
 package sklearn2pmml.preprocessing;
 
+import java.util.List;
+
 import sklearn.preprocessing.LabelBinarizer;
 
 public class PMMLLabelBinarizer extends LabelBinarizer {
 
 	public PMMLLabelBinarizer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	protected List<?> prepareClasses(List<?> classes){
+
+		if(classes.size() < 2){
+			throw new IllegalArgumentException();
+		}
+
+		return classes;
 	}
 
 	@Override

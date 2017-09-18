@@ -80,14 +80,7 @@ public class LabelBinarizer extends Transformer {
 
 		List<Feature> result = new ArrayList<>();
 
-		if(classes.size() < 2){
-			throw new IllegalArgumentException();
-		} else
-
-		// [negValue, posValue] -> [posValue]
-		if(classes.size() == 2){
-			classes = classes.subList(1, 2);
-		}
+		classes = prepareClasses(classes);
 
 		for(int i = 0; i < classes.size(); i++){
 			Object value = classes.get(i);
@@ -111,6 +104,20 @@ public class LabelBinarizer extends Transformer {
 		encoder.toCategorical(feature.getName(), categories);
 
 		return result;
+	}
+
+	protected List<?> prepareClasses(List<?> classes){
+
+		if(classes.size() < 2){
+			throw new IllegalArgumentException();
+		} else
+
+		// [negValue, posValue] -> [posValue]
+		if(classes.size() == 2){
+			classes = classes.subList(1, 2);
+		}
+
+		return classes;
 	}
 
 	public List<?> getClasses(){
