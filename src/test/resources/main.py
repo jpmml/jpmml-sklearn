@@ -67,6 +67,32 @@ def dump(obj):
 	for attr in dir(obj):
 		print("obj.%s = %s" % (attr, getattr(obj, attr)))
 
+def customize(estimator, **kwargs):
+	for key in kwargs:
+		setattr(estimator, key, kwargs[key])
+	return estimator
+
+class OptimalXGBClassifier(XGBClassifier):
+
+	def __init__(self, objective, ntree_limit = 0, missing = None):
+		super(OptimalXGBClassifier, self).__init__(objective = objective, missing = missing)
+		self.ntree_limit = ntree_limit
+
+	def predict(self, data, output_margin = False, ntree_limit = 0):
+		return super(OptimalXGBClassifier, self).predict(data = data, output_margin = output_margin, ntree_limit = self.ntree_limit)
+
+	def predict_proba(self, data, output_margin = False, ntree_limit = 0):
+		return super(OptimalXGBClassifier, self).predict_proba(data = data, output_margin = output_margin, ntree_limit = self.ntree_limit)
+
+class OptimalXGBRegressor(XGBRegressor):
+
+	def __init__(self, objective, ntree_limit = 0, missing = None):
+		super(OptimalXGBRegressor, self).__init__(objective = objective, missing = missing)
+		self.ntree_limit = ntree_limit
+
+	def predict(self, data, output_margin = False, ntree_limit = 0):
+		return super(OptimalXGBRegressor, self).predict(data = data, output_margin = output_margin, ntree_limit = self.ntree_limit)
+
 #
 # Clustering
 #
@@ -81,7 +107,7 @@ wheat_X, wheat_y = load_wheat("Wheat.csv")
 def kmeans_distance(kmeans, center, X):
 	return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - X, 2), axis = 1)
 
-def build_wheat(kmeans, name, with_affinity = True):
+def build_wheat(kmeans, name, with_affinity = True, **kwargs):
 	mapper = DataFrameMapper([
 		(wheat_X.columns.values, ContinuousDomain())
 	])
@@ -91,6 +117,7 @@ def build_wheat(kmeans, name, with_affinity = True):
 		("clusterer", kmeans)
 	])
 	pipeline.fit(wheat_X)
+	customize(kmeans, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["Cluster"])
 	if(with_affinity == True):
@@ -119,7 +146,7 @@ def load_audit(name):
 
 audit_X, audit_y = load_audit("Audit.csv")
 
-def build_audit(classifier, name, with_proba = True):
+def build_audit(classifier, name, with_proba = True, **kwargs):
 	continuous_mapper = DataFrameMapper([
 		("Age", ContinuousDomain()),
 		("Income", ContinuousDomain()),
@@ -144,6 +171,7 @@ def build_audit(classifier, name, with_proba = True):
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, audit_y)
+	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
 	if(with_proba == True):
@@ -166,7 +194,7 @@ build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
 build_audit(SVC(), "SVCAudit", with_proba = False)
 build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
-build_audit(XGBClassifier(objective = "binary:logistic"), "XGBAudit")
+build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71), "XGBAudit", compact = True)
 
 audit_dict_X = audit_X.to_dict("records")
 
@@ -216,7 +244,7 @@ def load_versicolor(name):
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
-def build_versicolor(classifier, name, with_proba = True):
+def build_versicolor(classifier, name, with_proba = True, **kwargs):
 	mapper = DataFrameMapper([
 		(versicolor_X.columns.values, [ContinuousDomain(), RobustScaler()])
 	])
@@ -229,6 +257,7 @@ def build_versicolor(classifier, name, with_proba = True):
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
+	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
 	if(with_proba == True):
@@ -256,7 +285,7 @@ def load_iris(name):
 
 iris_X, iris_y = load_iris("Iris.csv")
 
-def build_iris(classifier, name, with_proba = True):
+def build_iris(classifier, name, with_proba = True, **kwargs):
 	pipeline = PMMLPipeline([
 		("union", FeatureUnion([
 			("normal_scale", DataFrameMapper([
@@ -271,6 +300,7 @@ def build_iris(classifier, name, with_proba = True):
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)
+	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
 	if(with_proba == True):
@@ -298,7 +328,7 @@ build_iris(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLog
 build_iris(SVC(), "SVCIris", with_proba = False)
 build_iris(NuSVC(), "NuSVCIris", with_proba = False)
 build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
-build_iris(XGBClassifier(objective = "multi:softmax"), "XGBIris")
+build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), "XGBIris", compact = True)
 
 #
 # Text classification
@@ -311,13 +341,14 @@ def load_sentiment(name):
 
 sentiment_X, sentiment_y = load_sentiment("Sentiment.csv")
 
-def build_sentiment(classifier, name, with_proba = True):
+def build_sentiment(classifier, name, with_proba = True, **kwargs):
 	pipeline = PMMLPipeline([
 		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 2), norm = None, dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
 		("selector", SelectorProxy(SelectPercentile(chi2, percentile = 10))),
 		("classifier", classifier)
 	])
 	pipeline.fit(sentiment_X, sentiment_y)
+	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
 	if(with_proba == True):
@@ -344,7 +375,7 @@ def load_auto(name):
 
 auto_X, auto_y = load_auto("Auto.csv")
 
-def build_auto(regressor, name):
+def build_auto(regressor, name, **kwargs):
 	mapper = DataFrameMapper([
 		(["cylinders"], CategoricalDomain()),
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), Imputer(missing_values = "NaN"), StandardScaler()]),
@@ -357,6 +388,7 @@ def build_auto(regressor, name):
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, auto_y)
+	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name + ".csv")
@@ -374,7 +406,7 @@ build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
 build_auto(RidgeCV(), "RidgeAuto")
-build_auto(XGBRegressor(objective = "reg:linear"), "XGBAuto")
+build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", compact = True)
 
 def load_housing(name):
 	df = load_csv(name)
@@ -386,7 +418,7 @@ def load_housing(name):
 
 housing_X, housing_y = load_housing("Housing.csv")
 
-def build_housing(regressor, name, with_kneighbors = False):
+def build_housing(regressor, name, with_kneighbors = False, **kwargs):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
@@ -400,6 +432,7 @@ def build_housing(regressor, name, with_kneighbors = False):
 		("regressor", regressor)
 	])
 	pipeline.fit(housing_X, housing_y)
+	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
 	if(with_kneighbors == True):

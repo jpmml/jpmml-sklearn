@@ -22,6 +22,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
+import sklearn.Estimator;
 
 public class BoosterUtil {
 
@@ -29,19 +30,26 @@ public class BoosterUtil {
 	}
 
 	static
-	public int getNumberOfFeatures(HasBooster hasBooster){
-		Learner learner = getLearner(hasBooster);
+	public <E extends Estimator & HasBooster> int getNumberOfFeatures(E estimator){
+		Learner learner = getLearner(estimator);
 
 		return learner.getNumFeatures();
 	}
 
 	static
-	public MiningModel encodeBooster(HasBooster hasBooster, Schema schema){
-		Learner learner = getLearner(hasBooster);
+	public <E extends Estimator & HasBooster> MiningModel encodeBooster(E estimator, Schema schema){
+		Learner learner = getLearner(estimator);
+
+		Integer ntreeLimit = (Integer)estimator.get("ntree_limit");
+		Boolean compact = (Boolean)estimator.get("compact");
+
+		if(compact == null){
+			compact = Boolean.FALSE;
+		}
 
 		Schema xgbSchema = XGBoostUtil.toXGBoostSchema(schema);
 
-		MiningModel miningModel = learner.encodeMiningModel(xgbSchema);
+		MiningModel miningModel = learner.encodeMiningModel(ntreeLimit, compact, xgbSchema);
 
 		return miningModel;
 	}
