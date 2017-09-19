@@ -22,9 +22,12 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.Visitor;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.TreeModelProducer;
+import org.jpmml.sklearn.visitors.TreeModelCompactor;
 
 abstract
 public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
@@ -43,7 +46,19 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	public Model encodeModel(Schema schema);
 
 	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
-		return encodeModel(schema);
+		Model model = encodeModel(schema);
+
+		if(this instanceof TreeModelProducer){
+			Boolean compact = (Boolean)get("compact");
+
+			if(compact != null && compact){
+				Visitor visitor = new TreeModelCompactor();
+
+				visitor.applyTo(model);
+			}
+		}
+
+		return model;
 	}
 
 	@Override

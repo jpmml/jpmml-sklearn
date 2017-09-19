@@ -179,17 +179,17 @@ def build_audit(classifier, name, with_proba = True, **kwargs):
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name + ".csv")
 
-build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAudit")
+build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 2), "DecisionTreeAudit", compact = True)
 build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAudit")
 build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
-build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
+build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit", compact = True)
 build_audit(LGBMClassifier(seed = 13, objective = "binary"), "LGBMAudit")
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 build_audit(LogisticRegressionCV(), "LogisticRegressionAudit")
 build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
 build_audit(GaussianNB(), "NaiveBayesAudit")
-build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestAudit")
+build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestAudit", compact = True)
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
 build_audit(SVC(), "SVCAudit", with_proba = False)
@@ -357,7 +357,7 @@ def build_sentiment(classifier, name, with_proba = True, **kwargs):
 	store_csv(score, name + ".csv")
 
 build_sentiment(LogisticRegressionCV(), "LogisticRegressionSentiment")
-build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestSentiment")
+build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestSentiment", compact = True)
 
 #
 # Regression
@@ -394,17 +394,17 @@ def build_auto(regressor, name, **kwargs):
 	store_csv(mpg, name + ".csv")
 
 build_auto(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostAuto")
-build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuto")
+build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAuto", compact = True)
 build_auto(BaggingRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAuto")
 build_auto(DummyRegressor(strategy = "median"), "DummyAuto")
 build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
-build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
+build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto", compact = True)
 build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(LGBMRegressor(seed = 13, n_estimators = 17), "LGBMAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
-build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 5), "RandomForestAuto")
+build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", compact = True)
 build_auto(RidgeCV(), "RidgeAuto")
 build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", compact = True)
 
@@ -454,7 +454,7 @@ build_housing(NuSVR(), "NuSVRHousing")
 # Anomaly detection
 #
 
-def build_iforest_housing_anomaly(iforest, name):
+def build_iforest_housing_anomaly(iforest, name, **kwargs):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
@@ -463,12 +463,13 @@ def build_iforest_housing_anomaly(iforest, name):
 		("estimator", iforest)
 	])
 	pipeline.fit(housing_X)
+	customize(iforest, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(housing_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
 
-build_iforest_housing_anomaly(IsolationForest(random_state = 13), "IsolationForestHousingAnomaly")
+build_iforest_housing_anomaly(IsolationForest(random_state = 13), "IsolationForestHousingAnomaly", compact = True)
 
 def build_svm_housing_anomaly(svm, name):
 	mapper = DataFrameMapper([

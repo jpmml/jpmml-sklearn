@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2017 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,34 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.tree;
+package org.jpmml.sklearn;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.TreeModelProducer;
-import sklearn.Regressor;
-
-abstract
-public class TreeRegressor extends Regressor implements HasTree, TreeModelProducer {
-
-	public TreeRegressor(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
-	}
-
-	@Override
-	public TreeModel encodeModel(Schema schema){
-		return TreeModelUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
-	}
-
-	@Override
-	public Tree getTree(){
-		return (Tree)get("tree_");
-	}
+public interface TreeModelProducer {
 }

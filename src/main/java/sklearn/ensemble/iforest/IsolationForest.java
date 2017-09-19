@@ -47,13 +47,14 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.SkLearnUtil;
+import org.jpmml.sklearn.TreeModelProducer;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.tree.ExtraTreeRegressor;
 import sklearn.tree.Tree;
 import sklearn.tree.TreeModelUtil;
 
-public class IsolationForest extends EnsembleRegressor {
+public class IsolationForest extends EnsembleRegressor implements TreeModelProducer {
 
 	public IsolationForest(String module, String name){
 		super(module, name);

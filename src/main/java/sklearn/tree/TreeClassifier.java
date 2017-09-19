@@ -24,10 +24,11 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.TreeModelProducer;
 import sklearn.Classifier;
 
 abstract
-public class TreeClassifier extends Classifier implements HasTree {
+public class TreeClassifier extends Classifier implements HasTree, TreeModelProducer {
 
 	public TreeClassifier(String module, String name){
 		super(module, name);

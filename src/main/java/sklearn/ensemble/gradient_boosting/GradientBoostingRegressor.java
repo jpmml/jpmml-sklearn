@@ -25,10 +25,11 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.TreeModelProducer;
 import sklearn.Regressor;
 import sklearn.tree.DecisionTreeRegressor;
 
-public class GradientBoostingRegressor extends Regressor {
+public class GradientBoostingRegressor extends Regressor implements TreeModelProducer {
 
 	public GradientBoostingRegressor(String module, String name){
 		super(module, name);
