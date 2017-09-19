@@ -26,4 +26,14 @@ public class BaseEstimator extends ClassDict {
 	public BaseEstimator(String module, String name){
 		super(module, name);
 	}
+
+	public Object getOption(String key, Object defaultValue){
+		Object value = get(key);
+
+		if(value == null){
+			return defaultValue;
+		}
+
+		return value;
+	}
 }

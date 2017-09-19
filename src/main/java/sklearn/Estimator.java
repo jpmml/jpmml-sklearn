@@ -49,9 +49,9 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 		Model model = encodeModel(schema);
 
 		if(this instanceof TreeModelProducer){
-			Boolean compact = (Boolean)get("compact");
+			Boolean compact = (Boolean)getOption(TreeModelProducer.OPTION_COMPACT, Boolean.FALSE);
 
-			if(compact != null && compact){
+			if(compact){
 				Visitor visitor = new TreeModelCompactor();
 
 				visitor.applyTo(model);

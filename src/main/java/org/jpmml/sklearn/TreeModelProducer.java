@@ -19,4 +19,6 @@
 package org.jpmml.sklearn;
 
 public interface TreeModelProducer {
+
+	String OPTION_COMPACT = "compact";
 }
