@@ -66,9 +66,8 @@ public class BaseMultilayerPerceptronUtil {
 
 		ClassDictUtil.checkSize(coefs, intercepts);
 
-		List<Feature> features = schema.getFeatures();
-
 		Label label = schema.getLabel();
+		List<Feature> features = schema.getFeatures();
 
 		NeuralInputs neuralInputs = NeuralNetworkUtil.createNeuralInputs(features, DataType.DOUBLE);
 
@@ -152,7 +151,7 @@ public class BaseMultilayerPerceptronUtil {
 				break;
 		}
 
-		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, ModelUtil.createMiningSchema(schema.getLabel()), neuralInputs, neuralLayers)
+		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, ModelUtil.createMiningSchema(label), neuralInputs, neuralLayers)
 			.setNeuralOutputs(neuralOutputs);
 
 		return neuralNetwork;
