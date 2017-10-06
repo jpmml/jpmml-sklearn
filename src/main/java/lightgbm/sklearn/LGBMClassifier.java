@@ -24,6 +24,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.preprocessing.LabelEncoder;
 
 public class LGBMClassifier extends Classifier implements HasBooster {
 
@@ -38,7 +39,9 @@ public class LGBMClassifier extends Classifier implements HasBooster {
 
 	@Override
 	public List<?> getClasses(){
-		return ClassDictUtil.getArray(this, "classes");
+		LabelEncoder labelEncoder = getLabelEncoder();
+
+		return labelEncoder.getClasses();
 	}
 
 	@Override
@@ -49,5 +52,19 @@ public class LGBMClassifier extends Classifier implements HasBooster {
 	@Override
 	public Booster getBooster(){
 		return (Booster)get("_Booster");
+	}
+
+	public LabelEncoder getLabelEncoder(){
+		Object object = get("_le");
+
+		try {
+			if(object == null){
+				throw new NullPointerException();
+			}
+
+			return (LabelEncoder)object;
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("The label encoder object (" + ClassDictUtil.formatClass(object) + ") is not a LabelEncoder", re);
+		}
 	}
 }

@@ -20,6 +20,7 @@ package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.PMMLEquivalence;
+import org.jpmml.evaluator.RealNumberEquivalence;
 import org.junit.Test;
 
 public class RegressorTest extends EstimatorTest {
@@ -66,7 +67,7 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLGBMAuto() throws Exception {
-		evaluate("LGBM", "Auto");
+		evaluate("LGBM", "Auto", new RealNumberEquivalence(0));
 	}
 
 	@Test

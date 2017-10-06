@@ -20,6 +20,7 @@ package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.PMMLEquivalence;
+import org.jpmml.evaluator.RealNumberEquivalence;
 import org.junit.Test;
 
 public class ClassifierTest extends EstimatorTest {
@@ -61,7 +62,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLGBMAudit() throws Exception {
-		evaluate("LGBM", "Audit");
+		evaluate("LGBM", "Audit", new RealNumberEquivalence(0));
 	}
 
 	@Test
@@ -156,7 +157,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLGBMIris() throws Exception {
-		evaluate("LGBM", "Iris");
+		evaluate("LGBM", "Iris", new RealNumberEquivalence(0));
 	}
 
 	@Test
