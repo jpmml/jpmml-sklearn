@@ -18,16 +18,12 @@
  */
 package xgboost.sklearn;
 
-import java.util.List;
-
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.Classifier;
-import sklearn.preprocessing.LabelEncoder;
+import sklearn.LabelEncoderClassifier;
 
-public class XGBClassifier extends Classifier implements HasBooster {
+public class XGBClassifier extends LabelEncoderClassifier implements HasBooster {
 
 	public XGBClassifier(String module, String name){
 		super(module, name);
@@ -44,13 +40,6 @@ public class XGBClassifier extends Classifier implements HasBooster {
 	}
 
 	@Override
-	public List<?> getClasses(){
-		LabelEncoder labelEncoder = getLabelEncoder();
-
-		return labelEncoder.getClasses();
-	}
-
-	@Override
 	public MiningModel encodeModel(Schema schema){
 		return BoosterUtil.encodeBooster(this, schema);
 	}
@@ -58,19 +47,5 @@ public class XGBClassifier extends Classifier implements HasBooster {
 	@Override
 	public Booster getBooster(){
 		return (Booster)get("_Booster");
-	}
-
-	public LabelEncoder getLabelEncoder(){
-		Object object = get("_le");
-
-		try {
-			if(object == null){
-				throw new NullPointerException();
-			}
-
-			return (LabelEncoder)object;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The label encoder object (" + ClassDictUtil.formatClass(object) + ") is not a LabelEncoder", re);
-		}
 	}
 }

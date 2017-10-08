@@ -16,30 +16,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package lightgbm.sklearn;
+package sklearn;
 
-import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.Schema;
-import sklearn.LabelEncoderClassifier;
+import java.util.List;
 
-public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster {
+import org.jpmml.sklearn.ClassDictUtil;
+import sklearn.preprocessing.LabelEncoder;
 
-	public LGBMClassifier(String module, String name){
+abstract
+public class LabelEncoderClassifier extends Classifier {
+
+	public LabelEncoderClassifier(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		return BoosterUtil.getNumberOfFeatures(this);
+	public List<?> getClasses(){
+		LabelEncoder labelEncoder = getLabelEncoder();
+
+		return labelEncoder.getClasses();
 	}
 
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		return BoosterUtil.encodeModel(this, schema);
-	}
+	public LabelEncoder getLabelEncoder(){
+		Object object = get("_le");
 
-	@Override
-	public Booster getBooster(){
-		return (Booster)get("_Booster");
+		try {
+			if(object == null){
+				throw new NullPointerException();
+			}
+
+			return (LabelEncoder)object;
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("The label encoder object (" + ClassDictUtil.formatClass(object) + ") is not a LabelEncoder", re);
+		}
 	}
 }
