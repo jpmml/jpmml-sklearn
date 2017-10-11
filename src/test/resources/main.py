@@ -139,8 +139,8 @@ build_wheat(MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state
 def load_audit(name):
 	df = load_csv(name)
 	print(df.dtypes)
-	df["Deductions"] = df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
 	df["Adjusted"] = df["Adjusted"].astype(int)
+	df["Deductions"] = df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
 	print(df.dtypes)
 	return split_csv(df)
 
@@ -366,10 +366,10 @@ build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3),
 def load_auto(name):
 	df = load_csv(name)
 	print(df.dtypes)
+	df["acceleration"] = df["acceleration"].astype(float)
 	df["displacement"] = df["displacement"].astype(float)
 	df["horsepower"] = df["horsepower"].astype(float)
 	df["weight"] = df["weight"].astype(float)
-	df["acceleration"] = df["acceleration"].astype(float)
 	print(df.dtypes)
 	return split_csv(df)
 
@@ -407,6 +407,29 @@ build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features 
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", compact = True)
 build_auto(RidgeCV(), "RidgeAuto")
 build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", compact = True)
+
+auto_na_X, auto_na_y = load_auto("AutoNA.csv")
+
+auto_na_X["cylinders"] = auto_na_X["cylinders"].fillna(-1).astype(int)
+auto_na_X["model_year"] = auto_na_X["model_year"].fillna(-1).astype(int)
+auto_na_X["origin"] = auto_na_X["origin"].fillna(-1).astype(int)
+
+def build_auto_na(regressor, name):
+	mapper = DataFrameMapper(
+		[([column], [ContinuousDomain(with_data = False), Imputer()]) for column in ["acceleration", "displacement", "horsepower", "weight"]] +
+		[([column], [CategoricalDomain(with_data = False), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_na_X, auto_na_y)
+	store_pkl(pipeline, name + ".pkl")
+	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
+	store_csv(mpg, name + ".csv")
+
+build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA")
+build_auto_na(LinearRegression(), "LinearRegressionAutoNA")
 
 def load_housing(name):
 	df = load_csv(name)

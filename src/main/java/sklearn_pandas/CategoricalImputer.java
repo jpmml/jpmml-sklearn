@@ -21,6 +21,7 @@ package sklearn_pandas;
 import java.util.Collections;
 import java.util.List;
 
+import numpy.core.Scalar;
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -51,10 +52,22 @@ public class CategoricalImputer extends Transformer {
 	}
 
 	public Object getFill(){
-		return get("fill_");
+		return asJavaObject(get("fill_"));
 	}
 
 	public Object getMissingValues(){
-		return get("missing_values");
+		return asJavaObject(get("missing_values"));
+	}
+
+	static
+	private Object asJavaObject(Object object){
+
+		if(object instanceof Scalar){
+			Scalar scalar = (Scalar)object;
+
+			return scalar.getOnlyElement();
+		}
+
+		return object;
 	}
 }
