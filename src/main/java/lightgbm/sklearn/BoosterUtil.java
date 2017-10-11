@@ -22,6 +22,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
+import sklearn.Estimator;
 
 public class BoosterUtil {
 
@@ -29,8 +30,8 @@ public class BoosterUtil {
 	}
 
 	static
-	public int getNumberOfFeatures(HasBooster hasBooster){
-		GBDT gbdt = getGBDT(hasBooster);
+	public <E extends Estimator & HasBooster> int getNumberOfFeatures(E estimator){
+		GBDT gbdt = getGBDT(estimator);
 
 		String[] featureNames = gbdt.getFeatureNames();
 
@@ -38,12 +39,15 @@ public class BoosterUtil {
 	}
 
 	static
-	public MiningModel encodeModel(HasBooster hasBooster, Schema schema){
-		GBDT gbdt = getGBDT(hasBooster);
+	public <E extends Estimator & HasBooster> MiningModel encodeModel(E estimator, Schema schema){
+		GBDT gbdt = getGBDT(estimator);
+
+		Integer numIteration = (Integer)estimator.getOption("num_iteration", null);
+		Boolean compact = (Boolean)estimator.getOption("compact", Boolean.FALSE);
 
 		Schema lgbmSchema = LightGBMUtil.toLightGBMSchema(gbdt, schema);
 
-		MiningModel miningModel = gbdt.encodeMiningModel(lgbmSchema);
+		MiningModel miningModel = gbdt.encodeMiningModel(numIteration, compact, lgbmSchema);
 
 		return miningModel;
 	}

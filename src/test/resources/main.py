@@ -72,6 +72,27 @@ def customize(estimator, **kwargs):
 		setattr(estimator, key, kwargs[key])
 	return estimator
 
+class OptimalLGBMClassifier(LGBMClassifier):
+
+	def __init__(self, objective, n_estimators, num_iteration = 0, random_state = 13, n_jobs = -1):
+		super(OptimalLGBMClassifier, self).__init__(objective = objective, n_estimators = n_estimators, random_state = random_state, n_jobs = n_jobs)
+		self.num_iteration = num_iteration
+
+	def predict(self, X, raw_score = False, num_iteration = 0):
+		return super(OptimalLGBMClassifier, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration)
+
+	def predict_proba(self, X, raw_score = False, num_iteration = 0):
+		return super(OptimalLGBMClassifier, self).predict_proba(X = X, raw_score = raw_score, num_iteration = self.num_iteration)
+
+class OptimalLGBMRegressor(LGBMRegressor):
+
+	def __init__(self, objective, n_estimators, num_iteration = 0, random_state = 13, n_jobs = -1):
+		super(OptimalLGBMRegressor, self).__init__(objective = objective, n_estimators = n_estimators, random_state = random_state, n_jobs = n_jobs)
+		self.num_iteration = num_iteration
+
+	def predict(self, X, raw_score = False, num_iteration = 0):
+		return super(OptimalLGBMRegressor, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration)
+
 class OptimalXGBClassifier(XGBClassifier):
 
 	def __init__(self, objective, ntree_limit = 0, missing = None):
@@ -184,7 +205,7 @@ build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samp
 build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit", compact = True)
-build_audit(LGBMClassifier(seed = 13, objective = "binary"), "LGBMAudit")
+build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit", compact = True)
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 build_audit(LogisticRegressionCV(), "LogisticRegressionAudit")
 build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
@@ -314,7 +335,7 @@ build_iris(DummyClassifier(strategy = "constant", constant = "versicolor"), "Dum
 build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
 build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
-build_iris(LGBMClassifier(seed = 13, objective = "multiclass"), "LGBMIris")
+build_iris(OptimalLGBMClassifier(objective = "multiclass", n_estimators = 7, num_iteration = 3), "LGBMIris", compact = True)
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
 build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")
@@ -401,7 +422,7 @@ build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto", compact = True)
 build_auto(LassoCV(random_state = 13), "LassoAuto")
-build_auto(LGBMRegressor(seed = 13, n_estimators = 17), "LGBMAuto")
+build_auto(OptimalLGBMRegressor(objective = "regression", n_estimators = 17, num_iteration = 11), "LGBMAuto", compact = True)
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", compact = True)
