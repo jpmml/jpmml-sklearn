@@ -23,7 +23,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
-public class XGBRegressor extends Regressor implements HasBooster {
+public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOptions {
 
 	public XGBRegressor(String module, String name){
 		super(module, name);

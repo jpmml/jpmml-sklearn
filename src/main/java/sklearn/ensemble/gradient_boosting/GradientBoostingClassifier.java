@@ -34,12 +34,12 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.TreeModelProducer;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.tree.DecisionTreeRegressor;
+import sklearn.tree.HasTreeOptions;
 
-public class GradientBoostingClassifier extends Classifier implements TreeModelProducer {
+public class GradientBoostingClassifier extends Classifier implements HasTreeOptions {
 
 	public GradientBoostingClassifier(String module, String name){
 		super(module, name);

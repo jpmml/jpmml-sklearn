@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2017 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,31 +18,9 @@
  */
 package sklearn.tree;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import org.jpmml.sklearn.HasOptions;
 
-abstract
-public class TreeRegressor extends Regressor implements HasTree, HasTreeOptions {
+public interface HasTreeOptions extends HasOptions {
 
-	public TreeRegressor(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
-	}
-
-	@Override
-	public TreeModel encodeModel(Schema schema){
-		return TreeModelUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
-	}
-
-	@Override
-	public Tree getTree(){
-		return (Tree)get("tree_");
-	}
+	String OPTION_COMPACT = "compact";
 }

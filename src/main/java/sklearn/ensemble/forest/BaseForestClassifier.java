@@ -27,12 +27,12 @@ import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.TreeModelProducer;
 import sklearn.Classifier;
+import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeClassifier;
 
 abstract
-public class BaseForestClassifier extends Classifier implements TreeModelProducer {
+public class BaseForestClassifier extends Classifier implements HasTreeOptions {
 
 	public BaseForestClassifier(String module, String name){
 		super(module, name);

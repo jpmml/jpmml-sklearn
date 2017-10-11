@@ -26,8 +26,8 @@ import org.dmg.pmml.Visitor;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.TreeModelProducer;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
+import sklearn.tree.HasTreeOptions;
 
 abstract
 public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
@@ -48,8 +48,8 @@ public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
 	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
 		Model model = encodeModel(schema);
 
-		if(this instanceof TreeModelProducer){
-			Boolean compact = (Boolean)getOption(TreeModelProducer.OPTION_COMPACT, Boolean.FALSE);
+		if(this instanceof HasTreeOptions){
+			Boolean compact = (Boolean)getOption(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
 
 			if(compact){
 				Visitor visitor = new TreeModelCompactor();

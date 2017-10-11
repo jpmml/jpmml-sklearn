@@ -25,12 +25,12 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.TreeModelProducer;
 import sklearn.Regressor;
+import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 
 abstract
-public class BaseForestRegressor extends Regressor implements TreeModelProducer {
+public class BaseForestRegressor extends Regressor implements HasTreeOptions {
 
 	public BaseForestRegressor(String module, String name){
 		super(module, name);

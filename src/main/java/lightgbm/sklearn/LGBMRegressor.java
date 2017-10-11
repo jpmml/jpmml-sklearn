@@ -22,7 +22,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
-public class LGBMRegressor extends Regressor implements HasBooster {
+public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMOptions {
 
 	public LGBMRegressor(String module, String name){
 		super(module, name);

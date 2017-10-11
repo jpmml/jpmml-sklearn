@@ -16,9 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package xgboost.sklearn;
 
-public interface TreeModelProducer {
+import org.jpmml.sklearn.HasOptions;
+
+public interface HasXGBoostOptions extends HasOptions {
 
 	String OPTION_COMPACT = "compact";
+
+	String OPTION_NTREE_LIMIT = "ntree_limit";
 }

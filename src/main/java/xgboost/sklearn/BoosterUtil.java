@@ -37,11 +37,11 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster> MiningModel encodeBooster(E estimator, Schema schema){
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel encodeBooster(E estimator, Schema schema){
 		Learner learner = getLearner(estimator);
 
-		Integer ntreeLimit = (Integer)estimator.getOption("ntree_limit", null);
-		Boolean compact = (Boolean)estimator.getOption("compact", Boolean.FALSE);
+		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, null);
+		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.FALSE);
 
 		Schema xgbSchema = XGBoostUtil.toXGBoostSchema(schema);
 

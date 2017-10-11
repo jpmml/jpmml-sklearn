@@ -39,11 +39,11 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster> MiningModel encodeModel(E estimator, Schema schema){
+	public <E extends Estimator & HasBooster & HasLightGBMOptions> MiningModel encodeModel(E estimator, Schema schema){
 		GBDT gbdt = getGBDT(estimator);
 
-		Integer numIteration = (Integer)estimator.getOption("num_iteration", null);
-		Boolean compact = (Boolean)estimator.getOption("compact", Boolean.FALSE);
+		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, null);
+		Boolean compact = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.FALSE);
 
 		Schema lgbmSchema = LightGBMUtil.toLightGBMSchema(gbdt, schema);
 

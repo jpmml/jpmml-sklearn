@@ -23,7 +23,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.LabelEncoderClassifier;
 
-public class XGBClassifier extends LabelEncoderClassifier implements HasBooster {
+public class XGBClassifier extends LabelEncoderClassifier implements HasBooster, HasXGBoostOptions {
 
 	public XGBClassifier(String module, String name){
 		super(module, name);
