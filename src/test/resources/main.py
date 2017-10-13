@@ -239,8 +239,8 @@ audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
 def build_audit_na(classifier, name, with_proba = True):
 	mapper = DataFrameMapper(
-		[([column], [ContinuousDomain(with_data = False), Imputer()]) for column in ["Age", "Income", "Hours"]] +
-		[([column], [CategoricalDomain(with_data = False), CategoricalImputer(), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["Age", "Income", "Hours"]] +
+		[([column], [CategoricalDomain(missing_values = None), CategoricalImputer(), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -399,7 +399,7 @@ auto_X, auto_y = load_auto("Auto.csv")
 def build_auto(regressor, name, **kwargs):
 	mapper = DataFrameMapper([
 		(["cylinders"], CategoricalDomain()),
-		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), Imputer(missing_values = "NaN"), StandardScaler()]),
+		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(missing_values = None), Imputer(missing_values = "NaN"), StandardScaler()]),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
 		(["origin"], OneHotEncoder()),
 		(["weight", "displacement"], ExpressionTransformer("(X[:, 0] / X[:, 1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
@@ -437,8 +437,8 @@ auto_na_X["origin"] = auto_na_X["origin"].fillna(-1).astype(int)
 
 def build_auto_na(regressor, name):
 	mapper = DataFrameMapper(
-		[([column], [ContinuousDomain(with_data = False), Imputer()]) for column in ["acceleration", "displacement", "horsepower", "weight"]] +
-		[([column], [CategoricalDomain(with_data = False), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["acceleration", "displacement", "horsepower", "weight"]] +
+		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
