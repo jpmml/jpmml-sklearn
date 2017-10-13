@@ -25,8 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.Counts;
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
+import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
@@ -57,6 +59,15 @@ public class Domain extends Transformer {
 		}
 
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+		final
+		Object invalidValueReplacement = getInvalidValueReplacement();
+
+		if(invalidValueReplacement != null){
+
+			if(invalidValueTreatment == null){
+				invalidValueTreatment = InvalidValueTreatmentMethod.AS_IS;
+			}
+		}
 
 		for(Feature feature : features){
 			FieldName name = feature.getName();
@@ -70,7 +81,17 @@ public class Domain extends Transformer {
 			} // End if
 
 			if(invalidValueTreatment != null){
-				InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator()
+				InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator(){
+
+					@Override
+					public void decorate(DataField dataField, MiningField miningField){
+						super.decorate(dataField, miningField);
+
+						if(invalidValueReplacement != null){
+							miningField.setInvalidValueReplacement(ValueUtil.formatValue(invalidValueReplacement));
+						}
+					}
+				}
 					.setInvalidValueTreatment(invalidValueTreatment);
 
 				encoder.addDecorator(name, invalidValueDecorator);
@@ -90,6 +111,10 @@ public class Domain extends Transformer {
 
 	public String getInvalidValueTreatment(){
 		return (String)get("invalid_value_treatment");
+	}
+
+	public Object getInvalidValueReplacement(){
+		return get("invalid_value_replacement");
 	}
 
 	public Boolean getWithData(){
