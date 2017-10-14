@@ -25,12 +25,13 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Schema;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 
 abstract
-public class BaseForestRegressor extends Regressor implements HasTreeOptions {
+public class BaseForestRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
 	public BaseForestRegressor(String module, String name){
 		super(module, name);
@@ -43,12 +44,13 @@ public class BaseForestRegressor extends Regressor implements HasTreeOptions {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<TreeRegressor> estimators = getEstimators();
+		List<? extends TreeRegressor> estimators = getEstimators();
 
 		return BaseForestUtil.encodeBaseForest(estimators, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
 	}
 
-	public List<TreeRegressor> getEstimators(){
+	@Override
+	public List<? extends TreeRegressor> getEstimators(){
 		return (List)get("estimators_");
 	}
 }

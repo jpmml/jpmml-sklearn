@@ -24,9 +24,10 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
+import sklearn.HasEstimatorEnsemble;
 
 abstract
-public class EnsembleClassifier extends Classifier {
+public class EnsembleClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
 
 	public EnsembleClassifier(String module, String name){
 		super(module, name);
@@ -52,6 +53,7 @@ public class EnsembleClassifier extends Classifier {
 		return EstimatorUtil.asClassifier(baseEstimator);
 	}
 
+	@Override
 	public List<? extends Classifier> getEstimators(){
 		List<?> estimators = (List)get("estimators_");
 

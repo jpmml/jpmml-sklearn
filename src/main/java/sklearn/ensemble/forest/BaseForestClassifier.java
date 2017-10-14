@@ -28,11 +28,12 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeClassifier;
 
 abstract
-public class BaseForestClassifier extends Classifier implements HasTreeOptions {
+public class BaseForestClassifier extends Classifier implements HasEstimatorEnsemble<TreeClassifier>, HasTreeOptions {
 
 	public BaseForestClassifier(String module, String name){
 		super(module, name);
@@ -45,7 +46,7 @@ public class BaseForestClassifier extends Classifier implements HasTreeOptions {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<TreeClassifier> estimators = getEstimators();
+		List<? extends TreeClassifier> estimators = getEstimators();
 
 		MiningModel miningModel = BaseForestUtil.encodeBaseForest(estimators, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.CLASSIFICATION, schema)
 			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
@@ -53,7 +54,8 @@ public class BaseForestClassifier extends Classifier implements HasTreeOptions {
 		return miningModel;
 	}
 
-	public List<TreeClassifier> getEstimators(){
+	@Override
+	public List<? extends TreeClassifier> getEstimators(){
 		return (List)get("estimators_");
 	}
 }

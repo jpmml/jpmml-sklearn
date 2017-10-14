@@ -34,8 +34,9 @@ import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasEstimatorEnsemble;
 
-public class VotingClassifier extends Classifier {
+public class VotingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
 
 	public VotingClassifier(String module, String name){
 		super(module, name);
@@ -76,6 +77,7 @@ public class VotingClassifier extends Classifier {
 		return miningModel;
 	}
 
+	@Override
 	public List<? extends Classifier> getEstimators(){
 		List<?> estimators = (List)get("estimators_");
 

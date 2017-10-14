@@ -37,7 +37,7 @@ public class GradientBoostingUtil {
 	}
 
 	static
-	public MiningModel encodeGradientBoosting(List<DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
+	public MiningModel encodeGradientBoosting(List<? extends DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
 		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
 		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunction.REGRESSION, schema);

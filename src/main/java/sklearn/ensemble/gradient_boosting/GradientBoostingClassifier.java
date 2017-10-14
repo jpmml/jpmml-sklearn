@@ -36,10 +36,11 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.HasTreeOptions;
 
-public class GradientBoostingClassifier extends Classifier implements HasTreeOptions {
+public class GradientBoostingClassifier extends Classifier implements HasEstimatorEnsemble<DecisionTreeRegressor>, HasTreeOptions {
 
 	public GradientBoostingClassifier(String module, String name){
 		super(module, name);
@@ -72,7 +73,7 @@ public class GradientBoostingClassifier extends Classifier implements HasTreeOpt
 
 		Number learningRate = getLearningRate();
 
-		List<DecisionTreeRegressor> estimators = getEstimators();
+		List<? extends DecisionTreeRegressor> estimators = getEstimators();
 
 		Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), schema.getFeatures());
 
@@ -139,7 +140,8 @@ public class GradientBoostingClassifier extends Classifier implements HasTreeOpt
 		return (Number)get("learning_rate");
 	}
 
-	public List<DecisionTreeRegressor> getEstimators(){
+	@Override
+	public List<? extends DecisionTreeRegressor> getEstimators(){
 		return (List)ClassDictUtil.getArray(this, "estimators_");
 	}
 }

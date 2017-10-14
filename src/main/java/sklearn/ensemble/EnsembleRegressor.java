@@ -23,10 +23,11 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import sklearn.EstimatorUtil;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 
 abstract
-public class EnsembleRegressor extends Regressor {
+public class EnsembleRegressor extends Regressor implements HasEstimatorEnsemble<Regressor> {
 
 	public EnsembleRegressor(String module, String name){
 		super(module, name);
@@ -52,6 +53,7 @@ public class EnsembleRegressor extends Regressor {
 		return EstimatorUtil.asRegressor(baseEstimator);
 	}
 
+	@Override
 	public List<? extends Regressor> getEstimators(){
 		List<?> estimators = (List)get("estimators_");
 
