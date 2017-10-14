@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasEstimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Transformer;
@@ -57,7 +58,7 @@ import sklearn.TransformerUtil;
 import sklearn.TypeUtil;
 import sklearn.pipeline.Pipeline;
 
-public class PMMLPipeline extends Pipeline {
+public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 	public PMMLPipeline(){
 		this("sklearn2pmml", "PMMLPipeline");
@@ -202,6 +203,7 @@ public class PMMLPipeline extends Pipeline {
 		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(steps, 1));
 	}
 
+	@Override
 	public Estimator getEstimator(){
 		List<Object[]> steps = getSteps();
 

@@ -26,9 +26,10 @@ import numpy.core.Scalar;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasEstimator;
 import sklearn.Selector;
 
-public class SelectFromModel extends Selector {
+public class SelectFromModel extends Selector implements HasEstimator<Estimator> {
 
 	public SelectFromModel(String module, String name){
 		super(module, name);
@@ -62,6 +63,7 @@ public class SelectFromModel extends Selector {
 		return result;
 	}
 
+	@Override
 	public Estimator getEstimator(){
 		ClassDict estimator = (ClassDict)get("estimator_");
 

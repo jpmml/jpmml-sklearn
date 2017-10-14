@@ -30,8 +30,9 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
+import sklearn.HasEstimator;
 
-public class EstimatorProxy extends Estimator implements HasClasses {
+public class EstimatorProxy extends Estimator implements HasClasses, HasEstimator<Estimator> {
 
 	public EstimatorProxy(String module, String name){
 		super(module, name);
@@ -103,6 +104,7 @@ public class EstimatorProxy extends Estimator implements HasClasses {
 		return estimator.encodeModel(schema, encoder);
 	}
 
+	@Override
 	public Estimator getEstimator(){
 		ClassDict estimator = (ClassDict)super.get("estimator_");
 
