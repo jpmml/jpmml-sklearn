@@ -38,21 +38,21 @@ public class PMMLPipelineTest {
 		assertNull(pipeline.getSteps());
 		assertNull(pipeline.getRepr());
 		assertNull(pipeline.getActiveFields());
-		assertNull(pipeline.getTargetField());
+		assertNull(pipeline.getTargetFields());
 
 		Estimator estimator = new DummyClassifier(null, null);
 
 		pipeline
 			.setSteps(Collections.singletonList(new Object[]{"estimator", estimator}))
 			.setRepr("PMMLPipeline([steps=(\"estimator\", DummyClassifier())])")
-			.setTargetField("y")
+			.setTargetFields(Collections.singletonList("y"))
 			.setActiveFields(Arrays.asList("x1", "x2", "x3"));
 
 		assertEquals(Collections.emptyList(), pipeline.getTransformers());
 		assertEquals(estimator, pipeline.getEstimator());
 
 		assertNotNull(pipeline.getRepr());
-		assertEquals("y", pipeline.getTargetField());
+		assertEquals(Arrays.asList("y"), pipeline.getTargetFields());
 		assertEquals(Arrays.asList("x1", "x2", "x3"), pipeline.getActiveFields());
 	}
 }

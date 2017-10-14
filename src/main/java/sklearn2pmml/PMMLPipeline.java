@@ -19,6 +19,7 @@
 package sklearn2pmml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.CharMatcher;
@@ -76,12 +77,19 @@ public class PMMLPipeline extends Pipeline {
 		Label label = null;
 
 		if(estimator.isSupervised()){
-			String targetField = getTargetField();
+			String targetField = null;
+
+			List<String> targetFields = getTargetFields();
+			if(targetFields != null){
+				ClassDictUtil.checkSize(1, targetFields);
+
+				targetField = targetFields.get(0);
+			} // End if
 
 			if(targetField == null){
 				targetField = "y";
 
-				logger.warn("The 'target_field' attribute is not set. Assuming {} as the name of the target field", targetField);
+				logger.warn("The 'target_fields' attribute is not set. Assuming {} as the name of the target field", targetField);
 			}
 
 			MiningFunction miningFunction = estimator.getMiningFunction();
@@ -227,16 +235,6 @@ public class PMMLPipeline extends Pipeline {
 		return this;
 	}
 
-	public String getTargetField(){
-		return (String)get("target_field");
-	}
-
-	public PMMLPipeline setTargetField(String targetField){
-		put("target_field", targetField);
-
-		return this;
-	}
-
 	public List<String> getActiveFields(){
 
 		if(!containsKey("active_fields")){
@@ -247,13 +245,39 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public PMMLPipeline setActiveFields(List<String> activeFields){
-		NDArray array = new NDArray();
-		array.put("data", activeFields);
-		array.put("fortran_order", Boolean.FALSE);
-
-		put("active_fields", array);
+		put("active_fields", toArray(activeFields));
 
 		return this;
+	}
+
+	public List<String> getTargetFields(){
+
+		// SkLearn2PMML 0.24.3
+		if(containsKey("target_field")){
+			return Collections.singletonList((String)get("target_field"));
+		} // End if
+
+		// SkLearn2PMML 0.25+
+		if(!containsKey("target_fields")){
+			return null;
+		}
+
+		return (List)ClassDictUtil.getArray(this, "target_fields");
+	}
+
+	public PMMLPipeline setTargetFields(List<String> targetFields){
+		put("target_fields", toArray(targetFields));
+
+		return this;
+	}
+
+	static
+	private NDArray toArray(List<String> strings){
+		NDArray result = new NDArray();
+		result.put("data", strings);
+		result.put("fortran_order", Boolean.FALSE);
+
+		return result;
 	}
 
 	static

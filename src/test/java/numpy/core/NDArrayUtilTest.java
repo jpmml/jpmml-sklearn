@@ -34,9 +34,9 @@ public class NDArrayUtilTest {
 		};
 
 		NDArray array = new NDArray();
-		array.put("shape", new Object[]{2, 3});
-		array.put("fortran_order", Boolean.FALSE);
 		array.put("data", Arrays.asList(data));
+		array.put("fortran_order", Boolean.FALSE);
+		array.put("shape", new Object[]{2, 3});
 
 		assertEquals(Arrays.asList(data), NDArrayUtil.getContent(array));
 
