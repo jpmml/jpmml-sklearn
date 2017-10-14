@@ -25,10 +25,12 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
+import org.dmg.pmml.Visitor;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
@@ -39,7 +41,9 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import sklearn.Estimator;
+import sklearn.HasEstimatorEnsemble;
 
 public class TreeModelUtil {
 
@@ -47,21 +51,36 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, MiningFunction miningFunction, Schema schema){
-		PredicateManager predicateManager = new PredicateManager();
+	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
+		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
 
-		return encodeTreeModelSegmentation(estimators, predicateManager, miningFunction, schema);
+		if(compact){
+			Visitor visitor = new TreeModelCompactor();
+
+			visitor.applyTo(model);
+		}
+
+		return model;
 	}
 
 	static
-	public <E extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(List<E> estimators, final PredicateManager predicateManager, final MiningFunction miningFunction, final Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, MiningFunction miningFunction, Schema schema){
+		PredicateManager predicateManager = new PredicateManager();
+
+		return encodeTreeModelSegmentation(estimator, predicateManager, miningFunction, schema);
+	}
+
+	static
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, final PredicateManager predicateManager, final MiningFunction miningFunction, final Schema schema){
+		List<? extends T> estimators = estimator.getEstimators();
+
 		final
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		Function<E, TreeModel> function = new Function<E, TreeModel>(){
+		Function<T, TreeModel> function = new Function<T, TreeModel>(){
 
 			@Override
-			public TreeModel apply(E estimator){
+			public TreeModel apply(T estimator){
 				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), segmentSchema);
 
 				return TreeModelUtil.encodeTreeModel(estimator, predicateManager, miningFunction, treeModelSchema);

@@ -35,10 +35,12 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.HasTreeOptions;
+import sklearn2pmml.EstimatorProxy;
 
 public class GradientBoostingClassifier extends Classifier implements HasEstimatorEnsemble<DecisionTreeRegressor>, HasTreeOptions {
 
@@ -73,8 +75,6 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		Number learningRate = getLearningRate();
 
-		List<? extends DecisionTreeRegressor> estimators = getEstimators();
-
 		Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), schema.getFeatures());
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
@@ -82,7 +82,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		if(numberOfClasses == 1){
 			EstimatorUtil.checkSize(2, categoricalLabel);
 
-			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimators, init.getPriorProbability(0), learningRate, segmentSchema)
+			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, init.getPriorProbability(0), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.NONE, true, schema);
@@ -91,10 +91,23 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		if(numberOfClasses >= 3){
 			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
 
+			List<? extends DecisionTreeRegressor> estimators = getEstimators();
+
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
-				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(CMatrixUtil.getColumn(estimators, rows, columns, i), init.getPriorProbability(i), learningRate, segmentSchema)
+				final
+				List<? extends DecisionTreeRegressor> columnEstimators = CMatrixUtil.getColumn(estimators, rows, columns, i);
+
+				GradientBoostingClassifierProxy estimatorProxy = new GradientBoostingClassifierProxy(){
+
+					@Override
+					public List<? extends DecisionTreeRegressor> getEstimators(){
+						return columnEstimators;
+					}
+				};
+
+				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, init.getPriorProbability(i), learningRate, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 				miningModels.add(miningModel);
@@ -143,5 +156,14 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 	@Override
 	public List<? extends DecisionTreeRegressor> getEstimators(){
 		return (List)ClassDictUtil.getArray(this, "estimators_");
+	}
+
+	abstract
+	private class GradientBoostingClassifierProxy extends EstimatorProxy implements HasEstimatorEnsemble<DecisionTreeRegressor>, HasTreeOptions {
+
+		@Override
+		public Estimator getEstimator(){
+			return GradientBoostingClassifier.this;
+		}
 	}
 }

@@ -168,7 +168,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, treeModels))
 			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier));
 
-		return miningModel;
+		return TreeModelUtil.transform(this, miningModel);
 	}
 
 	public String getSkLearnVersion(){

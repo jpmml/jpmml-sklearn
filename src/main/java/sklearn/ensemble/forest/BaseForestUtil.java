@@ -28,7 +28,9 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTree;
+import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeModelUtil;
 
 public class BaseForestUtil {
@@ -37,12 +39,12 @@ public class BaseForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> MiningModel encodeBaseForest(List<E> estimators, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
-		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimators, miningFunction, schema);
+	public <E extends Estimator & HasEstimatorEnsemble<T> & HasTreeOptions, T extends Estimator & HasTree> MiningModel encodeBaseForest(E estimator, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
+		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimator, miningFunction, schema);
 
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, treeModels));
 
-		return miningModel;
+		return TreeModelUtil.transform(estimator, miningModel);
 	}
 }

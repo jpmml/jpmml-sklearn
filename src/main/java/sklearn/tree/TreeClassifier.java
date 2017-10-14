@@ -43,7 +43,7 @@ public class TreeClassifier extends Classifier implements HasTree, HasTreeOption
 		TreeModel treeModel = TreeModelUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, schema)
 			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
 
-		return treeModel;
+		return TreeModelUtil.transform(this, treeModel);
 	}
 
 	@Override

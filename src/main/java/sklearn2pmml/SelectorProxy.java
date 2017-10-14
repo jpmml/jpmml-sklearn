@@ -25,6 +25,10 @@ import sklearn.Selector;
 
 public class SelectorProxy extends Selector {
 
+	public SelectorProxy(){
+		this("sklearn2pmml", "SelectorProxy");
+	}
+
 	public SelectorProxy(String module, String name){
 		super(module, name);
 	}

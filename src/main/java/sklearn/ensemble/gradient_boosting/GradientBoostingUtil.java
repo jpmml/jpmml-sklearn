@@ -28,7 +28,10 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import sklearn.Estimator;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.DecisionTreeRegressor;
+import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeModelUtil;
 
 public class GradientBoostingUtil {
@@ -37,15 +40,15 @@ public class GradientBoostingUtil {
 	}
 
 	static
-	public MiningModel encodeGradientBoosting(List<? extends DecisionTreeRegressor> regressors, Number initialPrediction, Number learningRate, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<DecisionTreeRegressor> & HasTreeOptions> MiningModel encodeGradientBoosting(E estimator, Number initialPrediction, Number learningRate, Schema schema){
 		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
-		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(regressors, MiningFunction.REGRESSION, schema);
+		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimator, MiningFunction.REGRESSION, schema);
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
 			.setTargets(ModelUtil.createRescaleTargets(learningRate, initialPrediction, continuousLabel));
 
-		return miningModel;
+		return TreeModelUtil.transform(estimator, miningModel);
 	}
 }

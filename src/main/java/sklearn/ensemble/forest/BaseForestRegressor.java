@@ -44,9 +44,7 @@ public class BaseForestRegressor extends Regressor implements HasEstimatorEnsemb
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends TreeRegressor> estimators = getEstimators();
-
-		return BaseForestUtil.encodeBaseForest(estimators, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
+		return BaseForestUtil.encodeBaseForest(this, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
 	}
 
 	@Override
