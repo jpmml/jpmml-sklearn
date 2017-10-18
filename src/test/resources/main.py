@@ -27,7 +27,7 @@ from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
-from sklearn2pmml import EstimatorProxy, SelectorProxy
+from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.feature_extraction.text import Splitter
@@ -132,12 +132,13 @@ def build_wheat(kmeans, name, with_affinity = True, **kwargs):
 	mapper = DataFrameMapper([
 		(wheat_X.columns.values, ContinuousDomain())
 	])
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("mapper", mapper),
 		("scaler", MinMaxScaler()),
 		("clusterer", kmeans)
 	])
 	pipeline.fit(wheat_X)
+	pipeline = make_pmml_pipeline(pipeline, wheat_X.columns.values)
 	customize(kmeans, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["Cluster"])
@@ -174,14 +175,14 @@ def build_audit(classifier, name, with_proba = True, **kwargs):
 		("Hours", ContinuousDomain())
 	])
 	categorical_mapper = DataFrameMapper([
-		("Employment", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectFromModel(EstimatorProxy(DecisionTreeClassifier(random_state = 13))))]),
-		("Education", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectFromModel(EstimatorProxy(RandomForestClassifier(random_state = 13, n_estimators = 3)), threshold = "1.25 * mean"))]),
+		("Employment", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
+		("Education", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(RandomForestClassifier(random_state = 13, n_estimators = 3), threshold = "1.25 * mean")]),
 		("Marital", [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
-		("Occupation", [CategoricalDomain(), LabelBinarizer(), SelectorProxy(SelectKBest(k = 3))]),
+		("Occupation", [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
 		("Gender", [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
 		("Deductions", [CategoricalDomain(), LabelEncoder()]),
 	])
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("union", FeatureUnion([
 			("continuous", continuous_mapper),
 			("categorical", Pipeline([
@@ -192,6 +193,7 @@ def build_audit(classifier, name, with_proba = True, **kwargs):
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, audit_y)
+	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
@@ -269,7 +271,7 @@ def build_versicolor(classifier, name, with_proba = True, **kwargs):
 	mapper = DataFrameMapper([
 		(versicolor_X.columns.values, [ContinuousDomain(), RobustScaler()])
 	])
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("mapper", mapper),
 		("transformer-pipeline", Pipeline([
 			("polynomial", PolynomialFeatures(degree = 3)),
@@ -278,6 +280,7 @@ def build_versicolor(classifier, name, with_proba = True, **kwargs):
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
+	pipeline = make_pmml_pipeline(pipeline, versicolor_X.columns.values, versicolor_y.name)
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
@@ -307,7 +310,7 @@ def load_iris(name):
 iris_X, iris_y = load_iris("Iris.csv")
 
 def build_iris(classifier, name, with_proba = True, **kwargs):
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("union", FeatureUnion([
 			("normal_scale", DataFrameMapper([
 				(iris_X.columns.values, ContinuousDomain()),
@@ -321,6 +324,7 @@ def build_iris(classifier, name, with_proba = True, **kwargs):
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)
+	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values, iris_y.name)
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
@@ -363,12 +367,13 @@ def load_sentiment(name):
 sentiment_X, sentiment_y = load_sentiment("Sentiment.csv")
 
 def build_sentiment(classifier, name, with_proba = True, **kwargs):
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 2), norm = None, dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
-		("selector", SelectorProxy(SelectPercentile(chi2, percentile = 10))),
+		("selector", SelectPercentile(chi2, percentile = 10)),
 		("classifier", classifier)
 	])
 	pipeline.fit(sentiment_X, sentiment_y)
+	pipeline = make_pmml_pipeline(pipeline, sentiment_X.name, sentiment_y.name)
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
@@ -404,11 +409,12 @@ def build_auto(regressor, name, **kwargs):
 		(["origin"], OneHotEncoder()),
 		(["weight", "displacement"], ExpressionTransformer("(X[:, 0] / X[:, 1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
 	])
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("mapper", mapper),
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, auto_y)
+	pipeline = make_pmml_pipeline(pipeline, auto_X.columns.values, auto_y.name)
 	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
@@ -466,16 +472,17 @@ def build_housing(regressor, name, with_kneighbors = False, **kwargs):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("mapper", mapper),
 		("transformer-pipeline", Pipeline([
 			("polynomial", PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)),
 			("scaler", StandardScaler()),
-			("selector", SelectorProxy(SelectPercentile(score_func = f_regression, percentile = 35))),
+			("selector", SelectPercentile(score_func = f_regression, percentile = 35)),
 		])),
 		("regressor", regressor)
 	])
 	pipeline.fit(housing_X, housing_y)
+	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values, housing_y.name)
 	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
@@ -502,11 +509,12 @@ def build_iforest_housing_anomaly(iforest, name, **kwargs):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("mapper", mapper),
 		("estimator", iforest)
 	])
 	pipeline.fit(housing_X)
+	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values)
 	customize(iforest, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
@@ -519,12 +527,13 @@ def build_svm_housing_anomaly(svm, name):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
-	pipeline = PMMLPipeline([
+	pipeline = Pipeline([
 		("mapper", mapper),
 		("scaler", MaxAbsScaler()),
 		("estimator", svm)
 	])
 	pipeline.fit(housing_X)
+	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values)
 	store_pkl(pipeline, name + ".pkl")
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(housing_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
