@@ -52,7 +52,7 @@ public class TreeModelUtil {
 
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
-		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
+		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, Boolean.TRUE);
 
 		if(compact){
 			Visitor visitor = new TreeModelCompactor();

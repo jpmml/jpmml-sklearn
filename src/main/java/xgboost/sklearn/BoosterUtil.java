@@ -41,7 +41,7 @@ public class BoosterUtil {
 		Learner learner = getLearner(estimator);
 
 		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, null);
-		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.FALSE);
+		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
 
 		Schema xgbSchema = XGBoostUtil.toXGBoostSchema(schema);
 

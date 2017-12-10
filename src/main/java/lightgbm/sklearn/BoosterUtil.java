@@ -43,7 +43,7 @@ public class BoosterUtil {
 		GBDT gbdt = getGBDT(estimator);
 
 		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, null);
-		Boolean compact = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.FALSE);
+		Boolean compact = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.TRUE);
 
 		Schema lgbmSchema = LightGBMUtil.toLightGBMSchema(gbdt, schema);
 
