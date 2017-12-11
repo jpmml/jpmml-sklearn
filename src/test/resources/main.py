@@ -31,7 +31,7 @@ from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.feature_extraction.text import Splitter
-from sklearn2pmml.preprocessing import ExpressionTransformer, PMMLLabelBinarizer, PMMLLabelEncoder
+from sklearn2pmml.preprocessing import ExpressionTransformer, LookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -240,9 +240,23 @@ build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
 audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
 def build_audit_na(classifier, name, with_proba = True):
+	employment_mapping = {
+		"Consultant" : "Private",
+		"PSFederal" : "Public",
+		"PSLocal" : "Public",
+		"PSState" : "Public",
+		"SelfEmp" : "Private",
+		"Private" : "Private"
+	}
+	gender_mapping = {
+		"Female" : 0,
+		"Male" : 1
+	}
 	mapper = DataFrameMapper(
 		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["Age", "Income", "Hours"]] +
-		[([column], [CategoricalDomain(missing_values = None), CategoricalImputer(), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+		[("Employment", [CategoricalDomain(missing_values = None), CategoricalImputer(), LookupTransformer(employment_mapping, "Other"), PMMLLabelBinarizer()])] +
+		[([column], [CategoricalDomain(missing_values = None), CategoricalImputer(), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +
+		[("Gender", [CategoricalDomain(missing_values = None), CategoricalImputer(), LookupTransformer(gender_mapping, None)])]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
