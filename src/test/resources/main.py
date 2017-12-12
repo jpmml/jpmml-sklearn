@@ -325,12 +325,11 @@ iris_X, iris_y = load_iris("Iris.csv")
 
 def build_iris(classifier, name, with_proba = True, **kwargs):
 	pipeline = Pipeline([
-		("union", FeatureUnion([
-			("normal_scale", DataFrameMapper([
-				(iris_X.columns.values, ContinuousDomain()),
-			])),
-			("log_scale", DataFrameMapper([
-				(iris_X.columns.values, FunctionTransformer(numpy.log10))
+		("pipeline", Pipeline([
+			("domain", ContinuousDomain()),
+			("transform", FeatureUnion([
+				("normal_scale", FunctionTransformer(None)),
+				("log_scale", FunctionTransformer(numpy.log10))
 			]))
 		])),
 		("scaler", RobustScaler()),

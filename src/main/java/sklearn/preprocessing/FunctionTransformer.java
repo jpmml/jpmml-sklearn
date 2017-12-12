@@ -44,6 +44,10 @@ public class FunctionTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Object func = getFunc();
 
+		if(func == null){
+			return features;
+		}
+
 		UFunc ufunc;
 
 		try {
