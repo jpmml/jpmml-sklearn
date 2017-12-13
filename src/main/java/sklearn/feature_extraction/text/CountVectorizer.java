@@ -86,7 +86,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Boolean lowercase = getLowercase();
-		Map<String, Scalar> vocabulary = getVocabulary();
+		Map<String, ?> vocabulary = getVocabulary();
 
 		ClassDictUtil.checkSize(1, features);
 
@@ -94,9 +94,9 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 		BiMap<String, Integer> termIndexMap = HashBiMap.create(vocabulary.size());
 
-		Collection<Map.Entry<String, Scalar>> entries = vocabulary.entrySet();
-		for(Map.Entry<String, Scalar> entry : entries){
-			termIndexMap.put(entry.getKey(), ValueUtil.asInt((Number)(entry.getValue()).getOnlyElement()));
+		Collection<? extends Map.Entry<String, ?>> entries = vocabulary.entrySet();
+		for(Map.Entry<String, ?> entry : entries){
+			termIndexMap.put(entry.getKey(), toIndex(entry.getValue()));
 		}
 
 		BiMap<Integer, String> indexTermMap = termIndexMap.inverse();
@@ -275,7 +275,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		return (String)get("token_pattern");
 	}
 
-	public Map<String, Scalar> getVocabulary(){
+	public Map<String, ?> getVocabulary(){
 		return (Map)get("vocabulary_");
 	}
 
@@ -292,6 +292,18 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		} catch(IOException ioe){
 			throw new IllegalArgumentException(stopWords, ioe);
 		}
+	}
+
+	static
+	private Integer toIndex(Object value){
+
+		if(value instanceof Scalar){
+			Scalar scalar = (Scalar)value;
+
+			value = scalar.getOnlyElement();
+		}
+
+		return ValueUtil.asInteger((Number)value);
 	}
 
 	private static final Joiner JOINER = Joiner.on("|");
