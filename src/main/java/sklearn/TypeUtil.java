@@ -49,6 +49,10 @@ public class TypeUtil {
 		// A String value can be parsed to any other value
 		if(clazzes.size() > 1){
 			clazzes.remove(String.class);
+		} // End if
+
+		if(clazzes.size() > 1){
+			throw new IllegalArgumentException("Expected all values to be of the same data type, got " + clazzes.size() + " different data types (" + clazzes + ")");
 		}
 
 		Class<?> clazz = Iterables.getOnlyElement(clazzes);
