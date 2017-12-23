@@ -19,6 +19,7 @@
 package sklearn.tree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -42,6 +43,7 @@ import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
+import org.jpmml.sklearn.visitors.TreeModelLinearizer;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 
@@ -55,9 +57,11 @@ public class TreeModelUtil {
 		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, Boolean.TRUE);
 
 		if(compact){
-			Visitor visitor = new TreeModelCompactor();
+			List<Visitor> visitors = Arrays.<Visitor>asList(new TreeModelCompactor(), new TreeModelLinearizer());
 
-			visitor.applyTo(model);
+			for(Visitor visitor : visitors){
+				visitor.applyTo(model);
+			}
 		}
 
 		return model;

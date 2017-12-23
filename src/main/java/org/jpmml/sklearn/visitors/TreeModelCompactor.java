@@ -113,7 +113,7 @@ public class TreeModelCompactor extends AbstractVisitor {
 			SimplePredicate firstPredicate = (SimplePredicate)firstChild.getPredicate();
 			SimplePredicate secondPredicate = (SimplePredicate)secondChild.getPredicate();
 
-			if(!(firstPredicate.getField()).equals(secondPredicate.getField())){
+			if(!(firstPredicate.getField()).equals(secondPredicate.getField()) || !(firstPredicate.getValue()).equals(secondPredicate.getValue())){
 				throw new IllegalArgumentException();
 			} // End if
 
