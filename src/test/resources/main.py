@@ -417,7 +417,7 @@ auto_X, auto_y = load_auto("Auto.csv")
 def build_auto(regressor, name, **kwargs):
 	mapper = DataFrameMapper([
 		(["cylinders"], CategoricalDomain()),
-		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(missing_values = None), Imputer(missing_values = "NaN"), StandardScaler()]),
+		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
 		(["origin"], OneHotEncoder()),
 		(["weight", "displacement"], ExpressionTransformer("(X[:, 0] / X[:, 1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
