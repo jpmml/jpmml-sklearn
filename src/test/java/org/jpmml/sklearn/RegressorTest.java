@@ -101,6 +101,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateTPOTAuto() throws Exception {
+		evaluate("TPOT", "Auto");
+	}
+
+	@Test
 	public void evaluateXGBAuto() throws Exception {
 		evaluate("XGB", "Auto", new PMMLEquivalence(1e-6, 1e-6));
 	}
@@ -138,6 +143,11 @@ public class RegressorTest extends EstimatorTest {
 	@Test
 	public void evaluateNuSVRHousing() throws Exception {
 		evaluate("NuSVR", "Housing");
+	}
+
+	@Test
+	public void evaluateTPOTHousing() throws Exception {
+		evaluate("TPOT", "Housing");
 	}
 
 	@Test

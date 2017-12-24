@@ -1,6 +1,7 @@
+from common import *
+
 from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
-from scipy import sparse
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -11,7 +12,6 @@ from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, R
 from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
-from sklearn.externals import joblib
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_regression
@@ -37,35 +37,10 @@ from xgboost.sklearn import XGBClassifier, XGBRegressor
 
 import numpy
 import pandas
-#import pickle
-
-def load_csv(name):
-	return pandas.read_csv("csv/" + name, na_values = ["N/A", "NA"])
-
-def split_csv(df):
-	columns = df.columns.tolist()
-	return (df[columns[: -1]], df[columns[-1]])
-
-def store_csv(df, name):
-	df.to_csv("csv/" + name, index = False)
-
-# Joblib dump
-def store_pkl(obj, name):
-	joblib.dump(obj, "pkl/" + name, compress = 9)
 
 def pipeline_transform(pipeline, X):
 	identity_pipeline = Pipeline(pipeline.steps[: -1] + [("estimator", None)])
 	return identity_pipeline._transform(X)
-
-# Pickle dump
-#def store_pkl(obj, name):
-#	con = open("pkl/" + name, "wb")
-#	pickle.dump(obj, con, protocol = -1)
-#	con.close()
-
-def dump(obj):
-	for attr in dir(obj):
-		print("obj.%s = %s" % (attr, getattr(obj, attr)))
 
 def customize(estimator, **kwargs):
 	for key in kwargs:
@@ -118,11 +93,6 @@ class OptimalXGBRegressor(XGBRegressor):
 # Clustering
 #
 
-def load_wheat(name):
-	df = load_csv(name)
-	print(df.dtypes)
-	return split_csv(df)
-
 wheat_X, wheat_y = load_wheat("Wheat.csv")
 
 def kmeans_distance(kmeans, center, X):
@@ -157,14 +127,6 @@ build_wheat(MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state
 #
 # Binary classification
 #
-
-def load_audit(name):
-	df = load_csv(name)
-	print(df.dtypes)
-	df["Adjusted"] = df["Adjusted"].astype(int)
-	df["Deductions"] = df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
-	print(df.dtypes)
-	return split_csv(df)
 
 audit_X, audit_y = load_audit("Audit.csv")
 
@@ -273,12 +235,6 @@ def build_audit_na(classifier, name, with_proba = True):
 build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA")
 build_audit_na(LogisticRegression(), "LogisticRegressionAuditNA")
 
-def load_versicolor(name):
-	df = load_csv(name)
-	print(df.dtypes)
-	df["Species"] = df["Species"].astype(int)
-	return split_csv(df)
-
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
 def build_versicolor(classifier, name, with_proba = True, **kwargs):
@@ -315,11 +271,6 @@ build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
 #
 # Multi-class classification
 #
-
-def load_iris(name):
-	df = load_csv(name)
-	print(df.dtypes)
-	return split_csv(df)
 
 iris_X, iris_y = load_iris("Iris.csv")
 
@@ -372,11 +323,6 @@ build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), 
 # Text classification
 #
 
-def load_sentiment(name):
-	df = load_csv(name)
-	print(df.dtypes)
-	return (df["Sentence"], df["Score"])
-
 sentiment_X, sentiment_y = load_sentiment("Sentiment.csv")
 
 def build_sentiment(classifier, name, with_proba = True, **kwargs):
@@ -401,16 +347,6 @@ build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3),
 #
 # Regression
 #
-
-def load_auto(name):
-	df = load_csv(name)
-	print(df.dtypes)
-	df["acceleration"] = df["acceleration"].astype(float)
-	df["displacement"] = df["displacement"].astype(float)
-	df["horsepower"] = df["horsepower"].astype(float)
-	df["weight"] = df["weight"].astype(float)
-	print(df.dtypes)
-	return split_csv(df)
 
 auto_X, auto_y = load_auto("Auto.csv")
 
@@ -470,14 +406,6 @@ def build_auto_na(regressor, name):
 
 build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA")
 build_auto_na(LinearRegression(), "LinearRegressionAutoNA")
-
-def load_housing(name):
-	df = load_csv(name)
-	print(df.dtypes)
-	df["CHAS"] = df["CHAS"].astype(float)
-	df["RAD"] = df["RAD"].astype(float)
-	print(df.dtypes)
-	return split_csv(df)
 
 housing_X, housing_y = load_housing("Housing.csv")
 

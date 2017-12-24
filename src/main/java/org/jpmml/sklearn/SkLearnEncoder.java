@@ -18,6 +18,8 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,16 +37,30 @@ import org.dmg.pmml.PMML;
 import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
+import org.jpmml.converter.Schema;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Transformer;
 
 public class SkLearnEncoder extends ModelEncoder {
+
+	private List<Model> transformers = new ArrayList<>();
 
 	private Map<FieldName, UnivariateStats> univariateStats = new LinkedHashMap<>();
 
 
 	@Override
 	public PMML encodePMML(Model model){
+
+		if(this.transformers.size() > 0){
+			List<Model> models = new ArrayList<>(this.transformers);
+			models.add(model);
+
+			Schema schema = new Schema(null, Collections.<Feature>emptyList());
+
+			model = MiningModelUtil.createModelChain(models, schema);
+		}
+
 		PMML pmml = super.encodePMML(model);
 
 		DataDictionary dataDictionary = pmml.getDataDictionary();
@@ -108,6 +124,10 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public DerivedField createDerivedField(FieldName name, Expression expression){
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
+	}
+
+	public void addTransformer(Model transformer){
+		this.transformers.add(transformer);
 	}
 
 	public UnivariateStats getUnivariateStats(FieldName name){

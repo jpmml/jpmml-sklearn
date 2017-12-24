@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import org.dmg.pmml.DataField;
@@ -41,7 +38,6 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -99,7 +95,11 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 					{
 						List<?> classes = EstimatorUtil.getClasses(estimator);
 
-						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, TypeUtil.getDataType(classes, DataType.STRING), formatTargetCategories(classes));
+						DataType dataType = TypeUtil.getDataType(classes, DataType.STRING);
+
+						List<String> categories = EstimatorUtil.formatTargetCategories(classes);
+
+						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, dataType, categories);
 
 						label = new CategoricalLabel(dataField);
 					}
@@ -280,25 +280,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		result.put("fortran_order", Boolean.FALSE);
 
 		return result;
-	}
-
-	static
-	private List<String> formatTargetCategories(List<?> objects){
-		Function<Object, String> function = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object object){
-				String targetCategory = ValueUtil.formatValue(object);
-
-				if(targetCategory == null || CharMatcher.WHITESPACE.matchesAnyOf(targetCategory)){
-					throw new IllegalArgumentException(targetCategory);
-				}
-
-				return targetCategory;
-			}
-		};
-
-		return Lists.transform(objects, function);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PMMLPipeline.class);

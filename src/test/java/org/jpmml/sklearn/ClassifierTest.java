@@ -221,6 +221,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateTPOTIris() throws Exception {
+		evaluate("TPOT", "Iris");
+	}
+
+	@Test
 	public void evaluateVotingEnsembleIris() throws Exception {
 		FieldName[] probabilityFields = {FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)")};
 
@@ -280,6 +285,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateNuSVCVersicolor() throws Exception {
 		evaluate("NuSVC", "Versicolor");
+	}
+
+	@Test
+	public void evaluateTPOTVersicolor() throws Exception {
+		evaluate("TPOT", "Versicolor");
 	}
 
 	static

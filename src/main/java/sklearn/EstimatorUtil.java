@@ -20,9 +20,11 @@ package sklearn;
 
 import java.util.List;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 
 public class EstimatorUtil {
@@ -35,6 +37,25 @@ public class EstimatorUtil {
 		HasClasses hasClasses = (HasClasses)estimator;
 
 		return hasClasses.getClasses();
+	}
+
+	static
+	public List<String> formatTargetCategories(List<?> objects){
+		Function<Object, String> function = new Function<Object, String>(){
+
+			@Override
+			public String apply(Object object){
+				String targetCategory = ValueUtil.formatValue(object);
+
+				if(targetCategory == null || CharMatcher.WHITESPACE.matchesAnyOf(targetCategory)){
+					throw new IllegalArgumentException(targetCategory);
+				}
+
+				return targetCategory;
+			}
+		};
+
+		return Lists.transform(objects, function);
 	}
 
 	static

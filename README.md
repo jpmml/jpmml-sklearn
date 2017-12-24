@@ -110,6 +110,8 @@ Java library and command-line application for converting [Scikit-Learn](http://s
   * [Sklearn-Pandas](https://github.com/paulgb/sklearn-pandas):
     * `sklearn_pandas.CategoricalImputer`
     * `sklearn_pandas.DataFrameMapper`
+  * [TPOT](https://github.com/rhiever/tpot):
+    * `tpot.builtins.stacking_estimator.StackingEstimator`
   * [XGBoost](https://github.com/dmlc/xgboost):
     * [`xgboost.XGBClassifier`](http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
     * [`xgboost.XGBRegressor`](http://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
