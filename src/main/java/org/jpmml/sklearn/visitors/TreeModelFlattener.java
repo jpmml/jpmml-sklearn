@@ -35,7 +35,7 @@ import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.model.visitors.AbstractVisitor;
 
-public class TreeModelLinearizer extends AbstractVisitor {
+public class TreeModelFlattener extends AbstractVisitor {
 
 	private MiningFunction miningFunction = null;
 
@@ -107,11 +107,7 @@ public class TreeModelLinearizer extends AbstractVisitor {
 
 	@Override
 	public VisitorAction visit(TreeModel treeModel){
-		TreeModel.SplitCharacteristic splitCharacteristic = treeModel.getSplitCharacteristic();
-
-		if(!(TreeModel.SplitCharacteristic.MULTI_SPLIT).equals(splitCharacteristic)){
-			throw new IllegalArgumentException();
-		}
+		treeModel.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
 
 		return super.visit(treeModel);
 	}

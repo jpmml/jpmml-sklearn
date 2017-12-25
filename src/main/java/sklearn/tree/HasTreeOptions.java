@@ -19,8 +19,18 @@
 package sklearn.tree;
 
 import org.jpmml.sklearn.HasOptions;
+import org.jpmml.sklearn.visitors.TreeModelCompactor;
+import org.jpmml.sklearn.visitors.TreeModelFlattener;
 
 public interface HasTreeOptions extends HasOptions {
 
+	/**
+	 * @see TreeModelCompactor
+	 */
 	String OPTION_COMPACT = "compact";
+
+	/**
+	 * @see TreeModelFlattener
+	 */
+	String OPTION_FLAT = "flat";
 }

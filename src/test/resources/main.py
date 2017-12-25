@@ -174,7 +174,7 @@ build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnal
 build_audit(LogisticRegressionCV(), "LogisticRegressionAudit")
 build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
 build_audit(GaussianNB(), "NaiveBayesAudit")
-build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestAudit")
+build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestAudit", flat = True)
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
 build_audit(SVC(), "SVCAudit", with_proba = False)
@@ -309,7 +309,7 @@ build_iris(LogisticRegressionCV(), "LogisticRegressionIris")
 build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")
 build_iris(MLPClassifier(hidden_layer_sizes = (6,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPIris")
 build_iris(GaussianNB(), "NaiveBayesIris")
-build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris")
+build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris", flat = True)
 build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
 build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleIris")
 build_iris(SGDClassifier(random_state = 13, n_iter = 100), "SGDIris", with_proba = False)
@@ -342,7 +342,7 @@ def build_sentiment(classifier, name, with_proba = True, **kwargs):
 	store_csv(score, name + ".csv")
 
 build_sentiment(LogisticRegressionCV(), "LogisticRegressionSentiment")
-build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestSentiment")
+build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestSentiment", compact = False)
 
 #
 # Regression
@@ -380,7 +380,7 @@ build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(OptimalLGBMRegressor(objective = "regression", n_estimators = 17, num_iteration = 11), "LGBMAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
-build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto")
+build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", flat = True)
 build_auto(RidgeCV(), "RidgeAuto")
 build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto")
 

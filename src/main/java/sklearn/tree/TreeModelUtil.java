@@ -19,7 +19,6 @@
 package sklearn.tree;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -43,7 +42,7 @@ import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
-import org.jpmml.sklearn.visitors.TreeModelLinearizer;
+import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 
@@ -55,13 +54,20 @@ public class TreeModelUtil {
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
 		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, Boolean.TRUE);
+		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+
+		List<Visitor> visitors = new ArrayList<>();
 
 		if(compact){
-			List<Visitor> visitors = Arrays.<Visitor>asList(new TreeModelCompactor(), new TreeModelLinearizer());
+			visitors.add(new TreeModelCompactor());
+		} // End if
 
-			for(Visitor visitor : visitors){
-				visitor.applyTo(model);
-			}
+		if(flat){
+			visitors.add(new TreeModelFlattener());
+		}
+
+		for(Visitor visitor : visitors){
+			visitor.applyTo(model);
 		}
 
 		return model;
