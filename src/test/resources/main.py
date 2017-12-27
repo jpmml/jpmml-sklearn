@@ -14,7 +14,7 @@ from sklearn.ensemble.iforest import IsolationForest
 from sklearn.ensemble.voting_classifier import VotingClassifier
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_selection import chi2, f_regression
+from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
@@ -326,13 +326,12 @@ build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), 
 sentiment_X, sentiment_y = load_sentiment("Sentiment.csv")
 
 def build_sentiment(classifier, name, with_proba = True, **kwargs):
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 2), norm = None, dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
-		("selector", SelectPercentile(chi2, percentile = 10)),
+		("selector", SelectKBest(f_classif, k = 500)),
 		("classifier", classifier)
 	])
 	pipeline.fit(sentiment_X, sentiment_y)
-	pipeline = make_pmml_pipeline(pipeline, sentiment_X.name, sentiment_y.name)
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])

@@ -54,17 +54,22 @@ public class SelectKBest extends Selector {
 		for(int i = 0; i < scores.size(); i++){
 			Number score = scores.get(i);
 
-			Entry<Integer> entry = new Entry<>(i, score.doubleValue());
+			double doubleScore = score.doubleValue();
+			if(Double.isNaN(doubleScore)){
+				doubleScore = -Double.MAX_VALUE;
+			}
+
+			Entry<Integer> entry = new Entry<>(i, doubleScore);
 
 			entries.add(entry);
 		}
 
-		Collections.sort(entries, Collections.reverseOrder());
+		Collections.sort(entries);
 
 		boolean[] result = new boolean[scores.size()];
 
 		for(int i = 0, max = ValueUtil.asInt((Number)k); i < max; i++){
-			Entry<Integer> entry = entries.get(i);
+			Entry<Integer> entry = entries.get(entries.size() - (i + 1));
 
 			result[entry.getId()] = true;
 		}
