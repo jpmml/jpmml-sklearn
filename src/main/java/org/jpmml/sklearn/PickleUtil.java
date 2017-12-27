@@ -31,7 +31,6 @@ import joblib.NDArrayWrapperConstructor;
 import joblib.NumpyArrayWrapper;
 import net.razorvine.pickle.Opcodes;
 import net.razorvine.pickle.Unpickler;
-import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,8 +177,8 @@ public class PickleUtil {
 				constructor = new ExtensionObjectConstructor(module, name, (Class<? extends CClassDict>)clazz);
 			} else
 
-			if((ClassDict.class).isAssignableFrom(clazz)){
-				constructor = new ObjectConstructor(module, name, (Class<? extends ClassDict>)clazz);
+			if((PyClassDict.class).isAssignableFrom(clazz)){
+				constructor = new ObjectConstructor(module, name, (Class<? extends PyClassDict>)clazz);
 			} else
 
 			{

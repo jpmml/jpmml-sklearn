@@ -20,12 +20,12 @@ package scipy.sparse;
 
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDict;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.PyClassDict;
 
-public class CSRMatrix extends ClassDict implements HasArray {
+public class CSRMatrix extends PyClassDict implements HasArray {
 
 	public CSRMatrix(String module, String name){
 		super(module, name);

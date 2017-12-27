@@ -18,10 +18,8 @@
  */
 package org.jpmml.sklearn;
 
-import sklearn.BaseEstimator;
-
 /**
- * @see BaseEstimator#getOption(String, Object)
+ * @see PyClassDict#getOption(String, Object)
  */
 public interface HasOptions {
 }

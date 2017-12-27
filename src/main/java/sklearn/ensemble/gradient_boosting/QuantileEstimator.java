@@ -22,9 +22,9 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+import org.jpmml.sklearn.PyClassDict;
 
-public class QuantileEstimator extends BaseEstimator implements HasDefaultValue {
+public class QuantileEstimator extends PyClassDict implements HasDefaultValue {
 
 	public QuantileEstimator(String module, String name){
 		super(module, name);

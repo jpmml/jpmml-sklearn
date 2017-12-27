@@ -22,9 +22,9 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+import org.jpmml.sklearn.PyClassDict;
 
-public class MeanEstimator extends BaseEstimator implements HasDefaultValue {
+public class MeanEstimator extends PyClassDict implements HasDefaultValue {
 
 	public MeanEstimator(String module, String name){
 		super(module, name);

@@ -18,9 +18,9 @@
  */
 package sklearn2pmml.feature_extraction.text;
 
-import net.razorvine.pickle.objects.ClassDict;
+import org.jpmml.sklearn.PyClassDict;
 
-public class Splitter extends ClassDict {
+public class Splitter extends PyClassDict {
 
 	public Splitter(String module, String name){
 		super(module, name);

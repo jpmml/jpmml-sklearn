@@ -22,11 +22,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.razorvine.pickle.objects.ClassDict;
+import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
 
-public class Booster extends ClassDict {
+public class Booster extends PyClassDict {
 
 	private Learner learner = null;
 

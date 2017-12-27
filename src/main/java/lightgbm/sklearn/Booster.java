@@ -23,11 +23,11 @@ import java.io.StringReader;
 import java.util.List;
 
 import com.google.common.io.CharStreams;
-import net.razorvine.pickle.objects.ClassDict;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
+import org.jpmml.sklearn.PyClassDict;
 
-public class Booster extends ClassDict {
+public class Booster extends PyClassDict {
 
 	private GBDT gbdt = null;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2017 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn;
+package org.jpmml.sklearn;
 
 import net.razorvine.pickle.objects.ClassDict;
 
 abstract
-public class BaseEstimator extends ClassDict {
+public class PyClassDict extends ClassDict {
 
-	public BaseEstimator(String module, String name){
+	public PyClassDict(String module, String name){
 		super(module, name);
 	}
 

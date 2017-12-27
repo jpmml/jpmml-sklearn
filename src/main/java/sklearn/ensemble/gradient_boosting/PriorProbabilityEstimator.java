@@ -22,9 +22,9 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.jpmml.sklearn.ClassDictUtil;
-import sklearn.BaseEstimator;
+import org.jpmml.sklearn.PyClassDict;
 
-public class PriorProbabilityEstimator extends BaseEstimator implements HasPriorProbability {
+public class PriorProbabilityEstimator extends PyClassDict implements HasPriorProbability {
 
 	public PriorProbabilityEstimator(String module, String name){
 		super(module, name);

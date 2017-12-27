@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
 import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.PyClassDict;
 
 abstract
-public class NDArrayWrapper extends ClassDict implements HasArray {
+public class NDArrayWrapper extends PyClassDict implements HasArray {
 
 	private NDArray content = null;
 

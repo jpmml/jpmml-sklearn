@@ -24,10 +24,11 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Estimator extends BaseEstimator implements HasNumberOfFeatures {
+public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 
 	public Estimator(String module, String name){
 		super(module, name);

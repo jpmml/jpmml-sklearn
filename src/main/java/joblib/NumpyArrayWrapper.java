@@ -21,12 +21,12 @@ package joblib;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.razorvine.pickle.objects.ClassDict;
 import numpy.DType;
 import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
+import org.jpmml.sklearn.PyClassDict;
 
-public class NumpyArrayWrapper extends ClassDict {
+public class NumpyArrayWrapper extends PyClassDict {
 
 	public NumpyArrayWrapper(String module, String name){
 		super(module, name);

@@ -18,12 +18,12 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
-import net.razorvine.pickle.objects.ClassDict;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.PyClassDict;
 
 abstract
-public class LossFunction extends ClassDict {
+public class LossFunction extends PyClassDict {
 
 	public LossFunction(String module, String name){
 		super(module, name);
