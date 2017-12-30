@@ -156,6 +156,10 @@ def build_audit(classifier, name, with_proba = True, **kwargs):
 	])
 	pipeline.fit(audit_X, audit_y)
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
+	if isinstance(classifier, XGBClassifier):
+		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
@@ -251,6 +255,7 @@ def build_versicolor(classifier, name, with_proba = True, **kwargs):
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
 	pipeline = make_pmml_pipeline(pipeline, versicolor_X.columns.values, versicolor_y.name)
+	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
@@ -289,6 +294,10 @@ def build_iris(classifier, name, with_proba = True, **kwargs):
 	])
 	pipeline.fit(iris_X, iris_y)
 	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values, iris_y.name)
+	if isinstance(classifier, XGBClassifier):
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
@@ -363,6 +372,10 @@ def build_auto(regressor, name, **kwargs):
 	])
 	pipeline.fit(auto_X, auto_y)
 	pipeline = make_pmml_pipeline(pipeline, auto_X.columns.values, auto_y.name)
+	if isinstance(regressor, XGBRegressor):
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
 	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
@@ -423,6 +436,7 @@ def build_housing(regressor, name, with_kneighbors = False, **kwargs):
 	])
 	pipeline.fit(housing_X, housing_y)
 	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values, housing_y.name)
+	pipeline.verify(housing_X.sample(frac = 0.05, random_state = 13))
 	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])

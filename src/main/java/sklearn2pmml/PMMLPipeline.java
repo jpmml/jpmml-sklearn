@@ -21,6 +21,10 @@ package sklearn2pmml;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
 
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
@@ -28,22 +32,33 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Extension;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.ModelVerification;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.Row;
+import org.dmg.pmml.VerificationField;
+import org.dmg.pmml.VerificationFields;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
@@ -67,7 +82,11 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	public PMML encodePMML(){
 		List<Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
+		List<String> activeFields = getActiveFields();
+		List<String> probabilityFields = null;
+		List<String> targetFields = getTargetFields();
 		String repr = getRepr();
+		Verification verification = getVerification();
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
@@ -76,7 +95,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		if(estimator.isSupervised()){
 			String targetField = null;
 
-			List<String> targetFields = getTargetFields();
 			if(targetFields != null){
 				ClassDictUtil.checkSize(1, targetFields);
 
@@ -140,6 +158,140 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Schema schema = new Schema(label, features);
 
 		Model model = estimator.encodeModel(schema, encoder);
+
+		if(estimator.isSupervised() && verification != null){
+
+			if(activeFields == null){
+				throw new IllegalArgumentException();
+			}
+
+			int[] activeValuesShape = verification.getActiveValuesShape();
+			int[] targetValuesShape = verification.getTargetValuesShape();
+
+			ClassDictUtil.checkShapes(0, activeValuesShape, targetValuesShape);
+			ClassDictUtil.checkShapes(1, activeFields.size(), activeValuesShape);
+
+			List<?> activeValues = verification.getActiveValues();
+			List<?> targetValues = verification.getTargetValues();
+
+			int[] probabilityValuesShape = null;
+
+			List<?> probabilityValues = null;
+
+			if(estimator instanceof Classifier){
+				Classifier classifier = EstimatorUtil.asClassifier(estimator);
+
+				if(classifier.hasProbabilityDistribution() && verification.hasProbabilityValues()){
+					probabilityValuesShape = verification.getProbabilityValuesShape();
+
+					probabilityFields = new ArrayList<>();
+
+					CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+
+					List<String> values = categoricalLabel.getValues();
+					for(String value : values){
+						probabilityFields.add("probability(" + value + ")"); // XXX
+					}
+
+					ClassDictUtil.checkShapes(0, activeValuesShape, probabilityValuesShape);
+					ClassDictUtil.checkShapes(1, probabilityFields.size(), probabilityValuesShape);
+
+					probabilityValues = verification.getProbabilityValues();
+				}
+			}
+
+			Number precision = verification.getPrecision();
+			Number zeroThreshold = verification.getZeroThreshold();
+
+			int rows = activeValuesShape[0];
+
+			VerificationFields verificationFields = new VerificationFields();
+
+			List<List<?>> data = new ArrayList<>();
+
+			if(activeFields != null){
+
+				for(int i = 0; i < activeFields.size(); i++){
+					VerificationField verificationField = createVerificationField(activeFields.get(i));
+
+					verificationFields.addVerificationFields(verificationField);
+
+					data.add(CMatrixUtil.getColumn(activeValues, rows, activeFields.size(), i));
+				}
+			} // End if
+
+			if(probabilityFields != null){
+
+				for(int i = 0; i < probabilityFields.size(); i++){
+					VerificationField verificationField = createVerificationField(probabilityFields.get(i))
+						.setPrecision(precision.doubleValue())
+						.setZeroThreshold(zeroThreshold.doubleValue());
+
+					verificationFields.addVerificationFields(verificationField);
+
+					data.add(CMatrixUtil.getColumn(probabilityValues, rows, probabilityFields.size(), i));
+				}
+			} else
+
+			{
+				for(int i = 0; i < targetFields.size(); i++){
+					VerificationField verificationField = createVerificationField(targetFields.get(i));
+
+					DataType dataType = label.getDataType();
+					switch(dataType){
+						case DOUBLE:
+						case FLOAT:
+							verificationField
+								.setPrecision(precision.doubleValue())
+								.setZeroThreshold(zeroThreshold.doubleValue());
+							break;
+						default:
+							break;
+					}
+
+					verificationFields.addVerificationFields(verificationField);
+
+					data.add(CMatrixUtil.getColumn(targetValues, rows, targetFields.size(), i));
+				}
+			}
+
+			List<String> keys = new ArrayList<>();
+
+			for(VerificationField verificationField : verificationFields){
+				keys.add(verificationField.getColumn());
+			}
+
+			DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
+
+			InlineTable inlineTable = new InlineTable();
+
+			for(int i = 0; i < rows; i++){
+				Row row = new Row();
+
+				Document document = documentBuilder.newDocument();
+
+				for(int j = 0; j < data.size(); j++){
+					List<?> column = data.get(j);
+
+					Object cell = column.get(i);
+					if(cell == null){
+						continue;
+					}
+
+					Element element = document.createElement(keys.get(j));
+					element.setTextContent(ValueUtil.formatValue(cell));
+
+					row.addContent(element);
+				}
+
+				inlineTable.addRows(row);
+			}
+
+			ModelVerification modelVerification = new ModelVerification(verificationFields, inlineTable)
+				.setRecordCount(rows);
+
+			model.setModelVerification(modelVerification);
+		}
 
 		PMML pmml = encoder.encodePMML(model);
 
@@ -227,16 +379,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		return this;
 	}
 
-	public String getRepr(){
-		return (String)get("repr_");
-	}
-
-	public PMMLPipeline setRepr(String repr){
-		put("repr_", repr);
-
-		return this;
-	}
-
 	public List<String> getActiveFields(){
 
 		if(!containsKey("active_fields")){
@@ -273,6 +415,99 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		return this;
 	}
 
+	public String getRepr(){
+		return (String)get("repr_");
+	}
+
+	public PMMLPipeline setRepr(String repr){
+		put("repr_", repr);
+
+		return this;
+	}
+
+	public Verification getVerification(){
+		return (Verification)get("verification");
+	}
+
+	public PMMLPipeline setVerification(Verification verification){
+		put("verification", verification);
+
+		return this;
+	}
+
+	static
+	private VerificationField createVerificationField(String name){
+		VerificationField verificationField = new VerificationField()
+			.setField(FieldName.create(name))
+			.setColumn(createTagName(name));
+
+		return verificationField;
+	}
+
+	static
+	private String createTagName(String string){
+		StringBuilder sb = new StringBuilder();
+
+		Matcher matcher = PMMLPipeline.FUNCTION.matcher(string);
+		if(matcher.matches()){
+			string = (matcher.group(1) + "_" + matcher.group(2));
+		}
+
+		for(int i = 0; i < string.length(); i++){
+			char c = string.charAt(i);
+
+			boolean valid = (i == 0 ? isTagNameStartChar(c) : isTagNameContinuationChar(c));
+			if(valid){
+				sb.append(c);
+			} else
+
+			{
+				if(c == ' '){
+					sb.append("_x0020_");
+				} else
+
+				{
+					sb.append('_');
+					sb.append('x');
+
+					String hex = Integer.toHexString(c);
+					for(int j = 0; j < (4 - hex.length()); j++){
+						sb.append('0');
+					}
+
+					sb.append(hex);
+					sb.append('_');
+				}
+			}
+		}
+
+		return sb.toString();
+	}
+
+	static
+	private boolean isTagNameStartChar(char c){
+
+		switch(c){
+			case '_':
+				return true;
+			default:
+				return Character.isLetter(c);
+		}
+	}
+
+	static
+	public boolean isTagNameContinuationChar(char c){
+
+		switch(c){
+			case '-':
+			case '.':
+			case '_':
+				return true;
+			default:
+				return Character.isLetterOrDigit(c);
+		}
+	}
+
 	static
 	private NDArray toArray(List<String> strings){
 		NDArray result = new NDArray();
@@ -281,6 +516,8 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		return result;
 	}
+
+	private static final Pattern FUNCTION = Pattern.compile("^(.+)\\((.+)\\)$");
 
 	private static final Logger logger = LoggerFactory.getLogger(PMMLPipeline.class);
 }

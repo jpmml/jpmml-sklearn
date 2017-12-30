@@ -133,6 +133,31 @@ public class ClassDictUtil {
 	}
 
 	static
+	public void checkShapes(int axis, int[]... shapes){
+		int[] prevShape = null;
+
+		for(int[] shape : shapes){
+
+			if(prevShape != null && prevShape[axis] != shape[axis]){
+				throw new IllegalArgumentException("Expected the same number of elements, got different number of elements");
+			}
+
+			prevShape = shape;
+		}
+	}
+
+	static
+	public void checkShapes(int axis, int size, int[]... shapes){
+
+		for(int[] shape : shapes){
+
+			if(shape[axis] != size){
+				throw new IllegalArgumentException("Expected " + size + " element(s), got " + shape[axis] + " element(s)");
+			}
+		}
+	}
+
+	static
 	public String formatMember(ClassDict dict, String name){
 		String clazz = (String)dict.get("__class__");
 

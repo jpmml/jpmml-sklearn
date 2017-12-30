@@ -77,6 +77,11 @@ public class NDArrayUtil {
 
 	static
 	private <E> List<E> asJavaList(NDArray array, List<E> values){
+		return asJavaList(array, values, false);
+	}
+
+	static
+	private <E> List<E> asJavaList(NDArray array, List<E> values, boolean fortranOrderShape){
 		boolean fortranOrder = array.getFortranOrder();
 
 		if(fortranOrder){
@@ -86,6 +91,9 @@ public class NDArrayUtil {
 				case 1:
 					return values;
 				case 2:
+					if(fortranOrderShape){
+						shape = new int[]{shape[1], shape[0]};
+					}
 					return toJavaList(values, shape[0], shape[1]);
 				default:
 					throw new IllegalArgumentException();
@@ -209,7 +217,9 @@ public class NDArrayUtil {
 			if(descriptor.isObject()){
 				NDArray array = (NDArray)element;
 
-				result.addAll(NDArrayUtil.getContent(array));
+				List<?> content = (List)array.getContent();
+
+				result.addAll(asJavaList(array, content, array.getFortranOrder()));
 
 				continue;
 			}

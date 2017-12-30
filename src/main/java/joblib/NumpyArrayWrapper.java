@@ -35,14 +35,15 @@ public class NumpyArrayWrapper extends PyClassDict {
 	public NDArray toArray(InputStream is) throws IOException {
 		DType dtype = getDType();
 		Object[] shape = getShape();
+		String order = getOrder();
 
 		Object descr = dtype.toDescr();
-		Boolean fortran_order = parseOrder(getOrder());
+		Boolean fortranOrder = parseOrder(order);
 
 		Object data = NDArrayUtil.parseData(is, descr, shape);
 
 		NDArray array = new NDArray();
-		array.__setstate__(new Object[]{null, shape, descr, fortran_order, data});
+		array.__setstate__(new Object[]{null, shape, descr, fortranOrder, data});
 
 		return array;
 	}
