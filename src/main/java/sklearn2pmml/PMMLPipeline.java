@@ -157,7 +157,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		Schema schema = new Schema(label, features);
 
-		Model model = estimator.encodeModel(schema, encoder);
+		Model model = estimator.encodeModel(schema);
 
 		if(estimator.isSupervised() && verification != null){
 

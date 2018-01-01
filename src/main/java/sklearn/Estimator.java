@@ -25,7 +25,6 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.PyClassDict;
-import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
 public class Estimator extends PyClassDict implements HasNumberOfFeatures {
@@ -42,12 +41,6 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 
 	abstract
 	public Model encodeModel(Schema schema);
-
-	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
-		Model model = encodeModel(schema);
-
-		return model;
-	}
 
 	@Override
 	public int getNumberOfFeatures(){

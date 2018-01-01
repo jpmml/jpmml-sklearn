@@ -25,7 +25,6 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
@@ -97,14 +96,9 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 
 	@Override
 	public Model encodeModel(Schema schema){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Model encodeModel(Schema schema, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
-		return estimator.encodeModel(schema, encoder);
+		return estimator.encodeModel(schema);
 	}
 
 	@Override

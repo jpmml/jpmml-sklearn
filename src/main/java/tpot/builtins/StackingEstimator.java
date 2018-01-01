@@ -107,7 +107,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 		Schema schema = new Schema(label, features);
 
-		Model model = estimator.encodeModel(schema, encoder)
+		Model model = estimator.encodeModel(schema)
 			.setOutput(output);
 
 		encoder.addTransformer(model);
