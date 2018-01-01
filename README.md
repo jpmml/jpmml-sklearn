@@ -166,54 +166,67 @@ Load data to a `pandas.DataFrame` object:
 ```python
 import pandas
 
-iris_df = pandas.read_csv("Iris.csv")
+df = pandas.read_csv("Iris.csv")
+
+iris_X = df[df.columns.difference(["Species"])]
+iris_y = df["Species"]
 ```
 
-First, instantiate a `sklearn_pandas.DataFrameMapper` object, which performs **data column-wise** feature engineering and selection work:
+First, instantiate a `sklearn_pandas.DataFrameMapper` object, which performs **column-oriented** feature engineering and selection work:
 ```python
 from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import StandardScaler
 from sklearn2pmml.decoration import ContinuousDomain
 
-iris_mapper = DataFrameMapper([
+column_preprocessor = DataFrameMapper([
     (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), StandardScaler()])
 ])
 ```
 
-Second, instantiate any number of `Transformer` and `Selector` objects, which perform **dataset-wise** feature engineering and selection work:
+Second, instantiate any number of `Transformer` and `Selector` objects, which perform **table-oriented** feature engineering and selection work:
 ```python
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest
+from sklearn.pipeline import Pipeline
+from sklearn2pmml import SelectorProxy
 
-iris_pca = PCA(n_components = 3)
-iris_selector = SelectKBest(k = 2)
+table_preprocessor = Pipeline([
+	("pca", PCA(n_components = 3)),
+	("selector", SelectorProxy(SelectKBest(k = 2)))
+])
 ```
+
+Please note that stateless Scikit-Learn selector objects need to be wrapped into an `sklearn2pmml.SelectprProxy` object.
 
 Third, instantiate an `Estimator` object:
 ```python
 from sklearn.tree import DecisionTreeClassifier
 
-iris_classifier = DecisionTreeClassifier(min_samples_leaf = 5)
+classifier = DecisionTreeClassifier(min_samples_leaf = 5)
 ```
 
 Combine the above objects into a `sklearn2pmml.PMMLPipeline` object, and run the experiment:
 ```python
 from sklearn2pmml import PMMLPipeline
 
-iris_pipeline = PMMLPipeline([
-    ("mapper", iris_mapper),
-    ("pca", iris_pca),
-    ("selector", iris_selector),
-    ("estimator", iris_classifier)
+pipeline = PMMLPipeline([
+    ("columns", column_preprocessor),
+    ("table", table_preprocessor),
+    ("classifier", classifier)
 ])
-iris_pipeline.fit(iris_df, iris_df["Species"])
+pipeline.fit(iris_X, iris_y)
+```
+
+Optionally, embed model verification data:
+```python
+pipeline.verify(iris_X.sample(n = 15))
 ```
 
 Store the fitted `sklearn2pmml.PMMLPipeline` object in `pickle` data format:
 ```python
 from sklearn.externals import joblib
 
-joblib.dump(iris_pipeline, "pipeline.pkl.z", compress = 9)
+joblib.dump(pipeline, "pipeline.pkl.z", compress = 9)
 ```
 
 Please see the test script file [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.
