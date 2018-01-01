@@ -21,7 +21,6 @@ package sklearn.feature_selection;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.Scalar;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
@@ -65,7 +64,7 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 
 	@Override
 	public Estimator getEstimator(){
-		ClassDict estimator = (ClassDict)get("estimator_");
+		Object estimator = get("estimator_");
 
 		return EstimatorUtil.asEstimator(estimator);
 	}

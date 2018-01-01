@@ -20,7 +20,6 @@ package sklearn2pmml;
 
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -110,7 +109,7 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 
 	@Override
 	public Estimator getEstimator(){
-		ClassDict estimator = (ClassDict)super.get("estimator_");
+		Object estimator = super.get("estimator_");
 
 		return EstimatorUtil.asEstimator(estimator);
 	}

@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.NDArray;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -52,6 +51,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import org.slf4j.Logger;
@@ -308,7 +308,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		return pmml;
 	}
 
-	private List<Feature> initFeatures(ClassDict object, OpType opType, DataType dataType, SkLearnEncoder encoder){
+	private List<Feature> initFeatures(PyClassDict object, OpType opType, DataType dataType, SkLearnEncoder encoder){
 		List<String> activeFields = getActiveFields();
 
 		if(activeFields == null){

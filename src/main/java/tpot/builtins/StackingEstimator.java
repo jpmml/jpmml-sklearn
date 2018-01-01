@@ -21,7 +21,6 @@ package tpot.builtins;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
@@ -120,7 +119,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 	@Override
 	public Estimator getEstimator(){
-		ClassDict estimator = (ClassDict)super.get("estimator");
+		Object estimator = get("estimator");
 
 		return EstimatorUtil.asEstimator(estimator);
 	}
