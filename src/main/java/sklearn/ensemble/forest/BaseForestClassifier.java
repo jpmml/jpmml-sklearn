@@ -54,6 +54,6 @@ public class BaseForestClassifier extends Classifier implements HasEstimatorEnse
 
 	@Override
 	public List<? extends TreeClassifier> getEstimators(){
-		return (List)get("estimators_");
+		return getList("estimators_", TreeClassifier.class);
 	}
 }

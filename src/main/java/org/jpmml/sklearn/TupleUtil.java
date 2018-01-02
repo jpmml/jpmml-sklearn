@@ -34,6 +34,21 @@ public class TupleUtil {
 	}
 
 	static
+	public <E> E extractElement(Object[] tuple, int i, Class<? extends E> clazz){
+		Object value = extractElement(tuple, i);
+
+		CastFunction<E> castFunction = new CastFunction<E>(clazz){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Tuple contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return castFunction.apply(value);
+	}
+
+	static
 	public List<?> extractElementList(List<Object[]> tuples, final int i){
 		Function<Object[], Object> function = new Function<Object[], Object>(){
 
@@ -44,5 +59,20 @@ public class TupleUtil {
 		};
 
 		return Lists.transform(tuples, function);
+	}
+
+	static
+	public <E> List<? extends E> extractElementList(List<Object[]> tuples, int i, Class<? extends E> clazz){
+		List<?> values = extractElementList(tuples, i);
+
+		CastFunction<E> castFunction = new CastFunction<E>(clazz){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Tuple contains an unsupported value (" + ClassDictUtil.formatClass(object) +")";
+			}
+		};
+
+		return Lists.transform(values, castFunction);
 	}
 }

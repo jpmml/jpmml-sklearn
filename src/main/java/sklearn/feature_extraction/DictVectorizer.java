@@ -95,7 +95,7 @@ public class DictVectorizer extends Initializer {
 	}
 
 	public List<String> getFeatureNames(){
-		return (List)get("feature_names_");
+		return (List)getList("feature_names_", String.class);
 	}
 
 	public String getSeparator(){
@@ -103,6 +103,6 @@ public class DictVectorizer extends Initializer {
 	}
 
 	public Map<String, Integer> getVocabulary(){
-		return (Map)get("vocabulary_");
+		return get("vocabulary_", Map.class);
 	}
 }

@@ -21,7 +21,6 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 
 public class QuantileEstimator extends PyClassDict implements HasDefaultValue {
@@ -30,11 +29,12 @@ public class QuantileEstimator extends PyClassDict implements HasDefaultValue {
 		super(module, name);
 	}
 
+	@Override
 	public Number getDefaultValue(){
 		return Iterables.getOnlyElement(getQuantile());
 	}
 
 	public List<? extends Number> getQuantile(){
-		return (List)ClassDictUtil.getArray(this, "quantile");
+		return getArray("quantile", Number.class);
 	}
 }

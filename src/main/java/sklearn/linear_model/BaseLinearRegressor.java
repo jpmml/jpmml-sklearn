@@ -25,7 +25,6 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
 
 abstract
@@ -51,14 +50,14 @@ public class BaseLinearRegressor extends Regressor {
 	}
 
 	public List<? extends Number> getCoef(){
-		return (List)ClassDictUtil.getArray(this, "coef_");
+		return getArray("coef_", Number.class);
+	}
+
+	public int[] getCoefShape(){
+		return getArrayShape("coef_", 1);
 	}
 
 	public List<? extends Number> getIntercept(){
-		return (List)ClassDictUtil.getArray(this, "intercept_");
-	}
-
-	private int[] getCoefShape(){
-		return ClassDictUtil.getShape(this, "coef_", 1);
+		return getArray("intercept_", Number.class);
 	}
 }

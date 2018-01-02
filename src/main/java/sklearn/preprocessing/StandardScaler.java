@@ -118,32 +118,32 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getMean(){
-		return (List)ClassDictUtil.getArray(this, "mean_");
+		return getArray("mean_", Number.class);
+	}
+
+	public int[] getMeanShape(){
+		return getArrayShape("mean_", 1);
 	}
 
 	public List<? extends Number> getStd(){
 
 		// SkLearn 0.16
 		if(containsKey("std_")){
-			return (List)ClassDictUtil.getArray(this, "std_");
+			return getArray("std_", Number.class);
 		}
 
 		// SkLearn 0.17+
-		return (List)ClassDictUtil.getArray(this, "scale_");
+		return getArray("scale_", Number.class);
 	}
 
-	private int[] getMeanShape(){
-		return ClassDictUtil.getShape(this, "mean_", 1);
-	}
-
-	private int[] getStdShape(){
+	public int[] getStdShape(){
 
 		// SkLearn 0.16
 		if(containsKey("std_")){
-			return ClassDictUtil.getShape(this, "std_", 1);
+			return getArrayShape("std_", 1);
 		}
 
 		// SkLearn 0.17+
-		return ClassDictUtil.getShape(this, "scale_", 1);
+		return getArrayShape("scale_", 1);
 	}
 }

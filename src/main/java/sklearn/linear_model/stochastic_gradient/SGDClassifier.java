@@ -18,7 +18,6 @@
  */
 package sklearn.linear_model.stochastic_gradient;
 
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.linear_model.BaseLinearClassifier;
 
 public class SGDClassifier extends BaseLinearClassifier {
@@ -43,26 +42,15 @@ public class SGDClassifier extends BaseLinearClassifier {
 	}
 
 	public LossFunction getLossFunction(){
-		Object lossFunction;
 
 		// SkLearn 0.18
 		if(containsKey("loss_function")){
-			lossFunction = get("loss_function");
+			return get("loss_function", LossFunction.class);
 		} else
 
 		// SkLearn 0.19+
 		{
-			lossFunction = get("loss_function_");
-		}
-
-		try {
-			if(lossFunction == null){
-				throw new NullPointerException();
-			}
-
-			return (LossFunction)lossFunction;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The loss function object (" + ClassDictUtil.formatClass(lossFunction) + ") is not a LossFunction or is not a supported LossFunction subclass", re);
+			return get("loss_function_", LossFunction.class);
 		}
 	}
 }

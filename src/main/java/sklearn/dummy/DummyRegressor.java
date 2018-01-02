@@ -26,7 +26,6 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
 
 public class DummyRegressor extends Regressor {
@@ -50,6 +49,6 @@ public class DummyRegressor extends Regressor {
 	}
 
 	public List<? extends Number> getConstant(){
-		return (List)ClassDictUtil.getArray(this, "constant_");
+		return getArray("constant_", Number.class);
 	}
 }

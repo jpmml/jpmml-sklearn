@@ -49,6 +49,6 @@ public class BaseForestRegressor extends Regressor implements HasEstimatorEnsemb
 
 	@Override
 	public List<? extends TreeRegressor> getEstimators(){
-		return (List)get("estimators_");
+		return getList("estimators_", TreeRegressor.class);
 	}
 }

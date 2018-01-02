@@ -21,7 +21,6 @@ package scipy.sparse;
 import java.util.List;
 
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.PyClassDict;
 
@@ -42,15 +41,15 @@ public class CSRMatrix extends PyClassDict implements HasArray {
 	}
 
 	public List<?> getData(){
-		return ClassDictUtil.getArray(this, "data");
+		return getArray("data");
 	}
 
 	public List<Integer> getIndices(){
-		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "indices"));
+		return ValueUtil.asIntegers(getArray("indices", Number.class));
 	}
 
 	public List<Integer> getIndPtr(){
-		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "indptr"));
+		return ValueUtil.asIntegers(getArray("indptr", Number.class));
 	}
 
 	public Object[] getShape(){

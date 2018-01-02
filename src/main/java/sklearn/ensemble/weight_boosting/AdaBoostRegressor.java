@@ -28,7 +28,6 @@ import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
@@ -70,6 +69,6 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 	}
 
 	public List<? extends Number> getEstimatorWeights(){
-		return (List)ClassDictUtil.getArray(this, "estimator_weights_");
+		return getArray("estimator_weights_", Number.class);
 	}
 }

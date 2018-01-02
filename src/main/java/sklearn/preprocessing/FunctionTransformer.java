@@ -30,7 +30,6 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -48,13 +47,7 @@ public class FunctionTransformer extends Transformer {
 			return features;
 		}
 
-		UFunc ufunc;
-
-		try {
-			ufunc = (UFunc)func;
-		} catch(ClassCastException cce){
-			throw new IllegalArgumentException("The function object (" + ClassDictUtil.formatClass(func) + ") is not a Numpy universal function", cce);
-		}
+		UFunc ufunc = getUFunc();
 
 		List<Feature> result = new ArrayList<>();
 
@@ -78,6 +71,10 @@ public class FunctionTransformer extends Transformer {
 
 	public Object getFunc(){
 		return get("func");
+	}
+
+	public UFunc getUFunc(){
+		return get("func", UFunc.class);
 	}
 
 	static

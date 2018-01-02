@@ -180,7 +180,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	public double getThreshold(){
-		Scalar threshold = (Scalar)get("threshold_");
+		Scalar threshold = get("threshold_", Scalar.class);
 
 		return ValueUtil.asDouble((Number)threshold.getOnlyElement());
 	}

@@ -24,7 +24,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 import sklearn.tree.DecisionTreeRegressor;
@@ -61,17 +60,7 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 	}
 
 	public HasDefaultValue getInit(){
-		Object init = get("init_");
-
-		try {
-			if(init == null){
-				throw new NullPointerException();
-			}
-
-			return (HasDefaultValue)init;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(init) + ") is not a BaseEstimator or is not a supported BaseEstimator subclass", re);
-		}
+		return get("init_", HasDefaultValue.class);
 	}
 
 	public Number getLearningRate(){
@@ -80,6 +69,6 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 
 	@Override
 	public List<? extends DecisionTreeRegressor> getEstimators(){
-		return (List)ClassDictUtil.getArray(this, "estimators_");
+		return getArray("estimators_", DecisionTreeRegressor.class);
 	}
 }

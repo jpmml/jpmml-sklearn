@@ -22,7 +22,7 @@ import java.util.List;
 
 public interface HasTrainingData {
 
-	List<?> getY();
-
 	List<? extends Number> getFitX();
+
+	List<?> getY();
 }

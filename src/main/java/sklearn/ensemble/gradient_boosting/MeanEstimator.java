@@ -21,7 +21,6 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 
 public class MeanEstimator extends PyClassDict implements HasDefaultValue {
@@ -36,6 +35,6 @@ public class MeanEstimator extends PyClassDict implements HasDefaultValue {
 	}
 
 	public List<? extends Number> getMean(){
-		return (List)ClassDictUtil.getArray(this, "mean");
+		return getArray("mean", Number.class);
 	}
 }

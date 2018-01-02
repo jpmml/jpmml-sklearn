@@ -59,8 +59,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import sklearn.Classifier;
+import sklearn.ClassifierUtil;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
@@ -80,7 +80,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	public PMML encodePMML(){
-		List<Transformer> transformers = getTransformers();
+		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 		List<String> activeFields = getActiveFields();
 		List<String> probabilityFields = null;
@@ -111,11 +111,11 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			switch(miningFunction){
 				case CLASSIFICATION:
 					{
-						List<?> classes = EstimatorUtil.getClasses(estimator);
+						List<?> classes = ClassifierUtil.getClasses(estimator);
 
 						DataType dataType = TypeUtil.getDataType(classes, DataType.STRING);
 
-						List<String> categories = EstimatorUtil.formatTargetCategories(classes);
+						List<String> categories = ClassifierUtil.formatTargetCategories(classes);
 
 						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, dataType, categories);
 
@@ -176,10 +176,10 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 			int[] probabilityValuesShape = null;
 
-			List<?> probabilityValues = null;
+			List<? extends Number> probabilityValues = null;
 
 			if(estimator instanceof Classifier){
-				Classifier classifier = EstimatorUtil.asClassifier(estimator);
+				Classifier classifier = (Classifier)estimator;
 
 				if(classifier.hasProbabilityDistribution() && verification.hasProbabilityValues()){
 					probabilityValuesShape = verification.getProbabilityValuesShape();
@@ -345,14 +345,14 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	@Override
-	public List<Transformer> getTransformers(){
+	public List<? extends Transformer> getTransformers(){
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() > 0){
 			steps = steps.subList(0, steps.size() - 1);
 		}
 
-		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(steps, 1));
+		return TupleUtil.extractElementList(steps, 1, Transformer.class);
 	}
 
 	@Override
@@ -365,7 +365,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		Object[] lastStep = steps.get(steps.size() - 1);
 
-		return EstimatorUtil.asEstimator(TupleUtil.extractElement(lastStep, 1));
+		return TupleUtil.extractElement(lastStep, 1, Estimator.class);
 	}
 
 	@Override
@@ -385,7 +385,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			return null;
 		}
 
-		return (List)ClassDictUtil.getArray(this, "active_fields");
+		return (List)getArray("active_fields", String.class);
 	}
 
 	public PMMLPipeline setActiveFields(List<String> activeFields){
@@ -406,7 +406,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			return null;
 		}
 
-		return (List)ClassDictUtil.getArray(this, "target_fields");
+		return (List)getArray("target_fields", String.class);
 	}
 
 	public PMMLPipeline setTargetFields(List<String> targetFields){

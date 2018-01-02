@@ -60,10 +60,10 @@ public class MLPClassifier extends Classifier {
 	}
 
 	public List<? extends HasArray> getCoefs(){
-		return (List)get("coefs_");
+		return getList("coefs_", HasArray.class);
 	}
 
 	public List<? extends HasArray> getIntercepts(){
-		return (List)get("intercepts_");
+		return getList("intercepts_", HasArray.class);
 	}
 }

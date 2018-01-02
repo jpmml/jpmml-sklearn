@@ -118,18 +118,18 @@ public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getCenter(){
-		return (List)ClassDictUtil.getArray(this, "center_");
+		return getArray("center_", Number.class);
+	}
+
+	public int[] getCenterShape(){
+		return getArrayShape("center_", 1);
 	}
 
 	public List<? extends Number> getScale(){
-		return (List)ClassDictUtil.getArray(this, "scale_");
+		return getArray("scale_", Number.class);
 	}
 
-	private int[] getCenterShape(){
-		return ClassDictUtil.getShape(this, "center_", 1);
-	}
-
-	private int[] getScaleShape(){
-		return ClassDictUtil.getShape(this, "scale_", 1);
+	public int[] getScaleShape(){
+		return getArrayShape("scale_", 1);
 	}
 }

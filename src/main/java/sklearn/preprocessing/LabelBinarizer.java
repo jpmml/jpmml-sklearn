@@ -121,7 +121,7 @@ public class LabelBinarizer extends Transformer {
 	}
 
 	public List<?> getClasses(){
-		return (List)ClassDictUtil.getArray(this, "classes_");
+		return getArray("classes_");
 	}
 
 	public Number getPosLabel(){

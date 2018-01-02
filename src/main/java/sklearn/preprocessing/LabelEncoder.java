@@ -108,6 +108,6 @@ public class LabelEncoder extends Transformer {
 	}
 
 	public List<?> getClasses(){
-		return ClassDictUtil.getArray(this, "classes_");
+		return getArray("classes_");
 	}
 }

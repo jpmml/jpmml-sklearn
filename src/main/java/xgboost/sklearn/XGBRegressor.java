@@ -46,6 +46,6 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 
 	@Override
 	public Booster getBooster(){
-		return (Booster)get("_Booster");
+		return get("_Booster", Booster.class);
 	}
 }

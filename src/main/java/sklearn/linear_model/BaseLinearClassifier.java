@@ -32,9 +32,8 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
+import sklearn.ClassifierUtil;
 
 abstract
 public class BaseLinearClassifier extends Classifier {
@@ -67,13 +66,13 @@ public class BaseLinearClassifier extends Classifier {
 		List<Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
-			EstimatorUtil.checkSize(2, categoricalLabel);
+			ClassifierUtil.checkSize(2, categoricalLabel);
 
 			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 3){
-			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
+			ClassifierUtil.checkSize(numberOfClasses, categoricalLabel);
 
 			List<RegressionTable> regressionTables = new ArrayList<>();
 
@@ -97,14 +96,14 @@ public class BaseLinearClassifier extends Classifier {
 	}
 
 	public List<? extends Number> getCoef(){
-		return (List)ClassDictUtil.getArray(this, "coef_");
+		return getArray("coef_", Number.class);
+	}
+
+	public int[] getCoefShape(){
+		return getArrayShape("coef_", 2);
 	}
 
 	public List<? extends Number> getIntercept(){
-		return (List)ClassDictUtil.getArray(this, "intercept_");
-	}
-
-	private int[] getCoefShape(){
-		return ClassDictUtil.getShape(this, "coef_", 2);
+		return getArray("intercept_", Number.class);
 	}
 }

@@ -30,10 +30,8 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class VotingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
@@ -79,9 +77,7 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 
 	@Override
 	public List<? extends Classifier> getEstimators(){
-		List<?> estimators = (List)get("estimators_");
-
-		return EstimatorUtil.asClassifierList(estimators);
+		return getList("estimators_", Classifier.class);
 	}
 
 	public String getVoting(){
@@ -95,7 +91,7 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 			return (List)weights;
 		}
 
-		return (List)ClassDictUtil.getArray(this, "weights");
+		return getArray("weights", Number.class);
 	}
 
 	static

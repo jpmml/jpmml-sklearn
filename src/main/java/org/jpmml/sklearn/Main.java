@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.List;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -117,7 +118,7 @@ public class Main {
 				Pipeline pipeline = (Pipeline)object;
 
 				object = new PMMLPipeline()
-					.setSteps(pipeline.getSteps());
+					.setSteps((List)pipeline.getSteps());
 			} else
 
 			// Create a single-step PMMLPipeline from an Estimator

@@ -32,7 +32,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import sklearn.Estimator;
 
@@ -65,19 +64,12 @@ public class BaggingUtil {
 	}
 
 	static
-	public List<List<Integer>> transformEstimatorsFeatures(List<?> estimatorsFeatures){
-		Function<Object, List<Integer>> function = new Function<Object, List<Integer>>(){
+	public List<List<Integer>> transformEstimatorsFeatures(List<? extends HasArray> estimatorsFeatures){
+		Function<HasArray, List<Integer>> function = new Function<HasArray, List<Integer>>(){
 
 			@Override
-			public List<Integer> apply(Object object){
-
-				if(object instanceof HasArray){
-					HasArray hasArray = (HasArray)object;
-
-					return ValueUtil.asIntegers((List)hasArray.getArrayContent());
-				}
-
-				throw new IllegalArgumentException("The estimator features object (" + ClassDictUtil.formatClass(object) + ") is not an array");
+			public List<Integer> apply(HasArray hasArray){
+				return ValueUtil.asIntegers((List)hasArray.getArrayContent());
 			}
 		};
 

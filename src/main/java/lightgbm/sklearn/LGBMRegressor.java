@@ -40,6 +40,6 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 
 	@Override
 	public Booster getBooster(){
-		return (Booster)get("_Booster");
+		return get("_Booster", Booster.class);
 	}
 }

@@ -94,19 +94,19 @@ public class GaussianNB extends Classifier {
 	}
 
 	public List<Integer> getClassCount(){
-		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "class_count_"));
+		return ValueUtil.asIntegers(getArray("class_count_", Number.class));
 	}
 
 	public List<? extends Number> getTheta(){
-		return (List)ClassDictUtil.getArray(this, "theta_");
+		return getArray("theta_", Number.class);
+	}
+
+	public int[] getThetaShape(){
+		return getArrayShape("theta_", 2);
 	}
 
 	public List<? extends Number> getSigma(){
-		return (List)ClassDictUtil.getArray(this, "sigma_");
-	}
-
-	private int[] getThetaShape(){
-		return ClassDictUtil.getShape(this, "theta_", 2);
+		return getArray("sigma_", Number.class);
 	}
 
 	static

@@ -37,7 +37,6 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.clustering.ClusteringModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Clusterer;
 
 public class KMeans extends Clusterer {
@@ -91,14 +90,14 @@ public class KMeans extends Clusterer {
 	}
 
 	public List<? extends Number> getClusterCenters(){
-		return (List)ClassDictUtil.getArray(this, "cluster_centers_");
+		return getArray("cluster_centers_", Number.class);
+	}
+
+	public int[] getClusterCentersShape(){
+		return getArrayShape("cluster_centers_", 2);
 	}
 
 	public List<Integer> getLabels(){
-		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "labels_"));
-	}
-
-	private int[] getClusterCentersShape(){
-		return ClassDictUtil.getShape(this, "cluster_centers_", 2);
+		return ValueUtil.asIntegers(getArray("labels_", Number.class));
 	}
 }

@@ -25,7 +25,6 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Regressor;
 
 public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasTrainingData {
@@ -60,18 +59,13 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	}
 
 	@Override
-	public int getNumberOfNeighbors(){
-		return ValueUtil.asInt((Number)get("n_neighbors"));
-	}
-
-	@Override
-	public String getWeights(){
-		return (String)get("weights");
-	}
-
-	@Override
 	public String getMetric(){
 		return (String)get("metric");
+	}
+
+	@Override
+	public int getNumberOfNeighbors(){
+		return ValueUtil.asInt((Number)get("n_neighbors"));
 	}
 
 	@Override
@@ -80,16 +74,21 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	}
 
 	@Override
-	public List<? extends Number> getY(){
-		return (List)ClassDictUtil.getArray(this, "_y");
+	public String getWeights(){
+		return (String)get("weights");
 	}
 
 	@Override
 	public List<? extends Number> getFitX(){
-		return (List)ClassDictUtil.getArray(this, "_fit_X");
+		return getArray("_fit_X", Number.class);
 	}
 
-	private int[] getFitXShape(){
-		return ClassDictUtil.getShape(this, "_fit_X", 2);
+	public int[] getFitXShape(){
+		return getArrayShape("_fit_X", 2);
+	}
+
+	@Override
+	public List<? extends Number> getY(){
+		return getArray("_y", Number.class);
 	}
 }

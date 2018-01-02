@@ -27,7 +27,6 @@ import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Transformer;
-import sklearn.TransformerUtil;
 
 public class FeatureUnion extends Transformer {
 
@@ -47,7 +46,7 @@ public class FeatureUnion extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<Transformer> transformers = getTransformers();
+		List<? extends Transformer> transformers = getTransformers();
 
 		List<Feature> result = new ArrayList<>();
 
@@ -64,13 +63,13 @@ public class FeatureUnion extends Transformer {
 		return result;
 	}
 
-	public List<Transformer> getTransformers(){
+	public List<? extends Transformer> getTransformers(){
 		List<Object[]> transformerList = getTransformerList();
 
-		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(transformerList, 1));
+		return TupleUtil.extractElementList(transformerList, 1, Transformer.class);
 	}
 
 	public List<Object[]> getTransformerList(){
-		return (List)get("transformer_list");
+		return getTupleList("transformer_list");
 	}
 }

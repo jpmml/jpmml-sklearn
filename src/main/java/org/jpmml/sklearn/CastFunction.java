@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2018 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,35 +16,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn;
+package org.jpmml.sklearn;
 
-import java.util.List;
-
-import org.dmg.pmml.MiningFunction;
+import com.google.common.base.Function;
 
 abstract
-public class Classifier extends Estimator implements HasClasses {
+public class CastFunction<E> implements Function<Object, E> {
 
-	public Classifier(String module, String name){
-		super(module, name);
+	private Class<? extends E> clazz = null;
+
+
+	public CastFunction(Class<? extends E> clazz){
+		setClazz(clazz);
 	}
+
+	abstract
+	protected String formatMessage(Object object);
 
 	@Override
-	public MiningFunction getMiningFunction(){
-		return MiningFunction.CLASSIFICATION;
+	public E apply(Object object){
+		Class<? extends E> clazz = getClazz();
+
+		try {
+			return clazz.cast(object);
+		} catch(ClassCastException cce){
+			throw new IllegalArgumentException(formatMessage(object), cce);
+		}
 	}
 
-	@Override
-	public boolean isSupervised(){
-		return true;
+	public Class<? extends E> getClazz(){
+		return this.clazz;
 	}
 
-	public boolean hasProbabilityDistribution(){
-		return true;
-	}
+	private void setClazz(Class<? extends E> clazz){
 
-	@Override
-	public List<?> getClasses(){
-		return getArray("classes_");
+		if(clazz == null){
+			throw new IllegalArgumentException();
+		}
+
+		this.clazz = clazz;
 	}
 }

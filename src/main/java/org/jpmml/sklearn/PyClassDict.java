@@ -18,6 +18,11 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import net.razorvine.pickle.objects.ClassDict;
 
 abstract
@@ -25,6 +30,107 @@ public class PyClassDict extends ClassDict {
 
 	public PyClassDict(String module, String name){
 		super(module, name);
+	}
+
+	public <E> E get(final String name, Class<? extends E> clazz){
+		Object value = get(name);
+
+		if(value == null){
+
+			if(!containsKey(name)){
+				throw new IllegalArgumentException("Attribute " + ClassDictUtil.formatMember(this, name) + " not set");
+			}
+
+			throw new IllegalArgumentException("Attribute " + ClassDictUtil.formatMember(this, name) + " has a missing (None/null) value");
+		}
+
+		CastFunction<E> castFunction = new CastFunction<E>(clazz){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Attribute " + ClassDictUtil.formatMember(PyClassDict.this, name) + " has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return castFunction.apply(value);
+	}
+
+	public List<?> getArray(String name){
+		Object object = get(name);
+
+		if(object instanceof HasArray){
+			HasArray hasArray = (HasArray)object;
+
+			return hasArray.getArrayContent();
+		} // End if
+
+		if(object instanceof Number){
+			return Collections.singletonList(object);
+		}
+
+		throw new IllegalArgumentException("The value of " + ClassDictUtil.formatMember(this, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
+	}
+
+	public <E> List<? extends E> getArray(final String name, Class<? extends E> clazz){
+		List<?> values = getArray(name);
+
+		CastFunction<E> castFunction = new CastFunction<E>(clazz){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Array attribute " + ClassDictUtil.formatMember(PyClassDict.this, name) + " contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return Lists.transform(values, castFunction);
+	}
+
+	public int[] getArrayShape(String name){
+		Object object = get(name);
+
+		if(object instanceof HasArray){
+			HasArray hasArray = (HasArray)object;
+
+			return hasArray.getArrayShape();
+		} // End if
+
+		if(object instanceof Number){
+			return new int[]{1};
+		}
+
+		throw new IllegalArgumentException("The value of " + ClassDictUtil.formatMember(this, name) + " attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
+	}
+
+	public int[] getArrayShape(String name, int length){
+		int[] shape = getArrayShape(name);
+
+		if(shape.length != length){
+			throw new IllegalArgumentException("Expected " + length + "-dimensional array, got " + shape.length + "-dimensional (" + Arrays.toString(shape) + ") array");
+		}
+
+		return shape;
+	}
+
+	public List<?> getList(String name){
+		return get(name, List.class);
+	}
+
+	public <E> List<? extends E> getList(final String name, Class<? extends E> clazz){
+		List<?> values = getList(name);
+
+		CastFunction<E> castFunction = new CastFunction<E>(clazz){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "List attribute " + ClassDictUtil.formatMember(PyClassDict.this, name) + " contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return Lists.transform(values, castFunction);
+	}
+
+	public List<Object[]> getTupleList(String name){
+		return (List)getList(name, Object[].class);
 	}
 
 	public Object getOption(String key, Object defaultValue){

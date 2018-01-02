@@ -23,7 +23,6 @@ import java.util.List;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import org.jpmml.sklearn.CClassDict;
-import org.jpmml.sklearn.ClassDictUtil;
 
 public class Tree extends CClassDict {
 
@@ -34,6 +33,10 @@ public class Tree extends CClassDict {
 	@Override
 	public void __init__(Object[] args){
 		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
+	}
+
+	public double[] getValues(){
+		return Doubles.toArray((List)getArray("values"));
 	}
 
 	public int[] getChildrenLeft(){
@@ -56,16 +59,8 @@ public class Tree extends CClassDict {
 		return Ints.toArray(getNodeAttribute("n_node_samples"));
 	}
 
-	public double[] getValues(){
-		List<? extends Number> values = (List<? extends Number>)ClassDictUtil.getArray(this, "values");
-
-		return Doubles.toArray(values);
-	}
-
 	private List<? extends Number> getNodeAttribute(String key){
-		List<? extends Number> nodeAttributes = (List<? extends Number>)ClassDictUtil.getArray(this, "nodes", key);
-
-		return nodeAttributes;
+		return (List)getArray("nodes", key);
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {

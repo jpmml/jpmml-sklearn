@@ -27,6 +27,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.HasArray;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
 
@@ -59,8 +60,6 @@ public class BaggingClassifier extends EnsembleClassifier {
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
-		List<?> estimatorsFeatures = (List)get("estimators_features_");
-
-		return BaggingUtil.transformEstimatorsFeatures(estimatorsFeatures);
+		return BaggingUtil.transformEstimatorsFeatures(getList("estimators_features_", HasArray.class));
 	}
 }

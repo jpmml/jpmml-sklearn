@@ -25,78 +25,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import joblib.NDArrayWrapper;
 import net.razorvine.pickle.objects.ClassDict;
-import numpy.core.NDArray;
-import numpy.core.NDArrayUtil;
 
 public class ClassDictUtil {
 
 	private ClassDictUtil(){
-	}
-
-	static
-	public List<?> getArray(ClassDict dict, String name){
-		Object object = dict.get(name);
-
-		if(object instanceof HasArray){
-			HasArray hasArray = (HasArray)object;
-
-			return hasArray.getArrayContent();
-		} // End if
-
-		if(object instanceof Number){
-			return Collections.singletonList(object);
-		}
-
-		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
-	}
-
-	static
-	public List<?> getArray(ClassDict dict, String name, String key){
-		Object object = dict.get(name);
-
-		if(object instanceof NDArrayWrapper){
-			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
-
-			object = arrayWrapper.getContent();
-		} // End if
-
-		if(object instanceof NDArray){
-			NDArray array = (NDArray)object;
-
-			return NDArrayUtil.getContent(array, key);
-		}
-
-		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
-	}
-
-	static
-	public int[] getShape(ClassDict dict, String name, int length){
-		int[] shape = getShape(dict, name);
-
-		if(shape.length != length){
-			throw new IllegalArgumentException("The dimensionality of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + shape.length + ") is not " + length);
-		}
-
-		return shape;
-	}
-
-	static
-	public int[] getShape(ClassDict dict, String name){
-		Object object = dict.get(name);
-
-		if(object instanceof HasArray){
-			HasArray hasArray = (HasArray)object;
-
-			return hasArray.getArrayShape();
-		} // End if
-
-		if(object instanceof Number){
-			return new int[]{1};
-		}
-
-		throw new IllegalArgumentException("The value of the " + ClassDictUtil.formatMember(dict, name) + " attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
 	}
 
 	static

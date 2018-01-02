@@ -20,7 +20,6 @@ package sklearn.linear_model.ridge;
 
 import java.util.List;
 
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.linear_model.BaseLinearClassifier;
 import sklearn.preprocessing.LabelBinarizer;
 
@@ -43,16 +42,6 @@ public class RidgeClassifier extends BaseLinearClassifier {
 	}
 
 	public LabelBinarizer getLabelBinarizer(){
-		Object object = get("_label_binarizer");
-
-		try {
-			if(object == null){
-				throw new NullPointerException();
-			}
-
-			return (LabelBinarizer)object;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The label binarizer object (" + ClassDictUtil.formatClass(object) + ") is not a LabelBinarizer", re);
-		}
+		return get("_label_binarizer", LabelBinarizer.class);
 	}
 }

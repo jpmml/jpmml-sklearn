@@ -25,8 +25,11 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.CastFunction;
+import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.PyClassDict;
+import sklearn.ClassifierUtil;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimator;
 
@@ -91,7 +94,7 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	public List<?> getClasses(){
 		Estimator estimator = getEstimator();
 
-		return EstimatorUtil.getClasses(estimator);
+		return ClassifierUtil.getClasses(estimator);
 	}
 
 	@Override
@@ -101,10 +104,25 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		return estimator.encodeModel(schema);
 	}
 
+	/**
+	 * @see PyClassDict#get(String, Class)
+	 */
 	@Override
 	public Estimator getEstimator(){
 		Object estimator = super.get("estimator_");
 
-		return EstimatorUtil.asEstimator(estimator);
+		if(estimator == null){
+			throw new IllegalArgumentException("Attribute " + ClassDictUtil.formatMember(this, "estimator_") + " has a missing (None/null) value");
+		}
+
+		CastFunction<Estimator> castFunction = new CastFunction<Estimator>(Estimator.class){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Attribute " + ClassDictUtil.formatMember(EstimatorProxy.this, "estimator_") + " has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return castFunction.apply(estimator);
 	}
 }

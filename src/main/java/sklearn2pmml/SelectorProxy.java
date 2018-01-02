@@ -20,7 +20,6 @@ package sklearn2pmml;
 
 import java.util.List;
 
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Selector;
 
 public class SelectorProxy extends Selector {
@@ -42,10 +41,10 @@ public class SelectorProxy extends Selector {
 
 	@Override
 	public List<Boolean> getSupportMask(){
-		return (List)ClassDictUtil.getArray(this, "support_mask_");
+		return (List)getArray("support_mask_", Boolean.class);
 	}
 
-	private int[] getSupportMaskShape(){
-		return ClassDictUtil.getShape(this, "support_mask_", 1);
+	public int[] getSupportMaskShape(){
+		return getArrayShape("support_mask_", 1);
 	}
 }

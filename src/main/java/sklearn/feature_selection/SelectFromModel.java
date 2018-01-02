@@ -24,7 +24,6 @@ import java.util.List;
 import numpy.core.Scalar;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.Selector;
 
@@ -46,9 +45,12 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 		Estimator estimator = getEstimator();
 		Number threshold = getThreshold();
 
-		List<? extends Number> featureImportances = (List)ClassDictUtil.getArray(estimator, "feature_importances_");
-		if(featureImportances == null){
-			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute");
+		List<? extends Number> featureImportances;
+
+		try {
+			featureImportances = estimator.getArray("feature_importances_", Number.class);
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute", re);
 		}
 
 		List<Boolean> result = new ArrayList<>();
@@ -64,17 +66,17 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 
 	@Override
 	public Estimator getEstimator(){
-		Object estimator = get("estimator_");
-
-		return EstimatorUtil.asEstimator(estimator);
+		return get("estimator_", Estimator.class);
 	}
 
 	public Number getThreshold(){
-		Scalar threshold = (Scalar)get("threshold_");
+		Scalar threshold;
 
 		// SkLearn 0.19+
-		if(threshold == null){
-			throw new IllegalArgumentException("The selector object does not have a persistent \'threshold_\' attribute");
+		try {
+			threshold = get("threshold_", Scalar.class);
+		} catch(RuntimeException re){
+			throw new IllegalArgumentException("The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent \'threshold_\' attribute", re);
 		}
 
 		return (Number)threshold.getOnlyElement();

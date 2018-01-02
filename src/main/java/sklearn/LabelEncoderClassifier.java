@@ -20,7 +20,6 @@ package sklearn;
 
 import java.util.List;
 
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.preprocessing.LabelEncoder;
 
 abstract
@@ -38,16 +37,6 @@ public class LabelEncoderClassifier extends Classifier {
 	}
 
 	public LabelEncoder getLabelEncoder(){
-		Object object = get("_le");
-
-		try {
-			if(object == null){
-				throw new NullPointerException();
-			}
-
-			return (LabelEncoder)object;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The label encoder object (" + ClassDictUtil.formatClass(object) + ") is not a LabelEncoder", re);
-		}
+		return get("_le", LabelEncoder.class);
 	}
 }

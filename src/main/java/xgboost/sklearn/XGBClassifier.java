@@ -46,6 +46,6 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 
 	@Override
 	public Booster getBooster(){
-		return (Booster)get("_Booster");
+		return get("_Booster", Booster.class);
 	}
 }

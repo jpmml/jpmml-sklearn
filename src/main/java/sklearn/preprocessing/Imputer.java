@@ -72,15 +72,15 @@ public class Imputer extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getStatistics(){
-		return (List)ClassDictUtil.getArray(this, "statistics_");
+		return getArray("statistics_", Number.class);
+	}
+
+	public int[] getStatisticsShape(){
+		return getArrayShape("statistics_", 1);
 	}
 
 	public String getStrategy(){
 		return (String)get("strategy");
-	}
-
-	private int[] getStatisticsShape(){
-		return ClassDictUtil.getShape(this, "statistics_", 1);
 	}
 
 	static

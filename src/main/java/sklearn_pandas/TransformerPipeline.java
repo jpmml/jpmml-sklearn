@@ -29,6 +29,6 @@ public class TransformerPipeline extends PyClassDict {
 	}
 
 	public List<Object[]> getSteps(){
-		return (List)get("steps");
+		return getTupleList("steps");
 	}
 }

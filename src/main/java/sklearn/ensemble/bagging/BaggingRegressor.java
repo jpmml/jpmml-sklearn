@@ -24,6 +24,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.HasArray;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 
@@ -44,8 +45,6 @@ public class BaggingRegressor extends EnsembleRegressor {
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
-		List<?> estimatorsFeatures = (List)get("estimators_features_");
-
-		return BaggingUtil.transformEstimatorsFeatures(estimatorsFeatures);
+		return BaggingUtil.transformEstimatorsFeatures(getList("estimators_features_", HasArray.class));
 	}
 }

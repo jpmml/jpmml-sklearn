@@ -98,15 +98,15 @@ public class ContinuousDomain extends Domain {
 	}
 
 	public List<? extends Number> getDataMin(){
-		return (List)ClassDictUtil.getArray(this, "data_min_");
+		return getArray("data_min_", Number.class);
 	}
 
 	public List<? extends Number> getDataMax(){
-		return (List)ClassDictUtil.getArray(this, "data_max_");
+		return getArray("data_max_", Number.class);
 	}
 
 	public Map<String, ?> getNumericInfo(){
-		return (Map)get("numeric_info_");
+		return get("numeric_info_", Map.class);
 	}
 
 	static

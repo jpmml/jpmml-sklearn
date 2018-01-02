@@ -258,17 +258,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public Splitter getTokenizer(){
-		Object tokenizer = get("tokenizer");
-
-		try {
-			if(tokenizer == null){
-				throw new NullPointerException();
-			}
-
-			return (Splitter)tokenizer;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The tokenizer object (" + ClassDictUtil.formatClass(tokenizer) + ") is not Splitter");
-		}
+		return get("tokenizer", Splitter.class);
 	}
 
 	public String getTokenPattern(){
@@ -276,7 +266,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public Map<String, ?> getVocabulary(){
-		return (Map)get("vocabulary_");
+		return get("vocabulary_", Map.class);
 	}
 
 	static

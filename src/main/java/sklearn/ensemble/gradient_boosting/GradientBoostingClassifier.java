@@ -33,10 +33,9 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.ClassifierUtil;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.HasTreeOptions;
@@ -80,7 +79,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		if(numberOfClasses == 1){
-			EstimatorUtil.checkSize(2, categoricalLabel);
+			ClassifierUtil.checkSize(2, categoricalLabel);
 
 			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, init.getPriorProbability(0), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
@@ -89,7 +88,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		} else
 
 		if(numberOfClasses >= 3){
-			EstimatorUtil.checkSize(numberOfClasses, categoricalLabel);
+			ClassifierUtil.checkSize(numberOfClasses, categoricalLabel);
 
 			List<? extends DecisionTreeRegressor> estimators = getEstimators();
 
@@ -122,31 +121,11 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 	}
 
 	public LossFunction getLoss(){
-		Object loss = get("loss_");
-
-		try {
-			if(loss == null){
-				throw new NullPointerException();
-			}
-
-			return (LossFunction)loss;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The loss function object (" + ClassDictUtil.formatClass(loss) + ") is not a LossFunction or is not a supported LossFunction subclass", re);
-		}
+		return get("loss_", LossFunction.class);
 	}
 
 	public HasPriorProbability getInit(){
-		Object init = get("init_");
-
-		try {
-			if(init == null){
-				throw new NullPointerException();
-			}
-
-			return (HasPriorProbability)init;
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(init) + ") is not a BaseEstimator or is not a supported BaseEstimator subclass", re);
-		}
+		return get("init_", HasPriorProbability.class);
 	}
 
 	public Number getLearningRate(){
@@ -155,7 +134,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 	@Override
 	public List<? extends DecisionTreeRegressor> getEstimators(){
-		return (List)ClassDictUtil.getArray(this, "estimators_");
+		return getArray("estimators_", DecisionTreeRegressor.class);
 	}
 
 	abstract

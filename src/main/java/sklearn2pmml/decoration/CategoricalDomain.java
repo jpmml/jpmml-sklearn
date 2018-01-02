@@ -103,7 +103,7 @@ public class CategoricalDomain extends Domain {
 	}
 
 	public List<?> getData(){
-		return (List)ClassDictUtil.getArray(this, "data_");
+		return getArray("data_");
 	}
 
 	public Object[] getDiscrStats(){

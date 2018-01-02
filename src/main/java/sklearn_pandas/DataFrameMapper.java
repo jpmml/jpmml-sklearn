@@ -23,12 +23,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.sklearn.CastFunction;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -106,7 +106,7 @@ public class DataFrameMapper extends Initializer {
 	}
 
 	public List<Object[]> getFeatures(){
-		return (List)get("features");
+		return getTupleList("features");
 	}
 
 	public DataFrameMapper setFeatures(List<Object[]> features){
@@ -117,71 +117,57 @@ public class DataFrameMapper extends Initializer {
 
 	static
 	private List<String> getColumnList(Object[] feature){
-		Function<Object, String> function = new Function<Object, String>(){
+		Object key = feature[0];
+
+		if(key instanceof HasArray){
+			HasArray hasArray = (HasArray)key;
+
+			key = hasArray.getArrayContent();
+		}
+
+		CastFunction<String> castFunction = new CastFunction<String>(String.class){
 
 			@Override
-			public String apply(Object object){
-
-				if(object instanceof String){
-					return (String)object;
-				}
-
-				throw new IllegalArgumentException("The key object (" + ClassDictUtil.formatClass(object) + ") is not a String");
+			protected String formatMessage(Object object){
+				return "The key object (" + ClassDictUtil.formatClass(object) + ") is not a String";
 			}
 		};
 
-		try {
-			if(feature[0] instanceof HasArray){
-				HasArray hasArray = (HasArray)feature[0];
-
-				return (List)hasArray.getArrayContent();
-			} // End if
-
-			if(feature[0] instanceof List){
-				return Lists.transform(((List)feature[0]), function);
-			}
-
-			return Collections.singletonList(function.apply(feature[0]));
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("Invalid mapping key", re);
+		if(key instanceof List){
+			return Lists.transform((List)key, castFunction);
 		}
+
+		return Collections.singletonList(castFunction.apply(key));
 	}
 
 	static
 	private List<Transformer> getTransformerList(Object[] feature){
-		Function<Object, Transformer> function = new Function<Object, Transformer>(){
+		Object value = feature[1];
+
+		if(value == null){
+			return Collections.emptyList();
+		} // End if
+
+		if(value instanceof TransformerPipeline){
+			TransformerPipeline transformerPipeline = (TransformerPipeline)value;
+
+			List<Object[]> steps = transformerPipeline.getSteps();
+
+			value = TupleUtil.extractElementList(steps, 1);
+		}
+
+		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
 
 			@Override
-			public Transformer apply(Object object){
-
-				if(object instanceof Transformer){
-					return (Transformer)object;
-				}
-
-				throw new IllegalArgumentException("The value object (" + ClassDictUtil.formatClass(object) + ") is not a Transformer or is not a supported Transformer subclass");
+			protected String formatMessage(Object object){
+				return "The value object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
 			}
 		};
 
-		try {
-			if(feature[1] == null){
-				return Collections.emptyList();
-			} // End if
-
-			if(feature[1] instanceof TransformerPipeline){
-				TransformerPipeline transformerPipeline = (TransformerPipeline)feature[1];
-
-				List<Object[]> steps = transformerPipeline.getSteps();
-
-				return Lists.transform((List)TupleUtil.extractElementList(steps, 1), function);
-			} // End if
-
-			if(feature[1] instanceof List){
-				return Lists.transform((List)feature[1], function);
-			}
-
-			return Collections.singletonList(function.apply(feature[1]));
-		} catch(RuntimeException re){
-			throw new IllegalArgumentException("Invalid mapping value", re);
+		if(value instanceof List){
+			return Lists.transform((List)value, castFunction);
 		}
+
+		return Collections.singletonList(castFunction.apply(value));
 	}
 }

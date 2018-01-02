@@ -106,7 +106,7 @@ public class DummyClassifier extends Classifier {
 	}
 
 	public List<? extends Number> getClassPrior(){
-		return (List)ClassDictUtil.getArray(this, "class_prior_");
+		return getArray("class_prior_", Number.class);
 	}
 
 	public Object getConstant(){

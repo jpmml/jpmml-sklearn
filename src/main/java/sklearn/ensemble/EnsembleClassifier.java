@@ -23,7 +23,6 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 
 abstract
@@ -48,15 +47,11 @@ public class EnsembleClassifier extends Classifier implements HasEstimatorEnsemb
 	}
 
 	public Classifier getBaseEstimator(){
-		Object baseEstimator = get("base_estimator_");
-
-		return EstimatorUtil.asClassifier(baseEstimator);
+		return get("base_estimator_", Classifier.class);
 	}
 
 	@Override
 	public List<? extends Classifier> getEstimators(){
-		List<?> estimators = (List)get("estimators_");
-
-		return EstimatorUtil.asClassifierList(estimators);
+		return getList("estimators_", Classifier.class);
 	}
 }

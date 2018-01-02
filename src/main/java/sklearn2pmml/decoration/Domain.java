@@ -138,7 +138,7 @@ public class Domain extends Transformer {
 	}
 
 	public Map<String, ?> getCounts(){
-		return (Map)get("counts_");
+		return get("counts_", Map.class);
 	}
 
 	static

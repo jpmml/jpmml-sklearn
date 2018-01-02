@@ -24,7 +24,6 @@ import java.util.List;
 
 import com.google.common.primitives.Booleans;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Selector;
 
 public class SelectKBest extends Selector {
@@ -82,11 +81,11 @@ public class SelectKBest extends Selector {
 	}
 
 	public List<? extends Number> getScores(){
-		return (List)ClassDictUtil.getArray(this, "scores_");
+		return getArray("scores_", Number.class);
 	}
 
-	private int[] getScoresShape(){
-		return ClassDictUtil.getShape(this, "scores_", 1);
+	public int[] getScoresShape(){
+		return getArrayShape("scores_", 1);
 	}
 
 	static

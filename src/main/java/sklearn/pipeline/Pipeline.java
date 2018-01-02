@@ -28,7 +28,6 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
-import sklearn.TransformerUtil;
 
 public class Pipeline extends Transformer {
 
@@ -42,7 +41,7 @@ public class Pipeline extends Transformer {
 
 	@Override
 	public OpType getOpType(){
-		List<Transformer> transformers = getTransformers();
+		List<? extends Transformer> transformers = getTransformers();
 
 		for(Transformer transformer : transformers){
 			return transformer.getOpType();
@@ -53,7 +52,7 @@ public class Pipeline extends Transformer {
 
 	@Override
 	public DataType getDataType(){
-		List<Transformer> transformers = getTransformers();
+		List<? extends Transformer> transformers = getTransformers();
 
 		for(Transformer transformer : transformers){
 			return transformer.getDataType();
@@ -64,7 +63,7 @@ public class Pipeline extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<Transformer> transformers = getTransformers();
+		List<? extends Transformer> transformers = getTransformers();
 
 		for(Transformer transformer : transformers){
 
@@ -85,13 +84,13 @@ public class Pipeline extends Transformer {
 		return features;
 	}
 
-	public List<Transformer> getTransformers(){
+	public List<? extends Transformer> getTransformers(){
 		List<Object[]> steps = getSteps();
 
-		return TransformerUtil.asTransformerList(TupleUtil.extractElementList(steps, 1));
+		return TupleUtil.extractElementList(steps, 1, Transformer.class);
 	}
 
 	public List<Object[]> getSteps(){
-		return (List)get("steps");
+		return getTupleList("steps");
 	}
 }

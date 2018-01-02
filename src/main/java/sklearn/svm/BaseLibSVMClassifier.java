@@ -26,7 +26,6 @@ import org.jpmml.converter.CMatrix;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 
 abstract
@@ -94,31 +93,26 @@ public class BaseLibSVMClassifier extends Classifier {
 	}
 
 	public List<Integer> getSupport(){
-		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "support_"));
+		return ValueUtil.asIntegers(getArray("support_", Number.class));
 	}
 
 	public List<? extends Number> getSupportVectors(){
-		return (List)ClassDictUtil.getArray(this, "support_vectors_");
+		return getArray("support_vectors_", Number.class);
+	}
+
+	public int[] getSupportVectorsShape(){
+		return getArrayShape("support_vectors_", 2);
 	}
 
 	public List<Integer> getSupportSizes(){
-		return ValueUtil.asIntegers((List)ClassDictUtil.getArray(this, "n_support_"));
+		return ValueUtil.asIntegers(getArray("n_support_", Number.class));
 	}
 
 	public List<? extends Number> getDualCoef(){
-		return (List)ClassDictUtil.getArray(this, "_dual_coef_");
+		return getArray("_dual_coef_", Number.class);
 	}
 
 	public List<? extends Number> getIntercept(){
-		return (List)ClassDictUtil.getArray(this, "_intercept_");
-	}
-
-	private int[] getSupportVectorsShape(){
-		return ClassDictUtil.getShape(this, "support_vectors_", 2);
-	}
-
-	static
-	private <E> List<E> slice(List<E> list, int[] offsets, int index){
-		return list.subList(offsets[index], offsets[index + 1]);
+		return getArray("_intercept_", Number.class);
 	}
 }

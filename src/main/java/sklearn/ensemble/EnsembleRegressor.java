@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
-import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 
@@ -48,15 +47,11 @@ public class EnsembleRegressor extends Regressor implements HasEstimatorEnsemble
 	}
 
 	public Regressor getBaseEstimator(){
-		Object baseEstimator = get("base_estimator_");
-
-		return EstimatorUtil.asRegressor(baseEstimator);
+		return get("base_estimator_", Regressor.class);
 	}
 
 	@Override
 	public List<? extends Regressor> getEstimators(){
-		List<?> estimators = (List)get("estimators_");
-
-		return EstimatorUtil.asRegressorList(estimators);
+		return getList("estimators_", Regressor.class);
 	}
 }

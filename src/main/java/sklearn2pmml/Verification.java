@@ -20,7 +20,6 @@ package sklearn2pmml;
 
 import java.util.List;
 
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 
 public class Verification extends PyClassDict {
@@ -34,27 +33,27 @@ public class Verification extends PyClassDict {
 	}
 
 	public List<?> getActiveValues(){
-		return ClassDictUtil.getArray(this, "active_values");
-	}
-
-	public List<?> getProbabilityValues(){
-		return ClassDictUtil.getArray(this, "probability_values");
-	}
-
-	public List<?> getTargetValues(){
-		return ClassDictUtil.getArray(this, "target_values");
+		return getArray("active_values");
 	}
 
 	public int[] getActiveValuesShape(){
-		return ClassDictUtil.getShape(this, "active_values", 2);
+		return getArrayShape("active_values", 2);
+	}
+
+	public List<? extends Number> getProbabilityValues(){
+		return getArray("probability_values", Number.class);
 	}
 
 	public int[] getProbabilityValuesShape(){
-		return ClassDictUtil.getShape(this, "probability_values", 2);
+		return getArrayShape("probability_values", 2);
+	}
+
+	public List<?> getTargetValues(){
+		return getArray("target_values");
 	}
 
 	public int[] getTargetValuesShape(){
-		return ClassDictUtil.getShape(this, "target_values");
+		return getArrayShape("target_values");
 	}
 
 	public Number getPrecision(){

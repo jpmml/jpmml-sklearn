@@ -130,19 +130,19 @@ public class PCA extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getComponents(){
-		return (List)ClassDictUtil.getArray(this, "components_");
+		return getArray("components_", Number.class);
+	}
+
+	public int[] getComponentsShape(){
+		return getArrayShape("components_", 2);
 	}
 
 	public List<? extends Number> getExplainedVariance(){
-		return (List)ClassDictUtil.getArray(this, "explained_variance_");
+		return getArray("explained_variance_", Number.class);
 	}
 
 	public List<? extends Number> getMean(){
-		return (List)ClassDictUtil.getArray(this, "mean_");
-	}
-
-	private int[] getComponentsShape(){
-		return ClassDictUtil.getShape(this, "components_", 2);
+		return getArray("mean_", Number.class);
 	}
 
 	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);
