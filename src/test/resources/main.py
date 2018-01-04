@@ -29,7 +29,7 @@ from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, Label
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import PMMLPipeline
-from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
+from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.preprocessing import ExpressionTransformer, LookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
@@ -132,9 +132,7 @@ audit_X, audit_y = load_audit("Audit.csv")
 
 def build_audit(classifier, name, with_proba = True, **kwargs):
 	continuous_mapper = DataFrameMapper([
-		("Age", ContinuousDomain()),
-		("Income", ContinuousDomain()),
-		("Hours", ContinuousDomain())
+		(["Age", "Income", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 3)]))
 	])
 	categorical_mapper = DataFrameMapper([
 		("Employment", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
