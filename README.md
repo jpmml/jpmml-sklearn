@@ -106,6 +106,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * `sklearn2pmml.decoration.MultiDomain`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
+    * `sklearn2pmml.preprocessing.MultiLookupTransformer`
     * `sklearn2pmml.preprocessing.PMMLLabelBinarizer`
     * `sklearn2pmml.preprocessing.PMMLLabelEncoder`
   * [Sklearn-Pandas](https://github.com/paulgb/sklearn-pandas):

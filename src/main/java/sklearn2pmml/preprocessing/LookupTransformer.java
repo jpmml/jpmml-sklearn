@@ -30,6 +30,7 @@ import javax.xml.parsers.DocumentBuilder;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldColumnPair;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
@@ -70,17 +71,20 @@ public class LookupTransformer extends Transformer {
 		Map<?, ?> mapping = getMapping();
 		Object defaultValue = getDefaultValue();
 
-		ClassDictUtil.checkSize(1, features);
+		List<String> columns = new ArrayList<>();
+		columns.addAll(createInputColumns(features));
 
-		Feature feature = features.get(0);
+		if(columns.contains("output")){
+			throw new IllegalArgumentException();
+		}
+
+		columns.add("output");
 
 		List<Object> outputValues = new ArrayList<>(mapping.size() + 1);
 
 		DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
 
 		InlineTable inlineTable = new InlineTable();
-
-		List<String> columns = Arrays.asList("input", "output");
 
 		Collection<? extends Map.Entry<?, ?>> entries = mapping.entrySet();
 		for(Map.Entry<?, ?> entry : entries){
@@ -91,19 +95,35 @@ public class LookupTransformer extends Transformer {
 				continue;
 			}
 
-			List<String> values = Arrays.asList(ValueUtil.formatValue(inputValue), ValueUtil.formatValue(outputValue));
-
-			Row row = DOMUtil.createRow(documentBuilder, columns, values);
+			Row row = createRow(documentBuilder, columns, inputValue, outputValue);
+			if(row == null){
+				continue;
+			}
 
 			inlineTable.addRows(row);
 
 			outputValues.add(outputValue);
 		}
 
+		StringBuilder sb = new StringBuilder();
+
 		MapValues mapValues = new MapValues()
-			.addFieldColumnPairs(new FieldColumnPair(feature.getName(), columns.get(0)))
-			.setOutputColumn(columns.get(1))
 			.setInlineTable(inlineTable);
+
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+			String column = columns.get(i);
+
+			if(i > 0){
+				sb.append(", ");
+			}
+
+			sb.append((FeatureUtil.getName(feature)).getValue());
+
+			mapValues.addFieldColumnPairs(new FieldColumnPair(feature.getName(), column));
+		}
+
+		mapValues.setOutputColumn(columns.get(columns.size() - 1));
 
 		if(defaultValue != null){
 			mapValues.setDefaultValue(ValueUtil.formatValue(defaultValue));
@@ -111,9 +131,9 @@ public class LookupTransformer extends Transformer {
 			outputValues.add(defaultValue);
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("lookup", feature), OpType.CATEGORICAL, TypeUtil.getDataType(outputValues, DataType.STRING), mapValues);
+		DerivedField derivedField = encoder.createDerivedField(FieldName.create("lookup(" + sb.toString() + ")"), OpType.CATEGORICAL, TypeUtil.getDataType(outputValues, DataType.STRING), mapValues);
 
-		feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
+		Feature feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
 
 			@Override
 			public ContinuousFeature toContinuousFeature(){
@@ -126,6 +146,18 @@ public class LookupTransformer extends Transformer {
 		};
 
 		return Collections.singletonList(feature);
+	}
+
+	protected List<String> createInputColumns(List<Feature> features){
+		ClassDictUtil.checkSize(1, features);
+
+		return Collections.singletonList("input");
+	}
+
+	protected Row createRow(DocumentBuilder documentBuilder, List<String> columns, Object inputValue, Object outputValue){
+		List<String> values = Arrays.asList(ValueUtil.formatValue(inputValue), ValueUtil.formatValue(outputValue));
+
+		return DOMUtil.createRow(documentBuilder, columns, values);
 	}
 
 	public Map<?, ?> getMapping(){

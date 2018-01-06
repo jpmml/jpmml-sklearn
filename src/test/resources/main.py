@@ -31,7 +31,7 @@ from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
-from sklearn2pmml.preprocessing import ExpressionTransformer, LookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder
+from sklearn2pmml.preprocessing import ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -357,11 +357,19 @@ build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3),
 auto_X, auto_y = load_auto("Auto.csv")
 
 def build_auto(regressor, name, **kwargs):
+	cylinders_origin_mapping = {
+		(8, 1) : "8/1",
+		(6, 1) : "6/1",
+		(4, 1) : "4/1",
+		(6, 2) : "6/2",
+		(4, 2) : "4/2",
+		(6, 3) : "6/3",
+		(4, 3) : "4/3"
+	}
 	mapper = DataFrameMapper([
-		(["cylinders"], CategoricalDomain()),
-		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
+		(["cylinders", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
-		(["origin"], OneHotEncoder()),
+		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
 		(["weight", "displacement"], ExpressionTransformer("(X[:, 0] / X[:, 1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
 	])
 	pipeline = Pipeline([
@@ -402,8 +410,9 @@ auto_na_X["origin"] = auto_na_X["origin"].fillna(-1).astype(int)
 
 def build_auto_na(regressor, name):
 	mapper = DataFrameMapper(
-		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["acceleration", "displacement", "horsepower", "weight"]] +
-		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
+		[(["origin"], [CategoricalImputer(missing_values = -1), OneHotEncoder()])] +
+		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["acceleration", "displacement", "horsepower", "weight"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),

@@ -54,6 +54,7 @@ import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
+import org.jpmml.sklearn.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -437,75 +438,18 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 	static
 	private VerificationField createVerificationField(String name){
+		String tagName = name;
+
+		Matcher matcher = PMMLPipeline.FUNCTION.matcher(tagName);
+		if(matcher.matches()){
+			tagName = (matcher.group(1) + "_" + matcher.group(2));
+		}
+
 		VerificationField verificationField = new VerificationField()
 			.setField(FieldName.create(name))
-			.setColumn(createTagName(name));
+			.setColumn(XMLUtil.createTagName(tagName));
 
 		return verificationField;
-	}
-
-	static
-	private String createTagName(String string){
-		StringBuilder sb = new StringBuilder();
-
-		Matcher matcher = PMMLPipeline.FUNCTION.matcher(string);
-		if(matcher.matches()){
-			string = (matcher.group(1) + "_" + matcher.group(2));
-		}
-
-		for(int i = 0; i < string.length(); i++){
-			char c = string.charAt(i);
-
-			boolean valid = (i == 0 ? isTagNameStartChar(c) : isTagNameContinuationChar(c));
-			if(valid){
-				sb.append(c);
-			} else
-
-			{
-				if(c == ' '){
-					sb.append("_x0020_");
-				} else
-
-				{
-					sb.append('_');
-					sb.append('x');
-
-					String hex = Integer.toHexString(c);
-					for(int j = 0; j < (4 - hex.length()); j++){
-						sb.append('0');
-					}
-
-					sb.append(hex);
-					sb.append('_');
-				}
-			}
-		}
-
-		return sb.toString();
-	}
-
-	static
-	private boolean isTagNameStartChar(char c){
-
-		switch(c){
-			case '_':
-				return true;
-			default:
-				return Character.isLetter(c);
-		}
-	}
-
-	static
-	public boolean isTagNameContinuationChar(char c){
-
-		switch(c){
-			case '-':
-			case '.':
-			case '_':
-				return true;
-			default:
-				return Character.isLetterOrDigit(c);
-		}
 	}
 
 	static
