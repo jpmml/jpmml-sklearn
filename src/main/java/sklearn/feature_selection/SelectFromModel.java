@@ -26,6 +26,8 @@ import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
 import sklearn.Selector;
+import sklearn2pmml.EstimatorProxy;
+import sklearn2pmml.SelectorProxy;
 
 public class SelectFromModel extends Selector implements HasEstimator<Estimator> {
 
@@ -50,7 +52,10 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 		try {
 			featureImportances = estimator.getArray("feature_importances_", Number.class);
 		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute", re);
+			String message = "The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute. " +
+				"Please use the " + (EstimatorProxy.class).getName() + " wrapper class to give the estimator object a persistent state (eg. " + ClassDictUtil.formatProxyExample(EstimatorProxy.class, estimator) +")";
+
+			throw new IllegalArgumentException(message, re);
 		}
 
 		List<Boolean> result = new ArrayList<>();
@@ -76,7 +81,10 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 		try {
 			threshold = get("threshold_", Scalar.class);
 		} catch(RuntimeException re){
-			throw new IllegalArgumentException("The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent \'threshold_\' attribute", re);
+			String message = "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent \'threshold_\' attribute. " +
+				"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + ClassDictUtil.formatProxyExample(SelectorProxy.class, this) + ")";
+
+			throw new IllegalArgumentException(message, re);
 		}
 
 		return (Number)threshold.getOnlyElement();

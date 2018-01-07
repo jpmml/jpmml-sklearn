@@ -46,7 +46,7 @@ public class CClassDict extends ClassDict {
 			return hasArray.getArrayContent();
 		}
 
-		throw new IllegalArgumentException("The value of " + ClassDictUtil.formatMember(this, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
+		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
 	}
 
 	public List<?> getArray(String name, String key){
@@ -64,7 +64,7 @@ public class CClassDict extends ClassDict {
 			return NDArrayUtil.getContent(array, key);
 		}
 
-		throw new IllegalArgumentException("The value of " + ClassDictUtil.formatMember(this, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
+		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
 	}
 
 	public void __init__(Object[] args){

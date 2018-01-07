@@ -112,14 +112,14 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		Object estimator = super.get("estimator_");
 
 		if(estimator == null){
-			throw new IllegalArgumentException("Attribute " + ClassDictUtil.formatMember(this, "estimator_") + " has a missing (None/null) value");
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, "estimator_") + "\' has a missing (None/null) value");
 		}
 
 		CastFunction<Estimator> castFunction = new CastFunction<Estimator>(Estimator.class){
 
 			@Override
 			protected String formatMessage(Object object){
-				return "Attribute " + ClassDictUtil.formatMember(EstimatorProxy.this, "estimator_") + " has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+				return "Attribute \'" + ClassDictUtil.formatMember(EstimatorProxy.this, "estimator_") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
 			}
 		};
 

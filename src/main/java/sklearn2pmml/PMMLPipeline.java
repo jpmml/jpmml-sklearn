@@ -105,7 +105,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			if(targetField == null){
 				targetField = "y";
 
-				logger.warn("The 'target_fields' attribute is not set. Assuming {} as the name of the target field", targetField);
+				logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name of the target field", targetField);
 			}
 
 			MiningFunction miningFunction = estimator.getMiningFunction();
@@ -331,7 +331,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 				activeFields.add("x" + String.valueOf(i + 1));
 			}
 
-			logger.warn("The 'active_fields' attribute is not set. Assuming {} as the names of active fields", activeFields);
+			logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", activeFields);
 		}
 
 		List<Feature> result = new ArrayList<>();

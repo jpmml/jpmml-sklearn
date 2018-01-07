@@ -38,17 +38,17 @@ public class PyClassDict extends ClassDict {
 		if(value == null){
 
 			if(!containsKey(name)){
-				throw new IllegalArgumentException("Attribute " + ClassDictUtil.formatMember(this, name) + " not set");
+				throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, name) + "\' not set");
 			}
 
-			throw new IllegalArgumentException("Attribute " + ClassDictUtil.formatMember(this, name) + " has a missing (None/null) value");
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, name) + "\' has a missing (None/null) value");
 		}
 
 		CastFunction<E> castFunction = new CastFunction<E>(clazz){
 
 			@Override
 			protected String formatMessage(Object object){
-				return "Attribute " + ClassDictUtil.formatMember(PyClassDict.this, name) + " has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+				return "Attribute \'" + ClassDictUtil.formatMember(PyClassDict.this, name) + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
 			}
 		};
 
@@ -68,7 +68,7 @@ public class PyClassDict extends ClassDict {
 			return Collections.singletonList(object);
 		}
 
-		throw new IllegalArgumentException("The value of " + ClassDictUtil.formatMember(this, name) + " attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
+		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
 	}
 
 	public <E> List<? extends E> getArray(final String name, Class<? extends E> clazz){
@@ -78,7 +78,7 @@ public class PyClassDict extends ClassDict {
 
 			@Override
 			protected String formatMessage(Object object){
-				return "Array attribute " + ClassDictUtil.formatMember(PyClassDict.this, name) + " contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+				return "Array attribute \'" + ClassDictUtil.formatMember(PyClassDict.this, name) + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
 			}
 		};
 
@@ -98,7 +98,7 @@ public class PyClassDict extends ClassDict {
 			return new int[]{1};
 		}
 
-		throw new IllegalArgumentException("The value of " + ClassDictUtil.formatMember(this, name) + " attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
+		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) +") is not a supported array type");
 	}
 
 	public int[] getArrayShape(String name, int length){
@@ -122,7 +122,7 @@ public class PyClassDict extends ClassDict {
 
 			@Override
 			protected String formatMessage(Object object){
-				return "List attribute " + ClassDictUtil.formatMember(PyClassDict.this, name) + " contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+				return "List attribute \'" + ClassDictUtil.formatMember(PyClassDict.this, name) + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
 			}
 		};
 

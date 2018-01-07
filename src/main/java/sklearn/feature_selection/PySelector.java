@@ -40,23 +40,8 @@ public class PySelector extends Selector {
 		throw new IllegalArgumentException(formatMessage());
 	}
 
-	private String getName(){
-		return (String)get("__class__");
-	}
-
-	private String getSimpleName(){
-		String name = getName();
-
-		int dot = name.lastIndexOf('.');
-		if(dot > -1){
-			return name.substring(dot + 1);
-		}
-
-		return name;
-	}
-
 	private String formatMessage(){
 		return "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have persistent state. " +
-			"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + (SelectorProxy.class).getSimpleName() + "(" + getSimpleName() + "(...)))";
+			"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + ClassDictUtil.formatProxyExample(SelectorProxy.class, this) + ")";
 	}
 }

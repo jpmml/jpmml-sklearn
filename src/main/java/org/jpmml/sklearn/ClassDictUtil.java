@@ -91,6 +91,29 @@ public class ClassDictUtil {
 	}
 
 	static
+	public String getName(ClassDict dict){
+		String clazz = (String)dict.get("__class__");
+
+		if(clazz == null){
+			throw new IllegalArgumentException();
+		}
+
+		return clazz;
+	}
+
+	static
+	public String getSimpleName(ClassDict dict){
+		String name = getName(dict);
+
+		int dot = name.lastIndexOf('.');
+		if(dot > -1){
+			return name.substring(dot + 1);
+		}
+
+		return name;
+	}
+
+	static
 	public String formatMember(ClassDict dict, String name){
 		String clazz = (String)dict.get("__class__");
 
@@ -107,14 +130,17 @@ public class ClassDictUtil {
 		if(object instanceof ClassDict){
 			ClassDict dict = (ClassDict)object;
 
-			String clazz = (String)dict.get("__class__");
-
-			return "Python class " + clazz;
+			return "Python class " + getName(dict);
 		}
 
 		Class<?> clazz = object.getClass();
 
 		return "Java class " + clazz.getName();
+	}
+
+	static
+	public String formatProxyExample(Class<? extends ClassDict> proxyClazz, ClassDict dict){
+		return (proxyClazz.getSimpleName() + "(" + ClassDictUtil.getSimpleName(dict) + "(...))");
 	}
 
 	static
