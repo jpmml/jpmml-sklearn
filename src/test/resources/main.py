@@ -16,7 +16,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
-from sklearn.linear_model import ARDRegression, BayesianRidge, LinearRegression, LogisticRegression, LogisticRegressionCV
+from sklearn.linear_model import ARDRegression, BayesianRidge, HuberRegressor, LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
 from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
@@ -416,6 +416,7 @@ build_auto(DummyRegressor(strategy = "median"), "DummyAuto")
 build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
 build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
+build_auto(HuberRegressor(), "HuberAuto")
 build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(OptimalLGBMRegressor(objective = "regression", n_estimators = 17, num_iteration = 11), "LGBMAuto")
 build_auto(LinearRegression(), "LinearRegressionAuto")

@@ -76,6 +76,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateHuberAuto() throws Exception {
+		evaluate("Huber", "Auto");
+	}
+
+	@Test
 	public void evaluateLassoAuto() throws Exception {
 		evaluate("Lasso", "Auto");
 	}
