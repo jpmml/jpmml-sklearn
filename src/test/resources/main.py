@@ -16,7 +16,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
-from sklearn.linear_model import LinearRegression, LogisticRegression, LogisticRegressionCV
+from sklearn.linear_model import ARDRegression, LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
 from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
@@ -408,6 +408,7 @@ def build_auto(regressor, name, **kwargs):
 	store_csv(mpg, name + ".csv")
 
 build_auto(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostAuto")
+build_auto(ARDRegression(normalize = True), "BayesianARDAuto")
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAuto", compact = False)
 build_auto(BaggingRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAuto")
 build_auto(DummyRegressor(strategy = "median"), "DummyAuto")

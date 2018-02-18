@@ -31,6 +31,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateBayesianARDAuto() throws Exception {
+		evaluate("BayesianARD", "Auto");
+	}
+
+	@Test
 	public void evaluateDecisionTreeAuto() throws Exception {
 		evaluate("DecisionTree", "Auto");
 	}

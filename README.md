@@ -45,6 +45,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * [`feature_selection.SelectPercentile`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectPercentile.html) (only via `sklearn2pmml.SelectorProxy`)
     * [`feature_selection.VarianceThreshold`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.VarianceThreshold.html) (only via `sklearn2pmml.SelectorProxy`)
   * Generalized Linear Models:
+    * [`linear_model.ARDRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html)
     * [`linear_model.ElasticNet`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
     * [`linear_model.ElasticNetCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html)
     * [`linear_model.Lasso`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html)
