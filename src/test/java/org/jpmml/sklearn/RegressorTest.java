@@ -131,6 +131,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateTheilSenAuto() throws Exception {
+		evaluate("TheilSen", "Auto");
+	}
+
+	@Test
 	public void evaluateTPOTAuto() throws Exception {
 		evaluate("TPOT", "Auto");
 	}
