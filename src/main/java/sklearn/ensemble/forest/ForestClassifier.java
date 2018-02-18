@@ -32,10 +32,9 @@ import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeClassifier;
 
-abstract
-public class BaseForestClassifier extends Classifier implements HasEstimatorEnsemble<TreeClassifier>, HasTreeOptions {
+public class ForestClassifier extends Classifier implements HasEstimatorEnsemble<TreeClassifier>, HasTreeOptions {
 
-	public BaseForestClassifier(String module, String name){
+	public ForestClassifier(String module, String name){
 		super(module, name);
 	}
 

@@ -20,9 +20,9 @@ package sklearn.linear_model.logistic;
 
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
-import sklearn.linear_model.BaseLinearClassifier;
+import sklearn.linear_model.LinearClassifier;
 
-public class LogisticRegression extends BaseLinearClassifier {
+public class LogisticRegression extends LinearClassifier {
 
 	public LogisticRegression(String module, String name){
 		super(module, name);

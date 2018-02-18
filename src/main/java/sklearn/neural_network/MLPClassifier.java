@@ -39,7 +39,7 @@ public class MLPClassifier extends Classifier {
 	public int getNumberOfFeatures(){
 		List<? extends HasArray> coefs = getCoefs();
 
-		return BaseMultilayerPerceptronUtil.getNumberOfFeatures(coefs);
+		return MultilayerPerceptronUtil.getNumberOfFeatures(coefs);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class MLPClassifier extends Classifier {
 		List<? extends HasArray> coefs = getCoefs();
 		List<? extends HasArray> intercepts = getIntercepts();
 
-		NeuralNetwork neuralNetwork = BaseMultilayerPerceptronUtil.encodeNeuralNetwork(MiningFunction.CLASSIFICATION, activation, coefs, intercepts, schema)
+		NeuralNetwork neuralNetwork = MultilayerPerceptronUtil.encodeNeuralNetwork(MiningFunction.CLASSIFICATION, activation, coefs, intercepts, schema)
 			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
 
 		return neuralNetwork;

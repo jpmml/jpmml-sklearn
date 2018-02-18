@@ -35,10 +35,9 @@ import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 
-abstract
-public class BaseLinearClassifier extends Classifier {
+public class LinearClassifier extends Classifier {
 
-	public BaseLinearClassifier(String module, String name){
+	public LinearClassifier(String module, String name){
 		super(module, name);
 	}
 

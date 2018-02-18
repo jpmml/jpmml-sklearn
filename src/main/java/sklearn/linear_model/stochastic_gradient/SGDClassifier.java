@@ -18,9 +18,9 @@
  */
 package sklearn.linear_model.stochastic_gradient;
 
-import sklearn.linear_model.BaseLinearClassifier;
+import sklearn.linear_model.LinearClassifier;
 
-public class SGDClassifier extends BaseLinearClassifier {
+public class SGDClassifier extends LinearClassifier {
 
 	public SGDClassifier(String module, String name){
 		super(module, name);
@@ -35,10 +35,6 @@ public class SGDClassifier extends BaseLinearClassifier {
 		}
 
 		return false;
-	}
-
-	public String getLoss(){
-		return (String)get("loss");
 	}
 
 	public LossFunction getLossFunction(){

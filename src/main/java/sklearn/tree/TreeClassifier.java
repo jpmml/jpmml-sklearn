@@ -26,7 +26,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 
-abstract
 public class TreeClassifier extends Classifier implements HasTree, HasTreeOptions {
 
 	public TreeClassifier(String module, String name){

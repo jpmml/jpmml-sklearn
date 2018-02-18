@@ -43,9 +43,9 @@ import org.jpmml.converter.neural_network.NeuralNetworkUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 
-public class BaseMultilayerPerceptronUtil {
+public class MultilayerPerceptronUtil {
 
-	private BaseMultilayerPerceptronUtil(){
+	private MultilayerPerceptronUtil(){
 	}
 
 	static

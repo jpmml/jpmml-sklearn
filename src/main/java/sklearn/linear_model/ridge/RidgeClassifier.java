@@ -20,10 +20,10 @@ package sklearn.linear_model.ridge;
 
 import java.util.List;
 
-import sklearn.linear_model.BaseLinearClassifier;
+import sklearn.linear_model.LinearClassifier;
 import sklearn.preprocessing.LabelBinarizer;
 
-public class RidgeClassifier extends BaseLinearClassifier {
+public class RidgeClassifier extends LinearClassifier {
 
 	public RidgeClassifier(String module, String name){
 		super(module, name);

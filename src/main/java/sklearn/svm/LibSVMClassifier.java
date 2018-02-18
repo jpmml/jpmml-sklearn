@@ -28,10 +28,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.Classifier;
 
-abstract
-public class BaseLibSVMClassifier extends Classifier {
+public class LibSVMClassifier extends Classifier {
 
-	public BaseLibSVMClassifier(String module, String name){
+	public LibSVMClassifier(String module, String name){
 		super(module, name);
 	}
 
