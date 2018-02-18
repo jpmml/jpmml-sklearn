@@ -116,6 +116,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateOMPAuto() throws Exception {
+		evaluate("OMP", "Auto");
+	}
+
+	@Test
 	public void evaluateRandomForestAuto() throws Exception {
 		evaluate("RandomForest", "Auto");
 	}
