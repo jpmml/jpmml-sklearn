@@ -36,6 +36,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateBayesianRidgeAuto() throws Exception {
+		evaluate("BayesianRidge", "Auto");
+	}
+
+	@Test
 	public void evaluateDecisionTreeAuto() throws Exception {
 		evaluate("DecisionTree", "Auto");
 	}
@@ -118,6 +123,11 @@ public class RegressorTest extends EstimatorTest {
 	@Test
 	public void evaluateAdaBoostHousing() throws Exception {
 		evaluate("AdaBoost", "Housing");
+	}
+
+	@Test
+	public void evaluateBayesianRidgeHousing() throws Exception {
+		evaluate("BayesianRidge", "Housing");
 	}
 
 	@Test

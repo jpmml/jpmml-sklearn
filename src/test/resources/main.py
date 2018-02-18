@@ -16,7 +16,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
-from sklearn.linear_model import ARDRegression, LinearRegression, LogisticRegression, LogisticRegressionCV
+from sklearn.linear_model import ARDRegression, BayesianRidge, LinearRegression, LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
 from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
 from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
@@ -409,6 +409,7 @@ def build_auto(regressor, name, **kwargs):
 
 build_auto(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostAuto")
 build_auto(ARDRegression(normalize = True), "BayesianARDAuto")
+build_auto(BayesianRidge(normalize = True), "BayesianRidgeAuto")
 build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAuto", compact = False)
 build_auto(BaggingRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAuto")
 build_auto(DummyRegressor(strategy = "median"), "DummyAuto")
@@ -476,6 +477,7 @@ def build_housing(regressor, name, with_kneighbors = False, **kwargs):
 	store_csv(medv, name + ".csv")
 
 build_housing(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostHousing")
+build_housing(BayesianRidge(), "BayesianRidgeHousing")
 build_housing(KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", random_state = 13, tol = 0.001, max_iter = 1000), "MLPHousing")
 build_housing(SGDRegressor(random_state = 13), "SGDHousing")
