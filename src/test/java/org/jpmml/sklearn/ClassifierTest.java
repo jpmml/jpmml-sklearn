@@ -66,6 +66,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLGBMAuditCat() throws Exception {
+		evaluate("LGBM", "AuditCat");
+	}
+
+	@Test
 	public void evaluateLinearDiscriminantAnalysisAudit() throws Exception {
 		evaluate("LinearDiscriminantAnalysis", "Audit");
 	}

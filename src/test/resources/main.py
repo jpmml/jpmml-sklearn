@@ -183,6 +183,26 @@ build_audit(SVC(), "SVCAudit", with_proba = False)
 build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71), "XGBAudit")
 
+def build_audit_cat(classifier, name, with_proba = True, **fit_params):
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["Age", "Income", "Hours"]] +
+		[([column], [CategoricalDomain(), LabelEncoder()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender", "Deductions"]]
+	)
+	pipeline = Pipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_X, audit_y, **fit_params)
+	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
+	store_pkl(pipeline, name + ".pkl")
+	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
+	if(with_proba == True):
+		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
+		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name + ".csv")
+
+build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = [3, 4, 5, 6, 7, 8])
+
 audit_dict_X = audit_X.to_dict("records")
 
 def build_audit_dict(classifier, name, with_proba = True):

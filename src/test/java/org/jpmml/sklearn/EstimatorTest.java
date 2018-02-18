@@ -79,6 +79,10 @@ public class EstimatorTest extends IntegrationTest {
 			public List<Map<FieldName, String>> getInput() throws IOException {
 				String dataset = super.getDataset();
 
+				if(dataset.endsWith("Cat")){
+					dataset = dataset.substring(0, dataset.length() - "Cat".length());
+				} else
+
 				if(dataset.endsWith("Dict")){
 					dataset = dataset.substring(0, dataset.length() - "Dict".length());
 				}

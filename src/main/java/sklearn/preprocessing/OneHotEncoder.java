@@ -62,37 +62,39 @@ public class OneHotEncoder extends Transformer {
 
 		Feature feature = features.get(0);
 
-		List<String> categories = new ArrayList<>();
-
 		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < values.size(); i++){
-			int value = ValueUtil.asInt(values.get(i));
+		if(feature instanceof CategoricalFeature){
+			CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-			String category;
+			ClassDictUtil.checkSize(values, categoricalFeature.getValues());
 
-			if(feature instanceof CategoricalFeature){
-				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+			for(int i = 0; i < values.size(); i++){
+				result.add(new BinaryFeature(encoder, categoricalFeature.getName(), categoricalFeature.getDataType(), categoricalFeature.getValue(i)));
+			}
+		} else
 
-				category = categoricalFeature.getValue(value);
-			} else
+		if(feature instanceof WildcardFeature){
+			WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-			if(feature instanceof WildcardFeature){
-				WildcardFeature wildcardFeature = (WildcardFeature)feature;
+			List<String> categories = new ArrayList<>();
 
-				category = ValueUtil.formatValue((Integer)value);
-			} else
+			for(int i = 0; i < values.size(); i++){
+				int value = ValueUtil.asInt(values.get(i));
 
-			{
-				throw new IllegalArgumentException();
+				String category = ValueUtil.formatValue(value);
+
+				categories.add(category);
+
+				result.add(new BinaryFeature(encoder, wildcardFeature.getName(), wildcardFeature.getDataType(), category));
 			}
 
-			categories.add(category);
+			wildcardFeature.toCategoricalFeature(categories);
+		} else
 
-			result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
+		{
+			throw new IllegalArgumentException();
 		}
-
-		encoder.toCategorical(feature.getName(), categories);
 
 		return result;
 	}

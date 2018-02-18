@@ -34,6 +34,7 @@ import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Row;
 import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
@@ -68,12 +69,12 @@ public class LabelEncoder extends Transformer {
 
 		Feature feature = features.get(0);
 
-		List<String> categories = new ArrayList<>();
+		List<String> inputCategories = new ArrayList<>();
+		List<String> outputCategories = new ArrayList<>();
 
 		for(int i = 0; i < classes.size(); i++){
-			String category = ValueUtil.formatValue(classes.get(i));
-
-			categories.add(category);
+			inputCategories.add(ValueUtil.formatValue(classes.get(i)));
+			outputCategories.add(ValueUtil.formatValue(i));
 		}
 
 		FieldName name = createName(feature);
@@ -86,15 +87,15 @@ public class LabelEncoder extends Transformer {
 
 			List<String> columns = Arrays.asList("input", "output");
 
-			for(int i = 0; i < categories.size(); i++){
-				List<String> values = Arrays.asList(categories.get(i), String.valueOf(i));
+			for(int i = 0; i < classes.size(); i++){
+				List<String> values = Arrays.asList(inputCategories.get(i), outputCategories.get(i));
 
 				Row row = DOMUtil.createRow(documentBuilder, columns, values);
 
 				inlineTable.addRows(row);
 			}
 
-			encoder.toCategorical(feature.getName(), categories);
+			encoder.toCategorical(feature.getName(), inputCategories);
 
 			MapValues mapValues = new MapValues()
 				.addFieldColumnPairs(new FieldColumnPair(feature.getName(), columns.get(0)))
@@ -104,7 +105,18 @@ public class LabelEncoder extends Transformer {
 			derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, mapValues);
 		}
 
-		return Collections.<Feature>singletonList(new CategoricalFeature(encoder, derivedField, categories));
+		final
+		Feature encodedFeature = new CategoricalFeature(encoder, derivedField, outputCategories);
+
+		Feature result = new CategoricalFeature(encoder, feature.getName(), feature.getDataType(), inputCategories){
+
+			@Override
+			public ContinuousFeature toContinuousFeature(){
+				return encodedFeature.toContinuousFeature();
+			}
+		};
+
+		return Collections.singletonList(result);
 	}
 
 	public List<?> getClasses(){
