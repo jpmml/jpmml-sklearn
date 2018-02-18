@@ -46,7 +46,7 @@ public class BaseForestClassifier extends Classifier implements HasEstimatorEnse
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		MiningModel miningModel = BaseForestUtil.encodeBaseForest(this, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.CLASSIFICATION, schema)
+		MiningModel miningModel = ForestUtil.encodeBaseForest(this, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.CLASSIFICATION, schema)
 			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
 
 		return miningModel;

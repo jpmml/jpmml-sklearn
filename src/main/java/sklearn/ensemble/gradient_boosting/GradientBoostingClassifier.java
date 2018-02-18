@@ -37,11 +37,11 @@ import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
-import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeRegressor;
 import sklearn2pmml.EstimatorProxy;
 
-public class GradientBoostingClassifier extends Classifier implements HasEstimatorEnsemble<DecisionTreeRegressor>, HasTreeOptions {
+public class GradientBoostingClassifier extends Classifier implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
 	public GradientBoostingClassifier(String module, String name){
 		super(module, name);
@@ -90,18 +90,18 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		if(numberOfClasses >= 3){
 			ClassifierUtil.checkSize(numberOfClasses, categoricalLabel);
 
-			List<? extends DecisionTreeRegressor> estimators = getEstimators();
+			List<? extends TreeRegressor> estimators = getEstimators();
 
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
 				final
-				List<? extends DecisionTreeRegressor> columnEstimators = CMatrixUtil.getColumn(estimators, rows, columns, i);
+				List<? extends TreeRegressor> columnEstimators = CMatrixUtil.getColumn(estimators, rows, columns, i);
 
 				GradientBoostingClassifierProxy estimatorProxy = new GradientBoostingClassifierProxy(){
 
 					@Override
-					public List<? extends DecisionTreeRegressor> getEstimators(){
+					public List<? extends TreeRegressor> getEstimators(){
 						return columnEstimators;
 					}
 				};
@@ -133,12 +133,12 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 	}
 
 	@Override
-	public List<? extends DecisionTreeRegressor> getEstimators(){
-		return getArray("estimators_", DecisionTreeRegressor.class);
+	public List<? extends TreeRegressor> getEstimators(){
+		return getArray("estimators_", TreeRegressor.class);
 	}
 
 	abstract
-	private class GradientBoostingClassifierProxy extends EstimatorProxy implements HasEstimatorEnsemble<DecisionTreeRegressor>, HasTreeOptions {
+	private class GradientBoostingClassifierProxy extends EstimatorProxy implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
 		@Override
 		public Estimator getEstimator(){

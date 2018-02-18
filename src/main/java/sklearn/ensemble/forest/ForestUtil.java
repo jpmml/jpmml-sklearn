@@ -33,9 +33,9 @@ import sklearn.tree.HasTree;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeModelUtil;
 
-public class BaseForestUtil {
+public class ForestUtil {
 
-	private BaseForestUtil(){
+	private ForestUtil(){
 	}
 
 	static

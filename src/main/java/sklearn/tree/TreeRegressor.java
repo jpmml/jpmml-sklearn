@@ -24,7 +24,6 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
-abstract
 public class TreeRegressor extends Regressor implements HasTree, HasTreeOptions {
 
 	public TreeRegressor(String module, String name){

@@ -26,10 +26,10 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
-import sklearn.tree.DecisionTreeRegressor;
 import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeRegressor;
 
-public class GradientBoostingRegressor extends Regressor implements HasEstimatorEnsemble<DecisionTreeRegressor>, HasTreeOptions {
+public class GradientBoostingRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
 	public GradientBoostingRegressor(String module, String name){
 		super(module, name);
@@ -68,7 +68,7 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 	}
 
 	@Override
-	public List<? extends DecisionTreeRegressor> getEstimators(){
-		return getArray("estimators_", DecisionTreeRegressor.class);
+	public List<? extends TreeRegressor> getEstimators(){
+		return getArray("estimators_", TreeRegressor.class);
 	}
 }

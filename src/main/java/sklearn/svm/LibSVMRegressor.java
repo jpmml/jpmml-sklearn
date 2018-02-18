@@ -28,10 +28,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.Regressor;
 
-abstract
-public class BaseLibSVMRegressor extends Regressor {
+public class LibSVMRegressor extends Regressor {
 
-	public BaseLibSVMRegressor(String module, String name){
+	public LibSVMRegressor(String module, String name){
 		super(module, name);
 	}
 

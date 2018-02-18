@@ -27,10 +27,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Regressor;
 
-abstract
-public class BaseLinearRegressor extends Regressor {
+public class LinearRegressor extends Regressor {
 
-	public BaseLinearRegressor(String module, String name){
+	public LinearRegressor(String module, String name){
 		super(module, name);
 	}
 

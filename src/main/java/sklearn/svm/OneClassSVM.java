@@ -30,7 +30,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 
-public class OneClassSVM extends BaseLibSVMRegressor {
+public class OneClassSVM extends LibSVMRegressor {
 
 	public OneClassSVM(String module, String name){
 		super(module, name);

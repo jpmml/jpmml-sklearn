@@ -30,10 +30,9 @@ import sklearn.Regressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 
-abstract
-public class BaseForestRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
+public class ForestRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
-	public BaseForestRegressor(String module, String name){
+	public ForestRegressor(String module, String name){
 		super(module, name);
 	}
 
@@ -44,7 +43,7 @@ public class BaseForestRegressor extends Regressor implements HasEstimatorEnsemb
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		return BaseForestUtil.encodeBaseForest(this, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
+		return ForestUtil.encodeBaseForest(this, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
 	}
 
 	@Override

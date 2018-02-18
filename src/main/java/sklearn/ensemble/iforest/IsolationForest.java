@@ -49,10 +49,10 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
-import sklearn.tree.ExtraTreeRegressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.Tree;
 import sklearn.tree.TreeModelUtil;
+import sklearn.tree.TreeRegressor;
 
 public class IsolationForest extends EnsembleRegressor implements HasTreeOptions {
 
@@ -81,7 +81,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		List<TreeModel> treeModels = new ArrayList<>();
 
 		for(Regressor estimator : estimators){
-			ExtraTreeRegressor treeRegressor = (ExtraTreeRegressor)estimator;
+			TreeRegressor treeRegressor = (TreeRegressor)estimator;
 
 			final
 			Tree tree = treeRegressor.getTree();
