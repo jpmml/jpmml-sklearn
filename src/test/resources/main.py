@@ -6,20 +6,12 @@ from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.ensemble.bagging import BaggingClassifier, BaggingRegressor
-from sklearn.ensemble.forest import ExtraTreesClassifier, ExtraTreesRegressor, RandomForestClassifier, RandomForestRegressor
-from sklearn.ensemble.gradient_boosting import GradientBoostingClassifier, GradientBoostingRegressor
-from sklearn.ensemble.iforest import IsolationForest
-from sklearn.ensemble.voting_classifier import VotingClassifier
+from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, VotingClassifier
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
-from sklearn.linear_model import ARDRegression, BayesianRidge, HuberRegressor, LarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV
-from sklearn.linear_model.coordinate_descent import ElasticNetCV, LassoCV
-from sklearn.linear_model.ridge import RidgeCV, RidgeClassifier, RidgeClassifierCV
-from sklearn.linear_model.stochastic_gradient import SGDClassifier, SGDRegressor
+from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNetCV, HuberRegressor, LarsCV, LassoCV, LinearRegression, LogisticRegression, LogisticRegressionCV, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
