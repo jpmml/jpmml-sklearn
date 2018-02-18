@@ -50,6 +50,8 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * [`linear_model.ElasticNet`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
     * [`linear_model.ElasticNetCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html)
     * [`linear_model.HuberRegressor`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html)
+    * [`linear_model.Lars`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html)
+    * [`linear_model.LarsCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html)
     * [`linear_model.Lasso`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html)
     * [`linear_model.LassoCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html)
     * [`linear_model.LinearRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
