@@ -54,6 +54,8 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * [`linear_model.LarsCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html)
     * [`linear_model.Lasso`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html)
     * [`linear_model.LassoCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html)
+    * [`linear_model.LassoLars`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html)
+    * [`linear_model.LassoLarsCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html)
     * [`linear_model.LinearRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
     * [`linear_model.LogisticRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
     * [`linear_model.LogisticRegressionCV`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegressionCV.html)
