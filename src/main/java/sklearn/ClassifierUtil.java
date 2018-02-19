@@ -20,7 +20,6 @@ package sklearn;
 
 import java.util.List;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.jpmml.converter.CategoricalLabel;
@@ -46,7 +45,11 @@ public class ClassifierUtil {
 			public String apply(Object object){
 				String targetCategory = ValueUtil.formatValue(object);
 
-				if(targetCategory == null || CharMatcher.WHITESPACE.matchesAnyOf(targetCategory)){
+				if(targetCategory == null || ("").equals(targetCategory)){
+					throw new IllegalArgumentException(targetCategory);
+				} // End if
+
+				if(!(targetCategory).equals(targetCategory.trim())){
 					throw new IllegalArgumentException(targetCategory);
 				}
 
