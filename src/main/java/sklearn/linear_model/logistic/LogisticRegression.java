@@ -18,7 +18,7 @@
  */
 package sklearn.linear_model.logistic;
 
-import org.dmg.pmml.regression.RegressionModel;
+import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.linear_model.LinearClassifier;
 
@@ -29,7 +29,7 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	@Override
-	public RegressionModel encodeModel(Schema schema){
+	public Model encodeModel(Schema schema){
 		String multiClass = getMultiClass();
 
 		if(!("ovr").equals(multiClass)){
