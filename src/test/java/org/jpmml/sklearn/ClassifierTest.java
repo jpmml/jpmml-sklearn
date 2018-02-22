@@ -76,8 +76,13 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
-	public void evaluateLogisticRegressionAudit() throws Exception {
-		evaluate("LogisticRegression", "Audit");
+	public void evaluateMultinomialLogisticRegressionAudit() throws Exception {
+		evaluate("MultinomialLogisticRegression", "Audit");
+	}
+
+	@Test
+	public void evaluateOvRLogisticRegressionAudit() throws Exception {
+		evaluate("OvRLogisticRegression", "Audit");
 	}
 
 	@Test
@@ -171,8 +176,13 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
-	public void evaluateLogisticRegressionIris() throws Exception {
-		evaluate("LogisticRegression", "Iris");
+	public void evaluateMultinomialLogisticRegressionIris() throws Exception {
+		evaluate("MultinomialLogisticRegression", "Iris");
+	}
+
+	@Test
+	public void evaluateOvRLogisticRegressionIris() throws Exception {
+		evaluate("OvRLogisticRegression", "Iris");
 	}
 
 	@Test
