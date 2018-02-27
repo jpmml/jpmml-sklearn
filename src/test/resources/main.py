@@ -230,7 +230,8 @@ def build_audit_na(classifier, name, with_proba = True):
 		"Male" : 1
 	}
 	mapper = DataFrameMapper(
-		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["Age", "Income", "Hours"]] +
+		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["Age", "Hours"]] +
+		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000), Imputer()])] +
 		[("Employment", [CategoricalDomain(missing_values = None), CategoricalImputer(), LookupTransformer(employment_mapping, "Other"), PMMLLabelBinarizer()])] +
 		[([column], [CategoricalDomain(missing_values = None), CategoricalImputer(), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +
 		[("Gender", [CategoricalDomain(missing_values = None), CategoricalImputer(), LookupTransformer(gender_mapping, None)])]
@@ -433,7 +434,9 @@ def build_auto_na(regressor, name):
 	mapper = DataFrameMapper(
 		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
 		[(["origin"], [CategoricalImputer(missing_values = -1), OneHotEncoder()])] +
-		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["acceleration", "displacement", "horsepower", "weight"]]
+		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["acceleration", "displacement"]] +
+		[(["horsepower"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_extreme_values", low_value = 50, high_value = 225), Imputer()])] +
+		[(["weight"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_extreme_values", low_value = 2000, high_value = 5000), Imputer()])]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),

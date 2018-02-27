@@ -20,6 +20,7 @@ package sklearn2pmml.decoration;
 
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.dmg.pmml.OutlierTreatmentMethod;
 
 public class DomainUtil {
 
@@ -65,6 +66,25 @@ public class DomainUtil {
 				return InvalidValueTreatmentMethod.RETURN_INVALID;
 			default:
 				throw new IllegalArgumentException(invalidValueTreatment);
+		}
+	}
+
+	static
+	public OutlierTreatmentMethod parseOutlierTreatment(String outlierTreatment){
+
+		if(outlierTreatment == null){
+			return null;
+		}
+
+		switch(outlierTreatment){
+			case "as_is":
+				return OutlierTreatmentMethod.AS_IS;
+			case "as_missing_values":
+				return OutlierTreatmentMethod.AS_MISSING_VALUES;
+			case "as_extreme_values":
+				return OutlierTreatmentMethod.AS_EXTREME_VALUES;
+			default:
+				throw new IllegalArgumentException(outlierTreatment);
 		}
 	}
 }

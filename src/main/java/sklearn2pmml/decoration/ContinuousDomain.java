@@ -22,10 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.Interval;
+import org.dmg.pmml.MiningField;
 import org.dmg.pmml.NumericInfo;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.OutlierTreatmentMethod;
 import org.dmg.pmml.UnivariateStats;
+import org.jpmml.converter.Decorator;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
@@ -46,6 +50,34 @@ public class ContinuousDomain extends Domain {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		final
+		OutlierTreatmentMethod outlierTreatment = DomainUtil.parseOutlierTreatment(getOutlierTreatment());
+
+		final
+		Double lowValue;
+
+		final
+		Double highValue;
+
+		if(outlierTreatment != null){
+
+			switch(outlierTreatment){
+				case AS_EXTREME_VALUES:
+				case AS_MISSING_VALUES:
+					lowValue = getLowValue().doubleValue();
+					highValue = getHighValue().doubleValue();
+					break;
+				default:
+					lowValue = null;
+					highValue = null;
+			}
+		} else
+
+		{
+			lowValue = null;
+			highValue = null;
+		}
+
 		Boolean withData = getWithData();
 		Boolean withStatistics = getWithStatistics();
 
@@ -65,6 +97,20 @@ public class ContinuousDomain extends Domain {
 			Feature feature = features.get(i);
 
 			WildcardFeature wildcardFeature = (WildcardFeature)feature;
+
+			if(outlierTreatment != null){
+				Decorator outlierDecorator = new Decorator(){
+
+					@Override
+					public void decorate(DataField dataField, MiningField miningField){
+						miningField.setOutlierTreatment((OutlierTreatmentMethod.AS_IS).equals(outlierTreatment) ? null : outlierTreatment)
+							.setLowValue(lowValue)
+							.setHighValue(highValue);
+					}
+				};
+
+				encoder.addDecorator(wildcardFeature.getName(), outlierDecorator);
+			} // End if
 
 			if(withData){
 				Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED)
@@ -95,6 +141,18 @@ public class ContinuousDomain extends Domain {
 		}
 
 		return super.encodeFeatures(result, encoder);
+	}
+
+	public String getOutlierTreatment(){
+		return (String)get("outlier_treatment");
+	}
+
+	public Number getLowValue(){
+		return get("low_value", Number.class);
+	}
+
+	public Number getHighValue(){
+		return get("high_value", Number.class);
 	}
 
 	public List<? extends Number> getDataMin(){
