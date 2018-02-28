@@ -114,11 +114,14 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * `sklearn2pmml.decoration.CategoricalDomain`
     * `sklearn2pmml.decoration.ContinuousDomain`
     * `sklearn2pmml.decoration.MultiDomain`
+    * `sklearn2pmml.preprocessing.Aggregator`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`
     * `sklearn2pmml.preprocessing.PMMLLabelBinarizer`
     * `sklearn2pmml.preprocessing.PMMLLabelEncoder`
+    * `sklearn2pmml.preprocessing.PowerFunctionTransformer`
+    * `sklearn2pmml.preprocessing.StringNormalizer`
   * [Sklearn-Pandas](https://github.com/paulgb/sklearn-pandas):
     * `sklearn_pandas.CategoricalImputer`
     * `sklearn_pandas.DataFrameMapper`

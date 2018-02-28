@@ -23,7 +23,7 @@ from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
-from sklearn2pmml.preprocessing import ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder
+from sklearn2pmml.preprocessing import Aggregator, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -218,23 +218,23 @@ audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
 def build_audit_na(classifier, name, with_proba = True):
 	employment_mapping = {
-		"Consultant" : "Private",
-		"PSFederal" : "Public",
-		"PSLocal" : "Public",
-		"PSState" : "Public",
-		"SelfEmp" : "Private",
-		"Private" : "Private"
+		"CONSULTANT" : "PRIVATE",
+		"PSFEDERAL" : "PUBLIC",
+		"PSLOCAL" : "PUBLIC",
+		"PSSTATE" : "PUBLIC",
+		"SELFEMP" : "PRIVATE",
+		"PRIVATE" : "PRIVATE"
 	}
 	gender_mapping = {
-		"Female" : 0,
-		"Male" : 1
+		"FEMALE" : 0,
+		"MALE" : 1
 	}
 	mapper = DataFrameMapper(
-		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["Age", "Hours"]] +
-		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000), Imputer()])] +
-		[("Employment", [CategoricalDomain(missing_values = None), CategoricalImputer(), LookupTransformer(employment_mapping, "Other"), PMMLLabelBinarizer()])] +
-		[([column], [CategoricalDomain(missing_values = None), CategoricalImputer(), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +
-		[("Gender", [CategoricalDomain(missing_values = None), CategoricalImputer(), LookupTransformer(gender_mapping, None)])]
+		[([column], [ContinuousDomain(missing_values = None, with_data = False), Imputer()]) for column in ["Age", "Hours"]] +
+		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False), Imputer()])] +
+		[("Employment", [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()])] +
+		[([column], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(missing_values = None), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +
+		[("Gender", [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(gender_mapping, None)])]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -294,13 +294,17 @@ iris_X, iris_y = load_iris("Iris.csv")
 def build_iris(classifier, name, with_proba = True, **kwargs):
 	pipeline = Pipeline([
 		("pipeline", Pipeline([
-			("domain", ContinuousDomain()),
+			("mapper", DataFrameMapper([
+				(iris_X.columns.values, ContinuousDomain()),
+				(["Sepal.Length", "Petal.Length"], Aggregator(function = "mean")),
+				(["Sepal.Width", "Petal.Width"], Aggregator(function = "mean"))
+			])),
 			("transform", FeatureUnion([
 				("normal_scale", FunctionTransformer(None)),
-				("log_scale", FunctionTransformer(numpy.log10))
+				("log_scale", FunctionTransformer(numpy.log10)),
+				("power_scale", PowerFunctionTransformer(power = 2))
 			]))
 		])),
-		("scaler", RobustScaler()),
 		("pca", IncrementalPCA(n_components = 3, whiten = True)),
 		("classifier", classifier)
 	])
