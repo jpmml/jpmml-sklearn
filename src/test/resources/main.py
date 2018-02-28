@@ -495,7 +495,7 @@ build_housing(NuSVR(), "NuSVRHousing")
 # Anomaly detection
 #
 
-def build_iforest_housing_anomaly(iforest, name, **kwargs):
+def build_iforest_housing(iforest, name, **kwargs):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
@@ -511,9 +511,9 @@ def build_iforest_housing_anomaly(iforest, name, **kwargs):
 	outlier = DataFrame(pipeline.predict(housing_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
 
-build_iforest_housing_anomaly(IsolationForest(random_state = 13), "IsolationForestHousingAnomaly")
+build_iforest_housing(IsolationForest(random_state = 13), "IsolationForestHousing")
 
-def build_svm_housing_anomaly(svm, name):
+def build_ocsvm_housing(svm, name):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
@@ -529,4 +529,4 @@ def build_svm_housing_anomaly(svm, name):
 	outlier = DataFrame(pipeline.predict(housing_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
 
-build_svm_housing_anomaly(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousingAnomaly")
+build_ocsvm_housing(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousing")

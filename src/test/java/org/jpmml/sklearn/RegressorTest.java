@@ -156,6 +156,13 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateIsolationForestHousing() throws Exception {
+		FieldName[] anomalyScoreFields = {FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore")};
+
+		evaluate("IsolationForest", "Housing", excludeFields(anomalyScoreFields));
+	}
+
+	@Test
 	public void evaluateKNNHousing() throws Exception {
 		evaluate("KNN", "Housing");
 	}
@@ -163,6 +170,11 @@ public class RegressorTest extends EstimatorTest {
 	@Test
 	public void evaluateMLPHousing() throws Exception {
 		evaluate("MLP", "Housing");
+	}
+
+	@Test
+	public void evaluateOneClassSVMHousing() throws Exception {
+		evaluate("OneClassSVM", "Housing");
 	}
 
 	@Test
@@ -189,16 +201,4 @@ public class RegressorTest extends EstimatorTest {
 	public void evaluateTPOTHousing() throws Exception {
 		evaluate("TPOT", "Housing");
 	}
-
-	@Test
-	public void evaluateIsolationForestHousingAnomaly() throws Exception {
-		evaluate("IsolationForest", "HousingAnomaly", excludeFields(RegressorTest.anomalyScoreFields));
-	}
-
-	@Test
-	public void evaluateOneClassSVMHousingAnomaly() throws Exception {
-		evaluate("OneClassSVM", "HousingAnomaly");
-	}
-
-	private static final FieldName[] anomalyScoreFields = {FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore")};
 }
