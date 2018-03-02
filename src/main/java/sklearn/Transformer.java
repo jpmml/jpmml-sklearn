@@ -20,14 +20,11 @@ package sklearn;
 
 import java.util.List;
 
-import com.google.common.base.CaseFormat;
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import numpy.DType;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.sklearn.ClassDictConstructorUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -60,24 +57,5 @@ public class Transformer extends PyClassDict {
 		}
 
 		return (DType)dtype;
-	}
-
-	protected String name(){
-		Class<? extends Transformer> clazz = getClass();
-
-		String name = clazz.getSimpleName();
-		if(name.startsWith("PMML")){
-			name = name.substring("PMML".length());
-		}
-
-		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
-	}
-
-	protected FieldName createName(Feature feature){
-		return FeatureUtil.createName(name(), feature);
-	}
-
-	protected FieldName createName(Feature feature, int index){
-		return FeatureUtil.createName(name(), feature, index);
 	}
 }

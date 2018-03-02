@@ -46,19 +46,19 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		String function = translateFunction(getFunction());
+		String function = getFunction();
 
 		if(features.size() <= 1){
 			return features;
 		}
 
-		FieldName name = FieldName.create(function + "(" + FeatureUtil.formatFeatureList(features) + ")");
-
-		Apply apply = new Apply(function);
+		Apply apply = new Apply(translateFunction(function));
 
 		for(Feature feature : features){
 			apply.addExpressions(feature.ref());
 		}
+
+		FieldName name = FieldName.create(function + "(" + FeatureUtil.formatFeatureList(features) + ")"); // XXX
 
 		DerivedField derivedField = encoder.createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, apply);
 

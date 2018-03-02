@@ -105,20 +105,12 @@ public class LookupTransformer extends Transformer {
 			outputValues.add(outputValue);
 		}
 
-		StringBuilder sb = new StringBuilder();
-
 		MapValues mapValues = new MapValues()
 			.setInlineTable(inlineTable);
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			String column = columns.get(i);
-
-			if(i > 0){
-				sb.append(", ");
-			}
-
-			sb.append((FeatureUtil.getName(feature)).getValue());
 
 			mapValues.addFieldColumnPairs(new FieldColumnPair(feature.getName(), column));
 		}
@@ -131,7 +123,9 @@ public class LookupTransformer extends Transformer {
 			outputValues.add(defaultValue);
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FieldName.create("lookup(" + sb.toString() + ")"), OpType.CATEGORICAL, TypeUtil.getDataType(outputValues, DataType.STRING), mapValues);
+		FieldName name = FieldName.create("lookup(" + FeatureUtil.formatFeatureList(features) + ")"); // XXX
+
+		DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, TypeUtil.getDataType(outputValues, DataType.STRING), mapValues);
 
 		Feature feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
 

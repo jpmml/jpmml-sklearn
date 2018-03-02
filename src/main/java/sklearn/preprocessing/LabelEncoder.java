@@ -37,6 +37,7 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -77,7 +78,7 @@ public class LabelEncoder extends Transformer {
 			outputCategories.add(ValueUtil.formatValue(i));
 		}
 
-		FieldName name = createName(feature);
+		FieldName name = FeatureUtil.createName("label_encoder", feature);
 
 		DerivedField derivedField = encoder.getDerivedField(name);
 		if(derivedField == null){

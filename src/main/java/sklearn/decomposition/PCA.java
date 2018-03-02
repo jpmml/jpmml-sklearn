@@ -67,7 +67,7 @@ public class PCA extends Transformer implements HasNumberOfFeatures {
 
 		ClassDictUtil.checkSize(numberOfComponents, explainedVariance);
 
-		String id = name() + "@" + String.valueOf(PCA.SEQUENCE.getAndIncrement());
+		String id = "pca@" + String.valueOf(PCA.SEQUENCE.getAndIncrement());
 
 		List<Feature> result = new ArrayList<>();
 
@@ -118,11 +118,6 @@ public class PCA extends Transformer implements HasNumberOfFeatures {
 		}
 
 		return result;
-	}
-
-	@Override
-	protected String name(){
-		return "pca";
 	}
 
 	public Boolean getWhiten(){

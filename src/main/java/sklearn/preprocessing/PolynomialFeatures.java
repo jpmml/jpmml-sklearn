@@ -115,22 +115,12 @@ public class PolynomialFeatures extends Transformer implements HasNumberOfFeatur
 		List<Feature> result = new ArrayList<>();
 
 		for(int[] power : powers){
-			StringBuilder sb = new StringBuilder();
-
-			String sep = "";
-
 			List<Feature> powerFeatures = new ArrayList<>();
 
 			for(int i = 0; i < power.length; i++){
 
 				if(power[i] >= 1){
 					Feature transformedFeature = transformedFeatures.get(i)[power[i] - 1];
-
-					sb.append(sep);
-
-					sep = ":";
-
-					sb.append((FeatureUtil.getName(transformedFeature)).getValue());
 
 					powerFeatures.add(transformedFeature);
 				}
@@ -145,9 +135,21 @@ public class PolynomialFeatures extends Transformer implements HasNumberOfFeatur
 			} else
 
 			{
-				String id = sb.toString();
+				StringBuilder sb = new StringBuilder();
 
-				result.add(new InteractionFeature(encoder, FieldName.create(id), DataType.DOUBLE, powerFeatures));
+				String sep = "";
+
+				for(Feature powerFeature : powerFeatures){
+					FieldName name = FeatureUtil.getName(powerFeature);
+
+					sb.append(sep);
+
+					sep = ":";
+
+					sb.append(name.getValue());
+				}
+
+				result.add(new InteractionFeature(encoder, FieldName.create(sb.toString()), DataType.DOUBLE, powerFeatures));
 			}
 		}
 

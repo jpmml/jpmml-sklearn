@@ -24,10 +24,12 @@ import java.util.List;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -95,7 +97,9 @@ public class LabelBinarizer extends Transformer {
 				// "($name == value) ? pos_label : neg_label"
 				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", feature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
-				DerivedField derivedField = encoder.createDerivedField((classes.size() > 1 ? createName(feature, i) : createName(feature)), apply);
+				FieldName name = (classes.size() > 1 ? FeatureUtil.createName("label_binarizer", feature, i) : FeatureUtil.createName("label_binarizer", feature));
+
+				DerivedField derivedField = encoder.createDerivedField(name, apply);
 
 				result.add(new CategoricalFeature(encoder, derivedField, labelCategories));
 			}
