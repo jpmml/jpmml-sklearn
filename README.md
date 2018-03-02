@@ -115,6 +115,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * `sklearn2pmml.decoration.ContinuousDomain`
     * `sklearn2pmml.decoration.MultiDomain`
     * `sklearn2pmml.preprocessing.Aggregator`
+    * `sklearn2pmml.preprocessing.CutTransformer`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`

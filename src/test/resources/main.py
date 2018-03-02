@@ -23,7 +23,7 @@ from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
-from sklearn2pmml.preprocessing import Aggregator, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
+from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -178,7 +178,8 @@ build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71
 
 def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["Age", "Income", "Hours"]] +
+		[([column], ContinuousDomain()) for column in ["Age", "Income"]] +
+		[(["Hours"], [ContinuousDomain(), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = ["0-20", "20-40", "40-60", "60-80", "80-100"], right = False, include_lowest = True)])] +
 		[([column], [CategoricalDomain(), LabelEncoder()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender", "Deductions"]]
 	)
 	pipeline = Pipeline([
@@ -194,7 +195,7 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name + ".csv")
 
-build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = [3, 4, 5, 6, 7, 8])
+build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = [2, 3, 4, 5, 6, 7, 8])
 
 audit_dict_X = audit_X.to_dict("records")
 
@@ -438,7 +439,8 @@ def build_auto_na(regressor, name):
 	mapper = DataFrameMapper(
 		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
 		[(["origin"], [CategoricalImputer(missing_values = -1), OneHotEncoder()])] +
-		[([column], [ContinuousDomain(missing_values = None), Imputer()]) for column in ["acceleration", "displacement"]] +
+		[(["acceleration"], [ContinuousDomain(missing_values = None), CutTransformer(bins = [5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25]), CategoricalImputer()])] +
+		[(["displacement"], [ContinuousDomain(missing_values = None), Imputer()])] +
 		[(["horsepower"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_extreme_values", low_value = 50, high_value = 225), Imputer()])] +
 		[(["weight"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_extreme_values", low_value = 2000, high_value = 5000), Imputer()])]
 	)
