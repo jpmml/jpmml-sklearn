@@ -106,7 +106,7 @@ public class CutTransformer extends Transformer {
 	public List<String> getLabels(){
 		Object labels = get("labels");
 
-		if(labels == null){
+		if(labels == null || (Boolean.FALSE).equals(labels)){
 			return null;
 		}
 

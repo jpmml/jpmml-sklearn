@@ -48,6 +48,15 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public String getExpr(){
-		return (String)get("expr_");
+
+		// SkLearn2PMML 0.31.0
+		if(containsKey("expr_")){
+			return (String)get("expr_");
+		} else
+
+		// SkLearn2PMML 0.31.1+
+		{
+			return (String)get("expr");
+		}
 	}
 }
