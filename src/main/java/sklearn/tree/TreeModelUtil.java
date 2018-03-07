@@ -24,8 +24,10 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.Output;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
@@ -53,8 +55,25 @@ public class TreeModelUtil {
 
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
-		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, Boolean.TRUE);
+		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
+		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, winnerId ? Boolean.FALSE : Boolean.TRUE);
 		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+
+		if(winnerId){
+
+			if(compact || flat){
+				throw new IllegalArgumentException("Conflicting tree model options");
+			}
+
+			Output output = model.getOutput();
+			if(output == null){
+				output = new Output();
+
+				model.setOutput(output);
+			}
+
+			output.addOutputFields(ModelUtil.createEntityIdField(FieldName.create("nodeId")));
+		}
 
 		List<Visitor> visitors = new ArrayList<>();
 

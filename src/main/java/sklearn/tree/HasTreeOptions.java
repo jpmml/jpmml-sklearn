@@ -33,4 +33,9 @@ public interface HasTreeOptions extends HasOptions {
 	 * @see TreeModelFlattener
 	 */
 	String OPTION_FLAT = "flat";
+
+	/**
+	 * @see Node#getId()
+	 */
+	String OPTION_WINNER_ID = "winner_id";
 }
