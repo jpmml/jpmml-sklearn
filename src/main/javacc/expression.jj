@@ -31,6 +31,7 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.Feature;
 
@@ -38,6 +39,29 @@ public class ExpressionTranslator {
 
 	private List<Feature> features = null;
 
+
+	public Feature getFeature(int index){
+		List<Feature> features = getFeatures();
+
+		if(index >= 0 && index < features.size()){
+			return features.get(index);
+		}
+
+		throw new IllegalArgumentException(String.valueOf(index));
+	}
+
+	public Feature getFeature(FieldName name){
+		List<Feature> features = getFeatures();
+
+		for(Feature feature : features){
+
+			if((feature.getName()).equals(name)){
+				return feature;
+			}
+		}
+
+		throw new IllegalArgumentException(name.getValue());
+	}
 
 	public List<Feature> getFeatures(){
 		return this.features;
@@ -144,6 +168,12 @@ TOKEN:
 	|
 	< NAME: <LETTER> (<LETTER> | <DIGIT>)* >
 	|
+	< QUOTED_NAME:
+		"\"" <NAME> "\""
+		|
+		"\'" <NAME> "\'"
+	>
+	|
 	< #DIGIT: ["0" - "9"] >
 	|
 	< #NONZERO_DIGIT: ["1" - "9"] >
@@ -242,7 +272,11 @@ Expression PrimaryExpression():
 	(
 		expression = ParenthesizedExpression()
 		|
-		expression = FeatureInvocationExpression()
+		LOOKAHEAD(<NAME> <LBRACKET> <COLON>)
+		expression = FeatureIndexExpression()
+		|
+		LOOKAHEAD(<NAME> <LBRACKET> <QUOTED_NAME>)
+		expression = FeatureNameExpression()
 		|
 		expression = LiteralExpression()
 	)
@@ -264,7 +298,7 @@ Expression ParenthesizedExpression():
 	}
 }
 
-FieldRef FeatureInvocationExpression():
+FieldRef FeatureIndexExpression():
 {
 	Token variable;
 	Token column;
@@ -273,18 +307,34 @@ FieldRef FeatureInvocationExpression():
 	variable = <NAME> <LBRACKET> <COLON> <COMMA> column = <INT> <RBRACKET>
 
 	{
-		List<Feature> features = getFeatures();
-
 		if(!("X").equals(variable.image)){
 			throw new IllegalArgumentException(variable.image);
 		}
 
 		int index = Integer.parseInt(column.image);
-		if(index < 0 || index >= features.size()){
-			throw new IllegalArgumentException(token.image);
+
+		Feature feature = getFeature(index);
+
+		return feature.ref();
+	}
+}
+
+FieldRef FeatureNameExpression():
+{
+	Token variable;
+	Token quotedName;
+}
+{
+	variable = <NAME> <LBRACKET> quotedName = <QUOTED_NAME> <RBRACKET>
+
+	{
+		if(!("X").equals(variable.image)){
+			throw new IllegalArgumentException(variable.image);
 		}
 
-		Feature feature = features.get(index);
+		FieldName name = FieldName.create(quotedName.image.substring(1, quotedName.image.length() - 1));
+
+		Feature feature = getFeature(name);
 
 		return feature.ref();
 	}
