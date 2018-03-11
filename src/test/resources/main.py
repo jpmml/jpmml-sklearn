@@ -127,12 +127,12 @@ def build_audit(classifier, name, with_proba = True, **kwargs):
 		(["Age", "Income", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 3)]))
 	])
 	categorical_mapper = DataFrameMapper([
-		("Employment", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
-		("Education", [CategoricalDomain(), LabelBinarizer(), SelectFromModel(RandomForestClassifier(random_state = 13, n_estimators = 3), threshold = "1.25 * mean")]),
-		("Marital", [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
-		("Occupation", [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
-		("Gender", [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
-		("Deductions", [CategoricalDomain(), LabelEncoder()]),
+		(["Employment"], [CategoricalDomain(), LabelBinarizer(), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
+		(["Education"], [CategoricalDomain(), LabelBinarizer(), SelectFromModel(RandomForestClassifier(random_state = 13, n_estimators = 3), threshold = "1.25 * mean")]),
+		(["Marital"], [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
+		(["Occupation"], [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
+		(["Gender"], [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
+		(["Deductions"], [CategoricalDomain(), LabelEncoder()]),
 	])
 	pipeline = Pipeline([
 		("union", FeatureUnion([
@@ -231,11 +231,12 @@ def build_audit_na(classifier, name, with_proba = True):
 		"MALE" : 1
 	}
 	mapper = DataFrameMapper(
-		[([column], [ContinuousDomain(missing_values = None, with_data = False), Imputer()]) for column in ["Age", "Hours"]] +
+		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), ExpressionTransformer("numpy.where(pandas.notnull(X[:, 0]), X[:, 0], -999)"), Imputer(missing_values = -999)])] +
+		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), ExpressionTransformer("numpy.where(pandas.isnull(X[:, 0]), -999, X[:, 0])"), Imputer(missing_values = -999)])] +
 		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False), Imputer()])] +
-		[("Employment", [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()])] +
+		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()])] +
 		[([column], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(missing_values = None), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +
-		[("Gender", [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(gender_mapping, None)])]
+		[(["Gender"], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(gender_mapping, None)])]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -250,7 +251,7 @@ def build_audit_na(classifier, name, with_proba = True):
 	store_csv(adjusted, name + ".csv")
 
 build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA")
-build_audit_na(LogisticRegression(), "LogisticRegressionAuditNA")
+build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA")
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
@@ -281,8 +282,8 @@ build_versicolor(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5)
 build_versicolor(DummyClassifier(strategy = "prior"), "DummyVersicolor")
 build_versicolor(KNeighborsClassifier(), "KNNVersicolor", with_proba = False)
 build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPVersicolor")
-build_versicolor(SGDClassifier(random_state = 13, n_iter = 100), "SGDVersicolor", with_proba = False)
-build_versicolor(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogVersicolor")
+build_versicolor(SGDClassifier(random_state = 13, max_iter = 100), "SGDVersicolor", with_proba = False)
+build_versicolor(SGDClassifier(random_state = 13, loss = "log", max_iter = 100), "SGDLogVersicolor")
 build_versicolor(SVC(), "SVCVersicolor", with_proba = False)
 build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
 
@@ -339,8 +340,8 @@ build_iris(GaussianNB(), "NaiveBayesIris")
 build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris", flat = True)
 build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
 build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleIris")
-build_iris(SGDClassifier(random_state = 13, n_iter = 100), "SGDIris", with_proba = False)
-build_iris(SGDClassifier(random_state = 13, loss = "log", n_iter = 100), "SGDLogIris")
+build_iris(SGDClassifier(random_state = 13, max_iter = 100), "SGDIris", with_proba = False)
+build_iris(SGDClassifier(random_state = 13, loss = "log", max_iter = 100), "SGDLogIris")
 build_iris(SVC(), "SVCIris", with_proba = False)
 build_iris(NuSVC(), "NuSVCIris", with_proba = False)
 build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)

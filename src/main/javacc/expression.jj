@@ -25,6 +25,7 @@ options {
 PARSER_BEGIN(ExpressionTranslator)
 package org.jpmml.sklearn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
@@ -99,6 +100,30 @@ public class ExpressionTranslator {
 	}
 
 	static
+	private Apply translateFunction(String function, List<Expression> arguments){
+
+		switch(function){
+			case "numpy.where":
+				if(arguments.size() != 3){
+					throw new IllegalArgumentException();
+				}
+				return createApply("if", arguments.get(0), arguments.get(1), arguments.get(2));
+			case "pandas.isnull":
+				if(arguments.size() != 1){
+					throw new IllegalArgumentException();
+				}
+				return createApply("isMissing", arguments.get(0));
+			case "pandas.notnull":
+				if(arguments.size() != 1){
+					throw new IllegalArgumentException();
+				}
+				return createApply("isNotMissing", arguments.get(0));
+			default:
+				throw new IllegalArgumentException(function);
+		}
+	}
+
+	static
 	private String translateValue(Token value){
 		String image = value.image;
 
@@ -146,6 +171,8 @@ TOKEN:
 TOKEN:
 {
 	< COMMA: "," >
+	|
+	< DOT: "." >
 	|
 	< COLON: ":" >
 }
@@ -273,6 +300,8 @@ Expression PrimaryExpression():
 		LOOKAHEAD(<NAME> <LBRACKET>)
 		expression = ArrayIndexingExpression()
 		|
+		expression = FunctionInvocationExpression()
+		|
 		expression = ParenthesizedExpression()
 		|
 		expression = LiteralExpression()
@@ -323,6 +352,33 @@ FieldRef ArrayIndexingExpression():
 		}
 
 		return feature.ref();
+	}
+}
+
+Expression FunctionInvocationExpression():
+{
+	Token name;
+	StringBuilder function = new StringBuilder();
+	List<Expression> arguments;
+}
+{
+	name = <NAME> { function.append(name.image); } ( <DOT> name = <NAME> { function.append('.').append(name.image); })* <LPAREN> arguments = ArgumentList() <RPAREN>
+
+	{
+		return translateFunction(function.toString(), arguments);
+	}
+}
+
+List<Expression> ArgumentList():
+{
+	Expression expression;
+	List<Expression> expressions = new ArrayList<Expression>();
+}
+{
+	expression = Expression() { expressions.add(expression); } ( <COMMA> expression = Expression() { expressions.add(expression); })*
+
+	{
+		return expressions;
 	}
 }
 

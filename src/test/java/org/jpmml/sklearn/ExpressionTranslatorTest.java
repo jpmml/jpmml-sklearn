@@ -39,5 +39,7 @@ public class ExpressionTranslatorTest {
 
 		ExpressionTranslator.translate("(X[:, 0] + X[:, 1] - 1) / X[:, 2] * -0.5", features);
 		ExpressionTranslator.translate("(X[\"a\"] + X[\"b\"] - 1) / X['c'] * -0.5", features);
+
+		ExpressionTranslator.translate("numpy.where(pandas.notnull(X[\"a\"]), X[\"a\"], X[\"b\"] + X[\"c\"])", features);
 	}
 }
