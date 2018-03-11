@@ -168,10 +168,10 @@ TOKEN:
 	|
 	< NAME: <LETTER> (<LETTER> | <DIGIT>)* >
 	|
-	< QUOTED_NAME:
-		"\"" <NAME> "\""
+	< STRING:
+		"\"" (~["\""])* "\""
 		|
-		"\'" <NAME> "\'"
+		"\'" (~["\'"])* "\'"
 	>
 	|
 	< #DIGIT: ["0" - "9"] >
@@ -270,13 +270,10 @@ Expression PrimaryExpression():
 }
 {
 	(
+		LOOKAHEAD(<NAME> <LBRACKET>)
+		expression = ArrayIndexingExpression()
+		|
 		expression = ParenthesizedExpression()
-		|
-		LOOKAHEAD(<NAME> <LBRACKET> <COLON>)
-		expression = FeatureIndexExpression()
-		|
-		LOOKAHEAD(<NAME> <LBRACKET> <QUOTED_NAME>)
-		expression = FeatureNameExpression()
 		|
 		expression = LiteralExpression()
 	)
@@ -286,57 +283,58 @@ Expression PrimaryExpression():
 	}
 }
 
+FieldRef ArrayIndexingExpression():
+{
+	Token variable;
+	Token column;
+}
+{
+	(
+		LOOKAHEAD(<NAME> <LBRACKET> <COLON>)
+		variable = <NAME> <LBRACKET> <COLON> <COMMA> column = <INT> <RBRACKET>
+		|
+		variable = <NAME> <LBRACKET> column = <STRING> <RBRACKET>
+	)
+
+	{
+		if(!("X").equals(variable.image)){
+			throw new IllegalArgumentException(variable.image);
+		}
+
+		Feature feature;
+
+		switch(column.kind){
+			case ExpressionTranslatorConstants.INT:
+				{
+					int index = Integer.parseInt(column.image);
+
+					feature = getFeature(index);
+				}
+				break;
+			case ExpressionTranslatorConstants.STRING:
+				{
+					FieldName name = FieldName.create(column.image.substring(1, column.image.length() - 1));
+
+					feature = getFeature(name);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException();
+		}
+
+		return feature.ref();
+	}
+}
+
 Expression ParenthesizedExpression():
 {
 	Expression expression;
 }
 {
 	<LPAREN> expression = Expression() <RPAREN>
-
+	
 	{
 		return expression;
-	}
-}
-
-FieldRef FeatureIndexExpression():
-{
-	Token variable;
-	Token column;
-}
-{
-	variable = <NAME> <LBRACKET> <COLON> <COMMA> column = <INT> <RBRACKET>
-
-	{
-		if(!("X").equals(variable.image)){
-			throw new IllegalArgumentException(variable.image);
-		}
-
-		int index = Integer.parseInt(column.image);
-
-		Feature feature = getFeature(index);
-
-		return feature.ref();
-	}
-}
-
-FieldRef FeatureNameExpression():
-{
-	Token variable;
-	Token quotedName;
-}
-{
-	variable = <NAME> <LBRACKET> quotedName = <QUOTED_NAME> <RBRACKET>
-
-	{
-		if(!("X").equals(variable.image)){
-			throw new IllegalArgumentException(variable.image);
-		}
-
-		FieldName name = FieldName.create(quotedName.image.substring(1, quotedName.image.length() - 1));
-
-		Feature feature = getFeature(name);
-
-		return feature.ref();
 	}
 }
 
