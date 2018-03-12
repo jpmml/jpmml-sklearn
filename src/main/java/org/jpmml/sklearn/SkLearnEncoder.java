@@ -18,6 +18,7 @@
  */
 package org.jpmml.sklearn;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -124,6 +125,34 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public DerivedField createDerivedField(FieldName name, Expression expression){
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
+	}
+
+	public void renameFeature(Feature feature, FieldName renamedName){
+		FieldName name = feature.getName();
+
+		DerivedField derivedField = getDerivedField(name);
+		if(derivedField == null){
+			throw new IllegalArgumentException(name.getValue());
+		}
+
+		Map<FieldName, DerivedField> derivedFields = getDerivedFields();
+		derivedFields.remove(name);
+
+		try {
+			Field field = Feature.class.getDeclaredField("name");
+
+			if(!field.isAccessible()){
+				field.setAccessible(true);
+			}
+
+			field.set(feature, renamedName);
+		} catch(ReflectiveOperationException roe){
+			throw new RuntimeException(roe);
+		}
+
+		derivedField.setName(renamedName);
+
+		addDerivedField(derivedField);
 	}
 
 	public void addTransformer(Model transformer){

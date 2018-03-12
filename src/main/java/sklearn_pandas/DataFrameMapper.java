@@ -84,7 +84,7 @@ public class DataFrameMapper extends Initializer {
 					for(int i = 0; i < rowFeatures.size(); i++){
 						Feature rowFeature = rowFeatures.get(i);
 
-						encoder.renameField(rowFeature.getName(), rowFeatures.size() > 1 ? FieldName.create(alias + "_" + i) : FieldName.create(alias));
+						encoder.renameFeature(rowFeature, rowFeatures.size() > 1 ? FieldName.create(alias + "_" + i) : FieldName.create(alias));
 					}
 				}
 			}
