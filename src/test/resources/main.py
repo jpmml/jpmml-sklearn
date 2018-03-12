@@ -217,7 +217,7 @@ build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
 
 audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
-def build_audit_na(classifier, name, with_proba = True):
+def build_audit_na(classifier, name, with_proba = True, **kwargs):
 	employment_mapping = {
 		"CONSULTANT" : "PRIVATE",
 		"PSFEDERAL" : "PUBLIC",
@@ -243,14 +243,19 @@ def build_audit_na(classifier, name, with_proba = True):
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_na_X, audit_na_y)
+	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
 	if(with_proba == True):
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	if isinstance(classifier, DecisionTreeClassifier):
+		Xt = pipeline_transform(pipeline, audit_na_X)
+		adjusted_apply = DataFrame(classifier.apply(Xt), columns = ["nodeId"])
+		adjusted = pandas.concat((adjusted, adjusted_apply), axis = 1)
 	store_csv(adjusted, name + ".csv")
 
-build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA")
+build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", winner_id = True)
 build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA")
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")

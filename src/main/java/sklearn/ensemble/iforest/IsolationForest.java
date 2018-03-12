@@ -109,7 +109,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 							nodeDepth++;
 						}
 
-						double nodeSample = this.nodeSamples[Integer.parseInt(node.getId()) - 1];
+						double nodeSample = this.nodeSamples[Integer.parseInt(node.getId())];
 
 						double averagePathLength = (corrected ? correctedAveragePathLength(nodeSample) : averagePathLength(nodeSample));
 

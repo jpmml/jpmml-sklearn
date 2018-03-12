@@ -137,7 +137,6 @@ public class TreeModelUtil {
 		double[] values = tree.getValues();
 
 		Node root = new Node()
-			.setId("1")
 			.setPredicate(new True());
 
 		encodeNode(root, predicateManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
@@ -150,6 +149,8 @@ public class TreeModelUtil {
 
 	static
 	private void encodeNode(Node node, PredicateManager predicateManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
+		node.setId(String.valueOf(index));
+
 		int featureIndex = features[index];
 
 		// A non-leaf (binary split) node
@@ -189,13 +190,11 @@ public class TreeModelUtil {
 			int rightIndex = rightChildren[index];
 
 			Node leftChild = new Node()
-				.setId(String.valueOf(leftIndex + 1))
 				.setPredicate(leftPredicate);
 
 			encodeNode(leftChild, predicateManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			Node rightChild = new Node()
-				.setId(String.valueOf(rightIndex + 1))
 				.setPredicate(rightPredicate);
 
 			encodeNode(rightChild, predicateManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
