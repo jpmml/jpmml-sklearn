@@ -21,7 +21,7 @@ from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, Label
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import PMMLPipeline
-from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain, MultiDomain
+from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
@@ -231,8 +231,8 @@ def build_audit_na(classifier, name, with_proba = True):
 		"MALE" : 1
 	}
 	mapper = DataFrameMapper(
-		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), ExpressionTransformer("numpy.where(pandas.notnull(X[:, 0]), X[:, 0], -999)"), Imputer(missing_values = -999)])] +
-		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), ExpressionTransformer("numpy.where(pandas.isnull(X[:, 0]), -999, X[:, 0])"), Imputer(missing_values = -999)])] +
+		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("numpy.where(pandas.notnull(X[:, 0]), X[:, 0], -999)"), name = "flag_missing(Age, -999)"), Imputer(missing_values = -999)])] +
+		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("numpy.where(pandas.isnull(X[:, 0]), -999, X[:, 0])"), name = "flag_missing(Hours, -999)"), Imputer(missing_values = -999)])] +
 		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False), Imputer()])] +
 		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()])] +
 		[([column], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(missing_values = None), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +

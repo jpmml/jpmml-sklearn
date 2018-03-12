@@ -111,6 +111,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * `sklearn2pmml.EstimatorProxy`
     * `sklearn2pmml.PMMLPipeline`
     * `sklearn2pmml.SelectorProxy`
+    * `sklearn2pmml.decoration.Alias`
     * `sklearn2pmml.decoration.CategoricalDomain`
     * `sklearn2pmml.decoration.ContinuousDomain`
     * `sklearn2pmml.decoration.MultiDomain`
