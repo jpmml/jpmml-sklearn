@@ -104,7 +104,7 @@ def build_wheat(kmeans, name, with_affinity = True, **kwargs):
 	customize(kmeans, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["Cluster"])
-	if(with_affinity == True):
+	if with_affinity == True:
 		Xt = pipeline_transform(pipeline, wheat_X)
 		affinity_0 = kmeans_distance(kmeans, 0, Xt)
 		affinity_1 = kmeans_distance(kmeans, 1, Xt)
@@ -153,7 +153,7 @@ def build_audit(classifier, name, with_proba = True, **kwargs):
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
-	if(with_proba == True):
+	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name + ".csv")
@@ -190,7 +190,7 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
-	if(with_proba == True):
+	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name + ".csv")
@@ -207,7 +207,7 @@ def build_audit_dict(classifier, name, with_proba = True):
 	pipeline.fit(audit_dict_X, audit_y)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_dict_X), columns = ["Adjusted"])
-	if(with_proba == True):
+	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_dict_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name + ".csv")
@@ -246,7 +246,7 @@ def build_audit_na(classifier, name, with_proba = True, **kwargs):
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
-	if(with_proba == True):
+	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	if isinstance(classifier, DecisionTreeClassifier):
@@ -278,7 +278,7 @@ def build_versicolor(classifier, name, with_proba = True, **kwargs):
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
-	if(with_proba == True):
+	if with_proba == True:
 		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name + ".csv")
@@ -324,7 +324,7 @@ def build_iris(classifier, name, with_proba = True, **kwargs):
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
-	if(with_proba == True):
+	if with_proba == True:
 		species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name + ".csv")
@@ -368,7 +368,7 @@ def build_sentiment(classifier, name, with_proba = True, **kwargs):
 	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
-	if(with_proba == True):
+	if with_proba == True:
 		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability(0)", "probability(1)"])
 		score = pandas.concat((score, score_proba), axis = 1)
 	store_csv(score, name + ".csv")
@@ -483,7 +483,7 @@ def build_housing(regressor, name, with_kneighbors = False, **kwargs):
 	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
-	if(with_kneighbors == True):
+	if with_kneighbors == True:
 		Xt = pipeline_transform(pipeline, housing_X)
 		kneighbors = regressor.kneighbors(Xt)
 		medv_ids = DataFrame(kneighbors[1] + 1, columns = ["neighbor(" + str(x + 1) + ")" for x in range(regressor.n_neighbors)])
