@@ -19,10 +19,13 @@
 package sklearn.tree;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import numpy.core.Scalar;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
@@ -43,6 +46,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.visitors.NodeExtender;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
@@ -56,15 +60,20 @@ public class TreeModelUtil {
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
 		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
-		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, winnerId ? Boolean.FALSE : Boolean.TRUE);
+		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
+
+		boolean fixed = (winnerId || nodeExtensions != null);
+
+		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
 		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
 
+		if(fixed && (compact || flat)){
+			throw new IllegalArgumentException("Conflicting tree model options");
+		}
+
+		List<Visitor> visitors = new ArrayList<>();
+
 		if(winnerId){
-
-			if(compact || flat){
-				throw new IllegalArgumentException("Conflicting tree model options");
-			}
-
 			Output output = model.getOutput();
 			if(output == null){
 				output = new Output();
@@ -73,9 +82,42 @@ public class TreeModelUtil {
 			}
 
 			output.addOutputFields(ModelUtil.createEntityIdField(FieldName.create("nodeId")));
-		}
+		} // End if
 
-		List<Visitor> visitors = new ArrayList<>();
+		if(nodeExtensions != null){
+			Collection<? extends Map.Entry<String, Map<Integer, ?>>> entries = nodeExtensions.entrySet();
+
+			for(Map.Entry<String, Map<Integer, ?>> entry : entries){
+				String name = entry.getKey();
+
+				final
+				Map<Integer, ?> values = entry.getValue();
+
+				Visitor nodeExtender = new NodeExtender(name){
+
+					@Override
+					public String getValue(Node node){
+						Integer id = Integer.valueOf(node.getId());
+
+						Object value = values.get(id);
+						if(value != null){
+
+							if(value instanceof Scalar){
+								Scalar scalar = (Scalar)value;
+
+								value = scalar.getOnlyElement();
+							}
+
+							return ValueUtil.formatValue(value);
+						}
+
+						return null;
+					}
+				};
+
+				visitors.add(nodeExtender);
+			}
+		} // End if
 
 		if(compact){
 			visitors.add(new TreeModelCompactor());

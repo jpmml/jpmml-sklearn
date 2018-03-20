@@ -18,6 +18,7 @@
  */
 package sklearn.tree;
 
+import org.dmg.pmml.tree.Node;
 import org.jpmml.sklearn.HasOptions;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
@@ -38,4 +39,10 @@ public interface HasTreeOptions extends HasOptions {
 	 * @see Node#getId()
 	 */
 	String OPTION_WINNER_ID = "winner_id";
+
+	/**
+	 * @see Node#hasExtensions()
+	 * @see Node#getExtensions()
+	 */
+	String OPTION_NODE_EXTENSIONS = "node_extensions";
 }

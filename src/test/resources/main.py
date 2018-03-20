@@ -455,6 +455,10 @@ def build_auto_na(regressor, name):
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_na_X, auto_na_y)
+	if isinstance(regressor, DecisionTreeRegressor):
+		tree = regressor.tree_
+		node_impurity = {node_idx : tree.impurity[node_idx] for node_idx in range(0, tree.node_count) if tree.impurity[node_idx] != 0.0}
+		regressor.node_extensions = {regressor.criterion : node_impurity}
 	store_pkl(pipeline, name + ".pkl")
 	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
 	store_csv(mpg, name + ".csv")
