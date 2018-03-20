@@ -21,7 +21,6 @@ package sklearn.feature_selection;
 import java.util.ArrayList;
 import java.util.List;
 
-import numpy.core.Scalar;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
@@ -75,11 +74,11 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 	}
 
 	public Number getThreshold(){
-		Scalar threshold;
+		Number threshold;
 
 		// SkLearn 0.19+
 		try {
-			threshold = get("threshold_", Scalar.class);
+			threshold = (Number)getScalar("threshold_");
 		} catch(RuntimeException re){
 			String message = "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent \'threshold_\' attribute. " +
 				"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + ClassDictUtil.formatProxyExample(SelectorProxy.class, this) + ")";
@@ -87,6 +86,6 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 			throw new IllegalArgumentException(message, re);
 		}
 
-		return (Number)threshold.getOnlyElement();
+		return threshold;
 	}
 }

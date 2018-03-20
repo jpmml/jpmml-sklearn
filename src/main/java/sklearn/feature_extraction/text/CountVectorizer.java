@@ -36,7 +36,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.io.CharStreams;
 import numpy.DType;
-import numpy.core.Scalar;
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
@@ -96,7 +96,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 		Collection<? extends Map.Entry<String, ?>> entries = vocabulary.entrySet();
 		for(Map.Entry<String, ?> entry : entries){
-			termIndexMap.put(entry.getKey(), toIndex(entry.getValue()));
+			termIndexMap.put(entry.getKey(), ValueUtil.asInteger((Number)ScalarUtil.decode(entry.getValue())));
 		}
 
 		BiMap<Integer, String> indexTermMap = termIndexMap.inverse();
@@ -282,18 +282,6 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		} catch(IOException ioe){
 			throw new IllegalArgumentException(stopWords, ioe);
 		}
-	}
-
-	static
-	private Integer toIndex(Object value){
-
-		if(value instanceof Scalar){
-			Scalar scalar = (Scalar)value;
-
-			value = scalar.getOnlyElement();
-		}
-
-		return ValueUtil.asInteger((Number)value);
 	}
 
 	private static final Joiner JOINER = Joiner.on("|");

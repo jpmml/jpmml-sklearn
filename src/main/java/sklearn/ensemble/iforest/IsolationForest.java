@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import numpy.core.Scalar;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
@@ -180,9 +179,9 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	public double getThreshold(){
-		Scalar threshold = get("threshold_", Scalar.class);
+		Number threshold = (Number)getScalar("threshold_");
 
-		return ValueUtil.asDouble((Number)threshold.getOnlyElement());
+		return ValueUtil.asDouble(threshold);
 	}
 
 	static

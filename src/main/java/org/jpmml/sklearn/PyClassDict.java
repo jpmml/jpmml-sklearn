@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import net.razorvine.pickle.objects.ClassDict;
+import numpy.core.ScalarUtil;
 
 abstract
 public class PyClassDict extends ClassDict {
@@ -53,6 +54,12 @@ public class PyClassDict extends ClassDict {
 		};
 
 		return castFunction.apply(value);
+	}
+
+	public Object getScalar(String name){
+		Object object = get(name);
+
+		return ScalarUtil.decode(object);
 	}
 
 	public List<?> getArray(String name){

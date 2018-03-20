@@ -25,7 +25,7 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import numpy.core.Scalar;
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
@@ -101,12 +101,7 @@ public class TreeModelUtil {
 
 						Object value = values.get(id);
 						if(value != null){
-
-							if(value instanceof Scalar){
-								Scalar scalar = (Scalar)value;
-
-								value = scalar.getOnlyElement();
-							}
+							value = ScalarUtil.decode(value);
 
 							return ValueUtil.formatValue(value);
 						}
