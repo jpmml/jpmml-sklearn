@@ -109,12 +109,12 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * `lightgbm.LGBMRegressor`
   * [SkLearn2PMML](https://github.com/jpmml/sklearn2pmml):
     * `sklearn2pmml.EstimatorProxy`
-    * `sklearn2pmml.PMMLPipeline`
     * `sklearn2pmml.SelectorProxy`
     * `sklearn2pmml.decoration.Alias`
     * `sklearn2pmml.decoration.CategoricalDomain`
     * `sklearn2pmml.decoration.ContinuousDomain`
     * `sklearn2pmml.decoration.MultiDomain`
+    * `sklearn2pmml.pipeline.PMMLPipeline`
     * `sklearn2pmml.preprocessing.Aggregator`
     * `sklearn2pmml.preprocessing.CutTransformer`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
@@ -222,9 +222,9 @@ from sklearn.tree import DecisionTreeClassifier
 classifier = DecisionTreeClassifier(min_samples_leaf = 5)
 ```
 
-Combine the above objects into a `sklearn2pmml.PMMLPipeline` object, and run the experiment:
+Combine the above objects into a `sklearn2pmml.pipeline.PMMLPipeline` object, and run the experiment:
 ```python
-from sklearn2pmml import PMMLPipeline
+from sklearn2pmml.pipeline import PMMLPipeline
 
 pipeline = PMMLPipeline([
     ("columns", column_preprocessor),
@@ -239,7 +239,7 @@ Optionally, embed model verification data:
 pipeline.verify(iris_X.sample(n = 15))
 ```
 
-Store the fitted `sklearn2pmml.PMMLPipeline` object in `pickle` data format:
+Store the fitted `PMMLPipeline` object in `pickle` data format:
 ```python
 from sklearn.externals import joblib
 

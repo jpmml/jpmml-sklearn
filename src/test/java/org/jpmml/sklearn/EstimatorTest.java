@@ -30,7 +30,7 @@ import org.jpmml.evaluator.Batch;
 import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
 import org.jpmml.evaluator.PMMLEquivalence;
-import sklearn2pmml.PMMLPipeline;
+import sklearn2pmml.pipeline.PMMLPipeline;
 
 abstract
 public class EstimatorTest extends IntegrationTest {

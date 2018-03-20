@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Estimator;
 import sklearn.pipeline.Pipeline;
-import sklearn2pmml.PMMLPipeline;
+import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class Main {
 

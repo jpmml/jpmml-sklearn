@@ -20,9 +20,9 @@ from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
-from sklearn2pmml import PMMLPipeline
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
+from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
