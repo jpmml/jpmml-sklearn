@@ -10,7 +10,7 @@
 
 	<groupId>org.jpmml</groupId>
 	<artifactId>jpmml-sklearn</artifactId>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.5-SNAPSHOT</version>
 
 	<name>JPMML-SkLearn</name>
 	<description>Java library and command-line application for converting Scikit-Learn models to PMML</description>
