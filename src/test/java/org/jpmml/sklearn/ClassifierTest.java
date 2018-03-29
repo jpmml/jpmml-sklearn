@@ -19,6 +19,7 @@
 package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
+import org.jpmml.evaluator.FloatEquivalence;
 import org.jpmml.evaluator.PMMLEquivalence;
 import org.jpmml.evaluator.RealNumberEquivalence;
 import org.junit.Test;
@@ -132,7 +133,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-		evaluate("XGB", "Audit", new PMMLEquivalence(1e-5, 1e-5));
+		evaluate("XGB", "Audit", new FloatEquivalence(32));
 	}
 
 	@Test
@@ -249,7 +250,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", "Iris", new PMMLEquivalence(1e-6, 1e-6));
+		evaluate("XGB", "Iris", new FloatEquivalence(4));
 	}
 
 	@Test

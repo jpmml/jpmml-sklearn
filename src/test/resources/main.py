@@ -62,8 +62,8 @@ class OptimalLGBMRegressor(LGBMRegressor):
 
 class OptimalXGBClassifier(XGBClassifier):
 
-	def __init__(self, objective, ntree_limit = 0, missing = None):
-		super(OptimalXGBClassifier, self).__init__(objective = objective, missing = missing)
+	def __init__(self, objective, ntree_limit = 0, n_jobs = 1, random_state = 0, missing = None):
+		super(OptimalXGBClassifier, self).__init__(objective = objective, n_jobs = n_jobs, random_state = random_state, missing = missing)
 		self.ntree_limit = ntree_limit
 
 	def predict(self, data, output_margin = False, ntree_limit = 0):
@@ -74,8 +74,8 @@ class OptimalXGBClassifier(XGBClassifier):
 
 class OptimalXGBRegressor(XGBRegressor):
 
-	def __init__(self, objective, ntree_limit = 0, missing = None):
-		super(OptimalXGBRegressor, self).__init__(objective = objective, missing = missing)
+	def __init__(self, objective, ntree_limit = 0, n_jobs = 1, random_state = 0, missing = None):
+		super(OptimalXGBRegressor, self).__init__(objective = objective, n_jobs = n_jobs, random_state = random_state, missing = missing)
 		self.ntree_limit = ntree_limit
 
 	def predict(self, data, output_margin = False, ntree_limit = 0):
@@ -174,7 +174,7 @@ build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
 build_audit(SVC(), "SVCAudit", with_proba = False)
 build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
-build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71), "XGBAudit")
+build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit")
 
 def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	mapper = DataFrameMapper(
