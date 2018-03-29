@@ -70,7 +70,7 @@ public class LogisticRegression extends LinearClassifier {
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		List<Feature> features = schema.getFeatures();
+		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
 			return encodeOvRModel(schema);

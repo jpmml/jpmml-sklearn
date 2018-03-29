@@ -67,7 +67,7 @@ public class MultilayerPerceptronUtil {
 		ClassDictUtil.checkSize(coefs, intercepts);
 
 		Label label = schema.getLabel();
-		List<Feature> features = schema.getFeatures();
+		List<? extends Feature> features = schema.getFeatures();
 
 		NeuralInputs neuralInputs = NeuralNetworkUtil.createNeuralInputs(features, DataType.DOUBLE);
 

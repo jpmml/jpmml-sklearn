@@ -77,7 +77,7 @@ public class KNeighborsUtil {
 			keys.add(instanceField.getColumn());
 		}
 
-		List<Feature> features = schema.getFeatures();
+		List<? extends Feature> features = schema.getFeatures();
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 

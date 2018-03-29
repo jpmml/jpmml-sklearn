@@ -123,7 +123,7 @@ public class LookupTransformer extends Transformer {
 			outputValues.add(defaultValue);
 		}
 
-		FieldName name = FieldName.create("lookup(" + FeatureUtil.formatFeatureList(features) + ")"); // XXX
+		FieldName name = FeatureUtil.createName("lookup", features);
 
 		DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, TypeUtil.getDataType(outputValues, DataType.STRING), mapValues);
 

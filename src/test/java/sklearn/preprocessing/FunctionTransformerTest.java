@@ -19,9 +19,11 @@
 package sklearn.preprocessing;
 
 import numpy.core.UFunc;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.OpType;
 import org.jpmml.evaluator.EvaluationContext;
 import org.jpmml.evaluator.ExpressionUtil;
 import org.jpmml.evaluator.FieldValue;
@@ -62,8 +64,22 @@ public class FunctionTransformerTest {
 
 		FieldName name = new FieldName("x");
 
+		DataType dataType;
+
+		if(value instanceof Integer){
+			dataType = DataType.INTEGER;
+		} else
+
+		if(value instanceof Float){
+			dataType = DataType.FLOAT;
+		} else
+
+		{
+			dataType = DataType.DOUBLE;
+		}
+
 		EvaluationContext context = new ModelEvaluationContext(null); // XXX
-		context.declare(name, FieldValueUtil.create(null, null, value));
+		context.declare(name, FieldValueUtil.create(dataType, OpType.CONTINUOUS, value));
 
 		Expression expression = FunctionTransformer.encodeUFunc(ufunc, new FieldRef(name));
 

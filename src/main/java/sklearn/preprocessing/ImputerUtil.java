@@ -22,8 +22,8 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.MissingValueTreatmentMethod;
-import org.dmg.pmml.TypeDefinitionField;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -39,7 +39,7 @@ public class ImputerUtil {
 
 	static
 	public Feature encodeFeature(Feature feature, Object missingValue, Object replacementValue, MissingValueTreatmentMethod missingValueTreatmentMethod, SkLearnEncoder encoder){
-		TypeDefinitionField field = encoder.getField(feature.getName());
+		Field<?> field = encoder.getField(feature.getName());
 
 		if(field instanceof DataField){
 			MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
@@ -59,14 +59,14 @@ public class ImputerUtil {
 			Expression expression = feature.ref();
 
 			if(missingValue != null){
-				expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(missingValue));
+				expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(missingValue, feature.getDataType()));
 			} else
 
 			{
 				expression = PMMLUtil.createApply("isMissing", expression);
 			}
 
-			expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(replacementValue), feature.ref());
+			expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(replacementValue, feature.getDataType()), feature.ref());
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("imputer", feature), expression);
 

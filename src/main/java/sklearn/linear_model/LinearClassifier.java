@@ -66,7 +66,7 @@ public class LinearClassifier extends Classifier {
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		List<Feature> features = schema.getFeatures();
+		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
 			ClassifierUtil.checkSize(2, categoricalLabel);

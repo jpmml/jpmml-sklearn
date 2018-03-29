@@ -25,8 +25,8 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.TypeDefinitionField;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -62,7 +62,7 @@ public class StringNormalizer extends Transformer {
 				expression = PMMLUtil.createApply("trimBlanks", expression);
 			}
 
-			TypeDefinitionField field = encoder.toCategorical(feature.getName(), Collections.<String>emptyList());
+			Field<?> field = encoder.toCategorical(feature.getName(), Collections.<String>emptyList());
 
 			// XXX: Should have been set by the previous transformer
 			field.setDataType(DataType.STRING);

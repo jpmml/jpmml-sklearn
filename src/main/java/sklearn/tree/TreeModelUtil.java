@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
@@ -153,7 +153,9 @@ public class TreeModelUtil {
 			}
 		};
 
-		return new ArrayList<>(Lists.transform(estimators, function));
+		return estimators.stream()
+			.map(function)
+			.collect(Collectors.toList());
 	}
 
 	static

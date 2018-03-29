@@ -95,7 +95,7 @@ public class LabelBinarizer extends Transformer {
 
 			{
 				// "($name == value) ? pos_label : neg_label"
-				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", feature.ref(), PMMLUtil.createConstant(value)), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
+				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", feature.ref(), PMMLUtil.createConstant(value, feature.getDataType())), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
 				FieldName name = (classes.size() > 1 ? FeatureUtil.createName("label_binarizer", feature, i) : FeatureUtil.createName("label_binarizer", feature));
 

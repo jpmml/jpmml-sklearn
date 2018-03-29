@@ -158,7 +158,7 @@ print(sklearn2pmml.__version__)
 
 ### The JPMML-SkLearn side of operations
 
-* Java 1.7 or newer.
+* Java 1.8 or newer.
 
 # Installation #
 

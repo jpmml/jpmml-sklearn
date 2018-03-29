@@ -58,7 +58,7 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 			apply.addExpressions(feature.ref());
 		}
 
-		FieldName name = FieldName.create(function + "(" + FeatureUtil.formatFeatureList(features) + ")"); // XXX
+		FieldName name = FeatureUtil.createName(function, features);
 
 		DerivedField derivedField = encoder.createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, apply);
 

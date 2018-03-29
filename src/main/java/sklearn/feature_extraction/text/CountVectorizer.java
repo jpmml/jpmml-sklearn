@@ -213,8 +213,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public Apply encodeApply(String function, Feature feature, int index, String term){
-		Constant constant = PMMLUtil.createConstant(term)
-			.setDataType(DataType.STRING);
+		Constant constant = PMMLUtil.createConstant(term, DataType.STRING);
 
 		return PMMLUtil.createApply(function, feature.ref(), constant);
 	}
