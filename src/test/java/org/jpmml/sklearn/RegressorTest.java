@@ -97,7 +97,7 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLGBMAuto() throws Exception {
-		evaluate("LGBM", "Auto", new RealNumberEquivalence(0));
+		evaluate("LGBM", "Auto", new RealNumberEquivalence(1));
 	}
 
 	@Test

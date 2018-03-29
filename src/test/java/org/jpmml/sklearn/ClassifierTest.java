@@ -63,12 +63,12 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLGBMAudit() throws Exception {
-		evaluate("LGBM", "Audit", new RealNumberEquivalence(0));
+		evaluate("LGBM", "Audit", new RealNumberEquivalence(1));
 	}
 
 	@Test
 	public void evaluateLGBMAuditCat() throws Exception {
-		evaluate("LGBM", "AuditCat");
+		evaluate("LGBM", "AuditCat", new RealNumberEquivalence(1));
 	}
 
 	@Test
@@ -168,7 +168,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLGBMIris() throws Exception {
-		evaluate("LGBM", "Iris", new RealNumberEquivalence(0));
+		evaluate("LGBM", "Iris", new RealNumberEquivalence(1));
 	}
 
 	@Test
