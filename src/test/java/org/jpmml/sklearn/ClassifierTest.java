@@ -77,6 +77,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLinearSVCAudit() throws Exception {
+		evaluate("LinearSVC", "Audit");
+	}
+
+	@Test
 	public void evaluateMultinomialLogisticRegressionAudit() throws Exception {
 		evaluate("MultinomialLogisticRegression", "Audit");
 	}
@@ -177,6 +182,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLinearSVCIris() throws Exception {
+		evaluate("LinearSVC", "Iris");
+	}
+
+	@Test
 	public void evaluateMultinomialLogisticRegressionIris() throws Exception {
 		evaluate("MultinomialLogisticRegression", "Iris");
 	}
@@ -251,6 +261,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateXGBIris() throws Exception {
 		evaluate("XGB", "Iris", new FloatEquivalence(4));
+	}
+
+	@Test
+	public void evaluateLinearSVCSentiment() throws Exception {
+		evaluate("LinearSVC", "Sentiment");
 	}
 
 	@Test

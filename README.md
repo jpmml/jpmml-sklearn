@@ -92,11 +92,12 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * [`preprocessing.RobustScaler`](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)
     * [`preprocessing.StandardScaler`](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
   * Support Vector Machines:
+    * [`svm.LinearSVC`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html)
+    * [`svm.LinearSVR`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html)
     * [`svm.OneClassSVM`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html)
     * [`svm.SVC`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
     * [`svm.NuSVC`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVC.html)
     * [`svm.SVR`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
-    * [`svm.LinearSVR`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html)
     * [`svm.NuSVR`](http://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html)
   * Decision Trees:
     * [`tree.DecisionTreeClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)

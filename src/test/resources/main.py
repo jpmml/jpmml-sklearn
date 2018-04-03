@@ -18,7 +18,7 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
-from sklearn.svm import LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
+from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
@@ -165,6 +165,7 @@ build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "Extr
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
 build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit")
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
+build_audit(LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
 build_audit(LogisticRegression(multi_class = "multinomial", solver = "newton-cg", max_iter = 500), "MultinomialLogisticRegressionAudit")
 build_audit(LogisticRegressionCV(multi_class = "ovr"), "OvRLogisticRegressionAudit")
 build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
@@ -337,6 +338,7 @@ build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimato
 build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
 build_iris(OptimalLGBMClassifier(objective = "multiclass", n_estimators = 7, num_iteration = 3), "LGBMIris")
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
+build_iris(LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)
 build_iris(LogisticRegression(multi_class = "multinomial", solver = "lbfgs"), "MultinomialLogisticRegressionIris")
 build_iris(LogisticRegressionCV(multi_class = "ovr"), "OvRLogisticRegressionIris")
 build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")
@@ -373,6 +375,7 @@ def build_sentiment(classifier, name, with_proba = True, **kwargs):
 		score = pandas.concat((score, score_proba), axis = 1)
 	store_csv(score, name + ".csv")
 
+build_sentiment(LinearSVC(random_state = 13), "LinearSVCSentiment", with_proba = False)
 build_sentiment(LogisticRegressionCV(), "LogisticRegressionSentiment")
 build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestSentiment", compact = False)
 
