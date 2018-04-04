@@ -14,7 +14,7 @@ def _module(name, version):
 	return (name + "-" + version)
 
 def _platform_module(name, version):
-	return (_platform() + "-" + _module(name, version))
+	return (_platform() + "_" + _module(name, version))
 
 def _pickle(obj, path):
 	con = open(path, "wb")
@@ -26,7 +26,7 @@ iris = load_iris()
 iris_classifier = LogisticRegressionCV()
 iris_classifier.fit(iris.data, iris.target)
 
-sklearn_joblib.dump(iris_classifier, "dump/" + _platform_module("sklearn_joblib", sklearn_joblib.__version__) + ".pkl.z", compress = True)
+sklearn_joblib.dump(iris_classifier, "dump/" + _platform_module("sklearn-joblib", sklearn_joblib.__version__) + ".pkl.z", compress = True)
 joblib.dump(iris_classifier, "dump/" + _platform_module("joblib", joblib.__version__) + ".pkl.z", compress = True)
 
 for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):

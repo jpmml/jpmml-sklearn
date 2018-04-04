@@ -29,26 +29,26 @@ public class PickleUtilTest {
 
 	@Test
 	public void python27() throws IOException {
-		unpickle("python-2.7-joblib-0.9.4.pkl.z");
+		unpickle("python-2.7_joblib-0.9.4.pkl.z");
 
-		unpickle("python-2.7-pickle-p2.pkl");
+		unpickle("python-2.7_pickle-p2.pkl");
 
-		unpickle("python-2.7-sklearn_joblib-0.9.4.pkl.z");
-		unpickle("python-2.7-sklearn_joblib-0.10.2.pkl.z");
+		unpickle("python-2.7_sklearn-joblib-0.9.4.pkl.z");
+		unpickle("python-2.7_sklearn-joblib-0.10.2.pkl.z");
 	}
 
 	@Test
 	public void python34() throws IOException {
-		unpickle("python-3.4-joblib-0.9.3.pkl.z");
-		unpickle("python-3.4-joblib-0.9.4.pkl.z");
-		unpickle("python-3.4-joblib-0.10.0.pkl.z");
+		unpickle("python-3.4_joblib-0.9.3.pkl.z");
+		unpickle("python-3.4_joblib-0.9.4.pkl.z");
+		unpickle("python-3.4_joblib-0.10.0.pkl.z");
 
-		unpickle("python-3.4-pickle-p2.pkl");
-		unpickle("python-3.4-pickle-p3.pkl");
-		unpickle("python-3.4-pickle-p4.pkl");
+		unpickle("python-3.4_pickle-p2.pkl");
+		unpickle("python-3.4_pickle-p3.pkl");
+		unpickle("python-3.4_pickle-p4.pkl");
 
-		unpickle("python-3.4-sklearn_joblib-0.9.4.pkl.z");
-		unpickle("python-3.4-sklearn_joblib-0.11.pkl.z");
+		unpickle("python-3.4_sklearn-joblib-0.9.4.pkl.z");
+		unpickle("python-3.4_sklearn-joblib-0.11.pkl.z");
 	}
 
 	static
