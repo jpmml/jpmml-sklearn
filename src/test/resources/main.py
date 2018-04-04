@@ -34,11 +34,6 @@ def pipeline_transform(pipeline, X):
 	identity_pipeline = Pipeline(pipeline.steps[: -1] + [("estimator", None)])
 	return identity_pipeline._transform(X)
 
-def customize(estimator, **kwargs):
-	for key in kwargs:
-		setattr(estimator, key, kwargs[key])
-	return estimator
-
 class OptimalLGBMClassifier(LGBMClassifier):
 
 	def __init__(self, objective, n_estimators, num_iteration = 0, random_state = 13, n_jobs = -1):
@@ -90,7 +85,7 @@ wheat_X, wheat_y = load_wheat("Wheat.csv")
 def kmeans_distance(kmeans, center, X):
 	return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - X, 2), axis = 1)
 
-def build_wheat(kmeans, name, with_affinity = True, **kwargs):
+def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 	mapper = DataFrameMapper([
 		(wheat_X.columns.values, ContinuousDomain())
 	])
@@ -101,7 +96,7 @@ def build_wheat(kmeans, name, with_affinity = True, **kwargs):
 	])
 	pipeline.fit(wheat_X)
 	pipeline = make_pmml_pipeline(pipeline, wheat_X.columns.values)
-	customize(kmeans, **kwargs)
+	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name + ".pkl")
 	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["Cluster"])
 	if with_affinity == True:
@@ -122,7 +117,7 @@ build_wheat(MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state
 
 audit_X, audit_y = load_audit("Audit.csv")
 
-def build_audit(classifier, name, with_proba = True, **kwargs):
+def build_audit(classifier, name, with_proba = True, **pmml_options):
 	continuous_mapper = DataFrameMapper([
 		(["Age", "Income", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 3)]))
 	])
@@ -146,11 +141,11 @@ def build_audit(classifier, name, with_proba = True, **kwargs):
 	])
 	pipeline.fit(audit_X, audit_y)
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
+	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
-	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
 	if with_proba == True:
@@ -163,7 +158,7 @@ build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samp
 build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
 build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
-build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit")
+build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit", num_iteration = 17)
 build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 build_audit(LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
 build_audit(LogisticRegression(multi_class = "multinomial", solver = "newton-cg", max_iter = 500), "MultinomialLogisticRegressionAudit")
@@ -175,7 +170,7 @@ build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
 build_audit(SVC(), "SVCAudit", with_proba = False)
 build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
-build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit")
+build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit", ntree_limit = 71)
 
 def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	mapper = DataFrameMapper(
@@ -218,7 +213,7 @@ build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
 
 audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
-def build_audit_na(classifier, name, with_proba = True, **kwargs):
+def build_audit_na(classifier, name, with_proba = True, **pmml_options):
 	employment_mapping = {
 		"CONSULTANT" : "PRIVATE",
 		"PSFEDERAL" : "PUBLIC",
@@ -244,7 +239,7 @@ def build_audit_na(classifier, name, with_proba = True, **kwargs):
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_na_X, audit_na_y)
-	customize(classifier, **kwargs)
+	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name + ".pkl")
 	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
 	if with_proba == True:
@@ -261,7 +256,7 @@ build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "Logist
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
-def build_versicolor(classifier, name, with_proba = True, **kwargs):
+def build_versicolor(classifier, name, with_proba = True, **pmml_options):
 	mapper = DataFrameMapper([
 		(versicolor_X.columns.values, [ContinuousDomain(), RobustScaler()])
 	])
@@ -275,8 +270,8 @@ def build_versicolor(classifier, name, with_proba = True, **kwargs):
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
 	pipeline = make_pmml_pipeline(pipeline, versicolor_X.columns.values, versicolor_y.name)
+	pipeline.configure(**pmml_options)
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
-	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
 	if with_proba == True:
@@ -299,7 +294,7 @@ build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
 
 iris_X, iris_y = load_iris("Iris.csv")
 
-def build_iris(classifier, name, with_proba = True, **kwargs):
+def build_iris(classifier, name, with_proba = True, **pmml_options):
 	pipeline = Pipeline([
 		("pipeline", Pipeline([
 			("mapper", DataFrameMapper([
@@ -318,11 +313,11 @@ def build_iris(classifier, name, with_proba = True, **kwargs):
 	])
 	pipeline.fit(iris_X, iris_y)
 	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values, iris_y.name)
+	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
-	customize(classifier, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
 	if with_proba == True:
@@ -336,7 +331,7 @@ build_iris(DummyClassifier(strategy = "constant", constant = "versicolor"), "Dum
 build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesIris")
 build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
 build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
-build_iris(OptimalLGBMClassifier(objective = "multiclass", n_estimators = 7, num_iteration = 3), "LGBMIris")
+build_iris(OptimalLGBMClassifier(objective = "multiclass", n_estimators = 7, num_iteration = 3), "LGBMIris", num_iteration = 3)
 build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 build_iris(LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)
 build_iris(LogisticRegression(multi_class = "multinomial", solver = "lbfgs"), "MultinomialLogisticRegressionIris")
@@ -352,7 +347,7 @@ build_iris(SGDClassifier(random_state = 13, loss = "log", max_iter = 100), "SGDL
 build_iris(SVC(), "SVCIris", with_proba = False)
 build_iris(NuSVC(), "NuSVCIris", with_proba = False)
 build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
-build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), "XGBIris")
+build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), "XGBIris", ntree_limit = 7)
 
 #
 # Text classification
@@ -360,14 +355,14 @@ build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), 
 
 sentiment_X, sentiment_y = load_sentiment("Sentiment.csv")
 
-def build_sentiment(classifier, name, with_proba = True, **kwargs):
+def build_sentiment(classifier, name, with_proba = True, **pmml_options):
 	pipeline = PMMLPipeline([
 		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 2), norm = None, dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
 		("selector", SelectKBest(f_classif, k = 500)),
 		("classifier", classifier)
 	])
 	pipeline.fit(sentiment_X, sentiment_y)
-	customize(classifier, **kwargs)
+	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name + ".pkl")
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
 	if with_proba == True:
@@ -385,7 +380,7 @@ build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3),
 
 auto_X, auto_y = load_auto("Auto.csv")
 
-def build_auto(regressor, name, **kwargs):
+def build_auto(regressor, name, **pmml_options):
 	cylinders_origin_mapping = {
 		(8, 1) : "8/1",
 		(6, 1) : "6/1",
@@ -407,11 +402,11 @@ def build_auto(regressor, name, **kwargs):
 	])
 	pipeline.fit(auto_X, auto_y)
 	pipeline = make_pmml_pipeline(pipeline, auto_X.columns.values, auto_y.name)
+	pipeline.configure(**pmml_options)
 	if isinstance(regressor, XGBRegressor):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
-	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name + ".csv")
@@ -429,14 +424,14 @@ build_auto(HuberRegressor(), "HuberAuto")
 build_auto(LarsCV(), "LarsAuto")
 build_auto(LassoCV(random_state = 13), "LassoAuto")
 build_auto(LassoLarsCV(), "LassoLarsAuto")
-build_auto(OptimalLGBMRegressor(objective = "regression", n_estimators = 17, num_iteration = 11), "LGBMAuto")
+build_auto(OptimalLGBMRegressor(objective = "regression", n_estimators = 17, num_iteration = 11), "LGBMAuto", num_iteration = 11)
 build_auto(LinearRegression(), "LinearRegressionAuto")
 build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
 build_auto(OrthogonalMatchingPursuitCV(), "OMPAuto")
 build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", flat = True)
 build_auto(RidgeCV(), "RidgeAuto")
 build_auto(TheilSenRegressor(n_subsamples = 15, random_state = 13), "TheilSenAuto")
-build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto")
+build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", ntree_limit = 31)
 
 auto_na_X, auto_na_y = load_auto("AutoNA.csv")
 
@@ -461,7 +456,7 @@ def build_auto_na(regressor, name):
 	if isinstance(regressor, DecisionTreeRegressor):
 		tree = regressor.tree_
 		node_impurity = {node_idx : tree.impurity[node_idx] for node_idx in range(0, tree.node_count) if tree.impurity[node_idx] != 0.0}
-		regressor.node_extensions = {regressor.criterion : node_impurity}
+		pipeline.configure(node_extensions = {regressor.criterion : node_impurity})
 	store_pkl(pipeline, name + ".pkl")
 	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
 	store_csv(mpg, name + ".csv")
@@ -471,7 +466,7 @@ build_auto_na(LinearRegression(), "LinearRegressionAutoNA")
 
 housing_X, housing_y = load_housing("Housing.csv")
 
-def build_housing(regressor, name, with_kneighbors = False, **kwargs):
+def build_housing(regressor, name, with_kneighbors = False, **pmml_options):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
@@ -486,8 +481,8 @@ def build_housing(regressor, name, with_kneighbors = False, **kwargs):
 	])
 	pipeline.fit(housing_X, housing_y)
 	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values, housing_y.name)
+	pipeline.configure(**pmml_options)
 	pipeline.verify(housing_X.sample(frac = 0.05, random_state = 13))
-	customize(regressor, **kwargs)
 	store_pkl(pipeline, name + ".pkl")
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
 	if with_kneighbors == True:
@@ -510,7 +505,7 @@ build_housing(NuSVR(), "NuSVRHousing")
 # Anomaly detection
 #
 
-def build_iforest_housing(iforest, name, **kwargs):
+def build_iforest_housing(iforest, name, **pmml_options):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
@@ -520,7 +515,7 @@ def build_iforest_housing(iforest, name, **kwargs):
 	])
 	pipeline.fit(housing_X)
 	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values)
-	customize(iforest, **kwargs)
+	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name + ".pkl")
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(housing_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")

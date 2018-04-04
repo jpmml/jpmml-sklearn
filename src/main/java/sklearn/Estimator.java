@@ -18,13 +18,18 @@
  */
 package sklearn;
 
+import java.util.Map;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 abstract
 public class Estimator extends PyClassDict implements HasNumberOfFeatures {
@@ -54,4 +59,23 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 	public DataType getDataType(){
 		return DataType.DOUBLE;
 	}
+
+	public Object getOption(String key, Object defaultValue){
+		Map<String, ?> pmmlOptions = (Map)get("pmml_options_");
+
+		if(pmmlOptions != null && pmmlOptions.containsKey(key)){
+			return pmmlOptions.get(key);
+		} // End if
+
+		// XXX
+		if(containsKey(key)){
+			logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "pmml_options_") + "\' is not set. Falling back to the surrogate attribute \'" + ClassDictUtil.formatMember(this, key) + "\'");
+
+			return get(key);
+		}
+
+		return defaultValue;
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(Estimator.class);
 }

@@ -139,14 +139,4 @@ public class PyClassDict extends ClassDict {
 	public List<Object[]> getTupleList(String name){
 		return (List)getList(name, Object[].class);
 	}
-
-	public Object getOption(String key, Object defaultValue){
-		Object value = get(key);
-
-		if(value == null){
-			return defaultValue;
-		}
-
-		return value;
-	}
 }
