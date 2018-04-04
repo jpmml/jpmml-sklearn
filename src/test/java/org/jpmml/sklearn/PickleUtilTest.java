@@ -34,6 +34,7 @@ public class PickleUtilTest {
 		unpickle("python-2.7-pickle-p2.pkl");
 
 		unpickle("python-2.7-sklearn_joblib-0.9.4.pkl.z");
+		unpickle("python-2.7-sklearn_joblib-0.10.2.pkl.z");
 	}
 
 	@Test
@@ -47,6 +48,7 @@ public class PickleUtilTest {
 		unpickle("python-3.4-pickle-p4.pkl");
 
 		unpickle("python-3.4-sklearn_joblib-0.9.4.pkl.z");
+		unpickle("python-3.4-sklearn_joblib-0.11.pkl.z");
 	}
 
 	static

@@ -16,9 +16,9 @@ def _module(name, version):
 def _platform_module(name, version):
 	return (_platform() + "-" + _module(name, version))
 
-def _pickle(protocol):
-	con = open("dump/" + _platform_module("pickle", "p" + str(protocol)) + ".pkl", "wb")
-	pickle.dump(iris_classifier, con, protocol = protocol)
+def _pickle(obj, path):
+	con = open(path, "wb")
+	pickle.dump(obj, con, protocol = protocol)
 	con.close()
 
 iris = load_iris()
@@ -30,4 +30,4 @@ sklearn_joblib.dump(iris_classifier, "dump/" + _platform_module("sklearn_joblib"
 joblib.dump(iris_classifier, "dump/" + _platform_module("joblib", joblib.__version__) + ".pkl.z", compress = True)
 
 for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
-	_pickle(protocol)
+	_pickle(iris_classifier, "dump/" + _platform_module("pickle", "p" + str(protocol)) + ".pkl")
