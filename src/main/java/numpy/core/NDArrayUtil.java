@@ -291,19 +291,40 @@ public class NDArrayUtil {
 	}
 
 	static
+	private short readShort(InputStream is, ByteOrder byteOrder) throws IOException {
+		byte b1 = readByte(is);
+		byte b2 = readByte(is);
+
+		if((ByteOrder.BIG_ENDIAN).equals(byteOrder)){
+			return (short)toShortInt(b1, b2);
+		} else
+
+		if((ByteOrder.LITTLE_ENDIAN).equals(byteOrder)){
+			return (short)toShortInt(b2, b1);
+		}
+
+		throw new IOException();
+	}
+
+	static
 	private int readUnsignedShort(InputStream is, ByteOrder byteOrder) throws IOException {
 		byte b1 = readByte(is);
 		byte b2 = readByte(is);
 
 		if((ByteOrder.BIG_ENDIAN).equals(byteOrder)){
-			return Ints.fromBytes((byte)0, (byte)0, b1, b2);
+			return toShortInt(b1, b2);
 		} else
 
 		if((ByteOrder.LITTLE_ENDIAN).equals(byteOrder)){
-			return Ints.fromBytes((byte)0, (byte)0, b2, b1);
+			return toShortInt(b2, b1);
 		}
 
 		throw new IOException();
+	}
+
+	static
+	private int toShortInt(byte b1, byte b2){
+		return ((b1 & 0xFF) << 8) + (b2 & 0xFF);
 	}
 
 	static
@@ -408,6 +429,8 @@ public class NDArrayUtil {
 	static
 	private class TypeDescriptor {
 
+		private String descr = null;
+
 		private ByteOrder byteOrder = null;
 
 		private Kind kind = null;
@@ -416,6 +439,8 @@ public class NDArrayUtil {
 
 
 		private TypeDescriptor(String descr){
+			setDescr(descr);
+
 			int i = 0;
 
 			ByteOrder byteOrder = null;
@@ -458,6 +483,7 @@ public class NDArrayUtil {
 		}
 
 		public Object read(InputStream is) throws IOException {
+			String descr = getDescr();
 			Kind kind = getKind();
 			ByteOrder byteOrder = getByteOrder();
 			int size = getSize();
@@ -476,6 +502,10 @@ public class NDArrayUtil {
 				case INTEGER:
 					{
 						switch(size){
+							case 1:
+								return readByte(is);
+							case 2:
+								return readShort(is, byteOrder);
 							case 4:
 								return readInt(is, byteOrder);
 							case 8:
@@ -531,7 +561,7 @@ public class NDArrayUtil {
 					break;
 			}
 
-			throw new IOException();
+			throw new IllegalArgumentException(descr);
 		}
 
 		public boolean isObject(){
@@ -543,6 +573,14 @@ public class NDArrayUtil {
 				default:
 					return false;
 			}
+		}
+
+		public String getDescr(){
+			return this.descr;
+		}
+
+		private void setDescr(String descr){
+			this.descr = descr;
 		}
 
 		public ByteOrder getByteOrder(){

@@ -3,6 +3,7 @@ from sklearn.externals import joblib as sklearn_joblib
 from sklearn.linear_model import LogisticRegressionCV
 
 import joblib
+import numpy
 import pickle
 import platform
 
@@ -31,3 +32,18 @@ joblib.dump(iris_classifier, "dump/" + _platform_module("joblib", joblib.__versi
 
 for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
 	_pickle(iris_classifier, "dump/" + _platform_module("pickle", "p" + str(protocol)) + ".pkl")
+
+def _pickle_values(values, dtype):
+	_pickle(values.astype(dtype), "dump/" + _platform_module("numpy", numpy.__version__) + "_" + dtype.__name__ + ".pkl")
+
+values = numpy.asarray([x for x in range(-128, 127, 1)], dtype = numpy.int8)
+_pickle_values(values, numpy.int8)
+
+values = numpy.asarray([x for x in range(-32768, 32767, 127)], dtype = numpy.int16)
+_pickle_values(values, numpy.int16)
+
+values = numpy.asarray([x for x in range(-2147483648, 2147483647, 64 * 32767)], dtype = numpy.int32)
+_pickle_values(values, numpy.int32)
+_pickle_values(values, numpy.int64)
+_pickle_values(values, numpy.float32)
+_pickle_values(values, numpy.float64)
