@@ -65,7 +65,7 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 
 	@Override
 	public int getNumberOfNeighbors(){
-		return ValueUtil.asInt((Number)get("n_neighbors"));
+		return KNeighborsUtil.getNumberOfNeighbors(this);
 	}
 
 	@Override

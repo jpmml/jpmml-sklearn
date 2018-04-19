@@ -67,7 +67,7 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 
 	@Override
 	public int getNumberOfNeighbors(){
-		return ValueUtil.asInt((Number)get("n_neighbors"));
+		return KNeighborsUtil.getNumberOfNeighbors(this);
 	}
 
 	@Override

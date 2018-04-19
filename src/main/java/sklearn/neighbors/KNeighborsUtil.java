@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.CityBlock;
 import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
@@ -51,12 +52,20 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Estimator;
 
 public class KNeighborsUtil {
 
 	private KNeighborsUtil(){
+	}
+
+	static
+	public <E extends Estimator & HasNeighbors> int getNumberOfNeighbors(E estimator){
+		Object nNeighbors = ScalarUtil.decode(estimator.get("n_neighbors"));
+
+		return ValueUtil.asInt((Number)nNeighbors);
 	}
 
 	static
