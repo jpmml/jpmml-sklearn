@@ -126,7 +126,7 @@ public class Main {
 				Estimator estimator = (Estimator)object;
 
 				object = new PMMLPipeline()
-					.setSteps(Collections.<Object[]>singletonList(new Object[]{"estimator", estimator}));
+					.setSteps(Collections.singletonList(new Object[]{"estimator", estimator}));
 			} else
 
 			{

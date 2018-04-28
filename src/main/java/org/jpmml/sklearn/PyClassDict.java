@@ -33,7 +33,7 @@ public class PyClassDict extends ClassDict {
 		super(module, name);
 	}
 
-	public <E> E get(final String name, Class<? extends E> clazz){
+	public <E> E get(String name, Class<? extends E> clazz){
 		Object value = get(name);
 
 		if(value == null){
@@ -78,7 +78,7 @@ public class PyClassDict extends ClassDict {
 		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
 	}
 
-	public <E> List<? extends E> getArray(final String name, Class<? extends E> clazz){
+	public <E> List<? extends E> getArray(String name, Class<? extends E> clazz){
 		List<?> values = getArray(name);
 
 		CastFunction<E> castFunction = new CastFunction<E>(clazz){
@@ -122,7 +122,7 @@ public class PyClassDict extends ClassDict {
 		return get(name, List.class);
 	}
 
-	public <E> List<? extends E> getList(final String name, Class<? extends E> clazz){
+	public <E> List<? extends E> getList(String name, Class<? extends E> clazz){
 		List<?> values = getList(name);
 
 		CastFunction<E> castFunction = new CastFunction<E>(clazz){

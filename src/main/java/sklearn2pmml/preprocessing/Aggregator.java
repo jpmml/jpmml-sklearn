@@ -62,7 +62,7 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 
 		DerivedField derivedField = encoder.createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, apply);
 
-		return Collections.<Feature>singletonList(new ContinuousFeature(encoder, derivedField));
+		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
 	}
 
 	public String getFunction(){

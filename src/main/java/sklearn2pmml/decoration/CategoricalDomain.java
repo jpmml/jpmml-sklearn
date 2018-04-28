@@ -99,7 +99,7 @@ public class CategoricalDomain extends Domain {
 			encoder.putUnivariateStats(univariateStats);
 		}
 
-		return super.encodeFeatures(Collections.<Feature>singletonList(feature), encoder);
+		return super.encodeFeatures(Collections.singletonList(feature), encoder);
 	}
 
 	public List<?> getData(){

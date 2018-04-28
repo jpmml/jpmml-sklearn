@@ -23,7 +23,6 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Regressor;
@@ -45,7 +44,7 @@ public class DummyRegressor extends Regressor {
 
 		Number intercept = Iterables.getOnlyElement(constant);
 
-		return RegressionModelUtil.createRegression(Collections.<Feature>emptyList(), Collections.<Double>emptyList(), intercept.doubleValue(), null, schema);
+		return RegressionModelUtil.createRegression(Collections.emptyList(), Collections.emptyList(), intercept.doubleValue(), null, schema);
 	}
 
 	public List<? extends Number> getConstant(){

@@ -131,7 +131,6 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		for(int i = 0, max = indexTermMap.size(); i < max; i++){
 			String term = indexTermMap.get(i);
 
-			final
 			Apply apply = encodeApply(defineFunction.getName(), feature, i, term);
 
 			Feature termFeature = new Feature(encoder, FieldName.create(defineFunction.getName() + "(" + term + ")"), dtype != null ? dtype.getDataType() : DataType.DOUBLE){

@@ -90,7 +90,6 @@ public class TreeModelUtil {
 			for(Map.Entry<String, Map<Integer, ?>> entry : entries){
 				String name = entry.getKey();
 
-				final
 				Map<Integer, ?> values = entry.getValue();
 
 				Visitor nodeExtender = new NodeExtender(name){

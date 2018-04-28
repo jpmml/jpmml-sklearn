@@ -106,7 +106,6 @@ public class LabelEncoder extends Transformer {
 			derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, mapValues);
 		}
 
-		final
 		Feature encodedFeature = new CategoricalFeature(encoder, derivedField, outputCategories);
 
 		Feature result = new CategoricalFeature(encoder, feature.getName(), feature.getDataType(), inputCategories){

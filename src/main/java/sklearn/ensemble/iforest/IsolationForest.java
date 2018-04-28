@@ -70,7 +70,6 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		List<? extends Regressor> estimators = getEstimators();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/8549
-		final
 		boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.19") >= 0);
 
 		PredicateManager predicateManager = new PredicateManager();
@@ -82,7 +81,6 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		for(Regressor estimator : estimators){
 			TreeRegressor treeRegressor = (TreeRegressor)estimator;
 
-			final
 			Tree tree = treeRegressor.getTree();
 
 			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, predicateManager, MiningFunction.REGRESSION, segmentSchema);

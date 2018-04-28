@@ -69,7 +69,7 @@ public class PickleUtil {
 			Unpickler.registerConstructor(constructor.getModule(), constructor.getName(), constructor);
 		}
 
-		try(final InputStream is = storage.getObject()){
+		try(InputStream is = storage.getObject()){
 			Unpickler unpickler = new Unpickler(){
 
 				@Override

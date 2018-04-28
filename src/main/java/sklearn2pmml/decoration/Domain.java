@@ -59,7 +59,6 @@ public class Domain extends Transformer {
 		}
 
 		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
-		final
 		Object invalidValueReplacement = getInvalidValueReplacement();
 
 		if(invalidValueReplacement != null){

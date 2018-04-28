@@ -34,7 +34,7 @@ public class PMMLPipelineTest {
 	@Test
 	public void construct(){
 		PMMLPipeline pipeline = new PMMLPipeline()
-			.setSteps(Collections.<Object[]>emptyList());
+			.setSteps(Collections.emptyList());
 
 		assertNull(pipeline.getRepr());
 		assertNull(pipeline.getActiveFields());

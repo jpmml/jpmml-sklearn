@@ -78,7 +78,6 @@ public class CompressedInputStreamStorage extends InputStreamStorage {
 		// Remove trailing whitespace
 		header = header.trim();
 
-		final
 		long expectedSize = Long.parseLong(header.substring(4), 16);
 
 		// Consume the first byte

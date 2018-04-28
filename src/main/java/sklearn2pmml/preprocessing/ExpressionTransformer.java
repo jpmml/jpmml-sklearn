@@ -44,7 +44,7 @@ public class ExpressionTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(FieldName.create("eval(" + expr + ")"), expression);
 
-		return Collections.<Feature>singletonList(new ContinuousFeature(encoder, derivedField));
+		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
 	}
 
 	public String getExpr(){

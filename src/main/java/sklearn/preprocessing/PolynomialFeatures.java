@@ -52,13 +52,12 @@ public class PolynomialFeatures extends Transformer implements HasNumberOfFeatur
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, final SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		int numberOfInputFeatures = getNumberOfInputFeatures();
 		int numberOfOutputFeatures = getNumberOfOutputFeatures();
 
 		ClassDictUtil.checkSize(numberOfInputFeatures, features);
 
-		final
 		int degree = getDegree();
 
 		boolean includeBias = getIncludeBias();

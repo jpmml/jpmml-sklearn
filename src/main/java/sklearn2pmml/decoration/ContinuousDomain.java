@@ -50,13 +50,9 @@ public class ContinuousDomain extends Domain {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		final
 		OutlierTreatmentMethod outlierTreatment = DomainUtil.parseOutlierTreatment(getOutlierTreatment());
 
-		final
 		Double lowValue;
-
-		final
 		Double highValue;
 
 		if(outlierTreatment != null){

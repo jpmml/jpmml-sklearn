@@ -77,7 +77,7 @@ public class LinearClassifier extends Classifier {
 		if(numberOfClasses >= 3){
 			ClassifierUtil.checkSize(numberOfClasses, categoricalLabel);
 
-			Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), Collections.<Feature>emptyList());
+			Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), Collections.emptyList());
 
 			List<RegressionModel> regressionModels = new ArrayList<>();
 

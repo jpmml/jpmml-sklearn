@@ -93,16 +93,16 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 	public List<?> getY(){
 		List<? extends Number> y = getArray("_y", Number.class);
 
-		final
-		List<?> classes = getClasses();
-
 		Function<Number, Object> function = new Function<Number, Object>(){
+
+			private List<?> classes = getClasses();
+
 
 			@Override
 			public Object apply(Number number){
 				int index = ValueUtil.asInt(number);
 
-				return classes.get(index);
+				return this.classes.get(index);
 			}
 		};
 

@@ -95,7 +95,6 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 			List<MiningModel> miningModels = new ArrayList<>();
 
 			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
-				final
 				List<? extends TreeRegressor> columnEstimators = CMatrixUtil.getColumn(estimators, rows, columns, i);
 
 				GradientBoostingClassifierProxy estimatorProxy = new GradientBoostingClassifierProxy(){

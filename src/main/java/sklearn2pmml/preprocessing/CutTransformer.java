@@ -96,7 +96,7 @@ public class CutTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("cut", feature), OpType.CATEGORICAL, (labels != null ? DataType.STRING : DataType.INTEGER), discretize);
 
-		return Collections.<Feature>singletonList(new CategoricalFeature(encoder, derivedField, categories));
+		return Collections.singletonList(new CategoricalFeature(encoder, derivedField, categories));
 	}
 
 	public List<? extends Number> getBins(){

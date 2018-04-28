@@ -57,7 +57,7 @@ public class SkLearnEncoder extends ModelEncoder {
 			List<Model> models = new ArrayList<>(this.transformers);
 			models.add(model);
 
-			Schema schema = new Schema(null, Collections.<Feature>emptyList());
+			Schema schema = new Schema(null, Collections.emptyList());
 
 			model = MiningModelUtil.createModelChain(models, schema);
 		}

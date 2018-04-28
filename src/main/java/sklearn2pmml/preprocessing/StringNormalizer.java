@@ -62,7 +62,7 @@ public class StringNormalizer extends Transformer {
 				expression = PMMLUtil.createApply("trimBlanks", expression);
 			}
 
-			Field<?> field = encoder.toCategorical(feature.getName(), Collections.<String>emptyList());
+			Field<?> field = encoder.toCategorical(feature.getName(), Collections.emptyList());
 
 			// XXX: Should have been set by the previous transformer
 			field.setDataType(DataType.STRING);
