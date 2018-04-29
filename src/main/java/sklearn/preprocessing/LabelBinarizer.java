@@ -90,7 +90,7 @@ public class LabelBinarizer extends Transformer {
 			String category = ValueUtil.formatValue(value);
 
 			if(ValueUtil.isZero(negLabel) && ValueUtil.isOne(posLabel)){
-				result.add(new BinaryFeature(encoder, feature.getName(), DataType.STRING, category));
+				result.add(new BinaryFeature(encoder, feature, category));
 			} else
 
 			{

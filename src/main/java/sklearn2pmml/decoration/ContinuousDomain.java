@@ -22,15 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.Interval;
-import org.dmg.pmml.MiningField;
 import org.dmg.pmml.NumericInfo;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutlierTreatmentMethod;
 import org.dmg.pmml.UnivariateStats;
-import org.jpmml.converter.Decorator;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.OutlierDecorator;
 import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -95,15 +93,10 @@ public class ContinuousDomain extends Domain {
 			WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
 			if(outlierTreatment != null){
-				Decorator outlierDecorator = new Decorator(){
-
-					@Override
-					public void decorate(DataField dataField, MiningField miningField){
-						miningField.setOutlierTreatment((OutlierTreatmentMethod.AS_IS).equals(outlierTreatment) ? null : outlierTreatment)
-							.setLowValue(lowValue)
-							.setHighValue(highValue);
-					}
-				};
+				OutlierDecorator outlierDecorator = new OutlierDecorator()
+					.setOutlierTreatment(outlierTreatment)
+					.setLowValue(lowValue)
+					.setHighValue(highValue);
 
 				encoder.addDecorator(wildcardFeature.getName(), outlierDecorator);
 			} // End if

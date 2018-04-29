@@ -72,7 +72,7 @@ public class ContinuousOutputFeature extends ContinuousFeature {
 			output.addOutputFields(outputField);
 		}
 
-		return new ContinuousOutputFeature(encoder, output, outputField.getName(), outputField.getDataType());
+		return new ContinuousOutputFeature(encoder, output, outputField);
 	}
 
 	public Output getOutput(){

@@ -29,9 +29,9 @@ import org.dmg.pmml.Row;
 import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.XMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.XMLUtil;
 
 public class MultiLookupTransformer extends LookupTransformer {
 

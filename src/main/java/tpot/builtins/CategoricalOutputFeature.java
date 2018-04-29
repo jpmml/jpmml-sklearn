@@ -63,7 +63,7 @@ public class CategoricalOutputFeature extends CategoricalFeature {
 
 		outputField.setOpType(OpType.CONTINUOUS);
 
-		return new ContinuousOutputFeature(encoder, output, outputField.getName(), outputField.getDataType());
+		return new ContinuousOutputFeature(encoder, output, outputField);
 	}
 
 	@Override

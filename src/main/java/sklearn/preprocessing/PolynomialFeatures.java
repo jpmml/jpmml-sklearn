@@ -101,7 +101,7 @@ public class PolynomialFeatures extends Transformer implements HasNumberOfFeatur
 					ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 					for(int i = 2; i <= degree; i++){
-						features[i - 1] = new PowerFeature(encoder, continuousFeature.getName(), continuousFeature.getDataType(), i);
+						features[i - 1] = new PowerFeature(encoder, continuousFeature, i);
 					}
 				}
 

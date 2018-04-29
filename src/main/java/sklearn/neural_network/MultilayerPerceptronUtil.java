@@ -25,7 +25,6 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Entity;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.neural_network.Connection;
 import org.dmg.pmml.neural_network.NeuralInputs;
 import org.dmg.pmml.neural_network.NeuralLayer;
 import org.dmg.pmml.neural_network.NeuralNetwork;
@@ -99,6 +98,10 @@ public class MultilayerPerceptronUtil {
 				neuralLayer.addNeurons(neuron);
 			}
 
+			neuralLayers.add(neuralLayer);
+
+			entities = neuralLayer.getNeurons();
+
 			if(layer == (coefs.size() - 1)){
 				neuralLayer.setActivationFunction(NeuralNetwork.ActivationFunction.IDENTITY);
 
@@ -110,13 +113,13 @@ public class MultilayerPerceptronUtil {
 
 						// Binary classification
 						if(categoricalLabel.size() == 2){
-							neuralLayers.add(neuralLayer);
+							List<NeuralLayer> transformationNeuralLayers = NeuralNetworkUtil.createBinaryLogisticTransformation(Iterables.getOnlyElement(entities));
 
-							neuralLayer = encodeLogisticTransform(getOnlyNeuron(neuralLayer));
+							neuralLayers.addAll(transformationNeuralLayers);
 
-							neuralLayers.add(neuralLayer);
+							neuralLayer = Iterables.getLast(transformationNeuralLayers);
 
-							neuralLayer = encodeLabelBinarizerTransform(getOnlyNeuron(neuralLayer));
+							entities = neuralLayer.getNeurons();
 						} else
 
 						// Multi-class classification
@@ -132,10 +135,6 @@ public class MultilayerPerceptronUtil {
 						break;
 				}
 			}
-
-			entities = neuralLayer.getNeurons();
-
-			neuralLayers.add(neuralLayer);
 		}
 
 		NeuralOutputs neuralOutputs = null;
@@ -155,48 +154,6 @@ public class MultilayerPerceptronUtil {
 			.setNeuralOutputs(neuralOutputs);
 
 		return neuralNetwork;
-	}
-
-	static
-	private NeuralLayer encodeLogisticTransform(Neuron input){
-		NeuralLayer neuralLayer = new NeuralLayer()
-			.setActivationFunction(NeuralNetwork.ActivationFunction.LOGISTIC);
-
-		Neuron neuron = new Neuron()
-			.setId("logistic/1")
-			.setBias(0d)
-			.addConnections(new Connection(input.getId(), 1d));
-
-		neuralLayer.addNeurons(neuron);
-
-		return neuralLayer;
-	}
-
-	static
-	private NeuralLayer encodeLabelBinarizerTransform(Neuron input){
-		NeuralLayer neuralLayer = new NeuralLayer()
-			.setActivationFunction(NeuralNetwork.ActivationFunction.IDENTITY);
-
-		Neuron noEventNeuron = new Neuron()
-			.setId("event/false")
-			.setBias(1d)
-			.addConnections(new Connection(input.getId(), -1d));
-
-		Neuron eventNeuron = new Neuron()
-			.setId("event/true")
-			.setBias(0d)
-			.addConnections(new Connection(input.getId(), 1d));
-
-		neuralLayer.addNeurons(noEventNeuron, eventNeuron);
-
-		return neuralLayer;
-	}
-
-	static
-	private Neuron getOnlyNeuron(NeuralLayer neuralLayer){
-		List<Neuron> neurons = neuralLayer.getNeurons();
-
-		return Iterables.getOnlyElement(neurons);
 	}
 
 	static

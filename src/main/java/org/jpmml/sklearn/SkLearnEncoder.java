@@ -21,21 +21,17 @@ package org.jpmml.sklearn;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.ModelStats;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
@@ -46,8 +42,6 @@ import sklearn.Transformer;
 public class SkLearnEncoder extends ModelEncoder {
 
 	private List<Model> transformers = new ArrayList<>();
-
-	private Map<FieldName, UnivariateStats> univariateStats = new LinkedHashMap<>();
 
 
 	@Override
@@ -62,29 +56,7 @@ public class SkLearnEncoder extends ModelEncoder {
 			model = MiningModelUtil.createModelChain(models, schema);
 		}
 
-		PMML pmml = super.encodePMML(model);
-
-		DataDictionary dataDictionary = pmml.getDataDictionary();
-
-		List<DataField> dataFields = dataDictionary.getDataFields();
-		for(DataField dataField : dataFields){
-			UnivariateStats univariateStats = getUnivariateStats(dataField.getName());
-
-			if(univariateStats == null){
-				continue;
-			}
-
-			ModelStats modelStats = model.getModelStats();
-			if(modelStats == null){
-				modelStats = new ModelStats();
-
-				model.setModelStats(modelStats);
-			}
-
-			modelStats.addUnivariateStats(univariateStats);
-		}
-
-		return pmml;
+		return super.encodePMML(model);
 	}
 
 	public void updateFeatures(List<Feature> features, Transformer transformer){
@@ -157,17 +129,5 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public void addTransformer(Model transformer){
 		this.transformers.add(transformer);
-	}
-
-	public UnivariateStats getUnivariateStats(FieldName name){
-		return this.univariateStats.get(name);
-	}
-
-	public void putUnivariateStats(UnivariateStats univariateStats){
-		putUnivariateStats(univariateStats.getField(), univariateStats);
-	}
-
-	public void putUnivariateStats(FieldName name, UnivariateStats univariateStats){
-		this.univariateStats.put(name, univariateStats);
 	}
 }

@@ -20,45 +20,35 @@ package sklearn2pmml.pipeline;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
+import java.util.Map;
 
 import numpy.core.NDArray;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Extension;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.ModelVerification;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.Row;
 import org.dmg.pmml.VerificationField;
-import org.dmg.pmml.VerificationFields;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
-import org.jpmml.sklearn.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
@@ -206,37 +196,31 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 			int rows = activeValuesShape[0];
 
-			VerificationFields verificationFields = new VerificationFields();
-
-			List<List<?>> data = new ArrayList<>();
+			Map<VerificationField, List<?>> data = new LinkedHashMap<>();
 
 			if(activeFields != null){
 
 				for(int i = 0; i < activeFields.size(); i++){
-					VerificationField verificationField = createVerificationField(activeFields.get(i));
+					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(activeFields.get(i)));
 
-					verificationFields.addVerificationFields(verificationField);
-
-					data.add(CMatrixUtil.getColumn(activeValues, rows, activeFields.size(), i));
+					data.put(verificationField, CMatrixUtil.getColumn(activeValues, rows, activeFields.size(), i));
 				}
 			} // End if
 
 			if(probabilityFields != null){
 
 				for(int i = 0; i < probabilityFields.size(); i++){
-					VerificationField verificationField = createVerificationField(probabilityFields.get(i))
+					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(probabilityFields.get(i)))
 						.setPrecision(precision.doubleValue())
 						.setZeroThreshold(zeroThreshold.doubleValue());
 
-					verificationFields.addVerificationFields(verificationField);
-
-					data.add(CMatrixUtil.getColumn(probabilityValues, rows, probabilityFields.size(), i));
+					data.put(verificationField, CMatrixUtil.getColumn(probabilityValues, rows, probabilityFields.size(), i));
 				}
 			} else
 
 			{
 				for(int i = 0; i < targetFields.size(); i++){
-					VerificationField verificationField = createVerificationField(targetFields.get(i));
+					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(targetFields.get(i)));
 
 					DataType dataType = label.getDataType();
 					switch(dataType){
@@ -250,48 +234,11 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 							break;
 					}
 
-					verificationFields.addVerificationFields(verificationField);
-
-					data.add(CMatrixUtil.getColumn(targetValues, rows, targetFields.size(), i));
+					data.put(verificationField, CMatrixUtil.getColumn(targetValues, rows, targetFields.size(), i));
 				}
 			}
 
-			List<String> keys = new ArrayList<>();
-
-			for(VerificationField verificationField : verificationFields){
-				keys.add(verificationField.getColumn());
-			}
-
-			DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
-
-			InlineTable inlineTable = new InlineTable();
-
-			for(int i = 0; i < rows; i++){
-				Row row = new Row();
-
-				Document document = documentBuilder.newDocument();
-
-				for(int j = 0; j < data.size(); j++){
-					List<?> column = data.get(j);
-
-					Object cell = column.get(i);
-					if(cell == null){
-						continue;
-					}
-
-					Element element = document.createElement(keys.get(j));
-					element.setTextContent(ValueUtil.formatValue(cell));
-
-					row.addContent(element);
-				}
-
-				inlineTable.addRows(row);
-			}
-
-			ModelVerification modelVerification = new ModelVerification(verificationFields, inlineTable)
-				.setRecordCount(rows);
-
-			model.setModelVerification(modelVerification);
+			model.setModelVerification(ModelUtil.createModelVerification(data));
 		}
 
 		PMML pmml = encoder.encodePMML(model);
@@ -437,22 +384,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	static
-	private VerificationField createVerificationField(String name){
-		String tagName = name;
-
-		Matcher matcher = PMMLPipeline.FUNCTION.matcher(tagName);
-		if(matcher.matches()){
-			tagName = (matcher.group(1) + "_" + matcher.group(2));
-		}
-
-		VerificationField verificationField = new VerificationField()
-			.setField(FieldName.create(name))
-			.setColumn(XMLUtil.createTagName(tagName));
-
-		return verificationField;
-	}
-
-	static
 	private NDArray toArray(List<String> strings){
 		NDArray result = new NDArray();
 		result.put("data", strings);
@@ -460,8 +391,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		return result;
 	}
-
-	private static final Pattern FUNCTION = Pattern.compile("^(.+)\\((.+)\\)$");
 
 	private static final Logger logger = LoggerFactory.getLogger(PMMLPipeline.class);
 }

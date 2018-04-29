@@ -70,7 +70,7 @@ public class OneHotEncoder extends Transformer {
 			ClassDictUtil.checkSize(values, categoricalFeature.getValues());
 
 			for(int i = 0; i < values.size(); i++){
-				result.add(new BinaryFeature(encoder, categoricalFeature.getName(), categoricalFeature.getDataType(), categoricalFeature.getValue(i)));
+				result.add(new BinaryFeature(encoder, categoricalFeature, categoricalFeature.getValue(i)));
 			}
 		} else
 
@@ -86,7 +86,7 @@ public class OneHotEncoder extends Transformer {
 
 				categories.add(category);
 
-				result.add(new BinaryFeature(encoder, wildcardFeature.getName(), wildcardFeature.getDataType(), category));
+				result.add(new BinaryFeature(encoder, wildcardFeature, category));
 			}
 
 			wildcardFeature.toCategoricalFeature(categories);

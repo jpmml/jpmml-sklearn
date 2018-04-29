@@ -108,7 +108,7 @@ public class LabelEncoder extends Transformer {
 
 		Feature encodedFeature = new CategoricalFeature(encoder, derivedField, outputCategories);
 
-		Feature result = new CategoricalFeature(encoder, feature.getName(), feature.getDataType(), inputCategories){
+		Feature result = new CategoricalFeature(encoder, feature, inputCategories){
 
 			@Override
 			public ContinuousFeature toContinuousFeature(){

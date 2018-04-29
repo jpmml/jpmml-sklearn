@@ -55,6 +55,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -113,13 +114,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 				derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.STRING, apply);
 			}
 
-			feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
-
-				@Override
-				public ContinuousFeature toContinuousFeature(){
-					throw new UnsupportedOperationException();
-				}
-			};
+			feature = new StringFeature(encoder, derivedField);
 		}
 
 		DefineFunction defineFunction = encodeDefineFunction();

@@ -27,9 +27,9 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
@@ -69,13 +69,7 @@ public class StringNormalizer extends Transformer {
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("normalize", feature), OpType.CATEGORICAL, DataType.STRING, expression);
 
-			feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
-
-				@Override
-				public ContinuousFeature toContinuousFeature(){
-					throw new UnsupportedOperationException();
-				}
-			};
+			feature = new StringFeature(encoder, derivedField);
 
 			result.add(feature);
 		}

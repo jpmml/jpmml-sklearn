@@ -28,7 +28,9 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.MissingValueDecorator;
+import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -76,14 +78,10 @@ public class ImputerUtil {
 				case FLOAT:
 				case DOUBLE:
 					return new ContinuousFeature(encoder, derivedField);
+				case STRING:
+					return new StringFeature(encoder, derivedField);
 				default:
-					return new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
-
-						@Override
-						public ContinuousFeature toContinuousFeature(){
-							throw new UnsupportedOperationException();
-						}
-					};
+					return new ObjectFeature(encoder, derivedField.getName(), derivedField.getDataType());
 			}
 		} else
 

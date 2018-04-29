@@ -51,7 +51,7 @@ public class PowerFunctionTransformer extends Transformer {
 			{
 				ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-				result.add(new PowerFeature(encoder, continuousFeature.getName(), continuousFeature.getDataType(), power));
+				result.add(new PowerFeature(encoder, continuousFeature, power));
 			}
 		}
 
