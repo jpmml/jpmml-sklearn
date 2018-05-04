@@ -112,6 +112,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateOneVsRestAudit() throws Exception {
+		evaluate("OneVsRest", "Audit");
+	}
+
+	@Test
 	public void evaluateRandomForestAudit() throws Exception {
 		evaluate("RandomForest", "Audit");
 	}
@@ -202,13 +207,18 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateMLPIris() throws Exception {
+		evaluate("MLP", "Iris");
+	}
+
+	@Test
 	public void evaluateNaiveBayesIris() throws Exception {
 		evaluate("NaiveBayes", "Iris");
 	}
 
 	@Test
-	public void evaluateMLPIris() throws Exception {
-		evaluate("MLP", "Iris");
+	public void evaluateOneVsRestIris() throws Exception {
+		evaluate("OneVsRest", "Iris");
 	}
 
 	@Test

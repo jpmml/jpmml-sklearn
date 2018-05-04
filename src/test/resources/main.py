@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNetCV, HuberRegressor, LarsCV, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDRegressor, TheilSenRegressor
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -165,6 +166,7 @@ build_audit(LogisticRegression(multi_class = "multinomial", solver = "newton-cg"
 build_audit(LogisticRegressionCV(multi_class = "ovr"), "OvRLogisticRegressionAudit")
 build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
 build_audit(GaussianNB(), "NaiveBayesAudit")
+build_audit(OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
 build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestAudit", flat = True)
 build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
@@ -339,6 +341,7 @@ build_iris(LogisticRegressionCV(multi_class = "ovr"), "OvRLogisticRegressionIris
 build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")
 build_iris(MLPClassifier(hidden_layer_sizes = (6,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPIris")
 build_iris(GaussianNB(), "NaiveBayesIris")
+build_iris(OneVsRestClassifier(LogisticRegression()), "OneVsRestIris")
 build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris", flat = True)
 build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
 build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleIris")

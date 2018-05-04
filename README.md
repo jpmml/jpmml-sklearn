@@ -68,6 +68,8 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * [`linear_model.SGDClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html)
     * [`linear_model.SGDRegressor`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDRegressor.html)
     * [`linear_model.TheilSenRegressor`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html)
+  * Multiclass classification:
+    * [`multiclass.OneVsRestClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html)
   * Naive Bayes:
     * [`naive_bayes.GaussianNB`](http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)
   * Nearest Neighbors:
