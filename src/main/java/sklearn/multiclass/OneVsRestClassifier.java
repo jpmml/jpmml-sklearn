@@ -33,6 +33,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
+import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
@@ -43,7 +44,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 
 	@Override
 	public int getNumberOfFeatures(){
-		return -1;
+		return EstimatorUtil.getNumberOfFeatures(this);
 	}
 
 	@Override

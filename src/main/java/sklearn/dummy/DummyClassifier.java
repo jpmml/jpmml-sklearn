@@ -42,11 +42,6 @@ public class DummyClassifier extends Classifier {
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		return -1;
-	}
-
-	@Override
 	public TreeModel encodeModel(Schema schema){
 		List<?> classes = getClasses();
 		List<? extends Number> classPrior = getClassPrior();

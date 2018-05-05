@@ -34,11 +34,6 @@ public class DummyRegressor extends Regressor {
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		return -1;
-	}
-
-	@Override
 	public RegressionModel encodeModel(Schema schema){
 		List<? extends Number> constant = getConstant();
 

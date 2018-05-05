@@ -49,7 +49,13 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return ValueUtil.asInt((Number)get("n_features_"));
+		Number nFeatures = (Number)get("n_features_");
+
+		if(nFeatures == null){
+			return -1;
+		}
+
+		return ValueUtil.asInt(nFeatures);
 	}
 
 	public OpType getOpType(){
