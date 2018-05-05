@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Villu Ruusmann
+ * Copyright (c) 2018 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,26 +18,23 @@
  */
 package sklearn;
 
-import java.util.List;
-
-import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 
 abstract
-public class Initializer extends MultiTransformer {
+public class MultiTransformer extends Transformer {
 
-	public Initializer(String module, String name){
+	public MultiTransformer(String module, String name){
 		super(module, name);
 	}
 
-	abstract
-	public List<Feature> initializeFeatures(SkLearnEncoder encoder);
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		ClassDictUtil.checkSize(0, features);
-
-		return initializeFeatures(encoder);
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 }

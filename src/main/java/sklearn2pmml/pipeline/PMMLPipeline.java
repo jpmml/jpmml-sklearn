@@ -127,18 +127,26 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		List<Feature> features = new ArrayList<>();
 
-		Transformer transformer = TransformerUtil.getHead(transformers);
-		if(transformer != null){
+		PyClassDict featureInitializer = estimator;
 
-			if(!(transformer instanceof Initializer)){
-				features = initFeatures(transformer, transformer.getOpType(), transformer.getDataType(), encoder);
+		try {
+			Transformer transformer = TransformerUtil.getHead(transformers);
+
+			if(transformer != null){
+				featureInitializer = transformer;
+
+				if(!(transformer instanceof Initializer)){
+					features = initFeatures(transformer, transformer.getOpType(), transformer.getDataType(), encoder);
+				}
+
+				features = encodeFeatures(features, encoder);
+			} else
+
+			{
+				features = initFeatures(estimator, estimator.getOpType(), estimator.getDataType(), encoder);
 			}
-
-			features = encodeFeatures(features, encoder);
-		} else
-
-		{
-			features = initFeatures(estimator, estimator.getOpType(), estimator.getDataType(), encoder);
+		} catch(UnsupportedOperationException uoe){
+			throw new IllegalArgumentException("The first transformer or estimator object (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
 		}
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();

@@ -58,7 +58,7 @@ public class CategoricalOutputFeature extends CategoricalFeature {
 			case DOUBLE:
 				break;
 			default:
-				throw new UnsupportedOperationException();
+				throw new IllegalArgumentException();
 		}
 
 		outputField.setOpType(OpType.CONTINUOUS);

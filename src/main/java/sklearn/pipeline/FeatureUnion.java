@@ -21,27 +21,16 @@ package sklearn.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
+import sklearn.MultiTransformer;
 import sklearn.Transformer;
 
-public class FeatureUnion extends Transformer {
+public class FeatureUnion extends MultiTransformer {
 
 	public FeatureUnion(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public DataType getDataType(){
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
