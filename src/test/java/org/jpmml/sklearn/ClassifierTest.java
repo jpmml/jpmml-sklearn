@@ -98,7 +98,9 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLogisticRegressionAuditNA() throws Exception {
-		evaluate("LogisticRegression", "AuditNA");
+		FieldName[] transformFields = {FieldName.create("eval(probability(1))")};
+
+		evaluate("LogisticRegression", "AuditNA", excludeFields(transformFields));
 	}
 
 	@Test

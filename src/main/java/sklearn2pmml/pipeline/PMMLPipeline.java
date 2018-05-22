@@ -19,7 +19,6 @@
 package sklearn2pmml.pipeline;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,6 +78,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
 		Transformer predictTransformer = getPredictTransformer();
+		Transformer predictProbaTransformer = getPredictProbaTransformer();
 		List<String> activeFields = getActiveFields();
 		List<String> probabilityFields = null;
 		List<String> targetFields = getTargetFields();
@@ -165,13 +165,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Model model = estimator.encodeModel(schema);
 
 		if(predictTransformer != null){
-			Output output = model.getOutput();
-
-			if(output == null){
-				output = new Output();
-
-				model.setOutput(output);
-			}
+			Output output = ensureOutput(model);
 
 			FieldName name = FieldName.create("predict(" + (label.getName()).getValue() + ")");
 
@@ -193,24 +187,15 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 			output.addOutputFields(predictField);
 
-			SkLearnEncoder outputEncoder = new SkLearnEncoder();
+			encodeOutput(predictTransformer, model, Collections.singletonList(predictField));
+		} // End if
 
-			DataField dataField = outputEncoder.createDataField(predictField.getName(), predictField.getOpType(), predictField.getDataType());
+		if(predictProbaTransformer != null){
+			CategoricalLabel categoricalLabel = (CategoricalLabel)label;
 
-			predictTransformer.encodeFeatures(Collections.singletonList(new WildcardFeature(outputEncoder, dataField)), outputEncoder);
+			List<OutputField> predictProbaFields = ModelUtil.createProbabilityFields(DataType.DOUBLE, categoricalLabel.getValues());
 
-			Map<FieldName, DataField> outputDataFields = outputEncoder.getDataFields();
-			Map<FieldName, DerivedField> outputDerivedFields = outputEncoder.getDerivedFields();
-
-			Collection<DerivedField> derivedFields = outputDerivedFields.values();
-			for(DerivedField derivedField : derivedFields){
-				OutputField outputField = new OutputField(derivedField.getName(), derivedField.getDataType())
-					.setOpType(derivedField.getOpType())
-					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-					.setExpression(derivedField.getExpression());
-
-				output.addOutputFields(outputField);
-			}
+			encodeOutput(predictProbaTransformer, model, predictProbaFields);
 		} // End if
 
 		if(estimator.isSupervised() && verification != null){
@@ -355,6 +340,34 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		return result;
 	}
 
+	private void encodeOutput(Transformer transformer, Model model, List<OutputField> outputFields){
+		Output output = ensureOutput(model);
+
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
+		List<Feature> features = new ArrayList<>();
+
+		for(OutputField outputField : outputFields){
+			DataField dataField = encoder.createDataField(outputField.getName(), outputField.getOpType(), outputField.getDataType());
+
+			features.add(new WildcardFeature(encoder, dataField));
+		}
+
+		transformer.encodeFeatures(features, encoder);
+
+		Map<FieldName, DataField> dataField = encoder.getDataFields();
+		Map<FieldName, DerivedField> derivedFields = encoder.getDerivedFields();
+
+		for(DerivedField derivedField : derivedFields.values()){
+			OutputField outputField = new OutputField(derivedField.getName(), derivedField.getDataType())
+				.setOpType(derivedField.getOpType())
+				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+				.setExpression(derivedField.getExpression());
+
+			output.addOutputFields(outputField);
+		}
+	}
+
 	@Override
 	public List<? extends Transformer> getTransformers(){
 		List<Object[]> steps = getSteps();
@@ -391,13 +404,21 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	public Transformer getPredictTransformer(){
-		Object predictTransformer = get("predict_transformer");
+		return getTransformer("predict_transformer");
+	}
 
-		if(predictTransformer == null){
+	public Transformer getPredictProbaTransformer(){
+		return getTransformer("predict_proba_transformer");
+	}
+
+	private Transformer getTransformer(String key){
+		Object transformer = get(key);
+
+		if(transformer == null){
 			return null;
 		}
 
-		return get("predict_transformer", Transformer.class);
+		return get(key, Transformer.class);
 	}
 
 	public List<String> getActiveFields(){
@@ -454,6 +475,19 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		put("verification", verification);
 
 		return this;
+	}
+
+	static
+	private Output ensureOutput(Model model){
+		Output output = model.getOutput();
+
+		if(output == null){
+			output = new Output();
+
+			model.setOutput(output);
+		}
+
+		return output;
 	}
 
 	static
