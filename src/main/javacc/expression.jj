@@ -89,14 +89,24 @@ public class ExpressionTranslator {
 	}
 
 	static
-	private Apply createApply(String function, Expression... expressions){
-		Apply apply = new Apply(function);
+	private String translateRelationalOperator(String operator){
 		
-		for(Expression expression : expressions){
-			apply.addExpressions(expression);
+		switch(operator){
+			case "==":
+				return "equal";
+			case "!=":
+				return "notEqual";
+			case "<":
+				return "lessThan";
+			case "<=":
+				return "lessOrEqual";
+			case ">":
+				return "greaterThan";
+			case ">=":
+				return "greaterOrEqual";
+			default:
+				throw new IllegalArgumentException(operator);
 		}
-		
-		return apply;
 	}
 
 	static
@@ -139,6 +149,17 @@ public class ExpressionTranslator {
 
 		return image;
 	}
+
+	static
+	private Apply createApply(String function, Expression... expressions){
+		Apply apply = new Apply(function);
+		
+		for(Expression expression : expressions){
+			apply.addExpressions(expression);
+		}
+		
+		return apply;
+	}
 }
 PARSER_END(ExpressionTranslator)
 
@@ -166,6 +187,21 @@ TOKEN:
 	< PLUS: "+" >
 	|
 	< MINUS: "-" >
+}
+
+TOKEN:
+{
+	< EQUAL: "==" >
+	|
+	< NOT_EQUAL: "!=" >
+	|
+	< LESS_THAN: "<" >
+	|
+	< LESS_OR_EQUAL: "<=" >
+	|
+	< GREATER_THAN: ">" >
+	|
+	< GREATER_OR_EQUAL: ">=" >
 }
 
 TOKEN:
@@ -227,10 +263,24 @@ Expression Expression():
 	Expression expression;
 }
 {
-	expression = AdditiveExpression()
+	expression = ComparisonExpression()
 
 	{
 		return expression;
+	}
+}
+
+Expression ComparisonExpression():
+{
+	Expression left;
+	Token operator;
+	Expression right;
+}
+{
+	left = AdditiveExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = AdditiveExpression() { left = createApply(translateRelationalOperator(operator.image), left, right); })?
+
+	{
+		return left;
 	}
 }
 
@@ -241,7 +291,7 @@ Expression AdditiveExpression():
 	Expression right;
 }
 {
-	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = createApply(operator.image, left, right); } )*
+	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = createApply(operator.image, left, right); })*
 
 	{
 		return left;
@@ -255,7 +305,7 @@ Expression MultiplicativeExpression():
 	Expression right;
 }
 {
-	left = UnaryExpression() ((operator = <MULTIPLY> | operator = <DIVIDE>) right = UnaryExpression() { left = createApply(operator.image, left, right); } )*
+	left = UnaryExpression() ((operator = <MULTIPLY> | operator = <DIVIDE>) right = UnaryExpression() { left = createApply(operator.image, left, right); })*
 
 	{
 		return left;
