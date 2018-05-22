@@ -127,6 +127,16 @@ public class SkLearnEncoder extends ModelEncoder {
 		addDerivedField(derivedField);
 	}
 
+	@Override
+	public Map<FieldName, DataField> getDataFields(){
+		return super.getDataFields();
+	}
+
+	@Override
+	public Map<FieldName, DerivedField> getDerivedFields(){
+		return super.getDerivedFields();
+	}
+
 	public void addTransformer(Model transformer){
 		this.transformers.add(transformer);
 	}

@@ -107,7 +107,9 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLinearRegressionAutoNA() throws Exception {
-		evaluate("LinearRegression", "AutoNA");
+		FieldName[] transformFields = {FieldName.create("predict(mpg)"), FieldName.create("cut(predict(mpg))")};
+
+		evaluate("LinearRegression", "AutoNA", excludeFields(transformFields));
 	}
 
 	@Test

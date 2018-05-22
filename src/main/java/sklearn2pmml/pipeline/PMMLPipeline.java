@@ -19,6 +19,7 @@
 package sklearn2pmml.pipeline;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,13 +28,17 @@ import java.util.Map;
 import numpy.core.NDArray;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Extension;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.VerificationField;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
@@ -73,6 +78,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	public PMML encodePMML(){
 		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
+		Transformer predictTransformer = getPredictTransformer();
 		List<String> activeFields = getActiveFields();
 		List<String> probabilityFields = null;
 		List<String> targetFields = getTargetFields();
@@ -157,6 +163,55 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Schema schema = new Schema(label, features);
 
 		Model model = estimator.encodeModel(schema);
+
+		if(predictTransformer != null){
+			Output output = model.getOutput();
+
+			if(output == null){
+				output = new Output();
+
+				model.setOutput(output);
+			}
+
+			FieldName name = FieldName.create("predict(" + (label.getName()).getValue() + ")");
+
+			OutputField predictField;
+
+			if(label instanceof ContinuousLabel){
+				predictField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CONTINUOUS)
+					.setFinalResult(false);
+			} else
+
+			if(label instanceof CategoricalLabel){
+				predictField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CATEGORICAL)
+					.setFinalResult(false);
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
+
+			output.addOutputFields(predictField);
+
+			SkLearnEncoder outputEncoder = new SkLearnEncoder();
+
+			DataField dataField = outputEncoder.createDataField(predictField.getName(), predictField.getOpType(), predictField.getDataType());
+
+			predictTransformer.encodeFeatures(Collections.singletonList(new WildcardFeature(outputEncoder, dataField)), outputEncoder);
+
+			Map<FieldName, DataField> outputDataFields = outputEncoder.getDataFields();
+			Map<FieldName, DerivedField> outputDerivedFields = outputEncoder.getDerivedFields();
+
+			Collection<DerivedField> derivedFields = outputDerivedFields.values();
+			for(DerivedField derivedField : derivedFields){
+				OutputField outputField = new OutputField(derivedField.getName(), derivedField.getDataType())
+					.setOpType(derivedField.getOpType())
+					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+					.setExpression(derivedField.getExpression());
+
+				output.addOutputFields(outputField);
+			}
+		} // End if
 
 		if(estimator.isSupervised() && verification != null){
 
@@ -333,6 +388,16 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		put("steps", steps);
 
 		return this;
+	}
+
+	public Transformer getPredictTransformer(){
+		Object predictTransformer = get("predict_transformer");
+
+		if(predictTransformer == null){
+			return null;
+		}
+
+		return get("predict_transformer", Transformer.class);
 	}
 
 	public List<String> getActiveFields(){

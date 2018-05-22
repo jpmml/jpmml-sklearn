@@ -460,7 +460,7 @@ auto_na_X["cylinders"] = auto_na_X["cylinders"].fillna(-1).astype(int)
 auto_na_X["model_year"] = auto_na_X["model_year"].fillna(-1).astype(int)
 auto_na_X["origin"] = auto_na_X["origin"].fillna(-1).astype(int)
 
-def build_auto_na(regressor, name):
+def build_auto_na(regressor, name, predict_transformer = None):
 	mapper = DataFrameMapper(
 		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
 		[(["origin"], [CategoricalImputer(missing_values = -1), OneHotEncoder()])] +
@@ -472,7 +472,7 @@ def build_auto_na(regressor, name):
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("regressor", regressor)
-	])
+	], predict_transformer = predict_transformer)
 	pipeline.fit(auto_na_X, auto_na_y)
 	if isinstance(regressor, DecisionTreeRegressor):
 		tree = regressor.tree_
@@ -484,7 +484,7 @@ def build_auto_na(regressor, name):
 
 if "Auto" in datasets:
 	build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA")
-	build_auto_na(LinearRegression(), "LinearRegressionAutoNA")
+	build_auto_na(LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
 
 housing_X, housing_y = load_housing("Housing.csv")
 
