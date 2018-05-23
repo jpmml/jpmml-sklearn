@@ -10,7 +10,7 @@
 
 	<groupId>org.jpmml</groupId>
 	<artifactId>jpmml-sklearn</artifactId>
-	<version>1.5.3</version>
+	<version>1.5-SNAPSHOT</version>
 
 	<name>JPMML-SkLearn</name>
 	<description>Java library and command-line application for converting Scikit-Learn models to PMML</description>
@@ -35,7 +35,7 @@
 		<connection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</connection>
 		<developerConnection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</developerConnection>
 		<url>git://github.com/jpmml/jpmml-sklearn.git</url>
-		<tag>1.5.3</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
