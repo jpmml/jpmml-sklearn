@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
@@ -165,7 +166,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Model model = estimator.encodeModel(schema);
 
 		if(predictTransformer != null){
-			Output output = ensureOutput(model);
+			Output output = EstimatorUtil.ensureOutput(model);
 
 			FieldName name = FieldName.create("predict(" + (label.getName()).getValue() + ")");
 
@@ -341,7 +342,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	private void encodeOutput(Transformer transformer, Model model, List<OutputField> outputFields){
-		Output output = ensureOutput(model);
+		Output output = EstimatorUtil.ensureOutput(model);
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
@@ -475,19 +476,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		put("verification", verification);
 
 		return this;
-	}
-
-	static
-	private Output ensureOutput(Model model){
-		Output output = model.getOutput();
-
-		if(output == null){
-			output = new Output();
-
-			model.setOutput(output);
-		}
-
-		return output;
 	}
 
 	static

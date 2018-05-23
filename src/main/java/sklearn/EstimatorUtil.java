@@ -20,6 +20,9 @@ package sklearn;
 
 import java.util.List;
 
+import org.dmg.pmml.Model;
+import org.dmg.pmml.Output;
+
 public class EstimatorUtil {
 
 	private EstimatorUtil(){
@@ -34,5 +37,18 @@ public class EstimatorUtil {
 		}
 
 		return -1;
+	}
+
+	static
+	public Output ensureOutput(Model model){
+		Output output = model.getOutput();
+
+		if(output == null){
+			output = new Output();
+
+			model.setOutput(output);
+		}
+
+		return output;
 	}
 }

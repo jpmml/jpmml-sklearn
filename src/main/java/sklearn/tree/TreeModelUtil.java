@@ -31,6 +31,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
@@ -50,6 +51,7 @@ import org.jpmml.sklearn.visitors.NodeExtender;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class TreeModelUtil {
@@ -74,14 +76,12 @@ public class TreeModelUtil {
 		List<Visitor> visitors = new ArrayList<>();
 
 		if(winnerId){
-			Output output = model.getOutput();
-			if(output == null){
-				output = new Output();
+			Output output = EstimatorUtil.ensureOutput(model);
 
-				model.setOutput(output);
-			}
+			OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
+				.setDataType(DataType.INTEGER);
 
-			output.addOutputFields(ModelUtil.createEntityIdField(FieldName.create("nodeId")));
+			output.addOutputFields(nodeIdField);
 		} // End if
 
 		if(nodeExtensions != null){
