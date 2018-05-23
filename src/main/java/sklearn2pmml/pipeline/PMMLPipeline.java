@@ -19,12 +19,14 @@
 package sklearn2pmml.pipeline;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import numpy.core.NDArray;
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -38,7 +40,10 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.ResultFeature;
+import org.dmg.pmml.Value;
 import org.dmg.pmml.VerificationField;
+import org.dmg.pmml.Visitor;
+import org.dmg.pmml.VisitorAction;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
@@ -46,17 +51,20 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
+import org.jpmml.sklearn.visitors.AbstractExtender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasClassifierOptions;
 import sklearn.HasEstimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
@@ -111,12 +119,47 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 				case CLASSIFICATION:
 					{
 						List<?> classes = ClassifierUtil.getClasses(estimator);
+						Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
 
 						DataType dataType = TypeUtil.getDataType(classes, DataType.STRING);
 
 						List<String> categories = ClassifierUtil.formatTargetCategories(classes);
 
 						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, dataType, categories);
+
+						List<Visitor> visitors = new ArrayList<>();
+
+						if(classExtensions != null){
+							Collection<? extends Map.Entry<String, Map<String, ?>>> entries = classExtensions.entrySet();
+
+							for(Map.Entry<String, Map<String, ?>> entry : entries){
+								String name = entry.getKey();
+
+								Map<String, ?> values = entry.getValue();
+
+								Visitor valueExtender = new AbstractExtender(name){
+
+									@Override
+									public VisitorAction visit(Value pmmlValue){
+										Object value = values.get(pmmlValue.getValue());
+
+										if(value != null){
+											value = ScalarUtil.decode(value);
+
+											addExtension(pmmlValue, ValueUtil.formatValue(value));
+										}
+
+										return super.visit(pmmlValue);
+									}
+								};
+
+								visitors.add(valueExtender);
+							}
+						}
+
+						for(Visitor visitor : visitors){
+							visitor.applyTo(dataField);
+						}
 
 						label = new CategoricalLabel(dataField);
 					}

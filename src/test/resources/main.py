@@ -267,7 +267,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_proba_transforme
 	store_csv(adjusted, name + ".csv")
 
 if "Audit" in datasets:
-	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[:, 0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
+	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[:, 0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("numpy.where(X[:, 1] > 0.75, 1, 0)"), name = "eval(probability(1))", prefit = True))
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")

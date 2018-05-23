@@ -37,6 +37,7 @@ import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
+import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
@@ -47,7 +48,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.visitors.NodeExtender;
+import org.jpmml.sklearn.visitors.AbstractExtender;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
@@ -92,20 +93,20 @@ public class TreeModelUtil {
 
 				Map<Integer, ?> values = entry.getValue();
 
-				Visitor nodeExtender = new NodeExtender(name){
+				Visitor nodeExtender = new AbstractExtender(name){
 
 					@Override
-					public String getValue(Node node){
+					public VisitorAction visit(Node node){
 						Integer id = Integer.valueOf(node.getId());
 
 						Object value = values.get(id);
 						if(value != null){
 							value = ScalarUtil.decode(value);
 
-							return ValueUtil.formatValue(value);
+							addExtension(node, ValueUtil.formatValue(value));
 						}
 
-						return null;
+						return super.visit(node);
 					}
 				};
 

@@ -21,39 +21,30 @@ package org.jpmml.sklearn.visitors;
 import java.util.List;
 
 import org.dmg.pmml.Extension;
-import org.dmg.pmml.VisitorAction;
-import org.dmg.pmml.tree.Node;
+import org.dmg.pmml.HasExtensions;
+import org.dmg.pmml.PMMLObject;
 import org.jpmml.model.visitors.AbstractVisitor;
 
 abstract
-public class NodeExtender extends AbstractVisitor {
+public class AbstractExtender extends AbstractVisitor {
 
 	private String name = null;
 
 
-	public NodeExtender(String name){
+	public AbstractExtender(String name){
 		setName(name);
 	}
 
-	abstract
-	public String getValue(Node node);
-
-	@Override
-	public VisitorAction visit(Node node){
+	public <E extends PMMLObject & HasExtensions<E>> void addExtension(E object, String value){
 		String name = getName();
-		String value = getValue(node);
 
-		if(value != null){
-			List<Extension> extensions = node.getExtensions();
+		Extension extension = new Extension()
+			.setName(name)
+			.setValue(value);
 
-			Extension extension = new Extension()
-				.setName(name)
-				.setValue(value);
+		List<Extension> extensions = object.getExtensions();
 
-			extensions.add(extension);
-		}
-
-		return super.visit(node);
+		extensions.add(extension);
 	}
 
 	public String getName(){
