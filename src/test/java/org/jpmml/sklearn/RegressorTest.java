@@ -47,7 +47,9 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateDecisionTreeAutoNA() throws Exception {
-		evaluate("DecisionTree", "AutoNA");
+		FieldName[] transformFields = {FieldName.create("eval(nodeId)")};
+
+		evaluate("DecisionTree", "AutoNA", excludeFields(transformFields));
 	}
 
 	@Test

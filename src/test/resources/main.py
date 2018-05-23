@@ -228,7 +228,7 @@ if "Audit" in datasets:
 
 audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
-def build_audit_na(classifier, name, with_proba = True, predict_proba_transformer = None, **pmml_options):
+def build_audit_na(classifier, name, with_proba = True, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
 	employment_mapping = {
 		"CONSULTANT" : "PRIVATE",
 		"PSFEDERAL" : "PUBLIC",
@@ -252,7 +252,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_proba_transforme
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("classifier", classifier)
-	], predict_proba_transformer = predict_proba_transformer)
+	], predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name + ".pkl")
@@ -267,7 +267,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_proba_transforme
 	store_csv(adjusted, name + ".csv")
 
 if "Audit" in datasets:
-	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", winner_id = True)
+	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[:, 0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("numpy.where(X[:, 1] > 0.75, 1, 0)"), name = "eval(probability(1))", prefit = True))
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
@@ -460,7 +460,7 @@ auto_na_X["cylinders"] = auto_na_X["cylinders"].fillna(-1).astype(int)
 auto_na_X["model_year"] = auto_na_X["model_year"].fillna(-1).astype(int)
 auto_na_X["origin"] = auto_na_X["origin"].fillna(-1).astype(int)
 
-def build_auto_na(regressor, name, predict_transformer = None):
+def build_auto_na(regressor, name, predict_transformer = None, apply_transformer = None, **pmml_options):
 	mapper = DataFrameMapper(
 		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
 		[(["origin"], [CategoricalImputer(missing_values = -1), OneHotEncoder()])] +
@@ -472,18 +472,23 @@ def build_auto_na(regressor, name, predict_transformer = None):
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("regressor", regressor)
-	], predict_transformer = predict_transformer)
+	], predict_transformer = predict_transformer, apply_transformer = apply_transformer)
 	pipeline.fit(auto_na_X, auto_na_y)
 	if isinstance(regressor, DecisionTreeRegressor):
 		tree = regressor.tree_
 		node_impurity = {node_idx : tree.impurity[node_idx] for node_idx in range(0, tree.node_count) if tree.impurity[node_idx] != 0.0}
-		pipeline.configure(node_extensions = {regressor.criterion : node_impurity})
+		pmml_options["node_extensions"] = {regressor.criterion : node_impurity}
+	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name + ".pkl")
 	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
+	if isinstance(regressor, DecisionTreeRegressor):
+		Xt = pipeline_transform(pipeline, auto_na_X)
+		mpg_apply = DataFrame(regressor.apply(Xt), columns = ["nodeId"])
+		mpg = pandas.concat((mpg, mpg_apply), axis = 1)
 	store_csv(mpg, name + ".csv")
 
 if "Auto" in datasets:
-	build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA")
+	build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[:, 0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_auto_na(LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
 
 housing_X, housing_y = load_housing("Housing.csv")

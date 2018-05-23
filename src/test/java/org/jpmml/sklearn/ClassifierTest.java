@@ -38,7 +38,9 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateDecisionTreeAuditNA() throws Exception {
-		evaluate("DecisionTree", "AuditNA");
+		FieldName[] transformFields = {FieldName.create("eval(nodeId)")};
+
+		evaluate("DecisionTree", "AuditNA", excludeFields(transformFields));
 	}
 
 	@Test

@@ -80,6 +80,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Estimator estimator = getEstimator();
 		Transformer predictTransformer = getPredictTransformer();
 		Transformer predictProbaTransformer = getPredictProbaTransformer();
+		Transformer applyTransformer = getApplyTransformer();
 		List<String> activeFields = getActiveFields();
 		List<String> probabilityFields = null;
 		List<String> targetFields = getTargetFields();
@@ -197,6 +198,13 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			List<OutputField> predictProbaFields = ModelUtil.createProbabilityFields(DataType.DOUBLE, categoricalLabel.getValues());
 
 			encodeOutput(predictProbaTransformer, model, predictProbaFields);
+		} // End if
+
+		if(applyTransformer != null){
+			OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
+				.setDataType(DataType.INTEGER);
+
+			encodeOutput(applyTransformer, model, Collections.singletonList(nodeIdField));
 		} // End if
 
 		if(estimator.isSupervised() && verification != null){
@@ -410,6 +418,10 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 	public Transformer getPredictProbaTransformer(){
 		return getTransformer("predict_proba_transformer");
+	}
+
+	public Transformer getApplyTransformer(){
+		return getTransformer("apply_transformer");
 	}
 
 	private Transformer getTransformer(String key){
