@@ -22,7 +22,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -102,13 +101,7 @@ public class SkLearnEncoder extends ModelEncoder {
 	public void renameFeature(Feature feature, FieldName renamedName){
 		FieldName name = feature.getName();
 
-		DerivedField derivedField = getDerivedField(name);
-		if(derivedField == null){
-			throw new IllegalArgumentException(name.getValue());
-		}
-
-		Map<FieldName, DerivedField> derivedFields = getDerivedFields();
-		derivedFields.remove(name);
+		DerivedField derivedField = removeDerivedField(name);
 
 		try {
 			Field field = Feature.class.getDeclaredField("name");
@@ -125,16 +118,6 @@ public class SkLearnEncoder extends ModelEncoder {
 		derivedField.setName(renamedName);
 
 		addDerivedField(derivedField);
-	}
-
-	@Override
-	public Map<FieldName, DataField> getDataFields(){
-		return super.getDataFields();
-	}
-
-	@Override
-	public Map<FieldName, DerivedField> getDerivedFields(){
-		return super.getDerivedFields();
 	}
 
 	public void addTransformer(Model transformer){

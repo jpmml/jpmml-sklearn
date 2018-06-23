@@ -19,18 +19,15 @@
 package sklearn2pmml.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.Row;
-import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.XMLUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class MultiLookupTransformer extends LookupTransformer {
@@ -50,44 +47,58 @@ public class MultiLookupTransformer extends LookupTransformer {
 	}
 
 	@Override
-	protected List<String> createInputColumns(List<Feature> features){
+	protected List<String> formatColumns(List<Feature> features){
 		List<String> result = new ArrayList<>();
 
 		for(Feature feature : features){
 			FieldName name = feature.getName();
 
-			result.add(XMLUtil.createTagName(name.getValue()));
+			result.add("data:" + XMLUtil.createTagName(name.getValue()));
 		}
+
+		if(result.contains("data:output")){
+			throw new IllegalArgumentException();
+		}
+
+		result.add("data:output");
 
 		return result;
 	}
 
 	@Override
-	protected Row createRow(DocumentBuilder documentBuilder, List<String> columns, Object inputValue, Object outputValue){
-		Object[] inputValues = (Object[])inputValue;
+	protected Map<String, List<Object>> parseMapping(List<String> inputColumns, String outputColumn, Map<?, ?> mapping){
+		Map<String, List<Object>> result = new LinkedHashMap<>();
 
-		ClassDictUtil.checkSize(inputValues.length + 1, columns);
+		for(String inputColumn : inputColumns){
+			result.put(inputColumn, new ArrayList<>());
+		}
 
-		List<String> keys = new ArrayList<>();
-		List<String> values = new ArrayList<>();
+		result.put(outputColumn, new ArrayList<>());
 
-		for(int i = 0; i < inputValues.length; i++){
+		Collection<? extends Map.Entry<?, ?>> entries = mapping.entrySet();
+		for(Map.Entry<?, ?> entry : entries){
+			Object[] inputValue = (Object[])entry.getKey();
+			Object outputValue = entry.getValue();
 
-			if(inputValues[i] == null){
+			if(inputValue == null || inputValue.length != inputColumns.size()){
+				throw new IllegalArgumentException();
+			} // End if
+
+			if(outputValue == null){
 				continue;
 			}
 
-			keys.add(columns.get(i));
-			values.add(ValueUtil.formatValue(inputValues[i]));
+			for(int i = 0; i < inputColumns.size(); i++){
+				List<Object> inputValues = result.get(inputColumns.get(i));
+
+				inputValues.add(inputValue[i]);
+			}
+
+			List<Object> outputValues = result.get(outputColumn);
+
+			outputValues.add(outputValue);
 		}
 
-		if(keys.isEmpty()){
-			return null;
-		}
-
-		keys.add(columns.get(columns.size() - 1));
-		values.add(ValueUtil.formatValue(outputValue));
-
-		return DOMUtil.createRow(documentBuilder, keys, values);
+		return result;
 	}
 }

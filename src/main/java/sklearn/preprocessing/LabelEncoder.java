@@ -19,25 +19,19 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldColumnPair;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Row;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -82,26 +76,9 @@ public class LabelEncoder extends Transformer {
 
 		DerivedField derivedField = encoder.getDerivedField(name);
 		if(derivedField == null){
-			DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
-
-			InlineTable inlineTable = new InlineTable();
-
-			List<String> columns = Arrays.asList("input", "output");
-
-			for(int i = 0; i < classes.size(); i++){
-				List<String> values = Arrays.asList(inputCategories.get(i), outputCategories.get(i));
-
-				Row row = DOMUtil.createRow(documentBuilder, columns, values);
-
-				inlineTable.addRows(row);
-			}
-
 			encoder.toCategorical(feature.getName(), inputCategories);
 
-			MapValues mapValues = new MapValues()
-				.addFieldColumnPairs(new FieldColumnPair(feature.getName(), columns.get(0)))
-				.setOutputColumn(columns.get(1))
-				.setInlineTable(inlineTable);
+			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), inputCategories, outputCategories);
 
 			derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, mapValues);
 		}

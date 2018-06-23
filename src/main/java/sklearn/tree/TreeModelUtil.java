@@ -52,7 +52,6 @@ import org.jpmml.sklearn.visitors.AbstractExtender;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class TreeModelUtil {
@@ -77,7 +76,7 @@ public class TreeModelUtil {
 		List<Visitor> visitors = new ArrayList<>();
 
 		if(winnerId){
-			Output output = EstimatorUtil.ensureOutput(model);
+			Output output = ModelUtil.ensureOutput(model);
 
 			OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
 				.setDataType(DataType.INTEGER);

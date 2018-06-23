@@ -25,11 +25,11 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.xml.parsers.DocumentBuilder;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.BiMap;
@@ -44,13 +44,11 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLEncoder;
@@ -184,14 +182,14 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			.setExpression(new FieldRef(termField.getName()));
 
 		if((stopWords != null && stopWords.size() > 0) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){
-			DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
-
-			InlineTable inlineTable = new InlineTable()
-				.addRows(DOMUtil.createRow(documentBuilder, Arrays.asList("string", "stem", "regex"), Arrays.asList("(^|\\s+)\\p{Punct}*(" + JOINER.join(stopWords) + ")\\p{Punct}*(\\s+|$)", " ", "true")));
+			Map<String, List<String>> data = new LinkedHashMap<>();
+			data.put("string", Collections.singletonList("(^|\\s+)\\p{Punct}*(" + JOINER.join(stopWords) + ")\\p{Punct}*(\\s+|$)"));
+			data.put("stem", Collections.singletonList(" "));
+			data.put("regex", Collections.singletonList("true"));
 
 			TextIndexNormalization textIndexNormalization = new TextIndexNormalization()
 				.setRecursive(Boolean.TRUE) // Handles consecutive matches. See http://stackoverflow.com/a/25085385
-				.setInlineTable(inlineTable);
+				.setInlineTable(PMMLUtil.createInlineTable(data));
 
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
 		}

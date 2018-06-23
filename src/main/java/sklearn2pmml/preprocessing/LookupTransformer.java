@@ -22,24 +22,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldColumnPair;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Row;
 import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLEncoder;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -71,51 +68,31 @@ public class LookupTransformer extends Transformer {
 		Map<?, ?> mapping = getMapping();
 		Object defaultValue = getDefaultValue();
 
-		List<String> columns = new ArrayList<>();
-		columns.addAll(createInputColumns(features));
+		List<String> columns = formatColumns(features);
 
-		if(columns.contains("output")){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(features.size() + 1, columns);
 
-		columns.add("output");
+		MapValues mapValues = new MapValues();
 
-		List<Object> outputValues = new ArrayList<>(mapping.size() + 1);
-
-		DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
-
-		InlineTable inlineTable = new InlineTable();
-
-		Collection<? extends Map.Entry<?, ?>> entries = mapping.entrySet();
-		for(Map.Entry<?, ?> entry : entries){
-			Object inputValue = entry.getKey();
-			Object outputValue = entry.getValue();
-
-			if(outputValue == null){
-				continue;
-			}
-
-			Row row = createRow(documentBuilder, columns, inputValue, outputValue);
-			if(row == null){
-				continue;
-			}
-
-			inlineTable.addRows(row);
-
-			outputValues.add(outputValue);
-		}
-
-		MapValues mapValues = new MapValues()
-			.setInlineTable(inlineTable);
+		List<String> inputColumns = columns.subList(0, columns.size() - 1);
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
-			String column = columns.get(i);
+			String inputColumn = inputColumns.get(i);
 
-			mapValues.addFieldColumnPairs(new FieldColumnPair(feature.getName(), column));
+			mapValues.addFieldColumnPairs(new FieldColumnPair(feature.getName(), inputColumn));
 		}
 
-		mapValues.setOutputColumn(columns.get(columns.size() - 1));
+		String outputColumn = columns.get(columns.size() - 1);
+
+		mapValues.setOutputColumn(outputColumn);
+
+		Map<String, List<Object>> data = parseMapping(inputColumns, outputColumn, mapping);
+
+		mapValues.setInlineTable(PMMLUtil.createInlineTable(data));
+
+		List<Object> outputValues = new ArrayList<>();
+		outputValues.addAll(data.get(outputColumn));
 
 		if(defaultValue != null){
 			mapValues.setDefaultValue(ValueUtil.formatValue(defaultValue));
@@ -142,16 +119,40 @@ public class LookupTransformer extends Transformer {
 		return Collections.singletonList(feature);
 	}
 
-	protected List<String> createInputColumns(List<Feature> features){
+	protected List<String> formatColumns(List<Feature> features){
 		ClassDictUtil.checkSize(1, features);
 
-		return Collections.singletonList("input");
+		return Arrays.asList("data:input", "data:output");
 	}
 
-	protected Row createRow(DocumentBuilder documentBuilder, List<String> columns, Object inputValue, Object outputValue){
-		List<String> values = Arrays.asList(ValueUtil.formatValue(inputValue), ValueUtil.formatValue(outputValue));
+	protected Map<String, List<Object>> parseMapping(List<String> inputColumns, String outputColumn, Map<?, ?> mapping){
+		List<Object> inputValues = new ArrayList<>();
+		List<Object> outputValues = new ArrayList<>();
 
-		return DOMUtil.createRow(documentBuilder, columns, values);
+		Collection<? extends Map.Entry<?, ?>> entries = mapping.entrySet();
+		for(Map.Entry<?, ?> entry : entries){
+			Object inputValue = entry.getKey();
+			Object outputValue = entry.getValue();
+
+			if(inputValue == null){
+				throw new IllegalArgumentException();
+			} // End if
+
+			if(outputValue == null){
+				continue;
+			}
+
+			inputValues.add(inputValue);
+			outputValues.add(outputValue);
+		}
+
+		String inputColumn = inputColumns.get(0);
+
+		Map<String, List<Object>> result = new LinkedHashMap<>();
+		result.put(inputColumn, inputValues);
+		result.put(outputColumn, outputValues);
+
+		return result;
 	}
 
 	public Map<?, ?> getMapping(){

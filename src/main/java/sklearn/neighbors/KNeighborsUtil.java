@@ -18,10 +18,9 @@
  */
 package sklearn.neighbors;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
+import java.util.Map;
 
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.CityBlock;
@@ -30,7 +29,6 @@ import org.dmg.pmml.ComparisonMeasure;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Euclidean;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.Measure;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Minkowski;
@@ -38,7 +36,6 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
-import org.dmg.pmml.Row;
 import org.dmg.pmml.nearest_neighbor.InstanceField;
 import org.dmg.pmml.nearest_neighbor.InstanceFields;
 import org.dmg.pmml.nearest_neighbor.KNNInput;
@@ -47,10 +44,10 @@ import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.dmg.pmml.nearest_neighbor.TrainingInstances;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.DOMUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -70,21 +67,32 @@ public class KNeighborsUtil {
 
 	static
 	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunction miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
-		List<String> keys = new ArrayList<>();
+		String weights = estimator.getWeights();
+
+		if(!(weights).equals("uniform")){
+			throw new IllegalArgumentException(weights);
+		}
+
+		List<?> y = estimator.getY();
+		List<? extends Number> fitX = estimator.getFitX();
+
+		ClassDictUtil.checkSize(numberOfInstances, y);
+
+		Map<String, List<?>> data = new LinkedHashMap<>();
 
 		InstanceFields instanceFields = new InstanceFields();
-
-		KNNInputs knnInputs = new KNNInputs();
 
 		Label label = schema.getLabel();
 		if(label != null){
 			InstanceField instanceField = new InstanceField(label.getName())
-				.setColumn("y");
+				.setColumn("data:y");
 
 			instanceFields.addInstanceFields(instanceField);
 
-			keys.add(instanceField.getColumn());
+			data.put(instanceField.getColumn(), y);
 		}
+
+		KNNInputs knnInputs = new KNNInputs();
 
 		List<? extends Feature> features = schema.getFeatures();
 		for(int i = 0; i < features.size(); i++){
@@ -95,50 +103,26 @@ public class KNeighborsUtil {
 			FieldName name = continuousFeature.getName();
 
 			InstanceField instanceField = new InstanceField(name)
-				.setColumn("x" + String.valueOf(i + 1));
+				.setColumn("data:x" + String.valueOf(i + 1));
 
 			instanceFields.addInstanceFields(instanceField);
-
-			keys.add(instanceField.getColumn());
 
 			KNNInput knnInput = new KNNInput(name);
 
 			knnInputs.addKNNInputs(knnInput);
-		}
 
-		DocumentBuilder documentBuilder = DOMUtil.createDocumentBuilder();
-
-		InlineTable inlineTable = new InlineTable();
-
-		List<?> y = estimator.getY();
-		List<? extends Number> fitX = estimator.getFitX();
-
-		ClassDictUtil.checkSize(numberOfInstances, y);
-
-		for(int i = 0; i < numberOfInstances; i++){
-			List<Object> values = new ArrayList<>(1 + numberOfFeatures);
-			values.add(y.get(i));
-			values.addAll(CMatrixUtil.getRow(fitX, numberOfInstances, numberOfFeatures, i));
-
-			Row row = DOMUtil.createRow(documentBuilder, keys, values);
-
-			inlineTable.addRows(row);
+			data.put(instanceField.getColumn(), CMatrixUtil.getColumn(fitX, numberOfInstances, numberOfFeatures, i));
 		}
 
 		TrainingInstances trainingInstances = new TrainingInstances(instanceFields)
-			.setInlineTable(inlineTable)
+			.setInlineTable(PMMLUtil.createInlineTable(data))
 			.setTransformed(true);
 
 		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator.getMetric(), estimator.getP());
 
-		String weights = estimator.getWeights();
-		if(!(weights).equals("uniform")){
-			throw new IllegalArgumentException(weights);
-		}
-
 		int numberOfNeighbors = estimator.getNumberOfNeighbors();
 
-		List<OutputField> outputFields = new ArrayList<>(numberOfNeighbors);
+		Output output = new Output();
 
 		for(int i = 0; i < numberOfNeighbors; i++){
 			int rank = (i + 1);
@@ -148,10 +132,8 @@ public class KNeighborsUtil {
 				.setResultFeature(ResultFeature.ENTITY_ID)
 				.setRank(rank);
 
-			outputFields.add(outputField);
+			output.addOutputFields(outputField);
 		}
-
-		Output output = new Output(outputFields);
 
 		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunction.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs)
 			.setOutput(output);
