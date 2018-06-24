@@ -1,7 +1,7 @@
 JPMML-SkLearn
 =============
 
-Java library and command-line application for converting [Scikit-Learn](http://scikit-learn.org/) models to PMML.
+Java library and command-line application for converting [Scikit-Learn](http://scikit-learn.org/) pipelines to PMML.
 
 # Features #
 
@@ -148,7 +148,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
 * [`sklearn-pandas`](https://pypi.python.org/pypi/sklearn-pandas) 0.0.10 or newer.
 * [`sklearn2pmml`](https://github.com/jpmml/sklearn2pmml) 0.14.0 or newer.
 
-Python installation can be validated as follows:
+Validating Python installation:
 
 ```python
 import sklearn, sklearn.externals.joblib, sklearn_pandas, sklearn2pmml
@@ -182,7 +182,8 @@ A typical workflow can be summarized as follows:
 
 ### The Python side of operations
 
-Load data to a `pandas.DataFrame` object:
+Loading data to a `pandas.DataFrame` object:
+
 ```python
 import pandas
 
@@ -192,7 +193,8 @@ iris_X = df[df.columns.difference(["Species"])]
 iris_y = df["Species"]
 ```
 
-First, instantiate a `sklearn_pandas.DataFrameMapper` object, which performs **column-oriented** feature engineering and selection work:
+First, creating a `sklearn_pandas.DataFrameMapper` object, which performs **column-oriented** feature engineering and selection work:
+
 ```python
 from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import StandardScaler
@@ -203,7 +205,8 @@ column_preprocessor = DataFrameMapper([
 ])
 ```
 
-Second, instantiate any number of `Transformer` and `Selector` objects, which perform **table-oriented** feature engineering and selection work:
+Second, creating `Transformer` and `Selector` objects, which perform **table-oriented** feature engineering and selection work:
+
 ```python
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest
@@ -218,14 +221,16 @@ table_preprocessor = Pipeline([
 
 Please note that stateless Scikit-Learn selector objects need to be wrapped into an `sklearn2pmml.SelectprProxy` object.
 
-Third, instantiate an `Estimator` object:
+Third, creating an `Estimator` object:
+
 ```python
 from sklearn.tree import DecisionTreeClassifier
 
 classifier = DecisionTreeClassifier(min_samples_leaf = 5)
 ```
 
-Combine the above objects into a `sklearn2pmml.pipeline.PMMLPipeline` object, and run the experiment:
+Combining the above objects into a `sklearn2pmml.pipeline.PMMLPipeline` object, and running the experiment:
+
 ```python
 from sklearn2pmml.pipeline import PMMLPipeline
 
@@ -237,12 +242,14 @@ pipeline = PMMLPipeline([
 pipeline.fit(iris_X, iris_y)
 ```
 
-Optionally, embed model verification data:
+Embedding model verification data:
+
 ```python
 pipeline.verify(iris_X.sample(n = 15))
 ```
 
-Store the fitted `PMMLPipeline` object in `pickle` data format:
+Storing the fitted `PMMLPipeline` object in `pickle` data format:
+
 ```python
 from sklearn.externals import joblib
 
