@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
-import com.google.common.base.Predicate;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.Visitor;
-import org.jpmml.converter.visitors.CellTransformer;
 import org.jpmml.evaluator.Batch;
 import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
@@ -71,9 +69,6 @@ public class EstimatorTest extends IntegrationTest {
 				}
 
 				PMML pmml = pipeline.encodePMML();
-
-				Visitor visitor = new CellTransformer();
-				visitor.applyTo(pmml);
 
 				ensureValidity(pmml);
 
