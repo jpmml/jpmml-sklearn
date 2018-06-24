@@ -48,6 +48,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.visitors.AbstractExtender;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
@@ -62,26 +63,36 @@ public class TreeModelUtil {
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
 		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
-		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
 
-		boolean fixed = (winnerId || nodeExtensions != null);
+		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
+		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
+
+		boolean fixed = (nodeExtensions != null || nodeId);
 
 		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
 		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
 
 		if(fixed && (compact || flat)){
 			throw new IllegalArgumentException("Conflicting tree model options");
-		}
+		} // End if
 
-		List<Visitor> visitors = new ArrayList<>();
-
-		if(winnerId){
+		if((Boolean.TRUE).equals(winnerId)){
 			Output output = ModelUtil.ensureOutput(model);
 
 			OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
 				.setDataType(DataType.INTEGER);
 
 			output.addOutputFields(nodeIdField);
+		}
+
+		List<Visitor> visitors = new ArrayList<>();
+
+		if((Boolean.TRUE).equals(compact)){
+			visitors.add(new TreeModelCompactor());
+		} // End if
+
+		if((Boolean.TRUE).equals(flat)){
+			visitors.add(new TreeModelFlattener());
 		} // End if
 
 		if(nodeExtensions != null){
@@ -113,12 +124,18 @@ public class TreeModelUtil {
 			}
 		} // End if
 
-		if(compact){
-			visitors.add(new TreeModelCompactor());
-		} // End if
+		if((Boolean.FALSE).equals(nodeId)){
+			Visitor nodeIdCleaner = new AbstractVisitor(){
 
-		if(flat){
-			visitors.add(new TreeModelFlattener());
+				@Override
+				public VisitorAction visit(Node node){
+					node.setId(null);
+
+					return super.visit(node);
+				}
+			};
+
+			visitors.add(nodeIdCleaner);
 		}
 
 		for(Visitor visitor : visitors){
