@@ -170,7 +170,7 @@ Enter the project root directory and build using [Apache Maven](http://maven.apa
 mvn clean install
 ```
 
-The build produces an executable uber-JAR file `target/converter-executable-1.5-SNAPSHOT.jar`.
+The build produces an executable uber-JAR file `target/jpmml-sklearn-executable-1.5-SNAPSHOT.jar`.
 
 # Usage #
 
@@ -255,12 +255,12 @@ Please see the test script file [main.py](https://github.com/jpmml/jpmml-sklearn
 
 Converting the pipeline pickle file `pipeline.pkl.z` to a PMML file `pipeline.pmml`:
 ```
-java -jar target/converter-executable-1.5-SNAPSHOT.jar --pkl-input pipeline.pkl.z --pmml-output pipeline.pmml
+java -jar target/jpmml-sklearn-executable-1.5-SNAPSHOT.jar --pkl-input pipeline.pkl.z --pmml-output pipeline.pmml
 ```
 
 Getting help:
 ```
-java -jar target/converter-executable-1.5-SNAPSHOT.jar --help
+java -jar target/jpmml-sklearn-executable-1.5-SNAPSHOT.jar --help
 ```
 
 # License #
