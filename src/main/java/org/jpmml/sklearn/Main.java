@@ -100,11 +100,11 @@ public class Main {
 		try(Storage storage = PickleUtil.createStorage(this.input)){
 			logger.info("Parsing PKL..");
 
-			long start = System.currentTimeMillis();
+			long begin = System.currentTimeMillis();
 			object = PickleUtil.unpickle(storage);
 			long end = System.currentTimeMillis();
 
-			logger.info("Parsed PKL in {} ms.", (end - start));
+			logger.info("Parsed PKL in {} ms.", (end - begin));
 		} catch(Exception e){
 			logger.error("Failed to parse PKL", e);
 
@@ -155,11 +155,11 @@ public class Main {
 		try(OutputStream os = new FileOutputStream(this.output)){
 			logger.info("Marshalling PMML..");
 
-			long start = System.currentTimeMillis();
+			long begin = System.currentTimeMillis();
 			MetroJAXBUtil.marshalPMML(pmml, os);
 			long end = System.currentTimeMillis();
 
-			logger.info("Marshalled PMML in {} ms.", (end - start));
+			logger.info("Marshalled PMML in {} ms.", (end - begin));
 		} catch(Exception e){
 			logger.error("Failed to marshal PMML", e);
 
