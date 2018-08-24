@@ -18,11 +18,13 @@
  */
 package xgboost.sklearn;
 
+import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.xgboost.ByteOrderUtil;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
@@ -34,7 +36,7 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster> int getNumberOfFeatures(E estimator){
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> int getNumberOfFeatures(E estimator){
 		Learner learner = getLearner(estimator);
 
 		return learner.getNumFeatures();
@@ -59,9 +61,12 @@ public class BoosterUtil {
 	}
 
 	static
-	private Learner getLearner(HasBooster hasBooster){
-		Booster booster = hasBooster.getBooster();
+	private <E extends Estimator & HasBooster & HasXGBoostOptions> Learner getLearner(E estimator){
+		Booster booster = estimator.getBooster();
 
-		return booster.getLearner();
+		String byteOrder = (String)estimator.getOption(HasXGBoostOptions.OPTION_BYTE_ORDER, (ByteOrder.nativeOrder()).toString());
+		String charset = (String)estimator.getOption(HasXGBoostOptions.OPTION_CHARSET, null);
+
+		return booster.getLearner(ByteOrderUtil.forValue(byteOrder), charset);
 	}
 }

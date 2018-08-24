@@ -21,6 +21,7 @@ package xgboost.sklearn;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteOrder;
 
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.xgboost.Learner;
@@ -35,20 +36,20 @@ public class Booster extends PyClassDict {
 		super(module, name);
 	}
 
-	public Learner getLearner(){
+	public Learner getLearner(ByteOrder byteOrder, String charset){
 
 		if(this.learner == null){
-			this.learner = loadLearner();
+			this.learner = loadLearner(byteOrder, charset);
 		}
 
 		return this.learner;
 	}
 
-	private Learner loadLearner(){
+	private Learner loadLearner(ByteOrder byteOrder, String charset){
 		byte[] handle = getHandle();
 
 		try(InputStream is = new ByteArrayInputStream(handle)){
-			return XGBoostUtil.loadLearner(is);
+			return XGBoostUtil.loadLearner(is, byteOrder, charset);
 		} catch(IOException ioe){
 			throw new RuntimeException(ioe);
 		}
