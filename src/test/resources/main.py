@@ -63,11 +63,11 @@ class OptimalXGBClassifier(XGBClassifier):
 		super(OptimalXGBClassifier, self).__init__(objective = objective, n_jobs = n_jobs, random_state = random_state, missing = missing)
 		self.ntree_limit = ntree_limit
 
-	def predict(self, data, output_margin = False, ntree_limit = 0):
-		return super(OptimalXGBClassifier, self).predict(data = data, output_margin = output_margin, ntree_limit = self.ntree_limit)
+	def predict(self, data, ntree_limit = 0):
+		return super(OptimalXGBClassifier, self).predict(data = data, ntree_limit = self.ntree_limit)
 
-	def predict_proba(self, data, output_margin = False, ntree_limit = 0):
-		return super(OptimalXGBClassifier, self).predict_proba(data = data, output_margin = output_margin, ntree_limit = self.ntree_limit)
+	def predict_proba(self, data, ntree_limit = 0):
+		return super(OptimalXGBClassifier, self).predict_proba(data = data, ntree_limit = self.ntree_limit)
 
 class OptimalXGBRegressor(XGBRegressor):
 
@@ -75,8 +75,8 @@ class OptimalXGBRegressor(XGBRegressor):
 		super(OptimalXGBRegressor, self).__init__(objective = objective, n_jobs = n_jobs, random_state = random_state, missing = missing)
 		self.ntree_limit = ntree_limit
 
-	def predict(self, data, output_margin = False, ntree_limit = 0):
-		return super(OptimalXGBRegressor, self).predict(data = data, output_margin = output_margin, ntree_limit = self.ntree_limit)
+	def predict(self, data, ntree_limit = 0):
+		return super(OptimalXGBRegressor, self).predict(data = data, ntree_limit = self.ntree_limit)
 
 datasets = "Audit,Auto,Housing,Iris,Sentiment,Versicolor,Wheat"
 
