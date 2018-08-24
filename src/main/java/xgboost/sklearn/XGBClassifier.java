@@ -21,6 +21,7 @@ package xgboost.sklearn;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.xgboost.HasXGBoostOptions;
 import sklearn.LabelEncoderClassifier;
 
 public class XGBClassifier extends LabelEncoderClassifier implements HasBooster, HasXGBoostOptions {

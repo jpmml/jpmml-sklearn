@@ -18,81 +18,23 @@
  */
 package org.jpmml.sklearn.visitors;
 
-import java.util.Deque;
 import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
-import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 
-public class TreeModelCompactor extends AbstractVisitor {
+public class TreeModelCompactor extends AbstractTreeModelTransformer {
 
 	private MiningFunction miningFunction = null;
 
 
 	@Override
-	public void pushParent(PMMLObject object){
-		super.pushParent(object);
-
-		if(object instanceof Node){
-			handleNodePush((Node)object);
-		} else
-
-		if(object instanceof TreeModel){
-			handleTreeModelPush((TreeModel)object);
-		}
-	}
-
-	@Override
-	public PMMLObject popParent(){
-		PMMLObject object = super.popParent();
-
-		if(object instanceof Node){
-			handleNodePop((Node)object);
-		} else
-
-		if(object instanceof TreeModel){
-			handleTreeModelPop((TreeModel)object);
-		}
-
-		return object;
-	}
-
-	@Override
-	public VisitorAction visit(TreeModel treeModel){
-		TreeModel.MissingValueStrategy missingValueStrategy = treeModel.getMissingValueStrategy();
-		TreeModel.NoTrueChildStrategy noTrueChildStrategy = treeModel.getNoTrueChildStrategy();
-		TreeModel.SplitCharacteristic splitCharacteristic = treeModel.getSplitCharacteristic();
-
-		if(!(TreeModel.MissingValueStrategy.NONE).equals(missingValueStrategy) || !(TreeModel.NoTrueChildStrategy.RETURN_NULL_PREDICTION).equals(noTrueChildStrategy) || !(TreeModel.SplitCharacteristic.BINARY_SPLIT).equals(splitCharacteristic)){
-			throw new IllegalArgumentException();
-		}
-
-		treeModel
-			.setMissingValueStrategy(TreeModel.MissingValueStrategy.NULL_PREDICTION)
-			.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
-
-		MiningFunction miningFunction = treeModel.getMiningFunction();
-		switch(miningFunction){
-			case REGRESSION:
-				treeModel.setNoTrueChildStrategy(TreeModel.NoTrueChildStrategy.RETURN_LAST_PREDICTION);
-				break;
-			case CLASSIFICATION:
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
-
-		return super.visit(treeModel);
-	}
-
-	private void handleNodePush(Node node){
+	public void enterNode(Node node){
 		String id = node.getId();
 		String score = node.getScore();
 
@@ -110,22 +52,20 @@ public class TreeModelCompactor extends AbstractVisitor {
 			Node firstChild = children.get(0);
 			Node secondChild = children.get(1);
 
-			SimplePredicate firstPredicate = (SimplePredicate)firstChild.getPredicate();
-			SimplePredicate secondPredicate = (SimplePredicate)secondChild.getPredicate();
+			Predicate firstPredicate = firstChild.getPredicate();
+			Predicate secondPredicate = secondChild.getPredicate();
 
-			if(!(firstPredicate.getField()).equals(secondPredicate.getField()) || !(firstPredicate.getValue()).equals(secondPredicate.getValue())){
-				throw new IllegalArgumentException();
-			} // End if
+			checkFieldReference(firstPredicate, secondPredicate);
+			checkValue(firstPredicate, secondPredicate);
 
-			if((SimplePredicate.Operator.NOT_EQUAL).equals(firstPredicate.getOperator()) && (SimplePredicate.Operator.EQUAL).equals(secondPredicate.getOperator())){
-				children.remove(0);
-				children.add(1, firstChild);
+			if(hasOperator(firstPredicate, SimplePredicate.Operator.NOT_EQUAL) && hasOperator(secondPredicate, SimplePredicate.Operator.EQUAL)){
+				children = swapChildren(node);
 
 				firstChild = children.get(0);
 				secondChild = children.get(1);
 			} else
 
-			if((SimplePredicate.Operator.LESS_OR_EQUAL).equals(firstPredicate.getOperator()) && (SimplePredicate.Operator.GREATER_THAN).equals(secondPredicate.getOperator())){
+			if(hasOperator(firstPredicate, SimplePredicate.Operator.LESS_OR_EQUAL) && hasOperator(secondPredicate, SimplePredicate.Operator.GREATER_THAN)){
 				// Ignored
 			} else
 
@@ -145,8 +85,8 @@ public class TreeModelCompactor extends AbstractVisitor {
 		node.setId(null);
 	}
 
-	private void handleNodePop(Node node){
-		String score = node.getScore();
+	@Override
+	public void exitNode(Node node){
 		Predicate predicate = node.getPredicate();
 
 		if(predicate instanceof True){
@@ -156,41 +96,16 @@ public class TreeModelCompactor extends AbstractVisitor {
 				return;
 			}
 
-			String parentScore = parentNode.getScore();
-			if(parentScore != null){
-				throw new IllegalArgumentException();
-			} // End if
-
 			if((MiningFunction.REGRESSION).equals(this.miningFunction)){
-				parentNode.setScore(score);
-
-				List<Node> parentChildren = parentNode.getNodes();
-
-				boolean success = parentChildren.remove(node);
-				if(!success){
-					throw new IllegalArgumentException();
-				} // End if
-
-				if(node.hasNodes()){
-					List<Node> children = node.getNodes();
-
-					parentChildren.addAll(children);
-				}
+				initScore(parentNode, node);
+				replaceChildWithGrandchildren(parentNode, node);
 			} else
 
 			if((MiningFunction.CLASSIFICATION).equals(this.miningFunction)){
 
+				// Replace intermediate nodes, but not terminal nodes
 				if(node.hasNodes()){
-					List<Node> parentChildren = parentNode.getNodes();
-
-					boolean success = parentChildren.remove(node);
-					if(!success){
-						throw new IllegalArgumentException();
-					}
-
-					List<Node> children = node.getNodes();
-
-					parentChildren.addAll(children);
+					replaceChildWithGrandchildren(parentNode, node);
 				}
 			} else
 
@@ -200,22 +115,35 @@ public class TreeModelCompactor extends AbstractVisitor {
 		}
 	}
 
-	private void handleTreeModelPush(TreeModel treeModel){
+	@Override
+	public void enterTreeModel(TreeModel treeModel){
+		TreeModel.MissingValueStrategy missingValueStrategy = treeModel.getMissingValueStrategy();
+		TreeModel.NoTrueChildStrategy noTrueChildStrategy = treeModel.getNoTrueChildStrategy();
+		TreeModel.SplitCharacteristic splitCharacteristic = treeModel.getSplitCharacteristic();
+
+		if(!(TreeModel.MissingValueStrategy.NONE).equals(missingValueStrategy) || !(TreeModel.NoTrueChildStrategy.RETURN_NULL_PREDICTION).equals(noTrueChildStrategy) || !(TreeModel.SplitCharacteristic.BINARY_SPLIT).equals(splitCharacteristic)){
+			throw new IllegalArgumentException();
+		}
+
 		this.miningFunction = treeModel.getMiningFunction();
 	}
 
-	private void handleTreeModelPop(TreeModel treeModel){
-		this.miningFunction = null;
-	}
+	@Override
+	public void exitTreeModel(TreeModel treeModel){
+		treeModel
+			.setMissingValueStrategy(TreeModel.MissingValueStrategy.NULL_PREDICTION)
+			.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
 
-	private Node getParentNode(){
-		Deque<PMMLObject> parents = getParents();
-
-		PMMLObject parent = parents.peekFirst();
-		if(parent instanceof Node){
-			return (Node)parent;
+		switch(this.miningFunction){
+			case REGRESSION:
+				treeModel.setNoTrueChildStrategy(TreeModel.NoTrueChildStrategy.RETURN_LAST_PREDICTION);
+				break;
+			case CLASSIFICATION:
+				break;
+			default:
+				throw new IllegalArgumentException();
 		}
 
-		return null;
+		this.miningFunction = null;
 	}
 }

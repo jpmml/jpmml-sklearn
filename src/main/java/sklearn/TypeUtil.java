@@ -18,16 +18,13 @@
  */
 package sklearn;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
+import org.jpmml.converter.ValueUtil;
 
 public class TypeUtil {
 
@@ -36,44 +33,25 @@ public class TypeUtil {
 
 	static
 	public DataType getDataType(List<?> objects, DataType defaultDataType){
-		Function<Object, Class<?>> function = new Function<Object, Class<?>>(){
+		Set<DataType> dataTypes = objects.stream()
+			.map(ValueUtil::getDataType)
+			.collect(Collectors.toSet());
 
-			@Override
-			public Class<?> apply(Object object){
-				return object.getClass();
-			}
-		};
-
-		Set<Class<?>> clazzes = new HashSet<>(Lists.transform(objects, function));
-
-		// A String value can be parsed to any other value
-		if(clazzes.size() > 1){
-			clazzes.remove(String.class);
+		if(dataTypes.size() == 0){
+			return defaultDataType;
 		} // End if
 
-		if(clazzes.size() > 1){
-			throw new IllegalArgumentException("Expected all values to be of the same data type, got " + clazzes.size() + " different data types (" + clazzes + ")");
+		// A String value can be parsed to any other value
+		if(dataTypes.size() > 1){
+			dataTypes.remove(DataType.STRING);
+		} // End if
+
+		if(dataTypes.size() == 1){
+			return Iterables.getOnlyElement(dataTypes);
+		} else
+
+		{
+			throw new IllegalArgumentException("Expected all values to be of the same data type, got " + dataTypes.size() + " different data types (" + dataTypes + ")");
 		}
-
-		Class<?> clazz = Iterables.getOnlyElement(clazzes);
-
-		DataType dataType = TypeUtil.dataTypes.get(clazz);
-		if(dataType != null){
-			return dataType;
-		}
-
-		return defaultDataType;
-	}
-
-	private static final Map<Class<?>, DataType> dataTypes = new LinkedHashMap<>();
-
-	static {
-		dataTypes.put(Boolean.class, DataType.BOOLEAN);
-		dataTypes.put(Byte.class, DataType.INTEGER);
-		dataTypes.put(Short.class, DataType.INTEGER);
-		dataTypes.put(Integer.class, DataType.INTEGER);
-		dataTypes.put(Long.class, DataType.INTEGER);
-		dataTypes.put(Float.class, DataType.FLOAT);
-		dataTypes.put(Double.class, DataType.DOUBLE);
 	}
 }

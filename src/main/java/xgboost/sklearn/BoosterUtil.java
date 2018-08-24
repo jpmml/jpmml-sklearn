@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
 import sklearn.Estimator;
@@ -43,9 +44,12 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel encodeBooster(E estimator, Schema schema){
 		Learner learner = getLearner(estimator);
 
+		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
+		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, null);
+
 		Map<String, Object> options = new LinkedHashMap<>();
-		options.put(org.jpmml.xgboost.HasXGBoostOptions.OPTION_COMPACT, estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE));
-		options.put(org.jpmml.xgboost.HasXGBoostOptions.OPTION_NTREE_LIMIT, estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, null));
+		options.put(HasXGBoostOptions.OPTION_COMPACT, compact);
+		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
 		Schema xgbSchema = XGBoostUtil.toXGBoostSchema(schema);
 

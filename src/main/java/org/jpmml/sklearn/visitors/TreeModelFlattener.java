@@ -18,54 +18,25 @@
  */
 package org.jpmml.sklearn.visitors;
 
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Predicate;
-import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
-import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 
-public class TreeModelFlattener extends AbstractVisitor {
+public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
 	private MiningFunction miningFunction = null;
 
 
 	@Override
-	public void pushParent(PMMLObject object){
-		super.pushParent(object);
-
-		if(object instanceof TreeModel){
-			handleTreeModelPush((TreeModel)object);
-		}
-	}
-
-	@Override
-	public PMMLObject popParent(){
-		PMMLObject object = super.popParent();
-
-		if(object instanceof Node){
-			handleNodePop((Node)object);
-		} else
-
-		if(object instanceof TreeModel){
-			handleTreeModelPop((TreeModel)object);
-		}
-
-		return object;
-	}
-
-	@Override
-	public VisitorAction visit(Node node){
+	public void enterNode(Node node){
 
 		if(node.hasNodes()){
 			List<Node> children = node.getNodes();
@@ -101,19 +72,10 @@ public class TreeModelFlattener extends AbstractVisitor {
 				break;
 			}
 		}
-
-		return super.visit(node);
 	}
 
 	@Override
-	public VisitorAction visit(TreeModel treeModel){
-		treeModel.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
-
-		return super.visit(treeModel);
-	}
-
-	private void handleNodePop(Node node){
-		String score = node.getScore();
+	public void exitNode(Node node){
 		Predicate predicate = node.getPredicate();
 
 		if(predicate instanceof True){
@@ -131,36 +93,14 @@ public class TreeModelFlattener extends AbstractVisitor {
 			boolean success = parentChildren.remove(node);
 			if(!success){
 				throw new IllegalArgumentException();
-			}
-
-			String parentScore = parentNode.getScore();
-			if(parentScore != null){
-				throw new IllegalArgumentException();
-			}
-
-			parentNode.setScore(score);
+			} // End if
 
 			if((MiningFunction.REGRESSION).equals(this.miningFunction)){
-				// Ignored
+				initScore(parentNode, node);
 			} else
 
 			if((MiningFunction.CLASSIFICATION).equals(this.miningFunction)){
-				Double recordCount = node.getRecordCount();
-				List<ScoreDistribution> scoreDistributions = node.getScoreDistributions();
-
-				Double parentRecordCount = parentNode.getRecordCount();
-				if(parentRecordCount != null){
-					throw new IllegalArgumentException();
-				}
-
-				parentNode.setRecordCount(recordCount);
-
-				List<ScoreDistribution> parentScoreDistributions = parentNode.getScoreDistributions();
-				if(parentScoreDistributions.size() != 0){
-					throw new IllegalArgumentException();
-				}
-
-				parentScoreDistributions.addAll(scoreDistributions);
+				initScoreDistribution(parentNode, node);
 			} else
 
 			{
@@ -169,23 +109,16 @@ public class TreeModelFlattener extends AbstractVisitor {
 		}
 	}
 
-	private void handleTreeModelPush(TreeModel treeModel){
+	@Override
+	public void enterTreeModel(TreeModel treeModel){
 		this.miningFunction = treeModel.getMiningFunction();
 	}
 
-	private void handleTreeModelPop(TreeModel treeModel){
+	@Override
+	public void exitTreeModel(TreeModel treeModel){
+		treeModel.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
+
 		this.miningFunction = null;
-	}
-
-	private Node getParentNode(){
-		Deque<PMMLObject> parents = getParents();
-
-		PMMLObject parent = parents.peekFirst();
-		if(parent instanceof Node){
-			return (Node)parent;
-		}
-
-		return null;
 	}
 
 	static
@@ -198,10 +131,7 @@ public class TreeModelFlattener extends AbstractVisitor {
 
 		SimplePredicate simplePredicate = (SimplePredicate)predicate;
 
-		FieldName name = simplePredicate.getField();
-		SimplePredicate.Operator operator = simplePredicate.getOperator();
-
-		if(!(SimplePredicate.Operator.LESS_OR_EQUAL).equals(operator)){
+		if(!hasOperator(simplePredicate, SimplePredicate.Operator.LESS_OR_EQUAL)){
 			return null;
 		} // End if
 
@@ -211,8 +141,9 @@ public class TreeModelFlattener extends AbstractVisitor {
 			int endPos = 0;
 
 			for(Node child : children){
+				Predicate childPredicate = child.getPredicate();
 
-				if(!checkPredicate(child, name, operator)){
+				if(!hasFieldReference(childPredicate, simplePredicate.getField()) || !hasOperator(childPredicate, simplePredicate.getOperator())){
 					break;
 				}
 
@@ -227,18 +158,5 @@ public class TreeModelFlattener extends AbstractVisitor {
 		}
 
 		return null;
-	}
-
-	static
-	private boolean checkPredicate(Node node, FieldName name, SimplePredicate.Operator operator){
-		Predicate predicate = node.getPredicate();
-
-		if(predicate instanceof SimplePredicate){
-			SimplePredicate simplePredicate = (SimplePredicate)predicate;
-
-			return (simplePredicate.getField()).equals(name) && (simplePredicate.getOperator()).equals(operator);
-		}
-
-		return false;
 	}
 }

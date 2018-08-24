@@ -20,6 +20,7 @@ package lightgbm.sklearn;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.lightgbm.HasLightGBMOptions;
 import sklearn.Regressor;
 
 public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMOptions {
