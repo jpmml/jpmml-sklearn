@@ -42,11 +42,11 @@ class OptimalLGBMClassifier(LGBMClassifier):
 		super(OptimalLGBMClassifier, self).__init__(objective = objective, n_estimators = n_estimators, random_state = random_state, n_jobs = n_jobs)
 		self.num_iteration = num_iteration
 
-	def predict(self, X, raw_score = False, num_iteration = 0):
-		return super(OptimalLGBMClassifier, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration)
+	def predict(self, X, raw_score = False, num_iteration = 0, pred_leaf = False, pred_contrib = False):
+		return super(OptimalLGBMClassifier, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration, pred_leaf = pred_leaf, pred_contrib = pred_contrib)
 
-	def predict_proba(self, X, raw_score = False, num_iteration = 0):
-		return super(OptimalLGBMClassifier, self).predict_proba(X = X, raw_score = raw_score, num_iteration = self.num_iteration)
+	def predict_proba(self, X, raw_score = False, num_iteration = 0, pred_leaf = False, pred_contrib = False):
+		return super(OptimalLGBMClassifier, self).predict_proba(X = X, raw_score = raw_score, num_iteration = self.num_iteration, pred_leaf = pred_leaf, pred_contrib = pred_contrib)
 
 class OptimalLGBMRegressor(LGBMRegressor):
 
@@ -54,8 +54,8 @@ class OptimalLGBMRegressor(LGBMRegressor):
 		super(OptimalLGBMRegressor, self).__init__(objective = objective, n_estimators = n_estimators, random_state = random_state, n_jobs = n_jobs)
 		self.num_iteration = num_iteration
 
-	def predict(self, X, raw_score = False, num_iteration = 0):
-		return super(OptimalLGBMRegressor, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration)
+	def predict(self, X, raw_score = False, num_iteration = 0, pred_leaf = False, pred_contrib = False):
+		return super(OptimalLGBMRegressor, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration, pred_leaf = pred_leaf, pred_contrib = pred_contrib)
 
 class OptimalXGBClassifier(XGBClassifier):
 
