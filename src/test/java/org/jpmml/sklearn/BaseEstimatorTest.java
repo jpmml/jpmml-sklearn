@@ -34,4 +34,16 @@ public class BaseEstimatorTest extends EstimatorTest {
 	public void evaluateGradientBoostingAuto() throws Exception {
 		evaluate("H2OGradientBoosting", "Auto");
 	}
+
+	@Test
+	public void evaluateRandomForestAudit() throws Exception {
+		FieldName[] targetFields = {FieldName.create("Adjusted"), FieldName.create("h2o(Adjusted)")};
+
+		evaluate("H2ORandomForest", "Audit", excludeFields(targetFields));
+	}
+
+	@Test
+	public void evaluateRandomForestAuto() throws Exception {
+		evaluate("H2ORandomForest", "Auto");
+	}
 }

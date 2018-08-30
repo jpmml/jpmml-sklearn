@@ -2,6 +2,7 @@ from common import *
 
 from h2o import H2OFrame
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
+from h2o.estimators.random_forest import H2ORandomForestEstimator
 from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -239,6 +240,7 @@ def build_audit_h2o(classifier, name):
 
 if "Audit" in datasets and with_h2o:
 	build_audit_h2o(H2OGradientBoostingEstimator(distribution = "bernoulli", ntrees = 17), "H2OGradientBoostingAudit")
+	build_audit_h2o(H2ORandomForestEstimator(distribution = "bernoulli", seed = 13), "H2ORandomForestAudit")
 
 audit_dict_X = audit_X.to_dict("records")
 
@@ -508,6 +510,7 @@ def build_auto_h2o(regressor, name):
 
 if "Auto" in datasets and with_h2o:
 	build_auto_h2o(H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
+	build_auto_h2o(H2ORandomForestEstimator(distribution = "gaussian"), "H2ORandomForestAuto")
 
 auto_na_X, auto_na_y = load_auto("AutoNA.csv")
 
