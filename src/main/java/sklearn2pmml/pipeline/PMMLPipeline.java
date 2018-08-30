@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import h2o.estimators.BaseEstimator;
 import numpy.core.NDArray;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
@@ -268,26 +269,40 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 			List<? extends Number> probabilityValues = null;
 
+			boolean hasProbabilityValues = verification.hasProbabilityValues();
+
+			if(estimator instanceof BaseEstimator){
+				BaseEstimator baseEstimator = (BaseEstimator)estimator;
+
+				hasProbabilityValues &= baseEstimator.hasProbabilityDistribution();
+			} else
+
 			if(estimator instanceof Classifier){
 				Classifier classifier = (Classifier)estimator;
 
-				if(classifier.hasProbabilityDistribution() && verification.hasProbabilityValues()){
-					probabilityValuesShape = verification.getProbabilityValuesShape();
+				hasProbabilityValues &= classifier.hasProbabilityDistribution();
+			} else
 
-					probabilityFields = new ArrayList<>();
+			{
+				hasProbabilityValues = false;
+			} // End if
 
-					CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+			if(hasProbabilityValues){
+				probabilityValuesShape = verification.getProbabilityValuesShape();
 
-					List<String> values = categoricalLabel.getValues();
-					for(String value : values){
-						probabilityFields.add("probability(" + value + ")"); // XXX
-					}
+				probabilityFields = new ArrayList<>();
 
-					ClassDictUtil.checkShapes(0, activeValuesShape, probabilityValuesShape);
-					ClassDictUtil.checkShapes(1, probabilityFields.size(), probabilityValuesShape);
+				CategoricalLabel categoricalLabel = (CategoricalLabel)label;
 
-					probabilityValues = verification.getProbabilityValues();
+				List<String> values = categoricalLabel.getValues();
+				for(String value : values){
+					probabilityFields.add("probability(" + value + ")"); // XXX
 				}
+
+				ClassDictUtil.checkShapes(0, activeValuesShape, probabilityValuesShape);
+				ClassDictUtil.checkShapes(1, probabilityFields.size(), probabilityValuesShape);
+
+				probabilityValues = verification.getProbabilityValues();
 			}
 
 			Number precision = verification.getPrecision();

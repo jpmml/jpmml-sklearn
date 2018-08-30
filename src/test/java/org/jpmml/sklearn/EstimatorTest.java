@@ -18,18 +18,24 @@
  */
 package org.jpmml.sklearn;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.google.common.io.ByteStreams;
+import h2o.estimators.BaseEstimator;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.Batch;
 import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
 import org.jpmml.evaluator.PMMLEquivalence;
+import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
 
 abstract
@@ -68,9 +74,34 @@ public class EstimatorTest extends IntegrationTest {
 					pipeline = (PMMLPipeline)PickleUtil.unpickle(storage);
 				}
 
+				Estimator estimator = pipeline.getEstimator();
+
+				File tmpFile = null;
+
+				if(estimator instanceof BaseEstimator){
+					BaseEstimator baseEstimator = (BaseEstimator)estimator;
+
+					tmpFile = File.createTempFile(getName() + getDataset(), ".mojo.zip");
+
+					String mojoPath = baseEstimator.getMojoPath();
+
+					try(InputStream is = open("/" + mojoPath)){
+
+						try(OutputStream os = new FileOutputStream(tmpFile)){
+							ByteStreams.copy(is, os);
+						}
+					}
+
+					baseEstimator.setMojoPath(tmpFile.getAbsolutePath());
+				}
+
 				PMML pmml = pipeline.encodePMML();
 
 				ensureValidity(pmml);
+
+				if(tmpFile != null){
+					tmpFile.delete();
+				}
 
 				return pmml;
 			}

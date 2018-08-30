@@ -13,6 +13,10 @@ def split_csv(df):
 def store_csv(df, name):
 	df.to_csv("csv/" + name, index = False)
 
+def store_mojo(estimator, name):
+	estimator.download_mojo("mojo/" + name)
+	estimator._mojo_path = "mojo/" + name
+
 # Joblib dump
 def store_pkl(obj, name):
 	joblib.dump(obj, "pkl/" + name, compress = 9)

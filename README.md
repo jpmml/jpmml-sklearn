@@ -107,6 +107,8 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * [`tree.ExtraTreeClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html)
     * [`tree.ExtraTreeRegressor`](http://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
+  * [H2O.ai](https://www.h2o.ai/):
+    * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
   * [LightGBM](https://github.com/Microsoft/LightGBM):
     * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
     * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRegressor)
@@ -127,6 +129,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * `sklearn2pmml.preprocessing.PMMLLabelEncoder`
     * `sklearn2pmml.preprocessing.PowerFunctionTransformer`
     * `sklearn2pmml.preprocessing.StringNormalizer`
+    * `sklearn2pmml.preprocessing.h2o.H2OFrameCreator`
   * [Sklearn-Pandas](https://github.com/paulgb/sklearn-pandas):
     * `sklearn_pandas.CategoricalImputer`
     * `sklearn_pandas.DataFrameMapper`

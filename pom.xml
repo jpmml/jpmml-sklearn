@@ -57,6 +57,12 @@
 
 		<dependency>
 			<groupId>org.jpmml</groupId>
+			<artifactId>jpmml-h2o</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-lightgbm</artifactId>
 			<version>1.2.2</version>
 		</dependency>

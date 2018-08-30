@@ -1,5 +1,7 @@
 from common import *
 
+from h2o import H2OFrame
+from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -25,9 +27,11 @@ from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, 
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
+from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
+import h2o
 import numpy
 import pandas
 import sys
@@ -80,11 +84,18 @@ class OptimalXGBRegressor(XGBRegressor):
 
 datasets = "Audit,Auto,Housing,Iris,Sentiment,Versicolor,Wheat"
 
+with_h2o = False
+
 if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = sys.argv[1]
+	if len(sys.argv) > 2:
+		with_h2o = "H2O" in sys.argv[2]
 
 datasets = datasets.split(",")
+
+if with_h2o:
+	h2o.connect()
 
 #
 # Clustering
@@ -206,6 +217,28 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 
 if "Audit" in datasets:
 	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = [2, 3, 4, 5, 6, 7, 8])
+
+def build_audit_h2o(classifier, name):
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
+		[([column], CategoricalDomain()) for column in ["Employment", "Education", "Marital", "Occupation", "Gender", "Deductions"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("uploader", H2OFrameCreator()),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_X, H2OFrame(audit_y.to_frame(), column_types = ["categorical"]))
+	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
+	classifier = pipeline._final_estimator
+	store_mojo(classifier, name + ".zip")
+	store_pkl(pipeline, name + ".pkl")
+	adjusted = pipeline.predict(audit_X)
+	adjusted.set_names(["h2o(Adjusted)", "probability(0)", "probability(1)"])
+	store_csv(adjusted.as_data_frame(), name + ".csv")
+
+if "Audit" in datasets and with_h2o:
+	build_audit_h2o(H2OGradientBoostingEstimator(distribution = "bernoulli", ntrees = 17), "H2OGradientBoostingAudit")
 
 audit_dict_X = audit_X.to_dict("records")
 
@@ -453,6 +486,28 @@ if "Auto" in datasets:
 	build_auto(RidgeCV(), "RidgeAuto")
 	build_auto(TheilSenRegressor(n_subsamples = 15, random_state = 13), "TheilSenAuto")
 	build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", ntree_limit = 31)
+
+def build_auto_h2o(regressor, name):
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["cylinders", "model_year", "origin"]] +
+		[([column], CategoricalDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("uploader", H2OFrameCreator()),
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
+	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
+	regressor = pipeline._final_estimator
+	store_mojo(regressor, name + ".zip")
+	store_pkl(pipeline, name + ".pkl")
+	mpg = pipeline.predict(auto_X)
+	mpg.set_names(["mpg"])
+	store_csv(mpg.as_data_frame(), name + ".csv")
+
+if "Auto" in datasets and with_h2o:
+	build_auto_h2o(H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
 
 auto_na_X, auto_na_y = load_auto("AutoNA.csv")
 
