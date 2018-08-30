@@ -172,21 +172,18 @@ SPECIAL_TOKEN:
 
 TOKEN:
 {
-	< MULTIPLY: "*" >
-	|
-	< DIVIDE: "/" >
-	|
 	< LPAREN: "(" >
 	|
 	< RPAREN: ")" >
+}
+
+TOKEN:
+{
+	< OR: "or" >
 	|
-	< LBRACKET: "[" >
+	< AND: "and" >
 	|
-	< RBRACKET: "]" >
-	|
-	< PLUS: "+" >
-	|
-	< MINUS: "-" >
+	< NOT: "not" >
 }
 
 TOKEN:
@@ -202,6 +199,24 @@ TOKEN:
 	< GREATER_THAN: ">" >
 	|
 	< GREATER_OR_EQUAL: ">=" >
+}
+
+TOKEN:
+{
+	< MULTIPLY: "*" >
+	|
+	< DIVIDE: "/" >
+	|
+	< PLUS: "+" >
+	|
+	< MINUS: "-" >
+}
+
+TOKEN:
+{
+	< LBRACKET: "[" >
+	|
+	< RBRACKET: "]" >
 }
 
 TOKEN:
@@ -263,9 +278,52 @@ Expression Expression():
 	Expression expression;
 }
 {
-	expression = ComparisonExpression()
+	expression = LogicalOrExpression()
 
 	{
+		return expression;
+	}
+}
+
+Expression LogicalOrExpression():
+{
+	Expression left;
+	Expression right;
+}
+{
+	left = LogicalAndExpression() ( <OR> right = LogicalAndExpression() { left = createApply("or", left, right); } )*
+
+	{
+		return left;
+	}
+}
+
+Expression LogicalAndExpression():
+{
+	Expression left;
+	Expression right;
+}
+{
+	left = NegationExpression() ( <AND> right = NegationExpression() { left = createApply("and", left, right); } )*
+
+	{
+		return left;
+	}
+}
+
+Expression NegationExpression():
+{
+	Token operator = null;
+	Expression expression;
+}
+{
+	( operator = <NOT> )? expression = ComparisonExpression()
+
+	{
+		if(operator != null){
+			return createApply("not", expression);
+		}
+
 		return expression;
 	}
 }
