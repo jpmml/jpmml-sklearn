@@ -35,6 +35,7 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.visitors.ExpressionCompactor;
 
 public class ExpressionTranslator {
 
@@ -74,6 +75,11 @@ public class ExpressionTranslator {
 
 	static
 	public Expression translate(String string, List<Feature> features){
+		return translate(string, features, true);
+	}
+
+	static
+	public Expression translate(String string, List<Feature> features, boolean compact){
 		Expression expression;
 		
 		try {
@@ -83,6 +89,12 @@ public class ExpressionTranslator {
 			expression = expressionTranslator.translateExpressionInternal();
 		} catch(ParseException pe){
 			throw new IllegalArgumentException(string, pe);
+		}
+
+		if(compact){
+			ExpressionCompactor compactor = new ExpressionCompactor();
+
+			compactor.applyTo(expression);
 		}
 
 		return expression;

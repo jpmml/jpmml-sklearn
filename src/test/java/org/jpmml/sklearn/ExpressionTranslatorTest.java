@@ -53,9 +53,13 @@ public class ExpressionTranslatorTest {
 
 		checkApply(apply, "greaterThan", FieldRef.class, FieldRef.class);
 
-		apply = (Apply)ExpressionTranslator.translate("not X[\"a\"] < 0.0", doubleFeatures);
+		apply = (Apply)ExpressionTranslator.translate("not X[\"a\"] < 0.0", doubleFeatures, false);
 
 		checkApply(apply, "not", Apply.class);
+
+		apply = (Apply)ExpressionTranslator.translate("not X[\"a\"] < 0.0", doubleFeatures, true);
+
+		checkApply(apply, "greaterOrEqual", FieldRef.class, Constant.class);
 	}
 
 	@Test
