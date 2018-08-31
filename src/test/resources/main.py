@@ -510,7 +510,7 @@ def build_auto_h2o(regressor, name):
 
 if "Auto" in datasets and with_h2o:
 	build_auto_h2o(H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
-	build_auto_h2o(H2ORandomForestEstimator(distribution = "gaussian"), "H2ORandomForestAuto")
+	build_auto_h2o(H2ORandomForestEstimator(distribution = "gaussian", seed = 13), "H2ORandomForestAuto")
 
 auto_na_X, auto_na_y = load_auto("AutoNA.csv")
 
