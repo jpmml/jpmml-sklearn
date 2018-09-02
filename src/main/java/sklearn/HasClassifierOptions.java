@@ -19,9 +19,9 @@
 package sklearn;
 
 import org.dmg.pmml.Value;
-import org.jpmml.sklearn.HasOptions;
+import org.jpmml.sklearn.HasSkLearnOptions;
 
-public interface HasClassifierOptions extends HasOptions {
+public interface HasClassifierOptions extends HasSkLearnOptions {
 
 	/**
 	 * @see Value#hasExtensions()

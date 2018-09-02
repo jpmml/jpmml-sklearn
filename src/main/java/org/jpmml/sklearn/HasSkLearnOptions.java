@@ -18,10 +18,11 @@
  */
 package org.jpmml.sklearn;
 
+import org.jpmml.converter.HasOptions;
 import sklearn.Estimator;
 
 /**
  * @see Estimator#getOption(String, Object)
  */
-public interface HasOptions {
+public interface HasSkLearnOptions extends HasOptions {
 }

@@ -20,11 +20,11 @@ package sklearn.tree;
 
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.tree.Node;
-import org.jpmml.sklearn.HasOptions;
+import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
 
-public interface HasTreeOptions extends HasOptions {
+public interface HasTreeOptions extends HasSkLearnOptions {
 
 	/**
 	 * @see TreeModelCompactor
