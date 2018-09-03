@@ -19,20 +19,27 @@
 package sklearn.linear_model.logistic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.ClassifierUtil;
 import sklearn.linear_model.LinearClassifier;
 
@@ -60,6 +67,7 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	private Model encodeMultinomialModel(Schema schema){
+		String sklearnVersion = getSkLearnVersion();
 		int[] shape = getCoefShape();
 
 		int numberOfClasses = shape[0];
@@ -73,7 +81,35 @@ public class LogisticRegression extends LinearClassifier {
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
-			return encodeOvRModel(schema);
+			// See https://github.com/scikit-learn/scikit-learn/issues/9889
+			boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.20") >= 0);
+
+			if(!corrected){
+				return encodeOvRModel(schema);
+			}
+
+			Schema segmentSchema = new Schema(null, features);
+
+			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), null, segmentSchema)
+				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE));
+
+			Feature feature = new ContinuousFeature(null, FieldName.create("decisionFunction"), DataType.DOUBLE);
+
+			RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(feature), Collections.singletonList(-1d), 0d)
+				.setTargetCategory(categoricalLabel.getValue(0));
+
+			RegressionTable activeRegressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(feature), Collections.singletonList(1d), 0d)
+				.setTargetCategory(categoricalLabel.getValue(1));
+
+			List<RegressionTable> regressionTables = new ArrayList<>();
+			regressionTables.add(passiveRegressionTable);
+			regressionTables.add(activeRegressionTable);
+
+			RegressionModel secondRegressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
+				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
+				.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+
+			return MiningModelUtil.createModelChain(Arrays.asList(firstRegressionModel, secondRegressionModel), schema);
 		} else
 
 		if(numberOfClasses >= 3){
@@ -105,6 +141,13 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	public String getMultiClass(){
-		return (String)get("multi_class");
+		String multiClass = (String)get("multi_class");
+
+		// SkLearn 0.20
+		if(("warn").equals(multiClass)){
+			return "ovr";
+		}
+
+		return multiClass;
 	}
 }

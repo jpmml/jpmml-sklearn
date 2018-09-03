@@ -157,7 +157,27 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return PMMLUtil.createApply("lessOrEqual", fieldRef, PMMLUtil.createConstant(getThreshold()));
+				String behaviour = getBehaviour();
+
+				double threshold;
+
+				// SkLearn 0.19
+				if(behaviour == null){
+					threshold = getThreshold();
+				} else
+
+				// SkLearn 0.20+
+				{
+					if(("old").equals(behaviour)){
+						threshold = getThreshold();
+					} else
+
+					{
+						throw new IllegalArgumentException(behaviour);
+					}
+				}
+
+				return PMMLUtil.createApply("lessOrEqual", fieldRef, PMMLUtil.createConstant(threshold));
 			}
 		};
 
@@ -168,8 +188,8 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		return TreeModelUtil.transform(this, miningModel);
 	}
 
-	public String getSkLearnVersion(){
-		return (String)get("_sklearn_version");
+	public String getBehaviour(){
+		return (String)get("behaviour");
 	}
 
 	public int getMaxSamples(){
@@ -177,7 +197,17 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	public double getThreshold(){
-		Number threshold = (Number)getScalar("threshold_");
+		Number threshold;
+
+		// SkLearn 0.19
+		if(containsKey("threshold_")){
+			threshold = (Number)getScalar("threshold_");
+		} else
+
+		// SkLearn 0.20+
+		{
+			threshold = (Number)getScalar("_threshold_");
+		}
 
 		return ValueUtil.asDouble(threshold);
 	}

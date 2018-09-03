@@ -83,5 +83,9 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 		return defaultValue;
 	}
 
+	public String getSkLearnVersion(){
+		return (String)get("_sklearn_version");
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(Estimator.class);
 }

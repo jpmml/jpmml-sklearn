@@ -18,6 +18,10 @@
  */
 package sklearn.neighbors;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.jpmml.sklearn.CClassDict;
 
 public class BinaryTree extends CClassDict {
@@ -33,7 +37,16 @@ public class BinaryTree extends CClassDict {
 
 	@Override
 	public void __setstate__(Object[] args){
-		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
+
+		// SkLearn 0.19
+		if(args.length == SETSTATE_ATTRIBUTES.length){
+			super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
+		} else
+
+		// SkLearn 0.20+
+		{
+			super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES_WEIGHTED, args));
+		}
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {
@@ -54,4 +67,14 @@ public class BinaryTree extends CClassDict {
 		"n_calls",
 		"dist_metric"
 	};
+
+	private static final String[] SETSTATE_ATTRIBUTES_WEIGHTED;
+
+	static {
+		List<String> attributes = new ArrayList<>();
+		attributes.addAll(Arrays.asList(SETSTATE_ATTRIBUTES));
+		attributes.add("sample_weight");
+
+		SETSTATE_ATTRIBUTES_WEIGHTED = attributes.toArray(new String[attributes.size()]);
+	}
 }
