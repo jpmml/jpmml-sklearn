@@ -91,11 +91,6 @@ public class ExpressionTranslator extends AbstractTranslator {
 	private Apply translateFunction(String function, List<Expression> arguments){
 
 		switch(function){
-			case "numpy.where":
-				if(arguments.size() != 3){
-					throw new IllegalArgumentException();
-				}
-				return createApply("if", arguments.get(0), arguments.get(1), arguments.get(2));
 			case "pandas.isnull":
 				if(arguments.size() != 1){
 					throw new IllegalArgumentException();
@@ -157,6 +152,10 @@ TOKEN:
 
 TOKEN:
 {
+	< IF: "if">
+	|
+	< ELSE: "else" >
+	|
 	< OR: "or" >
 	|
 	< AND: "and" >
@@ -202,8 +201,6 @@ TOKEN:
 	< COMMA: "," >
 	|
 	< DOT: "." >
-	|
-	< COLON: ":" >
 }
 
 TOKEN:
@@ -256,10 +253,24 @@ Expression Expression():
 	Expression expression;
 }
 {
-	expression = LogicalOrExpression()
+	expression = IfElseExpression()
 
 	{
 		return expression;
+	}
+}
+
+Expression IfElseExpression():
+{
+	Expression left;
+	Expression center;
+	Expression right;
+}
+{
+	left = LogicalOrExpression() ( <IF> center = LogicalOrExpression() <ELSE> right = LogicalOrExpression() { left = createApply("if", center, left, right); } )?
+
+	{
+		return left;
 	}
 }
 
@@ -405,8 +416,8 @@ FieldRef ArrayIndexingExpression():
 }
 {
 	(
-		LOOKAHEAD(<NAME> <LBRACKET> <COLON>)
-		variable = <NAME> <LBRACKET> <COLON> <COMMA> column = <INT> <RBRACKET>
+		LOOKAHEAD(<NAME> <LBRACKET> <INT>)
+		variable = <NAME> <LBRACKET> column = <INT> <RBRACKET>
 		|
 		variable = <NAME> <LBRACKET> column = <STRING> <RBRACKET>
 	)

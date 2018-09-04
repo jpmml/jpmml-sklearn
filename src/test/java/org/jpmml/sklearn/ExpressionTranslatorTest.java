@@ -64,7 +64,7 @@ public class ExpressionTranslatorTest {
 
 	@Test
 	public void translateArithmeticExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("(X[:, 0] + X[:, 1] - 1) / X[:, 2] * -0.5", doubleFeatures);
+		Apply apply = (Apply)ExpressionTranslator.translate("(X[0] + X[1] - 1) / X[2] * -0.5", doubleFeatures);
 
 		checkApply(apply, "*", Apply.class, Constant.class);
 
@@ -75,7 +75,7 @@ public class ExpressionTranslatorTest {
 
 	@Test
 	public void translateFunctionInvocationExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("numpy.where(pandas.notnull(X[\"a\"]), X[\"a\"], X[\"b\"] + X[\"c\"])", doubleFeatures);
+		Apply apply = (Apply)ExpressionTranslator.translate("X[\"a\"] if pandas.notnull(X[\"a\"]) else X[\"b\"] + X[\"c\"]", doubleFeatures);
 
 		checkApply(apply, "if", Apply.class, FieldRef.class, Apply.class);
 	}

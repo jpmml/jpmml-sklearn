@@ -278,8 +278,8 @@ def build_audit_na(classifier, name, with_proba = True, predict_proba_transforme
 		"MALE" : 1
 	}
 	mapper = DataFrameMapper(
-		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("numpy.where(pandas.notnull(X[:, 0]), X[:, 0], -999)"), name = "flag_missing(Age, -999)"), Imputer(missing_values = -999)])] +
-		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("numpy.where(pandas.isnull(X[:, 0]), -999, X[:, 0])"), name = "flag_missing(Hours, -999)"), Imputer(missing_values = -999)])] +
+		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("X[0] if pandas.notnull(X[0]) else -999"), name = "flag_missing(Age, -999)"), Imputer(missing_values = -999)])] +
+		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else X[0]"), name = "flag_missing(Hours, -999)"), Imputer(missing_values = -999)])] +
 		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False), Imputer()])] +
 		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()])] +
 		[([column], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(missing_values = None), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +
@@ -303,8 +303,8 @@ def build_audit_na(classifier, name, with_proba = True, predict_proba_transforme
 	store_csv(adjusted, name + ".csv")
 
 if "Audit" in datasets:
-	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[:, 0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
-	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("numpy.where(X[:, 1] > 0.75, 1, 0)"), name = "eval(probability(1))", prefit = True))
+	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
+	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
@@ -464,7 +464,7 @@ def build_auto(regressor, name, **pmml_options):
 		(["cylinders", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
-		(["weight", "displacement"], ExpressionTransformer("(X[:, 0] / X[:, 1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
+		(["weight", "displacement"], ExpressionTransformer("(X[0] / X[1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
 	])
 	pipeline = Pipeline([
 		("mapper", mapper),
@@ -561,7 +561,7 @@ def build_auto_na(regressor, name, predict_transformer = None, apply_transformer
 	store_csv(mpg, name + ".csv")
 
 if "Auto" in datasets:
-	build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[:, 0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
+	build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_auto_na(LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
 
 housing_X, housing_y = load_housing("Housing.csv")
