@@ -29,6 +29,7 @@ from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
+from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 
@@ -402,6 +403,20 @@ if "Iris" in datasets:
 	build_iris(NuSVC(), "NuSVCIris", with_proba = False)
 	build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
 	build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), "XGBIris", ntree_limit = 7)
+
+if "Iris" in datasets:
+	classifier = RuleSetClassifier([
+		("X['Petal.Length'] >= 2.45 and X['Petal.Width'] < 1.75", "versicolor"),
+		("X['Petal.Length'] >= 2.45", "virginica")
+	], default_score = "setosa")
+	pipeline = PMMLPipeline([
+		("classifier", classifier)
+	])
+	pipeline.fit(iris_X, iris_y)
+	pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
+	store_pkl(pipeline, "RuleSetIris.pkl")
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	store_csv(species, "RuleSetIris.csv")
 
 #
 # Text classification

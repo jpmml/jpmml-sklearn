@@ -37,49 +37,15 @@ import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.visitors.ExpressionCompactor;
 
-public class ExpressionTranslator {
-
-	private List<Feature> features = null;
-
-
-	public Feature getFeature(int index){
-		List<Feature> features = getFeatures();
-
-		if(index >= 0 && index < features.size()){
-			return features.get(index);
-		}
-
-		throw new IllegalArgumentException(String.valueOf(index));
-	}
-
-	public Feature getFeature(FieldName name){
-		List<Feature> features = getFeatures();
-
-		for(Feature feature : features){
-
-			if((feature.getName()).equals(name)){
-				return feature;
-			}
-		}
-
-		throw new IllegalArgumentException(name.getValue());
-	}
-
-	public List<Feature> getFeatures(){
-		return this.features;
-	}
-
-	private void setFeatures(List<Feature> features){
-		this.features = features;
-	}
+public class ExpressionTranslator extends AbstractTranslator {
 
 	static
-	public Expression translate(String string, List<Feature> features){
+	public Expression translate(String string, List<? extends Feature> features){
 		return translate(string, features, true);
 	}
 
 	static
-	public Expression translate(String string, List<Feature> features, boolean compact){
+	public Expression translate(String string, List<? extends Feature> features, boolean compact){
 		Expression expression;
 		
 		try {
@@ -101,23 +67,23 @@ public class ExpressionTranslator {
 	}
 
 	static
-	private String translateRelationalOperator(String operator){
+	private String translateRelationalOperator(Token operator){
 		
-		switch(operator){
-			case "==":
+		switch(operator.kind){
+			case EQUAL:
 				return "equal";
-			case "!=":
+			case NOT_EQUAL:
 				return "notEqual";
-			case "<":
+			case LESS_THAN:
 				return "lessThan";
-			case "<=":
+			case LESS_OR_EQUAL:
 				return "lessOrEqual";
-			case ">":
+			case GREATER_THAN:
 				return "greaterThan";
-			case ">=":
+			case GREATER_OR_EQUAL:
 				return "greaterOrEqual";
 			default:
-				throw new IllegalArgumentException(operator);
+				throw new IllegalArgumentException(operator.image);
 		}
 	}
 
@@ -279,7 +245,7 @@ private Expression translateExpressionInternal():
 }
 {
 	expression = Expression() <EOF>
-	
+
 	{
 		return expression;
 	}
@@ -347,7 +313,7 @@ Expression ComparisonExpression():
 	Expression right;
 }
 {
-	left = AdditiveExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = AdditiveExpression() { left = createApply(translateRelationalOperator(operator.image), left, right); })?
+	left = AdditiveExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = AdditiveExpression() { left = createApply(translateRelationalOperator(operator), left, right); })?
 
 	{
 		return left;
@@ -508,7 +474,7 @@ Expression ParenthesizedExpression():
 }
 {
 	<LPAREN> expression = Expression() <RPAREN>
-	
+
 	{
 		return expression;
 	}

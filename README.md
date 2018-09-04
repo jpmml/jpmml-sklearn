@@ -131,6 +131,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
     * `sklearn2pmml.preprocessing.PowerFunctionTransformer`
     * `sklearn2pmml.preprocessing.StringNormalizer`
     * `sklearn2pmml.preprocessing.h2o.H2OFrameCreator`
+    * `sklearn2pmml.ruleset.RuleSetClassifier`
   * [Sklearn-Pandas](https://github.com/paulgb/sklearn-pandas):
     * `sklearn_pandas.CategoricalImputer`
     * `sklearn_pandas.DataFrameMapper`

@@ -1,0 +1,341 @@
+/*
+ * Copyright (c) 2018 Villu Ruusmann
+ *
+ * This file is part of JPMML-SkLearn
+ *
+ * JPMML-SkLearn is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * JPMML-SkLearn is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
+ */
+options {
+	JAVA_TEMPLATE_TYPE = "modern";
+	JDK_VERSION = "1.5";
+	STATIC = false;
+}
+
+PARSER_BEGIN(PredicateTranslator)
+package org.jpmml.sklearn;
+
+import java.util.List;
+
+import org.dmg.pmml.CompoundPredicate;
+import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Predicate;
+import org.dmg.pmml.SimplePredicate;
+import org.jpmml.converter.Feature;
+
+public class PredicateTranslator extends AbstractTranslator {
+
+	static
+	public Predicate translate(String string, List<? extends Feature> features){
+		Predicate predicate;
+
+		try {
+			PredicateTranslator predicateTranslator = new PredicateTranslator(string);
+			predicateTranslator.setFeatures(features);
+
+			predicate = predicateTranslator.translatePredicateInternal();
+		} catch(ParseException pe){
+			throw new IllegalArgumentException(pe);
+		}
+
+		return predicate;
+	}
+
+	static
+	private SimplePredicate.Operator translateRelationalOperator(Token operator){
+		
+		switch(operator.kind){
+			case EQUAL:
+				return SimplePredicate.Operator.EQUAL;
+			case NOT_EQUAL:
+				return SimplePredicate.Operator.NOT_EQUAL;
+			case LESS_THAN:
+				return SimplePredicate.Operator.LESS_THAN;
+			case LESS_OR_EQUAL:
+				return SimplePredicate.Operator.LESS_OR_EQUAL;
+			case GREATER_THAN:
+				return SimplePredicate.Operator.GREATER_THAN;
+			case GREATER_OR_EQUAL:
+				return SimplePredicate.Operator.GREATER_OR_EQUAL;
+			default:
+				throw new IllegalArgumentException(operator.image);
+		}
+	}
+
+	static
+	private String translateValue(Token value){
+		String image = value.image;
+		
+		switch(value.kind){
+			case INT:
+				if(image.endsWith("l") || image.endsWith("L")){
+					image = image.substring(0, image.length() - 1);
+				}
+				break;
+			default:
+				break;
+		}
+		
+		return image;
+	}
+
+	static
+	private CompoundPredicate createCompoundPredicate(CompoundPredicate.BooleanOperator booleanOperator, Predicate... predicates){
+		CompoundPredicate compoundPredicate = new CompoundPredicate(booleanOperator)
+			.addPredicates(predicates);
+
+		return compoundPredicate;
+	}
+
+	static
+	private SimplePredicate createSimplePredicate(FieldName field, SimplePredicate.Operator operator){
+		SimplePredicate simplePredicate = new SimplePredicate(field, operator);
+
+		return simplePredicate;
+	}
+
+	static
+	private SimplePredicate createSimplePredicate(FieldName field, SimplePredicate.Operator operator, String value){
+		SimplePredicate simplePredicate = new SimplePredicate(field, operator)
+			.setValue(value);
+
+		return simplePredicate;
+	}
+}
+PARSER_END(PredicateTranslator)
+
+SPECIAL_TOKEN:
+{
+	" "
+	|
+	"\t"
+}
+
+TOKEN:
+{
+	< LPAREN: "(" >
+	|
+	< RPAREN: ")" >
+}
+
+TOKEN:
+{
+	< OR: "or" >
+	|
+	< AND: "and" >
+}
+
+TOKEN:
+{
+	< EQUAL: "==" >
+	|
+	< NOT_EQUAL: "!=" >
+	|
+	< LESS_THAN: "<" >
+	|
+	< LESS_OR_EQUAL: "<=" >
+	|
+	< GREATER_THAN: ">" >
+	|
+	< GREATER_OR_EQUAL: ">=" >
+}
+
+TOKEN:
+{
+	< LBRACKET: "[" >
+	|
+	< RBRACKET: "]" >
+}
+
+TOKEN:
+{
+	< INT:
+	"0"
+	|
+	<NONZERO_DIGIT> (<DIGIT>)* ( ["l", "L"] )?
+	>
+	|
+	< FLOAT:
+	(<DIGIT>)+ "." (<DIGIT>)* (<EXPONENT>)?
+	|
+	"." (<DIGIT>)+ (<EXPONENT>)?
+	|
+	(<DIGIT>)+ <EXPONENT>
+	>
+	|
+	< NAME: <LETTER> (<LETTER> | <DIGIT>)* >
+	|
+	< STRING:
+	"\"" (~["\""])* "\""
+	|
+	"\'" (~["\'"])* "\'"
+	>
+	|
+	< #DIGIT: ["0" - "9"] >
+	|
+	< #NONZERO_DIGIT: ["1" - "9"] >
+	|
+	< #LETTER: ["a" - "z", "A" - "Z", "_"]>
+	|
+	< #EXPONENT: ["e", "E"] (["+", "-"])? (<DIGIT>)+ >
+}
+
+private Predicate translatePredicateInternal():
+{
+	Predicate predicate;
+}
+{
+	predicate = Predicate() <EOF>
+
+	{
+		return predicate;
+	}
+}
+
+Predicate Predicate():
+{
+	Predicate predicate;
+}
+{
+	predicate = LogicalOrExpression()
+
+	{
+		return predicate;
+	}
+}
+
+Predicate LogicalOrExpression():
+{
+	Predicate left;
+	Predicate right;
+}
+{
+	left = LogicalAndExpression() ( <OR> right = LogicalAndExpression() { left = createCompoundPredicate(CompoundPredicate.BooleanOperator.OR, left, right); } )*
+
+	{
+		return left;
+	}
+}
+
+Predicate LogicalAndExpression():
+{
+	Predicate left;
+	Predicate right;
+}
+{
+	left = ComparisonExpression() ( <AND> right = ComparisonExpression() { left = createCompoundPredicate(CompoundPredicate.BooleanOperator.AND, left, right); } )*
+
+	{
+		return left;
+	}
+}
+
+Predicate ComparisonExpression():
+{
+	Object left;
+	Token operator;
+	Object right;
+}
+{
+	left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = PrimaryExpression() { left = createSimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
+
+	{
+		return (Predicate)left;
+	}
+}
+
+Object PrimaryExpression():
+{
+	Object result;
+}
+{
+	(
+		LOOKAHEAD(<NAME> <LBRACKET>)
+		result = ArrayIndexingExpression()
+		|
+		result = ParenthesizedExpression()
+		|
+		result = LiteralExpression()
+	)
+
+	{
+		return result;
+	}
+}
+
+FieldName ArrayIndexingExpression():
+{
+	Token variable;
+	Token column;
+}
+{
+	(
+		LOOKAHEAD(<NAME> <LBRACKET> <INT>)
+		variable = <NAME> <LBRACKET> column = <INT> <RBRACKET>
+		|
+		variable = <NAME> <LBRACKET> column = <STRING> <RBRACKET>
+	)
+
+	{
+		Feature feature;
+
+		switch(column.kind){
+			case PredicateTranslatorConstants.INT:
+				{
+					int index = Integer.parseInt(column.image);
+
+					feature = getFeature(index);
+				}
+				break;
+			case PredicateTranslatorConstants.STRING:
+				{
+					FieldName name = FieldName.create(column.image.substring(1, column.image.length() - 1));
+
+					feature = getFeature(name);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException();
+		}
+
+		return feature.getName();
+	}
+}
+
+Predicate ParenthesizedExpression():
+{
+	Predicate predicate;
+}
+{
+	<LPAREN> predicate = Predicate() <RPAREN>
+
+	{
+		return predicate;
+	}
+}
+
+String LiteralExpression():
+{
+	Token value;
+}
+{
+	(
+		value = <INT>
+		|
+		value = <FLOAT>
+	)
+
+	{
+		return translateValue(value);
+	}
+}

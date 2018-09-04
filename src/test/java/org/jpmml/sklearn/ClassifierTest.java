@@ -241,6 +241,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateRuleSetIris() throws Exception {
+		evaluate("RuleSet", "Iris");
+	}
+
+	@Test
 	public void evaluateSGDIris() throws Exception {
 		evaluate("SGD", "Iris");
 	}

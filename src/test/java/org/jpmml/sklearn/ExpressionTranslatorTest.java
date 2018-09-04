@@ -81,7 +81,7 @@ public class ExpressionTranslatorTest {
 	}
 
 	static
-	private List<Expression> checkApply(Apply apply, String function, Class<? extends Expression>... expressionClazzes){
+	private void checkApply(Apply apply, String function, Class<? extends Expression>... expressionClazzes){
 		assertEquals(function, apply.getFunction());
 
 		List<Expression> expressions = apply.getExpressions();
@@ -93,8 +93,6 @@ public class ExpressionTranslatorTest {
 
 			assertEquals(expressionClazz, expression.getClass());
 		}
-
-		return expressions;
 	}
 
 	private static final List<Feature> booleanFeatures = Arrays.asList(
