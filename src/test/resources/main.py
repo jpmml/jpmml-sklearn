@@ -506,12 +506,12 @@ if "Auto" in datasets:
 
 def build_auto_h2o(regressor, name):
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["cylinders", "model_year", "origin"]] +
-		[([column], CategoricalDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]]
+		[([column], CategoricalDomain()) for column in ["cylinders", "model_year", "origin"]] +
+		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("uploader", H2OFrameCreator()),
+		("uploader", H2OFrameCreator(column_types = ["enum", "enum", "enum", "numeric", "numeric", "numeric", "numeric"])),
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
