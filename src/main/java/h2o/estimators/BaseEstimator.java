@@ -109,7 +109,9 @@ public class BaseEstimator extends Estimator implements HasClasses {
 			throw new IllegalArgumentException(e);
 		}
 
-		return converter.encodeModel(schema);
+		Schema mojoModelSchema = converter.toMojoModelSchema(schema);
+
+		return converter.encodeModel(mojoModelSchema);
 	}
 
 	public String getEstimatorType(){

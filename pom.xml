@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-h2o</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 
 		<dependency>
