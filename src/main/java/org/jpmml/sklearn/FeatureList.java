@@ -16,35 +16,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.preprocessing.h2o;
+package org.jpmml.sklearn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.FeatureList;
-import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
 
-public class H2OFrameCreator extends MultiTransformer {
+public class FeatureList extends ArrayList<Feature> {
 
-	public H2OFrameCreator(String module, String name){
-		super(module, name);
-	}
+	private List<String> names = null;
 
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<String> columnNames = getColumnNames();
 
-		if(columnNames != null){
-			FeatureList namedFeatures = new FeatureList(features, columnNames);
+	public FeatureList(List<? extends Feature> features, List<String> names){
+		super(features);
 
-			return namedFeatures;
+		if(names == null || features.size() != names.size()){
+			throw new IllegalArgumentException();
 		}
 
-		return features;
+		setNames(names);
 	}
 
-	public List<String> getColumnNames(){
-		return (List)get("column_names");
+	public Feature getFeature(String name){
+		List<String> names = getNames();
+
+		int index = names.indexOf(name);
+		if(index < 0){
+			throw new IllegalArgumentException(name);
+		}
+
+		return get(index);
+	}
+
+	public List<String> getNames(){
+		return this.names;
+	}
+
+	public void setNames(List<String> names){
+		this.names = names;
 	}
 }

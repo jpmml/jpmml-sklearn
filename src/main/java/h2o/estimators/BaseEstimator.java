@@ -19,16 +19,22 @@
 package h2o.estimators;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import hex.genmodel.MojoModel;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.h2o.Converter;
 import org.jpmml.h2o.ConverterFactory;
+import org.jpmml.h2o.H2OEncoder;
 import org.jpmml.h2o.MojoModelUtil;
+import org.jpmml.sklearn.FeatureList;
 import sklearn.Estimator;
 import sklearn.HasClasses;
 
@@ -109,7 +115,39 @@ public class BaseEstimator extends Estimator implements HasClasses {
 			throw new IllegalArgumentException(e);
 		}
 
-		Schema mojoModelSchema = converter.toMojoModelSchema(schema);
+		Label label = schema.getLabel();
+		List<? extends Feature> features = schema.getFeatures();
+
+		H2OEncoder encoder = new H2OEncoder();
+
+		Schema h2oSchema = converter.encodeSchema(encoder);
+
+		Label h2oLabel = h2oSchema.getLabel();
+		List<? extends Feature> h2oFeatures = h2oSchema.getFeatures();
+
+		List<Feature> sortedFeatures = new ArrayList<>();
+
+		for(Feature h2oFeature : h2oFeatures){
+			FieldName name = h2oFeature.getName();
+
+			Feature feature;
+
+			if(features instanceof FeatureList){
+				FeatureList namedFeatures = (FeatureList)features;
+
+				feature = namedFeatures.getFeature(name.getValue());
+			} else
+
+			{
+				int index = Integer.parseInt((name.getValue()).substring(1)) - 1;
+
+				feature = features.get(index);
+			}
+
+			sortedFeatures.add(feature);
+		}
+
+		Schema mojoModelSchema = converter.toMojoModelSchema(new Schema(label, sortedFeatures));
 
 		return converter.encodeModel(mojoModelSchema);
 	}

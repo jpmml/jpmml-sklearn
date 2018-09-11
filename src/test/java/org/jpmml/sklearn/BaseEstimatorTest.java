@@ -36,6 +36,18 @@ public class BaseEstimatorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLogisticRegressionAudit() throws Exception {
+		FieldName[] targetFields = {FieldName.create("Adjusted"), FieldName.create("h2o(Adjusted)")};
+
+		evaluate("H2OLogisticRegression", "Audit", excludeFields(targetFields));
+	}
+
+	@Test
+	public void evaluateLinearRegressionAuto() throws Exception {
+		evaluate("H2OLinearRegression", "Auto");
+	}
+
+	@Test
 	public void evaluateRandomForestAudit() throws Exception {
 		FieldName[] targetFields = {FieldName.create("Adjusted"), FieldName.create("h2o(Adjusted)")};
 

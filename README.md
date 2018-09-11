@@ -109,6 +109,7 @@ Java library and command-line application for converting [Scikit-Learn](http://s
 * Supported third-party Estimator and Transformer types:
   * [H2O.ai](https://www.h2o.ai/):
     * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
+    * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
     * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
   * [LightGBM](https://github.com/Microsoft/LightGBM):
     * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
