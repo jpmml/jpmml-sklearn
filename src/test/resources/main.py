@@ -513,7 +513,7 @@ def build_auto_h2o(regressor, name):
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("uploader", H2OFrameCreator(column_types = ["enum", "enum", "enum", "numeric", "numeric", "numeric", "numeric"])),
+		("uploader", H2OFrameCreator(column_names = ["cylinders", "model_year", "origin", "displacement", "horsepower", "weight", "acceleration"], column_types = ["enum", "enum", "enum", "numeric", "numeric", "numeric", "numeric"])),
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
