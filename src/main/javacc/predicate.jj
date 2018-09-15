@@ -25,13 +25,17 @@ options {
 PARSER_BEGIN(PredicateTranslator)
 package org.jpmml.sklearn;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.Array;
 import org.dmg.pmml.CompoundPredicate;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
+import org.dmg.pmml.SimpleSetPredicate;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
 
 public class PredicateTranslator extends AbstractTranslator {
 
@@ -111,6 +115,13 @@ public class PredicateTranslator extends AbstractTranslator {
 
 		return simplePredicate;
 	}
+
+	static
+	private SimpleSetPredicate createSimpleSetPredicate(FieldName field, SimpleSetPredicate.BooleanOperator booleanOperator, Array array){
+		SimpleSetPredicate simpleSetPredicate = new SimpleSetPredicate(field, booleanOperator, array);
+
+		return simpleSetPredicate;
+	}
 }
 PARSER_END(PredicateTranslator)
 
@@ -148,6 +159,10 @@ TOKEN:
 	< GREATER_THAN: ">" >
 	|
 	< GREATER_OR_EQUAL: ">=" >
+	|
+	< IN: "in" >
+	|
+	< NOT: "not" >
 }
 
 TOKEN:
@@ -155,6 +170,11 @@ TOKEN:
 	< LBRACKET: "[" >
 	|
 	< RBRACKET: "]" >
+}
+
+TOKEN:
+{
+	< COMMA: "," >
 }
 
 TOKEN:
@@ -243,11 +263,19 @@ Predicate LogicalAndExpression():
 Predicate ComparisonExpression():
 {
 	Object left;
-	Token operator;
+	Token operator = null;
 	Object right;
 }
 {
-	left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = PrimaryExpression() { left = createSimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
+	(
+		LOOKAHEAD(PrimaryExpression() <IN>)
+		left = PrimaryExpression() <IN> right = ListMakerExpression() { left = createSimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_IN, (Array)right); }
+		|
+		LOOKAHEAD(PrimaryExpression() <NOT> <IN>)
+		left = PrimaryExpression() <NOT> <IN> right = ListMakerExpression() { left = createSimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_NOT_IN, (Array)right); }
+		|
+		left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = PrimaryExpression() { left = createSimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
+	)
 
 	{
 		return (Predicate)left;
@@ -260,7 +288,6 @@ Object PrimaryExpression():
 }
 {
 	(
-		LOOKAHEAD(<NAME> <LBRACKET>)
 		result = ArrayIndexingExpression()
 		|
 		result = ParenthesizedExpression()
@@ -337,5 +364,19 @@ String LiteralExpression():
 
 	{
 		return translateValue(value);
+	}
+}
+
+Array ListMakerExpression():
+{
+	Object predicate;
+	
+	List<String> values = new ArrayList<String>();
+}
+{
+	<LBRACKET> predicate = LiteralExpression() { values.add((String)predicate); } ( <COMMA> predicate = LiteralExpression() { values.add((String)predicate); } )* <RBRACKET>
+	
+	{
+		return PMMLUtil.createStringArray(values);
 	}
 }

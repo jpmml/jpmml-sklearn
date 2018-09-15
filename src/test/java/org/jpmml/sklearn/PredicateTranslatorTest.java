@@ -26,6 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
+import org.dmg.pmml.SimpleSetPredicate;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.junit.Test;
@@ -59,6 +60,14 @@ public class PredicateTranslatorTest {
 		} catch(ClassCastException cce){
 			// Ignored
 		}
+
+		SimpleSetPredicate simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in [1, 2, 3]", doubleFeatures);
+
+		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, "1 2 3");
+
+		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X['a'] not in [0.0]", doubleFeatures);
+
+		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_NOT_IN, "0.0");
 	}
 
 	static
@@ -81,6 +90,13 @@ public class PredicateTranslatorTest {
 		assertEquals(field, simplePredicate.getField());
 		assertEquals(operator, simplePredicate.getOperator());
 		assertEquals(value, simplePredicate.getValue());
+	}
+
+	static
+	private void checkSimpleSetPredicate(SimpleSetPredicate simpleSetPredicate, FieldName field, SimpleSetPredicate.BooleanOperator booleanOperator, String value){
+		assertEquals(field, simpleSetPredicate.getField());
+		assertEquals(booleanOperator, simpleSetPredicate.getBooleanOperator());
+		assertEquals(value, (simpleSetPredicate.getArray()).getValue());
 	}
 
 	private static final List<Feature> doubleFeatures = Arrays.asList(
