@@ -162,6 +162,10 @@ TOKEN:
 	|
 	< IN: "in" >
 	|
+	< IS: "is" >
+	|
+	< NONE: "None" >
+	|
 	< NOT: "not" >
 }
 
@@ -280,6 +284,12 @@ Predicate ComparisonExpression():
 		|
 		LOOKAHEAD(PrimaryExpression() <NOT> <IN>)
 		left = PrimaryExpression() <NOT> <IN> right = ListMakerExpression() { left = createSimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_NOT_IN, (Array)right); }
+		|
+		LOOKAHEAD(PrimaryExpression() <IS> <NONE>)
+		left = PrimaryExpression() <IS> <NONE> { left = createSimplePredicate((FieldName)left, SimplePredicate.Operator.IS_MISSING); }
+		|
+		LOOKAHEAD(PrimaryExpression() <IS> <NOT> <NONE>)
+		left = PrimaryExpression() <IS> <NOT> <NONE> { left = createSimplePredicate((FieldName)left, SimplePredicate.Operator.IS_NOT_MISSING); }
 		|
 		left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = UnaryExpression() { left = createSimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
 	)

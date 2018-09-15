@@ -61,6 +61,14 @@ public class PredicateTranslatorTest {
 			// Ignored
 		}
 
+		simplePredicate = (SimplePredicate)PredicateTranslator.translate("X[0] is None", doubleFeatures);
+
+		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.IS_MISSING, null);
+
+		simplePredicate = (SimplePredicate)PredicateTranslator.translate("X['a'] is not None", doubleFeatures);
+
+		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.IS_NOT_MISSING, null);
+
 		SimpleSetPredicate simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in [1, 2, 3]", doubleFeatures);
 
 		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, "1 2 3");
