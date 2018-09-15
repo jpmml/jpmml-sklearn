@@ -54,7 +54,7 @@ public class ExpressionTranslator extends AbstractTranslator {
 
 			expression = expressionTranslator.translateExpressionInternal();
 		} catch(ParseException pe){
-			throw new IllegalArgumentException(string, pe);
+			throw new IllegalArgumentException("Python expression \'" + string + "\' is either invalid or not supported", pe);
 		}
 
 		if(compact){
