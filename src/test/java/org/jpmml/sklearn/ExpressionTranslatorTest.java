@@ -64,13 +64,36 @@ public class ExpressionTranslatorTest {
 
 	@Test
 	public void translateArithmeticExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("(X[0] + X[1] - 1) / X[2] * -0.5", doubleFeatures);
+		Apply apply = (Apply)ExpressionTranslator.translate("(X[0] + X[1] - 1) / X[2] * -2", doubleFeatures);
 
 		checkApply(apply, "*", Apply.class, Constant.class);
 
-		apply = (Apply)ExpressionTranslator.translate("(X[\"a\"] + X[\"b\"] - 1) / X['c'] * -0.5", doubleFeatures);
+		apply = (Apply)ExpressionTranslator.translate("(X[\"a\"] + X[\"b\"] - 1.0) / X['c'] * -2.0", doubleFeatures);
 
 		checkApply(apply, "*", Apply.class, Constant.class);
+	}
+
+	@Test
+	public void translateUnaryExpression(){
+		Constant constant = (Constant)ExpressionTranslator.translate("-1", doubleFeatures);
+
+		checkConstant(constant, "-1");
+
+		constant = (Constant)ExpressionTranslator.translate("+1", doubleFeatures);
+
+		checkConstant(constant, "1");
+
+		constant = (Constant)ExpressionTranslator.translate("-+1", doubleFeatures);
+
+		checkConstant(constant, "-1");
+
+		constant = (Constant)ExpressionTranslator.translate("--1", doubleFeatures);
+
+		checkConstant(constant, "1");
+
+		constant = (Constant)ExpressionTranslator.translate("---1", doubleFeatures);
+
+		checkConstant(constant, "-1");
 	}
 
 	@Test
@@ -78,6 +101,11 @@ public class ExpressionTranslatorTest {
 		Apply apply = (Apply)ExpressionTranslator.translate("X[\"a\"] if pandas.notnull(X[\"a\"]) else X[\"b\"] + X[\"c\"]", doubleFeatures);
 
 		checkApply(apply, "if", Apply.class, FieldRef.class, Apply.class);
+	}
+
+	static
+	private void checkConstant(Constant constant, String value){
+		assertEquals(value, constant.getValue());
 	}
 
 	static

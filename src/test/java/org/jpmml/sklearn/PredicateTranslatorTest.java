@@ -65,9 +65,9 @@ public class PredicateTranslatorTest {
 
 		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, "1 2 3");
 
-		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X['a'] not in [0.0]", doubleFeatures);
+		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X['a'] not in [-1.5, -1, -0.5, 0]", doubleFeatures);
 
-		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_NOT_IN, "0.0");
+		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_NOT_IN, "-1.5 -1 -0.5 0");
 	}
 
 	static

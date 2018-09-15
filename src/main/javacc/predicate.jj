@@ -167,6 +167,13 @@ TOKEN:
 
 TOKEN:
 {
+	< PLUS: "+" >
+	|
+	< MINUS: "-" >
+}
+
+TOKEN:
+{
 	< LBRACKET: "[" >
 	|
 	< RBRACKET: "]" >
@@ -274,11 +281,44 @@ Predicate ComparisonExpression():
 		LOOKAHEAD(PrimaryExpression() <NOT> <IN>)
 		left = PrimaryExpression() <NOT> <IN> right = ListMakerExpression() { left = createSimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_NOT_IN, (Array)right); }
 		|
-		left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = PrimaryExpression() { left = createSimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
+		left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = UnaryExpression() { left = createSimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
 	)
 
 	{
 		return (Predicate)left;
+	}
+}
+
+Object UnaryExpression():
+{
+	Token sign = null;
+	Object result;
+}
+{
+	(
+		sign = <PLUS> result = UnaryExpression()
+		|
+		sign = <MINUS> result = UnaryExpression()
+		|
+		result = PrimaryExpression()
+	)
+
+	{
+		if(sign != null && sign.kind == MINUS){
+			String value = (String)result;
+
+			if(value.startsWith("-")){
+				value = value.substring(1);
+			} else
+
+			{
+				value = ("-" + value);
+			}
+
+			result = value;
+		}
+
+		return result;
 	}
 }
 
@@ -374,7 +414,7 @@ Array ListMakerExpression():
 	List<String> values = new ArrayList<String>();
 }
 {
-	<LBRACKET> predicate = LiteralExpression() { values.add((String)predicate); } ( <COMMA> predicate = LiteralExpression() { values.add((String)predicate); } )* <RBRACKET>
+	<LBRACKET> predicate = UnaryExpression() { values.add((String)predicate); } ( <COMMA> predicate = UnaryExpression() { values.add((String)predicate); } )* <RBRACKET>
 	
 	{
 		return PMMLUtil.createStringArray(values);

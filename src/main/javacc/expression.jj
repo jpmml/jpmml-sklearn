@@ -365,7 +365,13 @@ Expression UnaryExpression():
 	Expression expression;
 }
 {
-	(sign = <PLUS> | sign = <MINUS>)? expression = PrimaryExpression()
+	(
+		sign = <PLUS> expression = UnaryExpression()
+		|
+		sign = <MINUS> expression = UnaryExpression()
+		|
+		expression = PrimaryExpression()
+	)
 
 	{
 		if(sign != null && sign.kind == MINUS){
@@ -373,7 +379,16 @@ Expression UnaryExpression():
 			if(expression instanceof Constant){
 				Constant constant = (Constant)expression;
 
-				constant.setValue("-" + constant.getValue());
+				String value = constant.getValue();
+				if(value.startsWith("-")){
+					value = value.substring(1);
+				} else
+					
+				{
+					value = ("-" + value);
+				}
+				
+				constant.setValue(value);
 			} else
 
 			{
