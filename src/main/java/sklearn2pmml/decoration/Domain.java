@@ -50,6 +50,7 @@ public class Domain extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		MissingValueTreatmentMethod missingValueTreatment = DomainUtil.parseMissingValueTreatment(getMissingValueTreatment());
 		Object missingValueReplacement = getMissingValueReplacement();
+		List<?> missingValues = getMissingValues();
 
 		if(missingValueReplacement != null){
 
@@ -71,10 +72,17 @@ public class Domain extends Transformer {
 		for(Feature feature : features){
 			FieldName name = feature.getName();
 
-			if(missingValueTreatment != null){
+			if(missingValueTreatment != null || missingValues != null){
 				MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
 					.setMissingValueTreatment(missingValueTreatment)
 					.setMissingValueReplacement(missingValueReplacement != null ? ValueUtil.formatValue(missingValueReplacement) : null);
+
+				if(missingValues != null){
+
+					for(Object missingValue : missingValues){
+						missingValueDecorator.addValues(ValueUtil.formatValue(missingValue));
+					}
+				}
 
 				encoder.addDecorator(name, missingValueDecorator);
 			} // End if
@@ -106,6 +114,23 @@ public class Domain extends Transformer {
 
 	public Object getMissingValueReplacement(){
 		return get("missing_value_replacement");
+	}
+
+	public List<Object> getMissingValues(){
+		Object missingValues = get("missing_values");
+
+		if(missingValues != null){
+
+			// SkLearn2PMML 0.38.0
+			if(!(missingValues instanceof List)){
+				return Collections.singletonList(missingValues);
+			}
+
+			// SkLearn2PMML 0.38.1+
+			return (List)missingValues;
+		}
+
+		return null;
 	}
 
 	public String getInvalidValueTreatment(){
