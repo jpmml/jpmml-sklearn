@@ -111,10 +111,17 @@ public class ExpressionTranslator extends AbstractTranslator {
 		String image = value.image;
 
 		switch(value.kind){
+			case FALSE:
+			case TRUE:
+				image = image.toLowerCase();
+				break;
 			case INT:
 				if(image.endsWith("l") || image.endsWith("L")){
 					image = image.substring(0, image.length() - 1);
 				}
+				break;
+			case STRING:
+				image = image.substring(1, image.length() - 1);
 				break;
 			default:
 				break;
@@ -201,6 +208,13 @@ TOKEN:
 	< COMMA: "," >
 	|
 	< DOT: "." >
+}
+
+TOKEN:
+{
+	< FALSE: "False" >
+	|
+	< TRUE: "True" >
 }
 
 TOKEN:
@@ -513,9 +527,15 @@ Constant LiteralExpression():
 }
 {
 	(
+		value = <FALSE> { dataType = DataType.BOOLEAN; }
+		|
+		value = <TRUE> { dataType = DataType.BOOLEAN; }
+		|
 		value = <INT> { dataType = DataType.INTEGER; }
 		|
 		value = <FLOAT> { dataType = DataType.DOUBLE; }
+		|
+		value = <STRING> { dataType = DataType.STRING; }
 	)
 
 	{

@@ -18,23 +18,17 @@
  */
 package org.jpmml.sklearn;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
-import org.jpmml.converter.CategoricalFeature;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.Feature;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ExpressionTranslatorTest {
+public class ExpressionTranslatorTest extends TranslatorTest {
 
 	@Test
 	public void translateLogicalExpression(){
@@ -49,7 +43,11 @@ public class ExpressionTranslatorTest {
 
 	@Test
 	public void translateComparisonExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("X[\"a\"] > X[\"b\"]", doubleFeatures);
+		Apply apply = (Apply)ExpressionTranslator.translate("X['a'] == True and X['b'] == False", booleanFeatures);
+
+		checkApply(apply, "and", Apply.class, Apply.class);
+
+		apply = (Apply)ExpressionTranslator.translate("X[\"a\"] > X[\"b\"]", doubleFeatures);
 
 		checkApply(apply, "greaterThan", FieldRef.class, FieldRef.class);
 
@@ -122,16 +120,4 @@ public class ExpressionTranslatorTest {
 			assertEquals(expressionClazz, expression.getClass());
 		}
 	}
-
-	private static final List<Feature> booleanFeatures = Arrays.asList(
-		new CategoricalFeature(null, FieldName.create("a"), DataType.BOOLEAN, Arrays.asList("false", "true")),
-		new CategoricalFeature(null, FieldName.create("b"), DataType.BOOLEAN, Arrays.asList("false", "true")),
-		new CategoricalFeature(null, FieldName.create("c"), DataType.BOOLEAN, Arrays.asList("false", "true"))
-	);
-
-	private static final List<Feature> doubleFeatures = Arrays.asList(
-		new ContinuousFeature(null, FieldName.create("a"), DataType.DOUBLE),
-		new ContinuousFeature(null, FieldName.create("b"), DataType.DOUBLE),
-		new ContinuousFeature(null, FieldName.create("c"), DataType.DOUBLE)
-	);
 }

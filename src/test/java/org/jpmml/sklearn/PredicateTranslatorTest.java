@@ -18,23 +18,19 @@
  */
 package org.jpmml.sklearn;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.CompoundPredicate;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.SimpleSetPredicate;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.Feature;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class PredicateTranslatorTest {
+public class PredicateTranslatorTest extends TranslatorTest {
 
 	@Test
 	public void translateLogicalPredicate(){
@@ -69,9 +65,17 @@ public class PredicateTranslatorTest {
 
 		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.IS_NOT_MISSING, null);
 
+		simplePredicate = (SimplePredicate)PredicateTranslator.translate("X[0] == \"one\"", stringFeatures);
+
+		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.EQUAL, "one");
+
 		SimpleSetPredicate simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in [1, 2, 3]", doubleFeatures);
 
 		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, "1 2 3");
+
+		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in ['one', 'two', 'three']", stringFeatures);
+
+		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, "one two three");
 
 		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X['a'] not in [-1.5, -1, -0.5, 0]", doubleFeatures);
 
@@ -106,10 +110,4 @@ public class PredicateTranslatorTest {
 		assertEquals(booleanOperator, simpleSetPredicate.getBooleanOperator());
 		assertEquals(value, (simpleSetPredicate.getArray()).getValue());
 	}
-
-	private static final List<Feature> doubleFeatures = Arrays.asList(
-		new ContinuousFeature(null, FieldName.create("a"), DataType.DOUBLE),
-		new ContinuousFeature(null, FieldName.create("b"), DataType.DOUBLE),
-		new ContinuousFeature(null, FieldName.create("c"), DataType.DOUBLE)
-	);
 }

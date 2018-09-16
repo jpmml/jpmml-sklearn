@@ -86,6 +86,9 @@ public class PredicateTranslator extends AbstractTranslator {
 					image = image.substring(0, image.length() - 1);
 				}
 				break;
+			case STRING:
+				image = image.substring(1, image.length() - 1);
+				break;
 			default:
 				break;
 		}
@@ -164,8 +167,6 @@ TOKEN:
 	|
 	< IS: "is" >
 	|
-	< NONE: "None" >
-	|
 	< NOT: "not" >
 }
 
@@ -190,26 +191,35 @@ TOKEN:
 
 TOKEN:
 {
-	< INT:
-	"0"
+	< FALSE: "False" >
 	|
-	<NONZERO_DIGIT> (<DIGIT>)* ( ["l", "L"] )?
+	< NONE: "None" >
+	|
+	< TRUE: "True" >
+}
+
+TOKEN:
+{
+	< INT:
+		"0"
+		|
+		<NONZERO_DIGIT> (<DIGIT>)* ( ["l", "L"] )?
 	>
 	|
 	< FLOAT:
-	(<DIGIT>)+ "." (<DIGIT>)* (<EXPONENT>)?
-	|
-	"." (<DIGIT>)+ (<EXPONENT>)?
-	|
-	(<DIGIT>)+ <EXPONENT>
+		(<DIGIT>)+ "." (<DIGIT>)* (<EXPONENT>)?
+		|
+		"." (<DIGIT>)+ (<EXPONENT>)?
+		|
+		(<DIGIT>)+ <EXPONENT>
 	>
 	|
 	< NAME: <LETTER> (<LETTER> | <DIGIT>)* >
 	|
 	< STRING:
-	"\"" (~["\""])* "\""
-	|
-	"\'" (~["\'"])* "\'"
+		"\"" (~["\""])* "\""
+		|
+		"\'" (~["\'"])* "\'"
 	>
 	|
 	< #DIGIT: ["0" - "9"] >
@@ -407,9 +417,15 @@ String LiteralExpression():
 }
 {
 	(
+		value = <FALSE>
+		|
+		value = <TRUE>
+		|
 		value = <INT>
 		|
 		value = <FLOAT>
+		|
+		value = <STRING>
 	)
 
 	{
