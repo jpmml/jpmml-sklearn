@@ -21,9 +21,11 @@ package sklearn2pmml.pipeline;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import h2o.estimators.BaseEstimator;
 import numpy.core.NDArray;
@@ -40,11 +42,17 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ResultFeature;
+import org.dmg.pmml.True;
 import org.dmg.pmml.Value;
 import org.dmg.pmml.VerificationField;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segment;
+import org.dmg.pmml.mining.Segmentation;
+import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
@@ -55,6 +63,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.visitors.AbstractExtender;
+import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -210,7 +219,19 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Model model = estimator.encodeModel(schema);
 
 		if(predictTransformer != null){
-			Output output = ModelUtil.ensureOutput(model);
+			Output output;
+
+			if(model instanceof MiningModel){
+				MiningModel miningModel = (MiningModel)model;
+
+				Model finalModel = getFinalModel(miningModel);
+
+				output = ModelUtil.ensureOutput(finalModel);
+			} else
+
+			{
+				output = ModelUtil.ensureOutput(model);
+			}
 
 			FieldName name = FieldName.create("predict(" + (label.getName()).getValue() + ")");
 
@@ -411,15 +432,65 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		List<Feature> features = new ArrayList<>();
 
+		Set<FieldName> names = new HashSet<>();
+
 		for(OutputField outputField : outputFields){
-			DataField dataField = encoder.createDataField(outputField.getName(), outputField.getOpType(), outputField.getDataType());
+			FieldName name = outputField.getName();
+
+			DataField dataField = encoder.createDataField(name, outputField.getOpType(), outputField.getDataType());
 
 			features.add(new WildcardFeature(encoder, dataField));
+
+			names.add(name);
 		}
 
 		transformer.encodeFeatures(features, encoder);
 
-		Output output = ModelUtil.ensureOutput(model);
+		class OutputFinder extends AbstractVisitor {
+
+			private Output output = null;
+
+
+			@Override
+			public VisitorAction visit(Output output){
+
+				if(output.hasOutputFields()){
+					List<OutputField> outputFields = output.getOutputFields();
+
+					Set<FieldName> definedNames = new HashSet<>();
+
+					for(OutputField outputField : outputFields){
+						FieldName name = outputField.getName();
+
+						definedNames.add(name);
+					}
+
+					if(definedNames.containsAll(names)){
+						setOutput(output);
+
+						return VisitorAction.TERMINATE;
+					}
+				}
+
+				return super.visit(output);
+			}
+
+			public Output getOutput(){
+				return this.output;
+			}
+
+			private void setOutput(Output output){
+				this.output = output;
+			}
+		}
+
+		OutputFinder outputFinder = new OutputFinder();
+		outputFinder.applyTo(model);
+
+		Output output = outputFinder.getOutput();
+		if(output == null){
+			throw new IllegalArgumentException();
+		}
 
 		Map<FieldName, DerivedField> derivedFields = encoder.getDerivedFields();
 
@@ -544,6 +615,42 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		put("verification", verification);
 
 		return this;
+	}
+
+	static
+	private Model getFinalModel(MiningModel miningModel){
+		Segmentation segmentation = miningModel.getSegmentation();
+
+		MultipleModelMethod multipleModelMethod = segmentation.getMultipleModelMethod();
+		switch(multipleModelMethod){
+			case SELECT_FIRST:
+			case SELECT_ALL:
+				throw new IllegalArgumentException();
+			case MODEL_CHAIN:
+				{
+					List<Segment> segments = segmentation.getSegments();
+
+					Segment lastSegment = segments.get(segments.size() - 1);
+
+					Predicate predicate = lastSegment.getPredicate();
+					if(!(predicate instanceof True)){
+						throw new IllegalArgumentException();
+					}
+
+					Model model = lastSegment.getModel();
+					if(model instanceof MiningModel){
+						MiningModel finalMiningModel = (MiningModel)model;
+
+						return getFinalModel(finalMiningModel);
+					}
+
+					return model;
+				}
+			default:
+				break;
+		}
+
+		return miningModel;
 	}
 
 	static

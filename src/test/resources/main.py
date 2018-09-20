@@ -266,7 +266,7 @@ if "Audit" in datasets:
 
 audit_na_X, audit_na_y = load_audit("AuditNA.csv")
 
-def build_audit_na(classifier, name, with_proba = True, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
+def build_audit_na(classifier, name, with_proba = True, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
 	employment_mapping = {
 		"CONSULTANT" : "PRIVATE",
 		"PSFEDERAL" : "PUBLIC",
@@ -290,7 +290,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_proba_transforme
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("classifier", classifier)
-	], predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
+	], predict_transformer = predict_transformer, predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name + ".pkl")
@@ -307,6 +307,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_proba_transforme
 if "Audit" in datasets:
 	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
+	build_audit_na(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 11, random_state = 13), "XGBAuditNA", predict_transformer = Alias(ExpressionTransformer("X[0]"), name = "eval(Adjusted)", prefit = True))
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
