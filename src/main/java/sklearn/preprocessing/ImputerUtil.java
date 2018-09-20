@@ -70,7 +70,7 @@ public class ImputerUtil {
 
 			expression = PMMLUtil.createApply("if", expression, PMMLUtil.createConstant(replacementValue, feature.getDataType()), feature.ref());
 
-			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("imputer", feature), expression);
+			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("imputer", feature), field.getOpType(), field.getDataType(), expression);
 
 			DataType dataType = derivedField.getDataType();
 			switch(dataType){
