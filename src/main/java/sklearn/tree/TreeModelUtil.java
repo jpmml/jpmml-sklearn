@@ -164,8 +164,9 @@ public class TreeModelUtil {
 			@Override
 			public TreeModel apply(T estimator){
 				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), segmentSchema);
-
-				return TreeModelUtil.encodeTreeModel(estimator, predicateManager, miningFunction, treeModelSchema);
+				TreeModel model = TreeModelUtil.encodeTreeModel(estimator, predicateManager, miningFunction, treeModelSchema);
+				estimator.getTree().freeResources();
+				return model;
 			}
 		};
 
