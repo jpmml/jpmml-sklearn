@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
+import joblib.NDArrayWrapper;
 import org.jpmml.sklearn.CClassDict;
 
 public class Tree extends CClassDict {
@@ -57,6 +58,14 @@ public class Tree extends CClassDict {
 
 	public int[] getNodeSamples(){
 		return Ints.toArray(getNodeAttribute("n_node_samples"));
+	}
+
+	public void freeResources() {
+		for (Object value: values()) {
+			if (value instanceof NDArrayWrapper) {
+				((NDArrayWrapper)value).freeContent();
+			}
+		}
 	}
 
 	private List<? extends Number> getNodeAttribute(String key){
