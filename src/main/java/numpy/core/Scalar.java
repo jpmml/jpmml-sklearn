@@ -28,8 +28,9 @@ import com.google.common.collect.Iterables;
 import numpy.DType;
 import org.jpmml.sklearn.CClassDict;
 import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.HasContent;
 
-public class Scalar extends CClassDict implements HasArray {
+public class Scalar extends CClassDict implements HasArray, HasContent<List<?>> {
 
 	private List<?> content = null;
 
@@ -63,6 +64,7 @@ public class Scalar extends CClassDict implements HasArray {
 		return Iterables.getOnlyElement(content);
 	}
 
+	@Override
 	public List<?> getContent(){
 
 		if(this.content == null){

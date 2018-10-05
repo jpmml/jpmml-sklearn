@@ -28,8 +28,9 @@ import com.google.common.base.Charsets;
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.sklearn.CClassDict;
 import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.HasContent;
 
-public class NDArray extends CClassDict implements HasArray {
+public class NDArray extends CClassDict implements HasArray, HasContent<Object> {
 
 	private Object content = null;
 
@@ -97,6 +98,7 @@ public class NDArray extends CClassDict implements HasArray {
 		return NDArrayUtil.getShape(this);
 	}
 
+	@Override
 	public Object getContent(){
 
 		if(this.content == null){

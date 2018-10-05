@@ -25,10 +25,11 @@ import java.util.List;
 import numpy.core.NDArray;
 import numpy.core.NDArrayUtil;
 import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.HasContent;
 import org.jpmml.sklearn.PyClassDict;
 
 abstract
-public class NDArrayWrapper extends PyClassDict implements HasArray {
+public class NDArrayWrapper extends PyClassDict implements HasArray, HasContent<NDArray> {
 
 	private NDArray content = null;
 
@@ -58,6 +59,7 @@ public class NDArrayWrapper extends PyClassDict implements HasArray {
 		return (String)get("filename");
 	}
 
+	@Override
 	public NDArray getContent(){
 
 		if(this.content == null){
