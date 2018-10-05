@@ -155,10 +155,9 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, final PredicateManager predicateManager, final ScoreDistributionManager scoreDistributionManager, final MiningFunction miningFunction, final Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, MiningFunction miningFunction, Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
-		final
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		Function<T, TreeModel> function = new Function<T, TreeModel>(){
@@ -309,7 +308,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public Schema toTreeModelSchema(final DataType dataType, Schema schema){
+	public Schema toTreeModelSchema(DataType dataType, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
