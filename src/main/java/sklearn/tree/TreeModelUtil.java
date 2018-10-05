@@ -149,12 +149,13 @@ public class TreeModelUtil {
 	static
 	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, MiningFunction miningFunction, Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
+		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModelSegmentation(estimator, predicateManager, miningFunction, schema);
+		return encodeTreeModelSegmentation(estimator, predicateManager, scoreDistributionManager, miningFunction, schema);
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, final PredicateManager predicateManager, final MiningFunction miningFunction, final Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, final PredicateManager predicateManager, final ScoreDistributionManager scoreDistributionManager, final MiningFunction miningFunction, final Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
 		final
@@ -166,7 +167,7 @@ public class TreeModelUtil {
 			public TreeModel apply(T estimator){
 				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), segmentSchema);
 
-				return TreeModelUtil.encodeTreeModel(estimator, predicateManager, miningFunction, treeModelSchema);
+				return TreeModelUtil.encodeTreeModel(estimator, predicateManager, scoreDistributionManager, miningFunction, treeModelSchema);
 			}
 		};
 
@@ -178,12 +179,13 @@ public class TreeModelUtil {
 	static
 	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
+		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModel(estimator, predicateManager, miningFunction, schema);
+		return encodeTreeModel(estimator, predicateManager, scoreDistributionManager, miningFunction, schema);
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, PredicateManager predicateManager, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, MiningFunction miningFunction, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -195,7 +197,7 @@ public class TreeModelUtil {
 		Node root = new Node()
 			.setPredicate(new True());
 
-		encodeNode(root, predicateManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+		encodeNode(root, predicateManager, scoreDistributionManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
@@ -206,7 +208,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	private void encodeNode(Node node, PredicateManager predicateManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
+	private void encodeNode(Node node, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
 		node.setId(String.valueOf(index));
 
 		int featureIndex = features[index];
@@ -250,12 +252,12 @@ public class TreeModelUtil {
 			Node leftChild = new Node()
 				.setPredicate(leftPredicate);
 
-			encodeNode(leftChild, predicateManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			encodeNode(leftChild, predicateManager, scoreDistributionManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			Node rightChild = new Node()
 				.setPredicate(rightPredicate);
 
-			encodeNode(rightChild, predicateManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			encodeNode(rightChild, predicateManager, scoreDistributionManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			node.addNodes(leftChild, rightChild);
 		} else
@@ -265,37 +267,33 @@ public class TreeModelUtil {
 			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
 				CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-				double[] scoreRecordCounts = getRow(values, leftChildren.length, categoricalLabel.size(), index);
+				double[] recordCounts = getRow(values, leftChildren.length, categoricalLabel.size(), index);
 
-				double recordCount = 0;
-
-				for(double scoreRecordCount : scoreRecordCounts){
-					recordCount += scoreRecordCount;
-				}
-
-				node.setRecordCount(recordCount);
+				double totalRecordCount = 0d;
 
 				String score = null;
 
-				Double probability = null;
+				double scoreRecordCount = -Double.MAX_VALUE;
 
-				for(int i = 0; i < categoricalLabel.size(); i++){
-					String value = categoricalLabel.getValue(i);
+				for(int i = 0; i < recordCounts.length; i++){
+					double recordCount = recordCounts[i];
 
-					ScoreDistribution scoreDistribution = new ScoreDistribution(value, scoreRecordCounts[i]);
+					totalRecordCount += recordCount;
 
-					node.addScoreDistributions(scoreDistribution);
+					if(recordCount > scoreRecordCount){
+						score = categoricalLabel.getValue(i);
 
-					double scoreProbability = (scoreRecordCounts[i] / recordCount);
-
-					if(probability == null || probability.compareTo(scoreProbability) < 0){
-						score = scoreDistribution.getValue();
-
-						probability = scoreProbability;
+						scoreRecordCount = recordCount;
 					}
 				}
 
-				node.setScore(score);
+				node
+					.setScore(score)
+					.setRecordCount(totalRecordCount);
+
+				List<ScoreDistribution> scoreDistributions = scoreDistributionManager.createScoreDistribution(categoricalLabel, recordCounts);
+
+				(node.getScoreDistributions()).addAll(scoreDistributions);
 			} else
 
 			if((MiningFunction.REGRESSION).equals(miningFunction)){

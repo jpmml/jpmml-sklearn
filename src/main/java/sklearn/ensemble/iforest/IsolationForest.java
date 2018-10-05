@@ -50,6 +50,7 @@ import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.tree.HasTreeOptions;
+import sklearn.tree.ScoreDistributionManager;
 import sklearn.tree.Tree;
 import sklearn.tree.TreeModelUtil;
 import sklearn.tree.TreeRegressor;
@@ -74,6 +75,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.19") >= 0);
 
 		PredicateManager predicateManager = new PredicateManager();
+		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
@@ -84,7 +86,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			Tree tree = treeRegressor.getTree();
 
-			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, predicateManager, MiningFunction.REGRESSION, segmentSchema);
+			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, predicateManager, scoreDistributionManager, MiningFunction.REGRESSION, segmentSchema);
 
 			Visitor visitor = new AbstractVisitor(){
 
