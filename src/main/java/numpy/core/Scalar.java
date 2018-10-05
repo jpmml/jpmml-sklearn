@@ -74,6 +74,11 @@ public class Scalar extends CClassDict implements HasArray, HasContent<List<?>> 
 		return this.content;
 	}
 
+	@Override
+	public void clearContent(){
+		this.content = null;
+	}
+
 	private List<?> loadContent(){
 		DType dtype = getDType();
 		byte[] obj = getObj();

@@ -50,6 +50,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
@@ -198,6 +199,8 @@ public class TreeModelUtil {
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
+
+		ClassDictUtil.clearContent(tree);
 
 		return treeModel;
 	}

@@ -45,6 +45,7 @@ import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
@@ -117,6 +118,8 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 				}
 			};
 			visitor.applyTo(treeModel);
+
+			ClassDictUtil.clearContent(tree);
 
 			treeModels.add(treeModel);
 		}

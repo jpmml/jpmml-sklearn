@@ -91,6 +91,24 @@ public class ClassDictUtil {
 	}
 
 	static
+	public void clearContent(ClassDict dict){
+
+		if(dict instanceof HasContent){
+			HasContent<?> hasContent = (HasContent<?>)dict;
+
+			hasContent.clearContent();
+		}
+
+		Collection<?> values = dict.values();
+		for(Object value : values){
+
+			if(value instanceof ClassDict){
+				clearContent((ClassDict)value);
+			}
+		}
+	}
+
+	static
 	public String getName(ClassDict dict){
 		String clazz = (String)dict.get("__class__");
 

@@ -69,6 +69,16 @@ public class NDArrayWrapper extends PyClassDict implements HasArray, HasContent<
 		return this.content;
 	}
 
+	@Override
+	public void clearContent(){
+
+		if(this.content != null){
+			this.content.clearContent();
+		}
+
+		this.content = null;
+	}
+
 	private NDArray loadContent(){
 
 		try(InputStream is = getInputStream()){

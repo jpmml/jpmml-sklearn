@@ -21,4 +21,6 @@ package org.jpmml.sklearn;
 public interface HasContent<E> {
 
 	E getContent();
+
+	void clearContent();
 }

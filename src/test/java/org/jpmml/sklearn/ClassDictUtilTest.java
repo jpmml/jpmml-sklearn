@@ -18,12 +18,56 @@
  */
 package org.jpmml.sklearn;
 
+import net.razorvine.pickle.objects.ClassDict;
 import org.junit.Test;
 import sklearn.tree.Tree;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ClassDictUtilTest {
+
+	@Test
+	public void clearContent(){
+		class ContentWrapper<E> extends ClassDict implements HasContent<E> {
+
+			private E content = null;
+
+
+			public ContentWrapper(E content){
+				super(null, null);
+
+				this.content = content;
+			}
+
+			@Override
+			public E getContent(){
+				return this.content;
+			}
+
+			@Override
+			public void clearContent(){
+				this.content = null;
+			}
+		}
+
+		ClassDict parentDict = new ClassDict(null, null);
+
+		ClassDict childDict = new ClassDict(null, null);
+
+		parentDict.put("child", childDict);
+
+		ContentWrapper<String> contentDict = new ContentWrapper<>("content");
+
+		childDict.put("content", contentDict);
+
+		assertNotNull(contentDict.getContent());
+
+		ClassDictUtil.clearContent(parentDict);
+
+		assertNull(contentDict.getContent());
+	}
 
 	@Test
 	public void formatMember(){

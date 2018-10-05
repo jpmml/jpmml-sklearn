@@ -108,6 +108,11 @@ public class NDArray extends CClassDict implements HasArray, HasContent<Object> 
 		return this.content;
 	}
 
+	@Override
+	public void clearContent(){
+		this.content = null;
+	}
+
 	private Object loadContent(){
 		Object[] shape = getShape();
 		Object descr = getDescr();
