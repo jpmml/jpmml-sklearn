@@ -74,7 +74,7 @@ public class PickleUtil {
 
 				@Override
 				protected Object dispatch(short key) throws IOException {
-					Object result = super.dispatch(key);;
+					Object result = super.dispatch(key);
 
 					if(key == Opcodes.BUILD){
 						Object head = super.stack.peek();
