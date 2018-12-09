@@ -19,8 +19,10 @@
 package tpot.builtins;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
@@ -49,7 +51,7 @@ public class CategoricalOutputFeature extends CategoricalFeature {
 
 		Output output = getOutput();
 
-		OutputField outputField = OutputUtil.getOutputField(output, getName());
+		OutputField outputField = getField();
 
 		DataType dataType = outputField.getDataType();
 		switch(dataType){
@@ -69,6 +71,25 @@ public class CategoricalOutputFeature extends CategoricalFeature {
 	@Override
 	public ContinuousOutputFeature toContinuousFeature(DataType dataType){
 		return (ContinuousOutputFeature)super.toContinuousFeature(dataType);
+	}
+
+	@Override
+	protected ContinuousOutputFeature toContinuousFeature(FieldName name, DataType dataType, Supplier<? extends Expression> expressionSupplier){
+		return (ContinuousOutputFeature)super.toContinuousFeature(name, dataType, expressionSupplier);
+	}
+
+	@Override
+	public OutputField getField(){
+		Output output = getOutput();
+
+		FieldName name = getName();
+
+		OutputField outputField = OutputUtil.getOutputField(output, name);
+		if(outputField == null){
+			throw new IllegalArgumentException(name.getValue());
+		}
+
+		return outputField;
 	}
 
 	public Output getOutput(){

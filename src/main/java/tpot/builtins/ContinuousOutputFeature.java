@@ -18,7 +18,10 @@
  */
 package tpot.builtins;
 
+import java.util.function.Supplier;
+
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
@@ -49,30 +52,43 @@ public class ContinuousOutputFeature extends ContinuousFeature {
 
 	@Override
 	public ContinuousOutputFeature toContinuousFeature(DataType dataType){
-		ContinuousOutputFeature continuousFeature = toContinuousFeature();
+		return (ContinuousOutputFeature)super.toContinuousFeature(dataType);
+	}
 
-		if((dataType).equals(continuousFeature.getDataType())){
-			return continuousFeature;
-		}
-
+	@Override
+	protected ContinuousOutputFeature toContinuousFeature(FieldName name, DataType dataType, Supplier<? extends Expression> expressionSupplier){
 		PMMLEncoder encoder = ensureEncoder();
-
-		FieldName name = FieldName.create((dataType.name()).toLowerCase() + "(" + (continuousFeature.getName()).getValue() + ")");
 
 		Output output = getOutput();
 
 		OutputField outputField = OutputUtil.getOutputField(output, name);
 		if(outputField == null){
+			Expression expression = expressionSupplier.get();
+
 			outputField = new OutputField(name, dataType)
 				.setOpType(OpType.CONTINUOUS)
 				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 				.setFinalResult(false)
-				.setExpression(continuousFeature.ref());
+				.setExpression(expression);
 
 			output.addOutputFields(outputField);
 		}
 
 		return new ContinuousOutputFeature(encoder, output, outputField);
+	}
+
+	@Override
+	public OutputField getField(){
+		Output output = getOutput();
+
+		FieldName name = getName();
+
+		OutputField outputField = OutputUtil.getOutputField(output, name);
+		if(outputField == null){
+			throw new IllegalArgumentException(name.getValue());
+		}
+
+		return outputField;
 	}
 
 	public Output getOutput(){

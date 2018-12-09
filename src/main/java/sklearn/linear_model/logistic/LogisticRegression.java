@@ -109,7 +109,7 @@ public class LogisticRegression extends LinearClassifier {
 				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
 				.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
 
-			return MiningModelUtil.createModelChain(Arrays.asList(firstRegressionModel, secondRegressionModel), schema);
+			return MiningModelUtil.createModelChain(Arrays.asList(firstRegressionModel, secondRegressionModel));
 		} else
 
 		if(numberOfClasses >= 3){

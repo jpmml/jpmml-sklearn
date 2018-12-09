@@ -20,7 +20,6 @@ package org.jpmml.sklearn;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
@@ -28,15 +27,11 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.MiningField;
-import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Transformer;
@@ -53,14 +48,7 @@ public class SkLearnEncoder extends ModelEncoder {
 			List<Model> models = new ArrayList<>(this.transformers);
 			models.add(model);
 
-			MiningSchema miningSchema = createMiningSchema(models);
-
-			Schema schema = new Schema(null, Collections.emptyList());
-
-			MiningModel miningModel = MiningModelUtil.createModelChain(models, schema)
-				.setMiningSchema(miningSchema);
-
-			model = miningModel;
+			model = MiningModelUtil.createModelChain(models);
 		}
 
 		return super.encodePMML(model);
@@ -130,32 +118,5 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public void addTransformer(Model transformer){
 		this.transformers.add(transformer);
-	}
-
-	static
-	private MiningSchema createMiningSchema(List<Model> models){
-		List<MiningField> targetMiningFields = new ArrayList<>();
-
-		for(Model model : models){
-			MiningSchema miningSchema = model.getMiningSchema();
-
-			List<MiningField> miningFields = miningSchema.getMiningFields();
-			for(MiningField miningField : miningFields){
-				MiningField.UsageType usageType = miningField.getUsageType();
-
-				switch(usageType){
-					case PREDICTED:
-					case TARGET:
-						targetMiningFields.add(miningField);
-						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		MiningSchema miningSchema = new MiningSchema(targetMiningFields);
-
-		return miningSchema;
 	}
 }

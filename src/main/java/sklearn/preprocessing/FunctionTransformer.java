@@ -22,10 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import numpy.core.UFunc;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -54,14 +55,7 @@ public class FunctionTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			ContinuousFeature continuousFeature = (features.get(i)).toContinuousFeature();
 
-			FieldName name = FeatureUtil.createName(ufunc.getName(), continuousFeature);
-
-			DerivedField derivedField = encoder.getDerivedField(name);
-			if(derivedField == null){
-				Expression expression = encodeUFunc(ufunc, continuousFeature.ref());
-
-				derivedField = encoder.createDerivedField(name, expression);
-			}
+			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName(ufunc.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, () -> encodeUFunc(ufunc, continuousFeature.ref()));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

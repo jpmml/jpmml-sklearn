@@ -41,7 +41,7 @@ public class ImputerUtil {
 
 	static
 	public Feature encodeFeature(Feature feature, Object missingValue, Object replacementValue, MissingValueTreatmentMethod missingValueTreatmentMethod, SkLearnEncoder encoder){
-		Field<?> field = encoder.getField(feature.getName());
+		Field<?> field = feature.getField();
 
 		if(field instanceof DataField){
 			MissingValueDecorator missingValueDecorator = new MissingValueDecorator()

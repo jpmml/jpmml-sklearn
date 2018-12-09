@@ -51,7 +51,6 @@ import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.ValueUtil;
@@ -103,14 +102,9 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		DType dtype = getDType();
 
 		if(lowercase){
-			FieldName name = FeatureUtil.createName("lowercase", feature);
+			Apply apply = PMMLUtil.createApply("lowercase", feature.ref());
 
-			DerivedField derivedField = encoder.getDerivedField(name);
-			if(derivedField == null){
-				Apply apply = PMMLUtil.createApply("lowercase", feature.ref());
-
-				derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.STRING, apply);
-			}
+			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("lowercase", feature), OpType.CATEGORICAL, DataType.STRING, () -> apply);
 
 			feature = new StringFeature(encoder, derivedField);
 		}
@@ -130,14 +124,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 				@Override
 				public ContinuousFeature toContinuousFeature(){
-					PMMLEncoder encoder = ensureEncoder();
-
-					DerivedField derivedField = encoder.getDerivedField(getName());
-					if(derivedField == null){
-						derivedField = encoder.createDerivedField(getName(), OpType.CONTINUOUS, getDataType(), apply);
-					}
-
-					return new ContinuousFeature(encoder, derivedField);
+					return toContinuousFeature(getName(), getDataType(), () -> apply);
 				}
 			};
 

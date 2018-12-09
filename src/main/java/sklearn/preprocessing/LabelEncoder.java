@@ -21,10 +21,10 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalFeature;
@@ -72,16 +72,13 @@ public class LabelEncoder extends Transformer {
 			outputCategories.add(ValueUtil.formatValue(i));
 		}
 
-		FieldName name = FeatureUtil.createName("label_encoder", feature);
-
-		DerivedField derivedField = encoder.getDerivedField(name);
-		if(derivedField == null){
+		Supplier<MapValues> mapValuesSupplier = () -> {
 			encoder.toCategorical(feature.getName(), inputCategories);
 
-			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), inputCategories, outputCategories);
+			return PMMLUtil.createMapValues(feature.getName(), inputCategories, outputCategories);
+		};
 
-			derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, mapValues);
-		}
+		DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("label_encoder", feature), OpType.CATEGORICAL, DataType.INTEGER, mapValuesSupplier);
 
 		Feature encodedFeature = new CategoricalFeature(encoder, derivedField, outputCategories);
 
