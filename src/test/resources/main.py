@@ -140,7 +140,7 @@ if "Wheat" in datasets:
 # Binary classification
 #
 
-audit_X, audit_y = load_audit("Audit.csv")
+audit_X, audit_y = load_audit("Audit.csv", stringify = False)
 
 def build_audit(classifier, name, with_proba = True, **pmml_options):
 	continuous_mapper = DataFrameMapper([
@@ -152,7 +152,7 @@ def build_audit(classifier, name, with_proba = True, **pmml_options):
 		(["Marital"], [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
 		(["Occupation"], [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
 		(["Gender"], [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
-		(["Deductions"], [CategoricalDomain(), LabelEncoder()]),
+		(["Deductions"], [CategoricalDomain()]),
 	])
 	pipeline = Pipeline([
 		("union", FeatureUnion([
@@ -198,6 +198,8 @@ if "Audit" in datasets:
 	build_audit(SVC(), "SVCAudit", with_proba = False)
 	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 	build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit", byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
+
+audit_X, audit_y = load_audit("Audit.csv")
 
 def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	mapper = DataFrameMapper(

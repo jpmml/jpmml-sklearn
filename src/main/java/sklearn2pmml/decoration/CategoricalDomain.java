@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.UnivariateStats;
+import org.jpmml.converter.BooleanFeature;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
@@ -84,7 +87,14 @@ public class CategoricalDomain extends Domain {
 
 			List<String> categories = Lists.transform(data, function);
 
-			feature = wildcardFeature.toCategoricalFeature(categories);
+			CategoricalFeature categoricalFeature = wildcardFeature.toCategoricalFeature(categories);
+
+			// XXX: Should take place inside WildcardFeature#toCategoricalFeature(List<String>)
+			if((DataType.BOOLEAN).equals(categoricalFeature.getDataType()) && (Arrays.asList("false", "true")).equals(categoricalFeature.getValues())){
+				categoricalFeature = new BooleanFeature(categoricalFeature.getEncoder(), categoricalFeature.getField());
+			}
+
+			feature = categoricalFeature;
 		} // End if
 
 		if(withStatistics){

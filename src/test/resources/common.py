@@ -31,11 +31,12 @@ def dump(obj):
 	for attr in dir(obj):
 		print("obj.%s = %s" % (attr, getattr(obj, attr)))
 
-def load_audit(name):
+def load_audit(name, stringify = True):
 	df = load_csv(name)
 	print(df.dtypes)
 	df["Adjusted"] = df["Adjusted"].astype(int)
-	df["Deductions"] = df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
+	if stringify:
+		df["Deductions"] = df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
 	print(df.dtypes)
 	return split_csv(df)
 
