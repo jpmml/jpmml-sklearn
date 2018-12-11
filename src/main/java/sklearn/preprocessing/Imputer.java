@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2018 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,83 +18,29 @@
  */
 package sklearn.preprocessing;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.MissingValueTreatmentMethod;
-import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
-import sklearn.Transformer;
+import sklearn.impute.SimpleImputer;
 
-public class Imputer extends Transformer implements HasNumberOfFeatures {
+public class Imputer extends SimpleImputer {
 
 	public Imputer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getStatisticsShape();
-
-		return shape[0];
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Object missingValues = getMissingValues();
-		List<? extends Number> statistics = getStatistics();
-		String strategy = getStrategy();
-
-		ClassDictUtil.checkSize(features, statistics);
+	public Object getMissingValues(){
+		Object missingValues = super.getMissingValues();
 
 		if(("NaN").equals(missingValues)){
 			missingValues = null;
 		}
 
-		MissingValueTreatmentMethod missingValueTreatment = parseStrategy(strategy);
-
-		List<Feature> result = new ArrayList<>();
-
-		for(int i = 0; i < features.size(); i++){
-			Feature feature = features.get(i);
-			Number statistic = statistics.get(i);
-
-			result.add(ImputerUtil.encodeFeature(feature, (Number)missingValues, statistic, missingValueTreatment, encoder));
-		}
-
-		return result;
+		return missingValues;
 	}
 
-	public Object getMissingValues(){
-		return get("missing_values");
-	}
-
+	@Override
 	public List<? extends Number> getStatistics(){
 		return getArray("statistics_", Number.class);
-	}
-
-	public int[] getStatisticsShape(){
-		return getArrayShape("statistics_", 1);
-	}
-
-	public String getStrategy(){
-		return (String)get("strategy");
-	}
-
-	static
-	private MissingValueTreatmentMethod parseStrategy(String strategy){
-
-		switch(strategy){
-			case "mean":
-				return MissingValueTreatmentMethod.AS_MEAN;
-			case "median":
-				return MissingValueTreatmentMethod.AS_MEDIAN;
-			case "most_frequent":
-				return MissingValueTreatmentMethod.AS_MODE;
-			default:
-				throw new IllegalArgumentException(strategy);
-		}
 	}
 }

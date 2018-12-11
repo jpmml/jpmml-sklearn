@@ -26,7 +26,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.preprocessing.ImputerUtil;
+import sklearn.impute.ImputerUtil;
 
 public class CategoricalImputer extends Transformer {
 
