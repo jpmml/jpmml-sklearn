@@ -58,6 +58,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateTransformedDecisionTreeAuto() throws Exception {
+		evaluate("TransformedDecisionTree", "Auto");
+	}
+
+	@Test
 	public void evaluateDummyAuto() throws Exception {
 		evaluate("Dummy", "Auto");
 	}
@@ -117,6 +122,11 @@ public class RegressorTest extends EstimatorTest {
 	@Test
 	public void evaluateLinearRegressionEnsembleAuto() throws Exception {
 		evaluate("LinearRegressionEnsemble", "Auto");
+	}
+
+	@Test
+	public void evaluateTransformedLinearRegressionAuto() throws Exception {
+		evaluate("TransformedLinearRegression", "Auto");
 	}
 
 	@Test

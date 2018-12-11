@@ -7,6 +7,7 @@ from h2o.estimators.random_forest import H2ORandomForestEstimator
 from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
 from sklearn.cluster import KMeans, MiniBatchKMeans
+from sklearn.compose import TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
@@ -508,6 +509,10 @@ if "Auto" in datasets:
 	build_auto(RidgeCV(), "RidgeAuto")
 	build_auto(TheilSenRegressor(n_subsamples = 15, random_state = 13), "TheilSenAuto")
 	build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", ntree_limit = 31)
+
+if "Auto" in datasets:
+	build_auto(TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
+	build_auto(TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedLinearRegressionAuto")
 
 def build_auto_h2o(regressor, name):
 	mapper = DataFrameMapper(

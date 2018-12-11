@@ -42,20 +42,18 @@ public class FunctionTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Object func = getFunc();
+		UFunc func = getFunc();
 
 		if(func == null){
 			return features;
 		}
-
-		UFunc ufunc = getUFunc();
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			ContinuousFeature continuousFeature = (features.get(i)).toContinuousFeature();
 
-			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName(ufunc.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, () -> encodeUFunc(ufunc, continuousFeature.ref()));
+			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName(func.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, () -> encodeUFunc(func, continuousFeature.ref()));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
@@ -63,16 +61,28 @@ public class FunctionTransformer extends Transformer {
 		return result;
 	}
 
-	public Object getFunc(){
-		return get("func");
-	}
+	public UFunc getFunc(){
+		Object ufunc = get("func");
 
-	public UFunc getUFunc(){
+		if(ufunc == null){
+			return null;
+		}
+
 		return get("func", UFunc.class);
 	}
 
+	public UFunc getInverseFunc(){
+		Object inverseFunc = get("inverse_func");
+
+		if(inverseFunc == null){
+			return null;
+		}
+
+		return get("inverse_func", UFunc.class);
+	}
+
 	static
-	Expression encodeUFunc(UFunc ufunc, FieldRef fieldRef){
+	public Expression encodeUFunc(UFunc ufunc, FieldRef fieldRef){
 		String name = ufunc.getName();
 
 		switch(name){
