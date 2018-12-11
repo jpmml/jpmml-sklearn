@@ -271,7 +271,14 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			encodeOutput(applyTransformer, model, Collections.singletonList(nodeIdField));
 		} // End if
 
-		if(estimator.isSupervised() && verification != null){
+		verification:
+		if(estimator.isSupervised()){
+
+			if(verification == null){
+				logger.warn("Model verification data is not set. Use method '" + ClassDictUtil.formatMember(this, "verify(X)") + "' to correct this deficiency");
+
+				break verification;
+			} // End if
 
 			if(activeFields == null){
 				throw new IllegalArgumentException();
