@@ -28,7 +28,7 @@ import org.jpmml.evaluator.EvaluationContext;
 import org.jpmml.evaluator.ExpressionUtil;
 import org.jpmml.evaluator.FieldValue;
 import org.jpmml.evaluator.FieldValueUtil;
-import org.jpmml.evaluator.ModelEvaluationContext;
+import org.jpmml.evaluator.VirtualEvaluationContext;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -78,7 +78,7 @@ public class FunctionTransformerTest {
 			dataType = DataType.DOUBLE;
 		}
 
-		EvaluationContext context = new ModelEvaluationContext(null); // XXX
+		EvaluationContext context = new VirtualEvaluationContext();
 		context.declare(name, FieldValueUtil.create(dataType, OpType.CONTINUOUS, value));
 
 		Expression expression = FunctionTransformer.encodeUFunc(ufunc, new FieldRef(name));
