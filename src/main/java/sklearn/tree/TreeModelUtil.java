@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.HasExtensions;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
@@ -108,17 +109,17 @@ public class TreeModelUtil {
 				Visitor nodeExtender = new AbstractExtender(name){
 
 					@Override
-					public VisitorAction visit(ComplexNode complexNode){
-						Integer id = Integer.valueOf(complexNode.getId());
+					public VisitorAction visit(Node node){
+						Integer id = Integer.valueOf(node.getId());
 
 						Object value = values.get(id);
 						if(value != null){
 							value = ScalarUtil.decode(value);
 
-							addExtension(complexNode, ValueUtil.formatValue(value));
+							addExtension((Node & HasExtensions)node, ValueUtil.formatValue(value));
 						}
 
-						return super.visit(complexNode);
+						return super.visit(node);
 					}
 				};
 
@@ -194,10 +195,7 @@ public class TreeModelUtil {
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
 
-		Node root = new ComplexNode()
-			.setPredicate(new True());
-
-		encodeNode(root, predicateManager, scoreDistributionManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+		Node root = encodeNode(new True(), predicateManager, scoreDistributionManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
@@ -208,8 +206,8 @@ public class TreeModelUtil {
 	}
 
 	static
-	private void encodeNode(Node node, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
-		node.setId(String.valueOf(index));
+	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
+		String id = String.valueOf(index);
 
 		int featureIndex = features[index];
 
@@ -249,21 +247,21 @@ public class TreeModelUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = new ComplexNode()
-				.setPredicate(leftPredicate);
+			Node leftChild = encodeNode(leftPredicate, predicateManager, scoreDistributionManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			Node rightChild = encodeNode(rightPredicate, predicateManager, scoreDistributionManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-			encodeNode(leftChild, predicateManager, scoreDistributionManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			Node result = new ComplexNode()
+				.setId(id)
+				.setPredicate(predicate)
+				.addNodes(leftChild, rightChild);
 
-			Node rightChild = new ComplexNode()
-				.setPredicate(rightPredicate);
-
-			encodeNode(rightChild, predicateManager, scoreDistributionManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
-
-			node.addNodes(leftChild, rightChild);
+			return result;
 		} else
 
 		// A leaf node
 		{
+			Node result;
+
 			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
 				CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -287,24 +285,31 @@ public class TreeModelUtil {
 					}
 				}
 
-				node
+				result = new ComplexNode()
+					.setId(id)
 					.setScore(score)
-					.setRecordCount(totalRecordCount);
+					.setRecordCount(totalRecordCount)
+					.setPredicate(predicate);
 
 				List<ScoreDistribution> scoreDistributions = scoreDistributionManager.createScoreDistribution(categoricalLabel, recordCounts);
 
-				(node.getScoreDistributions()).addAll(scoreDistributions);
+				(result.getScoreDistributions()).addAll(scoreDistributions);
 			} else
 
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
-				String score = ValueUtil.formatValue(values[index]);
+				double value = values[index];
 
-				node.setScore(score);
+				result = new ComplexNode()
+					.setId(id)
+					.setScore(value)
+					.setPredicate(predicate);
 			} else
 
 			{
 				throw new IllegalArgumentException();
 			}
+
+			return result;
 		}
 	}
 

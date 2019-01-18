@@ -113,7 +113,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 						double averagePathLength = (corrected ? correctedAveragePathLength(nodeSample) : averagePathLength(nodeSample));
 
-						node.setScore(ValueUtil.formatValue(nodeDepth + averagePathLength));
+						node.setScore(nodeDepth + averagePathLength);
 					}
 
 					return super.visit(node);
