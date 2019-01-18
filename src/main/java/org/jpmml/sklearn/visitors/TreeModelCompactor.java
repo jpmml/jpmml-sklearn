@@ -36,7 +36,7 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 	@Override
 	public void enterNode(Node node){
 		String id = node.getId();
-		String score = node.getScore();
+		Object score = node.getScore();
 
 		if(id == null){
 			throw new IllegalArgumentException();

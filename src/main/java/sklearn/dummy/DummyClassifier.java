@@ -26,6 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.True;
+import org.dmg.pmml.tree.ComplexNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
@@ -84,7 +85,7 @@ public class DummyClassifier extends Classifier {
 				throw new IllegalArgumentException(strategy);
 		}
 
-		Node root = new Node()
+		Node root = new ComplexNode()
 			.setPredicate(new True())
 			.setScore(ValueUtil.formatValue(classes.get(index)));
 

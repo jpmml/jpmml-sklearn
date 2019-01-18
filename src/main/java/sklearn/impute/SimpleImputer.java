@@ -57,7 +57,9 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 			Feature feature = features.get(i);
 			Object statistic = statistics.get(i);
 
-			result.add(ImputerUtil.encodeFeature(feature, missingValues, statistic, missingValueTreatment, encoder));
+			feature = ImputerUtil.encodeFeature(feature, missingValues, statistic, missingValueTreatment, encoder);
+
+			result.add(feature);
 		}
 
 		return result;

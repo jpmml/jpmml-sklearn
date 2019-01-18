@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
-import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
@@ -32,9 +32,9 @@ abstract
 class TranslatorTest {
 
 	static final List<Feature> booleanFeatures = Arrays.asList(
-		new CategoricalFeature(null, FieldName.create("a"), DataType.BOOLEAN, Arrays.asList("false", "true")),
-		new CategoricalFeature(null, FieldName.create("b"), DataType.BOOLEAN, Arrays.asList("false", "true")),
-		new CategoricalFeature(null, FieldName.create("c"), DataType.BOOLEAN, Arrays.asList("false", "true"))
+		new BooleanFeature(null, FieldName.create("a")),
+		new BooleanFeature(null, FieldName.create("b")),
+		new BooleanFeature(null, FieldName.create("c"))
 	);
 
 	static final List<Feature> doubleFeatures = Arrays.asList(

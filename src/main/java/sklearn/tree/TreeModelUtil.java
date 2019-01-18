@@ -38,6 +38,7 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.dmg.pmml.tree.ComplexNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
@@ -107,17 +108,17 @@ public class TreeModelUtil {
 				Visitor nodeExtender = new AbstractExtender(name){
 
 					@Override
-					public VisitorAction visit(Node node){
-						Integer id = Integer.valueOf(node.getId());
+					public VisitorAction visit(ComplexNode complexNode){
+						Integer id = Integer.valueOf(complexNode.getId());
 
 						Object value = values.get(id);
 						if(value != null){
 							value = ScalarUtil.decode(value);
 
-							addExtension(node, ValueUtil.formatValue(value));
+							addExtension(complexNode, ValueUtil.formatValue(value));
 						}
 
-						return super.visit(node);
+						return super.visit(complexNode);
 					}
 				};
 
@@ -193,7 +194,7 @@ public class TreeModelUtil {
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
 
-		Node root = new Node()
+		Node root = new ComplexNode()
 			.setPredicate(new True());
 
 		encodeNode(root, predicateManager, scoreDistributionManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
@@ -248,12 +249,12 @@ public class TreeModelUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = new Node()
+			Node leftChild = new ComplexNode()
 				.setPredicate(leftPredicate);
 
 			encodeNode(leftChild, predicateManager, scoreDistributionManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-			Node rightChild = new Node()
+			Node rightChild = new ComplexNode()
 				.setPredicate(rightPredicate);
 
 			encodeNode(rightChild, predicateManager, scoreDistributionManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
