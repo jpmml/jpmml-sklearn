@@ -523,12 +523,28 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){
-			throw new IllegalArgumentException("Expected one or more elements, got zero elements");
+			throw new IllegalArgumentException("Expected one or more steps, got zero steps");
 		}
 
 		Object[] lastStep = steps.get(steps.size() - 1);
 
-		return TupleUtil.extractElement(lastStep, 1, Estimator.class);
+		try {
+			return TupleUtil.extractElement(lastStep, 1, Estimator.class);
+		} catch(IllegalArgumentException iaeEstimator){
+			Transformer transformer = null;
+
+			try {
+				transformer = TupleUtil.extractElement(lastStep, 1, Transformer.class);
+			} catch(IllegalArgumentException iaeTransformer){
+				// Ignored
+			}
+
+			if(transformer != null){
+				throw new IllegalArgumentException("Expected an estimator object as the last step, got a transformer object (" + ClassDictUtil.formatClass(transformer) + ")");
+			}
+
+			throw iaeEstimator;
+		}
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public class DataFrameMapper extends Initializer {
 		List<Object[]> rows = getFeatures();
 
 		if(!(Boolean.FALSE).equals(_default)){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, "default") + "\' must be set to the 'False' value");
 		}
 
 		List<Feature> result = new ArrayList<>();
