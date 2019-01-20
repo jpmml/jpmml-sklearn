@@ -45,6 +45,8 @@ public class DomainUtil {
 				return MissingValueTreatmentMethod.AS_MEDIAN;
 			case "as_value":
 				return MissingValueTreatmentMethod.AS_VALUE;
+			case "return_invalid":
+				return MissingValueTreatmentMethod.RETURN_INVALID;
 			default:
 				throw new IllegalArgumentException(missingValueTreatment);
 		}
