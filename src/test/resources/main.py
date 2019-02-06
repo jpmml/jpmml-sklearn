@@ -7,7 +7,7 @@ from h2o.estimators.random_forest import H2ORandomForestEstimator
 from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
 from sklearn.cluster import KMeans, MiniBatchKMeans
-from sklearn.compose import TransformedTargetRegressor
+from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
@@ -100,6 +100,7 @@ if __name__ == "__main__":
 datasets = datasets.split(",")
 
 if with_h2o:
+	h2o.init()
 	h2o.connect()
 
 #
@@ -115,9 +116,12 @@ def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 	mapper = DataFrameMapper([
 		(wheat_X.columns.values, ContinuousDomain())
 	])
+	scaler = ColumnTransformer([
+		("robust", RobustScaler(), [0, 5])
+	], remainder = MinMaxScaler())
 	pipeline = Pipeline([
 		("mapper", mapper),
-		("scaler", MinMaxScaler()),
+		("scaler", scaler),
 		("clusterer", kmeans)
 	])
 	pipeline.fit(wheat_X)
@@ -317,12 +321,15 @@ if "Audit" in datasets:
 versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
 
 def build_versicolor(classifier, name, with_proba = True, **pmml_options):
-	mapper = DataFrameMapper([
-		(versicolor_X.columns.values, [ContinuousDomain(), RobustScaler()])
+	transformer = ColumnTransformer([
+		("continuous_columns", Pipeline([
+			("domain", ContinuousDomain()),
+			("scaler", RobustScaler())
+		]), versicolor_X.columns.values)
 	])
 	pipeline = Pipeline([
-		("mapper", mapper),
-		("transformer-pipeline", Pipeline([
+		("transformer", transformer),
+		("transformer-selector-pipeline", Pipeline([
 			("polynomial", PolynomialFeatures(degree = 3)),
 			("selector", SelectKBest(k = "all"))
 		])),
@@ -517,12 +524,12 @@ if "Auto" in datasets:
 	build_auto(TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedLinearRegressionAuto")
 
 def build_auto_h2o(regressor, name):
-	mapper = DataFrameMapper(
-		[([column], CategoricalDomain()) for column in ["cylinders", "model_year", "origin"]] +
-		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]]
+	transformer = ColumnTransformer(
+		[(column, CategoricalDomain(), [column]) for column in ["cylinders", "model_year", "origin"]] +
+		[(column, ContinuousDomain(), [column]) for column in ["displacement", "horsepower", "weight", "acceleration"]]
 	)
 	pipeline = PMMLPipeline([
-		("mapper", mapper),
+		("transformer", transformer),
 		("uploader", H2OFrameCreator(column_names = ["cylinders", "model_year", "origin", "displacement", "horsepower", "weight", "acceleration"], column_types = ["enum", "enum", "enum", "numeric", "numeric", "numeric", "numeric"])),
 		("regressor", regressor)
 	])
