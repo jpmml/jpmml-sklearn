@@ -128,6 +128,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.decoration.DateDomain`
     * `sklearn2pmml.decoration.DateTimeDomain`
     * `sklearn2pmml.decoration.MultiDomain`
+    * `sklearn2pmml.feature_selection.SelectUnique`
     * `sklearn2pmml.pipeline.PMMLPipeline`
     * `sklearn2pmml.preprocessing.Aggregator`
     * `sklearn2pmml.preprocessing.CutTransformer`

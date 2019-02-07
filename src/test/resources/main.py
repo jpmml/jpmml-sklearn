@@ -29,6 +29,7 @@ from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SV
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
+from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
@@ -44,6 +45,16 @@ import sys
 def pipeline_transform(pipeline, X):
 	identity_pipeline = Pipeline(pipeline.steps[: -1] + [("estimator", None)])
 	return identity_pipeline._transform(X)
+
+def make_interaction(left, right):
+	pipeline = Pipeline([
+		("mapper", DataFrameMapper([
+			([left], LabelBinarizer()),
+			([right], LabelBinarizer())
+		])),
+		("polynomial", PolynomialFeatures())
+	])
+	return pipeline
 
 class OptimalLGBMClassifier(LGBMClassifier):
 
@@ -481,12 +492,12 @@ def build_auto(regressor, name, **pmml_options):
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
 		(["weight", "displacement"], ExpressionTransformer("(X[0] / X[1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
 	])
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("mapper", mapper),
+		("selector", SelectUnique()),
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, auto_y)
-	pipeline = make_pmml_pipeline(pipeline, auto_X.columns.values, auto_y.name)
 	pipeline.configure(**pmml_options)
 	if isinstance(regressor, XGBRegressor):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
