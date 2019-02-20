@@ -64,7 +64,7 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 	}
 
 	public Number getLearningRate(){
-		return (Number)get("learning_rate");
+		return GradientBoostingUtil.getLearningRate(this);
 	}
 
 	@Override

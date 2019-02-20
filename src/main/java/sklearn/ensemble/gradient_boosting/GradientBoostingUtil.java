@@ -20,6 +20,7 @@ package sklearn.ensemble.gradient_boosting;
 
 import java.util.List;
 
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
@@ -37,6 +38,13 @@ import sklearn.tree.TreeRegressor;
 public class GradientBoostingUtil {
 
 	private GradientBoostingUtil(){
+	}
+
+	static
+	public <E extends Estimator & HasEstimatorEnsemble<TreeRegressor>> Number getLearningRate(E estimator){
+		Object learningRate = ScalarUtil.decode(estimator.get("learning_rate"));
+
+		return (Number)learningRate;
 	}
 
 	static

@@ -128,7 +128,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 	}
 
 	public Number getLearningRate(){
-		return (Number)get("learning_rate");
+		return GradientBoostingUtil.getLearningRate(this);
 	}
 
 	@Override
