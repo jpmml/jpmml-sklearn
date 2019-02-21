@@ -100,13 +100,13 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>1.4.6</version>
+			<version>1.4.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator-test</artifactId>
-			<version>1.4.6</version>
+			<version>1.4.7</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
