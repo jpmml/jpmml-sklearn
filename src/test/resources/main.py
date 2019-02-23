@@ -358,7 +358,6 @@ def build_versicolor(classifier, name, with_proba = True, **pmml_options):
 	store_csv(species, name + ".csv")
 
 if "Versicolor" in datasets:
-	build_versicolor(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeVersicolor", compact = False)
 	build_versicolor(DummyClassifier(strategy = "prior"), "DummyVersicolor")
 	build_versicolor(KNeighborsClassifier(), "KNNVersicolor", with_proba = False)
 	build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), 	"MLPVersicolor")
@@ -366,6 +365,29 @@ if "Versicolor" in datasets:
 	build_versicolor(SGDClassifier(random_state = 13, loss = "log", max_iter = 100), "SGDLogVersicolor")
 	build_versicolor(SVC(), "SVCVersicolor", with_proba = False)
 	build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
+
+versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
+
+def build_versicolor_direct(classifier, name, with_proba = True, **pmml_options):
+	transformer = ColumnTransformer([
+		("all", "passthrough", ["Petal.Length", "Petal.Width"])
+	], remainder = "drop")
+	pipeline = PMMLPipeline([
+		("transformer", transformer),
+		("classifier", classifier)
+	])
+	pipeline.fit(versicolor_X, versicolor_y)
+	pipeline.configure(**pmml_options)
+	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
+	store_pkl(pipeline, name + ".pkl")
+	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
+	if with_proba == True:
+		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
+		species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name + ".csv")
+
+if "Versicolor" in datasets:
+	build_versicolor_direct(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeVersicolor", compact = False)
 
 #
 # Multi-class classification

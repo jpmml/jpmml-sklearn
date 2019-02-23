@@ -33,6 +33,7 @@ import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
+import sklearn.MultiTransformer;
 import sklearn.Transformer;
 
 public class ColumnTransformer extends Initializer {
@@ -48,52 +49,23 @@ public class ColumnTransformer extends Initializer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<Object[]> transformers = getTransformers();
 		List<Object[]> fittedTransformers = getFittedTransformers();
 
 		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < fittedTransformers.size(); i++){
-			Object[] fittedTransformer = fittedTransformers.get(i);
-
-			Transformer transformer;
-
-			if(i < transformers.size()){
-				transformer = getTransformer(fittedTransformer);
-			} else
-
-			{
-				Object remainder = fittedTransformer[1];
-
-				if(("drop").equals(remainder)){
-					continue;
-				} else
-
-				if(("passthrough").equals(remainder)){
-					transformer = null;
-				} else
-
-				{
-					transformer = getTransformer(fittedTransformer);
-				}
-			}
+		for(Object[] fittedTransformer : fittedTransformers){
+			Transformer transformer = getTransformer(fittedTransformer);
 
 			List<Feature> rowFeatures = getFeatures(fittedTransformer, features, encoder);
 
-			if(transformer != null){
-				encoder.updateFeatures(rowFeatures, transformer);
+			encoder.updateFeatures(rowFeatures, transformer);
 
-				rowFeatures = transformer.encodeFeatures(rowFeatures, encoder);
-			}
+			rowFeatures = transformer.encodeFeatures(rowFeatures, encoder);
 
 			result.addAll(rowFeatures);
 		}
 
 		return result;
-	}
-
-	public List<Object[]> getTransformers(){
-		return getTupleList("transformers");
 	}
 
 	public List<Object[]> getFittedTransformers(){
@@ -103,6 +75,14 @@ public class ColumnTransformer extends Initializer {
 	static
 	private Transformer getTransformer(Object[] fittedTransformer){
 		Object transformer = fittedTransformer[1];
+
+		if(("drop").equals(transformer)){
+			return Drop.INSTANCE;
+		} else
+
+		if(("passthrough").equals(transformer)){
+			return PassThrough.INSTANCE;
+		}
 
 		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
 
@@ -177,5 +157,35 @@ public class ColumnTransformer extends Initializer {
 		};
 
 		return Lists.transform((List)columns, castFunction);
+	}
+
+	static
+	private class Drop extends MultiTransformer {
+
+		private Drop(){
+			super(null, null);
+		}
+
+		@Override
+		public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+			return Collections.emptyList();
+		}
+
+		public static final Drop INSTANCE = new Drop();
+	}
+
+	static
+	private class PassThrough extends MultiTransformer {
+
+		private PassThrough(){
+			super(null, null);
+		}
+
+		@Override
+		public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+			return features;
+		}
+
+		public static final PassThrough INSTANCE = new PassThrough();
 	}
 }
