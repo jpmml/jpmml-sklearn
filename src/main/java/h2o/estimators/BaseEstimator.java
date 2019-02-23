@@ -153,11 +153,11 @@ public class BaseEstimator extends Estimator implements HasClasses {
 	}
 
 	public String getEstimatorType(){
-		return (String)get("_estimator_type");
+		return getString("_estimator_type");
 	}
 
 	public String getMojoPath(){
-		return get("_mojo_path", String.class);
+		return getString("_mojo_path");
 	}
 
 	public BaseEstimator setMojoPath(String mojoPath){

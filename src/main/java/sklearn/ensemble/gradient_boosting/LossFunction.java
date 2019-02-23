@@ -33,6 +33,6 @@ public class LossFunction extends PyClassDict {
 	public Transformation createTransformation();
 
 	public Integer getK(){
-		return ValueUtil.asInteger((Number)get("K"));
+		return ValueUtil.asInteger(getNumber("K"));
 	}
 }

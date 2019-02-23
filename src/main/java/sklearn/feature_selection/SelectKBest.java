@@ -77,7 +77,7 @@ public class SelectKBest extends Selector {
 	}
 
 	public Object getK(){
-		return get("k");
+		return getObject("k");
 	}
 
 	public List<? extends Number> getScores(){

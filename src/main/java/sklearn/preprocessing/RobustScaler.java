@@ -111,11 +111,11 @@ public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public Boolean getWithCentering(){
-		return (Boolean)get("with_centering");
+		return getBoolean("with_centering");
 	}
 
 	public Boolean getWithScaling(){
-		return (Boolean)get("with_scaling");
+		return getBoolean("with_scaling");
 	}
 
 	public List<? extends Number> getCenter(){

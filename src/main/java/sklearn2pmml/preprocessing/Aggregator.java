@@ -66,7 +66,7 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public String getFunction(){
-		return (String)get("function");
+		return getString("function");
 	}
 
 	static

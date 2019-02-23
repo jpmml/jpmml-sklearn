@@ -202,27 +202,27 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public String getAnalyzer(){
-		return (String)get("analyzer");
+		return getString("analyzer");
 	}
 
 	public Boolean getBinary(){
-		return (Boolean)get("binary");
+		return getBoolean("binary");
 	}
 
 	public Boolean getLowercase(){
-		return (Boolean)get("lowercase");
+		return getBoolean("lowercase");
 	}
 
 	public Object[] getNGramRange(){
-		return (Object[])get("ngram_range");
+		return getTuple("ngram_range");
 	}
 
 	public Object getPreprocessor(){
-		return get("preprocessor");
+		return getOptionalObject("preprocessor");
 	}
 
 	public List<String> getStopWords(){
-		Object stopWords = get("stop_words");
+		Object stopWords = getOptionalObject("stop_words");
 
 		if(stopWords instanceof String){
 			return loadStopWords((String)stopWords);
@@ -232,15 +232,11 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public String getStripAccents(){
-		return (String)get("strip_accents");
+		return getOptionalString("strip_accents");
 	}
 
 	public Splitter getTokenizer(){
 		return get("tokenizer", Splitter.class);
-	}
-
-	public String getTokenPattern(){
-		return (String)get("token_pattern");
 	}
 
 	public Map<String, ?> getVocabulary(){

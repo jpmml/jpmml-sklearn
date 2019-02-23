@@ -129,10 +129,10 @@ public class LabelBinarizer extends Transformer {
 	}
 
 	public Number getPosLabel(){
-		return (Number)get("pos_label");
+		return getNumber("pos_label");
 	}
 
 	public Number getNegLabel(){
-		return (Number)get("neg_label");
+		return getNumber("neg_label");
 	}
 }

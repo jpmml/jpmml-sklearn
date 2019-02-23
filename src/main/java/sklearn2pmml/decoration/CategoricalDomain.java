@@ -107,7 +107,7 @@ public class CategoricalDomain extends Domain {
 	}
 
 	public Object[] getDiscrStats(){
-		return (Object[])get("discr_stats_");
+		return getTuple("discr_stats_");
 	}
 
 	static

@@ -53,6 +53,6 @@ public class CSRMatrix extends PyClassDict implements HasArray {
 	}
 
 	public Object[] getShape(){
-		return (Object[])get("_shape");
+		return getTuple("_shape");
 	}
 }

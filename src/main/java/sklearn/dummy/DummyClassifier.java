@@ -106,10 +106,10 @@ public class DummyClassifier extends Classifier {
 	}
 
 	public Object getConstant(){
-		return get("constant");
+		return getOptionalObject("constant");
 	}
 
 	public String getStrategy(){
-		return (String)get("strategy");
+		return getString("strategy");
 	}
 }

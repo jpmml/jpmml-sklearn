@@ -132,6 +132,6 @@ public class TfidfVectorizer extends CountVectorizer {
 	}
 
 	public TfidfTransformer getTransformer(){
-		return (TfidfTransformer)get("_tfidf");
+		return get("_tfidf", TfidfTransformer.class);
 	}
 }

@@ -156,23 +156,23 @@ public class PolynomialFeatures extends Transformer implements HasNumberOfFeatur
 	}
 
 	public int getDegree(){
-		return ValueUtil.asInt((Number)get("degree"));
+		return ValueUtil.asInt(getNumber("degree"));
 	}
 
 	public Boolean getIncludeBias(){
-		return (Boolean)get("include_bias");
+		return getBoolean("include_bias");
 	}
 
 	public Boolean getInteractionOnly(){
-		return (Boolean)get("interaction_only");
+		return getBoolean("interaction_only");
 	}
 
 	public int getNumberOfInputFeatures(){
-		return ValueUtil.asInt((Number)get("n_input_features_"));
+		return ValueUtil.asInt(getNumber("n_input_features_"));
 	}
 
 	public int getNumberOfOutputFeatures(){
-		return ValueUtil.asInt((Number)get("n_output_features_"));
+		return ValueUtil.asInt(getNumber("n_output_features_"));
 	}
 
 	/**

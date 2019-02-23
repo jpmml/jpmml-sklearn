@@ -43,7 +43,7 @@ public class DictVectorizer extends Initializer {
 
 	@Override
 	public List<Feature> initializeFeatures(SkLearnEncoder encoder){
-		List<String> featureNames = getFeatureNames();
+		List<? extends String> featureNames = getFeatureNames();
 		String separator = getSeparator();
 		Map<String, Integer> vocabulary = getVocabulary();
 
@@ -94,12 +94,12 @@ public class DictVectorizer extends Initializer {
 		return result;
 	}
 
-	public List<String> getFeatureNames(){
-		return (List)getList("feature_names_", String.class);
+	public List<? extends String> getFeatureNames(){
+		return getList("feature_names_", String.class);
 	}
 
 	public String getSeparator(){
-		return (String)get("separator");
+		return getString("separator");
 	}
 
 	public Map<String, Integer> getVocabulary(){

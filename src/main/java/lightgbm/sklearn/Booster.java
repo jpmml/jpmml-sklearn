@@ -58,6 +58,6 @@ public class Booster extends PyClassDict {
 	}
 
 	public String getHandle(){
-		return (String)get("handle");
+		return getString("handle");
 	}
 }

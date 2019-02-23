@@ -59,6 +59,6 @@ public class PowerFunctionTransformer extends Transformer {
 	}
 
 	public Integer getPower(){
-		return (Integer)get("power");
+		return (Integer)getNumber("power");
 	}
 }

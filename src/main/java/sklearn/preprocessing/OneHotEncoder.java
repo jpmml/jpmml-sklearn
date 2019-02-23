@@ -104,7 +104,7 @@ public class OneHotEncoder extends Transformer {
 
 		ClassDictUtil.checkSize(1, featureSizes);
 
-		Object numberOfValues = get("n_values");
+		Object numberOfValues = getOptionalObject("n_values");
 
 		if(("auto").equals(numberOfValues)){
 			return getActiveFeatures();

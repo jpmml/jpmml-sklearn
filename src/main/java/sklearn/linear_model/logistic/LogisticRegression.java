@@ -141,7 +141,7 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	public String getMultiClass(){
-		String multiClass = (String)get("multi_class");
+		String multiClass = getString("multi_class");
 
 		// SkLearn 0.20
 		if(("warn").equals(multiClass)){

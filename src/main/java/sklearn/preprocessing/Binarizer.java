@@ -59,6 +59,6 @@ public class Binarizer extends Transformer {
 	}
 
 	public Number getThreshold(){
-		return (Number)get("threshold");
+		return getNumber("threshold");
 	}
 }

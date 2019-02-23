@@ -57,10 +57,10 @@ public class Verification extends PyClassDict {
 	}
 
 	public Number getPrecision(){
-		return (Number)get("precision");
+		return getNumber("precision");
 	}
 
 	public Number getZeroThreshold(){
-		return (Number)get("zeroThreshold");
+		return getNumber("zeroThreshold");
 	}
 }

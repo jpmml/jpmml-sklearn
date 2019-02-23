@@ -111,11 +111,11 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public Boolean getWithMean(){
-		return (Boolean)get("with_mean");
+		return getBoolean("with_mean");
 	}
 
 	public Boolean getWithStd(){
-		return (Boolean)get("with_std");
+		return getBoolean("with_std");
 	}
 
 	public List<? extends Number> getMean(){

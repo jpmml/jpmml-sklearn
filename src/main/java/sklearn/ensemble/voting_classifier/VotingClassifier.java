@@ -77,11 +77,11 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 	}
 
 	public String getVoting(){
-		return (String)get("voting");
+		return getString("voting");
 	}
 
 	public List<? extends Number> getWeights(){
-		Object weights = get("weights");
+		Object weights = getOptionalObject("weights");
 
 		if((weights == null) || (weights instanceof List)){
 			return (List)weights;

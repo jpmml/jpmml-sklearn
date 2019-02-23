@@ -76,19 +76,19 @@ public class LibSVMClassifier extends Classifier {
 	}
 
 	public String getKernel(){
-		return (String)get("kernel");
+		return getString("kernel");
 	}
 
 	public Integer getDegree(){
-		return ValueUtil.asInteger((Number)get("degree"));
+		return ValueUtil.asInteger(getNumber("degree"));
 	}
 
 	public Double getGamma(){
-		return ValueUtil.asDouble((Number)get("_gamma"));
+		return ValueUtil.asDouble(getNumber("_gamma"));
 	}
 
 	public Double getCoef0(){
-		return ValueUtil.asDouble((Number)get("coef0"));
+		return ValueUtil.asDouble(getNumber("coef0"));
 	}
 
 	public List<Integer> getSupport(){

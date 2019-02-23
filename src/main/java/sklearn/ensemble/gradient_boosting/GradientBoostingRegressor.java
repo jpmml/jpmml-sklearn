@@ -40,7 +40,7 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 
 		// SkLearn 0.18
 		if(containsKey("n_features")){
-			return ValueUtil.asInt((Number)get("n_features"));
+			return ValueUtil.asInt(getNumber("n_features"));
 		}
 
 		// SkLearn 0.19+
@@ -64,7 +64,7 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 	}
 
 	public Number getLearningRate(){
-		return (Number)get("learning_rate");
+		return getNumber("learning_rate");
 	}
 
 	@Override

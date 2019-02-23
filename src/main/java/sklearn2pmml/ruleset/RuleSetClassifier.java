@@ -86,7 +86,7 @@ public class RuleSetClassifier extends Classifier {
 	}
 
 	public String getDefaultScore(){
-		return (String)get("default_score");
+		return getOptionalString("default_score");
 	}
 
 	public List<Object[]> getRules(){

@@ -56,6 +56,6 @@ public class Booster extends PyClassDict {
 	}
 
 	public byte[] getHandle(){
-		return (byte[])get("handle");
+		return get("handle", byte[].class);
 	}
 }

@@ -62,22 +62,22 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 
 	@Override
 	public String getMetric(){
-		return (String)get("metric");
+		return getString("metric");
 	}
 
 	@Override
 	public int getNumberOfNeighbors(){
-		return KNeighborsUtil.getNumberOfNeighbors(this);
+		return ValueUtil.asInt(getNumber("n_neighbors"));
 	}
 
 	@Override
 	public int getP(){
-		return ValueUtil.asInt((Number)get("p"));
+		return ValueUtil.asInt(getNumber("p"));
 	}
 
 	@Override
 	public String getWeights(){
-		return (String)get("weights");
+		return getString("weights");
 	}
 
 	@Override

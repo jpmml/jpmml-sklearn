@@ -96,7 +96,7 @@ public class DataFrameMapper extends Initializer {
 	}
 
 	public Object getDefault(){
-		return get("default");
+		return getObject("default");
 	}
 
 	public DataFrameMapper setDefault(Object _default){

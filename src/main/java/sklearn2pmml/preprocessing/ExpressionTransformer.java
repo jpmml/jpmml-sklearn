@@ -51,12 +51,12 @@ public class ExpressionTransformer extends Transformer {
 
 		// SkLearn2PMML 0.31.0
 		if(containsKey("expr_")){
-			return (String)get("expr_");
+			return getString("expr_");
 		} else
 
 		// SkLearn2PMML 0.31.1+
 		{
-			return (String)get("expr");
+			return getString("expr");
 		}
 	}
 }

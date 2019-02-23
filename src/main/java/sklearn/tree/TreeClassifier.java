@@ -47,6 +47,6 @@ public class TreeClassifier extends Classifier implements HasTree, HasTreeOption
 
 	@Override
 	public Tree getTree(){
-		return (Tree)get("tree_");
+		return get("tree_", Tree.class);
 	}
 }

@@ -49,13 +49,12 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 
 	@Override
 	public int getNumberOfFeatures(){
-		Number nFeatures = (Number)get("n_features_");
 
-		if(nFeatures == null){
-			return -1;
+		if(containsKey("n_features_")){
+			return ValueUtil.asInt(getNumber("n_features_"));
 		}
 
-		return ValueUtil.asInt(nFeatures);
+		return -1;
 	}
 
 	public OpType getOpType(){
@@ -67,7 +66,7 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 	}
 
 	public Object getOption(String key, Object defaultValue){
-		Map<String, ?> pmmlOptions = (Map)get("pmml_options_");
+		Map<String, ?> pmmlOptions = getOptional("pmml_options_", Map.class);
 
 		if(pmmlOptions != null && pmmlOptions.containsKey(key)){
 			return pmmlOptions.get(key);
@@ -84,7 +83,7 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 	}
 
 	public String getSkLearnVersion(){
-		return (String)get("_sklearn_version");
+		return getOptionalString("_sklearn_version");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Estimator.class);

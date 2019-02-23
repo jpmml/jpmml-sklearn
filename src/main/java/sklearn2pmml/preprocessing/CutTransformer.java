@@ -114,7 +114,7 @@ public class CutTransformer extends Transformer {
 	}
 
 	public List<?> getLabels(){
-		Object labels = get("labels");
+		Object labels = getOptionalObject("labels");
 
 		if(labels == null || (Boolean.FALSE).equals(labels)){
 			return null;
@@ -124,11 +124,11 @@ public class CutTransformer extends Transformer {
 	}
 
 	public Boolean getRight(){
-		return (Boolean)get("right");
+		return getBoolean("right");
 	}
 
 	public Boolean getIncludeLowest(){
-		return (Boolean)get("include_lowest");
+		return getBoolean("include_lowest");
 	}
 
 	static

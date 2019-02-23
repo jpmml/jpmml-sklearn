@@ -52,7 +52,7 @@ public class MLPRegressor extends Regressor {
 	}
 
 	public String getActivation(){
-		return (String)get("activation");
+		return getString("activation");
 	}
 
 	public List<? extends HasArray> getCoefs(){

@@ -49,15 +49,15 @@ public class NumpyArrayWrapper extends PyClassDict {
 	}
 
 	public DType getDType(){
-		return (DType)get("dtype");
+		return get("dtype", DType.class);
 	}
 
 	public Object[] getShape(){
-		return (Object[])get("shape");
+		return getTuple("shape");
 	}
 
 	public String getOrder(){
-		return (String)get("order");
+		return getString("order");
 	}
 
 	static

@@ -31,6 +31,6 @@ public class Splitter extends PyClassDict {
 	}
 
 	public String getSeparatorRE(){
-		return (String)get("separator_re");
+		return getString("separator_re");
 	}
 }

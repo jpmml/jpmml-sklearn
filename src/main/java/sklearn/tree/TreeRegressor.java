@@ -44,6 +44,6 @@ public class TreeRegressor extends Regressor implements HasTree, HasTreeOptions 
 
 	@Override
 	public Tree getTree(){
-		return (Tree)get("tree_");
+		return get("tree_", Tree.class);
 	}
 }

@@ -133,15 +133,15 @@ public class ContinuousDomain extends Domain {
 	}
 
 	public String getOutlierTreatment(){
-		return (String)get("outlier_treatment");
+		return getOptionalString("outlier_treatment");
 	}
 
 	public Number getLowValue(){
-		return get("low_value", Number.class);
+		return getNumber("low_value");
 	}
 
 	public Number getHighValue(){
-		return get("high_value", Number.class);
+		return getNumber("high_value");
 	}
 
 	public List<? extends Number> getDataMin(){

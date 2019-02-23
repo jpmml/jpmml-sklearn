@@ -67,6 +67,6 @@ public class Alias extends Transformer {
 	}
 
 	public String getName(){
-		return (String)get("name");
+		return getString("name");
 	}
 }

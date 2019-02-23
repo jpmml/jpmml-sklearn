@@ -45,6 +45,6 @@ public class LinearSVC extends LinearClassifier {
 	}
 
 	public String getMultiClass(){
-		return (String)get("multi_class");
+		return getString("multi_class");
 	}
 }

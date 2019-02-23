@@ -56,10 +56,62 @@ public class PyClassDict extends ClassDict {
 		return castFunction.apply(value);
 	}
 
+	public <E> E getOptional(String name, Class<? extends E> clazz){
+		Object value = get(name);
+
+		if(value == null){
+			return null;
+		}
+
+		return get(name, clazz);
+	}
+
+	public Boolean getBoolean(String name){
+		return get(name, Boolean.class);
+	}
+
+	public Boolean getOptionalBoolean(String name, Boolean defaultValue){
+		Boolean value = getOptional(name, Boolean.class);
+
+		if(value == null){
+			return defaultValue;
+		}
+
+		return value;
+	}
+
+	public Number getNumber(String name){
+		Object object = get(name, Object.class);
+
+		object = ScalarUtil.decode(object);
+
+		return (Number)object;
+	}
+
+	public Object getObject(String name){
+		return get(name, Object.class);
+	}
+
+	public Object getOptionalObject(String name){
+		return getOptional(name, Object.class);
+	}
+
 	public Object getScalar(String name){
 		Object object = get(name);
 
 		return ScalarUtil.decode(object);
+	}
+
+	public String getString(String name){
+		return get(name, String.class);
+	}
+
+	public String getOptionalString(String name){
+		return getOptional(name, String.class);
+	}
+
+	public Object[] getTuple(String name){
+		return get(name, Object[].class);
 	}
 
 	public List<?> getArray(String name){
@@ -122,7 +174,7 @@ public class PyClassDict extends ClassDict {
 		return get(name, List.class);
 	}
 
-	public <E> List<? extends E> getList(String name, Class<? extends E> clazz){
+	public <E> List<E> getList(String name, Class<? extends E> clazz){
 		List<?> values = getList(name);
 
 		CastFunction<E> castFunction = new CastFunction<E>(clazz){
@@ -137,6 +189,6 @@ public class PyClassDict extends ClassDict {
 	}
 
 	public List<Object[]> getTupleList(String name){
-		return (List)getList(name, Object[].class);
+		return getList(name, Object[].class);
 	}
 }

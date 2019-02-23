@@ -121,7 +121,7 @@ public class PCA extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public Boolean getWhiten(){
-		return (Boolean)get("whiten");
+		return getBoolean("whiten");
 	}
 
 	public List<? extends Number> getComponents(){

@@ -48,7 +48,7 @@ public class Transformer extends PyClassDict {
 	}
 
 	public DType getDType(){
-		Object dtype = get("dtype");
+		Object dtype = getObject("dtype");
 
 		if(dtype instanceof ClassDictConstructor){
 			ClassDictConstructor classDictConstructor = (ClassDictConstructor)dtype;

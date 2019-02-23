@@ -56,7 +56,7 @@ public class NDArrayWrapper extends PyClassDict implements HasArray, HasContent<
 	}
 
 	public String getFileName(){
-		return (String)get("filename");
+		return getString("filename");
 	}
 
 	@Override

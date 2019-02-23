@@ -571,13 +571,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	private Transformer getTransformer(String key){
-		Object transformer = get(key);
-
-		if(transformer == null){
-			return null;
-		}
-
-		return get(key, Transformer.class);
+		return getOptional(key, Transformer.class);
 	}
 
 	public List<String> getActiveFields(){
@@ -599,7 +593,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		// SkLearn2PMML 0.24.3
 		if(containsKey("target_field")){
-			return Collections.singletonList((String)get("target_field"));
+			return Collections.singletonList(getOptionalString("target_field"));
 		} // End if
 
 		// SkLearn2PMML 0.25+
@@ -617,7 +611,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	public String getRepr(){
-		return (String)get("repr_");
+		return getOptionalString("repr_");
 	}
 
 	public PMMLPipeline setRepr(String repr){
@@ -627,7 +621,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	public Verification getVerification(){
-		return (Verification)get("verification");
+		return getOptional("verification", Verification.class);
 	}
 
 	public PMMLPipeline setVerification(Verification verification){

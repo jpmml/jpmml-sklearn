@@ -56,7 +56,7 @@ public class MLPClassifier extends Classifier {
 	}
 
 	public String getActivation(){
-		return (String)get("activation");
+		return getString("activation");
 	}
 
 	public List<? extends HasArray> getCoefs(){

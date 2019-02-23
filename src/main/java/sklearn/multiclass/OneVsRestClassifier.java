@@ -52,7 +52,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 		List<? extends Classifier> estimators = getEstimators();
 		Boolean multilabel = getMultilabel();
 
-		if(multilabel != null && multilabel){
+		if(multilabel){
 			throw new IllegalArgumentException();
 		}
 
@@ -107,6 +107,6 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 	}
 
 	public Boolean getMultilabel(){
-		return (Boolean)get("multilabel_");
+		return getOptionalBoolean("multilabel_", Boolean.FALSE);
 	}
 }

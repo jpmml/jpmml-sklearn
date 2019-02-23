@@ -194,11 +194,11 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	public String getBehaviour(){
-		return (String)get("behaviour");
+		return getOptionalString("behaviour");
 	}
 
 	public int getMaxSamples(){
-		return ValueUtil.asInt((Number)get("max_samples_"));
+		return ValueUtil.asInt(getNumber("max_samples_"));
 	}
 
 	public double getThreshold(){
@@ -206,12 +206,12 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 		// SkLearn 0.19
 		if(containsKey("threshold_")){
-			threshold = (Number)getScalar("threshold_");
+			threshold = getNumber("threshold_");
 		} else
 
 		// SkLearn 0.20+
 		{
-			threshold = (Number)getScalar("_threshold_");
+			threshold = getNumber("_threshold_");
 		}
 
 		return ValueUtil.asDouble(threshold);

@@ -62,23 +62,11 @@ public class FunctionTransformer extends Transformer {
 	}
 
 	public UFunc getFunc(){
-		Object ufunc = get("func");
-
-		if(ufunc == null){
-			return null;
-		}
-
-		return get("func", UFunc.class);
+		return getOptional("func", UFunc.class);
 	}
 
 	public UFunc getInverseFunc(){
-		Object inverseFunc = get("inverse_func");
-
-		if(inverseFunc == null){
-			return null;
-		}
-
-		return get("inverse_func", UFunc.class);
+		return getOptional("inverse_func", UFunc.class);
 	}
 
 	static

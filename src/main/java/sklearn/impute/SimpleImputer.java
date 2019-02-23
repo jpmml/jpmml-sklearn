@@ -66,7 +66,7 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public Object getMissingValues(){
-		return get("missing_values");
+		return getOptionalObject("missing_values");
 	}
 
 	public List<?> getStatistics(){
@@ -78,7 +78,7 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public String getStrategy(){
-		return (String)get("strategy");
+		return getString("strategy");
 	}
 
 	static

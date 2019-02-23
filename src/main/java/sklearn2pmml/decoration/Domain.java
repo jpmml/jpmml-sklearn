@@ -109,15 +109,15 @@ public class Domain extends Transformer {
 	}
 
 	public String getMissingValueTreatment(){
-		return (String)get("missing_value_treatment");
+		return getOptionalString("missing_value_treatment");
 	}
 
 	public Object getMissingValueReplacement(){
-		return get("missing_value_replacement");
+		return getOptionalObject("missing_value_replacement");
 	}
 
 	public List<Object> getMissingValues(){
-		Object missingValues = get("missing_values");
+		Object missingValues = getOptionalObject("missing_values");
 
 		if(missingValues != null){
 
@@ -134,31 +134,19 @@ public class Domain extends Transformer {
 	}
 
 	public String getInvalidValueTreatment(){
-		return (String)get("invalid_value_treatment");
+		return getOptionalString("invalid_value_treatment");
 	}
 
 	public Object getInvalidValueReplacement(){
-		return get("invalid_value_replacement");
+		return getOptionalObject("invalid_value_replacement");
 	}
 
 	public Boolean getWithData(){
-		Boolean withData = (Boolean)get("with_data");
-
-		if(withData == null){
-			return Boolean.TRUE;
-		}
-
-		return withData;
+		return getOptionalBoolean("with_data", Boolean.TRUE);
 	}
 
 	public Boolean getWithStatistics(){
-		Boolean withStatistics = (Boolean)get("with_statistics");
-
-		if(withStatistics == null){
-			return Boolean.FALSE;
-		}
-
-		return withStatistics;
+		return getOptionalBoolean("with_statistics", Boolean.FALSE);
 	}
 
 	public Map<String, ?> getCounts(){

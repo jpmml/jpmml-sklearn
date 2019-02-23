@@ -30,7 +30,7 @@ public class TfidfTransformer extends PyClassDict {
 	}
 
 	public Number getWeight(int index){
-		CSRMatrix idfDiag = (CSRMatrix)get("_idf_diag");
+		CSRMatrix idfDiag = get("_idf_diag", CSRMatrix.class);
 
 		List<?> data = idfDiag.getData();
 
@@ -38,14 +38,14 @@ public class TfidfTransformer extends PyClassDict {
 	}
 
 	public String getNorm(){
-		return (String)get("norm");
+		return getOptionalString("norm");
 	}
 
 	public Boolean getSublinearTf(){
-		return (Boolean)get("sublinear_tf");
+		return getBoolean("sublinear_tf");
 	}
 
 	public Boolean getUseIdf(){
-		return (Boolean)get("use_idf");
+		return getBoolean("use_idf");
 	}
 }

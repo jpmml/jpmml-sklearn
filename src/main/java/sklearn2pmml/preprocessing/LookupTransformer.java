@@ -160,6 +160,6 @@ public class LookupTransformer extends Transformer {
 	}
 
 	public Object getDefaultValue(){
-		return get("default_value");
+		return getOptionalObject("default_value");
 	}
 }
