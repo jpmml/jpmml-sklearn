@@ -32,9 +32,11 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
+import sklearn.TypeUtil;
 
 public class CutTransformer extends Transformer {
 
@@ -45,14 +47,22 @@ public class CutTransformer extends Transformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> bins = getBins();
-		List<String> labels = getLabels();
+		List<?> labels = getLabels();
 		Boolean right = getRight();
 		Boolean includeLowest = getIncludeLowest();
 
 		ClassDictUtil.checkSize(1, features);
 
+		DataType dataType;
+
 		if(labels != null){
 			ClassDictUtil.checkSize(bins.size() - 1, labels);
+
+			dataType = TypeUtil.getDataType(labels, DataType.STRING);
+		} else
+
+		{
+			dataType = DataType.INTEGER;
 		}
 
 		Feature feature = features.get(0);
@@ -80,7 +90,7 @@ public class CutTransformer extends Transformer {
 			String label;
 
 			if(labels != null){
-				label = labels.get(i);
+				label = ValueUtil.formatValue(labels.get(i));
 			} else
 
 			{
@@ -94,7 +104,7 @@ public class CutTransformer extends Transformer {
 			discretize.addDiscretizeBins(discretizeBin);
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("cut", feature), OpType.CATEGORICAL, (labels != null ? DataType.STRING : DataType.INTEGER), discretize);
+		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("cut", feature), OpType.CATEGORICAL, dataType, discretize);
 
 		return Collections.singletonList(new CategoricalFeature(encoder, derivedField, categories));
 	}
@@ -103,14 +113,14 @@ public class CutTransformer extends Transformer {
 		return getList("bins", Number.class);
 	}
 
-	public List<String> getLabels(){
+	public List<?> getLabels(){
 		Object labels = get("labels");
 
 		if(labels == null || (Boolean.FALSE).equals(labels)){
 			return null;
 		}
 
-		return (List)getList("labels", String.class);
+		return getList("labels");
 	}
 
 	public Boolean getRight(){
