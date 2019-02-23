@@ -4,22 +4,22 @@ import pandas
 #import pickle
 
 def load_csv(name):
-	return pandas.read_csv("csv/" + name, na_values = ["N/A", "NA"])
+	return pandas.read_csv("csv/" + name + ".csv", na_values = ["N/A", "NA"])
 
 def split_csv(df):
 	columns = df.columns.tolist()
 	return (df[columns[: -1]], df[columns[-1]])
 
 def store_csv(df, name):
-	df.to_csv("csv/" + name, index = False)
+	df.to_csv("csv/" + name + ".csv", index = False)
 
 def store_mojo(estimator, name):
-	estimator.download_mojo("mojo/" + name)
-	estimator._mojo_path = "mojo/" + name
+	estimator.download_mojo("mojo/" + name + ".zip")
+	estimator._mojo_path = "mojo/" + name + ".zip"
 
 # Joblib dump
 def store_pkl(obj, name):
-	joblib.dump(obj, "pkl/" + name, compress = 9)
+	joblib.dump(obj, "pkl/" + name + ".pkl", compress = 9)
 
 # Pickle dump
 #def store_pkl(obj, name):

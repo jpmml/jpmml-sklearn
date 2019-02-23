@@ -20,18 +20,18 @@ def build_classifier(data, name):
 	classifier.fit(X, y)
 	pipeline = make_pmml_pipeline(classifier.fitted_pipeline_, active_fields = X.columns.values, target_fields = [y.name])
 	print(repr(pipeline))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	result = DataFrame(classifier.predict(X), columns = [y.name])
 	if(len(categories) > 0):
 		probabilities = DataFrame(classifier.predict_proba(X), columns = ["probability(" + str(category) + ")" for category in categories])
 		result = pandas.concat([result, probabilities], axis = 1)
-	store_csv(result, name + ".csv")
+	store_csv(result, name)
 
-iris_data = load_iris("Iris.csv")
+iris_data = load_iris("Iris")
 
 build_classifier(iris_data, "TPOTIris")
 
-versicolor_data = load_iris("Versicolor.csv")
+versicolor_data = load_iris("Versicolor")
 
 build_classifier(versicolor_data, "TPOTVersicolor")
 
@@ -47,14 +47,14 @@ def build_regressor(data, name):
 	regressor.fit(X, y)
 	pipeline = make_pmml_pipeline(regressor.fitted_pipeline_, active_fields = X.columns.values, target_fields = [y.name])
 	print(repr(pipeline))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	result = DataFrame(regressor.predict(X), columns = [y.name])
-	store_csv(result, name + ".csv")
+	store_csv(result, name)
 
-auto_data = load_auto("Auto.csv")
+auto_data = load_auto("Auto")
 
 build_regressor(auto_data, "TPOTAuto")
 
-housing_data = load_housing("Housing.csv")
+housing_data = load_housing("Housing")
 
 build_regressor(housing_data, "TPOTHousing")

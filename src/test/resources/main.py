@@ -118,7 +118,7 @@ if with_h2o:
 # Clustering
 #
 
-wheat_X, wheat_y = load_wheat("Wheat.csv")
+wheat_X, wheat_y = load_wheat("Wheat")
 
 def kmeans_distance(kmeans, center, X):
 	return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - X, 2), axis = 1)
@@ -138,7 +138,7 @@ def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 	pipeline.fit(wheat_X)
 	pipeline = make_pmml_pipeline(pipeline, wheat_X.columns.values)
 	pipeline.configure(**pmml_options)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["Cluster"])
 	if with_affinity == True:
 		Xt = pipeline_transform(pipeline, wheat_X)
@@ -147,7 +147,7 @@ def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 		affinity_2 = kmeans_distance(kmeans, 2, Xt)
 		cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity(0)", "affinity(1)", "affinity(2)"])
 		cluster = pandas.concat((cluster, cluster_affinity), axis = 1)
-	store_csv(cluster, name + ".csv")
+	store_csv(cluster, name)
 
 if "Wheat" in datasets:
 	build_wheat(KMeans(n_clusters = 3, random_state = 13), "KMeansWheat")
@@ -157,7 +157,7 @@ if "Wheat" in datasets:
 # Binary classification
 #
 
-audit_X, audit_y = load_audit("Audit.csv", stringify = False)
+audit_X, audit_y = load_audit("Audit", stringify = False)
 
 def build_audit(classifier, name, with_proba = True, **pmml_options):
 	continuous_mapper = DataFrameMapper([
@@ -188,12 +188,12 @@ def build_audit(classifier, name, with_proba = True, **pmml_options):
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
 	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
-	store_csv(adjusted, name + ".csv")
+	store_csv(adjusted, name)
 
 if "Audit" in datasets:
 	build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 2), "DecisionTreeAudit", compact = False)
@@ -216,7 +216,7 @@ if "Audit" in datasets:
 	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 	build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit", byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
 
-audit_X, audit_y = load_audit("Audit.csv")
+audit_X, audit_y = load_audit("Audit")
 
 def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	mapper = DataFrameMapper(
@@ -230,12 +230,12 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	])
 	pipeline.fit(audit_X, audit_y, **fit_params)
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
 	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
-	store_csv(adjusted, name + ".csv")
+	store_csv(adjusted, name)
 
 if "Audit" in datasets:
 	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = [2, 3, 4, 5, 6, 7, 8])
@@ -253,11 +253,11 @@ def build_audit_h2o(classifier, name):
 	pipeline.fit(audit_X, H2OFrame(audit_y.to_frame(), column_types = ["categorical"]))
 	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
 	classifier = pipeline._final_estimator
-	store_mojo(classifier, name + ".zip")
-	store_pkl(pipeline, name + ".pkl")
+	store_mojo(classifier, name)
+	store_pkl(pipeline, name)
 	adjusted = pipeline.predict(audit_X)
 	adjusted.set_names(["h2o(Adjusted)", "probability(0)", "probability(1)"])
-	store_csv(adjusted.as_data_frame(), name + ".csv")
+	store_csv(adjusted.as_data_frame(), name)
 
 if "Audit" in datasets and with_h2o:
 	build_audit_h2o(H2OGradientBoostingEstimator(distribution = "bernoulli", ntrees = 17), "H2OGradientBoostingAudit")
@@ -272,18 +272,18 @@ def build_audit_dict(classifier, name, with_proba = True):
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_dict_X, audit_y)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_dict_X), columns = ["Adjusted"])
 	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_dict_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
-	store_csv(adjusted, name + ".csv")
+	store_csv(adjusted, name)
 
 if "Audit" in datasets:
 	build_audit_dict(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditDict")
 	build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
 
-audit_na_X, audit_na_y = load_audit("AuditNA.csv")
+audit_na_X, audit_na_y = load_audit("AuditNA")
 
 def build_audit_na(classifier, name, with_proba = True, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
 	employment_mapping = {
@@ -313,7 +313,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_transformer = No
 	], predict_transformer = predict_transformer, predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.configure(**pmml_options)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
 	if with_proba == True:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
@@ -322,14 +322,14 @@ def build_audit_na(classifier, name, with_proba = True, predict_transformer = No
 		Xt = pipeline_transform(pipeline, audit_na_X)
 		adjusted_apply = DataFrame(classifier.apply(Xt), columns = ["nodeId"])
 		adjusted = pandas.concat((adjusted, adjusted_apply), axis = 1)
-	store_csv(adjusted, name + ".csv")
+	store_csv(adjusted, name)
 
 if "Audit" in datasets:
 	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 	build_audit_na(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 11, random_state = 13), "XGBAuditNA", predict_transformer = Alias(ExpressionTransformer("X[0]"), name = "eval(Adjusted)", prefit = True))
 
-versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
+versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
 def build_versicolor(classifier, name, with_proba = True, **pmml_options):
 	transformer = ColumnTransformer([
@@ -350,12 +350,12 @@ def build_versicolor(classifier, name, with_proba = True, **pmml_options):
 	pipeline = make_pmml_pipeline(pipeline, versicolor_X.columns.values, versicolor_y.name)
 	pipeline.configure(**pmml_options)
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
 	if with_proba == True:
 		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
 		species = pandas.concat((species, species_proba), axis = 1)
-	store_csv(species, name + ".csv")
+	store_csv(species, name)
 
 if "Versicolor" in datasets:
 	build_versicolor(DummyClassifier(strategy = "prior"), "DummyVersicolor")
@@ -366,7 +366,7 @@ if "Versicolor" in datasets:
 	build_versicolor(SVC(), "SVCVersicolor", with_proba = False)
 	build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
 
-versicolor_X, versicolor_y = load_versicolor("Versicolor.csv")
+versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
 def build_versicolor_direct(classifier, name, with_proba = True, **pmml_options):
 	transformer = ColumnTransformer([
@@ -379,12 +379,12 @@ def build_versicolor_direct(classifier, name, with_proba = True, **pmml_options)
 	pipeline.fit(versicolor_X, versicolor_y)
 	pipeline.configure(**pmml_options)
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
 	if with_proba == True:
 		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
 		species = pandas.concat((species, species_proba), axis = 1)
-	store_csv(species, name + ".csv")
+	store_csv(species, name)
 
 if "Versicolor" in datasets:
 	build_versicolor_direct(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeVersicolor", compact = False)
@@ -393,7 +393,7 @@ if "Versicolor" in datasets:
 # Multi-class classification
 #
 
-iris_X, iris_y = load_iris("Iris.csv")
+iris_X, iris_y = load_iris("Iris")
 
 def build_iris(classifier, name, with_proba = True, **pmml_options):
 	pipeline = Pipeline([
@@ -419,12 +419,12 @@ def build_iris(classifier, name, with_proba = True, **pmml_options):
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
 	if with_proba == True:
 		species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
 		species = pandas.concat((species, species_proba), axis = 1)
-	store_csv(species, name + ".csv")
+	store_csv(species, name)
 
 if "Iris" in datasets:
 	build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris", compact = False)
@@ -462,15 +462,15 @@ if "Iris" in datasets:
 	])
 	pipeline.fit(iris_X, iris_y)
 	pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
-	store_pkl(pipeline, "RuleSetIris.pkl")
+	store_pkl(pipeline, "RuleSetIris")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
-	store_csv(species, "RuleSetIris.csv")
+	store_csv(species, "RuleSetIris")
 
 #
 # Text classification
 #
 
-sentiment_X, sentiment_y = load_sentiment("Sentiment.csv")
+sentiment_X, sentiment_y = load_sentiment("Sentiment")
 
 def build_sentiment(classifier, name, with_proba = True, **pmml_options):
 	pipeline = PMMLPipeline([
@@ -480,12 +480,12 @@ def build_sentiment(classifier, name, with_proba = True, **pmml_options):
 	])
 	pipeline.fit(sentiment_X, sentiment_y)
 	pipeline.configure(**pmml_options)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
 	if with_proba == True:
 		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability(0)", "probability(1)"])
 		score = pandas.concat((score, score_proba), axis = 1)
-	store_csv(score, name + ".csv")
+	store_csv(score, name)
 
 if "Sentiment" in datasets:
 	build_sentiment(LinearSVC(random_state = 13), "LinearSVCSentiment", with_proba = False)
@@ -496,7 +496,7 @@ if "Sentiment" in datasets:
 # Regression
 #
 
-auto_X, auto_y = load_auto("Auto.csv")
+auto_X, auto_y = load_auto("Auto")
 
 def build_auto(regressor, name, **pmml_options):
 	cylinders_origin_mapping = {
@@ -525,9 +525,9 @@ def build_auto(regressor, name, **pmml_options):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
-	store_csv(mpg, name + ".csv")
+	store_csv(mpg, name)
 
 if "Auto" in datasets:
 	build_auto(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostAuto")
@@ -569,18 +569,18 @@ def build_auto_h2o(regressor, name):
 	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
 	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
 	regressor = pipeline._final_estimator
-	store_mojo(regressor, name + ".zip")
-	store_pkl(pipeline, name + ".pkl")
+	store_mojo(regressor, name)
+	store_pkl(pipeline, name)
 	mpg = pipeline.predict(auto_X)
 	mpg.set_names(["mpg"])
-	store_csv(mpg.as_data_frame(), name + ".csv")
+	store_csv(mpg.as_data_frame(), name)
 
 if "Auto" in datasets and with_h2o:
 	build_auto_h2o(H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
 	build_auto_h2o(H2OGeneralizedLinearEstimator(family = "gaussian"), "H2OLinearRegressionAuto")
 	build_auto_h2o(H2ORandomForestEstimator(distribution = "gaussian", seed = 13), "H2ORandomForestAuto")
 
-auto_na_X, auto_na_y = load_auto("AutoNA.csv")
+auto_na_X, auto_na_y = load_auto("AutoNA")
 
 auto_na_X["cylinders"] = auto_na_X["cylinders"].fillna(-1).astype(int)
 auto_na_X["model_year"] = auto_na_X["model_year"].fillna(-1).astype(int)
@@ -605,19 +605,19 @@ def build_auto_na(regressor, name, predict_transformer = None, apply_transformer
 		node_impurity = {node_idx : tree.impurity[node_idx] for node_idx in range(0, tree.node_count) if tree.impurity[node_idx] != 0.0}
 		pmml_options["node_extensions"] = {regressor.criterion : node_impurity}
 	pipeline.configure(**pmml_options)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
 	if isinstance(regressor, DecisionTreeRegressor):
 		Xt = pipeline_transform(pipeline, auto_na_X)
 		mpg_apply = DataFrame(regressor.apply(Xt), columns = ["nodeId"])
 		mpg = pandas.concat((mpg, mpg_apply), axis = 1)
-	store_csv(mpg, name + ".csv")
+	store_csv(mpg, name)
 
 if "Auto" in datasets:
 	build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_auto_na(LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
 
-housing_X, housing_y = load_housing("Housing.csv")
+housing_X, housing_y = load_housing("Housing")
 
 def build_housing(regressor, name, with_kneighbors = False, **pmml_options):
 	mapper = DataFrameMapper([
@@ -636,14 +636,14 @@ def build_housing(regressor, name, with_kneighbors = False, **pmml_options):
 	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values, housing_y.name)
 	pipeline.configure(**pmml_options)
 	pipeline.verify(housing_X.sample(frac = 0.05, random_state = 13))
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
 	if with_kneighbors == True:
 		Xt = pipeline_transform(pipeline, housing_X)
 		kneighbors = regressor.kneighbors(Xt)
 		medv_ids = DataFrame(kneighbors[1] + 1, columns = ["neighbor(" + str(x + 1) + ")" for x in range(regressor.n_neighbors)])
 		medv = pandas.concat((medv, medv_ids), axis = 1)
-	store_csv(medv, name + ".csv")
+	store_csv(medv, name)
 
 if "Housing" in datasets:
 	build_housing(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostHousing")
@@ -670,10 +670,10 @@ def build_iforest_housing(iforest, name, **pmml_options):
 	pipeline.fit(housing_X)
 	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values)
 	pipeline.configure(**pmml_options)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(housing_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
-	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
+	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name)
 
 if "Housing" in datasets:
 	build_iforest_housing(IsolationForest(random_state = 13), "IsolationForestHousing")
@@ -689,10 +689,10 @@ def build_ocsvm_housing(svm, name):
 	])
 	pipeline.fit(housing_X)
 	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values)
-	store_pkl(pipeline, name + ".pkl")
+	store_pkl(pipeline, name)
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(housing_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
-	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name + ".csv")
+	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name)
 
 if "Housing" in datasets:
 	build_ocsvm_housing(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousing")
