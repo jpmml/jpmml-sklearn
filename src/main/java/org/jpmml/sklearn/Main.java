@@ -142,6 +142,7 @@ public class Main {
 			logger.info("Converting..");
 
 			long begin = System.currentTimeMillis();
+			System.err.println(pipeline.toString());
 			pmml = pipeline.encodePMML();
 			long end = System.currentTimeMillis();
 

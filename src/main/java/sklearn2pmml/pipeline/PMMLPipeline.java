@@ -444,6 +444,8 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		for(OutputField outputField : outputFields){
 			FieldName name = outputField.getName();
 
+			System.out.println(name.getValue());
+
 			DataField dataField = encoder.createDataField(name, outputField.getOpType(), outputField.getDataType());
 
 			features.add(new WildcardFeature(encoder, dataField));

@@ -21,6 +21,7 @@ package numpy.core;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -367,9 +368,71 @@ public class NDArrayUtil {
 		throw new IOException();
 	}
 
+	public static int fromBytes(byte b1, byte b2) {
+		return b1 << 8 | b2 & 128;
+	}
+
+	static
+	private int read2Int(InputStream is, ByteOrder byteOrder) throws IOException {
+		byte b1 = readByte(is);
+		byte b2 = readByte(is);
+
+		byte[] bytes = new byte[]{b1, b2};
+
+		if((ByteOrder.BIG_ENDIAN).equals(byteOrder)){
+			return fromBytes(b1, b2);
+		} else
+
+		if((ByteOrder.LITTLE_ENDIAN).equals(byteOrder)){
+			return fromBytes(b2, b1);
+		}
+
+		throw new IOException();
+	}
+
 	static
 	private float readFloat(InputStream is, ByteOrder byteOrder) throws IOException {
 		return Float.intBitsToFloat(readInt(is, byteOrder));
+	}
+
+	// https://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java
+	// ignores the higher 16 bits
+	static public float readFloat16(InputStream is, ByteOrder byteOrder) throws IOException
+	{
+
+		byte b1 = readByte(is);
+		byte b2 = readByte(is);
+
+		byte[] bytes = new byte[]{b2, b1};
+
+		System.err.println("length");
+		System.err.println(bytes.length);
+		final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		short hbits = buffer.getShort();
+
+		int mant = hbits & 0x03ff;            // 10 bits mantissa
+		int exp =  hbits & 0x7c00;            // 5 bits exponent
+		if( exp == 0x7c00 )                   // NaN/Inf
+			exp = 0x3fc00;                    // -> NaN/Inf
+		else if( exp != 0 )                   // normalized value
+		{
+			exp += 0x1c000;                   // exp - 15 + 127
+			if( mant == 0 && exp > 0x1c400 )  // smooth transition
+				return Float.intBitsToFloat( ( hbits & 0x8000 ) << 16
+						| exp << 13 | 0x3ff );
+		}
+		else if( mant != 0 )                  // && exp==0 -> subnormal
+		{
+			exp = 0x1c400;                    // make it normal
+			do {
+				mant <<= 1;                   // mantissa * 2
+				exp -= 0x400;                 // decrease exp by 1
+			} while( ( mant & 0x400 ) == 0 ); // while not normal
+			mant &= 0x3ff;                    // discard subnormal bit
+		}                                     // else +/-0 -> +/-0
+		return Float.intBitsToFloat(          // combine all parts
+				( hbits & 0x8000 ) << 16          // sign  << ( 31 - 15 )
+						| ( exp | mant ) << 13 );         // value << ( 23 - 10 )
 	}
 
 	static
@@ -528,6 +591,17 @@ public class NDArrayUtil {
 				case FLOAT:
 					{
 						switch(size){
+							case 2:
+								float me = readFloat16(is, byteOrder);
+								float returnval;
+								if (me == (float)1.000122){
+									returnval = 1;
+								}
+								else {
+									returnval = me;
+								}
+								System.err.println(returnval);
+								return returnval;
 							case 4:
 								return readFloat(is, byteOrder);
 							case 8:
