@@ -22,19 +22,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.TypeUtil;
 
 public class CategoricalDomain extends Domain {
 
@@ -74,17 +72,7 @@ public class CategoricalDomain extends Domain {
 		if(withData){
 			List<?> data = getData();
 
-			Function<Object, String> function = new Function<Object, String>(){
-
-				@Override
-				public String apply(Object object){
-					return ValueUtil.formatValue(object);
-				}
-			};
-
-			List<String> categories = Lists.transform(data, function);
-
-			feature = wildcardFeature.toCategoricalFeature(categories);
+			feature = wildcardFeature.toCategoricalFeature(data);
 		} // End if
 
 		if(withStatistics){

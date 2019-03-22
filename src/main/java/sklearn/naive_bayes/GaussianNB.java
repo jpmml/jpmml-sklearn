@@ -110,7 +110,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	static
-	private TargetValueStats encodeTargetValueStats(List<String> values, List<? extends Number> means, List<? extends Number> variances){
+	private TargetValueStats encodeTargetValueStats(List<?> values, List<? extends Number> means, List<? extends Number> variances){
 		TargetValueStats targetValueStats = new TargetValueStats();
 
 		ClassDictUtil.checkSize(values, means, variances);
@@ -128,7 +128,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	static
-	private TargetValueCounts encodeTargetValueCounts(List<String> values, List<Integer> counts){
+	private TargetValueCounts encodeTargetValueCounts(List<?> values, List<Integer> counts){
 		TargetValueCounts targetValueCounts = new TargetValueCounts();
 
 		ClassDictUtil.checkSize(values, counts);

@@ -28,13 +28,12 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
-import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTreeOptions;
@@ -74,12 +73,12 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		Number learningRate = getLearningRate();
 
-		Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), schema.getFeatures());
+		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		if(numberOfClasses == 1){
-			ClassifierUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkSize(2, categoricalLabel);
 
 			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, init.getPriorProbability(0), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
@@ -88,7 +87,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		} else
 
 		if(numberOfClasses >= 3){
-			ClassifierUtil.checkSize(numberOfClasses, categoricalLabel);
+			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
 
 			List<? extends TreeRegressor> estimators = getEstimators();
 

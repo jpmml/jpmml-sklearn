@@ -62,7 +62,7 @@ public class FunctionTransformerTest {
 		UFunc ufunc = new UFunc("numpy.core", "_ufunc_reconstruct");
 		ufunc.__init__(new String[]{"numpy", function});
 
-		FieldName name = new FieldName("x");
+		FieldName name = FieldName.create("x");
 
 		DataType dataType;
 

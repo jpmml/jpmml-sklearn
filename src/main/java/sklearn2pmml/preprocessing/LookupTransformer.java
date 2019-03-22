@@ -37,11 +37,10 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TypeUtil;
 
 public class LookupTransformer extends Transformer {
 
@@ -95,7 +94,7 @@ public class LookupTransformer extends Transformer {
 		outputValues.addAll(data.get(outputColumn));
 
 		if(defaultValue != null){
-			mapValues.setDefaultValue(ValueUtil.formatValue(defaultValue));
+			mapValues.setDefaultValue(defaultValue);
 
 			outputValues.add(defaultValue);
 		}

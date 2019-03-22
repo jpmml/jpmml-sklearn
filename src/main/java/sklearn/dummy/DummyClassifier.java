@@ -26,13 +26,13 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.True;
-import org.dmg.pmml.tree.ComplexNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.tree.ClassifierNode;
+import org.jpmml.model.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 
@@ -85,14 +85,16 @@ public class DummyClassifier extends Classifier {
 				throw new IllegalArgumentException(strategy);
 		}
 
-		Node root = new ComplexNode()
-			.setPredicate(new True())
-			.setScore(ValueUtil.formatValue(classes.get(index)));
+		Node root = new ClassifierNode()
+			.setScore(ValueUtil.toString(classes.get(index)))
+			.setPredicate(new True());
+
+		List<ScoreDistribution> scoreDistributions = root.getScoreDistributions();
 
 		for(int i = 0; i < classes.size(); i++){
-			ScoreDistribution scoreDistribution = new ScoreDistribution(ValueUtil.formatValue(classes.get(i)), probabilities[i]);
+			ScoreDistribution scoreDistribution = new ScoreDistribution(ValueUtil.toString(classes.get(i)), probabilities[i]);
 
-			root.addScoreDistributions(scoreDistribution);
+			scoreDistributions.add(scoreDistribution);
 		}
 
 		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root)

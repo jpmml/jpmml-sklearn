@@ -30,9 +30,10 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.model.ValueUtil;
 import sklearn.Classifier;
-import sklearn.ClassifierUtil;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimatorEnsemble;
 
@@ -59,7 +60,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		if(estimators.size() == 1){
-			ClassifierUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkSize(2, categoricalLabel);
 
 			Classifier estimator = estimators.get(0);
 
@@ -71,7 +72,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 		} else
 
 		if(estimators.size() >= 2){
-			ClassifierUtil.checkSize(estimators.size(), categoricalLabel);
+			SchemaUtil.checkSize(estimators.size(), categoricalLabel);
 
 			List<Model> models = new ArrayList<>();
 
@@ -85,7 +86,9 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 				Output output = new Output()
 					.addOutputFields(ModelUtil.createProbabilityField(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), DataType.DOUBLE, categoricalLabel.getValue(i)));
 
-				Schema segmentSchema = new Schema(new CategoricalLabel(null, DataType.STRING, Arrays.asList("(other)", categoricalLabel.getValue(i))), schema.getFeatures());
+				CategoricalLabel segmentCategoricalLabel = new CategoricalLabel(null, DataType.STRING, Arrays.asList("(other)", ValueUtil.toString(categoricalLabel.getValue(i))));
+
+				Schema segmentSchema = schema.toRelabeledSchema(segmentCategoricalLabel);
 
 				Model model = estimator.encodeModel(segmentSchema)
 					.setOutput(output);

@@ -20,11 +20,6 @@ package sklearn;
 
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ValueUtil;
-
 public class ClassifierUtil {
 
 	private ClassifierUtil(){
@@ -35,36 +30,5 @@ public class ClassifierUtil {
 		HasClasses hasClasses = (HasClasses)estimator;
 
 		return hasClasses.getClasses();
-	}
-
-	static
-	public List<String> formatTargetCategories(List<?> objects){
-		Function<Object, String> function = new Function<Object, String>(){
-
-			@Override
-			public String apply(Object object){
-				String targetCategory = ValueUtil.formatValue(object);
-
-				if(targetCategory == null || ("").equals(targetCategory)){
-					throw new IllegalArgumentException(targetCategory);
-				} // End if
-
-				if(!(targetCategory).equals(targetCategory.trim())){
-					throw new IllegalArgumentException(targetCategory);
-				}
-
-				return targetCategory;
-			}
-		};
-
-		return Lists.transform(objects, function);
-	}
-
-	static
-	public void checkSize(int size, CategoricalLabel categoricalLabel){
-
-		if(categoricalLabel.size() != size){
-			throw new IllegalArgumentException("Expected " + size + " class(es), got " + categoricalLabel.size() + " class(es)");
-		}
 	}
 }

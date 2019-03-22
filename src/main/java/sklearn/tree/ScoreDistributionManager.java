@@ -35,7 +35,7 @@ public class ScoreDistributionManager {
 		List<ScoreDistribution> result = new ArrayList<>();
 
 		for(int i = 0; i < categoricalLabel.size(); i++){
-			String value = categoricalLabel.getValue(i);
+			Object value = categoricalLabel.getValue(i);
 			double recordCount = recordCounts[i];
 
 			ScoreDistribution scoreDistribution = new InternableScoreDistribution()

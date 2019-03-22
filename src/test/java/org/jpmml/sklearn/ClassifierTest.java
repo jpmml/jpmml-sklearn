@@ -70,7 +70,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateLGBMAuditCat() throws Exception {
-		evaluate("LGBM", "AuditCat", new RealNumberEquivalence(1));
+		evaluate("LGBM", "AuditCat", new RealNumberEquivalence(2));
 	}
 
 	@Test

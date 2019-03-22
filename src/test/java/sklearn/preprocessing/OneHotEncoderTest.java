@@ -54,9 +54,9 @@ public class OneHotEncoderTest {
 		for(int i = 0; i < 3; i++){
 			BinaryFeature outputFeature = (BinaryFeature)outputFeatures.get(i);
 
-			assertEquals(String.valueOf(i), outputFeature.getValue());
+			assertEquals(i, outputFeature.getValue());
 		}
 
-		assertEquals(Arrays.asList("0", "1", "2"), PMMLUtil.getValues(dataField));
+		assertEquals(Arrays.asList(0, 1, 2), PMMLUtil.getValues(dataField));
 	}
 }

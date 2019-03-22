@@ -18,6 +18,7 @@
  */
 package tpot.builtins;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.dmg.pmml.DataType;
@@ -96,11 +97,6 @@ public class ContinuousOutputFeature extends ContinuousFeature {
 	}
 
 	private void setOutput(Output output){
-
-		if(output == null){
-			throw new IllegalArgumentException();
-		}
-
-		this.output = output;
+		this.output = Objects.requireNonNull(output);
 	}
 }

@@ -18,8 +18,11 @@
  */
 package sklearn2pmml.ruleset;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.rule_set.RuleSelectionMethod;
@@ -47,7 +50,26 @@ public class RuleSetClassifier extends Classifier {
 
 	@Override
 	public List<String> getClasses(){
-		return Collections.emptyList();
+		String defaultScore = getDefaultScore();
+		List<Object[]> rules = getRules();
+
+		Set<String> scores = new LinkedHashSet<>();
+
+		if(defaultScore != null){
+			scores.add(defaultScore);
+		}
+
+		for(Object[] rule : rules){
+			String score = TupleUtil.extractElement(rule, 1, String.class);
+
+			scores.add(score);
+		}
+
+		List<String> result = new ArrayList<>(scores);
+
+		Collections.sort(result, String.CASE_INSENSITIVE_ORDER);
+
+		return result;
 	}
 
 	@Override

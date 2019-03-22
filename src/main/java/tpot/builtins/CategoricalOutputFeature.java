@@ -19,6 +19,7 @@
 package tpot.builtins;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.dmg.pmml.DataType;
@@ -35,11 +36,11 @@ public class CategoricalOutputFeature extends CategoricalFeature {
 	private Output output = null;
 
 
-	public CategoricalOutputFeature(PMMLEncoder encoder, Output output, OutputField outputField, List<String> values){
+	public CategoricalOutputFeature(PMMLEncoder encoder, Output output, OutputField outputField, List<?> values){
 		this(encoder, output, outputField.getName(), outputField.getDataType(), values);
 	}
 
-	public CategoricalOutputFeature(PMMLEncoder encoder, Output output, FieldName name, DataType dataType, List<String> values){
+	public CategoricalOutputFeature(PMMLEncoder encoder, Output output, FieldName name, DataType dataType, List<?> values){
 		super(encoder, name, dataType, values);
 
 		setOutput(output);
@@ -97,11 +98,6 @@ public class CategoricalOutputFeature extends CategoricalFeature {
 	}
 
 	private void setOutput(Output output){
-
-		if(output == null){
-			throw new IllegalArgumentException();
-		}
-
-		this.output = output;
+		this.output = Objects.requireNonNull(output);
 	}
 }

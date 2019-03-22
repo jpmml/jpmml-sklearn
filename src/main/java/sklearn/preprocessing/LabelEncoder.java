@@ -32,11 +32,10 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TypeUtil;
 
 public class LabelEncoder extends Transformer {
 
@@ -64,12 +63,12 @@ public class LabelEncoder extends Transformer {
 
 		Feature feature = features.get(0);
 
-		List<String> inputCategories = new ArrayList<>();
-		List<String> outputCategories = new ArrayList<>();
+		List<Object> inputCategories = new ArrayList<>();
+		List<Integer> outputCategories = new ArrayList<>();
 
 		for(int i = 0; i < classes.size(); i++){
-			inputCategories.add(ValueUtil.formatValue(classes.get(i)));
-			outputCategories.add(ValueUtil.formatValue(i));
+			inputCategories.add(classes.get(i));
+			outputCategories.add(i);
 		}
 
 		Supplier<MapValues> mapValuesSupplier = () -> {

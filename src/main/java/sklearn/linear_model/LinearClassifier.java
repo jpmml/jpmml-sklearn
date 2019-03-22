@@ -19,7 +19,6 @@
 package sklearn.linear_model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -29,15 +28,14 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Classifier;
-import sklearn.ClassifierUtil;
 
 public class LinearClassifier extends Classifier {
 
@@ -69,15 +67,15 @@ public class LinearClassifier extends Classifier {
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
-			ClassifierUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkSize(2, categoricalLabel);
 
 			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 3){
-			ClassifierUtil.checkSize(numberOfClasses, categoricalLabel);
+			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
 
-			Schema segmentSchema = new Schema(new ContinuousLabel(null, DataType.DOUBLE), Collections.emptyList());
+			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();
 
 			List<RegressionModel> regressionModels = new ArrayList<>();
 

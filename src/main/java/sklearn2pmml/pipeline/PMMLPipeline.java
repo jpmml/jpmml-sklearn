@@ -55,10 +55,11 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
+import org.jpmml.model.ValueUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
@@ -75,7 +76,6 @@ import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
-import sklearn.TypeUtil;
 import sklearn.pipeline.Pipeline;
 
 public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
@@ -123,12 +123,10 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			switch(miningFunction){
 				case CLASSIFICATION:
 					{
-						List<?> classes = ClassifierUtil.getClasses(estimator);
+						List<?> categories = ClassifierUtil.getClasses(estimator);
 						Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
 
-						DataType dataType = TypeUtil.getDataType(classes, DataType.STRING);
-
-						List<String> categories = ClassifierUtil.formatTargetCategories(classes);
+						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
 						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, dataType, categories);
 
@@ -151,7 +149,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 										if(value != null){
 											value = ScalarUtil.decode(value);
 
-											addExtension(pmmlValue, ValueUtil.formatValue(value));
+											addExtension(pmmlValue, ValueUtil.toString(value));
 										}
 
 										return super.visit(pmmlValue);
@@ -318,8 +316,8 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 				CategoricalLabel categoricalLabel = (CategoricalLabel)label;
 
-				List<String> values = categoricalLabel.getValues();
-				for(String value : values){
+				List<?> values = categoricalLabel.getValues();
+				for(Object value : values){
 					probabilityFields.add("probability(" + value + ")"); // XXX
 				}
 

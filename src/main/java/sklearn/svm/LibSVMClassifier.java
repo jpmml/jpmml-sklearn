@@ -64,11 +64,12 @@ public class LibSVMClassifier extends Classifier {
 
 		List<SupportVectorMachine> supportVectorMachines = supportVectorMachineModel.getSupportVectorMachines();
 		for(SupportVectorMachine supportVectorMachine : supportVectorMachines){
-			String category = supportVectorMachine.getTargetCategory();
+			Object category = supportVectorMachine.getTargetCategory();
+			Object alternateTargetCategory = supportVectorMachine.getAlternateTargetCategory();
 
 			// LibSVM: (decisionFunction > 0 ? first : second)
 			// PMML: (decisionFunction < 0 ? first : second)
-			supportVectorMachine.setTargetCategory(supportVectorMachine.getAlternateTargetCategory());
+			supportVectorMachine.setTargetCategory(alternateTargetCategory);
 			supportVectorMachine.setAlternateTargetCategory(category);
 		}
 

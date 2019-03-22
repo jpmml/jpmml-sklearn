@@ -36,11 +36,11 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnUtil;
-import sklearn.ClassifierUtil;
 import sklearn.linear_model.LinearClassifier;
 
 public class LogisticRegression extends LinearClassifier {
@@ -81,6 +81,8 @@ public class LogisticRegression extends LinearClassifier {
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
+			SchemaUtil.checkSize(2, categoricalLabel);
+
 			// See https://github.com/scikit-learn/scikit-learn/issues/9889
 			boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.20") >= 0);
 
@@ -88,7 +90,7 @@ public class LogisticRegression extends LinearClassifier {
 				return encodeOvRModel(schema);
 			}
 
-			Schema segmentSchema = new Schema(null, features);
+			Schema segmentSchema = schema.toRelabeledSchema(null);
 
 			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), null, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE));
@@ -113,7 +115,7 @@ public class LogisticRegression extends LinearClassifier {
 		} else
 
 		if(numberOfClasses >= 3){
-			ClassifierUtil.checkSize(numberOfClasses, categoricalLabel);
+			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
 
 			List<RegressionTable> regressionTables = new ArrayList<>();
 

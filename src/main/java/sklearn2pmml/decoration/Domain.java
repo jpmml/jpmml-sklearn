@@ -75,12 +75,12 @@ public class Domain extends Transformer {
 			if(missingValueTreatment != null || missingValues != null){
 				MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
 					.setMissingValueTreatment(missingValueTreatment)
-					.setMissingValueReplacement(missingValueReplacement != null ? ValueUtil.formatValue(missingValueReplacement) : null);
+					.setMissingValueReplacement(missingValueReplacement);
 
 				if(missingValues != null){
 
 					for(Object missingValue : missingValues){
-						missingValueDecorator.addValues(ValueUtil.formatValue(missingValue));
+						missingValueDecorator.addValues(missingValue);
 					}
 				}
 
@@ -95,7 +95,7 @@ public class Domain extends Transformer {
 						super.decorate(dataField, miningField);
 
 						if(invalidValueReplacement != null){
-							miningField.setInvalidValueReplacement(ValueUtil.formatValue(invalidValueReplacement));
+							miningField.setInvalidValueReplacement(invalidValueReplacement);
 						}
 					}
 				}

@@ -32,11 +32,10 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TypeUtil;
 
 public class CutTransformer extends Transformer {
 
@@ -71,7 +70,7 @@ public class CutTransformer extends Transformer {
 
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-		List<String> categories = new ArrayList<>();
+		List<Object> labelCategories = new ArrayList<>();
 
 		Discretize discretize = new Discretize(continuousFeature.getName());
 
@@ -87,17 +86,17 @@ public class CutTransformer extends Transformer {
 				interval.setClosure(Interval.Closure.CLOSED_CLOSED);
 			}
 
-			String label;
+			Object label;
 
 			if(labels != null){
-				label = ValueUtil.formatValue(labels.get(i));
+				label = labels.get(i);
 			} else
 
 			{
-				label = String.valueOf(i);
+				label = i;
 			}
 
-			categories.add(label);
+			labelCategories.add(label);
 
 			DiscretizeBin discretizeBin = new DiscretizeBin(label, interval);
 
@@ -106,7 +105,7 @@ public class CutTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("cut", feature), OpType.CATEGORICAL, dataType, discretize);
 
-		return Collections.singletonList(new CategoricalFeature(encoder, derivedField, categories));
+		return Collections.singletonList(new CategoricalFeature(encoder, derivedField, labelCategories));
 	}
 
 	public List<? extends Number> getBins(){

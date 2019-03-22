@@ -18,8 +18,6 @@
  */
 package sklearn.compose;
 
-import java.util.List;
-
 import numpy.core.UFunc;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
@@ -29,7 +27,6 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel.NormalizationMethod;
 import org.jpmml.converter.AbstractTransformation;
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -57,7 +54,6 @@ public class TransformedTargetRegressor extends Regressor {
 		}
 
 		Label label = schema.getLabel();
-		List<? extends Feature> features = schema.getFeatures();
 
 		Transformation transformation = new AbstractTransformation(){
 

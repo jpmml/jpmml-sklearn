@@ -18,6 +18,7 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.CompoundPredicate;
@@ -71,15 +72,15 @@ public class PredicateTranslatorTest extends TranslatorTest {
 
 		SimpleSetPredicate simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in [1, 2, 3]", doubleFeatures);
 
-		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, "1 2 3");
+		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, Arrays.asList("1", "2", "3"));
 
 		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in ['one', 'two', 'three']", stringFeatures);
 
-		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, "one two three");
+		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, Arrays.asList("one", "two", "three"));
 
 		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X['a'] not in [-1.5, -1, -0.5, 0]", doubleFeatures);
 
-		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_NOT_IN, "-1.5 -1 -0.5 0");
+		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_NOT_IN, Arrays.asList("-1.5", "-1", "-0.5", "0"));
 	}
 
 	static
@@ -105,7 +106,7 @@ public class PredicateTranslatorTest extends TranslatorTest {
 	}
 
 	static
-	private void checkSimpleSetPredicate(SimpleSetPredicate simpleSetPredicate, FieldName field, SimpleSetPredicate.BooleanOperator booleanOperator, String value){
+	private void checkSimpleSetPredicate(SimpleSetPredicate simpleSetPredicate, FieldName field, SimpleSetPredicate.BooleanOperator booleanOperator, Object value){
 		assertEquals(field, simpleSetPredicate.getField());
 		assertEquals(booleanOperator, simpleSetPredicate.getBooleanOperator());
 		assertEquals(value, (simpleSetPredicate.getArray()).getValue());

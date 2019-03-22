@@ -21,6 +21,7 @@ package sklearn.tree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,8 +40,9 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
-import org.dmg.pmml.tree.ComplexNode;
+import org.dmg.pmml.tree.DefaultNodeTransformer;
 import org.dmg.pmml.tree.Node;
+import org.dmg.pmml.tree.NodeTransformer;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalLabel;
@@ -50,6 +52,9 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.tree.ClassifierNode;
+import org.jpmml.converter.tree.CountingBranchNode;
+import org.jpmml.converter.tree.CountingLeafNode;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
@@ -103,23 +108,59 @@ public class TreeModelUtil {
 
 			for(Map.Entry<String, Map<Integer, ?>> entry : entries){
 				String name = entry.getKey();
-
 				Map<Integer, ?> values = entry.getValue();
 
 				Visitor nodeExtender = new AbstractExtender(name){
 
+					private NodeTransformer nodeTransformer = DefaultNodeTransformer.INSTANCE;
+
+
+					@Override
+					public VisitorAction visit(TreeModel treeModel){
+						treeModel.setNode(ensureExtensibility(treeModel.getNode()));
+
+						return super.visit(treeModel);
+					}
+
 					@Override
 					public VisitorAction visit(Node node){
-						Integer id = Integer.valueOf(node.getId());
 
-						Object value = values.get(id);
+						if(node.hasNodes()){
+							List<Node> children = node.getNodes();
+
+							for(ListIterator<Node> childIt = children.listIterator(); childIt.hasNext(); ){
+								childIt.set(ensureExtensibility(childIt.next()));
+							}
+						}
+
+						Object value = getValue(node);
 						if(value != null){
 							value = ScalarUtil.decode(value);
 
-							addExtension((Node & HasExtensions)node, ValueUtil.formatValue(value));
+							addExtension((Node & HasExtensions)node, org.jpmml.model.ValueUtil.toString(value));
 						}
 
 						return super.visit(node);
+					}
+
+					private Node ensureExtensibility(Node node){
+
+						if(node instanceof HasExtensions){
+							return node;
+						}
+
+						Object value = getValue(node);
+						if(value != null){
+							return this.nodeTransformer.toComplexNode(node);
+						}
+
+						return node;
+					}
+
+					private Object getValue(Node node){
+						Integer id = ValueUtil.asInteger((Number)node.getId());
+
+						return values.get(id);
 					}
 				};
 
@@ -207,7 +248,7 @@ public class TreeModelUtil {
 
 	static
 	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
-		String id = String.valueOf(index);
+		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
 
@@ -227,7 +268,7 @@ public class TreeModelUtil {
 					throw new IllegalArgumentException();
 				}
 
-				String value = binaryFeature.getValue();
+				Object value = binaryFeature.getValue();
 
 				leftPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.NOT_EQUAL, value);
 				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
@@ -238,7 +279,7 @@ public class TreeModelUtil {
 					.toContinuousFeature(DataType.FLOAT) // First, cast from any numeric type (including numpy.float64) to numpy.float32
 					.toContinuousFeature(DataType.DOUBLE); // Second, cast from numpy.float32 to numpy.float64
 
-				String value = ValueUtil.formatValue(threshold);
+				Double value = threshold;
 
 				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
 				rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);
@@ -250,7 +291,21 @@ public class TreeModelUtil {
 			Node leftChild = encodeNode(leftPredicate, predicateManager, scoreDistributionManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 			Node rightChild = encodeNode(rightPredicate, predicateManager, scoreDistributionManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
-			Node result = new ComplexNode()
+			Node result;
+
+			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
+				result = new ClassifierNode();
+			} else
+
+			if((MiningFunction.REGRESSION).equals(miningFunction)){
+				result = new CountingBranchNode();
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
+
+			result
 				.setId(id)
 				.setPredicate(predicate)
 				.addNodes(leftChild, rightChild);
@@ -269,7 +324,7 @@ public class TreeModelUtil {
 
 				double totalRecordCount = 0d;
 
-				String score = null;
+				Object score = null;
 
 				double scoreRecordCount = -Double.MAX_VALUE;
 
@@ -285,7 +340,7 @@ public class TreeModelUtil {
 					}
 				}
 
-				result = new ComplexNode()
+				result = new ClassifierNode()
 					.setId(id)
 					.setScore(score)
 					.setRecordCount(totalRecordCount)
@@ -299,7 +354,7 @@ public class TreeModelUtil {
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
 				double value = values[index];
 
-				result = new ComplexNode()
+				result = new CountingLeafNode()
 					.setId(id)
 					.setScore(value)
 					.setPredicate(predicate);

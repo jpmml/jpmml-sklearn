@@ -31,11 +31,11 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TypeUtil;
 
 public class LabelBinarizer extends Transformer {
 
@@ -66,19 +66,12 @@ public class LabelBinarizer extends Transformer {
 
 		Feature feature = features.get(0);
 
-		List<String> categories = new ArrayList<>();
+		List<Object> categories = new ArrayList<>();
+		categories.addAll(classes);
 
-		for(int i = 0; i < classes.size(); i++){
-			Object value = classes.get(i);
-
-			String category = ValueUtil.formatValue(value);
-
-			categories.add(category);
-		}
-
-		List<String> labelCategories = new ArrayList<>();
-		labelCategories.add(ValueUtil.formatValue(negLabel));
-		labelCategories.add(ValueUtil.formatValue(posLabel));
+		List<Number> labelCategories = new ArrayList<>();
+		labelCategories.add(negLabel);
+		labelCategories.add(posLabel);
 
 		List<Feature> result = new ArrayList<>();
 
@@ -87,10 +80,8 @@ public class LabelBinarizer extends Transformer {
 		for(int i = 0; i < classes.size(); i++){
 			Object value = classes.get(i);
 
-			String category = ValueUtil.formatValue(value);
-
 			if(ValueUtil.isZero(negLabel) && ValueUtil.isOne(posLabel)){
-				result.add(new BinaryFeature(encoder, feature, category));
+				result.add(new BinaryFeature(encoder, feature, value));
 			} else
 
 			{

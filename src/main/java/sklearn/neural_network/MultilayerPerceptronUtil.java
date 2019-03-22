@@ -23,8 +23,8 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.Entity;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.neural_network.NeuralEntity;
 import org.dmg.pmml.neural_network.NeuralInputs;
 import org.dmg.pmml.neural_network.NeuralLayer;
 import org.dmg.pmml.neural_network.NeuralNetwork;
@@ -70,7 +70,7 @@ public class MultilayerPerceptronUtil {
 
 		NeuralInputs neuralInputs = NeuralNetworkUtil.createNeuralInputs(features, DataType.DOUBLE);
 
-		List<? extends Entity> entities = neuralInputs.getNeuralInputs();
+		List<? extends NeuralEntity> entities = neuralInputs.getNeuralInputs();
 
 		List<NeuralLayer> neuralLayers = new ArrayList<>();
 

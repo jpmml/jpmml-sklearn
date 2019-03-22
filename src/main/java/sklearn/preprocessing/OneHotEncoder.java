@@ -29,12 +29,12 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TypeUtil;
 
 public class OneHotEncoder extends Transformer {
 
@@ -77,12 +77,12 @@ public class OneHotEncoder extends Transformer {
 		if(feature instanceof WildcardFeature){
 			WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-			List<String> categories = new ArrayList<>();
+			List<Integer> categories = new ArrayList<>();
 
 			for(int i = 0; i < values.size(); i++){
-				int value = ValueUtil.asInt(values.get(i));
+				Number value = values.get(i);
 
-				String category = ValueUtil.formatValue(value);
+				Integer category = ValueUtil.asInt(value);
 
 				categories.add(category);
 

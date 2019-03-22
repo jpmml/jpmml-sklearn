@@ -34,13 +34,13 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
 import sklearn.Transformer;
-import sklearn.TypeUtil;
 
 public class StackingEstimator extends Transformer implements HasEstimator<Estimator> {
 
@@ -66,11 +66,9 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 				{
 					Classifier classifier = (Classifier)estimator;
 
-					List<?> classes = ClassifierUtil.getClasses(estimator);
+					List<?> categories = ClassifierUtil.getClasses(estimator);
 
-					DataType dataType = TypeUtil.getDataType(classes, DataType.STRING);
-
-					List<String> categories = ClassifierUtil.formatTargetCategories(classes);
+					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
 					label = new CategoricalLabel(null, dataType, categories);
 
@@ -78,7 +76,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 					if(classifier.hasProbabilityDistribution()){
 
-						for(String category : categories){
+						for(Object category : categories){
 							OutputField outputField = ModelUtil.createProbabilityField(FieldName.create("probability(" + name.getValue() + ", " + category + ")"), DataType.DOUBLE, category)
 								.setFinalResult(false);
 

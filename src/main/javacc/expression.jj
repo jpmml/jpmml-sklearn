@@ -36,6 +36,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.visitors.ExpressionCompactor;
+import org.jpmml.model.ValueUtil;
 
 public class ExpressionTranslator extends AbstractTranslator {
 
@@ -393,16 +394,16 @@ Expression UnaryExpression():
 			if(expression instanceof Constant){
 				Constant constant = (Constant)expression;
 
-				String value = constant.getValue();
-				if(value.startsWith("-")){
-					value = value.substring(1);
+				String string = ValueUtil.toString(constant.getValue());
+				if(string.startsWith("-")){
+					string = string.substring(1);
 				} else
 					
 				{
-					value = ("-" + value);
+					string = ("-" + string);
 				}
 				
-				constant.setValue(value);
+				constant.setValue(string);
 			} else
 
 			{
