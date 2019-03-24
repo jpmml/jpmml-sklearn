@@ -72,7 +72,8 @@ public class CutTransformer extends Transformer {
 
 		List<Object> labelCategories = new ArrayList<>();
 
-		Discretize discretize = new Discretize(continuousFeature.getName());
+		Discretize discretize = new Discretize(continuousFeature.getName())
+			.setDataType(dataType);
 
 		for(int i = 0; i < bins.size() - 1; i++){
 			Number leftMargin = bins.get(i);

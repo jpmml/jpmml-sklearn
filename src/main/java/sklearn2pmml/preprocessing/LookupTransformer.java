@@ -99,9 +99,13 @@ public class LookupTransformer extends Transformer {
 			outputValues.add(defaultValue);
 		}
 
+		DataType dataType = TypeUtil.getDataType(outputValues, DataType.STRING);
+
+		mapValues.setDataType(dataType);
+
 		FieldName name = FeatureUtil.createName("lookup", features);
 
-		DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, TypeUtil.getDataType(outputValues, DataType.STRING), mapValues);
+		DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, dataType, mapValues);
 
 		Feature feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
 
