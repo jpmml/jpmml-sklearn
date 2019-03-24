@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>net.razorvine</groupId>
 			<artifactId>pyrolite</artifactId>
-			<version>4.22</version>
+			<version>4.23</version>
 		</dependency>
 
 		<dependency>
