@@ -31,7 +31,7 @@ from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, 
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, StringNormalizer
+from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, StringNormalizer
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
@@ -165,10 +165,10 @@ def build_audit(classifier, name, with_proba = True, **pmml_options):
 	])
 	categorical_mapper = DataFrameMapper([
 		(["Employment"], [CategoricalDomain(), LabelBinarizer(), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
-		(["Education"], [CategoricalDomain(), LabelBinarizer(), SelectFromModel(RandomForestClassifier(random_state = 13, n_estimators = 3), threshold = "1.25 * mean")]),
+		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), LabelBinarizer(), SelectFromModel(RandomForestClassifier(random_state = 13, n_estimators = 3), threshold = "1.25 * mean")]),
 		(["Marital"], [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
 		(["Occupation"], [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
-		(["Gender"], [CategoricalDomain(), LabelBinarizer(neg_label = -3, pos_label = 3)]),
+		(["Gender"], [CategoricalDomain(), MatchesTransformer("^Male$")]),
 		(["Deductions"], [CategoricalDomain()]),
 	])
 	pipeline = Pipeline([

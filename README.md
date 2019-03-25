@@ -135,10 +135,12 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.DaysSinceYearTransformer`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
+    * `sklearn2pmml.preprocessing.MatchesTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`
     * `sklearn2pmml.preprocessing.PMMLLabelBinarizer`
     * `sklearn2pmml.preprocessing.PMMLLabelEncoder`
     * `sklearn2pmml.preprocessing.PowerFunctionTransformer`
+    * `sklearn2pmml.preprocessing.ReplaceTransformer`
     * `sklearn2pmml.preprocessing.SecondsSinceYearTransformer`
     * `sklearn2pmml.preprocessing.StringNormalizer`
     * `sklearn2pmml.preprocessing.h2o.H2OFrameCreator`

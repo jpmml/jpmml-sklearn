@@ -147,7 +147,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-		evaluate("XGB", "Audit", new FloatEquivalence(32));
+		evaluate("XGB", "Audit", new FloatEquivalence(64));
 	}
 
 	@Test
