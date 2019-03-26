@@ -27,11 +27,12 @@ from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
+from sklearn2pmml import SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CutTransformer, ExpressionTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, StringNormalizer
+from sklearn2pmml.preprocessing import Aggregator, ConcatTransformer, CutTransformer, ExpressionTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, StringNormalizer
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
@@ -498,6 +499,9 @@ if "Sentiment" in datasets:
 
 auto_X, auto_y = load_auto("Auto")
 
+auto_X["model_year"] = auto_X["model_year"].astype(int)
+auto_X["origin"] = auto_X["origin"].astype(int)
+
 def build_auto(regressor, name, **pmml_options):
 	cylinders_origin_mapping = {
 		(8, 1) : "8/1",
@@ -511,6 +515,7 @@ def build_auto(regressor, name, **pmml_options):
 	mapper = DataFrameMapper([
 		(["cylinders", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
+		(["model_year", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), ConcatTransformer("/"), LabelBinarizer(), SelectorProxy(SelectFromModel(RandomForestRegressor(random_state = 13, n_estimators = 3), threshold = "1.25 * mean"))]),
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
 		(["weight", "displacement"], ExpressionTransformer("(X[0] / X[1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
 	])
@@ -549,7 +554,7 @@ if "Auto" in datasets:
 	build_auto(OrthogonalMatchingPursuitCV(), "OMPAuto")
 	build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", flat = True)
 	build_auto(RidgeCV(), "RidgeAuto")
-	build_auto(TheilSenRegressor(n_subsamples = 15, random_state = 13), "TheilSenAuto")
+	build_auto(TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
 	build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", ntree_limit = 31)
 
 if "Auto" in datasets:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2019 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,48 +16,53 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.decoration;
+package sklearn2pmml.preprocessing;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.Apply;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Expression;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
+import sklearn.Transformer;
 
-public class MultiDomain extends MultiTransformer {
+public class ConcatTransformer extends Transformer {
 
-	public MultiDomain(String module, String name){
+	public ConcatTransformer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Domain> domains = getDomains();
+		String separator = getSeparator();
 
-		ClassDictUtil.checkSize(domains, features);
+		Apply apply = PMMLUtil.createApply("concat");
 
-		List<Feature> result = new ArrayList<>();
+		List<Expression> expressions = apply.getExpressions();
 
 		for(int i = 0; i < features.size(); i++){
-			Domain domain = domains.get(i);
 			Feature feature = features.get(i);
 
-			List<Feature> domainFeatures = Collections.singletonList(feature);
+			if((i > 0) && !("").equals(separator)){
+				expressions.add(PMMLUtil.createConstant(separator, DataType.STRING));
+			}
 
-			encoder.updateFeatures(domainFeatures, domain);
-
-			domainFeatures = domain.encodeFeatures(domainFeatures, encoder);
-
-			result.addAll(domainFeatures);
+			expressions.add(feature.ref());
 		}
 
-		return result;
+		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("concat", features), OpType.CATEGORICAL, DataType.STRING, apply);
+
+		return Collections.singletonList(new StringFeature(encoder, derivedField));
 	}
 
-	public List<? extends Domain> getDomains(){
-		return getList("domains", Domain.class);
+	public String getSeparator(){
+		return getString("separator");
 	}
 }
