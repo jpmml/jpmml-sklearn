@@ -164,7 +164,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			public Expression createExpression(FieldRef fieldRef){
 				String behaviour = getBehaviour();
 
-				double threshold;
+				Number threshold;
 
 				// SkLearn 0.19
 				if(behaviour == null){
@@ -198,23 +198,18 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	public int getMaxSamples(){
-		return ValueUtil.asInt(getNumber("max_samples_"));
+		return getInteger("max_samples_");
 	}
 
-	public double getThreshold(){
-		Number threshold;
+	public Number getThreshold(){
 
 		// SkLearn 0.19
 		if(containsKey("threshold_")){
-			threshold = getNumber("threshold_");
+			return getNumber("threshold_");
 		} else
 
 		// SkLearn 0.20+
-		{
-			threshold = getNumber("_threshold_");
-		}
-
-		return ValueUtil.asDouble(threshold);
+		return getNumber("_threshold_");
 	}
 
 	static

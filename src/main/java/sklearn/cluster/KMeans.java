@@ -35,7 +35,6 @@ import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.clustering.ClusteringModelUtil;
 import sklearn.Clusterer;
 
@@ -98,6 +97,6 @@ public class KMeans extends Clusterer {
 	}
 
 	public List<Integer> getLabels(){
-		return ValueUtil.asIntegers(getArray("labels_", Number.class));
+		return getIntegerArray("labels_");
 	}
 }

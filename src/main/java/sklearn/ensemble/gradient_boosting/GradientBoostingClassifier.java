@@ -31,7 +31,6 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
 import sklearn.Estimator;
@@ -51,7 +50,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		// SkLearn 0.18
 		if(containsKey("n_features")){
-			return ValueUtil.asInt(getNumber("n_features"));
+			return getInteger("n_features");
 		}
 
 		// SkLearn 0.19+

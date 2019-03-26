@@ -60,7 +60,7 @@ public class LibSVMClassifier extends Classifier {
 		List<? extends Number> intercept = getIntercept();
 
 		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createClassification(new CMatrix<>(ValueUtil.asDoubles(supportVectors), numberOfVectors, numberOfFeatures), supportSizes, SupportVectorMachineUtil.formatIds(support), ValueUtil.asDoubles(intercept), ValueUtil.asDoubles(dualCoef), schema)
-			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0()));
+			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), ValueUtil.asDouble(getGamma()), ValueUtil.asDouble(getCoef0())));
 
 		List<SupportVectorMachine> supportVectorMachines = supportVectorMachineModel.getSupportVectorMachines();
 		for(SupportVectorMachine supportVectorMachine : supportVectorMachines){
@@ -81,19 +81,19 @@ public class LibSVMClassifier extends Classifier {
 	}
 
 	public Integer getDegree(){
-		return ValueUtil.asInteger(getNumber("degree"));
+		return getInteger("degree");
 	}
 
-	public Double getGamma(){
-		return ValueUtil.asDouble(getNumber("_gamma"));
+	public Number getGamma(){
+		return getNumber("_gamma");
 	}
 
-	public Double getCoef0(){
-		return ValueUtil.asDouble(getNumber("coef0"));
+	public Number getCoef0(){
+		return getNumber("coef0");
 	}
 
 	public List<Integer> getSupport(){
-		return ValueUtil.asIntegers(getArray("support_", Number.class));
+		return getIntegerArray("support_");
 	}
 
 	public List<? extends Number> getSupportVectors(){
@@ -105,7 +105,7 @@ public class LibSVMClassifier extends Classifier {
 	}
 
 	public List<Integer> getSupportSizes(){
-		return ValueUtil.asIntegers(getArray("n_support_", Number.class));
+		return getIntegerArray("n_support_");
 	}
 
 	public List<? extends Number> getDualCoef(){

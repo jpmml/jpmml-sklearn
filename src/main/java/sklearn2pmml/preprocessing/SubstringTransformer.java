@@ -74,10 +74,10 @@ public class SubstringTransformer extends Transformer {
 	}
 
 	public Integer getBegin(){
-		return (Integer)getNumber("begin");
+		return getInteger("begin");
 	}
 
 	public Integer getEnd(){
-		return (Integer)getNumber("end");
+		return getInteger("end");
 	}
 }

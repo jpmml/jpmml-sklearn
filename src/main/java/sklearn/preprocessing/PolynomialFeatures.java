@@ -34,7 +34,6 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.InteractionFeature;
 import org.jpmml.converter.PowerFeature;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
@@ -156,7 +155,7 @@ public class PolynomialFeatures extends Transformer implements HasNumberOfFeatur
 	}
 
 	public int getDegree(){
-		return ValueUtil.asInt(getNumber("degree"));
+		return getInteger("degree");
 	}
 
 	public Boolean getIncludeBias(){
@@ -168,11 +167,11 @@ public class PolynomialFeatures extends Transformer implements HasNumberOfFeatur
 	}
 
 	public int getNumberOfInputFeatures(){
-		return ValueUtil.asInt(getNumber("n_input_features_"));
+		return getInteger("n_input_features_");
 	}
 
 	public int getNumberOfOutputFeatures(){
-		return ValueUtil.asInt(getNumber("n_output_features_"));
+		return getInteger("n_output_features_");
 	}
 
 	/**

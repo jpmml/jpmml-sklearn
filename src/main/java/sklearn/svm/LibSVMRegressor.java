@@ -54,7 +54,7 @@ public class LibSVMRegressor extends Regressor {
 		List<? extends Number> intercept = getIntercept();
 
 		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createRegression(new CMatrix<>(ValueUtil.asDoubles(supportVectors), numberOfVectors, numberOfFeatures), SupportVectorMachineUtil.formatIds(support), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), ValueUtil.asDoubles(dualCoef), schema)
-			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0()));
+			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), ValueUtil.asDouble(getGamma()), ValueUtil.asDouble(getCoef0())));
 
 		return supportVectorMachineModel;
 	}
@@ -64,19 +64,19 @@ public class LibSVMRegressor extends Regressor {
 	}
 
 	public Integer getDegree(){
-		return ValueUtil.asInteger(getNumber("degree"));
+		return getInteger("degree");
 	}
 
-	public Double getGamma(){
-		return ValueUtil.asDouble(getNumber("_gamma"));
+	public Number getGamma(){
+		return getNumber("_gamma");
 	}
 
-	public Double getCoef0(){
-		return ValueUtil.asDouble(getNumber("coef0"));
+	public Number getCoef0(){
+		return getNumber("coef0");
 	}
 
 	public List<Integer> getSupport(){
-		return ValueUtil.asIntegers(getArray("support_", Number.class));
+		return getIntegerArray("support_");
 	}
 
 	public List<? extends Number> getSupportVectors(){

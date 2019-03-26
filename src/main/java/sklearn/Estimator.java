@@ -25,7 +25,6 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 	public int getNumberOfFeatures(){
 
 		if(containsKey("n_features_")){
-			return ValueUtil.asInt(getNumber("n_features_"));
+			return getInteger("n_features_");
 		}
 
 		return -1;

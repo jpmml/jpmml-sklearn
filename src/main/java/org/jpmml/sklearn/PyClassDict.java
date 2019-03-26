@@ -25,6 +25,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.ScalarUtil;
+import org.jpmml.converter.ValueUtil;
 
 abstract
 public class PyClassDict extends ClassDict {
@@ -80,6 +81,10 @@ public class PyClassDict extends ClassDict {
 		return value;
 	}
 
+	public Integer getInteger(String name){
+		return ValueUtil.asInteger(getNumber(name));
+	}
+
 	public Number getNumber(String name){
 		Object object = get(name, Object.class);
 
@@ -128,6 +133,12 @@ public class PyClassDict extends ClassDict {
 		}
 
 		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
+	}
+
+	public List<Integer> getIntegerArray(String name){
+		List<? extends Number> values = getArray(name, Number.class);
+
+		return ValueUtil.asIntegers(values);
 	}
 
 	public <E> List<? extends E> getArray(String name, Class<? extends E> clazz){

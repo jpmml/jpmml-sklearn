@@ -23,7 +23,6 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 import sklearn.tree.HasTreeOptions;
@@ -40,7 +39,7 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 
 		// SkLearn 0.18
 		if(containsKey("n_features")){
-			return ValueUtil.asInt(getNumber("n_features"));
+			return getInteger("n_features");
 		}
 
 		// SkLearn 0.19+

@@ -24,7 +24,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import sklearn.Regressor;
 
 public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasTrainingData {
@@ -65,12 +64,12 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 
 	@Override
 	public int getNumberOfNeighbors(){
-		return ValueUtil.asInt(getNumber("n_neighbors"));
+		return getInteger("n_neighbors");
 	}
 
 	@Override
 	public int getP(){
-		return ValueUtil.asInt(getNumber("p"));
+		return getInteger("p");
 	}
 
 	@Override

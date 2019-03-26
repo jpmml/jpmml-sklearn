@@ -19,7 +19,6 @@
 package sklearn.ensemble.gradient_boosting;
 
 import org.jpmml.converter.Transformation;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.PyClassDict;
 
 abstract
@@ -33,6 +32,6 @@ public class LossFunction extends PyClassDict {
 	public Transformation createTransformation();
 
 	public Integer getK(){
-		return ValueUtil.asInteger(getNumber("K"));
+		return getInteger("K");
 	}
 }

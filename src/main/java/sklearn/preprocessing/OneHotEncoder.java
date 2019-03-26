@@ -123,6 +123,6 @@ public class OneHotEncoder extends Transformer {
 	}
 
 	public List<Integer> getFeatureSizes(){
-		return ValueUtil.asIntegers(getArray("n_values_", Number.class));
+		return getIntegerArray("n_values_");
 	}
 }

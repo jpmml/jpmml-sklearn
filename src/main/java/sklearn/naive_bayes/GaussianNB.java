@@ -94,7 +94,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	public List<Integer> getClassCount(){
-		return ValueUtil.asIntegers(getArray("class_count_", Number.class));
+		return getIntegerArray("class_count_");
 	}
 
 	public List<? extends Number> getTheta(){
