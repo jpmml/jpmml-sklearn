@@ -144,6 +144,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.ReplaceTransformer`
     * `sklearn2pmml.preprocessing.SecondsSinceYearTransformer`
     * `sklearn2pmml.preprocessing.StringNormalizer`
+    * `sklearn2pmml.preprocessing.SubstringTransformer`
     * `sklearn2pmml.preprocessing.h2o.H2OFrameCreator`
     * `sklearn2pmml.ruleset.RuleSetClassifier`
   * [Sklearn-Pandas](https://github.com/paulgb/sklearn-pandas):
