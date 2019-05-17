@@ -24,7 +24,6 @@ import org.dmg.pmml.support_vector_machine.SupportVectorMachine;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.CMatrix;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.Classifier;
 
@@ -59,8 +58,8 @@ public class LibSVMClassifier extends Classifier {
 		List<? extends Number> dualCoef = getDualCoef();
 		List<? extends Number> intercept = getIntercept();
 
-		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createClassification(new CMatrix<>(ValueUtil.asDoubles(supportVectors), numberOfVectors, numberOfFeatures), supportSizes, SupportVectorMachineUtil.formatIds(support), ValueUtil.asDoubles(intercept), ValueUtil.asDoubles(dualCoef), schema)
-			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), ValueUtil.asDouble(getGamma()), ValueUtil.asDouble(getCoef0())));
+		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createClassification(new CMatrix<>(supportVectors, numberOfVectors, numberOfFeatures), supportSizes, SupportVectorMachineUtil.formatIds(support), intercept, dualCoef, schema)
+			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0()));
 
 		List<SupportVectorMachine> supportVectorMachines = supportVectorMachineModel.getSupportVectorMachines();
 		for(SupportVectorMachine supportVectorMachine : supportVectorMachines){

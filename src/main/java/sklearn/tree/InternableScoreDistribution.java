@@ -29,7 +29,7 @@ public class InternableScoreDistribution extends ScoreDistribution {
 		int result = 0;
 
 		result += (31 * result) + Objects.hashCode(this.getValue());
-		result += (31 * result) + Double.hashCode(this.getRecordCount());
+		result += (31 * result) + Objects.hashCode(this.getRecordCount());
 		result += (31 * result) + Objects.hashCode(this.getProbability());
 
 		return result;
@@ -41,7 +41,7 @@ public class InternableScoreDistribution extends ScoreDistribution {
 		if(object instanceof InternableScoreDistribution){
 			InternableScoreDistribution that = (InternableScoreDistribution)object;
 
-			return Objects.equals(this.getValue(), that.getValue()) && (this.getRecordCount() == that.getRecordCount()) && Objects.equals(this.getProbability(), that.getProbability());
+			return Objects.equals(this.getValue(), that.getValue()) && Objects.equals(this.getRecordCount(), that.getRecordCount()) && Objects.equals(this.getProbability(), that.getProbability());
 		}
 
 		return false;

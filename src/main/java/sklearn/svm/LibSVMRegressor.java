@@ -24,7 +24,6 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.CMatrix;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.Regressor;
 
@@ -53,8 +52,8 @@ public class LibSVMRegressor extends Regressor {
 		List<? extends Number> dualCoef = getDualCoef();
 		List<? extends Number> intercept = getIntercept();
 
-		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createRegression(new CMatrix<>(ValueUtil.asDoubles(supportVectors), numberOfVectors, numberOfFeatures), SupportVectorMachineUtil.formatIds(support), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), ValueUtil.asDoubles(dualCoef), schema)
-			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), ValueUtil.asDouble(getGamma()), ValueUtil.asDouble(getCoef0())));
+		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createRegression(new CMatrix<>(supportVectors, numberOfVectors, numberOfFeatures), SupportVectorMachineUtil.formatIds(support), Iterables.getOnlyElement(intercept), dualCoef, schema)
+			.setKernel(SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0()));
 
 		return supportVectorMachineModel;
 	}

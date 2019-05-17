@@ -18,11 +18,15 @@
  */
 package sklearn.svm;
 
+import java.util.List;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.OutlierTransformation;
@@ -53,6 +57,19 @@ public class OneClassSVM extends LibSVMRegressor {
 
 		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
 			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE, outlier));
+
+		Output output = supportVectorMachineModel.getOutput();
+
+		List<OutputField> outputFields = output.getOutputFields();
+		if(outputFields.size() != 2){
+			throw new IllegalArgumentException();
+		}
+
+		OutputField decisionFunctionOutputField = outputFields.get(0);
+
+		if(!decisionFunctionOutputField.isFinalResult()){
+			decisionFunctionOutputField.setFinalResult(true);
+		}
 
 		return supportVectorMachineModel;
 	}

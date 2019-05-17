@@ -30,7 +30,6 @@ import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.OutlierDecorator;
 import org.jpmml.converter.ValidValueDecorator;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -50,16 +49,16 @@ public class ContinuousDomain extends Domain {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		OutlierTreatmentMethod outlierTreatment = DomainUtil.parseOutlierTreatment(getOutlierTreatment());
 
-		Double lowValue;
-		Double highValue;
+		Number lowValue;
+		Number highValue;
 
 		if(outlierTreatment != null){
 
 			switch(outlierTreatment){
 				case AS_EXTREME_VALUES:
 				case AS_MISSING_VALUES:
-					lowValue = getLowValue().doubleValue();
-					highValue = getHighValue().doubleValue();
+					lowValue = getLowValue();
+					highValue = getHighValue();
 					break;
 				default:
 					lowValue = null;
@@ -103,8 +102,8 @@ public class ContinuousDomain extends Domain {
 
 			if(withData){
 				Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED)
-					.setLeftMargin(ValueUtil.asDouble(dataMin.get(i)))
-					.setRightMargin(ValueUtil.asDouble(dataMax.get(i)));
+					.setLeftMargin(dataMin.get(i))
+					.setRightMargin(dataMax.get(i));
 
 				ValidValueDecorator validValueDecorator = new ValidValueDecorator()
 					.addIntervals(interval);

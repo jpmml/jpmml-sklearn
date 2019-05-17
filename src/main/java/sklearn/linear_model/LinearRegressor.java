@@ -23,7 +23,6 @@ import java.util.List;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Regressor;
 
@@ -45,7 +44,7 @@ public class LinearRegressor extends Regressor {
 		List<? extends Number> coef = getCoef();
 		List<? extends Number> intercept = getIntercept();
 
-		return RegressionModelUtil.createRegression(schema.getFeatures(), ValueUtil.asDoubles(coef), ValueUtil.asDouble(Iterables.getOnlyElement(intercept)), null, schema);
+		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, Iterables.getOnlyElement(intercept), null, schema);
 	}
 
 	public List<? extends Number> getCoef(){

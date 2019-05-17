@@ -32,7 +32,6 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Classifier;
@@ -69,7 +68,7 @@ public class LinearClassifier extends Classifier {
 		if(numberOfClasses == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			return RegressionModelUtil.createBinaryLogisticClassification(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
+			return RegressionModelUtil.createBinaryLogisticClassification(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 3){
@@ -80,7 +79,7 @@ public class LinearClassifier extends Classifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i)), ValueUtil.asDouble(intercepts.get(i)), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
+				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercepts.get(i), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE));
 
 				regressionModels.add(regressionModel);

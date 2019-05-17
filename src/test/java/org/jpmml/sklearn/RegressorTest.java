@@ -171,9 +171,7 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateIsolationForestHousing() throws Exception {
-		FieldName[] anomalyScoreFields = {FieldName.create("rawAnomalyScore"), FieldName.create("normalizedAnomalyScore")};
-
-		evaluate("IsolationForest", "Housing", excludeFields(anomalyScoreFields));
+		evaluate("IsolationForest", "Housing");
 	}
 
 	@Test

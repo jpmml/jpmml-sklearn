@@ -347,8 +347,8 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 				for(int i = 0; i < probabilityFields.size(); i++){
 					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(probabilityFields.get(i)))
-						.setPrecision(precision.doubleValue())
-						.setZeroThreshold(zeroThreshold.doubleValue());
+						.setPrecision(precision)
+						.setZeroThreshold(zeroThreshold);
 
 					data.put(verificationField, CMatrixUtil.getColumn(probabilityValues, rows, probabilityFields.size(), i));
 				}
@@ -363,8 +363,8 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 						case DOUBLE:
 						case FLOAT:
 							verificationField
-								.setPrecision(precision.doubleValue())
-								.setZeroThreshold(zeroThreshold.doubleValue());
+								.setPrecision(precision)
+								.setZeroThreshold(zeroThreshold);
 							break;
 						default:
 							break;

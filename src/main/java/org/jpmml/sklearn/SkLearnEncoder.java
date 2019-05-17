@@ -79,7 +79,7 @@ public class SkLearnEncoder extends ModelEncoder {
 		DataField dataField = getDataField(name);
 
 		if(dataField == null){
-			throw new IllegalArgumentException(name.getValue());
+			throw new IllegalArgumentException("Field " + name.getValue() + " is undefined");
 		}
 
 		dataField.setOpType(opType);

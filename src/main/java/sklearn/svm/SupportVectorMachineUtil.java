@@ -27,7 +27,6 @@ import org.dmg.pmml.support_vector_machine.LinearKernel;
 import org.dmg.pmml.support_vector_machine.PolynomialKernel;
 import org.dmg.pmml.support_vector_machine.RadialBasisKernel;
 import org.dmg.pmml.support_vector_machine.SigmoidKernel;
-import org.jpmml.converter.ValueUtil;
 
 public class SupportVectorMachineUtil {
 
@@ -48,7 +47,7 @@ public class SupportVectorMachineUtil {
 	}
 
 	static
-	public Kernel createKernel(String kernel, Integer degree, Double gamma, Double coef0){
+	public Kernel createKernel(String kernel, Number degree, Number gamma, Number coef0){
 
 		switch(kernel){
 			case "linear":
@@ -57,7 +56,7 @@ public class SupportVectorMachineUtil {
 				return new PolynomialKernel()
 					.setGamma(gamma)
 					.setCoef0(coef0)
-					.setDegree(ValueUtil.asDouble(degree));
+					.setDegree(degree);
 			case "rbf":
 				return new RadialBasisKernel()
 					.setGamma(gamma);

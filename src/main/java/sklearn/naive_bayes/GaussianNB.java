@@ -37,7 +37,6 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
 
@@ -116,7 +115,7 @@ public class GaussianNB extends Classifier {
 		ClassDictUtil.checkSize(values, means, variances);
 
 		for(int i = 0; i < values.size(); i++){
-			GaussianDistribution gaussianDistribution = new GaussianDistribution(ValueUtil.asDouble(means.get(i)), ValueUtil.asDouble(variances.get(i)));
+			GaussianDistribution gaussianDistribution = new GaussianDistribution(means.get(i), variances.get(i));
 
 			TargetValueStat targetValueStat = new TargetValueStat(values.get(i))
 				.setContinuousDistribution(gaussianDistribution);

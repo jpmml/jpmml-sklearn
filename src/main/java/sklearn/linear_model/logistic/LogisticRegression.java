@@ -37,7 +37,6 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnUtil;
@@ -92,7 +91,7 @@ public class LogisticRegression extends LinearClassifier {
 
 			Schema segmentSchema = schema.toRelabeledSchema(null);
 
-			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0)), ValueUtil.asDouble(intercepts.get(0)), null, segmentSchema)
+			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE));
 
 			Feature feature = new ContinuousFeature(null, FieldName.create("decisionFunction"), DataType.DOUBLE);
@@ -120,7 +119,7 @@ public class LogisticRegression extends LinearClassifier {
 			List<RegressionTable> regressionTables = new ArrayList<>();
 
 			for(int i = 0; i < categoricalLabel.size(); i++){
-				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, ValueUtil.asDoubles(CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i)), ValueUtil.asDouble(intercepts.get(i)))
+				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercepts.get(i))
 					.setTargetCategory(categoricalLabel.getValue(i));
 
 				regressionTables.add(regressionTable);

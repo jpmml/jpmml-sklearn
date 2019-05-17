@@ -37,7 +37,6 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.neural_network.NeuralNetworkUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
@@ -89,8 +88,8 @@ public class MultilayerPerceptronUtil {
 			List<?> interceptVector = intercept.getArrayContent();
 
 			for(int column = 0; column < columns; column++){
-				List<Double> weights = (List)CMatrixUtil.getColumn(coefMatrix, rows, columns, column);
-				Double bias = ValueUtil.asDouble((Number)interceptVector.get(column));
+				List<? extends Number> weights = (List)CMatrixUtil.getColumn(coefMatrix, rows, columns, column);
+				Number bias = (Number)interceptVector.get(column);
 
 				Neuron neuron = NeuralNetworkUtil.createNeuron(entities, weights, bias)
 					.setId(String.valueOf(layer + 1) + "/" + String.valueOf(column + 1));

@@ -135,6 +135,11 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			}
 
 			@Override
+			public boolean isFinalResult(){
+				return false;
+			}
+
+			@Override
 			public Expression createExpression(FieldRef fieldRef){
 				double maxSamples = getMaxSamples();
 
@@ -150,6 +155,11 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			@Override
 			public FieldName getName(FieldName name){
 				return FieldName.create("decisionFunction");
+			}
+
+			@Override
+			public boolean isFinalResult(){
+				return true;
 			}
 
 			@Override

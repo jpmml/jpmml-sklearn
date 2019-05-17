@@ -33,7 +33,6 @@ import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueDecorator;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -156,7 +155,7 @@ public class Domain extends Transformer {
 	static
 	public Counts createCounts(Map<String, ?> values){
 		Counts counts = new Counts()
-			.setTotalFreq(selectValue(values, "totalFreq", 0d))
+			.setTotalFreq(selectValue(values, "totalFreq", 0))
 			.setMissingFreq(selectValue(values, "missingFreq"))
 			.setInvalidFreq(selectValue(values, "invalidFreq"));
 
@@ -179,19 +178,19 @@ public class Domain extends Transformer {
 	}
 
 	static
-	protected Double selectValue(Map<String, ?> values, String key){
+	protected Number selectValue(Map<String, ?> values, String key){
 		return selectValue(values, key, null);
 	}
 
 	static
-	protected Double selectValue(Map<String, ?> values, String key, Double defaultValue){
+	protected Number selectValue(Map<String, ?> values, String key, Number defaultValue){
 		Number value = (Number)values.get(key);
 
 		if(value == null){
 			return defaultValue;
 		}
 
-		return ValueUtil.asDouble(value);
+		return value;
 	}
 
 	static
