@@ -18,12 +18,25 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.jpmml.converter.SigmoidTransformation;
+import sklearn.HasPriorProbability;
 
 public class BinomialDeviance extends LossFunction {
 
 	public BinomialDeviance(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<? extends Number> computeInitRawPrediction(HasPriorProbability init){
+		Number probaPosClass = init.getPriorProbability(1);
+
+		double result = Math.log(probaPosClass.doubleValue() / (1d - probaPosClass.doubleValue()));
+
+		return Collections.singletonList(result);
 	}
 
 	@Override

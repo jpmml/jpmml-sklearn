@@ -19,6 +19,8 @@
 package sklearn.ensemble.gradient_boosting;
 
 import org.jpmml.sklearn.PyClassDict;
+import sklearn.HasDefaultValue;
+import sklearn.HasPriorProbability;
 
 public class ZeroEstimator extends PyClassDict implements HasDefaultValue, HasPriorProbability {
 

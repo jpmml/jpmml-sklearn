@@ -25,12 +25,20 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import sklearn.HasDefaultValue;
 import sklearn.Regressor;
 
-public class DummyRegressor extends Regressor {
+public class DummyRegressor extends Regressor implements HasDefaultValue {
 
 	public DummyRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public Number getDefaultValue(){
+		List<? extends Number> constant = getConstant();
+
+		return Iterables.getOnlyElement(constant);
 	}
 
 	@Override

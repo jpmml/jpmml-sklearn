@@ -35,11 +35,30 @@ import org.jpmml.converter.Schema;
 import org.jpmml.model.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.HasPriorProbability;
 
-public class DummyClassifier extends Classifier {
+public class DummyClassifier extends Classifier implements HasPriorProbability {
 
 	public DummyClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public Number getPriorProbability(int index){
+		List<?> classes = getClasses();
+		List<? extends Number> classPrior = getClassPrior();
+		String strategy = getStrategy();
+
+		ClassDictUtil.checkSize(classes, classPrior);
+
+		switch(strategy){
+			case "prior":
+				{
+					return classPrior.get(index);
+				}
+			default:
+				throw new IllegalArgumentException(strategy);
+		}
 	}
 
 	@Override

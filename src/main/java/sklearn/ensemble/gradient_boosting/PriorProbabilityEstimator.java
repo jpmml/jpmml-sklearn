@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.jpmml.sklearn.PyClassDict;
+import sklearn.HasPriorProbability;
 
 public class PriorProbabilityEstimator extends PyClassDict implements HasPriorProbability {
 

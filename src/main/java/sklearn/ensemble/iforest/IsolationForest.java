@@ -74,6 +74,9 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		// See https://github.com/scikit-learn/scikit-learn/issues/8549
 		boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.19") >= 0);
 
+		// See https://github.com/scikit-learn/scikit-learn/issues/11839
+		boolean nodeSampleCorrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.21") >= 0);
+
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
@@ -111,7 +114,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 						double nodeSample = this.nodeSamples[ValueUtil.asInt((Number)node.getId())];
 
-						double averagePathLength = (corrected ? correctedAveragePathLength(nodeSample) : averagePathLength(nodeSample));
+						double averagePathLength = (corrected ? correctedAveragePathLength(nodeSample, nodeSampleCorrected) : averagePathLength(nodeSample));
 
 						node.setScore(nodeDepth + averagePathLength);
 					}
@@ -143,7 +146,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			public Expression createExpression(FieldRef fieldRef){
 				double maxSamples = getMaxSamples();
 
-				double averagePathLength = (corrected ? correctedAveragePathLength(maxSamples) : averagePathLength(maxSamples));
+				double averagePathLength = (corrected ? correctedAveragePathLength(maxSamples, nodeSampleCorrected) : averagePathLength(maxSamples));
 
 				return PMMLUtil.createApply("/", fieldRef, PMMLUtil.createConstant(averagePathLength));
 			}
@@ -187,6 +190,10 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 						threshold = getThreshold();
 					} else
 
+					if(("new").equals(behaviour)){
+						threshold = 0d;
+					} else
+
 					{
 						throw new IllegalArgumentException(behaviour);
 					}
@@ -211,6 +218,15 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		return getInteger("max_samples_");
 	}
 
+	public Number getOffset(){
+
+		if(!containsKey("offset_")){
+			return 0.5d;
+		}
+
+		return getNumber("offset_");
+	}
+
 	public Number getThreshold(){
 
 		// SkLearn 0.19
@@ -233,10 +249,23 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	static
-	private double correctedAveragePathLength(double n){
+	private double correctedAveragePathLength(double n, boolean nodeSampleCorrected){
 
-		if(n <= 1d){
-			return 1d;
+		if(nodeSampleCorrected){
+
+			if(n <= 1d){
+				return 0d;
+			} else
+
+			if(n <= 2d){
+				return 1d;
+			}
+		} else
+
+		{
+			if(n <= 1d){
+				return 1d;
+			}
 		}
 
 		return 2d * (Math.log(n - 1d) + 0.577215664901532860606512090082402431d) - 2d * ((n - 1d) / n);

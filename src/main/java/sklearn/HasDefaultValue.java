@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble.gradient_boosting;
+package sklearn;
 
 import org.dmg.pmml.TargetValue;
 
 /**
  * @see TargetValue#getDefaultValue()
  */
-interface HasDefaultValue {
+public interface HasDefaultValue {
 
 	Number getDefaultValue();
 }

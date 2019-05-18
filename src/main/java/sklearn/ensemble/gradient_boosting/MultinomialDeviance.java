@@ -18,12 +18,31 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jpmml.converter.ExpTransformation;
+import sklearn.HasPriorProbability;
 
 public class MultinomialDeviance extends LossFunction {
 
 	public MultinomialDeviance(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<? extends Number> computeInitRawPrediction(HasPriorProbability init){
+		Integer k = getK();
+
+		List<Double> result = new ArrayList<>();
+
+		for(int i = 0; i < k; i++){
+			Number proba = init.getPriorProbability(i);
+
+			result.add(Math.log(proba.doubleValue()));
+		}
+
+		return result;
 	}
 
 	@Override

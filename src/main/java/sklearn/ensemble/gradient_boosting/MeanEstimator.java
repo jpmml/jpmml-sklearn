@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.jpmml.sklearn.PyClassDict;
+import sklearn.HasDefaultValue;
 
 public class MeanEstimator extends PyClassDict implements HasDefaultValue {
 

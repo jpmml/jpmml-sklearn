@@ -35,6 +35,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.HasPriorProbability;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn2pmml.EstimatorProxy;
@@ -79,7 +80,9 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		if(numberOfClasses == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, init.getPriorProbability(0), learningRate, segmentSchema)
+			List<? extends Number> initRawPrediction = loss.computeInitRawPrediction(init);
+
+			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, initRawPrediction.get(0), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.NONE, true, schema);
@@ -87,6 +90,8 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		if(numberOfClasses >= 3){
 			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
+
+			List<? extends Number> initRawPrediction = loss.computeInitRawPrediction(init);
 
 			List<? extends TreeRegressor> estimators = getEstimators();
 
@@ -103,7 +108,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 					}
 				};
 
-				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, init.getPriorProbability(i), learningRate, segmentSchema)
+				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initRawPrediction.get(i), learningRate, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 				miningModels.add(miningModel);

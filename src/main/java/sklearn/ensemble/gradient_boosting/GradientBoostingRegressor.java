@@ -23,6 +23,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
+import sklearn.HasDefaultValue;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 import sklearn.tree.HasTreeOptions;

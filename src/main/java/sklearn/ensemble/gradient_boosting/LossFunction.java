@@ -18,8 +18,11 @@
  */
 package sklearn.ensemble.gradient_boosting;
 
+import java.util.List;
+
 import org.jpmml.converter.Transformation;
 import org.jpmml.sklearn.PyClassDict;
+import sklearn.HasPriorProbability;
 
 abstract
 public class LossFunction extends PyClassDict {
@@ -27,6 +30,9 @@ public class LossFunction extends PyClassDict {
 	public LossFunction(String module, String name){
 		super(module, name);
 	}
+
+	abstract
+	public List<? extends Number> computeInitRawPrediction(HasPriorProbability init);
 
 	abstract
 	public Transformation createTransformation();

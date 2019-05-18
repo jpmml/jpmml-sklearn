@@ -20,6 +20,7 @@ package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.FloatEquivalence;
+import org.jpmml.evaluator.PMMLEquivalence;
 import org.jpmml.evaluator.RealNumberEquivalence;
 import org.junit.Test;
 
@@ -171,7 +172,7 @@ public class RegressorTest extends EstimatorTest {
 
 	@Test
 	public void evaluateIsolationForestHousing() throws Exception {
-		evaluate("IsolationForest", "Housing");
+		evaluate("IsolationForest", "Housing", new PMMLEquivalence(5e-12, 5e-12));
 	}
 
 	@Test
