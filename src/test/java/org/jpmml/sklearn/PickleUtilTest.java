@@ -54,6 +54,7 @@ public class PickleUtilTest {
 
 		unpickle("python-3.4_sklearn-joblib-0.9.4.pkl.z");
 		unpickle("python-3.4_sklearn-joblib-0.11.pkl.z");
+		unpickle("python-3.4_sklearn-joblib-0.13.0.pkl.z");
 
 		unpickleNumpyArrays("python-3.4_numpy-1.13.3");
 	}
@@ -62,13 +63,21 @@ public class PickleUtilTest {
 		unpickleNumpyArray(prefix + "_int8.pkl", Byte.MIN_VALUE, Byte.MAX_VALUE, 1);
 		unpickleNumpyArray(prefix + "_int16.pkl", Short.MIN_VALUE, Short.MAX_VALUE, 127);
 
-		String[] dtypes = {"int32", "int64", "float32", "float64"};
+		unpickleNumpyArray(prefix + "_uint8.pkl", 0, 255, 1);
+		unpickleNumpyArray(prefix + "_uint16.pkl", 0, 65535, 127);
+
+		String[] dtypes = new String[]{"int32", "int64", "float32", "float64"};
 		for(String dtype : dtypes){
 			unpickleNumpyArray(prefix + "_" + dtype + ".pkl", Integer.MIN_VALUE, Integer.MAX_VALUE, 64 * 32767);
 		}
+
+		dtypes = new String[]{"uint32", "uint64"};
+		for(String dtype : dtypes){
+			unpickleNumpyArray(prefix + "_" + dtype + ".pkl", 0L, 4294967295L, 64 * 32767);
+		}
 	}
 
-	private void unpickleNumpyArray(String name, int min, int max, int step) throws IOException {
+	private void unpickleNumpyArray(String name, long min, long max, long step) throws IOException {
 		HasArray hasArray = (HasArray)unpickle(name);
 
 		List<?> values = hasArray.getArrayContent();
@@ -86,7 +95,7 @@ public class PickleUtilTest {
 			} else
 
 			{
-				assertEquals(expectedValue.intValue(), value.intValue());
+				assertEquals(expectedValue.longValue(), value.longValue());
 			}
 		}
 	}

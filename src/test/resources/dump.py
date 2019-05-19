@@ -39,11 +39,21 @@ def _pickle_values(values, dtype):
 values = numpy.asarray([x for x in range(-128, 127, 1)], dtype = numpy.int8)
 _pickle_values(values, numpy.int8)
 
+values = numpy.asarray([x for x in range(0, 255, 1)], dtype = numpy.uint8)
+_pickle_values(values, numpy.uint8)
+
 values = numpy.asarray([x for x in range(-32768, 32767, 127)], dtype = numpy.int16)
 _pickle_values(values, numpy.int16)
+
+values = numpy.asarray([x for x in range(0, 65535, 127)], dtype = numpy.uint16)
+_pickle_values(values, numpy.uint16)
 
 values = numpy.asarray([x for x in range(-2147483648, 2147483647, 64 * 32767)], dtype = numpy.int32)
 _pickle_values(values, numpy.int32)
 _pickle_values(values, numpy.int64)
 _pickle_values(values, numpy.float32)
 _pickle_values(values, numpy.float64)
+
+values = numpy.asarray([x for x in range(0, 4294967295, 64 * 32767)], dtype = numpy.uint32)
+_pickle_values(values, numpy.uint32)
+_pickle_values(values, numpy.uint64)

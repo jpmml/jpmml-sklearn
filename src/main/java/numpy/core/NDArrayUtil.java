@@ -518,8 +518,16 @@ public class NDArrayUtil {
 				case UNSIGNED_INTEGER:
 					{
 						switch(size){
+							case 1:
+								return readUnsignedByte(is);
+							case 2:
+								return readUnsignedShort(is, byteOrder);
 							case 4:
 								return UnsignedInts.toLong(readInt(is, byteOrder));
+							case 8:
+								String string = Long.toUnsignedString(readLong(is, byteOrder));
+
+								return Long.parseUnsignedLong(string);
 							default:
 								break;
 						}
