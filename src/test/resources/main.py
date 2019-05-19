@@ -11,7 +11,7 @@ from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
-from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, VotingClassifier
+from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, VotingClassifier, VotingRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
@@ -555,6 +555,7 @@ if "Auto" in datasets:
 	build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", flat = True)
 	build_auto(RidgeCV(), "RidgeAuto")
 	build_auto(TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
+	build_auto(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor()), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
 	build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", ntree_limit = 31)
 
 if "Auto" in datasets:
@@ -659,6 +660,7 @@ if "Housing" in datasets:
 	build_housing(SVR(), "SVRHousing")
 	build_housing(LinearSVR(random_state = 13), "LinearSVRHousing")
 	build_housing(NuSVR(), "NuSVRHousing")
+	build_housing(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("lr", LinearRegression())]), "VotingEnsembleHousing")
 
 #
 # Anomaly detection
