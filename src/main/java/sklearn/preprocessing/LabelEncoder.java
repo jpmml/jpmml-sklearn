@@ -18,20 +18,12 @@
  */
 package sklearn.preprocessing;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.CategoricalFeature;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -63,33 +55,7 @@ public class LabelEncoder extends Transformer {
 
 		Feature feature = features.get(0);
 
-		List<Object> inputCategories = new ArrayList<>();
-		List<Integer> outputCategories = new ArrayList<>();
-
-		for(int i = 0; i < classes.size(); i++){
-			inputCategories.add(classes.get(i));
-			outputCategories.add(i);
-		}
-
-		Supplier<MapValues> mapValuesSupplier = () -> {
-			encoder.toCategorical(feature.getName(), inputCategories);
-
-			return PMMLUtil.createMapValues(feature.getName(), inputCategories, outputCategories);
-		};
-
-		DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("label_encoder", feature), OpType.CATEGORICAL, DataType.INTEGER, mapValuesSupplier);
-
-		Feature encodedFeature = new CategoricalFeature(encoder, derivedField, outputCategories);
-
-		Feature result = new CategoricalFeature(encoder, feature, inputCategories){
-
-			@Override
-			public ContinuousFeature toContinuousFeature(){
-				return encodedFeature.toContinuousFeature();
-			}
-		};
-
-		return Collections.singletonList(result);
+		return Collections.singletonList(EncoderUtil.encodeIndexFeature(feature, classes, DataType.INTEGER, encoder));
 	}
 
 	public List<?> getClasses(){

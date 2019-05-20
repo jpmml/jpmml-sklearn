@@ -20,6 +20,7 @@ package sklearn.preprocessing;
 
 import java.util.List;
 
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 
@@ -31,14 +32,11 @@ public class MultiOneHotEncoder extends OneHotEncoder {
 
 	@Override
 	public List<? extends Number> getValues(){
-		List<? extends HasArray> categories = getCategories();
+		List<List<?>> categories = getCategories();
 
 		ClassDictUtil.checkSize(1, categories);
 
-		HasArray hasArray = categories.get(0);
-
-		// XXX
-		return (List)hasArray.getArrayContent();
+		return ValueUtil.asNumbers(categories.get(0));
 	}
 
 	@Override
@@ -46,8 +44,8 @@ public class MultiOneHotEncoder extends OneHotEncoder {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<? extends HasArray> getCategories(){
-		return get("categories_", List.class);
+	public List<List<?>> getCategories(){
+		return EncoderUtil.transformCategories(getList("categories_", HasArray.class));
 	}
 
 	@Override

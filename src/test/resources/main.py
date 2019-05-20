@@ -24,7 +24,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, PolynomialFeatures, RobustScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, FunctionTransformer, Imputer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import SelectorProxy
@@ -223,7 +223,8 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["Age", "Income"]] +
 		[(["Hours"], [ContinuousDomain(), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = False, right = False, include_lowest = True)])] +
-		[([column], [CategoricalDomain(), LabelEncoder()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender", "Deductions"]]
+		[(["Employment", "Education", "Marital", "Occupation"], [MultiDomain([CategoricalDomain(), CategoricalDomain(), CategoricalDomain(), CategoricalDomain()]), OrdinalEncoder()])] +
+		[([column], [CategoricalDomain(), LabelEncoder()]) for column in ["Gender", "Deductions"]]
 	)
 	pipeline = Pipeline([
 		("mapper", mapper),
