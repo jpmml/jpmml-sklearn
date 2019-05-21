@@ -154,7 +154,7 @@ public class ClassifierTest extends EstimatorTest {
 	public void evaluateXGBAuditNA() throws Exception {
 		FieldName[] transformFields = {FieldName.create("predict(Adjusted)"), FieldName.create("eval(Adjusted)")};
 
-		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(4));
+		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(8));
 	}
 
 	@Test

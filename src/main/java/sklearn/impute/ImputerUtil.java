@@ -24,6 +24,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.dmg.pmml.OpType;
+import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -39,10 +41,10 @@ public class ImputerUtil {
 	}
 
 	static
-	public Feature encodeFeature(Feature feature, Object missingValue, Object replacementValue, MissingValueTreatmentMethod missingValueTreatmentMethod, SkLearnEncoder encoder){
+	public Feature encodeFeature(Feature feature, Boolean addIndicator, Object missingValue, Object replacementValue, MissingValueTreatmentMethod missingValueTreatmentMethod, SkLearnEncoder encoder){
 		Field<?> field = feature.getField();
 
-		if(field instanceof DataField){
+		if(field instanceof DataField && !addIndicator){
 			MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
 				.setMissingValueReplacement(replacementValue)
 				.setMissingValueTreatment(missingValueTreatmentMethod);
@@ -54,9 +56,9 @@ public class ImputerUtil {
 			encoder.addDecorator(feature.getName(), missingValueDecorator);
 
 			return feature;
-		} else
+		} // End if
 
-		if(field instanceof DerivedField){
+		if((field instanceof DataField) || (field instanceof DerivedField)){
 			Expression expression = feature.ref();
 
 			if(missingValue != null){
@@ -87,5 +89,22 @@ public class ImputerUtil {
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	static
+	public Feature encodeIndicatorFeature(Feature feature, Object missingValue, SkLearnEncoder encoder){
+		Expression expression = feature.ref();
+
+		if(missingValue != null){
+			expression = PMMLUtil.createApply("equal", expression, PMMLUtil.createConstant(missingValue, feature.getDataType()));
+		} else
+
+		{
+			expression = PMMLUtil.createApply("isMissing", expression);
+		}
+
+		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("missing_indicator", feature), OpType.CATEGORICAL, DataType.BOOLEAN, expression);
+
+		return new BooleanFeature(encoder, derivedField);
 	}
 }

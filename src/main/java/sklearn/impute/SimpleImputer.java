@@ -36,13 +36,19 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public int getNumberOfFeatures(){
+		Boolean addIndicator = getAddIndicator();
 		int[] shape = getStatisticsShape();
+
+		if(addIndicator){
+			return 2 * shape[0];
+		}
 
 		return shape[0];
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Boolean addIndicator = getAddIndicator();
 		Object missingValues = getMissingValues();
 		List<?> statistics = getStatistics();
 		String strategy = getStrategy();
@@ -55,18 +61,34 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 
 		MissingValueTreatmentMethod missingValueTreatment = parseStrategy(strategy);
 
+		List<Feature> indicatorFeatures = new ArrayList<>();
+
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			Object statistic = statistics.get(i);
 
-			feature = ImputerUtil.encodeFeature(feature, missingValues, statistic, missingValueTreatment, encoder);
+			if(addIndicator){
+				Feature indicatorFeature = ImputerUtil.encodeIndicatorFeature(feature, missingValues, encoder);
+
+				indicatorFeatures.add(indicatorFeature);
+			}
+
+			feature = ImputerUtil.encodeFeature(feature, addIndicator, missingValues, statistic, missingValueTreatment, encoder);
 
 			result.add(feature);
 		}
 
+		if(addIndicator){
+			result.addAll(indicatorFeatures);
+		}
+
 		return result;
+	}
+
+	public Boolean getAddIndicator(){
+		return getOptionalBoolean("add_indicator", Boolean.FALSE);
 	}
 
 	public Object getMissingValues(){
