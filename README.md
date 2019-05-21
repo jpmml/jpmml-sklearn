@@ -293,6 +293,11 @@ Getting help:
 java -jar target/jpmml-sklearn-executable-1.5-SNAPSHOT.jar --help
 ```
 
+# Documentation #
+
+* [Extending Scikit-Learn with business rules (BR) model type](http://openscoring.io/blog/2018/09/17/sklearn_business_rules/)
+* [Converting Scikit-Learn plus LightGBM pipelines to PMML documents](https://openscoring.io/blog/2019/04/07/converting_sklearn_lightgbm_pipeline_pmml/)
+
 # License #
 
 JPMML-SkLearn is dual-licensed under the [GNU Affero General Public License (AGPL) version 3.0](https://www.gnu.org/licenses/agpl-3.0.html), and a commercial license.
