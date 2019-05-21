@@ -49,6 +49,10 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 
 		ClassDictUtil.checkSize(features, statistics);
 
+		if((Double.valueOf(Double.NaN)).equals(missingValues)){
+			missingValues = null;
+		}
+
 		MissingValueTreatmentMethod missingValueTreatment = parseStrategy(strategy);
 
 		List<Feature> result = new ArrayList<>();
