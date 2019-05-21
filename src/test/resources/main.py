@@ -510,11 +510,11 @@ def build_auto(regressor, name, **pmml_options):
 		(4, 1) : "4/1",
 		(6, 2) : "6/2",
 		(4, 2) : "4/2",
-		(6, 3) : "6/3",
 		(4, 3) : "4/3"
 	}
 	mapper = DataFrameMapper([
 		(["cylinders", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
+		(["cylinders"], Alias(ExpressionTransformer("X[0] % 2.0 > 0.0"), name = "odd(cylinders)", prefit = True)),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
 		(["model_year", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), ConcatTransformer("/"), LabelBinarizer(), SelectorProxy(SelectFromModel(RandomForestRegressor(random_state = 13, n_estimators = 3), threshold = "1.25 * mean"))]),
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),

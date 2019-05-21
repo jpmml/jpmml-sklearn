@@ -89,6 +89,17 @@ public class ExpressionTranslator extends AbstractTranslator {
 	}
 
 	static
+	private String translateArithmeticOperator(Token operator){
+
+		switch(operator.kind){
+			case MODULO:
+				return "x-modulo";
+			default:
+				return operator.image;
+		}
+	}
+
+	static
 	private Apply translateFunction(String function, List<Expression> arguments){
 
 		switch(function){
@@ -195,6 +206,8 @@ TOKEN:
 	< PLUS: "+" >
 	|
 	< MINUS: "-" >
+	|
+	< MODULO: "%" >
 }
 
 TOKEN:
@@ -353,7 +366,7 @@ Expression AdditiveExpression():
 	Expression right;
 }
 {
-	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = createApply(operator.image, left, right); })*
+	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = createApply(translateArithmeticOperator(operator), left, right); })*
 
 	{
 		return left;
@@ -367,7 +380,7 @@ Expression MultiplicativeExpression():
 	Expression right;
 }
 {
-	left = UnaryExpression() ((operator = <MULTIPLY> | operator = <DIVIDE>) right = UnaryExpression() { left = createApply(operator.image, left, right); })*
+	left = UnaryExpression() ((operator = <MULTIPLY> | operator = <DIVIDE> | operator = <MODULO> ) right = UnaryExpression() { left = createApply(translateArithmeticOperator(operator), left, right); })*
 
 	{
 		return left;
