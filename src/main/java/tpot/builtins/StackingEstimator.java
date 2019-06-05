@@ -28,8 +28,11 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
@@ -58,7 +61,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 		Label label;
 
-		Output output;
+		Output output = new Output();
 
 		MiningFunction miningFunction = estimator.getMiningFunction();
 		switch(miningFunction){
@@ -72,30 +75,34 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 					label = new CategoricalLabel(null, dataType, categories);
 
-					output = ModelUtil.createPredictedOutput(name, OpType.CATEGORICAL, label.getDataType());
-
 					if(classifier.hasProbabilityDistribution()){
 
 						for(Object category : categories){
-							OutputField outputField = ModelUtil.createProbabilityField(FieldName.create("probability(" + name.getValue() + ", " + category + ")"), DataType.DOUBLE, category)
+							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldName.create("probability(" + name.getValue() + ", " + category + ")"), DataType.DOUBLE, category)
 								.setFinalResult(false);
 
-							output.addOutputFields(outputField);
+							DerivedOutputField probabilityField = encoder.createDerivedField(output, probabilityOutputField);
 
-							result.add(new ContinuousOutputFeature(encoder, output, outputField));
+							result.add(new ContinuousFeature(encoder, probabilityField));
 						}
 					}
 
-					result.add(new CategoricalOutputFeature(encoder, output, name, label.getDataType(), categories));
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CATEGORICAL);
+
+					DerivedOutputField predictedField = encoder.createDerivedField(output, predictedOutputField);
+
+					result.add(new CategoricalFeature(encoder, predictedField, categories));
 				}
 				break;
 			case REGRESSION:
 				{
 					label = new ContinuousLabel(null, DataType.DOUBLE);
 
-					output = ModelUtil.createPredictedOutput(name, OpType.CONTINUOUS, label.getDataType());
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CONTINUOUS);
 
-					result.add(new ContinuousOutputFeature(encoder, output, name, label.getDataType()));
+					DerivedOutputField predictedField = encoder.createDerivedField(output, predictedOutputField);
+
+					result.add(new ContinuousFeature(encoder, predictedField));
 				}
 				break;
 			default:

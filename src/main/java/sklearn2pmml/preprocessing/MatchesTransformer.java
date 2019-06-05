@@ -25,6 +25,7 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -49,8 +50,9 @@ public class MatchesTransformer extends PatternTransformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = PMMLUtil.createApply("matches")
-			.addExpressions(feature.ref(), PMMLUtil.createConstant(pattern, DataType.STRING));
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.MATCHES)
+			.addExpressions(feature.ref())
+			.addExpressions(PMMLUtil.createConstant(pattern, DataType.STRING));
 
 		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("matches", feature), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
 

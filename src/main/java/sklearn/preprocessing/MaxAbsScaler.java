@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -67,7 +68,7 @@ public class MaxAbsScaler extends Transformer implements HasNumberOfFeatures {
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 			// "$name / scale"
-			Apply apply = PMMLUtil.createApply("/", continuousFeature.ref(), PMMLUtil.createConstant(value));
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, continuousFeature.ref(), PMMLUtil.createConstant(value));
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("max_abs_scaler", continuousFeature), apply);
 

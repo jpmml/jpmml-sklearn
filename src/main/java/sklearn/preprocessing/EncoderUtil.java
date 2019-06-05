@@ -32,6 +32,7 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -70,7 +71,7 @@ public class EncoderUtil {
 
 		DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("encoder", feature), OpType.CATEGORICAL, dataType, mapValuesSupplier);
 
-		Feature encodedFeature = new CategoricalFeature(encoder, derivedField, indexCategories);
+		Feature encodedFeature = new IndexFeature(encoder, derivedField, indexCategories);
 
 		Feature result = new CategoricalFeature(encoder, feature, categories){
 

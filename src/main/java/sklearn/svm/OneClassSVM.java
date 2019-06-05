@@ -27,6 +27,7 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.OutlierTransformation;
@@ -51,7 +52,7 @@ public class OneClassSVM extends LibSVMRegressor {
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return PMMLUtil.createApply("lessOrEqual", fieldRef, PMMLUtil.createConstant(0d));
+				return PMMLUtil.createApply(PMMLFunctions.LESSOREQUAL, fieldRef, PMMLUtil.createConstant(0d));
 			}
 		};
 

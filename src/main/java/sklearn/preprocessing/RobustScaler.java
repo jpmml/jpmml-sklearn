@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -95,11 +96,11 @@ public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 			Expression expression = continuousFeature.ref();
 
 			if(!ValueUtil.isZero(centerValue)){
-				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(centerValue));
+				expression = PMMLUtil.createApply(PMMLFunctions.SUBTRACT, expression, PMMLUtil.createConstant(centerValue));
 			} // End if
 
 			if(!ValueUtil.isOne(scaleValue)){
-				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(scaleValue));
+				expression = PMMLUtil.createApply(PMMLFunctions.DIVIDE, expression, PMMLUtil.createConstant(scaleValue));
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("robust_scaler", continuousFeature), expression);

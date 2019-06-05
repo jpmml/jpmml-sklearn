@@ -18,6 +18,7 @@
  */
 package sklearn.preprocessing;
 
+import org.dmg.pmml.PMMLFunctions;
 import org.junit.Test;
 
 public class RobustScalerTest extends ScalerTest {
@@ -35,11 +36,11 @@ public class RobustScalerTest extends ScalerTest {
 		scaler.put("with_centering", Boolean.TRUE);
 		scaler.put("with_scaling", Boolean.TRUE);
 
-		assertTransformedFeature(scaler, "/");
+		assertTransformedFeature(scaler, PMMLFunctions.DIVIDE);
 
 		scaler.put("scale_", 1);
 
-		assertTransformedFeature(scaler, "-");
+		assertTransformedFeature(scaler, PMMLFunctions.SUBTRACT);
 
 		scaler.put("center_", 0);
 

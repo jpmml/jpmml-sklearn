@@ -27,6 +27,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
@@ -55,11 +56,20 @@ public class StringNormalizer extends Transformer {
 			Expression expression = feature.ref();
 
 			if(function != null){
+
+				switch(function){
+					case PMMLFunctions.LOWERCASE:
+					case PMMLFunctions.UPPERCASE:
+						break;
+					default:
+						throw new IllegalArgumentException(function);
+				}
+
 				expression = PMMLUtil.createApply(function, expression);
 			} // End if
 
 			if(trimBlanks){
-				expression = PMMLUtil.createApply("trimBlanks", expression);
+				expression = PMMLUtil.createApply(PMMLFunctions.TRIMBLANKS, expression);
 			}
 
 			Field<?> field = encoder.toCategorical(feature.getName(), Collections.emptyList());

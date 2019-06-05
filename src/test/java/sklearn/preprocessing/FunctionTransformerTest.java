@@ -39,11 +39,11 @@ public class FunctionTransformerTest {
 	public void evaluateUFunc(){
 		assertEquals(3d, evaluate("absolute", -3d));
 
-		assertEquals(-2d, evaluate("ceil", -2.75d));
-		assertEquals(3d, evaluate("ceil", 2.75d));
+		assertEquals(-2, evaluate("ceil", -2.75d));
+		assertEquals(3, evaluate("ceil", 2.75d));
 
-		assertEquals(-3d, evaluate("floor", -2.75d));
-		assertEquals(2d, evaluate("floor", 2.75d));
+		assertEquals(-3, evaluate("floor", -2.75d));
+		assertEquals(2, evaluate("floor", 2.75d));
 
 		assertEquals(-3, evaluate("negative", 3));
 		assertEquals(-3f, evaluate("negative", 3f));

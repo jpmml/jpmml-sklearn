@@ -26,6 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
@@ -43,7 +44,7 @@ public class ConcatTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String separator = getSeparator();
 
-		Apply apply = PMMLUtil.createApply("concat");
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.CONCAT);
 
 		List<Expression> expressions = apply.getExpressions();
 

@@ -18,6 +18,8 @@
  */
 package sklearn2pmml.preprocessing;
 
+import org.dmg.pmml.PMMLFunctions;
+
 public class SecondsSinceYearTransformer extends DurationTransformer {
 
 	public SecondsSinceYearTransformer(String module, String name){
@@ -26,6 +28,6 @@ public class SecondsSinceYearTransformer extends DurationTransformer {
 
 	@Override
 	public String getFunction(){
-		return "dateSecondsSinceYear";
+		return PMMLFunctions.DATESECONDSSINCEYEAR;
 	}
 }

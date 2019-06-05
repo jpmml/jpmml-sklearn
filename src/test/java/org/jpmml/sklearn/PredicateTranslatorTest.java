@@ -21,34 +21,55 @@ package org.jpmml.sklearn;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dmg.pmml.Array;
+import org.dmg.pmml.ComplexArray;
 import org.dmg.pmml.CompoundPredicate;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.SimpleSetPredicate;
+import org.jpmml.converter.Feature;
+import org.jpmml.model.ReflectionUtil;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class PredicateTranslatorTest extends TranslatorTest {
 
 	@Test
 	public void translateLogicalPredicate(){
-		CompoundPredicate compoundPredicate = (CompoundPredicate)PredicateTranslator.translate("X[0] > 0.0 and X[1] > 0 or X[2] > 0", doubleFeatures);
+		String string = "X[0] > 0.0 and X[1] > 0 or X[2] > 0";
 
-		checkCompoundPredicate(compoundPredicate, CompoundPredicate.BooleanOperator.OR, CompoundPredicate.class, SimplePredicate.class);
+		Predicate first = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.GREATER_THAN, "0.0");
+		Predicate second = createSimplePredicate(FieldName.create("b"), SimplePredicate.Operator.GREATER_THAN, "0");
+		Predicate third = createSimplePredicate(FieldName.create("c"), SimplePredicate.Operator.GREATER_THAN, "0");
 
-		compoundPredicate = (CompoundPredicate)PredicateTranslator.translate("(X[\"a\"] > 0.0) and ((X[\"b\"] > 0) or (X[\"c\"] > 0))", doubleFeatures);
+		Predicate expected = new CompoundPredicate(CompoundPredicate.BooleanOperator.OR)
+			.addPredicates(new CompoundPredicate(CompoundPredicate.BooleanOperator.AND)
+				.addPredicates(first)
+				.addPredicates(second)
+			)
+			.addPredicates(third);
 
-		checkCompoundPredicate(compoundPredicate, CompoundPredicate.BooleanOperator.AND, SimplePredicate.class, CompoundPredicate.class);
+		checkPredicate(expected, string, doubleFeatures);
+
+		string = "(X[\"a\"] > 0.0) and ((X[\"b\"] > 0) or (X[\"c\"] > 0))";
+
+		expected = new CompoundPredicate(CompoundPredicate.BooleanOperator.AND)
+			.addPredicates(first)
+			.addPredicates(new CompoundPredicate(CompoundPredicate.BooleanOperator.OR)
+				.addPredicates(second, third)
+			);
+
+		checkPredicate(expected, string, doubleFeatures);
 	}
 
 	@Test
 	public void translateComparisonPredicate(){
-		SimplePredicate simplePredicate = (SimplePredicate)PredicateTranslator.translate("X['a'] > 0.0", doubleFeatures);
+		Predicate expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.GREATER_THAN, "0.0");
 
-		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.GREATER_THAN, "0.0");
+		checkPredicate(expected, "X['a'] > 0.0", doubleFeatures);
 
 		try {
 			PredicateTranslator.translate("X['a'] > X['b']", doubleFeatures);
@@ -58,57 +79,44 @@ public class PredicateTranslatorTest extends TranslatorTest {
 			// Ignored
 		}
 
-		simplePredicate = (SimplePredicate)PredicateTranslator.translate("X[0] is None", doubleFeatures);
+		expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.IS_MISSING, null);
+		checkPredicate(expected, "X[0] is None", doubleFeatures);
 
-		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.IS_MISSING, null);
+		expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.IS_NOT_MISSING, null);
+		checkPredicate(expected, "X[0] is not None", doubleFeatures);
 
-		simplePredicate = (SimplePredicate)PredicateTranslator.translate("X['a'] is not None", doubleFeatures);
+		expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.EQUAL, "one");
+		checkPredicate(expected, "X[0] == \"one\"", stringFeatures);
 
-		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.IS_NOT_MISSING, null);
+		expected = createSimpleSetPredicate(FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, Arrays.asList("1", "2", "3"));
+		checkPredicate(expected, "X[0] in [1, 2, 3]", doubleFeatures);
 
-		simplePredicate = (SimplePredicate)PredicateTranslator.translate("X[0] == \"one\"", stringFeatures);
+		expected = createSimpleSetPredicate(FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, Arrays.asList("one", "two", "three"));
+		checkPredicate(expected, "X[0] in ['one', 'two', 'three']", stringFeatures);
 
-		checkSimplePredicate(simplePredicate, FieldName.create("a"), SimplePredicate.Operator.EQUAL, "one");
-
-		SimpleSetPredicate simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in [1, 2, 3]", doubleFeatures);
-
-		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, Arrays.asList("1", "2", "3"));
-
-		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X[0] in ['one', 'two', 'three']", stringFeatures);
-
-		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, Arrays.asList("one", "two", "three"));
-
-		simpleSetPredicate = (SimpleSetPredicate)PredicateTranslator.translate("X['a'] not in [-1.5, -1, -0.5, 0]", doubleFeatures);
-
-		checkSimpleSetPredicate(simpleSetPredicate, FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_NOT_IN, Arrays.asList("-1.5", "-1", "-0.5", "0"));
+		expected = createSimpleSetPredicate(FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_NOT_IN, Arrays.asList("-1.5", "-1", "-0.5", "0"));
+		checkPredicate(expected, "X['a'] not in [-1.5, -1, -0.5, 0]", doubleFeatures);
 	}
 
 	static
-	private void checkCompoundPredicate(CompoundPredicate compoundPredicate, CompoundPredicate.BooleanOperator booleanOperator, Class<? extends Predicate>... predicateClazzes){
-		assertEquals(booleanOperator, compoundPredicate.getBooleanOperator());
+	private void checkPredicate(Predicate expected, String string, List<Feature> features){
+		Predicate actual = PredicateTranslator.translate(string, features);
 
-		List<Predicate> predicates = compoundPredicate.getPredicates();
-		assertEquals(predicateClazzes.length, predicates.size());
-
-		for(int i = 0; i < predicateClazzes.length; i++){
-			Class<? extends Predicate> predicateClazz = predicateClazzes[i];
-			Predicate predicate = predicates.get(i);
-
-			assertEquals(predicateClazz, predicate.getClass());
-		}
+		assertTrue(ReflectionUtil.equals(expected, actual));
 	}
 
 	static
-	private void checkSimplePredicate(SimplePredicate simplePredicate, FieldName field, SimplePredicate.Operator operator, String value){
-		assertEquals(field, simplePredicate.getField());
-		assertEquals(operator, simplePredicate.getOperator());
-		assertEquals(value, simplePredicate.getValue());
+	private SimplePredicate createSimplePredicate(FieldName field, SimplePredicate.Operator operator, Object value){
+		return new SimplePredicate(field, operator)
+			.setValue(value);
 	}
 
 	static
-	private void checkSimpleSetPredicate(SimpleSetPredicate simpleSetPredicate, FieldName field, SimpleSetPredicate.BooleanOperator booleanOperator, Object value){
-		assertEquals(field, simpleSetPredicate.getField());
-		assertEquals(booleanOperator, simpleSetPredicate.getBooleanOperator());
-		assertEquals(value, (simpleSetPredicate.getArray()).getValue());
+	private SimpleSetPredicate createSimpleSetPredicate(FieldName field, SimpleSetPredicate.BooleanOperator booleanOperator, List<String> values){
+		Array array = new ComplexArray()
+			.setType(Array.Type.STRING)
+			.setValue(values);
+
+		return new SimpleSetPredicate(field, booleanOperator, array);
 	}
 }

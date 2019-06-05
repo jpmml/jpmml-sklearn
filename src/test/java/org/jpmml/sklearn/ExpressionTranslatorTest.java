@@ -20,104 +20,133 @@ package org.jpmml.sklearn;
 
 import java.util.List;
 
-import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
+import org.jpmml.model.ReflectionUtil;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ExpressionTranslatorTest extends TranslatorTest {
 
 	@Test
 	public void translateLogicalExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("X[\"a\"] and X[\"b\"] or X[\"c\"]", booleanFeatures);
+		String string = "X[\"a\"] and X[\"b\"] or X[\"c\"]";
 
-		checkApply(apply, "or", Apply.class, FieldRef.class);
+		Expression expected = PMMLUtil.createApply(PMMLFunctions.OR)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.AND)
+				.addExpressions(new FieldRef(FieldName.create("a")), new FieldRef(FieldName.create("b")))
+			)
+			.addExpressions(new FieldRef(FieldName.create("c")));
 
-		apply = (Apply)ExpressionTranslator.translate("not X[\"a\"]", booleanFeatures);
+		checkExpression(expected, string, booleanFeatures);
 
-		checkApply(apply, "not", FieldRef.class);
+		string = "not X[\"a\"]";
+
+		expected = PMMLUtil.createApply(PMMLFunctions.NOT)
+			.addExpressions(new FieldRef(FieldName.create("a")));
+
+		checkExpression(expected, string, booleanFeatures);
 	}
 
 	@Test
 	public void translateComparisonExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("X['a'] == True and X['b'] == False", booleanFeatures);
+		String string = "X['a'] == True and X['b'] == False";
 
-		checkApply(apply, "and", Apply.class, Apply.class);
+		FieldRef first = new FieldRef(FieldName.create("a"));
+		FieldRef second = new FieldRef(FieldName.create("b"));
 
-		apply = (Apply)ExpressionTranslator.translate("X[\"a\"] > X[\"b\"]", doubleFeatures);
+		Expression expected = PMMLUtil.createApply(PMMLFunctions.AND)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.EQUAL)
+				.addExpressions(first, PMMLUtil.createConstant("true", DataType.BOOLEAN))
+			)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.EQUAL)
+				.addExpressions(second, PMMLUtil.createConstant("false", DataType.BOOLEAN))
+			);
 
-		checkApply(apply, "greaterThan", FieldRef.class, FieldRef.class);
+		checkExpression(expected, string, booleanFeatures);
 
-		apply = (Apply)ExpressionTranslator.translate("not X[\"a\"] < 0.0", doubleFeatures, false);
+		string = "X[\"a\"] > X[\"b\"]";
 
-		checkApply(apply, "not", Apply.class);
+		expected = PMMLUtil.createApply(PMMLFunctions.GREATERTHAN)
+			.addExpressions(first, second);
 
-		apply = (Apply)ExpressionTranslator.translate("not X[\"a\"] < 0.0", doubleFeatures, true);
+		checkExpression(expected, string, doubleFeatures);
 
-		checkApply(apply, "greaterOrEqual", FieldRef.class, Constant.class);
+		string = "not X[\"a\"] < 0.0";
+
+		expected = PMMLUtil.createApply(PMMLFunctions.NOT)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.LESSTHAN)
+				.addExpressions(first, PMMLUtil.createConstant("0.0", DataType.DOUBLE))
+			);
+
+		checkExpression(expected, string, doubleFeatures);
 	}
 
 	@Test
 	public void translateArithmeticExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("(X[0] + X[1] - 1) / X[2] * -2", doubleFeatures);
+		String string = "(X[0] + X[1] - 1.0) / X[2] * -2";
 
-		checkApply(apply, "*", Apply.class, Constant.class);
+		Expression expected = PMMLUtil.createApply(PMMLFunctions.MULTIPLY)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.DIVIDE)
+				.addExpressions(PMMLUtil.createApply(PMMLFunctions.SUBTRACT)
+					.addExpressions(PMMLUtil.createApply(PMMLFunctions.ADD)
+						.addExpressions(new FieldRef(FieldName.create("a")), new FieldRef(FieldName.create("b")))
+					)
+					.addExpressions(PMMLUtil.createConstant("1.0", DataType.DOUBLE))
+				)
+				.addExpressions(new FieldRef(FieldName.create("c")))
+			)
+			.addExpressions(PMMLUtil.createConstant("-2", DataType.INTEGER));
 
-		apply = (Apply)ExpressionTranslator.translate("(X[\"a\"] + X[\"b\"] - 1.0) / X['c'] * -2.0", doubleFeatures);
+		checkExpression(expected, string, doubleFeatures);
 
-		checkApply(apply, "*", Apply.class, Constant.class);
+		string = "(X[\"a\"] + X[\"b\"] - 1.0) / X['c'] * -2";
+
+		checkExpression(expected, string, doubleFeatures);
 	}
 
 	@Test
 	public void translateUnaryExpression(){
-		Constant constant = (Constant)ExpressionTranslator.translate("-1", doubleFeatures);
+		Constant minusOne = PMMLUtil.createConstant("-1", DataType.INTEGER);
+		Constant plusOne = PMMLUtil.createConstant("1", DataType.INTEGER);
 
-		checkConstant(constant, "-1");
+		checkExpression(minusOne, "-1", doubleFeatures);
 
-		constant = (Constant)ExpressionTranslator.translate("+1", doubleFeatures);
+		checkExpression(plusOne, "1", doubleFeatures);
+		checkExpression(plusOne, "+1", doubleFeatures);
 
-		checkConstant(constant, "1");
-
-		constant = (Constant)ExpressionTranslator.translate("-+1", doubleFeatures);
-
-		checkConstant(constant, "-1");
-
-		constant = (Constant)ExpressionTranslator.translate("--1", doubleFeatures);
-
-		checkConstant(constant, "1");
-
-		constant = (Constant)ExpressionTranslator.translate("---1", doubleFeatures);
-
-		checkConstant(constant, "-1");
+		checkExpression(minusOne, "-+1", doubleFeatures);
+		checkExpression(plusOne, "--1", doubleFeatures);
+		checkExpression(minusOne, "---1", doubleFeatures);
 	}
 
 	@Test
 	public void translateFunctionInvocationExpression(){
-		Apply apply = (Apply)ExpressionTranslator.translate("X[\"a\"] if pandas.notnull(X[\"a\"]) else X[\"b\"] + X[\"c\"]", doubleFeatures);
+		String string = "X[\"a\"] if pandas.notnull(X[\"a\"]) else X[\"b\"] + X[\"c\"]";
 
-		checkApply(apply, "if", Apply.class, FieldRef.class, Apply.class);
+		Expression expected = PMMLUtil.createApply(PMMLFunctions.IF)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING)
+				.addExpressions(new FieldRef(FieldName.create("a")))
+			)
+			.addExpressions(new FieldRef(FieldName.create("a")))
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.ADD)
+				.addExpressions(new FieldRef(FieldName.create("b")), new FieldRef(FieldName.create("c")))
+			);
+
+		checkExpression(expected, string, doubleFeatures);
 	}
 
 	static
-	private void checkConstant(Constant constant, String value){
-		assertEquals(value, constant.getValue());
-	}
+	private void checkExpression(Expression expected, String string, List<Feature> features){
+		Expression actual = ExpressionTranslator.translate(string, features, false);
 
-	static
-	private void checkApply(Apply apply, String function, Class<? extends Expression>... expressionClazzes){
-		assertEquals(function, apply.getFunction());
-
-		List<Expression> expressions = apply.getExpressions();
-		assertEquals(expressionClazzes.length, expressions.size());
-
-		for(int i = 0; i < expressionClazzes.length; i++){
-			Class<? extends Expression> expressionClazz = expressionClazzes[i];
-			Expression expression = expressions.get(i);
-
-			assertEquals(expressionClazz, expression.getClass());
-		}
+		assertTrue(ReflectionUtil.equals(expected, actual));
 	}
 }

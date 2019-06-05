@@ -26,6 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
@@ -86,7 +87,7 @@ public class LabelBinarizer extends Transformer {
 
 			{
 				// "($name == value) ? pos_label : neg_label"
-				Apply apply = PMMLUtil.createApply("if", PMMLUtil.createApply("equal", feature.ref(), PMMLUtil.createConstant(value, feature.getDataType())), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
+				Apply apply = PMMLUtil.createApply(PMMLFunctions.IF, PMMLUtil.createApply(PMMLFunctions.EQUAL, feature.ref(), PMMLUtil.createConstant(value, feature.getDataType())), PMMLUtil.createConstant(posLabel), PMMLUtil.createConstant(negLabel));
 
 				FieldName name = (classes.size() > 1 ? FeatureUtil.createName("label_binarizer", feature, i) : FeatureUtil.createName("label_binarizer", feature));
 

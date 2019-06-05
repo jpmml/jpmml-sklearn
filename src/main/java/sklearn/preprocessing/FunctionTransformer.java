@@ -27,6 +27,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -75,53 +76,61 @@ public class FunctionTransformer extends Transformer {
 
 		switch(name){
 			case "absolute":
-				return PMMLUtil.createApply("abs", fieldRef);
+				return PMMLUtil.createApply(PMMLFunctions.ABS, fieldRef);
+			case "acos":
+				return PMMLUtil.createApply(PMMLFunctions.ACOS, fieldRef);
+			case "asin":
+				return PMMLUtil.createApply(PMMLFunctions.ASIN, fieldRef);
+			case "atan":
+				return PMMLUtil.createApply(PMMLFunctions.ATAN, fieldRef);
+			case "atan2":
+				return PMMLUtil.createApply(PMMLFunctions.ATAN2, fieldRef);
 			case "ceil":
+				return PMMLUtil.createApply(PMMLFunctions.CEIL, fieldRef);
+			case "cos":
+				return PMMLUtil.createApply(PMMLFunctions.COS, fieldRef);
+			case "cosh":
+				return PMMLUtil.createApply(PMMLFunctions.COSH, fieldRef);
 			case "exp":
+				return PMMLUtil.createApply(PMMLFunctions.EXP, fieldRef);
+			case "expm1":
+				return PMMLUtil.createApply(PMMLFunctions.EXPM1, fieldRef);
 			case "floor":
-				return PMMLUtil.createApply(name, fieldRef);
+				return PMMLUtil.createApply(PMMLFunctions.FLOOR, fieldRef);
+			case "hypot":
+				return PMMLUtil.createApply(PMMLFunctions.HYPOT, fieldRef);
 			case "log":
-				return PMMLUtil.createApply("ln", fieldRef);
+				return PMMLUtil.createApply(PMMLFunctions.LN, fieldRef);
+			case "log1p":
+				return PMMLUtil.createApply(PMMLFunctions.LN1P, fieldRef);
 			case "log10":
-				return PMMLUtil.createApply(name, fieldRef);
+				return PMMLUtil.createApply(PMMLFunctions.LOG10, fieldRef);
 			case "negative":
-				return PMMLUtil.createApply("*", PMMLUtil.createConstant(-1), fieldRef);
+				return PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(-1), fieldRef);
 			case "reciprocal":
-				return PMMLUtil.createApply("/", PMMLUtil.createConstant(1), fieldRef);
+				return PMMLUtil.createApply(PMMLFunctions.DIVIDE, PMMLUtil.createConstant(1), fieldRef);
+			case "rint":
+				return PMMLUtil.createApply(PMMLFunctions.RINT, fieldRef);
 			case "sign":
-				return PMMLUtil.createApply("if", PMMLUtil.createApply("lessThan", fieldRef, PMMLUtil.createConstant(0)),
+				return PMMLUtil.createApply(PMMLFunctions.IF, PMMLUtil.createApply(PMMLFunctions.LESSTHAN, fieldRef, PMMLUtil.createConstant(0)),
 					PMMLUtil.createConstant(-1), // x < 0
-					PMMLUtil.createApply("if", PMMLUtil.createApply("greaterThan", fieldRef, PMMLUtil.createConstant(0)),
+					PMMLUtil.createApply(PMMLFunctions.IF, PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, fieldRef, PMMLUtil.createConstant(0)),
 						PMMLUtil.createConstant(+1), // x > 0
 						PMMLUtil.createConstant(0) // x == 0
 					)
 				);
-			case "sqrt":
-				return PMMLUtil.createApply(name, fieldRef);
-			case "square":
-				return PMMLUtil.createApply("*", fieldRef, fieldRef);
-			default:
-				break;
-		}
-
-		switch(name){
-			case "asin":
-			case "acos":
-			case "atan":
-			case "atan2":
-			case "cos":
-			case "cosh":
-			case "expm1":
-			case "hypot":
-				return PMMLUtil.createApply("x-" + name, fieldRef);
-			case "log1p":
-				return PMMLUtil.createApply("x-ln1p", fieldRef);
-			case "rint":
 			case "sin":
+				return PMMLUtil.createApply(PMMLFunctions.SIN, fieldRef);
 			case "sinh":
+				return PMMLUtil.createApply(PMMLFunctions.SINH, fieldRef);
+			case "sqrt":
+				return PMMLUtil.createApply(PMMLFunctions.SQRT, fieldRef);
+			case "square":
+				return PMMLUtil.createApply(PMMLFunctions.MULTIPLY, fieldRef, fieldRef);
 			case "tan":
+				return PMMLUtil.createApply(PMMLFunctions.TAN, fieldRef);
 			case "tanh":
-				return PMMLUtil.createApply("x-" + name, fieldRef);
+				return PMMLUtil.createApply(PMMLFunctions.TANH, fieldRef);
 			default:
 				throw new IllegalArgumentException(name);
 		}

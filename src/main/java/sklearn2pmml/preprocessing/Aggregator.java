@@ -26,6 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -73,11 +74,12 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 	private String translateFunction(String function){
 
 		switch(function){
-			case "min":
 			case "max":
-				return function;
+				return PMMLFunctions.MAX;
 			case "mean":
-				return "avg";
+				return PMMLFunctions.AVG;
+			case "min":
+				return PMMLFunctions.MIN;
 			default:
 				throw new IllegalArgumentException(function);
 		}

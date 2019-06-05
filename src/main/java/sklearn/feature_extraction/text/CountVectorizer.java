@@ -45,6 +45,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
@@ -102,7 +103,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		DType dtype = getDType();
 
 		if(lowercase){
-			Apply apply = PMMLUtil.createApply("lowercase", feature.ref());
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.LOWERCASE, feature.ref());
 
 			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("lowercase", feature), OpType.CATEGORICAL, DataType.STRING, () -> apply);
 

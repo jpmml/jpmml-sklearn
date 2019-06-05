@@ -34,7 +34,9 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.visitors.ExpressionCompactor;
 import org.jpmml.model.ValueUtil;
 
@@ -72,17 +74,17 @@ public class ExpressionTranslator extends AbstractTranslator {
 		
 		switch(operator.kind){
 			case EQUAL:
-				return "equal";
+				return PMMLFunctions.EQUAL;
 			case NOT_EQUAL:
-				return "notEqual";
+				return PMMLFunctions.NOTEQUAL;
 			case LESS_THAN:
-				return "lessThan";
+				return PMMLFunctions.LESSTHAN;
 			case LESS_OR_EQUAL:
-				return "lessOrEqual";
+				return PMMLFunctions.LESSOREQUAL;
 			case GREATER_THAN:
-				return "greaterThan";
+				return PMMLFunctions.GREATERTHAN;
 			case GREATER_OR_EQUAL:
-				return "greaterOrEqual";
+				return PMMLFunctions.GREATEROREQUAL;
 			default:
 				throw new IllegalArgumentException(operator.image);
 		}
@@ -93,7 +95,7 @@ public class ExpressionTranslator extends AbstractTranslator {
 
 		switch(operator.kind){
 			case MODULO:
-				return "x-modulo";
+				return PMMLFunctions.MODULO;
 			default:
 				return operator.image;
 		}
@@ -107,12 +109,12 @@ public class ExpressionTranslator extends AbstractTranslator {
 				if(arguments.size() != 1){
 					throw new IllegalArgumentException();
 				}
-				return createApply("isMissing", arguments.get(0));
+				return PMMLUtil.createApply(PMMLFunctions.ISMISSING, arguments.get(0));
 			case "pandas.notnull":
 				if(arguments.size() != 1){
 					throw new IllegalArgumentException();
 				}
-				return createApply("isNotMissing", arguments.get(0));
+				return PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, arguments.get(0));
 			default:
 				throw new IllegalArgumentException(function);
 		}
@@ -140,17 +142,6 @@ public class ExpressionTranslator extends AbstractTranslator {
 		}
 
 		return image;
-	}
-
-	static
-	private Apply createApply(String function, Expression... expressions){
-		Apply apply = new Apply(function);
-		
-		for(Expression expression : expressions){
-			apply.addExpressions(expression);
-		}
-		
-		return apply;
 	}
 }
 PARSER_END(ExpressionTranslator)
@@ -295,7 +286,7 @@ Expression IfElseExpression():
 	Expression right;
 }
 {
-	left = LogicalOrExpression() ( <IF> center = LogicalOrExpression() <ELSE> right = LogicalOrExpression() { left = createApply("if", center, left, right); } )?
+	left = LogicalOrExpression() ( <IF> center = LogicalOrExpression() <ELSE> right = LogicalOrExpression() { left = PMMLUtil.createApply(PMMLFunctions.IF, center, left, right); } )?
 
 	{
 		return left;
@@ -308,7 +299,7 @@ Expression LogicalOrExpression():
 	Expression right;
 }
 {
-	left = LogicalAndExpression() ( <OR> right = LogicalAndExpression() { left = createApply("or", left, right); } )*
+	left = LogicalAndExpression() ( <OR> right = LogicalAndExpression() { left = PMMLUtil.createApply(PMMLFunctions.OR, left, right); } )*
 
 	{
 		return left;
@@ -321,7 +312,7 @@ Expression LogicalAndExpression():
 	Expression right;
 }
 {
-	left = NegationExpression() ( <AND> right = NegationExpression() { left = createApply("and", left, right); } )*
+	left = NegationExpression() ( <AND> right = NegationExpression() { left = PMMLUtil.createApply(PMMLFunctions.AND, left, right); } )*
 
 	{
 		return left;
@@ -338,7 +329,7 @@ Expression NegationExpression():
 
 	{
 		if(operator != null){
-			return createApply("not", expression);
+			return PMMLUtil.createApply(PMMLFunctions.NOT, expression);
 		}
 
 		return expression;
@@ -352,7 +343,7 @@ Expression ComparisonExpression():
 	Expression right;
 }
 {
-	left = AdditiveExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = AdditiveExpression() { left = createApply(translateRelationalOperator(operator), left, right); })?
+	left = AdditiveExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = AdditiveExpression() { left = PMMLUtil.createApply(translateRelationalOperator(operator), left, right); })?
 
 	{
 		return left;
@@ -366,7 +357,7 @@ Expression AdditiveExpression():
 	Expression right;
 }
 {
-	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = createApply(translateArithmeticOperator(operator), left, right); })*
+	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = PMMLUtil.createApply(translateArithmeticOperator(operator), left, right); })*
 
 	{
 		return left;
@@ -380,7 +371,7 @@ Expression MultiplicativeExpression():
 	Expression right;
 }
 {
-	left = UnaryExpression() ((operator = <MULTIPLY> | operator = <DIVIDE> | operator = <MODULO> ) right = UnaryExpression() { left = createApply(translateArithmeticOperator(operator), left, right); })*
+	left = UnaryExpression() ((operator = <MULTIPLY> | operator = <DIVIDE> | operator = <MODULO> ) right = UnaryExpression() { left = PMMLUtil.createApply(translateArithmeticOperator(operator), left, right); })*
 
 	{
 		return left;
@@ -403,28 +394,7 @@ Expression UnaryExpression():
 
 	{
 		if(sign != null && sign.kind == MINUS){
-			
-			if(expression instanceof Constant){
-				Constant constant = (Constant)expression;
-
-				String string = ValueUtil.toString(constant.getValue());
-				if(string.startsWith("-")){
-					string = string.substring(1);
-				} else
-					
-				{
-					string = ("-" + string);
-				}
-				
-				constant.setValue(string);
-			} else
-
-			{
-				Constant constant = new Constant()
-					.setValue("-1");
-
-				expression = createApply("*", constant, expression);
-			}
+			expression = PMMLUtil.toNegative(expression);
 		}
 
 		return expression;

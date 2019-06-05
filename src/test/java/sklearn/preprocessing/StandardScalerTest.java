@@ -18,6 +18,7 @@
  */
 package sklearn.preprocessing;
 
+import org.dmg.pmml.PMMLFunctions;
 import org.junit.Test;
 
 public class StandardScalerTest extends ScalerTest {
@@ -35,11 +36,11 @@ public class StandardScalerTest extends ScalerTest {
 		scaler.put("with_mean", Boolean.TRUE);
 		scaler.put("with_std", Boolean.TRUE);
 
-		assertTransformedFeature(scaler, "/");
+		assertTransformedFeature(scaler, PMMLFunctions.DIVIDE);
 
 		scaler.put("std_", 1d);
 
-		assertTransformedFeature(scaler, "-");
+		assertTransformedFeature(scaler, PMMLFunctions.SUBTRACT);
 
 		scaler.put("mean_", 0d);
 

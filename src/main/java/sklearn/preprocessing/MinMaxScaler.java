@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -73,11 +74,11 @@ public class MinMaxScaler extends Transformer implements HasNumberOfFeatures {
 			Expression expression = continuousFeature.ref();
 
 			if(!ValueUtil.isOne(scaleValue)){
-				expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(scaleValue));
+				expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, PMMLUtil.createConstant(scaleValue));
 			} // End if
 
 			if(!ValueUtil.isZero(minValue)){
-				expression = PMMLUtil.createApply("+", expression, PMMLUtil.createConstant(minValue));
+				expression = PMMLUtil.createApply(PMMLFunctions.ADD, expression, PMMLUtil.createConstant(minValue));
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("mix_max_scaler", continuousFeature), expression);

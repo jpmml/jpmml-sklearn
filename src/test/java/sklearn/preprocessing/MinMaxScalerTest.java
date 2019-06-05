@@ -18,6 +18,7 @@
  */
 package sklearn.preprocessing;
 
+import org.dmg.pmml.PMMLFunctions;
 import org.junit.Test;
 
 public class MinMaxScalerTest extends ScalerTest {
@@ -28,11 +29,11 @@ public class MinMaxScalerTest extends ScalerTest {
 		scaler.put("min_", 2d);
 		scaler.put("scale_", 6d);
 
-		assertTransformedFeature(scaler, "+");
+		assertTransformedFeature(scaler, PMMLFunctions.ADD);
 
 		scaler.put("min_", 0d);
 
-		assertTransformedFeature(scaler, "*");
+		assertTransformedFeature(scaler, PMMLFunctions.MULTIPLY);
 
 		scaler.put("scale_", 1d);
 

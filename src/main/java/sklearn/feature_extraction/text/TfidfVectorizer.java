@@ -27,6 +27,7 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
@@ -86,7 +87,7 @@ public class TfidfVectorizer extends CountVectorizer {
 
 		Boolean sublinearTf = transformer.getSublinearTf();
 		if(sublinearTf){
-			expression = PMMLUtil.createApply("+", PMMLUtil.createApply("log", expression), PMMLUtil.createConstant(1d));
+			expression = PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, expression), PMMLUtil.createConstant(1d));
 		} // End if
 
 		Boolean useIdf = transformer.getUseIdf();
@@ -95,7 +96,7 @@ public class TfidfVectorizer extends CountVectorizer {
 
 			defineFunction.addParameterFields(weight);
 
-			expression = PMMLUtil.createApply("*", expression, new FieldRef(weight.getName()));
+			expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weight.getName()));
 		}
 
 		defineFunction.setExpression(expression);

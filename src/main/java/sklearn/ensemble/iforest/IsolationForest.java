@@ -28,6 +28,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
@@ -148,7 +149,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 				double averagePathLength = (corrected ? correctedAveragePathLength(maxSamples, nodeSampleCorrected) : averagePathLength(maxSamples));
 
-				return PMMLUtil.createApply("/", fieldRef, PMMLUtil.createConstant(averagePathLength));
+				return PMMLUtil.createApply(PMMLFunctions.DIVIDE, fieldRef, PMMLUtil.createConstant(averagePathLength));
 			}
 		};
 
@@ -167,7 +168,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return PMMLUtil.createApply("-", PMMLUtil.createConstant(0.5d), PMMLUtil.createApply("pow", PMMLUtil.createConstant(2d), PMMLUtil.createApply("*", PMMLUtil.createConstant(-1d), fieldRef)));
+				return PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(0.5d), PMMLUtil.createApply(PMMLFunctions.POW, PMMLUtil.createConstant(2d), PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(-1d), fieldRef)));
 			}
 		};
 
@@ -199,7 +200,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 					}
 				}
 
-				return PMMLUtil.createApply("lessOrEqual", fieldRef, PMMLUtil.createConstant(threshold));
+				return PMMLUtil.createApply(PMMLFunctions.LESSOREQUAL, fieldRef, PMMLUtil.createConstant(threshold));
 			}
 		};
 

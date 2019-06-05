@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -95,11 +96,11 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 			Expression expression = continuousFeature.ref();
 
 			if(!ValueUtil.isZero(meanValue)){
-				expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
+				expression = PMMLUtil.createApply(PMMLFunctions.SUBTRACT, expression, PMMLUtil.createConstant(meanValue));
 			} // End if
 
 			if(!ValueUtil.isOne(stdValue)){
-				expression = PMMLUtil.createApply("/", expression, PMMLUtil.createConstant(stdValue));
+				expression = PMMLUtil.createApply(PMMLFunctions.DIVIDE, expression, PMMLUtil.createConstant(stdValue));
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("standard_scaler", continuousFeature), expression);

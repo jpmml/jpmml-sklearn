@@ -25,6 +25,7 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -65,8 +66,9 @@ public class SubstringTransformer extends Transformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = PMMLUtil.createApply("substring")
-			.addExpressions(feature.ref(), PMMLUtil.createConstant(begin + 1, DataType.INTEGER), PMMLUtil.createConstant((end - begin), DataType.INTEGER));
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.SUBSTRING)
+			.addExpressions(feature.ref())
+			.addExpressions(PMMLUtil.createConstant(begin + 1, DataType.INTEGER), PMMLUtil.createConstant((end - begin), DataType.INTEGER));
 
 		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("substring", feature), OpType.CATEGORICAL, DataType.STRING, apply);
 

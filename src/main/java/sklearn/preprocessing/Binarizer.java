@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -48,7 +49,7 @@ public class Binarizer extends Transformer {
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 			// "($name <= threshold) ? 0 : 1"
-			Apply apply = PMMLUtil.createApply("threshold", continuousFeature.ref(), PMMLUtil.createConstant(threshold));
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.THRESHOLD, continuousFeature.ref(), PMMLUtil.createConstant(threshold));
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("binarizer", continuousFeature), apply);
 

@@ -26,6 +26,7 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -74,7 +75,7 @@ public class PCA extends Transformer implements HasNumberOfFeatures {
 		for(int i = 0; i < numberOfComponents; i++){
 			List<? extends Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
-			Apply apply = new Apply("sum");
+			Apply apply = new Apply(PMMLFunctions.SUM);
 
 			for(int j = 0; j < numberOfFeatures; j++){
 				Feature feature = features.get(j);
@@ -94,11 +95,11 @@ public class PCA extends Transformer implements HasNumberOfFeatures {
 				Expression expression = continuousFeature.ref();
 
 				if(!ValueUtil.isZero(meanValue)){
-					expression = PMMLUtil.createApply("-", expression, PMMLUtil.createConstant(meanValue));
+					expression = PMMLUtil.createApply(PMMLFunctions.SUBTRACT, expression, PMMLUtil.createConstant(meanValue));
 				} // End if
 
 				if(!ValueUtil.isOne(componentValue)){
-					expression = PMMLUtil.createApply("*", expression, PMMLUtil.createConstant(componentValue));
+					expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, PMMLUtil.createConstant(componentValue));
 				}
 
 				apply.addExpressions(expression);
@@ -108,7 +109,7 @@ public class PCA extends Transformer implements HasNumberOfFeatures {
 				Number explainedVarianceValue = explainedVariance.get(i);
 
 				if(!ValueUtil.isOne(explainedVarianceValue)){
-					apply = PMMLUtil.createApply("/", apply, PMMLUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVarianceValue))));
+					apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, apply, PMMLUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVarianceValue))));
 				}
 			}
 

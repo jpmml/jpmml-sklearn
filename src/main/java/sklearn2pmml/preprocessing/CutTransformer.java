@@ -32,6 +32,7 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -106,7 +107,17 @@ public class CutTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("cut", feature), OpType.CATEGORICAL, dataType, discretize);
 
-		return Collections.singletonList(new CategoricalFeature(encoder, derivedField, labelCategories));
+		Feature result;
+
+		if(labels != null){
+			result = new CategoricalFeature(encoder, derivedField, labelCategories);
+		} else
+
+		{
+			result = new IndexFeature(encoder, derivedField, (List)labelCategories);
+		}
+
+		return Collections.singletonList(result);
 	}
 
 	public List<? extends Number> getBins(){
