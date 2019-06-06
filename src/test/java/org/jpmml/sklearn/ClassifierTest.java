@@ -141,6 +141,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateTPOTAudit() throws Exception {
+		evaluate("TPOT", "Audit");
+	}
+
+	@Test
 	public void evaluateVotingEnsembleAudit() throws Exception {
 		evaluate("VotingEnsemble", "Audit");
 	}
@@ -346,7 +351,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateTPOTVersicolor() throws Exception {
-		evaluate("TPOT", "Versicolor");
+		evaluate("TPOT", "Versicolor", new PMMLEquivalence(5e-13, 5e-13));
 	}
 
 	static
