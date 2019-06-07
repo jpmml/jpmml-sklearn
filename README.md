@@ -138,6 +138,12 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.CutTransformer`
     * `sklearn2pmml.preprocessing.DaysSinceYearTransformer`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
+      * Ternary conditional expression `${expression_true} if ${condition} else ${expression_false}`.
+      * Array indexing expressions `X[${position}]` and `X[${name}]`.
+      * Arithmetic operators `+`, `-`, `*`, `/` and `%`.
+      * Comparison operators `<=`, `<`, `==`, `!=`, `>` and `>=`.
+      * Logical operators `and`, `or` and `not`.
+      * Value missingness check functions `pandas.isnull` and `pandas.notnull`.
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`
@@ -296,7 +302,7 @@ java -jar target/jpmml-sklearn-executable-1.5-SNAPSHOT.jar --help
 # Documentation #
 
 * [Extending Scikit-Learn with business rules (BR) model type](http://openscoring.io/blog/2018/09/17/sklearn_business_rules/)
-* [Converting Scikit-Learn plus LightGBM pipelines to PMML documents](https://openscoring.io/blog/2019/04/07/converting_sklearn_lightgbm_pipeline_pmml/)
+* [Converting Scikit-Learn based LightGBM pipelines to PMML documents](https://openscoring.io/blog/2019/04/07/converting_sklearn_lightgbm_pipeline_pmml/)
 
 # License #
 
