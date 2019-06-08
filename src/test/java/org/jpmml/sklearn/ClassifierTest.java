@@ -59,6 +59,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateGBDTLRAudit() throws Exception {
+		evaluate("GBDTLR", "Audit");
+	}
+
+	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {
 		evaluate("GradientBoosting", "Audit");
 	}
@@ -317,6 +322,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateDummyVersicolor() throws Exception {
 		evaluate("Dummy", "Versicolor");
+	}
+
+	@Test
+	public void evaluateGBDTLRVersicolor() throws Exception {
+		evaluate("GBDTLR", "Versicolor");
 	}
 
 	@Test
