@@ -73,7 +73,7 @@ public class LogisticRegression extends LinearClassifier {
 		int numberOfFeatures = shape[1];
 
 		List<? extends Number> coef = getCoef();
-		List<? extends Number> intercepts = getIntercept();
+		List<? extends Number> intercept = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -91,7 +91,7 @@ public class LogisticRegression extends LinearClassifier {
 
 			Schema segmentSchema = schema.toRelabeledSchema(null);
 
-			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercepts.get(0), null, segmentSchema)
+			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), null, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE));
 
 			Feature feature = new ContinuousFeature(null, FieldName.create("decisionFunction"), DataType.DOUBLE);
@@ -119,7 +119,7 @@ public class LogisticRegression extends LinearClassifier {
 			List<RegressionTable> regressionTables = new ArrayList<>();
 
 			for(int i = 0; i < categoricalLabel.size(); i++){
-				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercepts.get(i))
+				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i))
 					.setTargetCategory(categoricalLabel.getValue(i));
 
 				regressionTables.add(regressionTable);

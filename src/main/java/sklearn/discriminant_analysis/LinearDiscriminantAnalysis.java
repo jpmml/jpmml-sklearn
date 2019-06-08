@@ -71,7 +71,7 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 		int numberOfFeatures = shape[1];
 
 		List<? extends Number> coef = getCoef();
-		List<? extends Number> intercepts = getIntercept();
+		List<? extends Number> intercept = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -92,7 +92,7 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercepts.get(i), RegressionModel.NormalizationMethod.NONE, segmentSchema)
+				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.NONE, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE));
 
 				regressionModels.add(regressionModel);

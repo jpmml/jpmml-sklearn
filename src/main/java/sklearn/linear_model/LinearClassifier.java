@@ -59,7 +59,7 @@ public class LinearClassifier extends Classifier {
 		boolean hasProbabilityDistribution = hasProbabilityDistribution();
 
 		List<? extends Number> coef = getCoef();
-		List<? extends Number> intercepts = getIntercept();
+		List<? extends Number> intercept = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -68,7 +68,7 @@ public class LinearClassifier extends Classifier {
 		if(numberOfClasses == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			return RegressionModelUtil.createBinaryLogisticClassification(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0), intercepts.get(0), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
+			return RegressionModelUtil.createBinaryLogisticClassification(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0), intercept.get(0), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
 		} else
 
 		if(numberOfClasses >= 3){
@@ -79,7 +79,7 @@ public class LinearClassifier extends Classifier {
 			List<RegressionModel> regressionModels = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercepts.get(i), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
+				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE));
 
 				regressionModels.add(regressionModel);
