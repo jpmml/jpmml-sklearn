@@ -43,12 +43,20 @@ import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class StackingEstimator extends Transformer implements HasEstimator<Estimator> {
+public class StackingEstimator extends Transformer implements HasEstimator<Estimator>, HasNumberOfFeatures {
 
 	public StackingEstimator(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getNumberOfFeatures();
 	}
 
 	@Override
