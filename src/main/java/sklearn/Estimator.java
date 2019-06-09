@@ -65,7 +65,7 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 	}
 
 	public Object getOption(String key, Object defaultValue){
-		Map<String, ?> pmmlOptions = getOptional("pmml_options_", Map.class);
+		Map<String, ?> pmmlOptions = getPMMLOptions();
 
 		if(pmmlOptions != null && pmmlOptions.containsKey(key)){
 			return pmmlOptions.get(key);
@@ -79,6 +79,16 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 		}
 
 		return defaultValue;
+	}
+
+	public Map<String, ?> getPMMLOptions(){
+		return getOptional("pmml_options_", Map.class);
+	}
+
+	public Estimator setPMMLOptions(Map<String, ?> pmmlOptions){
+		put("pmml_options_", pmmlOptions);
+
+		return this;
 	}
 
 	public String getSkLearnVersion(){

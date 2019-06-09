@@ -78,7 +78,7 @@ public class GBDTLR extends Classifier {
 		pmmlOptions.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
 		pmmlOptions.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
 
-		gbdt.put("pmml_options_", pmmlOptions);
+		gbdt.setPMMLOptions(pmmlOptions);
 
 		Model model = gbdt.encodeModel(schema);
 
