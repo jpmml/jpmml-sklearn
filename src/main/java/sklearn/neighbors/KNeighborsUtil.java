@@ -105,8 +105,7 @@ public class KNeighborsUtil {
 			data.put(instanceField.getColumn(), CMatrixUtil.getColumn(fitX, numberOfInstances, numberOfFeatures, i));
 		}
 
-		TrainingInstances trainingInstances = new TrainingInstances(instanceFields)
-			.setInlineTable(PMMLUtil.createInlineTable(data))
+		TrainingInstances trainingInstances = new TrainingInstances(instanceFields, null, PMMLUtil.createInlineTable(data))
 			.setTransformed(true);
 
 		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator.getMetric(), estimator.getP());
@@ -118,8 +117,7 @@ public class KNeighborsUtil {
 		for(int i = 0; i < numberOfNeighbors; i++){
 			int rank = (i + 1);
 
-			OutputField outputField = new OutputField(FieldName.create("neighbor(" + rank + ")"), DataType.STRING)
-				.setOpType(OpType.CATEGORICAL)
+			OutputField outputField = new OutputField(FieldName.create("neighbor(" + rank + ")"), OpType.CATEGORICAL, DataType.STRING)
 				.setResultFeature(ResultFeature.ENTITY_ID)
 				.setRank(rank);
 
@@ -152,9 +150,8 @@ public class KNeighborsUtil {
 							break;
 					}
 
-					ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
-						.setCompareFunction(CompareFunction.ABS_DIFF)
-						.setMeasure(measure);
+					ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, measure)
+						.setCompareFunction(CompareFunction.ABS_DIFF);
 
 					return comparisonMeasure;
 				}

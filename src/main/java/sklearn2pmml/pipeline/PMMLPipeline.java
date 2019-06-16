@@ -232,12 +232,12 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			OutputField predictField;
 
 			if(label instanceof ContinuousLabel){
-				predictField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CONTINUOUS)
+				predictField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType())
 					.setFinalResult(false);
 			} else
 
 			if(label instanceof CategoricalLabel){
-				predictField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CATEGORICAL)
+				predictField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType())
 					.setFinalResult(false);
 			} else
 
@@ -496,8 +496,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Map<FieldName, DerivedField> derivedFields = encoder.getDerivedFields();
 
 		for(DerivedField derivedField : derivedFields.values()){
-			OutputField outputField = new OutputField(derivedField.getName(), derivedField.getDataType())
-				.setOpType(derivedField.getOpType())
+			OutputField outputField = new OutputField(derivedField.getName(), derivedField.getOpType(), derivedField.getDataType())
 				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 				.setExpression(derivedField.getExpression());
 

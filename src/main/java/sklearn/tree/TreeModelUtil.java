@@ -236,7 +236,7 @@ public class TreeModelUtil {
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
 
-		Node root = encodeNode(new True(), predicateManager, scoreDistributionManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+		Node root = encodeNode(True.INSTANCE, predicateManager, scoreDistributionManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
@@ -294,11 +294,11 @@ public class TreeModelUtil {
 			Node result;
 
 			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
-				result = new ClassifierNode();
+				result = new ClassifierNode(null, predicate);
 			} else
 
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
-				result = new CountingBranchNode();
+				result = new CountingBranchNode(null, predicate);
 			} else
 
 			{
@@ -307,7 +307,6 @@ public class TreeModelUtil {
 
 			result
 				.setId(id)
-				.setPredicate(predicate)
 				.addNodes(leftChild, rightChild);
 
 			return result;
@@ -340,11 +339,9 @@ public class TreeModelUtil {
 					}
 				}
 
-				result = new ClassifierNode()
+				result = new ClassifierNode(score, predicate)
 					.setId(id)
-					.setScore(score)
-					.setRecordCount(totalRecordCount)
-					.setPredicate(predicate);
+					.setRecordCount(totalRecordCount);
 
 				List<ScoreDistribution> scoreDistributions = scoreDistributionManager.createScoreDistribution(categoricalLabel, recordCounts);
 
@@ -354,10 +351,8 @@ public class TreeModelUtil {
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
 				double value = values[index];
 
-				result = new CountingLeafNode()
-					.setId(id)
-					.setScore(value)
-					.setPredicate(predicate);
+				result = new CountingLeafNode(value, predicate)
+					.setId(id);
 			} else
 
 			{

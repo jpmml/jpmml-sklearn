@@ -163,11 +163,10 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 		ParameterField termField = new ParameterField(FieldName.create("term"));
 
-		TextIndex textIndex = new TextIndex(documentField.getName())
+		TextIndex textIndex = new TextIndex(documentField.getName(), new FieldRef(termField.getName()))
 			.setTokenize(Boolean.TRUE)
 			.setWordSeparatorCharacterRE(tokenizer.getSeparatorRE())
-			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null)
-			.setExpression(new FieldRef(termField.getName()));
+			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null);
 
 		if((stopWords != null && stopWords.size() > 0) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){
 			Map<String, List<String>> data = new LinkedHashMap<>();
@@ -175,19 +174,16 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			data.put("stem", Collections.singletonList(" "));
 			data.put("regex", Collections.singletonList("true"));
 
-			TextIndexNormalization textIndexNormalization = new TextIndexNormalization()
-				.setRecursive(Boolean.TRUE) // Handles consecutive matches. See http://stackoverflow.com/a/25085385
-				.setInlineTable(PMMLUtil.createInlineTable(data));
+			TextIndexNormalization textIndexNormalization = new TextIndexNormalization(null, PMMLUtil.createInlineTable(data))
+				.setRecursive(Boolean.TRUE); // Handles consecutive matches. See http://stackoverflow.com/a/25085385
 
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
 		}
 
 		String name = functionName() + "@" + String.valueOf(CountVectorizer.SEQUENCE.getAndIncrement());
 
-		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, null)
-			.setDataType(DataType.DOUBLE)
-			.addParameterFields(documentField, termField)
-			.setExpression(textIndex);
+		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.DOUBLE, null, textIndex)
+			.addParameterFields(documentField, termField);
 
 		return defineFunction;
 	}

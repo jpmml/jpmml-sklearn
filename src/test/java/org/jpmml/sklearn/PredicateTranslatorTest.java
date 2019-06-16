@@ -41,12 +41,12 @@ public class PredicateTranslatorTest extends TranslatorTest {
 	public void translateLogicalPredicate(){
 		String string = "X[0] > 0.0 and X[1] > 0 or X[2] > 0";
 
-		Predicate first = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.GREATER_THAN, "0.0");
-		Predicate second = createSimplePredicate(FieldName.create("b"), SimplePredicate.Operator.GREATER_THAN, "0");
-		Predicate third = createSimplePredicate(FieldName.create("c"), SimplePredicate.Operator.GREATER_THAN, "0");
+		Predicate first = new SimplePredicate(FieldName.create("a"), SimplePredicate.Operator.GREATER_THAN, "0.0");
+		Predicate second = new SimplePredicate(FieldName.create("b"), SimplePredicate.Operator.GREATER_THAN, "0");
+		Predicate third = new SimplePredicate(FieldName.create("c"), SimplePredicate.Operator.GREATER_THAN, "0");
 
-		Predicate expected = new CompoundPredicate(CompoundPredicate.BooleanOperator.OR)
-			.addPredicates(new CompoundPredicate(CompoundPredicate.BooleanOperator.AND)
+		Predicate expected = new CompoundPredicate(CompoundPredicate.BooleanOperator.OR, null)
+			.addPredicates(new CompoundPredicate(CompoundPredicate.BooleanOperator.AND, null)
 				.addPredicates(first)
 				.addPredicates(second)
 			)
@@ -56,9 +56,9 @@ public class PredicateTranslatorTest extends TranslatorTest {
 
 		string = "(X[\"a\"] > 0.0) and ((X[\"b\"] > 0) or (X[\"c\"] > 0))";
 
-		expected = new CompoundPredicate(CompoundPredicate.BooleanOperator.AND)
+		expected = new CompoundPredicate(CompoundPredicate.BooleanOperator.AND, null)
 			.addPredicates(first)
-			.addPredicates(new CompoundPredicate(CompoundPredicate.BooleanOperator.OR)
+			.addPredicates(new CompoundPredicate(CompoundPredicate.BooleanOperator.OR, null)
 				.addPredicates(second, third)
 			);
 
@@ -67,7 +67,7 @@ public class PredicateTranslatorTest extends TranslatorTest {
 
 	@Test
 	public void translateComparisonPredicate(){
-		Predicate expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.GREATER_THAN, "0.0");
+		Predicate expected = new SimplePredicate(FieldName.create("a"), SimplePredicate.Operator.GREATER_THAN, "0.0");
 
 		checkPredicate(expected, "X['a'] > 0.0", doubleFeatures);
 
@@ -79,13 +79,13 @@ public class PredicateTranslatorTest extends TranslatorTest {
 			// Ignored
 		}
 
-		expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.IS_MISSING, null);
+		expected = new SimplePredicate(FieldName.create("a"), SimplePredicate.Operator.IS_MISSING, null);
 		checkPredicate(expected, "X[0] is None", doubleFeatures);
 
-		expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.IS_NOT_MISSING, null);
+		expected = new SimplePredicate(FieldName.create("a"), SimplePredicate.Operator.IS_NOT_MISSING, null);
 		checkPredicate(expected, "X[0] is not None", doubleFeatures);
 
-		expected = createSimplePredicate(FieldName.create("a"), SimplePredicate.Operator.EQUAL, "one");
+		expected = new SimplePredicate(FieldName.create("a"), SimplePredicate.Operator.EQUAL, "one");
 		checkPredicate(expected, "X[0] == \"one\"", stringFeatures);
 
 		expected = createSimpleSetPredicate(FieldName.create("a"), SimpleSetPredicate.BooleanOperator.IS_IN, Arrays.asList("1", "2", "3"));
@@ -103,12 +103,6 @@ public class PredicateTranslatorTest extends TranslatorTest {
 		Predicate actual = PredicateTranslator.translate(string, features);
 
 		assertTrue(ReflectionUtil.equals(expected, actual));
-	}
-
-	static
-	private SimplePredicate createSimplePredicate(FieldName field, SimplePredicate.Operator operator, Object value){
-		return new SimplePredicate(field, operator)
-			.setValue(value);
 	}
 
 	static

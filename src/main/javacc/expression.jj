@@ -190,13 +190,13 @@ TOKEN:
 
 TOKEN:
 {
-	< MULTIPLY: "*" >
-	|
-	< DIVIDE: "/" >
-	|
 	< PLUS: "+" >
 	|
 	< MINUS: "-" >
+	|
+	< MULTIPLY: "*" >
+	|
+	< DIVIDE: "/" >
 	|
 	< MODULO: "%" >
 }

@@ -104,9 +104,7 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 				throw new IllegalArgumentException(strategy);
 		}
 
-		Node root = new ClassifierNode()
-			.setScore(ValueUtil.toString(classes.get(index)))
-			.setPredicate(new True());
+		Node root = new ClassifierNode(ValueUtil.toString(classes.get(index)), True.INSTANCE);
 
 		List<ScoreDistribution> scoreDistributions = root.getScoreDistributions();
 

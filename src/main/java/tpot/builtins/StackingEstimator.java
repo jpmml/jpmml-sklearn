@@ -95,7 +95,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 						}
 					}
 
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CATEGORICAL);
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType());
 
 					DerivedOutputField predictedField = encoder.createDerivedField(output, predictedOutputField);
 
@@ -106,7 +106,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 				{
 					label = new ContinuousLabel(null, DataType.DOUBLE);
 
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, label.getDataType(), OpType.CONTINUOUS);
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType());
 
 					DerivedOutputField predictedField = encoder.createDerivedField(output, predictedOutputField);
 

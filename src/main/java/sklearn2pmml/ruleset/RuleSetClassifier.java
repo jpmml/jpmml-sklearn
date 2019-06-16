@@ -95,9 +95,7 @@ public class RuleSetClassifier extends Classifier {
 			String predicate = TupleUtil.extractElement(rule, 0, String.class);
 			String score = TupleUtil.extractElement(rule, 1, String.class);
 
-			SimpleRule simpleRule = new SimpleRule()
-				.setPredicate(PredicateTranslator.translate(predicate, features))
-				.setScore(score);
+			SimpleRule simpleRule = new SimpleRule(score, PredicateTranslator.translate(predicate, features));
 
 			ruleSet.addRules(simpleRule);
 		}

@@ -98,32 +98,10 @@ public class PredicateTranslator extends AbstractTranslator {
 
 	static
 	private CompoundPredicate createCompoundPredicate(CompoundPredicate.BooleanOperator booleanOperator, Predicate... predicates){
-		CompoundPredicate compoundPredicate = new CompoundPredicate(booleanOperator)
+		CompoundPredicate compoundPredicate = new CompoundPredicate(booleanOperator, null)
 			.addPredicates(predicates);
 
 		return compoundPredicate;
-	}
-
-	static
-	private SimplePredicate createSimplePredicate(FieldName field, SimplePredicate.Operator operator){
-		SimplePredicate simplePredicate = new SimplePredicate(field, operator);
-
-		return simplePredicate;
-	}
-
-	static
-	private SimplePredicate createSimplePredicate(FieldName field, SimplePredicate.Operator operator, String value){
-		SimplePredicate simplePredicate = new SimplePredicate(field, operator)
-			.setValue(value);
-
-		return simplePredicate;
-	}
-
-	static
-	private SimpleSetPredicate createSimpleSetPredicate(FieldName field, SimpleSetPredicate.BooleanOperator booleanOperator, Array array){
-		SimpleSetPredicate simpleSetPredicate = new SimpleSetPredicate(field, booleanOperator, array);
-
-		return simpleSetPredicate;
 	}
 }
 PARSER_END(PredicateTranslator)
@@ -290,18 +268,18 @@ Predicate ComparisonExpression():
 {
 	(
 		LOOKAHEAD(PrimaryExpression() <IN>)
-		left = PrimaryExpression() <IN> right = ListMakerExpression() { left = createSimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_IN, (Array)right); }
+		left = PrimaryExpression() <IN> right = ListMakerExpression() { left = new SimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_IN, (Array)right); }
 		|
 		LOOKAHEAD(PrimaryExpression() <NOT> <IN>)
-		left = PrimaryExpression() <NOT> <IN> right = ListMakerExpression() { left = createSimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_NOT_IN, (Array)right); }
+		left = PrimaryExpression() <NOT> <IN> right = ListMakerExpression() { left = new SimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_NOT_IN, (Array)right); }
 		|
 		LOOKAHEAD(PrimaryExpression() <IS> <NONE>)
-		left = PrimaryExpression() <IS> <NONE> { left = createSimplePredicate((FieldName)left, SimplePredicate.Operator.IS_MISSING); }
+		left = PrimaryExpression() <IS> <NONE> { left = new SimplePredicate((FieldName)left, SimplePredicate.Operator.IS_MISSING, null); }
 		|
 		LOOKAHEAD(PrimaryExpression() <IS> <NOT> <NONE>)
-		left = PrimaryExpression() <IS> <NOT> <NONE> { left = createSimplePredicate((FieldName)left, SimplePredicate.Operator.IS_NOT_MISSING); }
+		left = PrimaryExpression() <IS> <NOT> <NONE> { left = new SimplePredicate((FieldName)left, SimplePredicate.Operator.IS_NOT_MISSING, null); }
 		|
-		left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = UnaryExpression() { left = createSimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
+		left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = UnaryExpression() { left = new SimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
 	)
 
 	{

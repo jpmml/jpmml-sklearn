@@ -70,17 +70,15 @@ public class KMeans extends Clusterer {
 		List<Cluster> clusters = new ArrayList<>();
 
 		for(int i = 0; i < numberOfClusters; i++){
-			Cluster cluster = new Cluster()
+			Cluster cluster = new Cluster(PMMLUtil.createRealArray(CMatrixUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i)))
 				.setId(String.valueOf(i))
-				.setSize((labelCounts.size () > 0 ? labelCounts.count(i) : null))
-				.setArray(PMMLUtil.createRealArray(CMatrixUtil.getRow(clusterCenters, numberOfClusters, numberOfFeatures, i)));
+				.setSize((labelCounts.size () > 0 ? labelCounts.count(i) : null));
 
 			clusters.add(cluster);
 		}
 
-		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE)
-			.setCompareFunction(CompareFunction.ABS_DIFF)
-			.setMeasure(new SquaredEuclidean());
+		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, new SquaredEuclidean())
+			.setCompareFunction(CompareFunction.ABS_DIFF);
 
 		ClusteringModel clusteringModel = new ClusteringModel(MiningFunction.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema(schema.getLabel()), comparisonMeasure, ClusteringModelUtil.createClusteringFields(schema.getFeatures()), clusters)
 			.setOutput(ClusteringModelUtil.createOutput(FieldName.create("Cluster"), DataType.DOUBLE, clusters));

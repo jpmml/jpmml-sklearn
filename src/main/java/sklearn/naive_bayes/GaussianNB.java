@@ -75,8 +75,7 @@ public class GaussianNB extends Classifier {
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-			BayesInput bayesInput = new BayesInput(continuousFeature.getName())
-				.setTargetValueStats(encodeTargetValueStats(categoricalLabel.getValues(), means, variances));
+			BayesInput bayesInput = new BayesInput(continuousFeature.getName(), encodeTargetValueStats(categoricalLabel.getValues(), means, variances), null);
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}
@@ -117,8 +116,7 @@ public class GaussianNB extends Classifier {
 		for(int i = 0; i < values.size(); i++){
 			GaussianDistribution gaussianDistribution = new GaussianDistribution(means.get(i), variances.get(i));
 
-			TargetValueStat targetValueStat = new TargetValueStat(values.get(i))
-				.setContinuousDistribution(gaussianDistribution);
+			TargetValueStat targetValueStat = new TargetValueStat(values.get(i), gaussianDistribution);
 
 			targetValueStats.addTargetValueStats(targetValueStat);
 		}

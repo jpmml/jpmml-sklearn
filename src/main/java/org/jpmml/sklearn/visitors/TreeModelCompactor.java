@@ -73,7 +73,7 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 				throw new IllegalArgumentException();
 			}
 
-			secondChild.setPredicate(new True());
+			secondChild.setPredicate(True.INSTANCE);
 		} else
 
 		{

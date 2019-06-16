@@ -71,9 +71,12 @@ public class LookupTransformer extends Transformer {
 
 		ClassDictUtil.checkSize(features.size() + 1, columns);
 
-		MapValues mapValues = new MapValues();
-
 		List<String> inputColumns = columns.subList(0, columns.size() - 1);
+		String outputColumn = columns.get(columns.size() - 1);
+
+		Map<String, List<Object>> data = parseMapping(inputColumns, outputColumn, mapping);
+
+		MapValues mapValues = new MapValues(outputColumn, null, PMMLUtil.createInlineTable(data));
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
@@ -81,14 +84,6 @@ public class LookupTransformer extends Transformer {
 
 			mapValues.addFieldColumnPairs(new FieldColumnPair(feature.getName(), inputColumn));
 		}
-
-		String outputColumn = columns.get(columns.size() - 1);
-
-		mapValues.setOutputColumn(outputColumn);
-
-		Map<String, List<Object>> data = parseMapping(inputColumns, outputColumn, mapping);
-
-		mapValues.setInlineTable(PMMLUtil.createInlineTable(data));
 
 		List<Object> outputValues = new ArrayList<>();
 		outputValues.addAll(data.get(outputColumn));
