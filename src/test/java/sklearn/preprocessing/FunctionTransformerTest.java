@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import numpy.core.UFunc;
+import numpy.core.UFuncUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
@@ -81,7 +82,7 @@ public class FunctionTransformerTest {
 		EvaluationContext context = new VirtualEvaluationContext();
 		context.declare(name, FieldValueUtil.create(dataType, OpType.CONTINUOUS, value));
 
-		Expression expression = FunctionTransformer.encodeUFunc(ufunc, new FieldRef(name));
+		Expression expression = UFuncUtil.encodeUFunc(ufunc, new FieldRef(name));
 
 		FieldValue result = ExpressionUtil.evaluate(expression, context);
 
