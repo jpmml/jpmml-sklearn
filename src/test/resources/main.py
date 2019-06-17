@@ -203,6 +203,7 @@ if "Audit" in datasets:
 	build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 	build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
 	build_audit(GBDTLR(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "GBDTLRAudit")
+	build_audit(GBDTLR(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "XGBLRAudit")
 	build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
 	build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit", num_iteration = 17)
 	build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
@@ -242,7 +243,9 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = [2, 3, 4, 5, 6, 7, 8])
+	cat_indices = [2, 3, 4, 5, 6, 7, 8]
+	build_audit_cat(GBDTLR(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "LGBMLRAuditCat", classifier__gbdt__categorical_feature = cat_indices)
+	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = cat_indices)
 
 def build_audit_h2o(classifier, name):
 	mapper = DataFrameMapper(

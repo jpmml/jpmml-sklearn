@@ -79,6 +79,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateLGBMLRAuditCat() throws Exception {
+		evaluate("LGBMLR", "AuditCat");
+	}
+
+	@Test
 	public void evaluateLinearDiscriminantAnalysisAudit() throws Exception {
 		evaluate("LinearDiscriminantAnalysis", "Audit");
 	}
@@ -165,6 +170,11 @@ public class ClassifierTest extends EstimatorTest {
 		FieldName[] transformFields = {FieldName.create("predict(Adjusted)"), FieldName.create("eval(Adjusted)")};
 
 		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(8));
+	}
+
+	@Test
+	public void evaluateXGBLRAudit() throws Exception {
+		evaluate("XGBLR", "Audit");
 	}
 
 	@Test
