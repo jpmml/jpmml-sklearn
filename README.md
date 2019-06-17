@@ -145,6 +145,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Comparison operators `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.
       * Value missingness check functions `pandas.isnull` and `pandas.notnull`.
+      * Numpy universal functions.
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`

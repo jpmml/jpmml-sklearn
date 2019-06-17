@@ -28,7 +28,7 @@ package org.jpmml.sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.Apply;
+import numpy.core.UFuncUtil;
 import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
@@ -102,22 +102,41 @@ public class ExpressionTranslator extends AbstractTranslator {
 	}
 
 	static
-	private Apply translateFunction(String function, List<Expression> arguments){
-
-		switch(function){
-			case "pandas.isnull":
-				if(arguments.size() != 1){
-					throw new IllegalArgumentException();
-				}
-				return PMMLUtil.createApply(PMMLFunctions.ISMISSING, arguments.get(0));
-			case "pandas.notnull":
-				if(arguments.size() != 1){
-					throw new IllegalArgumentException();
-				}
-				return PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, arguments.get(0));
-			default:
-				throw new IllegalArgumentException(function);
+	private Expression translateFunction(String function, List<Expression> arguments){
+		int dot = function.lastIndexOf('.');
+		if(dot < 0){
+			throw new IllegalArgumentException(function);
 		}
+
+		String module = function.substring(0, dot);
+		String name = function.substring(dot + 1);
+
+		if(("pandas").equals(module) || ("pd").equals(module)){
+
+			if(arguments.size() != 1){
+				throw new IllegalArgumentException();
+			}
+
+			switch(name){
+				case "isnull":
+					return PMMLUtil.createApply(PMMLFunctions.ISMISSING, arguments.get(0));
+				case "notnull":
+					return PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, arguments.get(0));
+				default:
+					break;
+			}
+		} else
+
+		if(("numpy").equals(module) || ("np").equals(module)){
+
+			if(arguments.size() != 1){
+				throw new IllegalArgumentException();
+			}
+
+			return UFuncUtil.encodeUFunc("numpy", name, arguments.get(0));
+		}
+
+		throw new IllegalArgumentException(function);
 	}
 
 	static
