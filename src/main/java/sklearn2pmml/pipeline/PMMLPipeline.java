@@ -105,19 +105,14 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		Label label = null;
 
 		if(estimator.isSupervised()){
-			String targetField = null;
 
-			if(targetFields != null){
-				ClassDictUtil.checkSize(1, targetFields);
-
-				targetField = targetFields.get(0);
-			} // End if
-
-			if(targetField == null){
-				targetField = "y";
-
-				logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name of the target field", targetField);
+			if(targetFields == null){
+				targetFields = initTargetFields();
 			}
+
+			ClassDictUtil.checkSize(1, targetFields);
+
+			String targetField = targetFields.get(0);
 
 			MiningFunction miningFunction = estimator.getMiningFunction();
 			switch(miningFunction){
@@ -190,14 +185,23 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 				featureInitializer = transformer;
 
 				if(!(transformer instanceof Initializer)){
-					features = initFeatures(transformer, transformer.getOpType(), transformer.getDataType(), encoder);
+
+					if(activeFields == null){
+						activeFields = initActiveFields(transformer);
+					}
+
+					features = initFeatures(activeFields, transformer.getOpType(), transformer.getDataType(), encoder);
 				}
 
 				features = encodeFeatures(features, encoder);
 			} else
 
 			{
-				features = initFeatures(estimator, estimator.getOpType(), estimator.getDataType(), encoder);
+				if(activeFields == null){
+					activeFields = initActiveFields(estimator);
+				}
+
+				features = initFeatures(activeFields, estimator.getOpType(), estimator.getDataType(), encoder);
 			}
 		} catch(UnsupportedOperationException uoe){
 			throw new IllegalArgumentException("The first transformer or estimator object (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
@@ -272,10 +276,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 				logger.warn("Model verification data is not set. Use method '" + ClassDictUtil.formatMember(this, "verify(X)") + "' to correct this deficiency");
 
 				break verification;
-			} // End if
-
-			if(activeFields == null){
-				throw new IllegalArgumentException();
 			}
 
 			int[] activeValuesShape = verification.getActiveValuesShape();
@@ -310,16 +310,9 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			} // End if
 
 			if(hasProbabilityValues){
+				probabilityFields = initProbabilityFields((CategoricalLabel)label);
+
 				probabilityValuesShape = verification.getProbabilityValuesShape();
-
-				probabilityFields = new ArrayList<>();
-
-				CategoricalLabel categoricalLabel = (CategoricalLabel)label;
-
-				List<?> values = categoricalLabel.getValues();
-				for(Object value : values){
-					probabilityFields.add("probability(" + value + ")"); // XXX
-				}
 
 				ClassDictUtil.checkShapes(0, activeValuesShape, probabilityValuesShape);
 				ClassDictUtil.checkShapes(1, probabilityFields.size(), probabilityValuesShape);
@@ -334,14 +327,11 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 			Map<VerificationField, List<?>> data = new LinkedHashMap<>();
 
-			if(activeFields != null){
+			for(int i = 0; i < activeFields.size(); i++){
+				VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(activeFields.get(i)));
 
-				for(int i = 0; i < activeFields.size(); i++){
-					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(activeFields.get(i)));
-
-					data.put(verificationField, CMatrixUtil.getColumn(activeValues, rows, activeFields.size(), i));
-				}
-			} // End if
+				data.put(verificationField, CMatrixUtil.getColumn(activeValues, rows, activeFields.size(), i));
+			}
 
 			if(probabilityFields != null){
 
@@ -390,42 +380,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		}
 
 		return pmml;
-	}
-
-	private List<Feature> initFeatures(PyClassDict object, OpType opType, DataType dataType, SkLearnEncoder encoder){
-		List<String> activeFields = getActiveFields();
-
-		if(activeFields == null){
-			int numberOfFeatures = -1;
-
-			if(object instanceof HasNumberOfFeatures){
-				HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)object;
-
-				numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
-			} // End if
-
-			if(numberOfFeatures < 0){
-				throw new IllegalArgumentException("The first transformer or estimator object (" + ClassDictUtil.formatClass(object) + ") does not specify the number of input features");
-			}
-
-			activeFields = new ArrayList<>(numberOfFeatures);
-
-			for(int i = 0, max = numberOfFeatures; i < max; i++){
-				activeFields.add("x" + String.valueOf(i + 1));
-			}
-
-			logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", activeFields);
-		}
-
-		List<Feature> result = new ArrayList<>();
-
-		for(String activeField : activeFields){
-			DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
-
-			result.add(new WildcardFeature(encoder, dataField));
-		}
-
-		return result;
 	}
 
 	private void encodeOutput(Transformer transformer, Model model, List<OutputField> outputFields){
@@ -625,6 +579,62 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		put("verification", verification);
 
 		return this;
+	}
+
+	private List<String> initActiveFields(PyClassDict object){
+		int numberOfFeatures = -1;
+
+		if(object instanceof HasNumberOfFeatures){
+			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)object;
+
+			numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
+		} // End if
+
+		if(numberOfFeatures < 0){
+			throw new IllegalArgumentException("The first transformer or estimator object (" + ClassDictUtil.formatClass(object) + ") does not specify the number of input features");
+		}
+
+		List<String> activeFields = new ArrayList<>(numberOfFeatures);
+
+		for(int i = 0, max = numberOfFeatures; i < max; i++){
+			activeFields.add("x" + String.valueOf(i + 1));
+		}
+
+		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", activeFields);
+
+		return activeFields;
+	}
+
+	private List<String> initProbabilityFields(CategoricalLabel categoricalLabel){
+		List<String> probabilityFields = new ArrayList<>();
+
+		List<?> values = categoricalLabel.getValues();
+		for(Object value : values){
+			probabilityFields.add("probability(" + value + ")"); // XXX
+		}
+
+		return probabilityFields;
+	}
+
+	private List<String> initTargetFields(){
+		String targetField = "y";
+
+		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name of the target field", targetField);
+
+		return Collections.singletonList(targetField);
+	}
+
+	static
+	private List<Feature> initFeatures(List<String> activeFields, OpType opType, DataType dataType, SkLearnEncoder encoder){
+		List<Feature> result = new ArrayList<>();
+
+		for(String activeField : activeFields){
+			DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
+
+			result.add(new WildcardFeature(encoder, dataField));
+		}
+
+		return result;
 	}
 
 	static
