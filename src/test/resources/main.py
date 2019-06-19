@@ -29,7 +29,7 @@ from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SV
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
-from sklearn2pmml.ensemble import GBDTLRClassifier
+from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -551,6 +551,7 @@ if "Auto" in datasets:
 	build_auto(DummyRegressor(strategy = "median"), "DummyAuto")
 	build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
 	build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
+	build_auto(GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
 	build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
 	build_auto(HuberRegressor(), "HuberAuto")
 	build_auto(LarsCV(), "LarsAuto")
@@ -662,6 +663,7 @@ def build_housing(regressor, name, with_kneighbors = False, **pmml_options):
 if "Housing" in datasets:
 	build_housing(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostHousing")
 	build_housing(BayesianRidge(), "BayesianRidgeHousing")
+	build_housing(GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
 	build_housing(KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 	build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", random_state = 13, tol = 0.001, max_iter = 1000), "MLPHousing")
 	build_housing(SGDRegressor(random_state = 13), "SGDHousing")
