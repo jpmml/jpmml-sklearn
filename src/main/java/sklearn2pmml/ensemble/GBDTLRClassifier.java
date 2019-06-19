@@ -50,9 +50,9 @@ import sklearn.linear_model.logistic.LogisticRegression;
 import sklearn.preprocessing.MultiOneHotEncoder;
 import sklearn.tree.HasTreeOptions;
 
-public class GBDTLR extends Classifier {
+public class GBDTLRClassifier extends Classifier {
 
-	public GBDTLR(String module, String name){
+	public GBDTLRClassifier(String module, String name){
 		super(module, name);
 	}
 
@@ -66,8 +66,8 @@ public class GBDTLR extends Classifier {
 	@Override
 	public Model encodeModel(Schema schema){
 		Classifier gbdt = getGBDT();
-		LogisticRegression lr = getLR();
 		MultiOneHotEncoder ohe = getOHE();
+		LogisticRegression lr = getLR();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 

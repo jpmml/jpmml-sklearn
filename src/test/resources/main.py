@@ -29,7 +29,7 @@ from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SV
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
-from sklearn2pmml.ensemble import GBDTLR
+from sklearn2pmml.ensemble import GBDTLRClassifier
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -202,8 +202,8 @@ if "Audit" in datasets:
 	build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAudit")
 	build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 	build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
-	build_audit(GBDTLR(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "GBDTLRAudit")
-	build_audit(GBDTLR(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "XGBLRAudit")
+	build_audit(GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "GBDTLRAudit")
+	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "XGBLRAudit")
 	build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
 	build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit", num_iteration = 17)
 	build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
@@ -244,7 +244,7 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 
 if "Audit" in datasets:
 	cat_indices = [2, 3, 4, 5, 6, 7, 8]
-	build_audit_cat(GBDTLR(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "LGBMLRAuditCat", classifier__gbdt__categorical_feature = cat_indices)
+	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "LGBMLRAuditCat", classifier__gbdt__categorical_feature = cat_indices)
 	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = cat_indices)
 
 def build_audit_h2o(classifier, name):
@@ -367,7 +367,7 @@ def build_versicolor(classifier, name, with_proba = True, **pmml_options):
 
 if "Versicolor" in datasets:
 	build_versicolor(DummyClassifier(strategy = "prior"), "DummyVersicolor")
-	build_versicolor(GBDTLR(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(random_state = 13)), "GBDTLRVersicolor")
+	build_versicolor(GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(random_state = 13)), "GBDTLRVersicolor")
 	build_versicolor(KNeighborsClassifier(), "KNNVersicolor", with_proba = False)
 	build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), 	"MLPVersicolor")
 	build_versicolor(SGDClassifier(random_state = 13, max_iter = 100), "SGDVersicolor", with_proba = False)
