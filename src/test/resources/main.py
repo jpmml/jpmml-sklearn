@@ -474,7 +474,7 @@ if "Iris" in datasets:
 		("mapper", mapper),
 		("estimator", SelectFirstEstimator([
 			("X[2] <= 3", dt_classifier),
-			("X[2] > 3", lr_classifier)
+			(str(True), lr_classifier)
 		]))
 	])
 	pipeline.active_fields = numpy.asarray(iris_X.columns.values)

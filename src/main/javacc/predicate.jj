@@ -30,10 +30,12 @@ import java.util.List;
 
 import org.dmg.pmml.Array;
 import org.dmg.pmml.CompoundPredicate;
+import org.dmg.pmml.False;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.SimpleSetPredicate;
+import org.dmg.pmml.True;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 
@@ -77,10 +79,12 @@ public class PredicateTranslator extends AbstractTranslator {
 	}
 
 	static
-	private String translateValue(Token value){
+	private Object translateValue(Token value){
 		String image = value.image;
 		
 		switch(value.kind){
+			case FALSE:
+				return False.INSTANCE;
 			case INT:
 				if(image.endsWith("l") || image.endsWith("L")){
 					image = image.substring(0, image.length() - 1);
@@ -89,6 +93,8 @@ public class PredicateTranslator extends AbstractTranslator {
 			case STRING:
 				image = image.substring(1, image.length() - 1);
 				break;
+			case TRUE:
+				return True.INSTANCE;
 			default:
 				break;
 		}
@@ -389,7 +395,7 @@ Predicate ParenthesizedExpression():
 	}
 }
 
-String LiteralExpression():
+Object LiteralExpression():
 {
 	Token value;
 }
