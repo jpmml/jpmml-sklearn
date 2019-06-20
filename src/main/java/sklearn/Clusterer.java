@@ -31,9 +31,4 @@ public class Clusterer extends Estimator {
 	public MiningFunction getMiningFunction(){
 		return MiningFunction.CLUSTERING;
 	}
-
-	@Override
-	public boolean isSupervised(){
-		return false;
-	}
 }

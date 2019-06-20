@@ -34,11 +34,6 @@ public class Classifier extends Estimator implements HasClasses {
 		return MiningFunction.CLASSIFICATION;
 	}
 
-	@Override
-	public boolean isSupervised(){
-		return true;
-	}
-
 	public boolean hasProbabilityDistribution(){
 		return true;
 	}

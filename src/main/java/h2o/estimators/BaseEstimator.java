@@ -62,19 +62,6 @@ public class BaseEstimator extends Estimator implements HasClasses {
 	}
 
 	@Override
-	public boolean isSupervised(){
-		String estimatorType = getEstimatorType();
-
-		switch(estimatorType){
-			case "classifier":
-			case "regressor":
-				return true;
-			default:
-				throw new IllegalArgumentException(estimatorType);
-		}
-	}
-
-	@Override
 	public List<?> getClasses(){
 		MojoModel mojoModel = getMojoModel();
 

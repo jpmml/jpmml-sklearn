@@ -31,9 +31,4 @@ public class Regressor extends Estimator {
 	public MiningFunction getMiningFunction(){
 		return MiningFunction.REGRESSION;
 	}
-
-	@Override
-	public boolean isSupervised(){
-		return true;
-	}
 }
