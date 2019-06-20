@@ -132,7 +132,11 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.decoration.DateTimeDomain`
     * `sklearn2pmml.decoration.MultiDomain`
     * `sklearn2pmml.ensemble.GBDTLMRegressor`
+      * The GBDT side: All Scikit-Learn regressors, `LGBMRegressor`, `XGBRegressor`.
+      * The LM side: `LinearRegression` and its subclasses.
     * `sklearn2pmml.ensemble.GBDTLRClassifier`
+      * The GBDT side: All Scikit-Learn classifiers, `LGBMClassifier`, `XGBClassifier`.
+      * The LR side: `LogisticRegression` and its subclasses.
     * `sklearn2pmml.ensemble.SelectFirstEstimator`
     * `sklearn2pmml.feature_selection.SelectUnique`
     * `sklearn2pmml.pipeline.PMMLPipeline`
@@ -308,6 +312,7 @@ java -jar target/jpmml-sklearn-executable-1.5-SNAPSHOT.jar --help
 * [Extending Scikit-Learn with business rules (BR) model type](https://openscoring.io/blog/2018/09/17/sklearn_business_rules/)
 * [Converting Scikit-Learn based LightGBM pipelines to PMML documents](https://openscoring.io/blog/2019/04/07/converting_sklearn_lightgbm_pipeline_pmml/)
 * [Converting Scikit-Learn based TPOT automated machine learning (AutoML) pipelines to PMML documents](https://openscoring.io/blog/2019/06/10/converting_sklearn_tpot_pipeline_pmml/)
+* [Extending Scikit-Learn with GBDT plus LR ensemble (GBDT+LR) model type](https://openscoring.io/blog/2019/06/19/sklearn_gbdt_lr_ensemble/)
 
 # License #
 
