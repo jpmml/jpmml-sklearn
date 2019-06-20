@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Predicate;
 import org.dmg.pmml.rule_set.RuleSelectionMethod;
 import org.dmg.pmml.rule_set.RuleSet;
 import org.dmg.pmml.rule_set.RuleSetModel;
@@ -95,7 +96,9 @@ public class RuleSetClassifier extends Classifier {
 			String predicate = TupleUtil.extractElement(rule, 0, String.class);
 			String score = TupleUtil.extractElement(rule, 1, String.class);
 
-			SimpleRule simpleRule = new SimpleRule(score, PredicateTranslator.translate(predicate, features));
+			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, features);
+
+			SimpleRule simpleRule = new SimpleRule(score, pmmlPredicate);
 
 			ruleSet.addRules(simpleRule);
 		}

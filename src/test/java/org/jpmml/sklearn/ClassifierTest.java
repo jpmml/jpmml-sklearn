@@ -273,6 +273,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateSelectFirstIris() throws Exception {
+		evaluate("SelectFirst", "Iris", excludeFields(ClassifierTest.irisProbabilityFields));
+	}
+
+	@Test
 	public void evaluateSGDIris() throws Exception {
 		evaluate("SGD", "Iris");
 	}
@@ -299,9 +304,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateVotingEnsembleIris() throws Exception {
-		FieldName[] probabilityFields = {FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)")};
-
-		evaluate("VotingEnsemble", "Iris", excludeFields(probabilityFields));
+		evaluate("VotingEnsemble", "Iris", excludeFields(ClassifierTest.irisProbabilityFields));
 	}
 
 	@Test
@@ -386,4 +389,7 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	private static final FieldName[] neighborFields = createFields("neighbor", 5);
+
+	private static final FieldName[] auditProbabilityFields = {FieldName.create("probability(0)"), FieldName.create("probability(1)")};
+	private static final FieldName[] irisProbabilityFields = {FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)")};
 }

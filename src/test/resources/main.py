@@ -29,7 +29,7 @@ from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SV
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
-from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier
+from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirstEstimator
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -460,6 +460,28 @@ if "Iris" in datasets:
 	build_iris(NuSVC(), "NuSVCIris", with_proba = False)
 	build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
 	build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), "XGBIris", ntree_limit = 7)
+
+if "Iris" in datasets:
+	mapper = DataFrameMapper([
+		(iris_X.columns.values, ContinuousDomain())
+	])
+	iris_Xt = mapper.fit_transform(iris_X)
+	dt_classifier = DecisionTreeClassifier(random_state = 13)
+	dt_classifier.fit(iris_Xt, iris_y)
+	lr_classifier = LogisticRegression(random_state = 13)
+	lr_classifier.fit(iris_Xt, iris_y)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("estimator", SelectFirstEstimator([
+			("X[2] <= 3", dt_classifier),
+			("X[2] > 3", lr_classifier)
+		]))
+	])
+	pipeline.active_fields = numpy.asarray(iris_X.columns.values)
+	pipeline.target_fields = numpy.asarray(["Species"])
+	store_pkl(pipeline, "SelectFirstIris")
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	store_csv(species, "SelectFirstIris")
 
 if "Iris" in datasets:
 	classifier = RuleSetClassifier([
