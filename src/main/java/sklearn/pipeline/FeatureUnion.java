@@ -40,11 +40,9 @@ public class FeatureUnion extends MultiTransformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(Transformer transformer : transformers){
-			encoder.updateFeatures(features, transformer);
-
 			List<Feature> transformerFeatures = new ArrayList<>(features);
 
-			transformerFeatures = transformer.encodeFeatures(transformerFeatures, encoder);
+			transformerFeatures = transformer.updateAndEncodeFeatures(transformerFeatures, encoder);
 
 			result.addAll(transformerFeatures);
 		}

@@ -32,9 +32,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
-import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
-import sklearn.Transformer;
 
 public class SkLearnEncoder extends ModelEncoder {
 
@@ -54,28 +52,7 @@ public class SkLearnEncoder extends ModelEncoder {
 		return super.encodePMML(model);
 	}
 
-	public void updateFeatures(List<Feature> features, Transformer transformer){
-		OpType opType;
-		DataType dataType;
-
-		try {
-			opType = transformer.getOpType();
-			dataType = transformer.getDataType();
-		} catch(UnsupportedOperationException uoe){
-			return;
-		}
-
-		for(Feature feature : features){
-
-			if(feature instanceof WildcardFeature){
-				WildcardFeature wildcardFeature = (WildcardFeature)feature;
-
-				updateType(wildcardFeature.getName(), opType, dataType);
-			}
-		}
-	}
-
-	public void updateType(FieldName name, OpType opType, DataType dataType){
+	public DataField updateDataField(FieldName name, OpType opType, DataType dataType){
 		DataField dataField = getDataField(name);
 
 		if(dataField == null){
@@ -84,6 +61,8 @@ public class SkLearnEncoder extends ModelEncoder {
 
 		dataField.setOpType(opType);
 		dataField.setDataType(dataType);
+
+		return dataField;
 	}
 
 	public DataField createDataField(FieldName name){

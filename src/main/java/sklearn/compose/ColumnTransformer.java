@@ -58,9 +58,7 @@ public class ColumnTransformer extends Initializer {
 
 			List<Feature> rowFeatures = getFeatures(fittedTransformer, features, encoder);
 
-			encoder.updateFeatures(rowFeatures, transformer);
-
-			rowFeatures = transformer.encodeFeatures(rowFeatures, encoder);
+			rowFeatures = transformer.updateAndEncodeFeatures(rowFeatures, encoder);
 
 			result.addAll(rowFeatures);
 		}

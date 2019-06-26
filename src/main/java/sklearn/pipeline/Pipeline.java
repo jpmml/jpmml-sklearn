@@ -76,9 +76,7 @@ public class Pipeline extends Transformer {
 				}
 			}
 
-			encoder.updateFeatures(features, transformer);
-
-			features = transformer.encodeFeatures(features, encoder);
+			features = transformer.updateAndEncodeFeatures(features, encoder);
 		}
 
 		return features;

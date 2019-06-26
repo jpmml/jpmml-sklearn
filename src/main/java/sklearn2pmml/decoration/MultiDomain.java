@@ -47,9 +47,7 @@ public class MultiDomain extends MultiTransformer {
 
 			List<Feature> domainFeatures = Collections.singletonList(feature);
 
-			encoder.updateFeatures(domainFeatures, domain);
-
-			domainFeatures = domain.encodeFeatures(domainFeatures, encoder);
+			domainFeatures = domain.updateAndEncodeFeatures(domainFeatures, encoder);
 
 			result.addAll(domainFeatures);
 		}
