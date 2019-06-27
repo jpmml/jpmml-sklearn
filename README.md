@@ -135,7 +135,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * The GBDT side: All Scikit-Learn regressors, `LGBMRegressor`, `XGBRegressor`, `XGBRFRegressor`.
       * The LM side: `LinearRegression` and its subclasses.
     * `sklearn2pmml.ensemble.GBDTLRClassifier`
-      * The GBDT side: All Scikit-Learn classifiers, `LGBMClassifier`, `XGBClassifier`.
+      * The GBDT side: All Scikit-Learn classifiers, `LGBMClassifier`, `XGBClassifier`, `XGBRFClassifier`.
       * The LR side: `LogisticRegression` and its subclasses.
     * `sklearn2pmml.ensemble.SelectFirstEstimator`
     * `sklearn2pmml.feature_selection.SelectUnique`
@@ -172,6 +172,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * [XGBoost](https://github.com/dmlc/xgboost):
     * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
     * [`xgboost.XGBRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
+    * [`xgboost.XGBRFClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFClassifier)
     * [`xgboost.XGBRFRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFRegressor)
 * Production quality:
   * Complete test coverage.

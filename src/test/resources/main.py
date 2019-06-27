@@ -37,7 +37,7 @@ from sklearn2pmml.preprocessing import Aggregator, ConcatTransformer, CutTransfo
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
-from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFRegressor
+from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
 
 import h2o
 import numpy
@@ -219,6 +219,7 @@ if "Audit" in datasets:
 	build_audit(SVC(), "SVCAudit", with_proba = False)
 	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 	build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit", byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
+	build_audit(XGBRFClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 5, random_state = 13), "XGBRFAudit")
 
 audit_X, audit_y = load_audit("Audit")
 

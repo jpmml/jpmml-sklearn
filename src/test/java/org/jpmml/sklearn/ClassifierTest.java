@@ -178,6 +178,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateXGBRFAudit() throws Exception {
+		evaluate("XGBRF", "Audit", new FloatEquivalence(8));
+	}
+
+	@Test
 	public void evaluateDecisionTreeIris() throws Exception {
 		evaluate("DecisionTree", "Iris");
 	}
