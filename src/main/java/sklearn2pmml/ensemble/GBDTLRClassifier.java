@@ -33,7 +33,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
-import sklearn.linear_model.logistic.LogisticRegression;
+import sklearn.linear_model.LinearClassifier;
 import sklearn.preprocessing.MultiOneHotEncoder;
 
 public class GBDTLRClassifier extends Classifier {
@@ -50,10 +50,17 @@ public class GBDTLRClassifier extends Classifier {
 	}
 
 	@Override
+	public boolean hasProbabilityDistribution(){
+		LinearClassifier lr = getLR();
+
+		return lr.hasProbabilityDistribution();
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
 		Classifier gbdt = getGBDT();
 		MultiOneHotEncoder ohe = getOHE();
-		LogisticRegression lr = getLR();
+		LinearClassifier lr = getLR();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -67,15 +74,15 @@ public class GBDTLRClassifier extends Classifier {
 		MiningModel miningModel = GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), segmentSchema)
 			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE));
 
-		return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, true, schema);
+		return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, lr.hasProbabilityDistribution(), schema);
 	}
 
 	public Classifier getGBDT(){
 		return get("gbdt_", Classifier.class);
 	}
 
-	public LogisticRegression getLR(){
-		return get("lr_", LogisticRegression.class);
+	public LinearClassifier getLR(){
+		return get("lr_", LinearClassifier.class);
 	}
 
 	public MultiOneHotEncoder getOHE(){

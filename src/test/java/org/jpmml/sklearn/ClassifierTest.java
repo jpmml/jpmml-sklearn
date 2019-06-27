@@ -183,6 +183,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateXGBRFLRAudit() throws Exception {
+		evaluate("XGBRFLR", "Audit");
+	}
+
+	@Test
 	public void evaluateDecisionTreeIris() throws Exception {
 		evaluate("DecisionTree", "Iris");
 	}
@@ -380,6 +385,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateTPOTVersicolor() throws Exception {
 		evaluate("TPOT", "Versicolor", new PMMLEquivalence(5e-13, 5e-13));
+	}
+
+	@Test
+	public void evaluateXGBRFLRVersicolor() throws Exception {
+		evaluate("XGBRFLR", "Versicolor");
 	}
 
 	static

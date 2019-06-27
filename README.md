@@ -132,11 +132,11 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.decoration.DateTimeDomain`
     * `sklearn2pmml.decoration.MultiDomain`
     * `sklearn2pmml.ensemble.GBDTLMRegressor`
-      * The GBDT side: All Scikit-Learn regressors, `LGBMRegressor`, `XGBRegressor`, `XGBRFRegressor`.
-      * The LM side: `LinearRegression` and its subclasses.
+      * The GBDT side: All Scikit-Learn decision tree ensemble regressors, `LGBMRegressor`, `XGBRegressor`, `XGBRFRegressor`.
+      * The LM side: A Scikit-Learn linear regressor (eg. `ElasticNet`, `LinearRegression`, `SGDRegressor`).
     * `sklearn2pmml.ensemble.GBDTLRClassifier`
-      * The GBDT side: All Scikit-Learn classifiers, `LGBMClassifier`, `XGBClassifier`, `XGBRFClassifier`.
-      * The LR side: `LogisticRegression` and its subclasses.
+      * The GBDT side: All Scikit-Learn decision tree ensemble classifiers, `LGBMClassifier`, `XGBClassifier`, `XGBRFClassifier`.
+      * The LR side: A Scikit-Learn binary linear classifier (eg. `LinearSVC`, `LogisticRegression`, `SGDClassifier`).
     * `sklearn2pmml.ensemble.SelectFirstEstimator`
     * `sklearn2pmml.feature_selection.SelectUnique`
     * `sklearn2pmml.pipeline.PMMLPipeline`

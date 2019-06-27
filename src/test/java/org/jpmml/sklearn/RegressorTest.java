@@ -176,6 +176,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateXGBRFLMAuto() throws Exception {
+		evaluate("XGBRFLM", "Auto");
+	}
+
+	@Test
 	public void evaluateAdaBoostHousing() throws Exception {
 		evaluate("AdaBoost", "Housing");
 	}
@@ -238,5 +243,10 @@ public class RegressorTest extends EstimatorTest {
 	@Test
 	public void evaluateVotingEnsembleHousing() throws Exception {
 		evaluate("VotingEnsemble", "Housing");
+	}
+
+	@Test
+	public void evaluateXGBRFLMHousing() throws Exception {
+		evaluate("XGBRFLM", "Housing");
 	}
 }

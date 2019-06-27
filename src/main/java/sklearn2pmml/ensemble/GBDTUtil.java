@@ -89,6 +89,10 @@ public class GBDTUtil {
 				Integer id = ValueUtil.asInteger((Number)treeCategory.get(i));
 				Number score = coef.get(coefOffset + i);
 
+				if(ValueUtil.isZeroLike(score)){
+					score = 0d;
+				}
+
 				nodeScores.put(id, score);
 			}
 
