@@ -171,6 +171,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateXGBRFAuto() throws Exception {
+		evaluate("XGBRF", "Auto", new FloatEquivalence(1));
+	}
+
+	@Test
 	public void evaluateAdaBoostHousing() throws Exception {
 		evaluate("AdaBoost", "Housing");
 	}

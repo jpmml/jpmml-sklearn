@@ -37,7 +37,7 @@ from sklearn2pmml.preprocessing import Aggregator, ConcatTransformer, CutTransfo
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
-from xgboost.sklearn import XGBClassifier, XGBRegressor
+from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFRegressor
 
 import h2o
 import numpy
@@ -588,6 +588,7 @@ if "Auto" in datasets:
 	build_auto(TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
 	build_auto(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor()), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
 	build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", ntree_limit = 31)
+	build_auto(XGBRFRegressor(n_estimators = 31, max_depth = 6, random_state = 13), "XGBRFAuto")
 
 if "Auto" in datasets:
 	build_auto(TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
