@@ -48,7 +48,7 @@ public class H2OFrameCreator extends MultiTransformer {
 		Object columnNames = getOptionalObject("column_names");
 
 		if(columnNames != null){
-			return getList("column_names", String.class);
+			return getListLike("column_names", String.class);
 		}
 
 		return null;

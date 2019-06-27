@@ -538,7 +538,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			return null;
 		}
 
-		return (List)getArray("active_fields", String.class);
+		return getListLike("active_fields", String.class);
 	}
 
 	public PMMLPipeline setActiveFields(List<String> activeFields){
@@ -559,7 +559,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 			return null;
 		}
 
-		return (List)getArray("target_fields", String.class);
+		return getListLike("target_fields", String.class);
 	}
 
 	public PMMLPipeline setTargetFields(List<String> targetFields){

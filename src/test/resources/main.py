@@ -480,8 +480,8 @@ if "Iris" in datasets:
 			(str(True), lr_classifier)
 		]))
 	])
-	pipeline.active_fields = numpy.asarray(iris_X.columns.values)
-	pipeline.target_fields = numpy.asarray(["Species"])
+	pipeline.active_fields = iris_X.columns.values
+	pipeline.target_fields = ["Species"]
 	store_pkl(pipeline, "SelectFirstIris")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
 	store_csv(species, "SelectFirstIris")

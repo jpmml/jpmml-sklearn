@@ -121,7 +121,7 @@ public class CutTransformer extends Transformer {
 	}
 
 	public List<? extends Number> getBins(){
-		return getList("bins", Number.class);
+		return getListLike("bins", Number.class);
 	}
 
 	public List<?> getLabels(){

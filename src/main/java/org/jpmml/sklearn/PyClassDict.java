@@ -202,4 +202,30 @@ public class PyClassDict extends ClassDict {
 	public List<Object[]> getTupleList(String name){
 		return getList(name, Object[].class);
 	}
+
+	public List<?> getListLike(String name){
+		Object object = get(name);
+
+		if(object instanceof HasArray){
+			return getArray(name);
+		} else
+
+		{
+			return getList(name);
+		}
+	}
+
+	public <E> List<E> getListLike(String name, Class<? extends E> clazz){
+		List<?> values = getListLike(name);
+
+		CastFunction<E> castFunction = new CastFunction<E>(clazz){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Array or list attribute \'" + ClassDictUtil.formatMember(PyClassDict.this, name) + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return Lists.transform(values, castFunction);
+	}
 }
