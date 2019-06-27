@@ -88,6 +88,13 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		super(module, name);
 	}
 
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		logger.warn(ClassDictUtil.formatClass(this) + " should be replaced with " + ClassDictUtil.formatClass(new Pipeline()) + " in nested workflows");
+
+		return super.encodeFeatures(features, encoder);
+	}
+
 	public PMML encodePMML(){
 		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = getEstimator();
@@ -193,7 +200,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 					features = initFeatures(activeFields, transformer.getOpType(), transformer.getDataType(), encoder);
 				}
 
-				features = encodeFeatures(features, encoder);
+				features = super.encodeFeatures(features, encoder);
 			} else
 
 			{
