@@ -32,7 +32,13 @@ public class PriorProbabilityEstimator extends PyClassDict implements HasPriorPr
 
 	@Override
 	public Number getPriorProbability(int index){
-		return Iterables.get(getPriors(), index);
+		List<? extends Number> priors = getPriors();
+
+		if(priors.size() <= 1 && index <= 1){
+			return Iterables.getOnlyElement(priors);
+		}
+
+		return Iterables.get(priors, index);
 	}
 
 	public List<? extends Number> getPriors(){

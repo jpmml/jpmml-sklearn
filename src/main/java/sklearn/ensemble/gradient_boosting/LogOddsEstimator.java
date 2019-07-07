@@ -32,7 +32,13 @@ public class LogOddsEstimator extends PyClassDict implements HasPriorProbability
 
 	@Override
 	public Number getPriorProbability(int index){
-		return Iterables.get(getPrior(), index);
+		List<? extends Number> prior = getPrior();
+
+		if(prior.size() <= 1 && index <= 1){
+			return Iterables.getOnlyElement(prior);
+		}
+
+		return Iterables.get(prior, index);
 	}
 
 	public List<? extends Number> getPrior(){
