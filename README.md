@@ -171,6 +171,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `tpot.builtins.stacking_estimator.StackingEstimator`
   * [XGBoost](https://github.com/dmlc/xgboost):
     * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
+    * [`xgboost.XGBRanker`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRanker)
     * [`xgboost.XGBRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
     * [`xgboost.XGBRFClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFClassifier)
     * [`xgboost.XGBRFRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFRegressor)
