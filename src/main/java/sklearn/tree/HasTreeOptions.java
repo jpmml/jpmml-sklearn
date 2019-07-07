@@ -18,13 +18,17 @@
  */
 package sklearn.tree;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.tree.Node;
+import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.visitors.TreeModelCompactor;
 import org.jpmml.sklearn.visitors.TreeModelFlattener;
 
-public interface HasTreeOptions extends HasSkLearnOptions {
+public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguration {
 
 	/**
 	 * @see TreeModelCompactor
@@ -51,4 +55,15 @@ public interface HasTreeOptions extends HasSkLearnOptions {
 	 * @see OutputField
 	 */
 	String OPTION_WINNER_ID = "winner_id";
+
+	@Override
+	default
+	public Map<String, ?> getNativeConfiguration(){
+		Map<String, Object> result = new LinkedHashMap<>();
+		result.put(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
+		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
+
+		return result;
+	}
 }

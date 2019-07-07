@@ -18,6 +18,8 @@
  */
 package sklearn.impute;
 
+import java.util.Collections;
+
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -26,6 +28,7 @@ import org.dmg.pmml.Field;
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.dmg.pmml.Value;
 import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -46,15 +49,13 @@ public class ImputerUtil {
 		Field<?> field = feature.getField();
 
 		if(field instanceof DataField && !addIndicator){
-			MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
-				.setMissingValueReplacement(replacementValue)
-				.setMissingValueTreatment(missingValueTreatmentMethod);
+			DataField dataField = (DataField)field;
+
+			encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatmentMethod, replacementValue));
 
 			if(missingValue != null){
-				missingValueDecorator.addValues(missingValue);
+				PMMLUtil.addValues(dataField, Collections.singletonList(missingValue), Value.Property.MISSING);
 			}
-
-			encoder.addDecorator(feature.getName(), missingValueDecorator);
 
 			return feature;
 		} // End if
@@ -70,7 +71,9 @@ public class ImputerUtil {
 				expression = PMMLUtil.createApply(PMMLFunctions.ISMISSING, expression);
 			}
 
-			expression = PMMLUtil.createApply(PMMLFunctions.IF, expression, PMMLUtil.createConstant(replacementValue, feature.getDataType()), feature.ref());
+			expression = PMMLUtil.createApply(PMMLFunctions.IF)
+				.addExpressions(expression)
+				.addExpressions(PMMLUtil.createConstant(replacementValue, feature.getDataType()), feature.ref());
 
 			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("imputer", feature), field.getOpType(), field.getDataType(), expression);
 

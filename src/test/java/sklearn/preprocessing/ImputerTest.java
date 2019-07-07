@@ -132,7 +132,7 @@ public class ImputerTest {
 
 		decorators = encoder.getDecorators(name);
 
-		assertEquals(3, decorators.size());
+		assertEquals(2, decorators.size());
 
 		assertTrue(feature instanceof ContinuousFeature);
 		assertEquals(name, feature.getName());
@@ -150,7 +150,7 @@ public class ImputerTest {
 
 		decorators = encoder.getDecorators(name);
 
-		assertEquals(2, decorators.size());
+		assertEquals(1, decorators.size());
 
 		assertTrue(feature instanceof ContinuousFeature);
 		assertEquals(imputedBinarizedName, feature.getName());

@@ -19,38 +19,17 @@
 package org.jpmml.sklearn;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
-import org.jpmml.converter.mining.MiningModelUtil;
 
 public class SkLearnEncoder extends ModelEncoder {
-
-	private List<Model> transformers = new ArrayList<>();
-
-
-	@Override
-	public PMML encodePMML(Model model){
-
-		if(this.transformers.size() > 0){
-			List<Model> models = new ArrayList<>(this.transformers);
-			models.add(model);
-
-			model = MiningModelUtil.createModelChain(models);
-		}
-
-		return super.encodePMML(model);
-	}
 
 	public DataField updateDataField(FieldName name, OpType opType, DataType dataType){
 		DataField dataField = getDataField(name);
@@ -93,9 +72,5 @@ public class SkLearnEncoder extends ModelEncoder {
 		derivedField.setName(renamedName);
 
 		addDerivedField(derivedField);
-	}
-
-	public void addTransformer(Model transformer){
-		this.transformers.add(transformer);
 	}
 }

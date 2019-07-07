@@ -21,11 +21,9 @@ package sklearn2pmml.pipeline;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import h2o.estimators.BaseEstimator;
 import numpy.core.NDArray;
@@ -47,7 +45,6 @@ import org.dmg.pmml.Value;
 import org.dmg.pmml.VerificationField;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
@@ -60,7 +57,6 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.ValueUtil;
-import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -223,57 +219,49 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 		Model model = estimator.encodeModel(schema);
 
-		if(predictTransformer != null){
-			Output output;
+		if((predictTransformer != null) || (predictProbaTransformer != null) || (applyTransformer != null)){
+			Model finalModel = MiningModelUtil.getFinalModel(model);
 
-			if(model instanceof MiningModel){
-				MiningModel miningModel = (MiningModel)model;
+			Output output = ModelUtil.ensureOutput(finalModel);
 
-				Model finalModel = MiningModelUtil.getFinalModel(miningModel);
+			if(predictTransformer != null){
+				FieldName name = FieldName.create("predict(" + (label.getName()).getValue() + ")");
 
-				output = ModelUtil.ensureOutput(finalModel);
-			} else
+				OutputField predictField;
 
-			{
-				output = ModelUtil.ensureOutput(model);
+				if(label instanceof ContinuousLabel){
+					predictField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType())
+						.setFinalResult(false);
+				} else
+
+				if(label instanceof CategoricalLabel){
+					predictField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType())
+						.setFinalResult(false);
+				} else
+
+				{
+					throw new IllegalArgumentException();
+				}
+
+				output.addOutputFields(predictField);
+
+				encodeOutput(output, Collections.singletonList(predictField), predictTransformer);
+			} // End if
+
+			if(predictProbaTransformer != null){
+				CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+
+				List<OutputField> predictProbaFields = ModelUtil.createProbabilityFields(DataType.DOUBLE, categoricalLabel.getValues());
+
+				encodeOutput(output, predictProbaFields, predictProbaTransformer);
+			} // End if
+
+			if(applyTransformer != null){
+				OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
+					.setDataType(DataType.INTEGER);
+
+				encodeOutput(output, Collections.singletonList(nodeIdField), applyTransformer);
 			}
-
-			FieldName name = FieldName.create("predict(" + (label.getName()).getValue() + ")");
-
-			OutputField predictField;
-
-			if(label instanceof ContinuousLabel){
-				predictField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType())
-					.setFinalResult(false);
-			} else
-
-			if(label instanceof CategoricalLabel){
-				predictField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType())
-					.setFinalResult(false);
-			} else
-
-			{
-				throw new IllegalArgumentException();
-			}
-
-			output.addOutputFields(predictField);
-
-			encodeOutput(predictTransformer, model, Collections.singletonList(predictField));
-		} // End if
-
-		if(predictProbaTransformer != null){
-			CategoricalLabel categoricalLabel = (CategoricalLabel)label;
-
-			List<OutputField> predictProbaFields = ModelUtil.createProbabilityFields(DataType.DOUBLE, categoricalLabel.getValues());
-
-			encodeOutput(predictProbaTransformer, model, predictProbaFields);
-		} // End if
-
-		if(applyTransformer != null){
-			OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
-				.setDataType(DataType.INTEGER);
-
-			encodeOutput(applyTransformer, model, Collections.singletonList(nodeIdField));
 		} // End if
 
 		verification:
@@ -389,70 +377,18 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		return pmml;
 	}
 
-	private void encodeOutput(Transformer transformer, Model model, List<OutputField> outputFields){
+	private void encodeOutput(Output output, List<OutputField> outputFields, Transformer transformer){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		List<Feature> features = new ArrayList<>();
 
-		Set<FieldName> names = new HashSet<>();
-
 		for(OutputField outputField : outputFields){
-			FieldName name = outputField.getName();
-
-			DataField dataField = encoder.createDataField(name, outputField.getOpType(), outputField.getDataType());
+			DataField dataField = encoder.createDataField(outputField.getName(), outputField.getOpType(), outputField.getDataType());
 
 			features.add(new WildcardFeature(encoder, dataField));
-
-			names.add(name);
 		}
 
 		transformer.encodeFeatures(features, encoder);
-
-		class OutputFinder extends AbstractVisitor {
-
-			private Output output = null;
-
-
-			@Override
-			public VisitorAction visit(Output output){
-
-				if(output.hasOutputFields()){
-					List<OutputField> outputFields = output.getOutputFields();
-
-					Set<FieldName> definedNames = new HashSet<>();
-
-					for(OutputField outputField : outputFields){
-						FieldName name = outputField.getName();
-
-						definedNames.add(name);
-					}
-
-					if(definedNames.containsAll(names)){
-						setOutput(output);
-
-						return VisitorAction.TERMINATE;
-					}
-				}
-
-				return super.visit(output);
-			}
-
-			public Output getOutput(){
-				return this.output;
-			}
-
-			private void setOutput(Output output){
-				this.output = output;
-			}
-		}
-
-		OutputFinder outputFinder = new OutputFinder();
-		outputFinder.applyTo(model);
-
-		Output output = outputFinder.getOutput();
-		if(output == null){
-			throw new IllegalArgumentException();
-		}
 
 		Map<FieldName, DerivedField> derivedFields = encoder.getDerivedFields();
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.NumericInfo;
 import org.dmg.pmml.OpType;
@@ -29,7 +30,6 @@ import org.dmg.pmml.OutlierTreatmentMethod;
 import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.OutlierDecorator;
-import org.jpmml.converter.ValidValueDecorator;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -91,13 +91,10 @@ public class ContinuousDomain extends Domain {
 
 			WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-			if(outlierTreatment != null){
-				OutlierDecorator outlierDecorator = new OutlierDecorator()
-					.setOutlierTreatment(outlierTreatment)
-					.setLowValue(lowValue)
-					.setHighValue(highValue);
+			DataField dataField = wildcardFeature.getField();
 
-				encoder.addDecorator(wildcardFeature.getName(), outlierDecorator);
+			if(outlierTreatment != null){
+				encoder.addDecorator(dataField, new OutlierDecorator(outlierTreatment, lowValue, highValue));
 			} // End if
 
 			if(withData){
@@ -105,12 +102,9 @@ public class ContinuousDomain extends Domain {
 					.setLeftMargin(dataMin.get(i))
 					.setRightMargin(dataMax.get(i));
 
-				ValidValueDecorator validValueDecorator = new ValidValueDecorator()
-					.addIntervals(interval);
+				dataField.addIntervals(interval);
 
 				feature = wildcardFeature.toContinuousFeature();
-
-				encoder.addDecorator(wildcardFeature.getName(), validValueDecorator);
 			} // End if
 
 			if(withStatistics){
@@ -118,7 +112,7 @@ public class ContinuousDomain extends Domain {
 				Map<String, ?> numericInfo = extractMap(getNumericInfo(), i);
 
 				UnivariateStats univariateStats = new UnivariateStats()
-					.setField(wildcardFeature.getName())
+					.setField(dataField.getName())
 					.setCounts(createCounts(counts))
 					.setNumericInfo(createNumericInfo(numericInfo));
 

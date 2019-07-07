@@ -26,7 +26,6 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
@@ -63,54 +62,22 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
-		List<Feature> result = new ArrayList<>();
-
-		FieldName name = FieldName.create("stack(" + features.size() + ")");
-
 		Label label;
-
-		Output output = new Output();
 
 		MiningFunction miningFunction = estimator.getMiningFunction();
 		switch(miningFunction){
 			case CLASSIFICATION:
 				{
-					Classifier classifier = (Classifier)estimator;
-
 					List<?> categories = ClassifierUtil.getClasses(estimator);
 
 					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
 					label = new CategoricalLabel(null, dataType, categories);
-
-					if(classifier.hasProbabilityDistribution()){
-
-						for(Object category : categories){
-							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldName.create("probability(" + name.getValue() + ", " + category + ")"), DataType.DOUBLE, category)
-								.setFinalResult(false);
-
-							DerivedOutputField probabilityField = encoder.createDerivedField(output, probabilityOutputField);
-
-							result.add(new ContinuousFeature(encoder, probabilityField));
-						}
-					}
-
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType());
-
-					DerivedOutputField predictedField = encoder.createDerivedField(output, predictedOutputField);
-
-					result.add(new CategoricalFeature(encoder, predictedField, categories));
 				}
 				break;
 			case REGRESSION:
 				{
 					label = new ContinuousLabel(null, DataType.DOUBLE);
-
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType());
-
-					DerivedOutputField predictedField = encoder.createDerivedField(output, predictedOutputField);
-
-					result.add(new ContinuousFeature(encoder, predictedField));
 				}
 				break;
 			default:
@@ -119,10 +86,52 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 		Schema schema = new Schema(label, features);
 
-		Model model = estimator.encodeModel(schema)
-			.setOutput(output);
+		Model model = estimator.encodeModel(schema);
 
 		encoder.addTransformer(model);
+
+		FieldName name = FieldName.create("stack(" + features.size() + ")");
+
+		List<Feature> result = new ArrayList<>();
+
+		switch(miningFunction){
+			case CLASSIFICATION:
+				{
+					Classifier classifier = (Classifier)estimator;
+
+					List<?> categories = ClassifierUtil.getClasses(estimator);
+
+					if(classifier.hasProbabilityDistribution()){
+
+						for(Object category : categories){
+							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldName.create("probability(" + name.getValue() + ", " + category + ")"), DataType.DOUBLE, category)
+								.setFinalResult(false);
+
+							DerivedOutputField probabilityField = encoder.createDerivedField(model, probabilityOutputField, false);
+
+							result.add(new ContinuousFeature(encoder, probabilityField));
+						}
+					}
+
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType());
+
+					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
+
+					result.add(new CategoricalFeature(encoder, predictedField, categories));
+				}
+				break;
+			case REGRESSION:
+				{
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType());
+
+					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
+
+					result.add(new ContinuousFeature(encoder, predictedField));
+				}
+				break;
+			default:
+				throw new IllegalArgumentException();
+		}
 
 		result.addAll(features);
 

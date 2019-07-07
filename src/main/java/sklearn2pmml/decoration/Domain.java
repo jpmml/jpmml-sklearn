@@ -26,13 +26,13 @@ import java.util.Map;
 
 import org.dmg.pmml.Counts;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
-import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.dmg.pmml.Value;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueDecorator;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -69,38 +69,18 @@ public class Domain extends Transformer {
 		}
 
 		for(Feature feature : features){
-			FieldName name = feature.getName();
+			DataField dataField = (DataField)feature.getField();
 
-			if(missingValueTreatment != null || missingValues != null){
-				MissingValueDecorator missingValueDecorator = new MissingValueDecorator()
-					.setMissingValueTreatment(missingValueTreatment)
-					.setMissingValueReplacement(missingValueReplacement);
+			if(missingValueTreatment != null){
+				encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatment, missingValueReplacement));
+			} // End if
 
-				if(missingValues != null){
-
-					for(Object missingValue : missingValues){
-						missingValueDecorator.addValues(missingValue);
-					}
-				}
-
-				encoder.addDecorator(name, missingValueDecorator);
+			if(missingValues != null){
+				PMMLUtil.addValues(dataField, missingValues, Value.Property.MISSING);
 			} // End if
 
 			if(invalidValueTreatment != null){
-				InvalidValueDecorator invalidValueDecorator = new InvalidValueDecorator(){
-
-					@Override
-					public void decorate(DataField dataField, MiningField miningField){
-						super.decorate(dataField, miningField);
-
-						if(invalidValueReplacement != null){
-							miningField.setInvalidValueReplacement(invalidValueReplacement);
-						}
-					}
-				}
-					.setInvalidValueTreatment(invalidValueTreatment);
-
-				encoder.addDecorator(name, invalidValueDecorator);
+				encoder.addDecorator(dataField, new InvalidValueDecorator(invalidValueTreatment, invalidValueReplacement));
 			}
 		}
 
