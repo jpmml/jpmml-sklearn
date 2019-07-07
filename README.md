@@ -121,6 +121,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
   * [LightGBM](https://github.com/Microsoft/LightGBM):
     * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
+    * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
     * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRegressor)
   * [SkLearn2PMML](https://github.com/jpmml/sklearn2pmml):
     * `sklearn2pmml.EstimatorProxy`
