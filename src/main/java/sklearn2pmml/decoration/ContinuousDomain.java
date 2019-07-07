@@ -89,7 +89,7 @@ public class ContinuousDomain extends Domain {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			WildcardFeature wildcardFeature = (WildcardFeature)feature;
+			WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
 			DataField dataField = wildcardFeature.getField();
 

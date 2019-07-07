@@ -67,7 +67,7 @@ public class CategoricalDomain extends Domain {
 
 		Feature feature = features.get(0);
 
-		WildcardFeature wildcardFeature = (WildcardFeature)feature;
+		WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
 		if(withData){
 			List<?> data = getData();

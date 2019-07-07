@@ -33,6 +33,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -171,6 +172,18 @@ public class Domain extends Transformer {
 		}
 
 		return value;
+	}
+
+	static
+	protected WildcardFeature asWildcardFeature(Feature feature){
+
+		if(feature instanceof WildcardFeature){
+			WildcardFeature wildcardFeature = (WildcardFeature)feature;
+
+			return wildcardFeature;
+		}
+
+		throw new IllegalArgumentException("Field " + feature.getName() + " is not decorable");
 	}
 
 	static

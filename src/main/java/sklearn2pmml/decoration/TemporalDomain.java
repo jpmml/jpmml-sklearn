@@ -48,10 +48,12 @@ public class TemporalDomain extends Domain {
 		OpType opType = getOpType();
 		DataType dataType = getDataType();
 
-		for(Feature feature : features){
-			WildcardFeature wildcardFeature = (WildcardFeature)feature;
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
 
-			DataField dataField = (DataField)encoder.getField(wildcardFeature.getName());
+			WildcardFeature wildcardFeature = asWildcardFeature(feature);
+
+			DataField dataField = wildcardFeature.getField();
 
 			dataField
 				.setOpType(opType)
