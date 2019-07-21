@@ -31,7 +31,6 @@ import java.util.Map;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.UnsignedInts;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.serpent.Parser;
 import net.razorvine.serpent.ast.Ast;
@@ -262,7 +261,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private Map<String, ?> parseDict(String string){
+	public Map<String, ?> parseDict(String string){
 		Parser parser = new Parser();
 
 		Ast ast = parser.parse(string);
@@ -271,7 +270,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private byte readByte(InputStream is) throws IOException {
+	public byte readByte(InputStream is) throws IOException {
 		int b = is.read();
 		if(b < 0){
 			throw new EOFException();
@@ -281,7 +280,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private int readUnsignedByte(InputStream is) throws IOException {
+	public int readUnsignedByte(InputStream is) throws IOException {
 		int b = is.read();
 		if(b < 0){
 			throw new EOFException();
@@ -291,7 +290,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private short readShort(InputStream is, ByteOrder byteOrder) throws IOException {
+	public short readShort(InputStream is, ByteOrder byteOrder) throws IOException {
 		byte b1 = readByte(is);
 		byte b2 = readByte(is);
 
@@ -307,7 +306,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private int readUnsignedShort(InputStream is, ByteOrder byteOrder) throws IOException {
+	public int readUnsignedShort(InputStream is, ByteOrder byteOrder) throws IOException {
 		byte b1 = readByte(is);
 		byte b2 = readByte(is);
 
@@ -323,12 +322,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private int toShortInt(byte b1, byte b2){
-		return ((b1 & 0xFF) << 8) + (b2 & 0xFF);
-	}
-
-	static
-	private int readInt(InputStream is, ByteOrder byteOrder) throws IOException {
+	public int readInt(InputStream is, ByteOrder byteOrder) throws IOException {
 		byte b1 = readByte(is);
 		byte b2 = readByte(is);
 		byte b3 = readByte(is);
@@ -346,7 +340,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private long readLong(InputStream is, ByteOrder byteOrder) throws IOException {
+	public long readLong(InputStream is, ByteOrder byteOrder) throws IOException {
 		byte b1 = readByte(is);
 		byte b2 = readByte(is);
 		byte b3 = readByte(is);
@@ -368,24 +362,24 @@ public class NDArrayUtil {
 	}
 
 	static
-	private float readFloat(InputStream is, ByteOrder byteOrder) throws IOException {
+	public float readFloat(InputStream is, ByteOrder byteOrder) throws IOException {
 		return Float.intBitsToFloat(readInt(is, byteOrder));
 	}
 
 	static
-	private double readDouble(InputStream is, ByteOrder byteOrder) throws IOException {
+	public double readDouble(InputStream is, ByteOrder byteOrder) throws IOException {
 		return Double.longBitsToDouble(readLong(is, byteOrder));
 	}
 
 	static
-	private Object readObject(InputStream is) throws IOException {
+	public Object readObject(InputStream is) throws IOException {
 		Unpickler unpickler = new Unpickler();
 
 		return unpickler.load(is);
 	}
 
 	static
-	private String readString(InputStream is, int size) throws IOException {
+	public String readString(InputStream is, int size) throws IOException {
 		byte[] buffer = new byte[size];
 
 		ByteStreams.readFully(is, buffer);
@@ -394,7 +388,7 @@ public class NDArrayUtil {
 	}
 
 	static
-	private String readUnicode(InputStream is, ByteOrder byteOrder, int size) throws IOException {
+	public String readUnicode(InputStream is, ByteOrder byteOrder, int size) throws IOException {
 		byte[] buffer = new byte[size * 4];
 
 		ByteStreams.readFully(is, buffer);
@@ -411,6 +405,11 @@ public class NDArrayUtil {
 	}
 
 	static
+	private int toShortInt(byte b1, byte b2){
+		return ((b1 & 0xFF) << 8) + (b2 & 0xFF);
+	}
+
+	static
 	private String toString(byte[] buffer, String encoding) throws IOException {
 		String string = new String(buffer, encoding);
 
@@ -420,242 +419,6 @@ public class NDArrayUtil {
 		}
 
 		return string;
-	}
-
-	/**
-	 * http://docs.scipy.org/doc/numpy/reference/arrays.dtypes.html
-	 * http://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.byteorder.html
-	 */
-	static
-	private class TypeDescriptor {
-
-		private String descr = null;
-
-		private ByteOrder byteOrder = null;
-
-		private Kind kind = null;
-
-		private int size = 0;
-
-
-		private TypeDescriptor(String descr){
-			setDescr(descr);
-
-			int i = 0;
-
-			ByteOrder byteOrder = null;
-
-			switch(descr.charAt(i)){
-				// Native
-				case '=':
-					byteOrder = ByteOrder.nativeOrder();
-					i++;
-					break;
-				// Big-endian
-				case '>':
-					byteOrder = ByteOrder.BIG_ENDIAN;
-					i++;
-					break;
-				// Little-endian
-				case '<':
-					byteOrder = ByteOrder.LITTLE_ENDIAN;
-					i++;
-					break;
-				// Not applicable
-				case '|':
-					i++;
-					break;
-			}
-
-			setByteOrder(byteOrder);
-
-			Kind kind = Kind.forChar(descr.charAt(i));
-
-			i++;
-
-			setKind(kind);
-
-			if(i < descr.length()){
-				int size = Integer.parseInt(descr.substring(i));
-
-				setSize(size);
-			}
-		}
-
-		public Object read(InputStream is) throws IOException {
-			String descr = getDescr();
-			Kind kind = getKind();
-			ByteOrder byteOrder = getByteOrder();
-			int size = getSize();
-
-			switch(kind){
-				case BOOLEAN:
-					{
-						switch(size){
-							case 1:
-								return (readByte(is) == 1);
-							default:
-								break;
-						}
-					}
-					break;
-				case INTEGER:
-					{
-						switch(size){
-							case 1:
-								return readByte(is);
-							case 2:
-								return readShort(is, byteOrder);
-							case 4:
-								return readInt(is, byteOrder);
-							case 8:
-								return readLong(is, byteOrder);
-							default:
-								break;
-						}
-					}
-					break;
-				case UNSIGNED_INTEGER:
-					{
-						switch(size){
-							case 1:
-								return readUnsignedByte(is);
-							case 2:
-								return readUnsignedShort(is, byteOrder);
-							case 4:
-								return UnsignedInts.toLong(readInt(is, byteOrder));
-							case 8:
-								String string = Long.toUnsignedString(readLong(is, byteOrder));
-
-								return Long.parseUnsignedLong(string);
-							default:
-								break;
-						}
-					}
-					break;
-				case FLOAT:
-					{
-						switch(size){
-							case 4:
-								return readFloat(is, byteOrder);
-							case 8:
-								return readDouble(is, byteOrder);
-							default:
-								break;
-						}
-					}
-					break;
-				case OBJECT:
-					{
-						return readObject(is);
-					}
-				case STRING:
-					{
-						return readString(is, size);
-					}
-				case UNICODE:
-					{
-						return readUnicode(is, byteOrder, size);
-					}
-				case VOID:
-					{
-						byte[] buffer = new byte[size];
-
-						ByteStreams.readFully(is, buffer);
-
-						return buffer;
-					}
-				default:
-					break;
-			}
-
-			throw new IllegalArgumentException(descr);
-		}
-
-		public boolean isObject(){
-			Kind kind = getKind();
-
-			switch(kind){
-				case OBJECT:
-					return true;
-				default:
-					return false;
-			}
-		}
-
-		public String getDescr(){
-			return this.descr;
-		}
-
-		private void setDescr(String descr){
-			this.descr = descr;
-		}
-
-		public ByteOrder getByteOrder(){
-			return this.byteOrder;
-		}
-
-		private void setByteOrder(ByteOrder byteOrder){
-			this.byteOrder = byteOrder;
-		}
-
-		public Kind getKind(){
-			return this.kind;
-		}
-
-		private void setKind(Kind kind){
-			this.kind = kind;
-		}
-
-		public int getSize(){
-			return this.size;
-		}
-
-		private void setSize(int size){
-			this.size = size;
-		}
-
-		static
-		private enum Kind {
-			BOOLEAN,
-			INTEGER,
-			UNSIGNED_INTEGER,
-			FLOAT,
-			COMPLEX_FLOAT,
-			OBJECT,
-			STRING,
-			UNICODE,
-			VOID,
-			;
-
-			static
-			public Kind forChar(char c){
-
-				switch(c){
-					case 'b':
-						return BOOLEAN;
-					case 'i':
-						return INTEGER;
-					case 'u':
-						return UNSIGNED_INTEGER;
-					case 'f':
-						return FLOAT;
-					case 'c':
-						return COMPLEX_FLOAT;
-					case 'O':
-						return OBJECT;
-					case 'S':
-					case 'a':
-						return STRING;
-					case 'U':
-						return UNICODE;
-					case 'V':
-						return VOID;
-					default:
-						throw new IllegalArgumentException();
-				}
-			}
-		}
 	}
 
 	private static final byte[] MAGIC_STRING = {(byte)'\u0093', 'N', 'U', 'M', 'P', 'Y'};

@@ -228,7 +228,9 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["Age", "Income"]] +
 		[(["Hours"], [ContinuousDomain(), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = False, right = False, include_lowest = True)])] +
-		[(["Employment", "Education", "Marital", "Occupation"], [MultiDomain([CategoricalDomain(), CategoricalDomain(), CategoricalDomain(), CategoricalDomain()]), OrdinalEncoder()])] +
+		[(["Employment", "Education"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), OrdinalEncoder(dtype = numpy.int_)])] +
+		[(["Marital"], [CategoricalDomain(), OrdinalEncoder(dtype = numpy.uint16)])] +
+		[(["Occupation"], [CategoricalDomain(), OrdinalEncoder(dtype = numpy.float_)])] +
 		[([column], [CategoricalDomain(), LabelEncoder()]) for column in ["Gender", "Deductions"]]
 	)
 	pipeline = Pipeline([

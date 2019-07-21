@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import numpy.core.TypeDescriptor;
 import org.dmg.pmml.DataType;
 import org.jpmml.sklearn.CClassDict;
 
@@ -51,22 +52,42 @@ public class DType extends CClassDict {
 	public DataType getDataType(){
 		String className = getClassName();
 
-		switch(className){
-			case "numpy.bool_":
-				return DataType.BOOLEAN;
-			case "numpy.int_":
-			case "numpy.int8":
-			case "numpy.int16":
-			case "numpy.int32":
-			case "numpy.int64":
-				return DataType.INTEGER;
-			case "numpy.float32":
-				return DataType.FLOAT;
-			case "numpy.float_":
-			case "numpy.float64":
-				return DataType.DOUBLE;
-			default:
-				throw new IllegalArgumentException(className);
+		if(("numpy.dtype").equals(className)){
+			String obj = getObj();
+			String order = getOrder();
+
+			TypeDescriptor typeDescriptor = new TypeDescriptor(formatDescr(obj, order));
+
+			return typeDescriptor.getDataType();
+		} else
+
+		{
+			switch(className){
+				case "builtins.bool":
+					return DataType.BOOLEAN;
+				case "builtins.int":
+					return DataType.INTEGER;
+				case "numpy.bool_":
+					return DataType.BOOLEAN;
+				case "numpy.int_":
+				case "numpy.int8":
+				case "numpy.int16":
+				case "numpy.int32":
+				case "numpy.int64":
+					return DataType.INTEGER;
+				case "numpy.uint8":
+				case "numpy.uint16":
+				case "numpy.uint32":
+				case "numpy.uint64":
+					return DataType.INTEGER;
+				case "numpy.float32":
+					return DataType.FLOAT;
+				case "numpy.float_":
+				case "numpy.float64":
+					return DataType.DOUBLE;
+				default:
+					throw new IllegalArgumentException(className);
+			}
 		}
 	}
 

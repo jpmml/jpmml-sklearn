@@ -102,6 +102,8 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 		DType dtype = getDType();
 
+		DataType dataType = (dtype != null ? dtype.getDataType() : DataType.DOUBLE);
+
 		if(lowercase){
 			Apply apply = PMMLUtil.createApply(PMMLFunctions.LOWERCASE, feature.ref());
 
@@ -121,7 +123,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 			Apply apply = encodeApply(defineFunction.getName(), feature, i, term);
 
-			Feature termFeature = new Feature(encoder, FieldName.create(defineFunction.getName() + "(" + term + ")"), dtype != null ? dtype.getDataType() : DataType.DOUBLE){
+			Feature termFeature = new Feature(encoder, FieldName.create(defineFunction.getName() + "(" + term + ")"), dataType){
 
 				@Override
 				public ContinuousFeature toContinuousFeature(){

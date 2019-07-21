@@ -21,12 +21,16 @@ package org.jpmml.sklearn;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.io.ByteStreams;
+import numpy.DType;
+import numpy.core.NDArray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class PickleUtilTest {
 
@@ -38,6 +42,7 @@ public class PickleUtilTest {
 
 		unpickle("python-2.7_sklearn-joblib-0.9.4.pkl.z");
 		unpickle("python-2.7_sklearn-joblib-0.10.2.pkl.z");
+		unpickle("python-2.7_sklearn-joblib-0.13.0.pkl.z");
 
 		unpickleNumpyArrays("python-2.7_numpy-1.11.2");
 	}
@@ -60,13 +65,15 @@ public class PickleUtilTest {
 	}
 
 	private void unpickleNumpyArrays(String prefix) throws IOException {
+		unpickleNumpyArray(prefix + "_bool.pkl", Arrays.asList(false, true));
+
 		unpickleNumpyArray(prefix + "_int8.pkl", Byte.MIN_VALUE, Byte.MAX_VALUE, 1);
 		unpickleNumpyArray(prefix + "_int16.pkl", Short.MIN_VALUE, Short.MAX_VALUE, 127);
 
 		unpickleNumpyArray(prefix + "_uint8.pkl", 0, 255, 1);
 		unpickleNumpyArray(prefix + "_uint16.pkl", 0, 65535, 127);
 
-		String[] dtypes = new String[]{"int32", "int64", "float32", "float64"};
+		String[] dtypes = new String[]{"int", "int32", "int64", "float32", "float64"};
 		for(String dtype : dtypes){
 			unpickleNumpyArray(prefix + "_" + dtype + ".pkl", Integer.MIN_VALUE, Integer.MAX_VALUE, 64 * 32767);
 		}
@@ -77,10 +84,28 @@ public class PickleUtilTest {
 		}
 	}
 
-	private void unpickleNumpyArray(String name, long min, long max, long step) throws IOException {
-		HasArray hasArray = (HasArray)unpickle(name);
+	private void unpickleNumpyArray(String name, List<?> expectedValues) throws IOException {
+		NDArray ndArray = (NDArray)unpickle(name);
 
-		List<?> values = hasArray.getArrayContent();
+		List<?> values = ndArray.getArrayContent();
+		int[] shape = ndArray.getArrayShape();
+
+		DType dtype = (DType)ndArray.getDescr();
+
+		assertNotNull(dtype.getDataType());
+
+		assertEquals(expectedValues, values);
+	}
+
+	private void unpickleNumpyArray(String name, long min, long max, long step) throws IOException {
+		NDArray ndArray = (NDArray)unpickle(name);
+
+		List<?> values = ndArray.getArrayContent();
+		int[] shape = ndArray.getArrayShape();
+
+		DType dtype = (DType)ndArray.getDescr();
+
+		assertNotNull(dtype.getDataType());
 
 		for(int i = 0; i < values.size(); i++){
 			Number expectedValue = min + (i * step);
