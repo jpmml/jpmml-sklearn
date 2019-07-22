@@ -32,8 +32,10 @@ import org.jpmml.sklearn.CastFunction;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.TupleUtil;
+import sklearn.Drop;
 import sklearn.Initializer;
-import sklearn.MultiTransformer;
+import sklearn.PassThrough;
 import sklearn.Transformer;
 
 public class ColumnTransformer extends Initializer {
@@ -72,17 +74,23 @@ public class ColumnTransformer extends Initializer {
 
 	static
 	private Transformer getTransformer(Object[] fittedTransformer){
-		Object transformer = fittedTransformer[1];
-
-		if(("drop").equals(transformer)){
-			return Drop.INSTANCE;
-		} else
-
-		if(("passthrough").equals(transformer)){
-			return PassThrough.INSTANCE;
-		}
+		Object transformer = TupleUtil.extractElement(fittedTransformer, 1);
 
 		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
+
+			@Override
+			public Transformer apply(Object object){
+
+				if(("drop").equals(object)){
+					return Drop.INSTANCE;
+				} else
+
+				if(("passthrough").equals(object)){
+					return PassThrough.INSTANCE;
+				}
+
+				return super.apply(object);
+			}
 
 			@Override
 			protected String formatMessage(Object object){
@@ -95,7 +103,7 @@ public class ColumnTransformer extends Initializer {
 
 	static
 	private List<Feature> getFeatures(Object[] fittedTransformer, List<Feature> features, SkLearnEncoder encoder){
-		Object columns = fittedTransformer[2];
+		Object columns = TupleUtil.extractElement(fittedTransformer, 2);
 
 		if(columns instanceof HasArray){
 			HasArray hasArray = (HasArray)columns;
@@ -155,35 +163,5 @@ public class ColumnTransformer extends Initializer {
 		};
 
 		return Lists.transform((List)columns, castFunction);
-	}
-
-	static
-	private class Drop extends MultiTransformer {
-
-		private Drop(){
-			super(null, null);
-		}
-
-		@Override
-		public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-			return Collections.emptyList();
-		}
-
-		public static final Drop INSTANCE = new Drop();
-	}
-
-	static
-	private class PassThrough extends MultiTransformer {
-
-		private PassThrough(){
-			super(null, null);
-		}
-
-		@Override
-		public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-			return features;
-		}
-
-		public static final PassThrough INSTANCE = new PassThrough();
 	}
 }

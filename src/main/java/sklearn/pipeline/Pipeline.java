@@ -20,14 +20,17 @@ package sklearn.pipeline;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.sklearn.CastFunction;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
 import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
+import sklearn.PassThrough;
 import sklearn.Transformer;
 
 public class Pipeline extends Transformer {
@@ -94,7 +97,7 @@ public class Pipeline extends Transformer {
 
 		Object estimator = TupleUtil.extractElement(finalStep, 1);
 
-		return Estimator.class.isInstance(estimator);
+		return ("passthrough").equals(estimator) || Estimator.class.isInstance(estimator);
 	}
 
 	public List<? extends Transformer> getTransformers(){
@@ -104,7 +107,27 @@ public class Pipeline extends Transformer {
 			steps = steps.subList(0, steps.size() - 1);
 		}
 
-		return TupleUtil.extractElementList(steps, 1, Transformer.class);
+		List<?> transformers = TupleUtil.extractElementList(steps, 1);
+
+		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
+
+			@Override
+			public Transformer apply(Object object){
+
+				if(("passthrough").equals(object)){
+					return PassThrough.INSTANCE;
+				}
+
+				return super.apply(object);
+			}
+
+			@Override
+			public String formatMessage(Object object){
+				return "The transformer object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
+			}
+		};
+
+		return Lists.transform(transformers, castFunction);
 	}
 
 	public Estimator getFinalEstimator(){
@@ -116,13 +139,27 @@ public class Pipeline extends Transformer {
 
 		Object[] finalStep = steps.get(steps.size() - 1);
 
-		try {
-			return TupleUtil.extractElement(finalStep, 1, Estimator.class);
-		} catch(IllegalArgumentException iae){
-			Object estimator = TupleUtil.extractElement(finalStep, 1);
+		Object estimator = TupleUtil.extractElement(finalStep, 1);
 
-			throw new IllegalArgumentException("The transformer object of the final step (" + ClassDictUtil.formatClass(estimator) + ") is not a supported Estimator", iae);
-		}
+		CastFunction<Estimator> castFunction = new CastFunction<Estimator>(Estimator.class){
+
+			@Override
+			public Estimator apply(Object object){
+
+				if(("passthrough").equals(object)){
+					return null;
+				}
+
+				return super.apply(object);
+			}
+
+			@Override
+			public String formatMessage(Object object){
+				return "The transformer object of the final step (" + ClassDictUtil.formatClass(object) + ") is not a supported Estimator";
+			}
+		};
+
+		return castFunction.apply(estimator);
 	}
 
 	public List<Object[]> getSteps(){

@@ -672,7 +672,9 @@ def build_housing(regressor, name, with_kneighbors = False, **pmml_options):
 		("transformer-pipeline", Pipeline([
 			("polynomial", PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)),
 			("scaler", StandardScaler()),
+			("passthrough-transformer", "passthrough"),
 			("selector", SelectPercentile(score_func = f_regression, percentile = 35)),
+			("passthrough-final-estimator", "passthrough")
 		])),
 		("regressor", regressor)
 	])
