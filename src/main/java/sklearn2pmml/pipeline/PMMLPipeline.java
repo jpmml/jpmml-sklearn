@@ -83,11 +83,6 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	@Override
-	public boolean hasFinalEstimator(){
-		return true;
-	}
-
-	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		logger.warn(ClassDictUtil.formatClass(this) + " should be replaced with " + ClassDictUtil.formatClass(new Pipeline()) + " in nested workflows");
 
@@ -96,10 +91,16 @@ public class PMMLPipeline extends Pipeline {
 
 	public PMML encodePMML(){
 		List<? extends Transformer> transformers = getTransformers();
-		Estimator estimator = getFinalEstimator();
+		Estimator estimator = null;
+
+		if(hasFinalEstimator()){
+			estimator = getFinalEstimator();
+		}
+
 		Transformer predictTransformer = getPredictTransformer();
 		Transformer predictProbaTransformer = getPredictProbaTransformer();
 		Transformer applyTransformer = getApplyTransformer();
+
 		List<String> activeFields = getActiveFields();
 		List<String> probabilityFields = null;
 		List<String> targetFields = getTargetFields();
@@ -110,7 +111,7 @@ public class PMMLPipeline extends Pipeline {
 
 		Label label = null;
 
-		if(estimator.isSupervised()){
+		if(estimator != null && estimator.isSupervised()){
 
 			if(targetFields == null){
 				targetFields = initTargetFields();
@@ -202,7 +203,8 @@ public class PMMLPipeline extends Pipeline {
 				features = super.encodeFeatures(features, encoder);
 			} else
 
-			{
+			if(estimator != null){
+
 				if(activeFields == null){
 					activeFields = initActiveFields(estimator);
 				}
@@ -211,6 +213,10 @@ public class PMMLPipeline extends Pipeline {
 			}
 		} catch(UnsupportedOperationException uoe){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
+		}
+
+		if(estimator == null){
+			return encodePMML(null, repr, encoder);
 		}
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();
@@ -365,6 +371,10 @@ public class PMMLPipeline extends Pipeline {
 			model.setModelVerification(ModelUtil.createModelVerification(data));
 		}
 
+		return encodePMML(model, repr, encoder);
+	}
+
+	private PMML encodePMML(Model model, String repr, SkLearnEncoder encoder){
 		PMML pmml = encoder.encodePMML(model);
 
 		if(repr != null){
