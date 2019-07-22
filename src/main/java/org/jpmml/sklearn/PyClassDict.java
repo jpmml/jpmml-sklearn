@@ -107,6 +107,12 @@ public class PyClassDict extends ClassDict {
 		return ScalarUtil.decode(object);
 	}
 
+	public Object getOptionalScalar(String name){
+		Object object = getOptional(name, Object.class);
+
+		return ScalarUtil.decode(object);
+	}
+
 	public String getString(String name){
 		return get(name, String.class);
 	}

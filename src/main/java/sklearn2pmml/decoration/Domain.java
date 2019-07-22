@@ -93,7 +93,7 @@ public class Domain extends Transformer {
 	}
 
 	public Object getMissingValueReplacement(){
-		return getOptionalObject("missing_value_replacement");
+		return getOptionalScalar("missing_value_replacement");
 	}
 
 	public List<Object> getMissingValues(){
@@ -118,7 +118,7 @@ public class Domain extends Transformer {
 	}
 
 	public Object getInvalidValueReplacement(){
-		return getOptionalObject("invalid_value_replacement");
+		return getOptionalScalar("invalid_value_replacement");
 	}
 
 	public Boolean getWithData(){

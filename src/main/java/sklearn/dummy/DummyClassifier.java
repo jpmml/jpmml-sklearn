@@ -125,7 +125,7 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 	}
 
 	public Object getConstant(){
-		return getOptionalObject("constant");
+		return getOptionalScalar("constant");
 	}
 
 	public String getStrategy(){

@@ -125,7 +125,7 @@ public class CutTransformer extends Transformer {
 	}
 
 	public List<?> getLabels(){
-		Object labels = getOptionalObject("labels");
+		Object labels = getOptionalScalar("labels");
 
 		if(labels == null || (Boolean.FALSE).equals(labels)){
 			return null;

@@ -82,6 +82,6 @@ public class MissingIndicator extends Transformer implements HasNumberOfFeatures
 	}
 
 	public Object getMissingValues(){
-		return getOptionalObject("missing_values");
+		return getOptionalScalar("missing_values");
 	}
 }

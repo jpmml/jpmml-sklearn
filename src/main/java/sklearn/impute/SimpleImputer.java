@@ -92,7 +92,7 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public Object getMissingValues(){
-		return getOptionalObject("missing_values");
+		return getOptionalScalar("missing_values");
 	}
 
 	public List<?> getStatistics(){
