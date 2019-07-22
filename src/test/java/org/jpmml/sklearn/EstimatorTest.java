@@ -74,7 +74,7 @@ public class EstimatorTest extends IntegrationTest {
 					pipeline = (PMMLPipeline)PickleUtil.unpickle(storage);
 				}
 
-				Estimator estimator = pipeline.getEstimator();
+				Estimator estimator = pipeline.getFinalEstimator();
 
 				File tmpFile = null;
 

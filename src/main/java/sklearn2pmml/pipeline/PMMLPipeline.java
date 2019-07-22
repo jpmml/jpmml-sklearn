@@ -60,21 +60,19 @@ import org.jpmml.model.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.TupleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasClassifierOptions;
-import sklearn.HasEstimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 import sklearn.pipeline.Pipeline;
 
-public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
+public class PMMLPipeline extends Pipeline {
 
 	public PMMLPipeline(){
 		this("sklearn2pmml", "PMMLPipeline");
@@ -82,6 +80,11 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 	public PMMLPipeline(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public boolean hasFinalEstimator(){
+		return true;
 	}
 
 	@Override
@@ -93,7 +96,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 
 	public PMML encodePMML(){
 		List<? extends Transformer> transformers = getTransformers();
-		Estimator estimator = getEstimator();
+		Estimator estimator = getFinalEstimator();
 		Transformer predictTransformer = getPredictTransformer();
 		Transformer predictProbaTransformer = getPredictProbaTransformer();
 		Transformer applyTransformer = getApplyTransformer();
@@ -207,7 +210,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 				features = initFeatures(activeFields, estimator.getOpType(), estimator.getDataType(), encoder);
 			}
 		} catch(UnsupportedOperationException uoe){
-			throw new IllegalArgumentException("The first transformer or estimator object (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
+			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
 		}
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();
@@ -402,46 +405,6 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 	}
 
 	@Override
-	public List<? extends Transformer> getTransformers(){
-		List<Object[]> steps = getSteps();
-
-		if(steps.size() > 0){
-			steps = steps.subList(0, steps.size() - 1);
-		}
-
-		return TupleUtil.extractElementList(steps, 1, Transformer.class);
-	}
-
-	@Override
-	public Estimator getEstimator(){
-		List<Object[]> steps = getSteps();
-
-		if(steps.size() < 1){
-			throw new IllegalArgumentException("Expected one or more steps, got zero steps");
-		}
-
-		Object[] lastStep = steps.get(steps.size() - 1);
-
-		try {
-			return TupleUtil.extractElement(lastStep, 1, Estimator.class);
-		} catch(IllegalArgumentException iaeEstimator){
-			Transformer transformer = null;
-
-			try {
-				transformer = TupleUtil.extractElement(lastStep, 1, Transformer.class);
-			} catch(IllegalArgumentException iaeTransformer){
-				// Ignored
-			}
-
-			if(transformer != null){
-				throw new IllegalArgumentException("Expected an estimator object as the last step, got a transformer object (" + ClassDictUtil.formatClass(transformer) + ")");
-			}
-
-			throw iaeEstimator;
-		}
-	}
-
-	@Override
 	public List<Object[]> getSteps(){
 		return super.getSteps();
 	}
@@ -534,7 +497,7 @@ public class PMMLPipeline extends Pipeline implements HasEstimator<Estimator> {
 		} // End if
 
 		if(numberOfFeatures < 0){
-			throw new IllegalArgumentException("The first transformer or estimator object (" + ClassDictUtil.formatClass(object) + ") does not specify the number of input features");
+			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(object) + ") does not specify the number of input features");
 		}
 
 		List<String> activeFields = new ArrayList<>(numberOfFeatures);

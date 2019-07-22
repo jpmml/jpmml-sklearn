@@ -49,7 +49,7 @@ public class PMMLPipelineTest {
 			.setActiveFields(Arrays.asList("x1", "x2", "x3"));
 
 		assertEquals(Collections.emptyList(), pipeline.getTransformers());
-		assertEquals(estimator, pipeline.getEstimator());
+		assertEquals(estimator, pipeline.getFinalEstimator());
 
 		assertNotNull(pipeline.getRepr());
 		assertEquals(Arrays.asList("y"), pipeline.getTargetFields());

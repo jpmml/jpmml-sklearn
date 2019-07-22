@@ -26,6 +26,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.TupleUtil;
+import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
@@ -82,10 +83,46 @@ public class Pipeline extends Transformer {
 		return features;
 	}
 
+	public boolean hasFinalEstimator(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.size() < 1){
+			return false;
+		}
+
+		Object[] finalStep = steps.get(steps.size() - 1);
+
+		Object estimator = TupleUtil.extractElement(finalStep, 1);
+
+		return Estimator.class.isInstance(estimator);
+	}
+
 	public List<? extends Transformer> getTransformers(){
 		List<Object[]> steps = getSteps();
 
+		if(hasFinalEstimator()){
+			steps = steps.subList(0, steps.size() - 1);
+		}
+
 		return TupleUtil.extractElementList(steps, 1, Transformer.class);
+	}
+
+	public Estimator getFinalEstimator(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.size() < 1){
+			throw new IllegalArgumentException("Expected one or more steps, got zero steps");
+		}
+
+		Object[] finalStep = steps.get(steps.size() - 1);
+
+		try {
+			return TupleUtil.extractElement(finalStep, 1, Estimator.class);
+		} catch(IllegalArgumentException iae){
+			Object estimator = TupleUtil.extractElement(finalStep, 1);
+
+			throw new IllegalArgumentException("The transformer object of the final step (" + ClassDictUtil.formatClass(estimator) + ") is not a supported Estimator", iae);
+		}
 	}
 
 	public List<Object[]> getSteps(){
