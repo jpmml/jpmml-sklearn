@@ -105,6 +105,10 @@ public class ColumnTransformer extends Initializer {
 	private List<Feature> getFeatures(Object[] fittedTransformer, List<Feature> features, SkLearnEncoder encoder){
 		Object columns = TupleUtil.extractElement(fittedTransformer, 2);
 
+		if((columns instanceof String) || (columns instanceof Integer)){
+			columns = Collections.singletonList(columns);
+		} else
+
 		if(columns instanceof HasArray){
 			HasArray hasArray = (HasArray)columns;
 
