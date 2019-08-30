@@ -422,7 +422,27 @@ if "Iris" in datasets:
 	build_iris(SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
 	build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)
-	build_iris(XGBClassifier(objective = "multi:softprob"), "XGBIris", predict_params = {"ntree_limit" : 7}, predict_proba_params = {"ntree_limit" : 7}, ntree_limit = 7)
+
+iris_train_mask = numpy.random.choice([False, True], size = (150,), p = [0.5, 0.5])
+iris_test_mask = ~iris_train_mask
+
+def build_iris_opt(classifier, name, fit_params = {}, **pmml_options):
+	pipeline = PMMLPipeline([
+		("classifier", classifier)
+	])
+	pipeline.fit(iris_X[iris_train_mask], iris_y[iris_train_mask], **fit_params)
+	if isinstance(classifier, XGBClassifier):
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
+if "Iris" in datasets:
+	build_iris_opt(XGBClassifier(objective = "multi:softprob"), "XGBIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "mlogloss", "classifier__early_stopping_rounds" : 3})
 
 if "Iris" in datasets:
 	mapper = DataFrameMapper([
@@ -551,8 +571,26 @@ if "Auto" in datasets:
 	build_auto(RidgeCV(), "RidgeAuto")
 	build_auto(TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
 	build_auto(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor()), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
-	build_auto(XGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", predict_params = {"ntree_limit" : 31}, ntree_limit = 31)
 	build_auto(XGBRFRegressor(n_estimators = 31, max_depth = 6, random_state = 13), "XGBRFAuto")
+
+auto_train_mask = numpy.random.choice([False, True], size = (392,), p = [0.5, 0.5])
+auto_test_mask = ~auto_train_mask
+
+def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
+	pipeline = PMMLPipeline([
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_X[auto_train_mask], auto_y[auto_train_mask], **fit_params)
+	if isinstance(regressor, XGBRegressor):
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
+	store_csv(mpg, name)
+
+if "Auto" in datasets:
+	build_auto_opt(XGBRegressor(objective = "reg:linear"), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 
 if "Auto" in datasets:
 	build_auto(TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
