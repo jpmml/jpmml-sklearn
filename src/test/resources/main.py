@@ -167,7 +167,7 @@ def build_audit(classifier, name, with_proba = True, **pmml_options):
 	])
 	categorical_mapper = DataFrameMapper([
 		(["Employment"], [CategoricalDomain(), SubstringTransformer(0, 3), LabelBinarizer(), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
-		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), LabelBinarizer(), SelectFromModel(RandomForestClassifier(random_state = 13, n_estimators = 3), threshold = "1.25 * mean")]),
+		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), LabelBinarizer(), SelectFromModel(RandomForestClassifier(n_estimators = 3, random_state = 13), threshold = "1.25 * mean")]),
 		(["Marital"], [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
 		(["Occupation"], [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
 		(["Gender"], [CategoricalDomain(), MatchesTransformer("^Male$"), CastTransformer(int)]),
@@ -198,27 +198,27 @@ def build_audit(classifier, name, with_proba = True, **pmml_options):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 2), "DecisionTreeAudit", compact = False)
-	build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAudit")
+	build_audit(DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13), "DecisionTreeAudit", compact = False)
+	build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
 	build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
-	build_audit(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesAudit")
-	build_audit(GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "GBDTLRAudit")
-	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "XGBLRAudit")
+	build_audit(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesAudit")
+	build_audit(GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRAudit")
+	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(solver = "liblinear")), "XGBLRAudit")
 	build_audit(GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
-	build_audit(GradientBoostingClassifier(random_state = 13, loss = "exponential", init = None), "GradientBoostingAudit")
+	build_audit(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13), "GradientBoostingAudit")
 	build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit", num_iteration = 17)
 	build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 	build_audit(LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
 	build_audit(LogisticRegression(multi_class = "multinomial", solver = "newton-cg", max_iter = 500), "MultinomialLogisticRegressionAudit")
-	build_audit(LogisticRegressionCV(multi_class = "ovr"), "OvRLogisticRegressionAudit")
-	build_audit(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleAudit")
+	build_audit(LogisticRegressionCV(cv = 3, multi_class = "ovr"), "OvRLogisticRegressionAudit")
+	build_audit(BaggingClassifier(LogisticRegression(solver = "liblinear"), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleAudit")
 	build_audit(GaussianNB(), "NaiveBayesAudit")
-	build_audit(OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
-	build_audit(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestAudit", flat = True)
+	build_audit(OneVsRestClassifier(LogisticRegression(solver = "liblinear")), "OneVsRestAudit")
+	build_audit(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAudit", flat = True)
 	build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
-	build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleAudit")
-	build_audit(SVC(), "SVCAudit", with_proba = False)
-	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
+	build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
+	build_audit(SVC(gamma = "auto"), "SVCAudit", with_proba = False)
+	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(solver = "liblinear"))], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 	build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit", byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
 	build_audit(XGBRFClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 5, random_state = 13), "XGBRFAudit")
 
@@ -248,7 +248,7 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 
 if "Audit" in datasets:
 	cat_indices = [2, 3, 4, 5, 6, 7, 8]
-	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(random_state = 13)), "LGBMLRAuditCat", classifier__gbdt__categorical_feature = cat_indices)
+	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(solver = "liblinear")), "LGBMLRAuditCat", classifier__gbdt__categorical_feature = cat_indices)
 	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = cat_indices)
 
 def build_audit_h2o(classifier, name):
@@ -291,8 +291,8 @@ def build_audit_dict(classifier, name, with_proba = True):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit_dict(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditDict")
-	build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
+	build_audit_dict(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditDict")
+	build_audit_dict(LogisticRegression(solver = "liblinear"), "LogisticRegressionAuditDict")
 
 audit_na_X, audit_na_y = load_audit("AuditNA")
 
@@ -337,7 +337,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_transformer = No
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit_na(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
+	build_audit_na(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 	build_audit_na(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 11, random_state = 13), "XGBAuditNA", predict_transformer = Alias(ExpressionTransformer("X[0]"), name = "eval(Adjusted)", prefit = True))
 
@@ -371,14 +371,14 @@ def build_versicolor(classifier, name, with_proba = True, **pmml_options):
 
 if "Versicolor" in datasets:
 	build_versicolor(DummyClassifier(strategy = "prior"), "DummyVersicolor")
-	build_versicolor(GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(random_state = 13)), "GBDTLRVersicolor")
+	build_versicolor(GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRVersicolor")
 	build_versicolor(GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, random_state = 13), LinearSVC(random_state = 13)), "XGBRFLRVersicolor", with_proba = False)
 	build_versicolor(KNeighborsClassifier(), "KNNVersicolor", with_proba = False)
-	build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), 	"MLPVersicolor")
-	build_versicolor(SGDClassifier(random_state = 13, max_iter = 100), "SGDVersicolor", with_proba = False)
-	build_versicolor(SGDClassifier(random_state = 13, loss = "log", max_iter = 100), "SGDLogVersicolor")
-	build_versicolor(SVC(), "SVCVersicolor", with_proba = False)
-	build_versicolor(NuSVC(), "NuSVCVersicolor", with_proba = False)
+	build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPVersicolor")
+	build_versicolor(SGDClassifier(max_iter = 100, random_state = 13), "SGDVersicolor", with_proba = False)
+	build_versicolor(SGDClassifier(loss = "log", max_iter = 100, random_state = 13), "SGDLogVersicolor")
+	build_versicolor(SVC(gamma = "auto"), "SVCVersicolor", with_proba = False)
+	build_versicolor(NuSVC(gamma = "auto"), "NuSVCVersicolor", with_proba = False)
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
@@ -401,7 +401,7 @@ def build_versicolor_direct(classifier, name, with_proba = True, **pmml_options)
 	store_csv(species, name)
 
 if "Versicolor" in datasets:
-	build_versicolor_direct(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeVersicolor", compact = False)
+	build_versicolor_direct(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeVersicolor", compact = False)
 
 #
 # Multi-class classification
@@ -418,8 +418,8 @@ def build_iris(classifier, name, with_proba = True, **pmml_options):
 				(["Sepal.Width", "Petal.Width"], Aggregator(function = "mean"))
 			])),
 			("transform", FeatureUnion([
-				("normal_scale", FunctionTransformer(None)),
-				("log_scale", FunctionTransformer(numpy.log10)),
+				("normal_scale", FunctionTransformer(None, validate = True)),
+				("log_scale", FunctionTransformer(numpy.log10, validate = True)),
 				("power_scale", PowerFunctionTransformer(power = 2))
 			]))
 		])),
@@ -441,29 +441,29 @@ def build_iris(classifier, name, with_proba = True, **pmml_options):
 	store_csv(species, name)
 
 if "Iris" in datasets:
-	build_iris(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), "DecisionTreeIris", compact = False)
-	build_iris(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleIris")
+	build_iris(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeIris", compact = False)
+	build_iris(BaggingClassifier(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleIris")
 	build_iris(DummyClassifier(strategy = "constant", constant = "versicolor"), "DummyIris")
-	build_iris(ExtraTreesClassifier(random_state = 13, min_samples_leaf = 5), "ExtraTreesIris")
-	build_iris(GradientBoostingClassifier(random_state = 13, init = None, n_estimators = 17), "GradientBoostingIris")
+	build_iris(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesIris")
+	build_iris(GradientBoostingClassifier(init = None, n_estimators = 17, random_state = 13), "GradientBoostingIris")
 	build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
 	build_iris(OptimalLGBMClassifier(objective = "multiclass", n_estimators = 7, num_iteration = 3), "LGBMIris", num_iteration = 3)
 	build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 	build_iris(LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)
 	build_iris(LogisticRegression(multi_class = "multinomial", solver = "lbfgs"), "MultinomialLogisticRegressionIris")
-	build_iris(LogisticRegressionCV(multi_class = "ovr"), "OvRLogisticRegressionIris")
-	build_iris(BaggingClassifier(LogisticRegression(), random_state = 13, n_estimators = 3, max_features = 0.5), "LogisticRegressionEnsembleIris")
-	build_iris(MLPClassifier(hidden_layer_sizes = (6,), solver = "lbfgs", random_state = 13, tol = 0.1, max_iter = 100), "MLPIris")
+	build_iris(LogisticRegressionCV(cv = 3, multi_class = "ovr"), "OvRLogisticRegressionIris")
+	build_iris(BaggingClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear"), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleIris")
+	build_iris(MLPClassifier(hidden_layer_sizes = (6,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPIris")
 	build_iris(GaussianNB(), "NaiveBayesIris")
-	build_iris(OneVsRestClassifier(LogisticRegression()), "OneVsRestIris")
-	build_iris(RandomForestClassifier(random_state = 13, min_samples_leaf = 5), "RandomForestIris", flat = True)
+	build_iris(OneVsRestClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear")), "OneVsRestIris")
+	build_iris(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIris", flat = True)
 	build_iris(RidgeClassifierCV(), "RidgeIris", with_proba = False)
-	build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), random_state = 13, n_estimators = 3, max_features = 0.5), "RidgeEnsembleIris")
-	build_iris(SGDClassifier(random_state = 13, max_iter = 100), "SGDIris", with_proba = False)
-	build_iris(SGDClassifier(random_state = 13, loss = "log", max_iter = 100), "SGDLogIris")
-	build_iris(SVC(), "SVCIris", with_proba = False)
-	build_iris(NuSVC(), "NuSVCIris", with_proba = False)
-	build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
+	build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleIris")
+	build_iris(SGDClassifier(max_iter = 100, random_state = 13), "SGDIris", with_proba = False)
+	build_iris(SGDClassifier(loss = "log", max_iter = 100, random_state = 13), "SGDLogIris")
+	build_iris(SVC(gamma = "auto"), "SVCIris", with_proba = False)
+	build_iris(NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
+	build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)
 	build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), "XGBIris", ntree_limit = 7)
 
 if "Iris" in datasets:
@@ -473,7 +473,7 @@ if "Iris" in datasets:
 	iris_Xt = mapper.fit_transform(iris_X)
 	dt_classifier = DecisionTreeClassifier(random_state = 13)
 	dt_classifier.fit(iris_Xt, iris_y)
-	lr_classifier = LogisticRegression(random_state = 13)
+	lr_classifier = LogisticRegression(multi_class = "ovr", solver = "liblinear")
 	lr_classifier.fit(iris_Xt, iris_y)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -525,8 +525,8 @@ def build_sentiment(classifier, name, with_proba = True, **pmml_options):
 
 if "Sentiment" in datasets:
 	build_sentiment(LinearSVC(random_state = 13), "LinearSVCSentiment", with_proba = False)
-	build_sentiment(LogisticRegressionCV(), "LogisticRegressionSentiment")
-	build_sentiment(RandomForestClassifier(random_state = 13, min_samples_leaf = 3), "RandomForestSentiment", compact = False)
+	build_sentiment(LogisticRegressionCV(cv = 3), "LogisticRegressionSentiment")
+	build_sentiment(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestSentiment", compact = False)
 
 #
 # Regression
@@ -550,7 +550,7 @@ def build_auto(regressor, name, **pmml_options):
 		(["cylinders", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
 		(["cylinders"], Alias(ExpressionTransformer("X[0] % 2.0 > 0.0"), name = "odd(cylinders)", prefit = True)),
 		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
-		(["model_year", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), ConcatTransformer("/"), LabelBinarizer(), SelectorProxy(SelectFromModel(RandomForestRegressor(random_state = 13, n_estimators = 3), threshold = "1.25 * mean"))]),
+		(["model_year", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), ConcatTransformer("/"), LabelBinarizer(), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
 		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
 		(["weight", "displacement"], ExpressionTransformer("(X[0] / X[1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
 	])
@@ -570,26 +570,26 @@ def build_auto(regressor, name, **pmml_options):
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
-	build_auto(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostAuto")
+	build_auto(AdaBoostRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), random_state = 13, n_estimators = 17), "AdaBoostAuto")
 	build_auto(ARDRegression(normalize = True), "BayesianARDAuto")
 	build_auto(BayesianRidge(normalize = True), "BayesianRidgeAuto")
-	build_auto(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAuto", compact = False)
-	build_auto(BaggingRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 3, max_features = 0.5), "DecisionTreeEnsembleAuto")
+	build_auto(DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAuto", compact = False)
+	build_auto(BaggingRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAuto")
 	build_auto(DummyRegressor(strategy = "median"), "DummyAuto")
-	build_auto(ElasticNetCV(random_state = 13), "ElasticNetAuto")
-	build_auto(ExtraTreesRegressor(random_state = 13, min_samples_leaf = 5), "ExtraTreesAuto")
+	build_auto(ElasticNetCV(cv = 3, random_state = 13), "ElasticNetAuto")
+	build_auto(ExtraTreesRegressor(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesAuto")
 	build_auto(GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
 	build_auto(GBDTLMRegressor(XGBRFRegressor(n_estimators = 17, max_depth = 6, random_state = 13), ElasticNet(random_state = 13)), "XGBRFLMAuto")
-	build_auto(GradientBoostingRegressor(random_state = 13, init = None), "GradientBoostingAuto")
+	build_auto(GradientBoostingRegressor(init = None, random_state = 13), "GradientBoostingAuto")
 	build_auto(HuberRegressor(), "HuberAuto")
-	build_auto(LarsCV(), "LarsAuto")
-	build_auto(LassoCV(random_state = 13), "LassoAuto")
-	build_auto(LassoLarsCV(), "LassoLarsAuto")
+	build_auto(LarsCV(cv = 3), "LarsAuto")
+	build_auto(LassoCV(cv = 3, random_state = 13), "LassoAuto")
+	build_auto(LassoLarsCV(cv = 3), "LassoLarsAuto")
 	build_auto(OptimalLGBMRegressor(objective = "regression", n_estimators = 17, num_iteration = 11), "LGBMAuto", num_iteration = 11)
 	build_auto(LinearRegression(), "LinearRegressionAuto")
-	build_auto(BaggingRegressor(LinearRegression(), random_state = 13, max_features = 0.75), "LinearRegressionEnsembleAuto")
-	build_auto(OrthogonalMatchingPursuitCV(), "OMPAuto")
-	build_auto(RandomForestRegressor(random_state = 13, min_samples_leaf = 3), "RandomForestAuto", flat = True)
+	build_auto(BaggingRegressor(LinearRegression(), max_features = 0.75, random_state = 13), "LinearRegressionEnsembleAuto")
+	build_auto(OrthogonalMatchingPursuitCV(cv = 3), "OMPAuto")
+	build_auto(RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuto", flat = True)
 	build_auto(RidgeCV(), "RidgeAuto")
 	build_auto(TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
 	build_auto(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor()), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
@@ -658,7 +658,7 @@ def build_auto_na(regressor, name, predict_transformer = None, apply_transformer
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
-	build_auto_na(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 2), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
+	build_auto_na(DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_auto_na(LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
 
 housing_X, housing_y = load_housing("Housing")
@@ -692,16 +692,16 @@ def build_housing(regressor, name, with_kneighbors = False, **pmml_options):
 	store_csv(medv, name)
 
 if "Housing" in datasets:
-	build_housing(AdaBoostRegressor(DecisionTreeRegressor(random_state = 13, min_samples_leaf = 5), random_state = 13, n_estimators = 17), "AdaBoostHousing")
+	build_housing(AdaBoostRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), n_estimators = 17, random_state = 13), "AdaBoostHousing")
 	build_housing(BayesianRidge(), "BayesianRidgeHousing")
 	build_housing(GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
 	build_housing(GBDTLMRegressor(XGBRFRegressor(n_estimators = 17, max_depth = 5, random_state = 13), SGDRegressor(penalty = "elasticnet", random_state = 13)), "XGBRFLMHousing")
 	build_housing(KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
-	build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", random_state = 13, tol = 0.001, max_iter = 1000), "MLPHousing")
+	build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", tol = 0.001, max_iter = 1000, random_state = 13), "MLPHousing")
 	build_housing(SGDRegressor(random_state = 13), "SGDHousing")
-	build_housing(SVR(), "SVRHousing")
+	build_housing(SVR(gamma = "auto"), "SVRHousing")
 	build_housing(LinearSVR(random_state = 13), "LinearSVRHousing")
-	build_housing(NuSVR(), "NuSVRHousing")
+	build_housing(NuSVR(gamma = "auto"), "NuSVRHousing")
 	build_housing(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("lr", LinearRegression())]), "VotingEnsembleHousing")
 
 #
@@ -725,7 +725,7 @@ def build_iforest_housing(iforest, name, **pmml_options):
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name)
 
 if "Housing" in datasets:
-	build_iforest_housing(IsolationForest(random_state = 13), "IsolationForestHousing")
+	build_iforest_housing(IsolationForest(contamination = 0.1, behaviour = "old", random_state = 13), "IsolationForestHousing")
 
 def build_ocsvm_housing(svm, name):
 	mapper = DataFrameMapper([
@@ -744,4 +744,4 @@ def build_ocsvm_housing(svm, name):
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name)
 
 if "Housing" in datasets:
-	build_ocsvm_housing(OneClassSVM(nu = 0.10, random_state = 13), "OneClassSVMHousing")
+	build_ocsvm_housing(OneClassSVM(gamma = "auto", nu = 0.10, random_state = 13), "OneClassSVMHousing")
