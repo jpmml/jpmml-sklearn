@@ -119,7 +119,7 @@ if "Wheat" in datasets:
 
 audit_X, audit_y = load_audit("Audit", stringify = False)
 
-def build_audit(classifier, name, with_proba = True, predict_params = {}, predict_proba_params = {}, **pmml_options):
+def build_audit(classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, **pmml_options):
 	continuous_mapper = DataFrameMapper([
 		(["Age", "Income", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 3)]))
 	])
@@ -141,7 +141,7 @@ def build_audit(classifier, name, with_proba = True, predict_params = {}, predic
 		])),
 		("classifier", classifier)
 	])
-	pipeline.fit(audit_X, audit_y)
+	pipeline.fit(audit_X, audit_y, **fit_params)
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
@@ -182,7 +182,7 @@ if "Audit" in datasets:
 
 audit_X, audit_y = load_audit("Audit")
 
-def build_audit_cat(classifier, name, with_proba = True, **fit_params):
+def build_audit_cat(classifier, name, with_proba = True, fit_params = {}):
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["Age", "Income"]] +
 		[(["Hours"], [ContinuousDomain(), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = False, right = False, include_lowest = True)])] +
@@ -206,8 +206,8 @@ def build_audit_cat(classifier, name, with_proba = True, **fit_params):
 
 if "Audit" in datasets:
 	cat_indices = [2, 3, 4, 5, 6, 7, 8]
-	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(solver = "liblinear")), "LGBMLRAuditCat", classifier__gbdt__categorical_feature = cat_indices)
-	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", classifier__categorical_feature = cat_indices)
+	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(solver = "liblinear")), "LGBMLRAuditCat", fit_params = {"classifier__gbdt__categorical_feature" : cat_indices})
+	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", fit_params = {"classifier__categorical_feature" : cat_indices})
 
 def build_audit_h2o(classifier, name):
 	mapper = DataFrameMapper(
@@ -254,7 +254,7 @@ if "Audit" in datasets:
 
 audit_na_X, audit_na_y = load_audit("AuditNA")
 
-def build_audit_na(classifier, name, with_proba = True, predict_params = {}, predict_proba_params = {}, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
+def build_audit_na(classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
 	employment_mapping = {
 		"CONSULTANT" : "PRIVATE",
 		"PSFEDERAL" : "PUBLIC",
@@ -281,7 +281,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_params = {}, pre
 		("mapper", mapper),
 		("classifier", classifier)
 	], predict_transformer = predict_transformer, predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
-	pipeline.fit(audit_na_X, audit_na_y)
+	pipeline.fit(audit_na_X, audit_na_y, **fit_params)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X, **predict_params), columns = ["Adjusted"])
@@ -367,7 +367,7 @@ if "Versicolor" in datasets:
 
 iris_X, iris_y = load_iris("Iris")
 
-def build_iris(classifier, name, with_proba = True, predict_params = {}, predict_proba_params = {}, **pmml_options):
+def build_iris(classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, **pmml_options):
 	pipeline = Pipeline([
 		("pipeline", Pipeline([
 			("mapper", DataFrameMapper([
@@ -384,7 +384,7 @@ def build_iris(classifier, name, with_proba = True, predict_params = {}, predict
 		("pca", IncrementalPCA(n_components = 3, whiten = True)),
 		("classifier", classifier)
 	])
-	pipeline.fit(iris_X, iris_y)
+	pipeline.fit(iris_X, iris_y, **fit_params)
 	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values, iris_y.name)
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
@@ -495,7 +495,7 @@ auto_X, auto_y = load_auto("Auto")
 auto_X["model_year"] = auto_X["model_year"].astype(int)
 auto_X["origin"] = auto_X["origin"].astype(int)
 
-def build_auto(regressor, name, predict_params = {}, **pmml_options):
+def build_auto(regressor, name, fit_params = {}, predict_params = {}, **pmml_options):
 	cylinders_origin_mapping = {
 		(8, 1) : "8/1",
 		(6, 1) : "6/1",
@@ -517,7 +517,7 @@ def build_auto(regressor, name, predict_params = {}, **pmml_options):
 		("selector", SelectUnique()),
 		("regressor", regressor)
 	])
-	pipeline.fit(auto_X, auto_y)
+	pipeline.fit(auto_X, auto_y, **fit_params)
 	pipeline.configure(**pmml_options)
 	if isinstance(regressor, XGBRegressor):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, precision = 1e-5, zeroThreshold = 1e-5)
