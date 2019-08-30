@@ -46,8 +46,10 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> MiningModel encodeModel(E estimator, Schema schema){
 		GBDT gbdt = getGBDT(estimator);
 
+		Integer bestIteration = (Integer)estimator.getOptionalScalar("best_iteration_");
+
 		Boolean compact = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.TRUE);
-		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, null);
+		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
 
 		Map<String, Object> options = new LinkedHashMap<>();
 		options.put(HasLightGBMOptions.OPTION_COMPACT, compact);

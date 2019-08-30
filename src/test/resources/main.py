@@ -405,7 +405,6 @@ if "Iris" in datasets:
 	build_iris(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesIris")
 	build_iris(GradientBoostingClassifier(init = None, n_estimators = 17, random_state = 13), "GradientBoostingIris")
 	build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
-	build_iris(LGBMClassifier(objective = "multiclass", n_estimators = 7), "LGBMIris", predict_params = {"num_iteration" : 3}, predict_proba_params = {"num_iteration" : 3}, num_iteration = 3)
 	build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 	build_iris(LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)
 	build_iris(LogisticRegression(multi_class = "multinomial", solver = "lbfgs"), "MultinomialLogisticRegressionIris")
@@ -442,6 +441,7 @@ def build_iris_opt(classifier, name, fit_params = {}, **pmml_options):
 	store_csv(species, name)
 
 if "Iris" in datasets:
+	build_iris_opt(LGBMClassifier(objective = "multiclass"), "LGBMIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "multi_logloss", "classifier__early_stopping_rounds" : 3})
 	build_iris_opt(XGBClassifier(objective = "multi:softprob"), "XGBIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "mlogloss", "classifier__early_stopping_rounds" : 3})
 
 if "Iris" in datasets:
@@ -563,7 +563,6 @@ if "Auto" in datasets:
 	build_auto(LarsCV(cv = 3), "LarsAuto")
 	build_auto(LassoCV(cv = 3, random_state = 13), "LassoAuto")
 	build_auto(LassoLarsCV(cv = 3), "LassoLarsAuto")
-	build_auto(LGBMRegressor(objective = "regression", n_estimators = 17), "LGBMAuto", predict_params = {"num_iteration" : 11}, num_iteration = 11)
 	build_auto(LinearRegression(), "LinearRegressionAuto")
 	build_auto(BaggingRegressor(LinearRegression(), max_features = 0.75, random_state = 13), "LinearRegressionEnsembleAuto")
 	build_auto(OrthogonalMatchingPursuitCV(cv = 3), "OMPAuto")
@@ -590,6 +589,7 @@ def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
+	build_auto_opt(LGBMRegressor(objective = "regression"), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 	build_auto_opt(XGBRegressor(objective = "reg:linear"), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 
 if "Auto" in datasets:
