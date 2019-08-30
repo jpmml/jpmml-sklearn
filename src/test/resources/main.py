@@ -58,48 +58,6 @@ def make_interaction(left, right):
 	])
 	return pipeline
 
-class OptimalLGBMClassifier(LGBMClassifier):
-
-	def __init__(self, objective, n_estimators, num_iteration = 0, random_state = 13, n_jobs = -1):
-		super(OptimalLGBMClassifier, self).__init__(objective = objective, n_estimators = n_estimators, random_state = random_state, n_jobs = n_jobs)
-		self.num_iteration = num_iteration
-
-	def predict(self, X, raw_score = False, num_iteration = 0, pred_leaf = False, pred_contrib = False):
-		return super(OptimalLGBMClassifier, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration, pred_leaf = pred_leaf, pred_contrib = pred_contrib)
-
-	def predict_proba(self, X, raw_score = False, num_iteration = 0, pred_leaf = False, pred_contrib = False):
-		return super(OptimalLGBMClassifier, self).predict_proba(X = X, raw_score = raw_score, num_iteration = self.num_iteration, pred_leaf = pred_leaf, pred_contrib = pred_contrib)
-
-class OptimalLGBMRegressor(LGBMRegressor):
-
-	def __init__(self, objective, n_estimators, num_iteration = 0, random_state = 13, n_jobs = -1):
-		super(OptimalLGBMRegressor, self).__init__(objective = objective, n_estimators = n_estimators, random_state = random_state, n_jobs = n_jobs)
-		self.num_iteration = num_iteration
-
-	def predict(self, X, raw_score = False, num_iteration = 0, pred_leaf = False, pred_contrib = False):
-		return super(OptimalLGBMRegressor, self).predict(X = X, raw_score = raw_score, num_iteration = self.num_iteration, pred_leaf = pred_leaf, pred_contrib = pred_contrib)
-
-class OptimalXGBClassifier(XGBClassifier):
-
-	def __init__(self, objective, ntree_limit = 0, n_jobs = 1, random_state = 0, missing = None):
-		super(OptimalXGBClassifier, self).__init__(objective = objective, n_jobs = n_jobs, random_state = random_state, missing = missing)
-		self.ntree_limit = ntree_limit
-
-	def predict(self, data, ntree_limit = 0):
-		return super(OptimalXGBClassifier, self).predict(data = data, ntree_limit = self.ntree_limit)
-
-	def predict_proba(self, data, ntree_limit = 0):
-		return super(OptimalXGBClassifier, self).predict_proba(data = data, ntree_limit = self.ntree_limit)
-
-class OptimalXGBRegressor(XGBRegressor):
-
-	def __init__(self, objective, ntree_limit = 0, n_jobs = 1, random_state = 0, missing = None):
-		super(OptimalXGBRegressor, self).__init__(objective = objective, n_jobs = n_jobs, random_state = random_state, missing = missing)
-		self.ntree_limit = ntree_limit
-
-	def predict(self, data, ntree_limit = 0):
-		return super(OptimalXGBRegressor, self).predict(data = data, ntree_limit = self.ntree_limit)
-
 datasets = "Audit,Auto,Housing,Iris,Sentiment,Versicolor,Wheat"
 
 with_h2o = False
@@ -161,7 +119,7 @@ if "Wheat" in datasets:
 
 audit_X, audit_y = load_audit("Audit", stringify = False)
 
-def build_audit(classifier, name, with_proba = True, **pmml_options):
+def build_audit(classifier, name, with_proba = True, predict_params = {}, predict_proba_params = {}, **pmml_options):
 	continuous_mapper = DataFrameMapper([
 		(["Age", "Income", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 3)]))
 	])
@@ -187,13 +145,13 @@ def build_audit(classifier, name, with_proba = True, **pmml_options):
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
-		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
-		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
+		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
 	store_pkl(pipeline, name)
-	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
+	adjusted = DataFrame(pipeline.predict(audit_X, **predict_params), columns = ["Adjusted"])
 	if with_proba == True:
-		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
+		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X, **predict_proba_params), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
@@ -206,7 +164,7 @@ if "Audit" in datasets:
 	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(solver = "liblinear")), "XGBLRAudit")
 	build_audit(GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
 	build_audit(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13), "GradientBoostingAudit")
-	build_audit(OptimalLGBMClassifier(objective = "binary", n_estimators = 37, num_iteration = 17), "LGBMAudit", num_iteration = 17)
+	build_audit(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAudit", predict_params = {"num_iteration" : 17}, predict_proba_params = {"num_iteration" : 17}, num_iteration = 17)
 	build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 	build_audit(LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
 	build_audit(LogisticRegression(multi_class = "multinomial", solver = "newton-cg", max_iter = 500), "MultinomialLogisticRegressionAudit")
@@ -219,7 +177,7 @@ if "Audit" in datasets:
 	build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
 	build_audit(SVC(gamma = "auto"), "SVCAudit", with_proba = False)
 	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(solver = "liblinear"))], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
-	build_audit(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 71, random_state = 13), "XGBAudit", byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
+	build_audit(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAudit", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
 	build_audit(XGBRFClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 5, random_state = 13), "XGBRFAudit")
 
 audit_X, audit_y = load_audit("Audit")
@@ -296,7 +254,7 @@ if "Audit" in datasets:
 
 audit_na_X, audit_na_y = load_audit("AuditNA")
 
-def build_audit_na(classifier, name, with_proba = True, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
+def build_audit_na(classifier, name, with_proba = True, predict_params = {}, predict_proba_params = {}, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
 	employment_mapping = {
 		"CONSULTANT" : "PRIVATE",
 		"PSFEDERAL" : "PUBLIC",
@@ -326,9 +284,9 @@ def build_audit_na(classifier, name, with_proba = True, predict_transformer = No
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
-	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
+	adjusted = DataFrame(pipeline.predict(audit_na_X, **predict_params), columns = ["Adjusted"])
 	if with_proba == True:
-		adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
+		adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X, **predict_proba_params), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	if isinstance(classifier, DecisionTreeClassifier):
 		Xt = pipeline_transform(pipeline, audit_na_X)
@@ -339,7 +297,7 @@ def build_audit_na(classifier, name, with_proba = True, predict_transformer = No
 if "Audit" in datasets:
 	build_audit_na(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
-	build_audit_na(OptimalXGBClassifier(objective = "binary:logistic", ntree_limit = 11, random_state = 13), "XGBAuditNA", predict_transformer = Alias(ExpressionTransformer("X[0]"), name = "eval(Adjusted)", prefit = True))
+	build_audit_na(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAuditNA", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, predict_transformer = Alias(ExpressionTransformer("X[0]"), name = "eval(Adjusted)", prefit = True), ntree_limit = 71)
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
@@ -409,7 +367,7 @@ if "Versicolor" in datasets:
 
 iris_X, iris_y = load_iris("Iris")
 
-def build_iris(classifier, name, with_proba = True, **pmml_options):
+def build_iris(classifier, name, with_proba = True, predict_params = {}, predict_proba_params = {}, **pmml_options):
 	pipeline = Pipeline([
 		("pipeline", Pipeline([
 			("mapper", DataFrameMapper([
@@ -430,13 +388,13 @@ def build_iris(classifier, name, with_proba = True, **pmml_options):
 	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values, iris_y.name)
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
-		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
-		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
 	store_pkl(pipeline, name)
-	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species = DataFrame(pipeline.predict(iris_X, **predict_params), columns = ["Species"])
 	if with_proba == True:
-		species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+		species_proba = DataFrame(pipeline.predict_proba(iris_X, **predict_proba_params), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
 
@@ -447,7 +405,7 @@ if "Iris" in datasets:
 	build_iris(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesIris")
 	build_iris(GradientBoostingClassifier(init = None, n_estimators = 17, random_state = 13), "GradientBoostingIris")
 	build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
-	build_iris(OptimalLGBMClassifier(objective = "multiclass", n_estimators = 7, num_iteration = 3), "LGBMIris", num_iteration = 3)
+	build_iris(LGBMClassifier(objective = "multiclass", n_estimators = 7), "LGBMIris", predict_params = {"num_iteration" : 3}, predict_proba_params = {"num_iteration" : 3}, num_iteration = 3)
 	build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 	build_iris(LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)
 	build_iris(LogisticRegression(multi_class = "multinomial", solver = "lbfgs"), "MultinomialLogisticRegressionIris")
@@ -464,7 +422,7 @@ if "Iris" in datasets:
 	build_iris(SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
 	build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)
-	build_iris(OptimalXGBClassifier(objective = "multi:softprob", ntree_limit = 7), "XGBIris", ntree_limit = 7)
+	build_iris(XGBClassifier(objective = "multi:softprob"), "XGBIris", predict_params = {"ntree_limit" : 7}, predict_proba_params = {"ntree_limit" : 7}, ntree_limit = 7)
 
 if "Iris" in datasets:
 	mapper = DataFrameMapper([
@@ -537,7 +495,7 @@ auto_X, auto_y = load_auto("Auto")
 auto_X["model_year"] = auto_X["model_year"].astype(int)
 auto_X["origin"] = auto_X["origin"].astype(int)
 
-def build_auto(regressor, name, **pmml_options):
+def build_auto(regressor, name, predict_params = {}, **pmml_options):
 	cylinders_origin_mapping = {
 		(8, 1) : "8/1",
 		(6, 1) : "6/1",
@@ -562,11 +520,11 @@ def build_auto(regressor, name, **pmml_options):
 	pipeline.fit(auto_X, auto_y)
 	pipeline.configure(**pmml_options)
 	if isinstance(regressor, XGBRegressor):
-		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
-		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params)
 	store_pkl(pipeline, name)
-	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
+	mpg = DataFrame(pipeline.predict(auto_X, **predict_params), columns = ["mpg"])
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
@@ -585,7 +543,7 @@ if "Auto" in datasets:
 	build_auto(LarsCV(cv = 3), "LarsAuto")
 	build_auto(LassoCV(cv = 3, random_state = 13), "LassoAuto")
 	build_auto(LassoLarsCV(cv = 3), "LassoLarsAuto")
-	build_auto(OptimalLGBMRegressor(objective = "regression", n_estimators = 17, num_iteration = 11), "LGBMAuto", num_iteration = 11)
+	build_auto(LGBMRegressor(objective = "regression", n_estimators = 17), "LGBMAuto", predict_params = {"num_iteration" : 11}, num_iteration = 11)
 	build_auto(LinearRegression(), "LinearRegressionAuto")
 	build_auto(BaggingRegressor(LinearRegression(), max_features = 0.75, random_state = 13), "LinearRegressionEnsembleAuto")
 	build_auto(OrthogonalMatchingPursuitCV(cv = 3), "OMPAuto")
@@ -593,7 +551,7 @@ if "Auto" in datasets:
 	build_auto(RidgeCV(), "RidgeAuto")
 	build_auto(TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
 	build_auto(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor()), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
-	build_auto(OptimalXGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", ntree_limit = 31)
+	build_auto(XGBRegressor(objective = "reg:linear", ntree_limit = 31), "XGBAuto", predict_params = {"ntree_limit" : 31}, ntree_limit = 31)
 	build_auto(XGBRFRegressor(n_estimators = 31, max_depth = 6, random_state = 13), "XGBRFAuto")
 
 if "Auto" in datasets:
