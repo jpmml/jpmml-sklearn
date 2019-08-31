@@ -27,6 +27,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.HasArray;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
+import sklearn.ensemble.EnsembleUtil;
 
 public class BaggingRegressor extends EnsembleRegressor {
 
@@ -45,6 +46,6 @@ public class BaggingRegressor extends EnsembleRegressor {
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
-		return BaggingUtil.transformEstimatorsFeatures(getList("estimators_features_", HasArray.class));
+		return EnsembleUtil.transformEstimatorsFeatures(getList("estimators_features_", HasArray.class));
 	}
 }

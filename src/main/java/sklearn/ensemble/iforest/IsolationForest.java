@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import com.google.common.primitives.Ints;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
@@ -47,9 +48,11 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
+import sklearn.ensemble.EnsembleUtil;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.ScoreDistributionManager;
 import sklearn.tree.Tree;
@@ -71,6 +74,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	public MiningModel encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
 		List<? extends Regressor> estimators = getEstimators();
+		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/8549
 		boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.19") >= 0);
@@ -85,12 +89,17 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 		List<TreeModel> treeModels = new ArrayList<>();
 
-		for(Regressor estimator : estimators){
+		for(int i = 0; i < estimators.size(); i++){
+			Regressor estimator = estimators.get(i);
+			List<Integer> estimatorFeatures = estimatorsFeatures.get(i);
+
+			Schema estimatorSchema = segmentSchema.toSubSchema(Ints.toArray(estimatorFeatures));
+
 			TreeRegressor treeRegressor = (TreeRegressor)estimator;
 
 			Tree tree = treeRegressor.getTree();
 
-			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, predicateManager, scoreDistributionManager, MiningFunction.REGRESSION, segmentSchema);
+			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, predicateManager, scoreDistributionManager, MiningFunction.REGRESSION, estimatorSchema);
 
 			Visitor visitor = new AbstractVisitor(){
 
@@ -209,6 +218,10 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier));
 
 		return TreeModelUtil.transform(this, miningModel);
+	}
+
+	public List<List<Integer>> getEstimatorsFeatures(){
+		return EnsembleUtil.transformEstimatorsFeatures(getList("estimators_features_", HasArray.class));
 	}
 
 	public String getBehaviour(){

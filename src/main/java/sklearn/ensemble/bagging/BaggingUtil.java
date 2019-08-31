@@ -21,8 +21,6 @@ package sklearn.ensemble.bagging;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -30,9 +28,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.HasArray;
 import sklearn.Estimator;
 
 public class BaggingUtil {
@@ -61,18 +57,5 @@ public class BaggingUtil {
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models));
 
 		return miningModel;
-	}
-
-	static
-	public List<List<Integer>> transformEstimatorsFeatures(List<? extends HasArray> estimatorsFeatures){
-		Function<HasArray, List<Integer>> function = new Function<HasArray, List<Integer>>(){
-
-			@Override
-			public List<Integer> apply(HasArray hasArray){
-				return ValueUtil.asIntegers((List)hasArray.getArrayContent());
-			}
-		};
-
-		return Lists.transform(estimatorsFeatures, function);
 	}
 }

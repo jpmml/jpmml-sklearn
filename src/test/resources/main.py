@@ -721,7 +721,7 @@ def build_iforest_housing(iforest, name, **pmml_options):
 	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name)
 
 if "Housing" in datasets:
-	build_iforest_housing(IsolationForest(contamination = 0.1, behaviour = "old", random_state = 13), "IsolationForestHousing")
+	build_iforest_housing(IsolationForest(contamination = 0.1, behaviour = "old", max_features = 3, random_state = 13), "IsolationForestHousing")
 
 def build_ocsvm_housing(svm, name):
 	mapper = DataFrameMapper([
