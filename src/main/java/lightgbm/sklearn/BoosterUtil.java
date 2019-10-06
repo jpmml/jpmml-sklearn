@@ -25,7 +25,6 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.HasLightGBMOptions;
-import org.jpmml.lightgbm.LightGBMUtil;
 import sklearn.Estimator;
 
 public class BoosterUtil {
@@ -55,7 +54,7 @@ public class BoosterUtil {
 		options.put(HasLightGBMOptions.OPTION_COMPACT, compact);
 		options.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);
 
-		Schema lgbmSchema = LightGBMUtil.toLightGBMSchema(gbdt, schema);
+		Schema lgbmSchema = gbdt.toLightGBMSchema(schema);
 
 		MiningModel miningModel = gbdt.encodeMiningModel(options, lgbmSchema);
 
