@@ -27,7 +27,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.ByteOrderUtil;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
-import org.jpmml.xgboost.XGBoostUtil;
 import sklearn.Estimator;
 
 public class BoosterUtil {
@@ -55,7 +54,7 @@ public class BoosterUtil {
 		options.put(HasXGBoostOptions.OPTION_COMPACT, compact);
 		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
-		Schema xgbSchema = XGBoostUtil.toXGBoostSchema(schema);
+		Schema xgbSchema = learner.toXGBoostSchema(schema);
 
 		MiningModel miningModel = learner.encodeMiningModel(options, xgbSchema);
 
