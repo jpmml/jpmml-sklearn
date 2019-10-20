@@ -55,6 +55,12 @@ public class SkLearnEncoder extends ModelEncoder {
 	public void renameFeature(Feature feature, FieldName renamedName){
 		FieldName name = feature.getName();
 
+		org.dmg.pmml.Field<?> pmmlField = getField(name);
+
+		if(pmmlField instanceof DataField){
+			throw new IllegalArgumentException("User input field " + name.getValue() + " cannot be renamed");
+		}
+
 		DerivedField derivedField = removeDerivedField(name);
 
 		try {
