@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import com.google.common.base.CaseFormat;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -69,6 +70,14 @@ public class DurationTransformer extends Transformer {
 			throw new IllegalArgumentException(String.valueOf(epochDateTime));
 		}
 
+		String dateFunction = function;
+
+		if(dateFunction.startsWith("date")){
+			dateFunction = dateFunction.substring("date".length(), dateFunction.length());
+		}
+
+		dateFunction = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, dateFunction);
+
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
@@ -76,7 +85,7 @@ public class DurationTransformer extends Transformer {
 
 			Apply apply = PMMLUtil.createApply(function, objectFeature.ref(), PMMLUtil.createConstant(epochDateTime.getYear(), DataType.INTEGER));
 
-			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("days_since_year", objectFeature), OpType.CONTINUOUS, DataType.INTEGER, apply);
+			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName(dateFunction, objectFeature), OpType.CONTINUOUS, DataType.INTEGER, apply);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
