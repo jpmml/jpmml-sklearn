@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.google.common.base.CaseFormat;
-import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -70,6 +70,8 @@ public class DurationTransformer extends Transformer {
 			throw new IllegalArgumentException(String.valueOf(epochDateTime));
 		}
 
+		int year = epochDateTime.getYear();
+
 		String dateFunction = function;
 
 		if(dateFunction.startsWith("date")){
@@ -83,9 +85,9 @@ public class DurationTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			ObjectFeature objectFeature = (ObjectFeature)features.get(i);
 
-			Apply apply = PMMLUtil.createApply(function, objectFeature.ref(), PMMLUtil.createConstant(epochDateTime.getYear(), DataType.INTEGER));
+			FieldName name = FieldName.create(dateFunction + "(" + (FeatureUtil.getName(objectFeature)).getValue() + ", " + year + ")");
 
-			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName(dateFunction, objectFeature), OpType.CONTINUOUS, DataType.INTEGER, apply);
+			DerivedField derivedField = encoder.ensureDerivedField(name, OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(function, objectFeature.ref(), PMMLUtil.createConstant(year, DataType.INTEGER)));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
