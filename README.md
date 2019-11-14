@@ -3,6 +3,20 @@ JPMML-SkLearn
 
 Java library and command-line application for converting [Scikit-Learn](https://scikit-learn.org/) pipelines to PMML.
 
+# Table of Contents #
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+    + [The Python side of operations](#the-python-side-of-operations)
+    + [The JPMML-SkLearn side of operations](#the-jpmml-sklearn-side-of-operations)
+- [Installation](#installation)
+- [Usage](#usage)
+    + [The Python side of operations](#the-python-side-of-operations-1)
+    + [The JPMML-SkLearn side of operations](#the-jpmml-sklearn-side-of-operations-1)
+- [Documentation](#documentation)
+- [License](#license)
+- [Additional information](#additional-information)
+
 # Features #
 
 * Supported Estimator and Transformer types:
@@ -118,7 +132,9 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * [H2O.ai](https://www.h2o.ai/):
     * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
     * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
+    * [`h2o.estimators.isolation_forest.H2OIsolationForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oisolationforestestimator)
     * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
+    * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
   * [LightGBM](https://github.com/Microsoft/LightGBM):
     * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
     * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
