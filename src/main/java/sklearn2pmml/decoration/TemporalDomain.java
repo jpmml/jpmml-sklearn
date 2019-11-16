@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
@@ -45,19 +44,12 @@ public class TemporalDomain extends Domain {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Feature> result = new ArrayList<>();
 
-		OpType opType = getOpType();
-		DataType dataType = getDataType();
-
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
 			WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
 			DataField dataField = wildcardFeature.getField();
-
-			dataField
-				.setOpType(opType)
-				.setDataType(dataType);
 
 			feature = new ObjectFeature(encoder, dataField.getName(), dataField.getDataType());
 

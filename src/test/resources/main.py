@@ -512,6 +512,7 @@ if "Sentiment" in datasets:
 
 auto_X, auto_y = load_auto("Auto")
 
+auto_X["cylinders"] = auto_X["cylinders"].astype(int)
 auto_X["model_year"] = auto_X["model_year"].astype(int)
 auto_X["origin"] = auto_X["origin"].astype(int)
 
@@ -525,12 +526,12 @@ def build_auto(regressor, name, fit_params = {}, predict_params = {}, **pmml_opt
 		(4, 3) : "4/3"
 	}
 	mapper = DataFrameMapper([
-		(["cylinders", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
-		(["cylinders"], Alias(ExpressionTransformer("X[0] % 2.0 > 0.0"), name = "odd(cylinders)", prefit = True)),
-		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 77)"}), # Pre/post 1973 oil crisis effects
-		(["model_year", "origin"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), ConcatTransformer("/"), LabelBinarizer(), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
-		(["displacement", "horsepower", "weight", "acceleration"], [ContinuousDomain(), StandardScaler()]),
-		(["weight", "displacement"], ExpressionTransformer("(X[0] / X[1]) + 0.5"), {"alias" : "weight / displacement + 0.5"})
+		(["cylinders"], [CategoricalDomain(), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0"), name = "odd(cylinders)", prefit = True)]),
+		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
+		(["model_year"], [CategoricalDomain(), Binarizer(threshold = 77)], {"alias" : "bin(model_year, 1977)"}), # Pre/post 1973 oil crisis effects
+		(["model_year", "origin"], [ConcatTransformer("/"), LabelBinarizer(), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
+		(["weight", "displacement"], [ContinuousDomain(), ExpressionTransformer("(X[0] / X[1]) + 0.5")], {"alias" : "weight / displacement + 0.5"}),
+		(["displacement", "horsepower", "weight", "acceleration"], [MultiDomain([None, ContinuousDomain(), None, ContinuousDomain()]), StandardScaler()])
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -572,6 +573,10 @@ if "Auto" in datasets:
 	build_auto(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor()), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
 	build_auto(XGBRFRegressor(n_estimators = 31, max_depth = 6, random_state = 13), "XGBRFAuto")
 
+if "Auto" in datasets:
+	build_auto(TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
+	build_auto(TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedLinearRegressionAuto")
+
 auto_train_mask = numpy.random.choice([False, True], size = (392,), p = [0.5, 0.5])
 auto_test_mask = ~auto_train_mask
 
@@ -591,10 +596,6 @@ def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
 if "Auto" in datasets:
 	build_auto_opt(LGBMRegressor(objective = "regression"), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 	build_auto_opt(XGBRegressor(objective = "reg:linear"), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
-
-if "Auto" in datasets:
-	build_auto(TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
-	build_auto(TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedLinearRegressionAuto")
 
 def build_auto_h2o(regressor, name):
 	transformer = ColumnTransformer(

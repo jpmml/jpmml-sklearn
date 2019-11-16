@@ -25,6 +25,7 @@ import net.razorvine.pickle.objects.ClassDictConstructor;
 import numpy.DType;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
@@ -68,7 +69,14 @@ public class Transformer extends PyClassDict {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				DataField dataField = encoder.updateDataField(wildcardFeature.getName(), opType, dataType);
+				FieldName name = wildcardFeature.getName();
+
+				DataField dataField = encoder.getDataField(name);
+				if(dataField == null){
+					throw new IllegalArgumentException("Field " + name.getValue() + " is undefined");
+				}
+
+				dataField = updateDataField(dataField, opType, dataType, encoder);
 
 				feature = new WildcardFeature(encoder, dataField);
 			}
@@ -77,6 +85,29 @@ public class Transformer extends PyClassDict {
 		}
 
 		return result;
+	}
+
+	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
+		FieldName name = dataField.getName();
+
+		if(encoder.isFrozen(name)){
+			return dataField;
+		}
+
+		switch(dataType){
+			case DOUBLE:
+				// If the DataField element already specifies a non-default data type, then keep it
+				if(!(DataType.DOUBLE).equals(dataField.getDataType())){
+					dataType = dataField.getDataType();
+				}
+				break;
+		}
+
+		dataField
+			.setOpType(opType)
+			.setDataType(dataType);
+
+		return dataField;
 	}
 
 	public List<Feature> updateAndEncodeFeatures(List<Feature> features, SkLearnEncoder encoder){

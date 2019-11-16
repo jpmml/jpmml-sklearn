@@ -26,8 +26,11 @@ import java.util.Map;
 
 import org.dmg.pmml.Counts;
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
@@ -44,6 +47,23 @@ public class Domain extends Transformer {
 
 	public Domain(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
+		FieldName name = dataField.getName();
+
+		if(encoder.isFrozen(name)){
+			throw new IllegalArgumentException("Field " + name.getValue() + " is frozen for type information updates");
+		}
+
+		dataField
+			.setDataType(dataType)
+			.setOpType(opType);
+
+		encoder.setFrozen(name, true);
+
+		return dataField;
 	}
 
 	@Override

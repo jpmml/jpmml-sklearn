@@ -19,6 +19,8 @@
 package org.jpmml.sklearn;
 
 import java.lang.reflect.Field;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -31,18 +33,8 @@ import org.jpmml.converter.ModelEncoder;
 
 public class SkLearnEncoder extends ModelEncoder {
 
-	public DataField updateDataField(FieldName name, OpType opType, DataType dataType){
-		DataField dataField = getDataField(name);
+	private Set<FieldName> frozenFields = new LinkedHashSet<>();
 
-		if(dataField == null){
-			throw new IllegalArgumentException("Field " + name.getValue() + " is undefined");
-		}
-
-		dataField.setOpType(opType);
-		dataField.setDataType(dataType);
-
-		return dataField;
-	}
 
 	public DataField createDataField(FieldName name){
 		return createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
@@ -78,5 +70,20 @@ public class SkLearnEncoder extends ModelEncoder {
 		derivedField.setName(renamedName);
 
 		addDerivedField(derivedField);
+	}
+
+	public boolean isFrozen(FieldName name){
+		return this.frozenFields.contains(name);
+	}
+
+	public void setFrozen(FieldName name, boolean frozen){
+
+		if(frozen){
+			this.frozenFields.add(name);
+		} else
+
+		{
+			this.frozenFields.remove(name);
+		}
 	}
 }
