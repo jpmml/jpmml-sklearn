@@ -332,7 +332,10 @@ Object PrimaryExpression():
 }
 {
 	(
+		LOOKAHEAD(<NAME> <LBRACKET>)
 		result = ArrayIndexingExpression()
+		|
+		result = NameInvocationExpression()
 		|
 		result = ParenthesizedExpression()
 		|
@@ -346,33 +349,37 @@ Object PrimaryExpression():
 
 FieldName ArrayIndexingExpression():
 {
-	Token variable;
+	Token name;
 	Token column;
 }
 {
 	(
 		LOOKAHEAD(<NAME> <LBRACKET> <INT>)
-		variable = <NAME> <LBRACKET> column = <INT> <RBRACKET>
+		name = <NAME> <LBRACKET> column = <INT> <RBRACKET>
 		|
-		variable = <NAME> <LBRACKET> column = <STRING> <RBRACKET>
+		name = <NAME> <LBRACKET> column = <STRING> <RBRACKET>
 	)
 
 	{
+		if(!("X").equals(name.image)){
+			throw new IllegalArgumentException("Name \'" + name.image + "\' is not defined");
+		}
+
 		Feature feature;
 
 		switch(column.kind){
 			case PredicateTranslatorConstants.INT:
 				{
-					int index = Integer.parseInt(column.image);
+					int colIndex = Integer.parseInt(column.image);
 
-					feature = getFeature(index);
+					feature = getFeature(colIndex);
 				}
 				break;
 			case PredicateTranslatorConstants.STRING:
 				{
-					FieldName name = FieldName.create(column.image.substring(1, column.image.length() - 1));
+					String colName = column.image.substring(1, column.image.length() - 1);
 
-					feature = getFeature(name);
+					feature = getFeature(FieldName.create(colName));
 				}
 				break;
 			default:
@@ -380,6 +387,26 @@ FieldName ArrayIndexingExpression():
 		}
 
 		return feature.getName();
+	}
+}
+
+Object NameInvocationExpression():
+{
+	Token name;
+}
+{
+	name = <NAME> {
+		if(("X").equals(name.image)){
+			throw new IllegalArgumentException("Name \'X\' refers to a row vector. Use an array indexing expression X[<column index>] or X[<column name>] to refer to a specific row vector element");
+		} else 
+	
+		{
+			throw new IllegalArgumentException("Name \'" + name.image + "\' is not defined");
+		}
+	}
+
+	{
+		return null;
 	}
 }
 
