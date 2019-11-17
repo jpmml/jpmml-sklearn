@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import numpy.core.UFuncUtil;
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
@@ -38,9 +39,47 @@ import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.visitors.ExpressionCompactor;
-import org.jpmml.model.ValueUtil;
 
 public class ExpressionTranslator extends AbstractTranslator {
+
+	static
+	public boolean isString(Expression expression, List<? extends Feature> features){ 
+
+		if(expression instanceof Constant){
+			Constant constant = (Constant)expression;
+
+			return (DataType.STRING).equals(constant.getDataType());
+		} else
+
+		if(expression instanceof FieldRef){
+			FieldRef fieldRef = (FieldRef)expression;
+
+			Feature feature = getFeature(features, fieldRef.getField());
+
+			return (DataType.STRING).equals(feature.getDataType());
+		} else
+
+		if(expression instanceof Apply){
+			Apply apply = (Apply)expression;
+
+			String function = apply.getFunction();
+			switch(function){
+				case PMMLFunctions.CONCAT:
+				case PMMLFunctions.FORMATDATETIME:
+				case PMMLFunctions.FORMATNUMBER:
+				case PMMLFunctions.LOWERCASE:
+				case PMMLFunctions.REPLACE:
+				case PMMLFunctions.SUBSTRING:
+				case PMMLFunctions.TRIMBLANKS:
+				case PMMLFunctions.UPPERCASE:
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		return false;
+	}
 
 	static
 	public Expression translate(String string, List<? extends Feature> features){
@@ -376,7 +415,17 @@ Expression AdditiveExpression():
 	Expression right;
 }
 {
-	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() { left = PMMLUtil.createApply(translateArithmeticOperator(operator), left, right); })*
+	left = MultiplicativeExpression() ((operator = <PLUS> | operator = <MINUS>) right = MultiplicativeExpression() {
+		List<? extends Feature> features = getFeatures();
+
+		if((operator.kind == PLUS) && (isString(left, features) && isString(right, features))){
+			left = PMMLUtil.createApply(PMMLFunctions.CONCAT, left, right);
+		} else
+
+		{
+			left = PMMLUtil.createApply(translateArithmeticOperator(operator), left, right);
+		}
+	})*
 
 	{
 		return left;
@@ -455,6 +504,8 @@ FieldRef ArrayIndexingExpression():
 	)
 
 	{
+		List<? extends Feature> features = getFeatures();
+
 		if(!("X").equals(name.image)){
 			throw new IllegalArgumentException("Name \'" + name.image + "\' is not defined");
 		}
@@ -466,14 +517,14 @@ FieldRef ArrayIndexingExpression():
 				{
 					int colIndex = Integer.parseInt(column.image);
 
-					feature = getFeature(colIndex);
+					feature = getFeature(features, colIndex);
 				}
 				break;
 			case ExpressionTranslatorConstants.STRING:
 				{
 					String colName = column.image.substring(1, column.image.length() - 1);
 
-					feature = getFeature(FieldName.create(colName));
+					feature = getFeature(features, FieldName.create(colName));
 				}
 				break;
 			default:

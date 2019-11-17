@@ -18,7 +18,9 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
@@ -29,18 +31,26 @@ public class AbstractTranslator {
 	private List<? extends Feature> features = null;
 
 
-	public Feature getFeature(int index){
-		List<? extends Feature> features = getFeatures();
+	public List<? extends Feature> getFeatures(){
+		return this.features;
+	}
+
+	void setFeatures(List<? extends Feature> features){
+		this.features = features;
+	}
+
+	static
+	public Feature getFeature(List<? extends Feature> features, int index){
 
 		if(index >= 0 && index < features.size()){
 			return features.get(index);
 		}
 
-		throw new IllegalArgumentException(String.valueOf(index));
+		throw new IllegalArgumentException("Column index " + index + " not in range " + Arrays.asList(0, features.size()));
 	}
 
-	public Feature getFeature(FieldName name){
-		List<? extends Feature> features = getFeatures();
+	static
+	public Feature getFeature(List<? extends Feature> features, FieldName name){
 
 		for(Feature feature : features){
 
@@ -49,14 +59,10 @@ public class AbstractTranslator {
 			}
 		}
 
-		throw new IllegalArgumentException(name.getValue());
-	}
+		List<String> names = features.stream()
+			.map(feature -> "\'" + (feature.getName()).getValue() + "\'")
+			.collect(Collectors.toList());
 
-	public List<? extends Feature> getFeatures(){
-		return this.features;
-	}
-
-	void setFeatures(List<? extends Feature> features){
-		this.features = features;
+		throw new IllegalArgumentException("Column name \'" + name.getValue() + "\' not in " + names);
 	}
 }

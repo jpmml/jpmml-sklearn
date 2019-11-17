@@ -163,8 +163,9 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.CutTransformer`
     * `sklearn2pmml.preprocessing.DaysSinceYearTransformer`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
-      * Ternary conditional expression `${expression_true} if ${condition} else ${expression_false}`.
-      * Array indexing expressions `X[${position}]` and `X[${name}]`.
+      * Ternary conditional expression `<expression_true> if <condition> else <expression_false>`.
+      * Array indexing expressions `X[<column index>]` and `X[<column name>]`.
+      * String concatenation expressions.
       * Arithmetic operators `+`, `-`, `*`, `/` and `%`.
       * Comparison operators `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.

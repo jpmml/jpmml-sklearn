@@ -21,9 +21,11 @@ package sklearn2pmml.preprocessing;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ExpressionTranslator;
@@ -42,7 +44,20 @@ public class ExpressionTransformer extends Transformer {
 
 		Expression expression = ExpressionTranslator.translate(expr, features);
 
-		DerivedField derivedField = encoder.createDerivedField(FieldName.create("eval(" + expr + ")"), expression);
+		OpType opType;
+		DataType dataType;
+
+		if(ExpressionTranslator.isString(expression, features)){
+			opType = OpType.CATEGORICAL;
+			dataType = DataType.STRING;
+		} else
+
+		{
+			opType = OpType.CONTINUOUS;
+			dataType = DataType.DOUBLE;
+		}
+
+		DerivedField derivedField = encoder.createDerivedField(FieldName.create("eval(" + expr + ")"), opType, dataType, expression);
 
 		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
 	}

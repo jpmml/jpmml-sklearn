@@ -113,6 +113,23 @@ public class ExpressionTranslatorTest extends TranslatorTest {
 	}
 
 	@Test
+	public void translateStringConcatenationExpression(){
+		String string = "\'19\' + X[0] + \'-01-01\'";
+
+		Expression expected = PMMLUtil.createApply(PMMLFunctions.CONCAT)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.CONCAT)
+				.addExpressions(PMMLUtil.createConstant("19", DataType.STRING), new FieldRef(FieldName.create("a")))
+			)
+			.addExpressions(PMMLUtil.createConstant("-01-01", DataType.STRING));
+
+		checkExpression(expected, string, stringFeatures);
+
+		string = "\"19\" + X[\'a\'] + \"-01-01\"";
+
+		checkExpression(expected, string, stringFeatures);
+	}
+
+	@Test
 	public void translateUnaryExpression(){
 		Constant minusOne = PMMLUtil.createConstant("-1", DataType.INTEGER);
 		Constant plusOne = PMMLUtil.createConstant("1", DataType.INTEGER);
