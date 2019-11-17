@@ -67,6 +67,8 @@ public class DType extends CClassDict {
 					return DataType.BOOLEAN;
 				case "builtins.int":
 					return DataType.INTEGER;
+				case "builtins.str":
+					return DataType.STRING;
 				case "numpy.bool_":
 					return DataType.BOOLEAN;
 				case "numpy.int_":

@@ -43,9 +43,30 @@ public class CastTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		DType dtype = getDType();
+		Object dtype = getObject("dtype");
 
-		DataType dataType = dtype.getDataType();
+		DataType dataType;
+
+		if(dtype instanceof String){
+			String stringDType = (String)dtype;
+
+			switch(stringDType){
+				case "datetime64[D]":
+					dataType = DataType.DATE;
+					break;
+				case "datetime64[s]":
+					dataType = DataType.DATE_TIME;
+					break;
+				default:
+					throw new IllegalArgumentException(stringDType);
+			}
+		} else
+
+		{
+			DType numpyDType = super.getDType();
+
+			dataType = numpyDType.getDataType();
+		}
 
 		OpType opType;
 
@@ -53,6 +74,10 @@ public class CastTransformer extends Transformer {
 			case STRING:
 			case BOOLEAN:
 				opType = OpType.CATEGORICAL;
+				break;
+			case DATE:
+			case DATE_TIME:
+				opType = OpType.ORDINAL;
 				break;
 			default:
 				opType = OpType.CONTINUOUS;
@@ -81,6 +106,8 @@ public class CastTransformer extends Transformer {
 						feature = new ContinuousFeature(encoder, derivedField);
 						break;
 					case BOOLEAN:
+					case DATE:
+					case DATE_TIME:
 						// Falls through
 					default:
 						feature = new ObjectFeature(encoder, name, dataType);
