@@ -77,9 +77,15 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 			case "max":
 				return PMMLFunctions.MAX;
 			case "mean":
+			case "avg":
 				return PMMLFunctions.AVG;
 			case "min":
 				return PMMLFunctions.MIN;
+			case "prod":
+			case "product":
+				return PMMLFunctions.PRODUCT;
+			case "sum":
+				return PMMLFunctions.SUM;
 			default:
 				throw new IllegalArgumentException(function);
 		}
