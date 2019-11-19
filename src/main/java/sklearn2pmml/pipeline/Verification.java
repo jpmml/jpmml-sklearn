@@ -37,6 +37,12 @@ public class Verification extends PyClassDict {
 	}
 
 	public int[] getActiveValuesShape(){
+		int[] shape = getArrayShape("active_values");
+
+		if(shape.length == 1){
+			return new int[]{shape[0], 1};
+		}
+
 		return getArrayShape("active_values", 2);
 	}
 

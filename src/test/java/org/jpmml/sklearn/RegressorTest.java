@@ -94,6 +94,16 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateIsotonicRegressionIncrAuto() throws Exception {
+		evaluate("IsotonicRegressionIncr", "Auto");
+	}
+
+	@Test
+	public void evaluateIsotonicRegressionDecrAuto() throws Exception {
+		evaluate("IsotonicRegressionDecr", "Auto");
+	}
+
+	@Test
 	public void evaluateLarsAuto() throws Exception {
 		evaluate("Lars", "Auto");
 	}

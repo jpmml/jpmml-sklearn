@@ -17,6 +17,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.impute import MissingIndicator, SimpleImputer
+from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, HuberRegressor, LarsCV, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDRegressor, TheilSenRegressor
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -576,6 +577,20 @@ if "Auto" in datasets:
 if "Auto" in datasets:
 	build_auto(TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
 	build_auto(TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedLinearRegressionAuto")
+
+def build_auto_isotonic(regressor, auto_isotonic_X, name):
+	pipeline = PMMLPipeline([
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_isotonic_X, auto_y)
+	pipeline.verify(auto_isotonic_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+	mpg = DataFrame(pipeline.predict(auto_isotonic_X), columns = ["mpg"])
+	store_csv(mpg, name)
+
+if "Auto" in datasets:
+	build_auto_isotonic(IsotonicRegression(increasing = True, out_of_bounds = "nan"), auto_X["acceleration"], "IsotonicRegressionIncrAuto")
+	build_auto_isotonic(IsotonicRegression(increasing = False, y_min = 12, y_max = 36, out_of_bounds = "clip"), auto_X["weight"], "IsotonicRegressionDecrAuto")
 
 auto_train_mask = numpy.random.choice([False, True], size = (392,), p = [0.5, 0.5])
 auto_test_mask = ~auto_train_mask
