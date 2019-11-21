@@ -450,15 +450,20 @@ if "Iris" in datasets:
 		(iris_X.columns.values, ContinuousDomain())
 	])
 	iris_Xt = mapper.fit_transform(iris_X)
-	dt_classifier = DecisionTreeClassifier(random_state = 13)
-	dt_classifier.fit(iris_Xt, iris_y)
-	lr_classifier = LogisticRegression(multi_class = "ovr", solver = "liblinear")
-	lr_classifier.fit(iris_Xt, iris_y)
+	dt_pipeline = PMMLPipeline([
+		("classifier", DecisionTreeClassifier(random_state = 13))
+	])
+	dt_pipeline.fit(iris_Xt, iris_y)
+	lr_pipeline = PMMLPipeline([
+		("scaler", StandardScaler()),
+		("classifier", LogisticRegression(multi_class = "ovr", solver = "liblinear"))
+	])
+	lr_pipeline.fit(iris_Xt, iris_y)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("estimator", SelectFirstEstimator([
-			("X[2] <= 3", dt_classifier),
-			(str(True), lr_classifier)
+			("X[2] <= 3", dt_pipeline),
+			(str(True), lr_pipeline)
 		]))
 	])
 	pipeline.active_fields = iris_X.columns.values

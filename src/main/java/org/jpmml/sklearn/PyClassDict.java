@@ -34,6 +34,28 @@ public class PyClassDict extends ClassDict {
 		super(module, name);
 	}
 
+	public String getPyModule(){
+		String className = getClassName();
+
+		int dot = className.lastIndexOf('.');
+		if(dot > -1){
+			return className.substring(0, dot);
+		}
+
+		return null;
+	}
+
+	public String getPyName(){
+		String className = getClassName();
+
+		int dot = className.lastIndexOf('.');
+		if(dot > -1){
+			return className.substring(dot + 1);
+		}
+
+		return className;
+	}
+
 	public <E> E get(String name, Class<? extends E> clazz){
 		Object value = get(name);
 

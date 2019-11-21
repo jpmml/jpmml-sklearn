@@ -22,10 +22,23 @@ import java.util.List;
 
 import sklearn.pipeline.FeatureUnion;
 import sklearn.pipeline.Pipeline;
+import sklearn.pipeline.PipelineTransformer;
 
 public class TransformerUtil {
 
 	private TransformerUtil(){
+	}
+
+	static
+	public int getNumberOfFeatures(Transformer transformer){
+
+		if(transformer instanceof HasNumberOfFeatures){
+			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)transformer;
+
+			return hasNumberOfFeatures.getNumberOfFeatures();
+		}
+
+		return -1;
 	}
 
 	static
@@ -40,8 +53,10 @@ public class TransformerUtil {
 				transformers = featureUnion.getTransformers();
 			} else
 
-			if(transformer instanceof Pipeline){
-				Pipeline pipeline = (Pipeline)transformer;
+			if(transformer instanceof PipelineTransformer){
+				PipelineTransformer pipelineTransformer = (PipelineTransformer)transformer;
+
+				Pipeline pipeline = pipelineTransformer.getPipeline();
 
 				transformers = pipeline.getTransformers();
 			} else

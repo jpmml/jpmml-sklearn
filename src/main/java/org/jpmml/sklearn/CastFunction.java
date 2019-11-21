@@ -38,6 +38,13 @@ public class CastFunction<E> implements Function<Object, E> {
 		Class<? extends E> clazz = getClazz();
 
 		try {
+
+			if(object instanceof Castable){
+				Castable castable = (Castable)object;
+
+				object = castable.castTo(clazz);
+			}
+
 			return clazz.cast(object);
 		} catch(ClassCastException cce){
 			throw new IllegalArgumentException(formatMessage(object), cce);
