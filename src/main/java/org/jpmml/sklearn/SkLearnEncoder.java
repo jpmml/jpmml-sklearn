@@ -19,8 +19,8 @@
 package org.jpmml.sklearn;
 
 import java.lang.reflect.Field;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -30,10 +30,11 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
+import sklearn2pmml.decoration.Domain;
 
 public class SkLearnEncoder extends ModelEncoder {
 
-	private Set<FieldName> frozenFields = new LinkedHashSet<>();
+	private Map<FieldName, Domain> frozenFields = new LinkedHashMap<>();
 
 
 	public DataField createDataField(FieldName name){
@@ -73,13 +74,13 @@ public class SkLearnEncoder extends ModelEncoder {
 	}
 
 	public boolean isFrozen(FieldName name){
-		return this.frozenFields.contains(name);
+		return this.frozenFields.containsKey(name);
 	}
 
-	public void setFrozen(FieldName name, boolean frozen){
+	public void setFrozen(FieldName name, Domain domain){
 
-		if(frozen){
-			this.frozenFields.add(name);
+		if(domain != null){
+			this.frozenFields.put(name, domain);
 		} else
 
 		{
