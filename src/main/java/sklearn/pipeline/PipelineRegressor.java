@@ -18,24 +18,18 @@
  */
 package sklearn.pipeline;
 
-import java.util.List;
-
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
-import sklearn.ClassifierUtil;
-import sklearn.Estimator;
-import sklearn.HasClasses;
-import sklearn.HasEstimator;
+import sklearn.Regressor;
 
-public class PipelineEstimator extends Estimator implements HasClasses, HasEstimator<Estimator> {
+public class PipelineRegressor extends Regressor {
 
 	private Pipeline pipeline = null;
 
 
-	public PipelineEstimator(Pipeline pipeline){
+	public PipelineRegressor(Pipeline pipeline){
 		super(pipeline.getPyModule(), pipeline.getPyName());
 
 		setPipeline(pipeline);
@@ -63,31 +57,10 @@ public class PipelineEstimator extends Estimator implements HasClasses, HasEstim
 	}
 
 	@Override
-	public MiningFunction getMiningFunction(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getMiningFunction();
-	}
-
-	@Override
 	public boolean isSupervised(){
-		Estimator estimator = getEstimator();
+		Regressor regressor = getFinalRegressor();
 
-		return estimator.isSupervised();
-	}
-
-	@Override
-	public List<?> getClasses(){
-		Estimator estimator = getEstimator();
-
-		return ClassifierUtil.getClasses(estimator);
-	}
-
-	@Override
-	public Estimator getEstimator(){
-		Pipeline pipeline = getPipeline();
-
-		return pipeline.getFinalEstimator();
+		return regressor.isSupervised();
 	}
 
 	@Override
@@ -95,6 +68,12 @@ public class PipelineEstimator extends Estimator implements HasClasses, HasEstim
 		Pipeline pipeline = getPipeline();
 
 		return pipeline.encodeModel(schema);
+	}
+
+	public Regressor getFinalRegressor(){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.getFinalEstimator(Regressor.class);
 	}
 
 	public Pipeline getPipeline(){

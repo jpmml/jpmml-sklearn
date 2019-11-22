@@ -25,9 +25,11 @@ import org.jpmml.sklearn.CastFunction;
 import org.jpmml.sklearn.Castable;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.TupleUtil;
+import sklearn.Classifier;
 import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.PassThrough;
+import sklearn.Regressor;
 import sklearn.Transformer;
 
 public class Pipeline extends Composite implements Castable {
@@ -105,6 +107,10 @@ public class Pipeline extends Composite implements Castable {
 
 	@Override
 	public Estimator getFinalEstimator(){
+		return getFinalEstimator(Estimator.class);
+	}
+
+	public <E extends Estimator> E getFinalEstimator(Class<? extends E> clazz){
 		List<Object[]> steps = getSteps();
 
 		if(steps.size() < 1){
@@ -115,10 +121,10 @@ public class Pipeline extends Composite implements Castable {
 
 		Object estimator = TupleUtil.extractElement(finalStep, 1);
 
-		CastFunction<Estimator> castFunction = new CastFunction<Estimator>(Estimator.class){
+		CastFunction<E> castFunction = new CastFunction<E>(clazz){
 
 			@Override
-			public Estimator apply(Object object){
+			public E apply(Object object){
 
 				if(("passthrough").equals(object)){
 					return null;
@@ -145,6 +151,14 @@ public class Pipeline extends Composite implements Castable {
 
 		if((Estimator.class).equals(clazz)){
 			return toEstimator();
+		} else
+
+		if((Classifier.class).equals(clazz)){
+			return toClassifier();
+		} else
+
+		if((Regressor.class).equals(clazz)){
+			return toRegressor();
 		}
 
 		return this;
@@ -164,7 +178,25 @@ public class Pipeline extends Composite implements Castable {
 	}
 
 	public Estimator toEstimator(){
-		return new PipelineEstimator(this);
+		Estimator estimator = getFinalEstimator();
+
+		if(estimator instanceof Classifier){
+			return toClassifier();
+		} else
+
+		if(estimator instanceof Regressor){
+			return toRegressor();
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	public Classifier toClassifier(){
+		return new PipelineClassifier(this);
+	}
+
+	public Regressor toRegressor(){
+		return new PipelineRegressor(this);
 	}
 
 	public List<Object[]> getSteps(){
