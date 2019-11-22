@@ -20,9 +20,9 @@ package sklearn;
 
 import java.util.List;
 
-public class EstimatorUtil {
+public class EstimatorEnsembleUtil {
 
-	private EstimatorUtil(){
+	private EstimatorEnsembleUtil(){
 	}
 
 	static

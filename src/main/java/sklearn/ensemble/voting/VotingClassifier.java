@@ -31,7 +31,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
+import sklearn.EstimatorEnsembleUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class VotingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
@@ -42,7 +42,7 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 
 	@Override
 	public int getNumberOfFeatures(){
-		return EstimatorUtil.getNumberOfFeatures(this);
+		return EstimatorEnsembleUtil.getNumberOfFeatures(this);
 	}
 
 	@Override
