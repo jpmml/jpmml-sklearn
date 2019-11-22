@@ -31,7 +31,7 @@ import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Composite extends PyClassDict implements HasNumberOfFeatures {
+public class Composite extends PyClassDict implements HasNumberOfFeatures, HasType {
 
 	public Composite(String module, String name){
 		super(module, name);
@@ -69,6 +69,7 @@ public class Composite extends PyClassDict implements HasNumberOfFeatures {
 		return -1;
 	}
 
+	@Override
 	public OpType getOpType(){
 
 		if(hasTransformers()){
@@ -88,6 +89,7 @@ public class Composite extends PyClassDict implements HasNumberOfFeatures {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public DataType getDataType(){
 
 		if(hasTransformers()){

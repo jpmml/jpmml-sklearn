@@ -34,7 +34,7 @@ import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Transformer extends PyClassDict {
+public class Transformer extends PyClassDict implements HasType {
 
 	public Transformer(String module, String name){
 		super(module, name);
@@ -43,10 +43,12 @@ public class Transformer extends PyClassDict {
 	abstract
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder);
 
+	@Override
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
 	}
 
+	@Override
 	public DataType getDataType(){
 		return DataType.DOUBLE;
 	}

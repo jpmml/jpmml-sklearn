@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract
-public class Estimator extends PyClassDict implements HasNumberOfFeatures {
+public class Estimator extends PyClassDict implements HasNumberOfFeatures, HasType {
 
 	public Estimator(String module, String name){
 		super(module, name);
@@ -67,10 +67,12 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures {
 		return -1;
 	}
 
+	@Override
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
 	}
 
+	@Override
 	public DataType getDataType(){
 		return DataType.DOUBLE;
 	}
