@@ -35,6 +35,13 @@ public class MissingIndicator extends Transformer implements HasNumberOfFeatures
 	}
 
 	@Override
+	public int getNumberOfFeatures(){
+		int[] shape = getFeatureIndicesShape();
+
+		return shape[0];
+	}
+
+	@Override
 	public OpType getOpType(){
 		throw new UnsupportedOperationException();
 	}
@@ -42,13 +49,6 @@ public class MissingIndicator extends Transformer implements HasNumberOfFeatures
 	@Override
 	public DataType getDataType(){
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getFeatureIndicesShape();
-
-		return shape[0];
 	}
 
 	@Override

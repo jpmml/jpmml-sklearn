@@ -42,20 +42,6 @@ public class PipelineEstimator extends Estimator implements HasClasses, HasEstim
 	}
 
 	@Override
-	public MiningFunction getMiningFunction(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getMiningFunction();
-	}
-
-	@Override
-	public boolean isSupervised(){
-		Estimator estimator = getEstimator();
-
-		return estimator.isSupervised();
-	}
-
-	@Override
 	public int getNumberOfFeatures(){
 		Pipeline pipeline = getPipeline();
 
@@ -77,6 +63,20 @@ public class PipelineEstimator extends Estimator implements HasClasses, HasEstim
 	}
 
 	@Override
+	public MiningFunction getMiningFunction(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getMiningFunction();
+	}
+
+	@Override
+	public boolean isSupervised(){
+		Estimator estimator = getEstimator();
+
+		return estimator.isSupervised();
+	}
+
+	@Override
 	public List<?> getClasses(){
 		Estimator estimator = getEstimator();
 
@@ -84,17 +84,17 @@ public class PipelineEstimator extends Estimator implements HasClasses, HasEstim
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
-		Pipeline pipeline = getPipeline();
-
-		return pipeline.encodeModel(schema);
-	}
-
-	@Override
 	public Estimator getEstimator(){
 		Pipeline pipeline = getPipeline();
 
 		return pipeline.getFinalEstimator();
+	}
+
+	@Override
+	public Model encodeModel(Schema schema){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.encodeModel(schema);
 	}
 
 	public Pipeline getPipeline(){

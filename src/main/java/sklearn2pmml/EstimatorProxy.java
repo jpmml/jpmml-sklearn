@@ -56,20 +56,6 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
-	public MiningFunction getMiningFunction(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getMiningFunction();
-	}
-
-	@Override
-	public boolean isSupervised(){
-		Estimator estimator = getEstimator();
-
-		return estimator.isSupervised();
-	}
-
-	@Override
 	public int getNumberOfFeatures(){
 		Estimator estimator = getEstimator();
 
@@ -88,6 +74,20 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		Estimator estimator = getEstimator();
 
 		return estimator.getDataType();
+	}
+
+	@Override
+	public MiningFunction getMiningFunction(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getMiningFunction();
+	}
+
+	@Override
+	public boolean isSupervised(){
+		Estimator estimator = getEstimator();
+
+		return estimator.isSupervised();
 	}
 
 	@Override

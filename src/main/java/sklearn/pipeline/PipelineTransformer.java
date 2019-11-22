@@ -39,6 +39,13 @@ public class PipelineTransformer extends Transformer implements HasNumberOfFeatu
 	}
 
 	@Override
+	public int getNumberOfFeatures(){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.getNumberOfFeatures();
+	}
+
+	@Override
 	public OpType getOpType(){
 		Pipeline pipeline = getPipeline();
 
@@ -50,13 +57,6 @@ public class PipelineTransformer extends Transformer implements HasNumberOfFeatu
 		Pipeline pipeline = getPipeline();
 
 		return pipeline.getDataType();
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		Pipeline pipeline = getPipeline();
-
-		return pipeline.getNumberOfFeatures();
 	}
 
 	@Override

@@ -68,6 +68,11 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	@Override
+	public int getNumberOfFeatures(){
+		return 1;
+	}
+
+	@Override
 	public OpType getOpType(){
 		return OpType.CATEGORICAL;
 	}
@@ -75,11 +80,6 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	@Override
 	public DataType getDataType(){
 		return DataType.STRING;
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		return 1;
 	}
 
 	@Override

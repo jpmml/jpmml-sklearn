@@ -43,20 +43,6 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures, HasTy
 	abstract
 	public Model encodeModel(Schema schema);
 
-	public boolean isSupervised(){
-		MiningFunction miningFunction = getMiningFunction();
-
-		switch(miningFunction){
-			case CLASSIFICATION:
-			case REGRESSION:
-				return true;
-			case CLUSTERING:
-				return false;
-			default:
-				throw new IllegalArgumentException();
-		}
-	}
-
 	@Override
 	public int getNumberOfFeatures(){
 
@@ -75,6 +61,20 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures, HasTy
 	@Override
 	public DataType getDataType(){
 		return DataType.DOUBLE;
+	}
+
+	public boolean isSupervised(){
+		MiningFunction miningFunction = getMiningFunction();
+
+		switch(miningFunction){
+			case CLASSIFICATION:
+			case REGRESSION:
+				return true;
+			case CLUSTERING:
+				return false;
+			default:
+				throw new IllegalArgumentException();
+		}
 	}
 
 	public Object getOption(String key, Object defaultValue){
