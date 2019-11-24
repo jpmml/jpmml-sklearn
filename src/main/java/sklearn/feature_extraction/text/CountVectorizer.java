@@ -208,6 +208,10 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		return getBoolean("binary");
 	}
 
+	public DType getDType(){
+		return (DType)getDType(false);
+	}
+
 	public Boolean getLowercase(){
 		return getBoolean("lowercase");
 	}

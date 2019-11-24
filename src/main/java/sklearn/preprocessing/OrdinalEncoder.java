@@ -95,4 +95,8 @@ public class OrdinalEncoder extends Transformer {
 	public List<List<?>> getCategories(){
 		return EncoderUtil.transformCategories(getList("categories_", HasArray.class));
 	}
+
+	public DType getDType(){
+		return (DType)getDType(false);
+	}
 }

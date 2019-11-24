@@ -43,7 +43,7 @@ public class CastTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Object dtype = getObject("dtype");
+		Object dtype = getDType();
 
 		DataType dataType;
 
@@ -63,7 +63,7 @@ public class CastTransformer extends Transformer {
 		} else
 
 		{
-			DType numpyDType = super.getDType();
+			DType numpyDType = (DType)dtype;
 
 			dataType = numpyDType.getDataType();
 		}
@@ -119,5 +119,9 @@ public class CastTransformer extends Transformer {
 		}
 
 		return result;
+	}
+
+	public Object getDType(){
+		return getDType(true);
 	}
 }

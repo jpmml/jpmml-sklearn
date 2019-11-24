@@ -118,15 +118,23 @@ public class Transformer extends PyClassDict implements HasType {
 		return encodeFeatures(features, encoder);
 	}
 
-	public DType getDType(){
-		Object dtype = getObject("dtype");
+	protected Object getDType(boolean extended){
+		Object dtype = get("dtype");
+
+		if(dtype instanceof String){
+			String string = (String)dtype;
+
+			if(extended){
+				return string;
+			}
+		} else
 
 		if(dtype instanceof ClassDictConstructor){
 			ClassDictConstructor classDictConstructor = (ClassDictConstructor)dtype;
 
-			dtype = ClassDictConstructorUtil.construct(classDictConstructor, DType.class);
+			return ClassDictConstructorUtil.construct(classDictConstructor, DType.class);
 		}
 
-		return (DType)dtype;
+		return get("dtype", DType.class);
 	}
 }
