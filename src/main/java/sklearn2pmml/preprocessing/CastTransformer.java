@@ -21,7 +21,6 @@ package sklearn2pmml.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
@@ -34,6 +33,7 @@ import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class CastTransformer extends Transformer {
 
@@ -45,44 +45,8 @@ public class CastTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Object dtype = getDType();
 
-		DataType dataType;
-
-		if(dtype instanceof String){
-			String stringDType = (String)dtype;
-
-			switch(stringDType){
-				case "datetime64[D]":
-					dataType = DataType.DATE;
-					break;
-				case "datetime64[s]":
-					dataType = DataType.DATE_TIME;
-					break;
-				default:
-					throw new IllegalArgumentException(stringDType);
-			}
-		} else
-
-		{
-			DType numpyDType = (DType)dtype;
-
-			dataType = numpyDType.getDataType();
-		}
-
-		OpType opType;
-
-		switch(dataType){
-			case STRING:
-			case BOOLEAN:
-				opType = OpType.CATEGORICAL;
-				break;
-			case DATE:
-			case DATE_TIME:
-				opType = OpType.ORDINAL;
-				break;
-			default:
-				opType = OpType.CONTINUOUS;
-				break;
-		}
+		OpType opType = TransformerUtil.getOpType(dtype);
+		DataType dataType = TransformerUtil.getDataType(dtype);
 
 		List<Feature> result = new ArrayList<>();
 

@@ -31,6 +31,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.ExpressionTranslator;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class ExpressionTransformer extends Transformer {
 
@@ -40,26 +41,41 @@ public class ExpressionTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Object dtype = getDType();
 		String expr = getExpr();
 
 		Expression expression = ExpressionTranslator.translate(expr, features);
 
-		OpType opType;
 		DataType dataType;
 
-		if(ExpressionTranslator.isString(expression, features)){
-			opType = OpType.CATEGORICAL;
-			dataType = DataType.STRING;
+		if(dtype != null){
+			dataType = TransformerUtil.getDataType(dtype);
 		} else
 
 		{
-			opType = OpType.CONTINUOUS;
-			dataType = DataType.DOUBLE;
+			if(ExpressionTranslator.isString(expression, features)){
+				dataType = DataType.STRING;
+			} else
+
+			{
+				dataType = DataType.DOUBLE;
+			}
 		}
+
+		OpType opType = TransformerUtil.getOpType(dataType);
 
 		DerivedField derivedField = encoder.createDerivedField(FieldName.create("eval(" + expr + ")"), opType, dataType, expression);
 
 		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
+	}
+
+	public Object getDType(){
+
+		if(!containsKey("dtype")){
+			return null;
+		}
+
+		return getDType(true);
 	}
 
 	public String getExpr(){

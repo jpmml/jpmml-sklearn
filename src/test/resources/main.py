@@ -270,7 +270,7 @@ def build_audit_na(classifier, name, with_proba = True, fit_params = {}, predict
 		"MISSING_VALUE" : 0.5
 	}
 	mapper = DataFrameMapper(
-		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("X[0] if pandas.notnull(X[0]) else -999"), name = "flag_missing(Age, -999)"), Imputer(missing_values = -999)])] +
+		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("X[0] if pandas.notnull(X[0]) else -999", dtype = int), name = "flag_missing(Age, -999)"), SimpleImputer(missing_values = -999, strategy = "constant", fill_value = 38)])] +
 		[(["Age"], MissingIndicator())] +
 		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else X[0]"), name = "flag_missing(Hours, -999)"), SimpleImputer(missing_values = -999, add_indicator = True)])] +
 		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False), SimpleImputer(strategy = "median", add_indicator = True)])] +
