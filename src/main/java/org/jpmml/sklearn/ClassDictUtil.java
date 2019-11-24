@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.razorvine.pickle.objects.ClassDict;
+import sklearn2pmml.decoration.Alias;
 
 public class ClassDictUtil {
 
@@ -154,6 +155,11 @@ public class ClassDictUtil {
 		Class<?> clazz = object.getClass();
 
 		return "Java class " + clazz.getName();
+	}
+
+	static
+	public String formatAliasExample(){
+		return (Alias.class).getSimpleName() + "(transformer = ..., name = ...)";
 	}
 
 	static

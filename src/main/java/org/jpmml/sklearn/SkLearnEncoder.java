@@ -30,6 +30,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
+import sklearn2pmml.decoration.Alias;
 import sklearn2pmml.decoration.Domain;
 
 public class SkLearnEncoder extends ModelEncoder {
@@ -43,6 +44,22 @@ public class SkLearnEncoder extends ModelEncoder {
 
 	public DerivedField createDerivedField(FieldName name, Expression expression){
 		return createDerivedField(name, OpType.CONTINUOUS, DataType.DOUBLE, expression);
+	}
+
+	@Override
+	public void addDerivedField(DerivedField derivedField){
+
+		try {
+			super.addDerivedField(derivedField);
+		} catch(RuntimeException re){
+			FieldName name = derivedField.getName();
+
+			String message = "Field " + name.getValue() + " is already defined. " +
+				"Please refactor the pipeline so that it would not contain duplicate field declarations, " +
+				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + ClassDictUtil.formatAliasExample() + ")";
+
+			throw new IllegalArgumentException(message, re);
+		}
 	}
 
 	public void renameFeature(Feature feature, FieldName renamedName){
