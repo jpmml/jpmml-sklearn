@@ -33,6 +33,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.TransformerUtil;
 
 public class CategoricalDomain extends Domain {
 
@@ -47,7 +48,12 @@ public class CategoricalDomain extends Domain {
 
 	@Override
 	public DataType getDataType(){
+		Object dtype = getDType();
 		Boolean withData = getWithData();
+
+		if(dtype != null){
+			return TransformerUtil.getDataType(dtype);
+		} // End if
 
 		if(withData){
 			List<?> data = getData();

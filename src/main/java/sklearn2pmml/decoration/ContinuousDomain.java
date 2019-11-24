@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.NumericInfo;
 import org.dmg.pmml.OpType;
@@ -33,6 +34,7 @@ import org.jpmml.converter.OutlierDecorator;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.TransformerUtil;
 
 public class ContinuousDomain extends Domain {
 
@@ -43,6 +45,17 @@ public class ContinuousDomain extends Domain {
 	@Override
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
+	}
+
+	@Override
+	public DataType getDataType(){
+		Object dtype = getDType();
+
+		if(dtype != null){
+			return TransformerUtil.getDataType(dtype);
+		}
+
+		return DataType.DOUBLE;
 	}
 
 	@Override

@@ -108,6 +108,15 @@ public class Domain extends Transformer {
 		return features;
 	}
 
+	public Object getDType(){
+
+		if(!containsKey("dtype")){
+			return null;
+		}
+
+		return super.getDType(true);
+	}
+
 	public String getMissingValueTreatment(){
 		return getOptionalString("missing_value_treatment");
 	}
