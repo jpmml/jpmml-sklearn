@@ -37,6 +37,7 @@ public class UFuncUtil {
 
 		switch(module){
 			case "numpy":
+			case "numpy.core":
 				return encodeNumpyUFunc(name, expression);
 			default:
 				throw new IllegalArgumentException(module);
