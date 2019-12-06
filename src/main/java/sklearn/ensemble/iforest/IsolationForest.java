@@ -177,7 +177,9 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(0.5d), PMMLUtil.createApply(PMMLFunctions.POW, PMMLUtil.createConstant(2d), PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(-1d), fieldRef)));
+				Number offset = getOffset();
+
+				return PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(-offset.doubleValue()), PMMLUtil.createApply(PMMLFunctions.POW, PMMLUtil.createConstant(2d), PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(-1d), fieldRef)));
 			}
 		};
 
@@ -200,7 +202,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 						threshold = getThreshold();
 					} else
 
-					if(("new").equals(behaviour)){
+					if(("new").equals(behaviour) || ("deprecated").equals(behaviour)){
 						threshold = 0d;
 					} else
 

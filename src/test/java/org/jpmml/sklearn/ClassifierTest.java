@@ -319,7 +319,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", "Iris", new FloatEquivalence(4));
+		evaluate("XGB", "Iris", new FloatEquivalence(8));
 	}
 
 	@Test

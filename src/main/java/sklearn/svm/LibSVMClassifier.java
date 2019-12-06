@@ -106,7 +106,14 @@ public class LibSVMClassifier extends Classifier {
 	}
 
 	public List<Integer> getSupportSizes(){
-		return getIntegerArray("n_support_");
+
+		// SkLearn 0.21
+		if(containsKey("n_support_")){
+			return getIntegerArray("n_support_");
+		}
+
+		// SkLearn 0.22+
+		return getIntegerArray("_n_support");
 	}
 
 	public List<? extends Number> getDualCoef(){
