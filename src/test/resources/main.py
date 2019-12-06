@@ -722,7 +722,7 @@ if "Housing" in datasets:
 	build_housing(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("lr", LinearRegression())]), "VotingEnsembleHousing")
 
 #
-# Anomaly detection
+# Outlier detection
 #
 
 def build_iforest_housing(iforest, name, **pmml_options):
