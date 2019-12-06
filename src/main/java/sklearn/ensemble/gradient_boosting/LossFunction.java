@@ -32,7 +32,7 @@ public class LossFunction extends PyClassDict {
 	}
 
 	abstract
-	public List<? extends Number> computeInitRawPrediction(HasPriorProbability init);
+	public List<? extends Number> computeInitialPredictions(HasPriorProbability init);
 
 	abstract
 	public Transformation createTransformation();

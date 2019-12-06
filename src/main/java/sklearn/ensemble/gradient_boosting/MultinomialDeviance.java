@@ -31,7 +31,7 @@ public class MultinomialDeviance extends LossFunction {
 	}
 
 	@Override
-	public List<? extends Number> computeInitRawPrediction(HasPriorProbability init){
+	public List<? extends Number> computeInitialPredictions(HasPriorProbability init){
 		Integer k = getK();
 
 		List<Double> result = new ArrayList<>();

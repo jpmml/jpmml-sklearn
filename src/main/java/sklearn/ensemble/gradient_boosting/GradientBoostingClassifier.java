@@ -20,6 +20,7 @@ package sklearn.ensemble.gradient_boosting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
@@ -32,6 +33,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
@@ -65,6 +67,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
+		String sklearnVersion = getSkLearnVersion();
 		LossFunction loss = getLoss();
 
 		int numberOfClasses = loss.getK();
@@ -73,6 +76,14 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		Number learningRate = getLearningRate();
 
+		IntFunction<Number> initialPredictions = init::getPriorProbability;
+
+		if(sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.21") >= 0){
+			List<? extends Number> computedInitialPredictions = loss.computeInitialPredictions(init);
+
+			initialPredictions = computedInitialPredictions::get;
+		}
+
 		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
@@ -80,9 +91,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 		if(numberOfClasses == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			List<? extends Number> initRawPrediction = loss.computeInitRawPrediction(init);
-
-			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, initRawPrediction.get(0), learningRate, segmentSchema)
+			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.NONE, true, schema);
@@ -90,8 +99,6 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		if(numberOfClasses >= 3){
 			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
-
-			List<? extends Number> initRawPrediction = loss.computeInitRawPrediction(init);
 
 			List<? extends TreeRegressor> estimators = getEstimators();
 
@@ -108,7 +115,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 					}
 				};
 
-				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initRawPrediction.get(i), learningRate, segmentSchema)
+				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initialPredictions.apply(i), learningRate, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 				miningModels.add(miningModel);
