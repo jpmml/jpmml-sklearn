@@ -56,13 +56,41 @@ public class ExpressionTranslatorTest extends TranslatorTest {
 	}
 
 	@Test
+	public void translateIdentityComparisonExpression(){
+		String string = "X[0] is None";
+
+		FieldRef first = new FieldRef(FieldName.create("a"));
+
+		Expression expected = PMMLUtil.createApply(PMMLFunctions.ISMISSING)
+			.addExpressions(first);
+
+		checkExpression(expected, string, doubleFeatures);
+
+		string = "(X['a'] + 1) is not None";
+
+		expected = PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.ADD)
+				.addExpressions(first, PMMLUtil.createConstant("1", DataType.INTEGER))
+			);
+
+		checkExpression(expected, string, doubleFeatures);
+	}
+
+	@Test
 	public void translateComparisonExpression(){
-		String string = "X['a'] == True and X['b'] == False";
+		String string = "X['a'] and X['b']";
 
 		FieldRef first = new FieldRef(FieldName.create("a"));
 		FieldRef second = new FieldRef(FieldName.create("b"));
 
 		Expression expected = PMMLUtil.createApply(PMMLFunctions.AND)
+			.addExpressions(first, second);
+
+		checkExpression(expected, string, booleanFeatures);
+
+		string = "X['a'] == True and X['b'] == False";
+
+		expected = PMMLUtil.createApply(PMMLFunctions.AND)
 			.addExpressions(PMMLUtil.createApply(PMMLFunctions.EQUAL)
 				.addExpressions(first, PMMLUtil.createConstant("true", DataType.BOOLEAN))
 			)
@@ -71,6 +99,23 @@ public class ExpressionTranslatorTest extends TranslatorTest {
 			);
 
 		checkExpression(expected, string, booleanFeatures);
+
+		string = "X[0] in [0.0, 1.0]";
+
+		expected = PMMLUtil.createApply(PMMLFunctions.ISIN)
+			.addExpressions(first, PMMLUtil.createConstant("0.0", DataType.DOUBLE), PMMLUtil.createConstant("1.0", DataType.DOUBLE));
+
+		checkExpression(expected, string, doubleFeatures);
+
+		string = "(X[0] + 1.0) not in [X[1]]";
+
+		expected = PMMLUtil.createApply(PMMLFunctions.ISNOTIN)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.ADD)
+				.addExpressions(first, PMMLUtil.createConstant("1.0", DataType.DOUBLE))
+			)
+			.addExpressions(second);
+
+		checkExpression(expected, string, doubleFeatures);
 
 		string = "X[\"a\"] > X[\"b\"]";
 

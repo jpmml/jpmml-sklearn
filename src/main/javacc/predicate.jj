@@ -131,10 +131,16 @@ TOKEN:
 	< OR: "or" >
 	|
 	< AND: "and" >
+	|
+	< NOT: "not" >
 }
 
 TOKEN:
 {
+	< IS: "is" >
+	|
+	< IN: "in" >
+	|
 	< EQUAL: "==" >
 	|
 	< NOT_EQUAL: "!=" >
@@ -146,12 +152,6 @@ TOKEN:
 	< GREATER_THAN: ">" >
 	|
 	< GREATER_OR_EQUAL: ">=" >
-	|
-	< IN: "in" >
-	|
-	< IS: "is" >
-	|
-	< NOT: "not" >
 }
 
 TOKEN:
@@ -273,17 +273,17 @@ Predicate ComparisonExpression():
 }
 {
 	(
-		LOOKAHEAD(PrimaryExpression() <IN>)
-		left = PrimaryExpression() <IN> right = ListMakerExpression() { left = new SimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_IN, (Array)right); }
-		|
-		LOOKAHEAD(PrimaryExpression() <NOT> <IN>)
-		left = PrimaryExpression() <NOT> <IN> right = ListMakerExpression() { left = new SimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_NOT_IN, (Array)right); }
-		|
 		LOOKAHEAD(PrimaryExpression() <IS> <NONE>)
 		left = PrimaryExpression() <IS> <NONE> { left = new SimplePredicate((FieldName)left, SimplePredicate.Operator.IS_MISSING, null); }
 		|
 		LOOKAHEAD(PrimaryExpression() <IS> <NOT> <NONE>)
 		left = PrimaryExpression() <IS> <NOT> <NONE> { left = new SimplePredicate((FieldName)left, SimplePredicate.Operator.IS_NOT_MISSING, null); }
+		|
+		LOOKAHEAD(PrimaryExpression() <IN>)
+		left = PrimaryExpression() <IN> right = ListMakerExpression() { left = new SimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_IN, (Array)right); }
+		|
+		LOOKAHEAD(PrimaryExpression() <NOT> <IN>)
+		left = PrimaryExpression() <NOT> <IN> right = ListMakerExpression() { left = new SimpleSetPredicate((FieldName)left, SimpleSetPredicate.BooleanOperator.IS_NOT_IN, (Array)right); }
 		|
 		left = PrimaryExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = UnaryExpression() { left = new SimplePredicate((FieldName)left, translateRelationalOperator(operator), (String)right); } )?
 	)

@@ -233,6 +233,10 @@ TOKEN:
 
 TOKEN:
 {
+	< IS: "is" >
+	|
+	< IN: "in" >
+	|
 	< EQUAL: "==" >
 	|
 	< NOT_EQUAL: "!=" >
@@ -276,6 +280,8 @@ TOKEN:
 TOKEN:
 {
 	< FALSE: "False" >
+	|
+	< NONE: "None" >
 	|
 	< TRUE: "True" >
 }
@@ -398,10 +404,24 @@ Expression ComparisonExpression():
 {
 	Expression left;
 	Token operator;
-	Expression right;
+	Object right;
 }
 {
-	left = AdditiveExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = AdditiveExpression() { left = PMMLUtil.createApply(translateRelationalOperator(operator), left, right); })?
+	(
+		LOOKAHEAD(AdditiveExpression() <IS> <NONE>)
+		left = AdditiveExpression() <IS> <NONE> { left = PMMLUtil.createApply(PMMLFunctions.ISMISSING, left); }
+		|
+		LOOKAHEAD(AdditiveExpression() <IS> <NOT> <NONE>)
+		left = AdditiveExpression() <IS> <NOT> <NONE> { left = PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, left); }
+		|
+		LOOKAHEAD(AdditiveExpression() <IN>)
+		left = AdditiveExpression() <IN> right = ListMakerExpression() { left = PMMLUtil.createApply(PMMLFunctions.ISIN, left).addExpressions(((List<Expression>)right).toArray(new Expression[0])); }
+		|
+		LOOKAHEAD(AdditiveExpression() <NOT> <IN>)
+		left = AdditiveExpression() <NOT> <IN> right = ListMakerExpression() { left = PMMLUtil.createApply(PMMLFunctions.ISNOTIN, left).addExpressions(((List<Expression>)right).toArray(new Expression[0])); }
+		|
+		left = AdditiveExpression() ((operator = <EQUAL> | operator = <NOT_EQUAL> | operator = <LESS_THAN> | operator = <LESS_OR_EQUAL> | operator = <GREATER_THAN> | operator = <GREATER_OR_EQUAL>) right = AdditiveExpression() { left = PMMLUtil.createApply(translateRelationalOperator(operator), left, (Expression)right); })?
+	)
 
 	{
 		return left;
@@ -548,20 +568,20 @@ Expression FunctionInvocationExpression():
 		}
 		
 		function.append(name.image);
-	} ( <DOT> name = <NAME> { function.append('.').append(name.image); })* <LPAREN> arguments = ArgumentList() <RPAREN>
+	} ( <DOT> name = <NAME> { function.append('.').append(name.image); })* arguments = Arguments()
 
 	{
 		return translateFunction(function.toString(), arguments);
 	}
 }
 
-List<Expression> ArgumentList():
+List<Expression> Arguments():
 {
 	Expression expression;
 	List<Expression> expressions = new ArrayList<Expression>();
 }
 {
-	expression = Expression() { expressions.add(expression); } ( <COMMA> expression = Expression() { expressions.add(expression); })*
+	<LPAREN> expression = Expression() { expressions.add(expression); } ( <COMMA> expression = Expression() { expressions.add(expression); })* <RPAREN>
 
 	{
 		return expressions;
@@ -604,5 +624,18 @@ Constant LiteralExpression():
 			.setDataType(dataType);
 
 		return constant;
+	}
+}
+
+List<Expression> ListMakerExpression():
+{
+	Expression expression;
+	List<Expression> expressions = new ArrayList<Expression>();
+}
+{
+	<LBRACKET> expression = Expression() { expressions.add(expression); } ( <COMMA> expression = Expression() { expressions.add(expression); })* <RBRACKET>
+
+	{
+		return expressions;
 	}
 }

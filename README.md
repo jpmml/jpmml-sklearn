@@ -169,7 +169,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Array indexing expressions `X[<column index>]` and `X[<column name>]`.
       * String concatenation expressions.
       * Arithmetic operators `+`, `-`, `*`, `/` and `%`.
-      * Comparison operators `<=`, `<`, `==`, `!=`, `>` and `>=`.
+      * Identity comparison operators `is None` and `is not None`.
+      * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.
       * Value missingness check functions `pandas.isnull` and `pandas.notnull`.
       * Numpy universal functions.
