@@ -61,7 +61,7 @@ public class Domain extends Transformer {
 			.setDataType(dataType)
 			.setOpType(opType);
 
-		encoder.setFrozen(name, this);
+		encoder.setDomain(name, this);
 
 		return dataField;
 	}

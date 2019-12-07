@@ -35,7 +35,7 @@ import sklearn2pmml.decoration.Domain;
 
 public class SkLearnEncoder extends ModelEncoder {
 
-	private Map<FieldName, Domain> frozenFields = new LinkedHashMap<>();
+	private Map<FieldName, Domain> domains = new LinkedHashMap<>();
 
 
 	public DataField createDataField(FieldName name){
@@ -91,17 +91,21 @@ public class SkLearnEncoder extends ModelEncoder {
 	}
 
 	public boolean isFrozen(FieldName name){
-		return this.frozenFields.containsKey(name);
+		return this.domains.containsKey(name);
 	}
 
-	public void setFrozen(FieldName name, Domain domain){
+	public Domain getDomain(FieldName name){
+		return this.domains.get(name);
+	}
+
+	public void setDomain(FieldName name, Domain domain){
 
 		if(domain != null){
-			this.frozenFields.put(name, domain);
+			this.domains.put(name, domain);
 		} else
 
 		{
-			this.frozenFields.remove(name);
+			this.domains.remove(name);
 		}
 	}
 }

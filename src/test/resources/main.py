@@ -198,6 +198,7 @@ def build_audit_cat(classifier, name, with_proba = True, fit_params = {}):
 	])
 	pipeline.fit(audit_X, audit_y, **fit_params)
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
+	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
 	if with_proba == True:
@@ -284,6 +285,10 @@ def build_audit_na(classifier, name, with_proba = True, fit_params = {}, predict
 	], predict_transformer = predict_transformer, predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
 	pipeline.fit(audit_na_X, audit_na_y, **fit_params)
 	pipeline.configure(**pmml_options)
+	if isinstance(classifier, XGBClassifier):
+		pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X, **predict_params), columns = ["Adjusted"])
 	if with_proba == True:
@@ -666,6 +671,7 @@ def build_auto_na(regressor, name, predict_transformer = None, apply_transformer
 		node_impurity = {node_idx : tree.impurity[node_idx] for node_idx in range(0, tree.node_count) if tree.impurity[node_idx] != 0.0}
 		pmml_options["node_extensions"] = {regressor.criterion : node_impurity}
 	pipeline.configure(**pmml_options)
+	pipeline.verify(auto_na_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
 	if isinstance(regressor, DecisionTreeRegressor):

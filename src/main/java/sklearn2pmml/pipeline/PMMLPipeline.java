@@ -21,10 +21,14 @@ package sklearn2pmml.pipeline;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import h2o.estimators.BaseEstimator;
 import numpy.core.NDArray;
 import numpy.core.ScalarUtil;
@@ -71,6 +75,7 @@ import sklearn.Initializer;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 import sklearn.pipeline.Pipeline;
+import sklearn2pmml.decoration.Domain;
 
 public class PMMLPipeline extends Pipeline {
 
@@ -331,11 +336,16 @@ public class PMMLPipeline extends Pipeline {
 
 			Map<VerificationField, List<?>> data = new LinkedHashMap<>();
 
-			for(int i = 0; i < activeFields.size(); i++){
-				VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(activeFields.get(i)));
+			if(activeFields != null){
 
-				data.put(verificationField, CMatrixUtil.getColumn(activeValues, rows, activeFields.size(), i));
-			}
+				for(int i = 0; i < activeFields.size(); i++){
+					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(activeFields.get(i)));
+
+					Domain domain = encoder.getDomain(verificationField.getField());
+
+					data.put(verificationField, CMatrixUtil.getColumn(cleanValues(domain, activeValues), rows, activeFields.size(), i));
+				}
+			} // End if
 
 			if(probabilityFields != null){
 
@@ -344,7 +354,7 @@ public class PMMLPipeline extends Pipeline {
 						.setPrecision(precision)
 						.setZeroThreshold(zeroThreshold);
 
-					data.put(verificationField, CMatrixUtil.getColumn(probabilityValues, rows, probabilityFields.size(), i));
+					data.put(verificationField, CMatrixUtil.getColumn(cleanValues(null, probabilityValues), rows, probabilityFields.size(), i));
 				}
 			} else
 
@@ -364,7 +374,9 @@ public class PMMLPipeline extends Pipeline {
 							break;
 					}
 
-					data.put(verificationField, CMatrixUtil.getColumn(targetValues, rows, targetFields.size(), i));
+					Domain domain = encoder.getDomain(verificationField.getField());
+
+					data.put(verificationField, CMatrixUtil.getColumn(cleanValues(domain, targetValues), rows, targetFields.size(), i));
 				}
 			}
 
@@ -551,6 +563,28 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		return result;
+	}
+
+	static
+	private List<?> cleanValues(Domain domain, List<?> values){
+		Set<Object> missingValues = new HashSet<>();
+		missingValues.add(Float.NaN);
+		missingValues.add(Double.NaN);
+
+		Function<Object, Object> function = new Function<Object, Object>(){
+
+			@Override
+			public Object apply(Object value){
+
+				if(missingValues.contains(value)){
+					return null;
+				}
+
+				return value;
+			}
+		};
+
+		return Lists.transform(values, function);
 	}
 
 	static
