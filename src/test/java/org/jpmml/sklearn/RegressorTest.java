@@ -160,6 +160,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateStackingEnsembleAuto() throws Exception {
+		evaluate("StackingEnsemble", "Auto");
+	}
+
+	@Test
 	public void evaluateTheilSenAuto() throws Exception {
 		evaluate("TheilSen", "Auto");
 	}
