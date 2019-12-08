@@ -11,7 +11,7 @@ from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
-from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingRegressor, VotingClassifier, VotingRegressor
+from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
@@ -176,6 +176,7 @@ if "Audit" in datasets:
 	build_audit(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAudit", flat = True)
 	build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 	build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
+	build_audit(StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")
 	build_audit(SVC(gamma = "auto"), "SVCAudit", with_proba = False)
 	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 	build_audit(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAudit", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
@@ -424,6 +425,7 @@ if "Iris" in datasets:
 	build_iris(BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleIris")
 	build_iris(SGDClassifier(max_iter = 100, random_state = 13), "SGDIris", with_proba = False)
 	build_iris(SGDClassifier(loss = "log", max_iter = 100, random_state = 13), "SGDLogIris")
+	build_iris(StackingClassifier([("lda", LinearDiscriminantAnalysis()), ("lr", LogisticRegression(multi_class = "multinomial", solver = "lbfgs"))], final_estimator = GradientBoostingClassifier(n_estimators = 5, random_state = 13), passthrough = True), "StackingEnsembleIris")
 	build_iris(SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
 	build_iris(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)

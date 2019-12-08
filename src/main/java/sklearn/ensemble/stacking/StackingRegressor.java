@@ -18,26 +18,20 @@
  */
 package sklearn.ensemble.stacking;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
@@ -51,57 +45,30 @@ public class StackingRegressor extends Regressor implements HasEstimatorEnsemble
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		List<? extends Regressor> estimators = getEstimators();
-		List<String> stackMethods = getStackMethod();
 		Regressor finalEstimator = getFinalEstimator();
 		Boolean passthrough = getPassthrough();
+		List<String> stackMethod = getStackMethod();
 
-		ClassDictUtil.checkSize(estimators, stackMethods);
+		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
-		Label label = schema.getLabel();
-		List<? extends Feature> features = schema.getFeatures();
+		StackingUtil.PredictFunction predictFunction = new StackingUtil.PredictFunction(){
 
-		Set<PMMLEncoder> encoders = features.stream()
-			.map(feature -> feature.getEncoder())
-			.collect(Collectors.toSet());
+			@Override
+			public List<Feature> apply(int index, Model model, String stackMethod, SkLearnEncoder encoder){
 
-		SkLearnEncoder encoder = (SkLearnEncoder)Iterables.getOnlyElement(encoders);
+				if(!("predict").equals(stackMethod)){
+					throw new IllegalArgumentException(stackMethod);
+				}
 
-		List<Feature> stackFeatures = new ArrayList<>();
+				OutputField predictedOutputField = ModelUtil.createPredictedField(FieldName.create(stackMethod + "(" + index + ")"), OpType.CONTINUOUS, continuousLabel.getDataType());
 
-		List<Model> models = new ArrayList<>();
+				DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 
-		for(int i = 0; i < estimators.size(); i++){
-			Regressor estimator = estimators.get(i);
-			String stackMethod = stackMethods.get(i);
-
-			if(!("predict").equals(stackMethod)){
-				throw new IllegalArgumentException(stackMethod);
+				return Collections.singletonList(new ContinuousFeature(encoder, predictedField));
 			}
+		};
 
-			Model model = estimator.encodeModel(schema);
-
-			OutputField predictedOutputField = ModelUtil.createPredictedField(FieldName.create(stackMethod + "(" + i + ")"), OpType.CONTINUOUS, label.getDataType());
-
-			DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-			stackFeatures.add(new ContinuousFeature(encoder, predictedField));
-
-			models.add(model);
-		}
-
-		if(passthrough){
-			stackFeatures.addAll(features);
-		}
-
-		{
-			Schema finalSchema = new Schema(label, stackFeatures);
-
-			Model finalModel = finalEstimator.encodeModel(finalSchema);
-
-			models.add(finalModel);
-		}
-
-		return MiningModelUtil.createModelChain(models);
+		return StackingUtil.encodeStacking(estimators, stackMethod, predictFunction, finalEstimator, passthrough, schema);
 	}
 
 	@Override

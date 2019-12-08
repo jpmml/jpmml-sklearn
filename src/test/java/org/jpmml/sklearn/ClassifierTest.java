@@ -146,6 +146,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateStackingEnsembleAudit() throws Exception {
+		evaluate("StackingEnsemble", "Audit");
+	}
+
+	@Test
 	public void evaluateSVCAudit() throws Exception {
 		evaluate("SVC", "Audit");
 	}
@@ -295,6 +300,11 @@ public class ClassifierTest extends EstimatorTest {
 	@Test
 	public void evaluateSGDLogIris() throws Exception {
 		evaluate("SGDLog", "Iris");
+	}
+
+	@Test
+	public void evaluateStackingEnsembleIris() throws Exception {
+		evaluate("StackingEnsemble", "Iris");
 	}
 
 	@Test
