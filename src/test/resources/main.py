@@ -453,28 +453,21 @@ if "Iris" in datasets:
 	build_iris_opt(XGBClassifier(objective = "multi:softprob"), "XGBIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "mlogloss", "classifier__early_stopping_rounds" : 3})
 
 if "Iris" in datasets:
-	mapper = DataFrameMapper([
-		(iris_X.columns.values, ContinuousDomain())
-	])
-	iris_Xt = mapper.fit_transform(iris_X)
-	dt_pipeline = PMMLPipeline([
-		("classifier", DecisionTreeClassifier(random_state = 13))
-	])
-	dt_pipeline.fit(iris_Xt, iris_y)
-	lr_pipeline = PMMLPipeline([
-		("scaler", StandardScaler()),
-		("classifier", LogisticRegression(multi_class = "ovr", solver = "liblinear"))
-	])
-	lr_pipeline.fit(iris_Xt, iris_y)
 	pipeline = PMMLPipeline([
-		("mapper", mapper),
+		("mapper", DataFrameMapper([
+			(iris_X.columns.values, ContinuousDomain())
+		])),
 		("estimator", SelectFirstEstimator([
-			("X[2] <= 3", dt_pipeline),
-			(str(True), lr_pipeline)
+			("X[1] <= 3", Pipeline([
+				("classifier", DecisionTreeClassifier(random_state = 13))
+			])),
+			(str(True), Pipeline([
+				("scaler", StandardScaler()),
+				("classifier", LogisticRegression(multi_class = "ovr", solver = "liblinear"))
+			]))
 		]))
 	])
-	pipeline.active_fields = iris_X.columns.values
-	pipeline.target_fields = ["Species"]
+	pipeline.fit(iris_X, iris_y)
 	store_pkl(pipeline, "SelectFirstIris")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
 	store_csv(species, "SelectFirstIris")
