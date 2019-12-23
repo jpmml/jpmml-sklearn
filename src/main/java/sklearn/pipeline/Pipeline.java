@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import org.jpmml.sklearn.CastFunction;
+import org.jpmml.sklearn.CastUtil;
 import org.jpmml.sklearn.Castable;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.TupleUtil;
@@ -71,7 +72,13 @@ public class Pipeline extends Composite implements Castable {
 
 		Object estimator = TupleUtil.extractElement(finalStep, 1);
 
-		return ("passthrough").equals(estimator) || Estimator.class.isInstance(estimator);
+		if(("passthrough").equals(estimator)){
+			return true;
+		}
+
+		estimator = CastUtil.deepCastTo(estimator, Estimator.class);
+
+		return Estimator.class.isInstance(estimator);
 	}
 
 	@Override
