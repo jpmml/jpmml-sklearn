@@ -22,9 +22,9 @@ import org.jpmml.sklearn.Castable;
 import org.jpmml.sklearn.PyClassDict;
 import sklearn.Estimator;
 
-public class GridSearchCV extends PyClassDict implements Castable {
+public class EstimatorSearcher extends PyClassDict implements Castable {
 
-	public GridSearchCV(String module, String name){
+	public EstimatorSearcher(String module, String name){
 		super(module, name);
 	}
 

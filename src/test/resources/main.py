@@ -19,7 +19,7 @@ from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercen
 from sklearn.impute import MissingIndicator, SimpleImputer
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDRegressor, TheilSenRegressor
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
@@ -344,7 +344,7 @@ if "Versicolor" in datasets:
 	build_versicolor(SGDClassifier(max_iter = 100, random_state = 13), "SGDVersicolor", with_proba = False)
 	build_versicolor(SGDClassifier(loss = "log", max_iter = 100, random_state = 13), "SGDLogVersicolor")
 	build_versicolor(GridSearchCV(SVC(gamma = "auto"), {"C" : [1, 3, 5]}), "SVCVersicolor", with_proba = False)
-	build_versicolor(NuSVC(gamma = "auto"), "NuSVCVersicolor", with_proba = False)
+	build_versicolor(RandomizedSearchCV(NuSVC(gamma = "auto"), {"nu" : [0.3, 0.4, 0.5, 0.6]}), "NuSVCVersicolor", with_proba = False)
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
