@@ -47,8 +47,6 @@ public class NDArray extends CClassDict implements HasArray, HasContent<Object> 
 	public void __init__(Object[] args){
 
 		if(isDefault(args)){
-
-			// XXX
 			return;
 		}
 
