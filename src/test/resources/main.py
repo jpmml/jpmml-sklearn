@@ -1,5 +1,7 @@
 from common import *
 
+from sklearn.experimental import enable_hist_gradient_boosting
+
 from h2o import H2OFrame
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.estimators.glm import H2OGeneralizedLinearEstimator
@@ -11,7 +13,7 @@ from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
-from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
+from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
@@ -567,6 +569,7 @@ if "Auto" in datasets:
 	build_auto(GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
 	build_auto(GBDTLMRegressor(XGBRFRegressor(n_estimators = 17, max_depth = 6, random_state = 13), ElasticNet(random_state = 13)), "XGBRFLMAuto")
 	build_auto(GradientBoostingRegressor(init = None, random_state = 13), "GradientBoostingAuto")
+	build_auto(HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingAuto")
 	build_auto(HuberRegressor(), "HuberAuto")
 	build_auto(LarsCV(cv = 3), "LarsAuto")
 	build_auto(LassoCV(cv = 3, random_state = 13), "LassoAuto")
@@ -716,6 +719,7 @@ if "Housing" in datasets:
 	build_housing(BayesianRidge(), "BayesianRidgeHousing")
 	build_housing(GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
 	build_housing(GBDTLMRegressor(XGBRFRegressor(n_estimators = 17, max_depth = 5, random_state = 13), SGDRegressor(penalty = "elasticnet", random_state = 13)), "XGBRFLMHousing")
+	build_housing(HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingHousing")
 	build_housing(KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 	build_housing(MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", tol = 0.001, max_iter = 1000, random_state = 13), "MLPHousing")
 	build_housing(SGDRegressor(random_state = 13), "SGDHousing")

@@ -23,7 +23,10 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import joblib.NDArrayWrapper;
 import net.razorvine.pickle.objects.ClassDict;
+import numpy.core.NDArray;
+import numpy.core.NDArrayUtil;
 import numpy.core.ScalarUtil;
 import org.jpmml.converter.ValueUtil;
 
@@ -158,6 +161,24 @@ public class PyClassDict extends ClassDict {
 
 		if(object instanceof Number){
 			return Collections.singletonList(object);
+		}
+
+		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
+	}
+
+	public List<?> getArray(String name, String key){
+		Object object = get(name);
+
+		if(object instanceof NDArrayWrapper){
+			NDArrayWrapper arrayWrapper = (NDArrayWrapper)object;
+
+			object = arrayWrapper.getContent();
+		} // End if
+
+		if(object instanceof NDArray){
+			NDArray array = (NDArray)object;
+
+			return NDArrayUtil.getContent(array, key);
 		}
 
 		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");

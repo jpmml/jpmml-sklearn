@@ -111,6 +111,10 @@ public class DType extends CClassDict {
 
 		if((NODEDATA_KEYS).equals(valueKeys)){
 			return formatDescr(NODEDATA_KEYS, values);
+		} else
+
+		if((NODESTRUCT_KEYS).equals(valueKeys)){
+			return formatDescr(NODESTRUCT_KEYS, values);
 		}
 
 		throw new IllegalArgumentException();
@@ -172,4 +176,5 @@ public class DType extends CClassDict {
 
 	private static final Set<String> TREE_KEYS = new LinkedHashSet<>(Arrays.asList("left_child", "right_child", "feature", "threshold", "impurity", "n_node_samples", "weighted_n_node_samples"));
 	private static final Set<String> NODEDATA_KEYS = new LinkedHashSet<>(Arrays.asList("idx_start", "idx_end", "is_leaf", "radius"));
+	private static final Set<String> NODESTRUCT_KEYS = new LinkedHashSet<>(Arrays.asList("value", "count", "feature_idx", "threshold", "missing_go_to_left", "left", "right", "gain", "depth", "is_leaf", "bin_threshold"));
 }
