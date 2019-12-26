@@ -55,8 +55,9 @@ public class GradientBoostingRegressor extends Regressor implements HasEstimator
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		HasDefaultValue init = getInit();
+		Number learningRate = getLearningRate();
 
-		return GradientBoostingUtil.encodeGradientBoosting(this, init.getDefaultValue(), getLearningRate(), schema);
+		return GradientBoostingUtil.encodeGradientBoosting(this, init.getDefaultValue(), learningRate, schema);
 	}
 
 	public HasDefaultValue getInit(){

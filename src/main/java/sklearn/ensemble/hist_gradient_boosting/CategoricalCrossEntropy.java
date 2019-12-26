@@ -18,32 +18,9 @@
  */
 package sklearn.ensemble.hist_gradient_boosting;
 
-import java.util.Collections;
-import java.util.List;
+public class CategoricalCrossEntropy extends BaseLoss {
 
-import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
-
-public class HistGradientBoostingRegressor extends Regressor {
-
-	public HistGradientBoostingRegressor(String module, String name){
+	public CategoricalCrossEntropy(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		List<List<TreePredictor>> predictors = getPredictors();
-		Number baselinePrediction = getBaselinePrediction();
-
-		return HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, Collections.singletonList(baselinePrediction), 0, schema);
-	}
-
-	public Number getBaselinePrediction(){
-		return getNumber("_baseline_prediction");
-	}
-
-	public List<List<TreePredictor>> getPredictors(){
-		return (List)getList("_predictors", List.class);
 	}
 }

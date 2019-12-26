@@ -18,32 +18,12 @@
  */
 package sklearn.ensemble.hist_gradient_boosting;
 
-import java.util.Collections;
-import java.util.List;
+import org.jpmml.sklearn.PyClassDict;
 
-import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+abstract
+public class BaseLoss extends PyClassDict {
 
-public class HistGradientBoostingRegressor extends Regressor {
-
-	public HistGradientBoostingRegressor(String module, String name){
+	public BaseLoss(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		List<List<TreePredictor>> predictors = getPredictors();
-		Number baselinePrediction = getBaselinePrediction();
-
-		return HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, Collections.singletonList(baselinePrediction), 0, schema);
-	}
-
-	public Number getBaselinePrediction(){
-		return getNumber("_baseline_prediction");
-	}
-
-	public List<List<TreePredictor>> getPredictors(){
-		return (List)getList("_predictors", List.class);
 	}
 }

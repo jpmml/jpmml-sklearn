@@ -13,7 +13,7 @@ from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
-from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
+from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingClassifier, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import chi2, f_classif, f_regression
@@ -168,6 +168,7 @@ if "Audit" in datasets:
 	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(multi_class = "ovr", solver = "liblinear")), "XGBLRAudit")
 	build_audit(GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
 	build_audit(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13), "GradientBoostingAudit")
+	build_audit(HistGradientBoostingClassifier(max_iter = 71, random_state = 13), "HistGradientBoostingAudit")
 	build_audit(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAudit", predict_params = {"num_iteration" : 17}, predict_proba_params = {"num_iteration" : 17}, num_iteration = 17)
 	build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 	build_audit(LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
@@ -414,6 +415,7 @@ if "Iris" in datasets:
 	build_iris(DummyClassifier(strategy = "constant", constant = "versicolor"), "DummyIris")
 	build_iris(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesIris")
 	build_iris(GradientBoostingClassifier(init = None, n_estimators = 17, random_state = 13), "GradientBoostingIris")
+	build_iris(HistGradientBoostingClassifier(max_iter = 10, random_state = 13), "HistGradientBoostingIris")
 	build_iris(KNeighborsClassifier(), "KNNIris", with_proba = False)
 	build_iris(LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 	build_iris(LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)

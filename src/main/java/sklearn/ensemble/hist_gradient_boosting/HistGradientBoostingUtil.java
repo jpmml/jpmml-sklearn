@@ -18,25 +18,65 @@
  */
 package sklearn.ensemble.hist_gradient_boosting;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.BranchNode;
 import org.dmg.pmml.tree.LeafNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
 
 public class HistGradientBoostingUtil {
 
 	private HistGradientBoostingUtil(){
+	}
+
+	static
+	public MiningModel encodeHistGradientBoosting(List<List<TreePredictor>> predictors, List<? extends Number> baselinePredictions, int column, Schema schema){
+		List<TreePredictor> treePredictors = predictors.stream()
+			.map(predictor -> predictor.get(column))
+			.collect(Collectors.toList());
+
+		Number baselinePrediction = baselinePredictions.get(column);
+
+		return encodeHistGradientBoosting(treePredictors, baselinePrediction, schema);
+	}
+
+	static
+	public MiningModel encodeHistGradientBoosting(List<TreePredictor> treePredictors, Number baselinePrediction, Schema schema){
+		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
+
+		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
+
+		List<TreeModel> treeModels = new ArrayList<>();
+
+		for(TreePredictor treePredictor : treePredictors){
+			TreeModel treeModel = HistGradientBoostingUtil.encodeTreeModel(treePredictor, segmentSchema);
+
+			treeModels.add(treeModel);
+		}
+
+		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
+			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
+			.setTargets(ModelUtil.createRescaleTargets(null, baselinePrediction, continuousLabel));
+
+		return miningModel;
 	}
 
 	static
