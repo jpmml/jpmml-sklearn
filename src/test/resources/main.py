@@ -310,6 +310,26 @@ if "Audit" in datasets:
 	build_audit_na(LogisticRegression(multi_class = "ovr", solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 	build_audit_na(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAuditNA", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, predict_transformer = Alias(ExpressionTransformer("X[0]"), name = "eval(Adjusted)", prefit = True), ntree_limit = 71)
 
+def build_audit_na_hist(classifier, name):
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
+		[([column], [CategoricalDomain(), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_na_X, audit_na_y)
+	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
+if "Audit" in datasets:
+	build_audit_na_hist(HistGradientBoostingClassifier(max_iter = 71, random_state = 13), "HistGradientBoostingAuditNA")
+
 versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
 def build_versicolor(classifier, name, with_proba = True, **pmml_options):
@@ -685,6 +705,30 @@ def build_auto_na(regressor, name, predict_transformer = None, apply_transformer
 if "Auto" in datasets:
 	build_auto_na(DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_auto_na(LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
+
+auto_na_X, auto_na_y = load_auto("AutoNA")
+
+auto_na_X["cylinders"] = auto_na_X["cylinders"].astype("Int64")
+auto_na_X["model_year"] = auto_na_X["model_year"].astype("Int64")
+auto_na_X["origin"] = auto_na_X["origin"].astype("Int64")
+
+def build_auto_na_hist(regressor, name):
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
+		[([column], [CategoricalDomain(), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_na_X, auto_na_y)
+	pipeline.verify(auto_na_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
+	store_csv(mpg, name)
+
+if "Auto" in datasets:
+	build_auto_na_hist(HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingAutoNA")
 
 housing_X, housing_y = load_housing("Housing")
 

@@ -74,6 +74,11 @@ public class ClassifierTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateHistGradientBoostingAuditNA() throws Exception {
+		evaluate("HistGradientBoosting", "AuditNA");
+	}
+
+	@Test
 	public void evaluateLGBMAudit() throws Exception {
 		evaluate("LGBM", "Audit", new RealNumberEquivalence(1));
 	}

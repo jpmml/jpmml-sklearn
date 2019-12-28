@@ -93,18 +93,20 @@ public class HistGradientBoostingUtil {
 		int[] rightChildren = treePredictor.getRight();
 		int[] featureIdx = treePredictor.getFeatureIdx();
 		double[] thresholds = treePredictor.getThreshold();
+		int[] missingGoToLeft = treePredictor.getMissingGoToLeft();
 		double[] values = treePredictor.getValues();
 
-		Node root = encodeNode(True.INSTANCE, predicateManager, 0, leaf, leftChildren, rightChildren, featureIdx, thresholds, values, schema);
+		Node root = encodeNode(True.INSTANCE, predicateManager, 0, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()), root)
-			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
+			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
+			.setMissingValueStrategy(TreeModel.MissingValueStrategy.DEFAULT_CHILD);
 
 		return treeModel;
 	}
 
 	static
-	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, int index, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, double[] thresholds, double[] values, Schema schema){
+	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, int index, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, double[] thresholds, int[] missingGoToLeft, double[] values, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		if(leaf[index] == 0){
@@ -114,6 +116,8 @@ public class HistGradientBoostingUtil {
 
 			Predicate leftPredicate;
 			Predicate rightPredicate;
+
+			boolean defaultLeft;
 
 			if(feature instanceof BinaryFeature){
 				BinaryFeature binaryFeature = (BinaryFeature)feature;
@@ -126,6 +130,9 @@ public class HistGradientBoostingUtil {
 
 				leftPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.NOT_EQUAL, value);
 				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
+
+				// XXX
+				defaultLeft = true;
 			} else
 
 			{
@@ -135,13 +142,16 @@ public class HistGradientBoostingUtil {
 
 				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
 				rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);
+
+				defaultLeft = (missingGoToLeft[index] == 1);
 			}
 
-			Node leftChild = encodeNode(leftPredicate, predicateManager, leftChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, values, schema);
-			Node rightChild = encodeNode(rightPredicate, predicateManager, rightChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, values, schema);
+			Node leftChild = encodeNode(leftPredicate, predicateManager, leftChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
+			Node rightChild = encodeNode(rightPredicate, predicateManager, rightChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
 
 			Node result = new BranchNode(null, predicate)
 				.setId(id)
+				.setDefaultChild(defaultLeft ? leftChild.getId() : rightChild.getId())
 				.addNodes(leftChild, rightChild);
 
 			return result;
