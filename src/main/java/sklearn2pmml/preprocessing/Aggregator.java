@@ -42,7 +42,7 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return -1;
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	@Override

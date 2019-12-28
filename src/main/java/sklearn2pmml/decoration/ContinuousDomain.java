@@ -34,6 +34,7 @@ import org.jpmml.converter.OutlierDecorator;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.TransformerUtil;
 
 public class ContinuousDomain extends Domain {
@@ -55,7 +56,7 @@ public class ContinuousDomain extends Domain {
 			}
 		}
 
-		return -1;
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	@Override

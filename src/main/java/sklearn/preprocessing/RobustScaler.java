@@ -56,7 +56,7 @@ public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 		} else
 
 		{
-			return -1;
+			return HasNumberOfFeatures.UNKNOWN;
 		}
 
 		return shape[0];

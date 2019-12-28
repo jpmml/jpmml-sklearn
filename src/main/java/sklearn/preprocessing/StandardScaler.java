@@ -56,7 +56,7 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 		} else
 
 		{
-			return -1;
+			return HasNumberOfFeatures.UNKNOWN;
 		}
 
 		return shape[0];

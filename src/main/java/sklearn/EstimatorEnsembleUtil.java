@@ -33,6 +33,6 @@ public class EstimatorEnsembleUtil {
 			return estimator.getNumberOfFeatures();
 		}
 
-		return -1;
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 }

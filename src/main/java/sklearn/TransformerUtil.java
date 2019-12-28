@@ -41,7 +41,7 @@ public class TransformerUtil {
 			return hasNumberOfFeatures.getNumberOfFeatures();
 		}
 
-		return -1;
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	static

@@ -21,4 +21,6 @@ package sklearn;
 public interface HasNumberOfFeatures {
 
 	int getNumberOfFeatures();
+
+	public static final int UNKNOWN = -1;
 }

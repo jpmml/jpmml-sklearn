@@ -225,7 +225,7 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		int numberOfFeatures = estimator.getNumberOfFeatures();
-		if(numberOfFeatures > -1){
+		if(numberOfFeatures != HasNumberOfFeatures.UNKNOWN){
 			ClassDictUtil.checkSize(numberOfFeatures, features);
 		}
 
@@ -510,7 +510,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	private List<String> initActiveFields(PyClassDict object){
-		int numberOfFeatures = -1;
+		int numberOfFeatures = HasNumberOfFeatures.UNKNOWN;
 
 		if(object instanceof HasNumberOfFeatures){
 			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)object;
@@ -518,7 +518,7 @@ public class PMMLPipeline extends Pipeline {
 			numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
 		} // End if
 
-		if(numberOfFeatures < 0){
+		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(object) + ") does not specify the number of input features");
 		}
 

@@ -50,7 +50,7 @@ public class Estimator extends PyClassDict implements HasNumberOfFeatures, HasTy
 			return getInteger("n_features_");
 		}
 
-		return -1;
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	@Override

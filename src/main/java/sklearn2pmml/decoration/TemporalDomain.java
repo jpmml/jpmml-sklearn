@@ -27,6 +27,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 
 abstract
 public class TemporalDomain extends Domain {
@@ -37,7 +38,7 @@ public class TemporalDomain extends Domain {
 
 	@Override
 	public int getNumberOfFeatures(){
-		return -1;
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	@Override

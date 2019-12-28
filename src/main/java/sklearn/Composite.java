@@ -66,7 +66,7 @@ public class Composite extends PyClassDict implements HasNumberOfFeatures, HasTy
 			return estimator.getNumberOfFeatures();
 		}
 
-		return -1;
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	@Override
