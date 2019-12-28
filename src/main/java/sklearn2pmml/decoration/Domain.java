@@ -40,10 +40,11 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
 abstract
-public class Domain extends Transformer {
+public class Domain extends Transformer implements HasNumberOfFeatures {
 
 	public Domain(String module, String name){
 		super(module, name);

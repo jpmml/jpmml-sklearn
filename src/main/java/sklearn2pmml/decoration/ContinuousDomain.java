@@ -43,6 +43,22 @@ public class ContinuousDomain extends Domain {
 	}
 
 	@Override
+	public int getNumberOfFeatures(){
+		Boolean withData = getWithData();
+
+		if(withData){
+			int[] dataMinShape = getDataMinShape();
+			int[] dataMaxShape = getDataMaxShape();
+
+			if(dataMinShape[0] == dataMaxShape[0]){
+				return dataMinShape[0];
+			}
+		}
+
+		return -1;
+	}
+
+	@Override
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
 	}
@@ -154,8 +170,16 @@ public class ContinuousDomain extends Domain {
 		return getArray("data_min_", Number.class);
 	}
 
+	public int[] getDataMinShape(){
+		return getArrayShape("data_min_", 1);
+	}
+
 	public List<? extends Number> getDataMax(){
 		return getArray("data_max_", Number.class);
+	}
+
+	public int[] getDataMaxShape(){
+		return getArrayShape("data_max_", 1);
 	}
 
 	public Map<String, ?> getNumericInfo(){

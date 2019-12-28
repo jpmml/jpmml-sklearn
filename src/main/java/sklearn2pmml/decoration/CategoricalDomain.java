@@ -42,6 +42,11 @@ public class CategoricalDomain extends Domain {
 	}
 
 	@Override
+	public int getNumberOfFeatures(){
+		return 1;
+	}
+
+	@Override
 	public OpType getOpType(){
 		return OpType.CATEGORICAL;
 	}
