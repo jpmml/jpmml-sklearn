@@ -10,7 +10,7 @@ from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
-from sklearn.decomposition import IncrementalPCA
+from sklearn.decomposition import IncrementalPCA, PCA, TruncatedSVD
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingClassifier, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
@@ -373,10 +373,11 @@ versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
 def build_versicolor_direct(classifier, name, with_proba = True, **pmml_options):
 	transformer = ColumnTransformer([
-		("all", "passthrough", ["Petal.Length", "Petal.Width"])
+		("all", "passthrough", ["Sepal.Length", "Petal.Length", "Petal.Width"])
 	], remainder = "drop")
 	pipeline = PMMLPipeline([
 		("transformer", transformer),
+		("svd", TruncatedSVD(n_components = 2)),
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)

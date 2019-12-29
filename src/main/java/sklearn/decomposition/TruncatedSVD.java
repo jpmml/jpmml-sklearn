@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2019 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -35,9 +35,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class PCA extends BasePCA {
+public class TruncatedSVD extends BasePCA {
 
-	public PCA(String module, String name){
+	public TruncatedSVD(String module, String name){
 		super(module, name);
 	}
 
@@ -49,17 +49,10 @@ public class PCA extends BasePCA {
 		int numberOfFeatures = shape[1];
 
 		List<? extends Number> components = getComponents();
-		List<? extends Number> mean = getMean();
 
-		ClassDictUtil.checkSize(numberOfFeatures, features, mean);
+		ClassDictUtil.checkSize(numberOfFeatures, features);
 
-		Boolean whiten = getWhiten();
-
-		List<? extends Number> explainedVariance = (whiten ? getExplainedVariance() : null);
-
-		ClassDictUtil.checkSize(numberOfComponents, explainedVariance);
-
-		String id = "pca@" + String.valueOf(PCA.SEQUENCE.getAndIncrement());
+		String id = "svd@" + String.valueOf(TruncatedSVD.SEQUENCE.getAndIncrement());
 
 		List<Feature> result = new ArrayList<>();
 
@@ -71,10 +64,9 @@ public class PCA extends BasePCA {
 			for(int j = 0; j < numberOfFeatures; j++){
 				Feature feature = features.get(j);
 
-				Number meanValue = mean.get(j);
 				Number componentValue = component.get(j);
 
-				if(ValueUtil.isZero(meanValue) && ValueUtil.isOne(componentValue)){
+				if(ValueUtil.isOne(componentValue)){
 					apply.addExpressions(feature.ref());
 
 					continue;
@@ -82,26 +74,10 @@ public class PCA extends BasePCA {
 
 				ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-				// "($name[i] - mean[i]) * component[i]"
-				Expression expression = continuousFeature.ref();
-
-				if(!ValueUtil.isZero(meanValue)){
-					expression = PMMLUtil.createApply(PMMLFunctions.SUBTRACT, expression, PMMLUtil.createConstant(meanValue));
-				} // End if
-
-				if(!ValueUtil.isOne(componentValue)){
-					expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, PMMLUtil.createConstant(componentValue));
-				}
+				// "$name[i] * component[i]"
+				Expression expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, continuousFeature.ref(), PMMLUtil.createConstant(componentValue));
 
 				apply.addExpressions(expression);
-			}
-
-			if(whiten){
-				Number explainedVarianceValue = explainedVariance.get(i);
-
-				if(!ValueUtil.isOne(explainedVarianceValue)){
-					apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, apply, PMMLUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVarianceValue))));
-				}
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(FieldName.create(id + "[" + String.valueOf(i) + "]"), apply);
@@ -110,18 +86,6 @@ public class PCA extends BasePCA {
 		}
 
 		return result;
-	}
-
-	public Boolean getWhiten(){
-		return getBoolean("whiten");
-	}
-
-	public List<? extends Number> getExplainedVariance(){
-		return getArray("explained_variance_", Number.class);
-	}
-
-	public List<? extends Number> getMean(){
-		return getArray("mean_", Number.class);
 	}
 
 	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);
