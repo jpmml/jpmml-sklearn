@@ -63,9 +63,9 @@ import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 
-public class TreeModelUtil {
+public class TreeUtil {
 
-	private TreeModelUtil(){
+	private TreeUtil(){
 	}
 
 	static
@@ -190,15 +190,15 @@ public class TreeModelUtil {
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModelSegmentation(estimator, predicateManager, scoreDistributionManager, miningFunction, schema);
+		return encodeTreeModelEnsemble(estimator, predicateManager, scoreDistributionManager, miningFunction, schema);
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelSegmentation(E estimator, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, MiningFunction miningFunction, Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
@@ -209,7 +209,7 @@ public class TreeModelUtil {
 			public TreeModel apply(T estimator){
 				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), segmentSchema);
 
-				return TreeModelUtil.encodeTreeModel(estimator, predicateManager, scoreDistributionManager, miningFunction, treeModelSchema);
+				return TreeUtil.encodeTreeModel(estimator, predicateManager, scoreDistributionManager, miningFunction, treeModelSchema);
 			}
 		};
 
@@ -364,7 +364,7 @@ public class TreeModelUtil {
 	}
 
 	static
-	public Schema toTreeModelSchema(DataType dataType, Schema schema){
+	private Schema toTreeModelSchema(DataType dataType, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override

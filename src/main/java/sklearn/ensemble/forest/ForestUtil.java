@@ -31,7 +31,7 @@ import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTree;
 import sklearn.tree.HasTreeOptions;
-import sklearn.tree.TreeModelUtil;
+import sklearn.tree.TreeUtil;
 
 public class ForestUtil {
 
@@ -40,11 +40,11 @@ public class ForestUtil {
 
 	static
 	public <E extends Estimator & HasEstimatorEnsemble<T> & HasTreeOptions, T extends Estimator & HasTree> MiningModel encodeBaseForest(E estimator, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
-		List<TreeModel> treeModels = TreeModelUtil.encodeTreeModelSegmentation(estimator, miningFunction, schema);
+		List<TreeModel> treeModels = TreeUtil.encodeTreeModelEnsemble(estimator, miningFunction, schema);
 
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, treeModels));
 
-		return TreeModelUtil.transform(estimator, miningModel);
+		return TreeUtil.transform(estimator, miningModel);
 	}
 }

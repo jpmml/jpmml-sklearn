@@ -56,7 +56,7 @@ import sklearn.ensemble.EnsembleUtil;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.ScoreDistributionManager;
 import sklearn.tree.Tree;
-import sklearn.tree.TreeModelUtil;
+import sklearn.tree.TreeUtil;
 import sklearn.tree.TreeRegressor;
 
 public class IsolationForest extends EnsembleRegressor implements HasTreeOptions {
@@ -99,7 +99,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			Tree tree = treeRegressor.getTree();
 
-			TreeModel treeModel = TreeModelUtil.encodeTreeModel(treeRegressor, predicateManager, scoreDistributionManager, MiningFunction.REGRESSION, estimatorSchema);
+			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, predicateManager, scoreDistributionManager, MiningFunction.REGRESSION, estimatorSchema);
 
 			Visitor visitor = new AbstractVisitor(){
 
@@ -219,7 +219,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, treeModels))
 			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier));
 
-		return TreeModelUtil.transform(this, miningModel);
+		return TreeUtil.transform(this, miningModel);
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){
