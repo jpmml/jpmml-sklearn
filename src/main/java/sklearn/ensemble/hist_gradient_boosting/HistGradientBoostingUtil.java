@@ -24,19 +24,10 @@ import java.util.stream.Collectors;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Predicate;
-import org.dmg.pmml.SimplePredicate;
-import org.dmg.pmml.True;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
-import org.dmg.pmml.tree.BranchNode;
-import org.dmg.pmml.tree.LeafNode;
-import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
@@ -62,12 +53,14 @@ public class HistGradientBoostingUtil {
 	public MiningModel encodeHistGradientBoosting(List<TreePredictor> treePredictors, Number baselinePrediction, Schema schema){
 		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
+		PredicateManager predicateManager = new PredicateManager();
+
 		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
 
 		List<TreeModel> treeModels = new ArrayList<>();
 
 		for(TreePredictor treePredictor : treePredictors){
-			TreeModel treeModel = HistGradientBoostingUtil.encodeTreeModel(treePredictor, segmentSchema);
+			TreeModel treeModel = TreePredictorUtil.encodeTreeModel(treePredictor, predicateManager, segmentSchema);
 
 			treeModels.add(treeModel);
 		}
@@ -77,95 +70,5 @@ public class HistGradientBoostingUtil {
 			.setTargets(ModelUtil.createRescaleTargets(null, baselinePrediction, continuousLabel));
 
 		return miningModel;
-	}
-
-	static
-	public TreeModel encodeTreeModel(TreePredictor treePredictor, Schema schema){
-		PredicateManager predicateManager = new PredicateManager();
-
-		return encodeTreeModel(treePredictor, predicateManager, schema);
-	}
-
-	static
-	public TreeModel encodeTreeModel(TreePredictor treePredictor, PredicateManager predicateManager, Schema schema){
-		int[] leaf = treePredictor.isLeaf();
-		int[] leftChildren = treePredictor.getLeft();
-		int[] rightChildren = treePredictor.getRight();
-		int[] featureIdx = treePredictor.getFeatureIdx();
-		double[] thresholds = treePredictor.getThreshold();
-		int[] missingGoToLeft = treePredictor.getMissingGoToLeft();
-		double[] values = treePredictor.getValues();
-
-		Node root = encodeNode(True.INSTANCE, predicateManager, 0, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
-
-		TreeModel treeModel = new TreeModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()), root)
-			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
-			.setMissingValueStrategy(TreeModel.MissingValueStrategy.DEFAULT_CHILD);
-
-		return treeModel;
-	}
-
-	static
-	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, int index, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, double[] thresholds, int[] missingGoToLeft, double[] values, Schema schema){
-		Integer id = Integer.valueOf(index);
-
-		if(leaf[index] == 0){
-			Feature feature = schema.getFeature(featureIdx[index]);
-
-			double threshold = thresholds[index];
-
-			Predicate leftPredicate;
-			Predicate rightPredicate;
-
-			boolean defaultLeft;
-
-			if(feature instanceof BinaryFeature){
-				BinaryFeature binaryFeature = (BinaryFeature)feature;
-
-				if(threshold != 0.5d){
-					throw new IllegalArgumentException();
-				}
-
-				Object value = binaryFeature.getValue();
-
-				leftPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.NOT_EQUAL, value);
-				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
-
-				// XXX
-				defaultLeft = true;
-			} else
-
-			{
-				ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.DOUBLE);
-
-				Double value = threshold;
-
-				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
-				rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);
-
-				defaultLeft = (missingGoToLeft[index] == 1);
-			}
-
-			Node leftChild = encodeNode(leftPredicate, predicateManager, leftChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
-			Node rightChild = encodeNode(rightPredicate, predicateManager, rightChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
-
-			Node result = new BranchNode(null, predicate)
-				.setId(id)
-				.setDefaultChild(defaultLeft ? leftChild.getId() : rightChild.getId())
-				.addNodes(leftChild, rightChild);
-
-			return result;
-		} else
-
-		if(leaf[index] == 1){
-			Node result = new LeafNode(values[index], predicate)
-				.setId(id);
-
-			return result;
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
 	}
 }
