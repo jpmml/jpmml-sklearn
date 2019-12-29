@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2019 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,38 +18,99 @@
  */
 package sklearn.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.jpmml.converter.ValueUtil;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
+import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.MultiTransformer;
 
-public class MultiOneHotEncoder extends OneHotEncoder {
+public class MultiOneHotEncoder extends MultiTransformer {
 
 	public MultiOneHotEncoder(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public List<? extends Number> getValues(){
-		List<List<?>> categories = getCategories();
-
-		ClassDictUtil.checkSize(1, categories);
-
-		return ValueUtil.asNumbers(categories.get(0));
+	public OpType getOpType(){
+		return OpType.CATEGORICAL;
 	}
 
 	@Override
-	public List<? extends Number> getActiveFeatures(){
-		throw new UnsupportedOperationException();
+	public DataType getDataType(){
+		return super.getDataType();
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		List<List<?>> categories = getCategories();
+
+		ClassDictUtil.checkSize(categories, features);
+
+		Object drop = getDrop();
+		List<Integer> dropIdx = (drop != null ? getDropIdx() : null);
+
+		List<Feature> result = new ArrayList<>();
+
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+			List<?> featureCategories = categories.get(i);
+
+			if(feature instanceof CategoricalFeature){
+				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+
+				ClassDictUtil.checkSize(featureCategories, categoricalFeature.getValues());
+			} else
+
+			if(feature instanceof ObjectFeature){
+				ObjectFeature objectFeature = (ObjectFeature)feature;
+			} else
+
+			if(feature instanceof WildcardFeature){
+				WildcardFeature wildcardFeature = (WildcardFeature)feature;
+
+				feature = wildcardFeature.toCategoricalFeature(featureCategories);
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			} // End if
+
+			if(dropIdx != null){
+				// Unbox to primitive value in order to ensure correct List#remove(int) vs. List#remove(Object) method resolution
+				int index = dropIdx.get(i);
+
+				featureCategories = new ArrayList<>(featureCategories);
+				featureCategories.remove(index);
+			}
+
+			for(int j = 0; j < featureCategories.size(); j++){
+				Object featureCategory = featureCategories.get(j);
+
+				result.add(new BinaryFeature(encoder, feature, featureCategory));
+			}
+		}
+
+		return result;
 	}
 
 	public List<List<?>> getCategories(){
 		return EncoderUtil.transformCategories(getList("categories_", HasArray.class));
 	}
 
-	@Override
-	public List<Integer> getFeatureSizes(){
-		throw new UnsupportedOperationException();
+	public Object getDrop(){
+		return getOptionalObject("drop");
+	}
+
+	public List<Integer> getDropIdx(){
+		return getIntegerArray("drop_idx_");
 	}
 }
