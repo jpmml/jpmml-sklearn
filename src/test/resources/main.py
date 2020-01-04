@@ -643,7 +643,7 @@ def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
 
 if "Auto" in datasets:
 	build_auto_opt(LGBMRegressor(objective = "regression"), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
-	build_auto_opt(XGBRegressor(objective = "reg:linear"), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
+	build_auto_opt(XGBRegressor(objective = "reg:squarederror"), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 
 def build_auto_h2o(regressor, name):
 	transformer = ColumnTransformer(
