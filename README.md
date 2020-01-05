@@ -5,17 +5,17 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
 # Table of Contents #
 
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-    + [The Python side of operations](#the-python-side-of-operations)
-    + [The JPMML-SkLearn side of operations](#the-jpmml-sklearn-side-of-operations)
-- [Installation](#installation)
-- [Usage](#usage)
-    + [The Python side of operations](#the-python-side-of-operations-1)
-    + [The JPMML-SkLearn side of operations](#the-jpmml-sklearn-side-of-operations-1)
-- [Documentation](#documentation)
-- [License](#license)
-- [Additional information](#additional-information)
+* [Features](#features)
+* [Prerequisites](#prerequisites)
+  * [The Python side of operations](#the-python-side-of-operations)
+  * [The JPMML-SkLearn side of operations](#the-jpmml-sklearn-side-of-operations)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [The Python side of operations](#the-python-side-of-operations-1)
+  * [The JPMML-SkLearn side of operations](#the-jpmml-sklearn-side-of-operations-1)
+* [Documentation](#documentation)
+* [License](#license)
+* [Additional information](#additional-information)
 
 # Features #
 
