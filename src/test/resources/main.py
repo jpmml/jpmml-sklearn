@@ -558,11 +558,11 @@ def build_auto(regressor, name, fit_params = {}, predict_params = {}, **pmml_opt
 		(4, 3) : "4/3"
 	}
 	mapper = DataFrameMapper([
-		(["cylinders"], [CategoricalDomain(), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0"), name = "odd(cylinders)", prefit = True)]),
-		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), LabelBinarizer()]),
+		(["cylinders"], [CategoricalDomain(), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0", dtype = numpy.int8), name = "odd(cylinders)", prefit = True)]),
+		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), OneHotEncoder()]),
 		(["model_year"], [CategoricalDomain(), CastTransformer(str), ExpressionTransformer("'19' + X[0] + '-01-01'"), CastTransformer("datetime64[D]"), DaysSinceYearTransformer(1977), Binarizer(threshold = 0)], {"alias" : "bin(model_year, 1977)"}),
 		(["model_year", "origin"], [ConcatTransformer("/"), OneHotEncoder(sparse = False), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
-		(["weight", "displacement"], [ContinuousDomain(), ExpressionTransformer("(X[0] / X[1]) + 0.5")], {"alias" : "weight / displacement + 0.5"}),
+		(["weight", "displacement"], [ContinuousDomain(), ExpressionTransformer("(X[0] / X[1]) + 0.5", dtype = numpy.float64)], {"alias" : "weight / displacement + 0.5"}),
 		(["displacement", "horsepower", "weight", "acceleration"], [MultiDomain([None, ContinuousDomain(), None, ContinuousDomain()]), StandardScaler()])
 	])
 	pipeline = PMMLPipeline([
