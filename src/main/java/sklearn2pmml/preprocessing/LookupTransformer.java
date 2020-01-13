@@ -35,6 +35,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
@@ -102,7 +103,7 @@ public class LookupTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, dataType, mapValues);
 
-		Feature feature = new Feature(encoder, derivedField.getName(), derivedField.getDataType()){
+		Feature feature = new ObjectFeature(encoder, derivedField.getName(), derivedField.getDataType()){
 
 			@Override
 			public ContinuousFeature toContinuousFeature(){
