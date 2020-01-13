@@ -39,6 +39,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.linear_model.LinearClassifier;
 
@@ -51,6 +52,10 @@ public class LogisticRegression extends LinearClassifier {
 	@Override
 	public Model encodeModel(Schema schema){
 		String multiClass = getMultiClass();
+
+		if(("auto").equals(multiClass)){
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be explicitly set to the 'ovr' or 'multinomial' value");
+		} else
 
 		if(("multinomial").equals(multiClass)){
 			return encodeMultinomialModel(schema);

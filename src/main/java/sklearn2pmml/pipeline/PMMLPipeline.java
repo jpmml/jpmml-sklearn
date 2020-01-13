@@ -282,7 +282,7 @@ public class PMMLPipeline extends Pipeline {
 		if(estimator.isSupervised()){
 
 			if(verification == null){
-				logger.warn("Model verification data is not set. Use method '" + ClassDictUtil.formatMember(this, "verify(X)") + "' to correct this deficiency");
+				logger.warn("Model verification data is not set. Use method \'" + ClassDictUtil.formatMember(this, "verify(X)") + "\' to correct this deficiency");
 
 				break verification;
 			}
