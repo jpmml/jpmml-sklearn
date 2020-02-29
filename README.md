@@ -346,6 +346,7 @@ java -jar target/jpmml-sklearn-executable-1.5-SNAPSHOT.jar --help
 
 Up-to-date:
 
+* [Extending Scikit-Learn with feature specifications](https://openscoring.io/blog/2020/02/23/sklearn_feature_specification_pmml/)
 * [Converting logistic regression models to PMML documents](https://openscoring.io/blog/2020/01/19/converting_logistic_regression_pmml/)
 * [Stacking Scikit-Learn, LightGBM and XGBoost models](https://openscoring.io/blog/2020/01/02/stacking_sklearn_lightgbm_xgboost/)
 * [Converting Scikit-Learn hyperparameter-tuned pipelines to PMML documents](https://openscoring.io/blog/2019/12/25/converting_sklearn_gridsearchcv_pipeline_pmml/)
@@ -360,10 +361,12 @@ Slightly outdated:
 
 # License #
 
-JPMML-SkLearn is dual-licensed under the [GNU Affero General Public License (AGPL) version 3.0](https://www.gnu.org/licenses/agpl-3.0.html), and a commercial license.
+JPMML-SkLearn is licensed under the terms and conditions of the [GNU Affero General Public License, Version 3.0](https://www.gnu.org/licenses/agpl-3.0.html).
+
+If you would like to use JPMML-SkLearn in a proprietary software project, then it is possible to enter into a licensing agreement which makes JPMML-SkLearn available under the terms and conditions of the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause) instead.
 
 # Additional information #
 
 JPMML-SkLearn is developed and maintained by Openscoring Ltd, Estonia.
 
-Interested in using JPMML software in your application? Please contact [info@openscoring.io](mailto:info@openscoring.io)
+Interested in using [Java PMML API](https://github.com/jpmml) software in your company? Please contact [info@openscoring.io](mailto:info@openscoring.io)
