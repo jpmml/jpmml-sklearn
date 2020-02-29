@@ -65,6 +65,8 @@ public class DType extends CClassDict {
 			switch(className){
 				case "builtins.bool":
 					return DataType.BOOLEAN;
+				case "builtins.float":
+					return DataType.DOUBLE;
 				case "builtins.int":
 					return DataType.INTEGER;
 				case "builtins.str":

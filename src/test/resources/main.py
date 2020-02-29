@@ -37,7 +37,7 @@ from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirst
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer
+from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
@@ -89,7 +89,7 @@ def kmeans_distance(kmeans, center, X):
 
 def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 	mapper = DataFrameMapper([
-		(wheat_X.columns.values, ContinuousDomain())
+		(wheat_X.columns.values, [ContinuousDomain(dtype = float), IdentityTransformer()])
 	])
 	scaler = ColumnTransformer([
 		("robust", RobustScaler(), [0, 5])
