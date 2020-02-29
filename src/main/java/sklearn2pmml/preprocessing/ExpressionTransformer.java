@@ -70,12 +70,13 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public Object getDType(){
+		Object dtype = get("dtype");
 
-		if(!containsKey("dtype")){
+		if(dtype == null){
 			return null;
 		}
 
-		return getDType(true);
+		return super.getDType(true);
 	}
 
 	public String getExpr(){

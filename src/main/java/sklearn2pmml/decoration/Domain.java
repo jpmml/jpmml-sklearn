@@ -110,8 +110,9 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public Object getDType(){
+		Object dtype = get("dtype");
 
-		if(!containsKey("dtype")){
+		if(dtype == null){
 			return null;
 		}
 
