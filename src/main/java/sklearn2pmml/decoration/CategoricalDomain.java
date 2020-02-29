@@ -22,20 +22,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.TypeUtil;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.TransformerUtil;
 
-public class CategoricalDomain extends Domain {
+public class CategoricalDomain extends DiscreteDomain {
 
 	public CategoricalDomain(String module, String name){
 		super(module, name);
@@ -49,24 +43,6 @@ public class CategoricalDomain extends Domain {
 	@Override
 	public OpType getOpType(){
 		return OpType.CATEGORICAL;
-	}
-
-	@Override
-	public DataType getDataType(){
-		Object dtype = getDType();
-		Boolean withData = getWithData();
-
-		if(dtype != null){
-			return TransformerUtil.getDataType(dtype);
-		} // End if
-
-		if(withData){
-			List<?> data = getData();
-
-			return TypeUtil.getDataType(data, DataType.STRING);
-		}
-
-		return DataType.STRING;
 	}
 
 	@Override
@@ -99,26 +75,5 @@ public class CategoricalDomain extends Domain {
 		}
 
 		return super.encodeFeatures(Collections.singletonList(feature), encoder);
-	}
-
-	public List<?> getData(){
-		return getArray("data_");
-	}
-
-	public Object[] getDiscrStats(){
-		return getTuple("discr_stats_");
-	}
-
-	static
-	public DiscrStats createDiscrStats(Object[] objects){
-		List<Object> values = (List)asArray(objects[0]);
-		List<Integer> counts = ValueUtil.asIntegers((List)asArray(objects[1]));
-
-		ClassDictUtil.checkSize(values, counts);
-
-		DiscrStats discrStats = new DiscrStats()
-			.addArrays(PMMLUtil.createStringArray(values), PMMLUtil.createIntArray(counts));
-
-		return discrStats;
 	}
 }

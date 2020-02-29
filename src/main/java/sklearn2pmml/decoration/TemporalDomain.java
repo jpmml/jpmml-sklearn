@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.WildcardFeature;
@@ -30,7 +29,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 
 abstract
-public class TemporalDomain extends Domain {
+public class TemporalDomain extends OrdinalDomain {
 
 	public TemporalDomain(String module, String name){
 		super(module, name);
@@ -39,11 +38,6 @@ public class TemporalDomain extends Domain {
 	@Override
 	public int getNumberOfFeatures(){
 		return HasNumberOfFeatures.UNKNOWN;
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.ORDINAL;
 	}
 
 	@Override
