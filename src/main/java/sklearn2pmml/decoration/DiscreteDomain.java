@@ -18,14 +18,20 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
+import org.dmg.pmml.UnivariateStats;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.TransformerUtil;
 
 abstract
@@ -33,6 +39,14 @@ public class DiscreteDomain extends Domain {
 
 	public DiscreteDomain(String module, String name){
 		super(module, name);
+	}
+
+	abstract
+	public Feature encode(WildcardFeature wildcardFeature, List<?> values);
+
+	@Override
+	public int getNumberOfFeatures(){
+		return 1;
 	}
 
 	@Override
@@ -51,6 +65,42 @@ public class DiscreteDomain extends Domain {
 		}
 
 		return DataType.STRING;
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Boolean withData = getWithData();
+		Boolean withStatistics = getWithStatistics();
+
+		ClassDictUtil.checkSize(1, features);
+
+		Feature feature = features.get(0);
+
+		WildcardFeature wildcardFeature = asWildcardFeature(feature);
+
+		if(withData){
+			List<?> data = getData();
+
+			feature = encode(wildcardFeature, data);
+		} else
+
+		{
+			feature = encode(wildcardFeature, Collections.emptyList());
+		} // End if
+
+		if(withStatistics){
+			Map<String, ?> counts = extractMap(getCounts(), 0);
+			Object[] discrStats = getDiscrStats();
+
+			UnivariateStats univariateStats = new UnivariateStats()
+				.setField(wildcardFeature.getName())
+				.setCounts(createCounts(counts))
+				.setDiscrStats(createDiscrStats(discrStats));
+
+			encoder.putUnivariateStats(univariateStats);
+		}
+
+		return super.encodeFeatures(Collections.singletonList(feature), encoder);
 	}
 
 	public List<?> getData(){

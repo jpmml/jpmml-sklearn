@@ -18,16 +18,14 @@
  */
 package sklearn2pmml.decoration;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
 
 public class CategoricalDomain extends DiscreteDomain {
 
@@ -36,44 +34,22 @@ public class CategoricalDomain extends DiscreteDomain {
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		return 1;
-	}
-
-	@Override
 	public OpType getOpType(){
 		return OpType.CATEGORICAL;
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Boolean withData = getWithData();
-		Boolean withStatistics = getWithStatistics();
+	public Feature encode(WildcardFeature wildcardFeature, List<?> values){
+		PMMLEncoder encoder = wildcardFeature.getEncoder();
 
-		ClassDictUtil.checkSize(1, features);
+		if(values == null || values.isEmpty()){
+			DataField dataField = (DataField)encoder.getField(wildcardFeature.getName());
 
-		Feature feature = features.get(0);
+			dataField.setOpType(OpType.CATEGORICAL);
 
-		WildcardFeature wildcardFeature = asWildcardFeature(feature);
-
-		if(withData){
-			List<?> data = getData();
-
-			feature = wildcardFeature.toCategoricalFeature(data);
-		} // End if
-
-		if(withStatistics){
-			Map<String, ?> counts = extractMap(getCounts(), 0);
-			Object[] discrStats = getDiscrStats();
-
-			UnivariateStats univariateStats = new UnivariateStats()
-				.setField(wildcardFeature.getName())
-				.setCounts(createCounts(counts))
-				.setDiscrStats(createDiscrStats(discrStats));
-
-			encoder.putUnivariateStats(univariateStats);
+			return new ObjectFeature(encoder, dataField.getName(), dataField.getDataType());
 		}
 
-		return super.encodeFeatures(Collections.singletonList(feature), encoder);
+		return wildcardFeature.toCategoricalFeature(values);
 	}
 }

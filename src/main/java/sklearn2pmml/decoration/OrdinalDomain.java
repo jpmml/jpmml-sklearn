@@ -18,9 +18,14 @@
  */
 package sklearn2pmml.decoration;
 
-import org.dmg.pmml.OpType;
+import java.util.List;
 
-abstract
+import org.dmg.pmml.DataField;
+import org.dmg.pmml.OpType;
+import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.PMMLEncoder;
+import org.jpmml.converter.WildcardFeature;
+
 public class OrdinalDomain extends DiscreteDomain {
 
 	public OrdinalDomain(String module, String name){
@@ -30,5 +35,24 @@ public class OrdinalDomain extends DiscreteDomain {
 	@Override
 	public OpType getOpType(){
 		return OpType.ORDINAL;
+	}
+
+	@Override
+	public ObjectFeature encode(WildcardFeature wildcardFeature, List<?> values){
+		PMMLEncoder encoder = wildcardFeature.getEncoder();
+
+		DataField dataField;
+
+		if(values == null || values.isEmpty()){
+			dataField = (DataField)encoder.getField(wildcardFeature.getName());
+		} else
+
+		{
+			dataField = (DataField)encoder.toCategorical(wildcardFeature.getName(), values);
+		}
+
+		dataField.setOpType(OpType.ORDINAL);
+
+		return new ObjectFeature(encoder, dataField.getName(), dataField.getDataType());
 	}
 }
