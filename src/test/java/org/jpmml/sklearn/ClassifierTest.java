@@ -177,14 +177,14 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-		evaluate("XGB", "Audit", new FloatEquivalence(128));
+		evaluate("XGB", "Audit", excludeFields(ClassifierTest.falseProbabilityField), new FloatEquivalence(8));
 	}
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
-		FieldName[] transformFields = {FieldName.create("predict(Adjusted)"), FieldName.create("eval(Adjusted)")};
+		FieldName[] transformFields = {ClassifierTest.falseProbabilityField, FieldName.create("predict(Adjusted)"), FieldName.create("eval(Adjusted)")};
 
-		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(32));
+		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(8));
 	}
 
 	@Test
@@ -194,7 +194,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBRFAudit() throws Exception {
-		evaluate("XGBRF", "Audit", new FloatEquivalence(8));
+		evaluate("XGBRF", "Audit", excludeFields(ClassifierTest.falseProbabilityField), new FloatEquivalence(2));
 	}
 
 	@Test
@@ -430,6 +430,8 @@ public class ClassifierTest extends EstimatorTest {
 
 	private static final FieldName[] neighborFields = createFields("neighbor", 5);
 
-	private static final FieldName[] auditProbabilityFields = {FieldName.create("probability(0)"), FieldName.create("probability(1)")};
+	private static final FieldName falseProbabilityField = FieldName.create("probability(0)");
+	private static final FieldName trueProbabilityField = FieldName.create("probability(1)");
+
 	private static final FieldName[] irisProbabilityFields = {FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)")};
 }
