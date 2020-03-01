@@ -177,14 +177,14 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-		evaluate("XGB", "Audit", new FloatEquivalence(64));
+		evaluate("XGB", "Audit", new FloatEquivalence(128));
 	}
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
 		FieldName[] transformFields = {FieldName.create("predict(Adjusted)"), FieldName.create("eval(Adjusted)")};
 
-		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(8));
+		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(32));
 	}
 
 	@Test
@@ -344,7 +344,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", "Iris", new FloatEquivalence(8));
+		evaluate("XGB", "Iris", new FloatEquivalence(4));
 	}
 
 	@Test
