@@ -72,8 +72,26 @@ public class SelectFirstEstimator extends Estimator implements HasClasses {
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.SELECT_FIRST, null);
 
 		for(Object[] step : steps){
-			String predicate = TupleUtil.extractElement(step, 0, String.class);
-			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
+			String name;
+			Estimator estimator;
+			String predicate;
+
+			// SkLearn2PMML 0.54.0
+			if(step.length == 2){
+				predicate = TupleUtil.extractElement(step, 0, String.class);
+				estimator = TupleUtil.extractElement(step, 1, Estimator.class);
+			} else
+
+			// SkLearn2PMML 0.55.0+
+			if(step.length == 3){
+				name = TupleUtil.extractElement(step, 0, String.class);
+				estimator = TupleUtil.extractElement(step, 1, Estimator.class);
+				predicate = TupleUtil.extractElement(step, 2, String.class);
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			} // End if
 
 			if(miningFunction == null){
 				miningFunction = estimator.getMiningFunction();

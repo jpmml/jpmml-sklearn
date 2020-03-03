@@ -484,13 +484,13 @@ if "Iris" in datasets:
 			(iris_X.columns.values, ContinuousDomain())
 		])),
 		("estimator", SelectFirstEstimator([
-			("X[1] <= 3", Pipeline([
+			("select", Pipeline([
 				("classifier", DecisionTreeClassifier(random_state = 13))
-			])),
-			(str(True), Pipeline([
+			]), "X[1] <= 3"),
+			("default", Pipeline([
 				("scaler", StandardScaler()),
 				("classifier", LogisticRegression(multi_class = "ovr", solver = "liblinear"))
-			]))
+			]), str(True))
 		]))
 	])
 	pipeline.fit(iris_X, iris_y)

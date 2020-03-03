@@ -44,18 +44,6 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
-	public Object get(Object key){
-
-		if(super.containsKey(key)){
-			return super.get(key);
-		}
-
-		Estimator estimator = getEstimator();
-
-		return estimator.get(key);
-	}
-
-	@Override
 	public int getNumberOfFeatures(){
 		Estimator estimator = getEstimator();
 
@@ -109,17 +97,28 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	 */
 	@Override
 	public Estimator getEstimator(){
-		Object estimator = super.get("estimator_");
+		String name;
 
+		// SkLearn2PMML 0.54.0
+		if(containsKey("estimator_")){
+			name = "estimator_";
+		} else
+
+		// SkLearn2PMML 0.55.0+
+		{
+			name = "estimator";
+		}
+
+		Object estimator = get(name);
 		if(estimator == null){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, "estimator_") + "\' has a missing (None/null) value");
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, name) + "\' has a missing (None/null) value");
 		}
 
 		CastFunction<Estimator> castFunction = new CastFunction<Estimator>(Estimator.class){
 
 			@Override
 			protected String formatMessage(Object object){
-				return "Attribute \'" + ClassDictUtil.formatMember(EstimatorProxy.this, "estimator_") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+				return "Attribute \'" + ClassDictUtil.formatMember(EstimatorProxy.this, name) + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
 			}
 		};
 
