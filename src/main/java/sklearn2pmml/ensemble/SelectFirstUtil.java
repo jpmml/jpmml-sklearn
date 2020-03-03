@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Villu Ruusmann
+ * Copyright (c) 2020 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -32,33 +32,25 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.PredicateTranslator;
 import org.jpmml.sklearn.TupleUtil;
-import sklearn.ClassifierUtil;
 import sklearn.Estimator;
-import sklearn.HasClasses;
 
-public class SelectFirstEstimator extends Estimator implements HasClasses {
+public class SelectFirstUtil {
 
-	public SelectFirstEstimator(String module, String name){
-		super(module, name);
+	private SelectFirstUtil(){
 	}
 
-	@Override
-	public MiningFunction getMiningFunction(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getMiningFunction();
+	static
+	public MiningModel encodeRegressor(List<Object[]> steps, Schema schema){
+		return encodeModel(MiningFunction.REGRESSION, steps, schema);
 	}
 
-	@Override
-	public List<?> getClasses(){
-		Estimator estimator = getEstimator();
-
-		return ClassifierUtil.getClasses(estimator);
+	static
+	public MiningModel encodeClassifier(List<Object[]> steps, Schema schema){
+		return encodeModel(MiningFunction.CLASSIFICATION, steps, schema);
 	}
 
-	@Override
-	public Model encodeModel(Schema schema){
-		List<Object[]> steps = getSteps();
+	static
+	private MiningModel encodeModel(MiningFunction miningFunction, List<Object[]> steps, Schema schema){
 
 		if(steps.size() < 1){
 			throw new IllegalArgumentException();
@@ -67,47 +59,23 @@ public class SelectFirstEstimator extends Estimator implements HasClasses {
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		MiningFunction miningFunction = null;
-
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.SELECT_FIRST, null);
 
 		for(Object[] step : steps){
-			String name;
-			Estimator estimator;
-			String predicate;
+			String name = TupleUtil.extractElement(step, 0, String.class);
+			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
+			String predicate = TupleUtil.extractElement(step, 2, String.class);
 
-			// SkLearn2PMML 0.54.0
-			if(step.length == 2){
-				predicate = TupleUtil.extractElement(step, 0, String.class);
-				estimator = TupleUtil.extractElement(step, 1, Estimator.class);
-			} else
-
-			// SkLearn2PMML 0.55.0+
-			if(step.length == 3){
-				name = TupleUtil.extractElement(step, 0, String.class);
-				estimator = TupleUtil.extractElement(step, 1, Estimator.class);
-				predicate = TupleUtil.extractElement(step, 2, String.class);
-			} else
-
-			{
+			if(!(miningFunction).equals(estimator.getMiningFunction())){
 				throw new IllegalArgumentException();
-			} // End if
-
-			if(miningFunction == null){
-				miningFunction = estimator.getMiningFunction();
-			} else
-
-			{
-				if(!(miningFunction).equals(estimator.getMiningFunction())){
-					throw new IllegalArgumentException();
-				}
 			}
 
 			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, features);
 
 			Model model = estimator.encodeModel(schema);
 
-			Segment segment = new Segment(pmmlPredicate, model);
+			Segment segment = new Segment(pmmlPredicate, model)
+				.setId(name);
 
 			segmentation.addSegments(segment);
 		}
@@ -116,21 +84,5 @@ public class SelectFirstEstimator extends Estimator implements HasClasses {
 			.setSegmentation(segmentation);
 
 		return miningModel;
-	}
-
-	public Estimator getEstimator(){
-		List<Object[]> steps = getSteps();
-
-		if(steps.size() < 1){
-			throw new IllegalArgumentException();
-		}
-
-		Object[] step = steps.get(0);
-
-		return TupleUtil.extractElement(step, 1, Estimator.class);
-	}
-
-	public List<Object[]> getSteps(){
-		return getTupleList("steps");
 	}
 }

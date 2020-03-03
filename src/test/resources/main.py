@@ -33,7 +33,7 @@ from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SV
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
-from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirstEstimator
+from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirstClassifier
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -483,7 +483,7 @@ if "Iris" in datasets:
 		("mapper", DataFrameMapper([
 			(iris_X.columns.values, ContinuousDomain())
 		])),
-		("estimator", SelectFirstEstimator([
+		("classifier", SelectFirstClassifier([
 			("select", Pipeline([
 				("classifier", DecisionTreeClassifier(random_state = 13))
 			]), "X[1] <= 3"),
@@ -496,6 +496,8 @@ if "Iris" in datasets:
 	pipeline.fit(iris_X, iris_y)
 	store_pkl(pipeline, "SelectFirstIris")
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, "SelectFirstIris")
 
 if "Iris" in datasets:
