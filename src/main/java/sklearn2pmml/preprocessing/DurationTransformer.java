@@ -19,11 +19,9 @@
 package sklearn2pmml.preprocessing;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import com.google.common.base.CaseFormat;
 import org.dmg.pmml.DataType;
@@ -35,6 +33,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.sklearn.CalendarUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -58,14 +57,7 @@ public class DurationTransformer extends Transformer {
 		GregorianCalendar epoch = getEpoch();
 		String function = getFunction();
 
-		ZoneId epochZoneId = ZoneId.systemDefault();
-
-		TimeZone epochTimeZone = epoch.getTimeZone();
-		if(epochTimeZone != null){
-			epochZoneId = epochTimeZone.toZoneId();
-		}
-
-		LocalDateTime epochDateTime = LocalDateTime.ofInstant(epoch.toInstant(), epochZoneId);
+		LocalDateTime epochDateTime = CalendarUtil.toLocalDateTime(epoch);
 		if(epochDateTime.getMonthValue() != 1 || epochDateTime.getDayOfMonth() != 1){
 			throw new IllegalArgumentException(String.valueOf(epochDateTime));
 		}

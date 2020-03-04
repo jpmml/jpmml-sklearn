@@ -146,7 +146,7 @@ public class ContinuousDomain extends Domain {
 				UnivariateStats univariateStats = new UnivariateStats()
 					.setField(dataField.getName())
 					.setCounts(createCounts(counts))
-					.setNumericInfo(createNumericInfo(numericInfo));
+					.setNumericInfo(createNumericInfo(wildcardFeature.getDataType(), numericInfo));
 
 				encoder.putUnivariateStats(univariateStats);
 			}
@@ -190,7 +190,7 @@ public class ContinuousDomain extends Domain {
 	}
 
 	static
-	public NumericInfo createNumericInfo(Map<String, ?> values){
+	public NumericInfo createNumericInfo(DataType dataType, Map<String, ?> values){
 		NumericInfo numericInfo = new NumericInfo()
 			.setMinimum(selectValue(values, "minimum"))
 			.setMaximum(selectValue(values, "maximum"))
