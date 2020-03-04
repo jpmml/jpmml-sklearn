@@ -91,7 +91,9 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 		}
 
 		for(Feature feature : features){
-			DataField dataField = (DataField)feature.getField();
+			WildcardFeature wildcardFeature = asWildcardFeature(feature);
+
+			DataField dataField = wildcardFeature.getField();
 
 			if(missingValueTreatment != null){
 				encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatment, missingValueReplacement));

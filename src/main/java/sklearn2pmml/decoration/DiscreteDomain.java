@@ -69,6 +69,8 @@ public class DiscreteDomain extends Domain {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		features = super.encodeFeatures(features, encoder);
+
 		Boolean withData = getWithData();
 		Boolean withStatistics = getWithStatistics();
 
@@ -100,7 +102,7 @@ public class DiscreteDomain extends Domain {
 			encoder.putUnivariateStats(univariateStats);
 		}
 
-		return super.encodeFeatures(Collections.singletonList(feature), encoder);
+		return Collections.singletonList(feature);
 	}
 
 	public List<?> getData(){

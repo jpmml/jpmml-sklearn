@@ -77,6 +77,8 @@ public class ContinuousDomain extends Domain {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		features = super.encodeFeatures(features, encoder);
+
 		OutlierTreatmentMethod outlierTreatment = DomainUtil.parseOutlierTreatment(getOutlierTreatment());
 
 		Number lowValue;
@@ -152,7 +154,7 @@ public class ContinuousDomain extends Domain {
 			result.add(feature);
 		}
 
-		return super.encodeFeatures(result, encoder);
+		return result;
 	}
 
 	public String getOutlierTreatment(){

@@ -19,16 +19,18 @@
 package sklearn2pmml.decoration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.DataField;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 
 abstract
-public class TemporalDomain extends OrdinalDomain {
+public class TemporalDomain extends Domain {
 
 	public TemporalDomain(String module, String name){
 		super(module, name);
@@ -41,6 +43,8 @@ public class TemporalDomain extends OrdinalDomain {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		features = super.encodeFeatures(features, encoder);
+
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
@@ -48,11 +52,15 @@ public class TemporalDomain extends OrdinalDomain {
 
 			WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
-			feature = encode(wildcardFeature, Collections.emptyList());
+			DataField dataField = wildcardFeature.getField();
+
+			dataField.setOpType(OpType.ORDINAL);
+
+			feature = new ObjectFeature(encoder, dataField.getName(), dataField.getDataType());
 
 			result.add(feature);
 		}
 
-		return super.encodeFeatures(result, encoder);
+		return result;
 	}
 }
