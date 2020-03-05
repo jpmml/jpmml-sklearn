@@ -192,6 +192,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.PMMLLabelEncoder`
     * `sklearn2pmml.preprocessing.PowerFunctionTransformer`
     * `sklearn2pmml.preprocessing.ReplaceTransformer`
+    * `sklearn2pmml.preprocessing.SecondsSinceMidnightTransformer`
     * `sklearn2pmml.preprocessing.SecondsSinceYearTransformer`
     * `sklearn2pmml.preprocessing.StringNormalizer`
     * `sklearn2pmml.preprocessing.SubstringTransformer`
