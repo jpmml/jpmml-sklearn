@@ -18,15 +18,10 @@
  */
 package sklearn2pmml.decoration;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.UnivariateStats;
@@ -35,7 +30,6 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.CalendarUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.TransformerUtil;
@@ -89,8 +83,6 @@ public class DiscreteDomain extends Domain {
 		if(withData){
 			List<?> data = getData();
 
-			data = formatValues(wildcardFeature.getDataType(), data);
-
 			feature = encode(wildcardFeature, data);
 		} else
 
@@ -128,46 +120,9 @@ public class DiscreteDomain extends Domain {
 
 		ClassDictUtil.checkSize(values, counts);
 
-		values = (List)formatValues(dataType, values);
-
 		DiscrStats discrStats = new DiscrStats()
-			.addArrays(PMMLUtil.createStringArray(values), PMMLUtil.createIntArray(counts));
+			.addArrays(PMMLUtil.createStringArray(standardizeValues(dataType, values)), PMMLUtil.createIntArray(counts));
 
 		return discrStats;
-	}
-
-	static
-	private List<?> formatValues(DataType dataType, List<?> values){
-		Function<Object, Object> function;
-
-		switch(dataType){
-			case DATE:
-				function = new Function<Object, Object>(){
-
-					@Override
-					public LocalDate apply(Object object){
-						return CalendarUtil.toLocalDate((GregorianCalendar)object);
-					}
-				};
-				break;
-			case DATE_TIME:
-				function = new Function<Object, Object>(){
-
-					@Override
-					public LocalDateTime apply(Object object){
-						return CalendarUtil.toLocalDateTime((GregorianCalendar)object);
-					}
-				};
-				break;
-			default:
-				function = null;
-				break;
-		}
-
-		if(function != null){
-			values = Lists.transform(values, function);
-		}
-
-		return values;
 	}
 }

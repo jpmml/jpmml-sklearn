@@ -48,7 +48,7 @@ public class OrdinalDomain extends DiscreteDomain {
 		} else
 
 		{
-			dataField = (DataField)encoder.toCategorical(wildcardFeature.getName(), values);
+			dataField = (DataField)encoder.toCategorical(wildcardFeature.getName(), standardizeValues(wildcardFeature.getDataType(), values));
 		}
 
 		dataField.setOpType(OpType.ORDINAL);

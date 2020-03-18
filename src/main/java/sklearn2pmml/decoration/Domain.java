@@ -18,12 +18,17 @@
  */
 package sklearn2pmml.decoration;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.Counts;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -37,6 +42,7 @@ import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.sklearn.CalendarUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -95,16 +101,18 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 
 			DataField dataField = wildcardFeature.getField();
 
+			DataType dataType = dataField.getDataType();
+
 			if(missingValueTreatment != null){
-				encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatment, missingValueReplacement));
+				encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatment, standardizeValue(dataType, missingValueReplacement)));
 			} // End if
 
 			if(missingValues != null){
-				PMMLUtil.addValues(dataField, missingValues, Value.Property.MISSING);
+				PMMLUtil.addValues(dataField, standardizeValues(dataType, missingValues), Value.Property.MISSING);
 			} // End if
 
 			if(invalidValueTreatment != null){
-				encoder.addDecorator(dataField, new InvalidValueDecorator(invalidValueTreatment, invalidValueReplacement));
+				encoder.addDecorator(dataField, new InvalidValueDecorator(invalidValueTreatment, standardizeValue(dataType, invalidValueReplacement)));
 			}
 		}
 
@@ -233,5 +241,53 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 		}
 
 		throw new IllegalArgumentException(ClassDictUtil.formatClass(object) + " is not a supported array type");
+	}
+
+	static
+	protected Object standardizeValue(DataType dataType, Object value){
+
+		switch(dataType){
+			case DATE:
+				return CalendarUtil.toLocalDate((GregorianCalendar)value);
+			case DATE_TIME:
+				return CalendarUtil.toLocalDateTime((GregorianCalendar)value);
+			default:
+				return value;
+		}
+	}
+
+	static
+	protected List<?> standardizeValues(DataType dataType, List<?> values){
+		Function<Object, Object> function;
+
+		switch(dataType){
+			case DATE:
+				function = new Function<Object, Object>(){
+
+					@Override
+					public LocalDate apply(Object object){
+						return CalendarUtil.toLocalDate((GregorianCalendar)object);
+					}
+				};
+				break;
+			case DATE_TIME:
+				function = new Function<Object, Object>(){
+
+					@Override
+					public LocalDateTime apply(Object object){
+						return CalendarUtil.toLocalDateTime((GregorianCalendar)object);
+					}
+				};
+				break;
+			default:
+				function = null;
+				break;
+		}
+
+		if(function != null){
+			values = Lists.transform(values, function);
+		}
+
+		return values;
 	}
 }

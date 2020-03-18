@@ -50,6 +50,6 @@ public class CategoricalDomain extends DiscreteDomain {
 			return new ObjectFeature(encoder, dataField.getName(), dataField.getDataType());
 		}
 
-		return wildcardFeature.toCategoricalFeature(values);
+		return wildcardFeature.toCategoricalFeature(standardizeValues(wildcardFeature.getDataType(), values));
 	}
 }
