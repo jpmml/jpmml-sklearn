@@ -142,6 +142,23 @@ public class ExpressionTranslator extends AbstractTranslator {
 
 	static
 	private Expression translateTrailerFunction(Expression expression, String function, List<Expression> arguments){
+		
+		if(("lower").equals(function) || ("upper").equals(function)){
+			
+			if(arguments.size() != 0){
+				throw new IllegalArgumentException();
+			}
+
+			switch(function){
+				case "lower":
+					return PMMLUtil.createApply(PMMLFunctions.LOWERCASE, expression);
+				case "upper":
+					return PMMLUtil.createApply(PMMLFunctions.UPPERCASE, expression);
+				default:
+					break;
+			}
+		}
+		
 		throw new IllegalArgumentException(function);
 	}
 

@@ -175,6 +175,24 @@ public class ExpressionTranslatorTest extends TranslatorTest {
 	}
 
 	@Test
+	public void translateStringIfElseExpression(){
+		String string = "X[0].lower() if X[1] == \'lowercase\' else X[0].upper()";
+
+		Expression expected = PMMLUtil.createApply(PMMLFunctions.IF)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.EQUAL)
+				.addExpressions(new FieldRef(FieldName.create("b")), PMMLUtil.createConstant("lowercase", DataType.STRING))
+			)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.LOWERCASE)
+				.addExpressions(new FieldRef(FieldName.create("a")))
+			)
+			.addExpressions(PMMLUtil.createApply(PMMLFunctions.UPPERCASE)
+				.addExpressions(new FieldRef(FieldName.create("a")))
+			);
+
+		checkExpression(expected, string, stringFeatures);
+	}
+
+	@Test
 	public void translateUnaryExpression(){
 		Constant minusOne = PMMLUtil.createConstant("-1", DataType.INTEGER);
 		Constant plusOne = PMMLUtil.createConstant("1", DataType.INTEGER);
