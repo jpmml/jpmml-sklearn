@@ -141,6 +141,11 @@ public class ExpressionTranslator extends AbstractTranslator {
 	}
 
 	static
+	private Expression translateTrailerFunction(Expression expression, String function, List<Expression> arguments){
+		throw new IllegalArgumentException(function);
+	}
+
+	static
 	private Expression translateFunction(String function, List<Expression> arguments){
 		int dot = function.lastIndexOf('.');
 		if(dot < 0){
@@ -492,11 +497,13 @@ Expression UnaryExpression():
 Expression PrimaryExpression():
 {
 	Expression expression;
+	Token name = null;
+	List<Expression> arguments = null;
 }
 {
 	(
 		LOOKAHEAD(<NAME> <LBRACKET>)
-		expression = ArrayIndexingExpression()
+		expression = ArrayIndexingExpression() (<DOT> name = <NAME> arguments = Arguments())?
 		|
 		expression = FunctionInvocationExpression()
 		|
@@ -506,6 +513,10 @@ Expression PrimaryExpression():
 	)
 
 	{
+		if(name != null){
+			return translateTrailerFunction(expression, name.image, arguments);
+		}
+
 		return expression;
 	}
 }
@@ -558,8 +569,8 @@ FieldRef ArrayIndexingExpression():
 Expression FunctionInvocationExpression():
 {
 	Token name;
-	StringBuilder function = new StringBuilder();
 	List<Expression> arguments;
+	StringBuilder function = new StringBuilder();
 }
 {
 	name = <NAME> {
@@ -581,7 +592,12 @@ List<Expression> Arguments():
 	List<Expression> expressions = new ArrayList<Expression>();
 }
 {
-	<LPAREN> expression = Expression() { expressions.add(expression); } ( <COMMA> expression = Expression() { expressions.add(expression); })* <RPAREN>
+	(
+		LOOKAHEAD(<LPAREN> <RPAREN>)
+		<LPAREN> <RPAREN>
+		|
+		<LPAREN> expression = Expression() { expressions.add(expression); } ( <COMMA> expression = Expression() { expressions.add(expression); })* <RPAREN>
+	)
 
 	{
 		return expressions;
