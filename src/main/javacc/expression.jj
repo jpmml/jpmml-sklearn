@@ -157,8 +157,17 @@ public class ExpressionTranslator extends AbstractTranslator {
 				default:
 					break;
 			}
+		} else
+
+		if(("strip").equals(function)){
+			
+			if(arguments.size() != 0){
+				throw new IllegalArgumentException();
+			}
+
+			return PMMLUtil.createApply(PMMLFunctions.TRIMBLANKS, expression);
 		}
-		
+
 		throw new IllegalArgumentException(function);
 	}
 
