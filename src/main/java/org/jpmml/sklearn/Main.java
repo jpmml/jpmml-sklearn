@@ -22,7 +22,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -33,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Estimator;
 import sklearn.pipeline.Pipeline;
+import sklearn.tree.HasTreeOptions;
 import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class Main {
@@ -57,6 +61,56 @@ public class Main {
 		required = true
 	)
 	private File output = null;
+
+	/**
+	 * @see HasTreeOptions#OPTION_COMPACT
+	 */
+	@Parameter (
+		names = "-X-compact",
+		arity = 1,
+		hidden = true
+	)
+	private Boolean compact = null;
+
+	/**
+	 * @see HasTreeOptions#OPTION_FLAT
+	 */
+	@Parameter (
+		names = "-X-flat",
+		arity = 1,
+		hidden = true
+	)
+	private Boolean flat = null;
+
+	/**
+	 * @see HasTreeOptions#OPTION_NODE_ID
+	 */
+	@Parameter (
+		names = "-X-node_id",
+		arity = 1,
+		hidden = true
+	)
+	private Boolean nodeId = null;
+
+	/**
+	 * @see HasTreeOptions#OPTION_NODE_SCORE
+	 */
+	@Parameter (
+		names = "-X-node_score",
+		arity = 1,
+		hidden = true
+	)
+	private Boolean nodeScore = null;
+
+	/**
+	 * @see HasTreeOptions#OPTION_WINNER_ID
+	 */
+	@Parameter (
+		names = {"-X-winner_id"},
+		arity = 1,
+		hidden = true
+	)
+	private Boolean winnerId = null;
 
 
 	static
@@ -135,6 +189,35 @@ public class Main {
 		}
 
 		PMMLPipeline pipeline = (PMMLPipeline)object;
+
+		options:
+		if(pipeline.hasFinalEstimator()){
+			Estimator estimator = pipeline.getFinalEstimator();
+
+			Map<String, Object> options = new LinkedHashMap<>();
+
+			options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
+			options.put(HasTreeOptions.OPTION_FLAT, this.flat);
+			options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
+			options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
+			options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);
+
+			// Ignore defaults
+			options.values().removeIf(Objects::isNull);
+
+			if(options.isEmpty()){
+				break options;
+			}
+
+			Map<String, ?> pmmlOptions = estimator.getPMMLOptions();
+			if(pmmlOptions == null){
+				pmmlOptions = new LinkedHashMap<>();
+
+				estimator.setPMMLOptions(pmmlOptions);
+			}
+
+			pmmlOptions.putAll((Map)options);
+		}
 
 		PMML pmml;
 
