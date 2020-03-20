@@ -330,7 +330,9 @@ public class TreeUtil {
 			} else
 
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
-				result = new CountingBranchNode(null, predicate);
+				double value = values[index];
+
+				result = new CountingBranchNode(value, predicate);
 			} else
 
 			{

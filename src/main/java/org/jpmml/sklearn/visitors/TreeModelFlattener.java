@@ -96,6 +96,8 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 			} // End if
 
 			if((MiningFunction.REGRESSION).equals(this.miningFunction)){
+				parentNode.setScore(null);
+
 				initScore(parentNode, node);
 			} else
 
