@@ -74,14 +74,23 @@ public class TreeUtil {
 
 		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
 		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
+		Boolean nodeScore = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId);
 
-		boolean fixed = (nodeExtensions != null || nodeId);
+		boolean fixed = (nodeExtensions != null || nodeId || nodeScore);
 
 		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
 		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
 
-		if(fixed && (compact || flat)){
-			throw new IllegalArgumentException("Conflicting tree model options");
+		if(compact || flat){
+
+			if(fixed){
+				throw new IllegalArgumentException("Conflicting tree model options");
+			}
+
+			nodeExtensions = null;
+
+			nodeId = null;
+			nodeScore = null;
 		} // End if
 
 		if((Boolean.TRUE).equals(winnerId)){
@@ -180,6 +189,29 @@ public class TreeUtil {
 			};
 
 			visitors.add(nodeIdCleaner);
+		} // End if
+
+		if((Boolean.FALSE).equals(nodeScore)){
+			Visitor nodeScoreCleaner = new AbstractVisitor(){
+
+				@Override
+				public VisitorAction visit(Node node){
+
+					if(node.hasNodes()){
+						node.setScore(null);
+
+						if(node.hasScoreDistributions()){
+							List<ScoreDistribution> scoreDistributions = node.getScoreDistributions();
+
+							scoreDistributions.clear();
+						}
+					}
+
+					return super.visit(node);
+				}
+			};
+
+			visitors.add(nodeScoreCleaner);
 		}
 
 		for(Visitor visitor : visitors){

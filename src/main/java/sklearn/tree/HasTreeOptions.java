@@ -52,6 +52,11 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 	String OPTION_NODE_ID = "node_id";
 
 	/**
+	 * @see Node#getScore()
+	 */
+	String OPTION_NODE_SCORE = "node_score";
+
+	/**
 	 * @see OutputField
 	 */
 	String OPTION_WINNER_ID = "winner_id";
@@ -63,6 +68,7 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 		result.put(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
+		result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
 
 		return result;
 	}
