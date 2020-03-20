@@ -69,6 +69,7 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
+		result.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
 
 		return result;
 	}
