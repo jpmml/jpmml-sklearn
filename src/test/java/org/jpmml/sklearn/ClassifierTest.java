@@ -27,6 +27,16 @@ import org.junit.Test;
 public class ClassifierTest extends EstimatorTest {
 
 	@Test
+	public void evaluateDurationInDaysApollo() throws Exception {
+		evaluate("DurationInDays", "Apollo");
+	}
+
+	@Test
+	public void evaluateDurationInSecondsApollo() throws Exception {
+		evaluate("DurationInSeconds", "Apollo");
+	}
+
+	@Test
 	public void evaluateDecisionTreeAudit() throws Exception {
 		evaluate("DecisionTree", "Audit");
 	}
