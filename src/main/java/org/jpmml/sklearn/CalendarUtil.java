@@ -31,6 +31,11 @@ public class CalendarUtil {
 
 	static
 	public LocalDate toLocalDate(Calendar calendar){
+
+		if(calendar == null){
+			return null;
+		}
+
 		LocalDateTime dateTime = toLocalDateTime(calendar);
 
 		return dateTime.toLocalDate();
@@ -38,6 +43,11 @@ public class CalendarUtil {
 
 	static
 	public LocalDateTime toLocalDateTime(Calendar calendar){
+
+		if(calendar == null){
+			return null;
+		}
+
 		ZoneId zoneId = ZoneId.systemDefault();
 
 		TimeZone timeZone = calendar.getTimeZone();
