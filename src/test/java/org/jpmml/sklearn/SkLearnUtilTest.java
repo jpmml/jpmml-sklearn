@@ -44,6 +44,8 @@ public class SkLearnUtilTest {
 		assertTrue(SkLearnUtil.compareVersion("0.19.1", "0.19.1") == 0);
 
 		assertTrue(SkLearnUtil.compareVersion("0.20", "0.19") > 0);
+
+		assertTrue(SkLearnUtil.compareVersion("0.22.2", "0.22.2.post1") == 0);
 	}
 
 	@Test
@@ -55,5 +57,11 @@ public class SkLearnUtilTest {
 		assertEquals(Arrays.asList(0, 19), SkLearnUtil.parseVersion("0.19.dev"));
 		assertEquals(Arrays.asList(0, 19), SkLearnUtil.parseVersion("0.19.dev1"));
 		assertEquals(Arrays.asList(0, 19, 1), SkLearnUtil.parseVersion("0.19.1"));
+
+		assertEquals(Arrays.asList(0, 22), SkLearnUtil.parseVersion("0.22.post1"));
+		assertEquals(Arrays.asList(0, 22), SkLearnUtil.parseVersion("0.22rc1.post1.dev1"));
+		assertEquals(Arrays.asList(0, 22, 2), SkLearnUtil.parseVersion("0.22.2"));
+		assertEquals(Arrays.asList(0, 22, 2), SkLearnUtil.parseVersion("0.22.2.post1"));
+		assertEquals(Arrays.asList(0, 22, 2), SkLearnUtil.parseVersion("0.22.2.post1.dev1"));
 	}
 }

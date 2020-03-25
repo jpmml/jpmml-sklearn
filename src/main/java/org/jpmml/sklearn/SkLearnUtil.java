@@ -71,5 +71,10 @@ public class SkLearnUtil {
 		return tokens;
 	}
 
-	private static final Pattern PEP440_VERSION = Pattern.compile("(\\d+)\\.(\\d+)(?:(?:a|b|rc)\\d)?(?:\\.(?:(\\d)|(?:(?:dev)?\\d?)))?");
+	private static final String PEP440_REGEX =
+		"(\\d+)" +
+		"\\.(\\d+)" + "(?:(?:a|b|rc)\\d)?" +
+		"(?:\\.(?:(\\d)|(?:(?:post|dev)?\\d?)))*";
+
+	private static final Pattern PEP440_VERSION = Pattern.compile(PEP440_REGEX);
 }
