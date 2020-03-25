@@ -104,7 +104,9 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 			DataType dataType = dataField.getDataType();
 
 			if(missingValueTreatment != null){
-				encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatment, standardizeValue(dataType, missingValueReplacement)));
+				Object pmmlMissingValueReplacement = (missingValueReplacement != null ? standardizeValue(dataType, missingValueReplacement) : null);
+
+				encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatment, pmmlMissingValueReplacement));
 			} // End if
 
 			if(missingValues != null){
@@ -112,7 +114,9 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 			} // End if
 
 			if(invalidValueTreatment != null){
-				encoder.addDecorator(dataField, new InvalidValueDecorator(invalidValueTreatment, standardizeValue(dataType, invalidValueReplacement)));
+				Object pmmlInvalidValueReplacement = (invalidValueReplacement != null ? standardizeValue(dataType, invalidValueReplacement) : null);
+
+				encoder.addDecorator(dataField, new InvalidValueDecorator(invalidValueTreatment, pmmlInvalidValueReplacement));
 			}
 		}
 
