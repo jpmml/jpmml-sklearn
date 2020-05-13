@@ -119,7 +119,7 @@ public class OneHotEncoder extends Transformer {
 	}
 
 	public List<? extends Number> getActiveFeatures(){
-		return getArray("active_features_", Number.class);
+		return getNumberArray("active_features_");
 	}
 
 	public List<Integer> getFeatureSizes(){

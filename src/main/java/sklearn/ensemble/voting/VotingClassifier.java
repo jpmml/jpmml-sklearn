@@ -87,7 +87,7 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 			return (List)weights;
 		}
 
-		return getArray("weights", Number.class);
+		return getNumberArray("weights");
 	}
 
 	static

@@ -51,6 +51,6 @@ public class DummyRegressor extends Regressor implements HasDefaultValue {
 	}
 
 	public List<? extends Number> getConstant(){
-		return getArray("constant_", Number.class);
+		return getNumberArray("constant_");
 	}
 }

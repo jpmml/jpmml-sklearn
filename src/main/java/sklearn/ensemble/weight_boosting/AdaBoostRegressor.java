@@ -65,6 +65,6 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 	}
 
 	public List<? extends Number> getEstimatorWeights(){
-		return getArray("estimator_weights_", Number.class);
+		return getNumberArray("estimator_weights_");
 	}
 }

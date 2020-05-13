@@ -70,6 +70,6 @@ public class VotingRegressor extends Regressor implements HasEstimatorEnsemble<R
 			return (List)weights;
 		}
 
-		return getArray("weights", Number.class);
+		return getNumberArray("weights");
 	}
 }

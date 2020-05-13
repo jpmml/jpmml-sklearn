@@ -82,11 +82,11 @@ public class IsotonicRegression extends Regressor {
 	}
 
 	public List<? extends Number> getNecessaryX(){
-		return getArray("_necessary_X_", Number.class);
+		return getNumberArray("_necessary_X_");
 	}
 
 	public List<? extends Number> getNecessaryY(){
-		return getArray("_necessary_y_", Number.class);
+		return getNumberArray("_necessary_y_");
 	}
 
 	public String getOutOfBounds(){

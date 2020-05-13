@@ -120,7 +120,7 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getMean(){
-		return getArray("mean_", Number.class);
+		return getNumberArray("mean_");
 	}
 
 	public int[] getMeanShape(){
@@ -131,11 +131,11 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 
 		// SkLearn 0.16
 		if(containsKey("std_")){
-			return getArray("std_", Number.class);
+			return getNumberArray("std_");
 		}
 
 		// SkLearn 0.17+
-		return getArray("scale_", Number.class);
+		return getNumberArray("scale_");
 	}
 
 	public int[] getStdShape(){

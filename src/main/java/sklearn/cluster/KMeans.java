@@ -87,7 +87,7 @@ public class KMeans extends Clusterer {
 	}
 
 	public List<? extends Number> getClusterCenters(){
-		return getArray("cluster_centers_", Number.class);
+		return getNumberArray("cluster_centers_");
 	}
 
 	public int[] getClusterCentersShape(){

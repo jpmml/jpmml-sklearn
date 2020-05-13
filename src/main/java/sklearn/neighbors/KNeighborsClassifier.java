@@ -82,7 +82,7 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 
 	@Override
 	public List<? extends Number> getFitX(){
-		return getArray("_fit_X", Number.class);
+		return getNumberArray("_fit_X");
 	}
 
 	public int[] getFitXShape(){
@@ -91,7 +91,7 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 
 	@Override
 	public List<?> getY(){
-		List<? extends Number> y = getArray("_y", Number.class);
+		List<? extends Number> y = getNumberArray("_y");
 
 		Function<Number, Object> function = new Function<Number, Object>(){
 

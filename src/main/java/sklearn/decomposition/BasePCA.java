@@ -38,7 +38,7 @@ public class BasePCA extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getComponents(){
-		return getArray("components_", Number.class);
+		return getNumberArray("components_");
 	}
 
 	public int[] getComponentsShape(){

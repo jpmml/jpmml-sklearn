@@ -47,7 +47,7 @@ public class Verification extends PyClassDict {
 	}
 
 	public List<? extends Number> getProbabilityValues(){
-		return getArray("probability_values", Number.class);
+		return getNumberArray("probability_values");
 	}
 
 	public int[] getProbabilityValuesShape(){

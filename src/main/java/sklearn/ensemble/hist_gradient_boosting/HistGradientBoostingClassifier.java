@@ -93,7 +93,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 	}
 
 	public List<? extends Number> getBaselinePrediction(){
-		return getArray("_baseline_prediction", Number.class);
+		return getNumberArray("_baseline_prediction");
 	}
 
 	public BaseLoss getLoss(){

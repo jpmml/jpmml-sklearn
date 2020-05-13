@@ -41,7 +41,7 @@ public class SelectorProxy extends Selector {
 
 	@Override
 	public List<Boolean> getSupportMask(){
-		return (List)getArray("support_mask_", Boolean.class);
+		return getBooleanArray("support_mask_");
 	}
 
 	public int[] getSupportMaskShape(){

@@ -184,10 +184,33 @@ public class PyClassDict extends ClassDict {
 		throw new IllegalArgumentException("The value of \'" + ClassDictUtil.formatMember(this, name) + "\' attribute (" + ClassDictUtil.formatClass(object) + ") is not a supported array type");
 	}
 
+	public List<Boolean> getBooleanArray(String name){
+		return (List)getArray(name, Boolean.class);
+	}
+
 	public List<Integer> getIntegerArray(String name){
-		List<? extends Number> values = getArray(name, Number.class);
+		List<? extends Number> values = getNumberArray(name);
 
 		return ValueUtil.asIntegers(values);
+	}
+
+	public List<Number> getNumberArray(String name){
+		List<?> values = getArray(name);
+
+		CastFunction<Number> castFunction = new CastFunction<Number>(Number.class){
+
+			@Override
+			public Number apply(Object object){
+				return super.apply(ScalarUtil.decode(object));
+			}
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Array attribute \'" + ClassDictUtil.formatMember(PyClassDict.this, name) + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return Lists.transform(values, castFunction);
 	}
 
 	public <E> List<? extends E> getArray(String name, Class<? extends E> clazz){

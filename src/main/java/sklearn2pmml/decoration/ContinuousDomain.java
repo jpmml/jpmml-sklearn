@@ -170,7 +170,7 @@ public class ContinuousDomain extends Domain {
 	}
 
 	public List<? extends Number> getDataMin(){
-		return getArray("data_min_", Number.class);
+		return getNumberArray("data_min_");
 	}
 
 	public int[] getDataMinShape(){
@@ -178,7 +178,7 @@ public class ContinuousDomain extends Domain {
 	}
 
 	public List<? extends Number> getDataMax(){
-		return getArray("data_max_", Number.class);
+		return getNumberArray("data_max_");
 	}
 
 	public int[] getDataMaxShape(){

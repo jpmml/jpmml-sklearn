@@ -42,6 +42,6 @@ public class PriorProbabilityEstimator extends PyClassDict implements HasPriorPr
 	}
 
 	public List<? extends Number> getPriors(){
-		return getArray("priors", Number.class);
+		return getNumberArray("priors");
 	}
 }

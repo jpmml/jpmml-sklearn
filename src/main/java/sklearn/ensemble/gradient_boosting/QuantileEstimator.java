@@ -36,6 +36,6 @@ public class QuantileEstimator extends PyClassDict implements HasDefaultValue {
 	}
 
 	public List<? extends Number> getQuantile(){
-		return getArray("quantile", Number.class);
+		return getNumberArray("quantile");
 	}
 }

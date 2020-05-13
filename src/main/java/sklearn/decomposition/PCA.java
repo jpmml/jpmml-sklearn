@@ -117,11 +117,11 @@ public class PCA extends BasePCA {
 	}
 
 	public List<? extends Number> getExplainedVariance(){
-		return getArray("explained_variance_", Number.class);
+		return getNumberArray("explained_variance_");
 	}
 
 	public List<? extends Number> getMean(){
-		return getArray("mean_", Number.class);
+		return getNumberArray("mean_");
 	}
 
 	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);

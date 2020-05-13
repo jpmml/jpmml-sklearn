@@ -90,11 +90,11 @@ public class MinMaxScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getMin(){
-		return getArray("min_", Number.class);
+		return getNumberArray("min_");
 	}
 
 	public List<? extends Number> getScale(){
-		return getArray("scale_", Number.class);
+		return getNumberArray("scale_");
 	}
 
 	public int[] getScaleShape(){

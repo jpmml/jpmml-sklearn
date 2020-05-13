@@ -79,7 +79,7 @@ public class MaxAbsScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getScale(){
-		return getArray("scale_", Number.class);
+		return getNumberArray("scale_");
 	}
 
 	public int[] getScaleShape(){

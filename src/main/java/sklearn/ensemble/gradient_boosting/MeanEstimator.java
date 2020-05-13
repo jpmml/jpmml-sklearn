@@ -36,6 +36,6 @@ public class MeanEstimator extends PyClassDict implements HasDefaultValue {
 	}
 
 	public List<? extends Number> getMean(){
-		return getArray("mean", Number.class);
+		return getNumberArray("mean");
 	}
 }

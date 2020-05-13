@@ -42,6 +42,6 @@ public class LogOddsEstimator extends PyClassDict implements HasPriorProbability
 	}
 
 	public List<? extends Number> getPrior(){
-		return getArray("prior", Number.class);
+		return getNumberArray("prior");
 	}
 }

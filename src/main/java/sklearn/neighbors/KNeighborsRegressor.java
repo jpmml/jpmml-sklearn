@@ -79,7 +79,7 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 
 	@Override
 	public List<? extends Number> getFitX(){
-		return getArray("_fit_X", Number.class);
+		return getNumberArray("_fit_X");
 	}
 
 	public int[] getFitXShape(){
@@ -88,6 +88,6 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 
 	@Override
 	public List<? extends Number> getY(){
-		return getArray("_y", Number.class);
+		return getNumberArray("_y");
 	}
 }

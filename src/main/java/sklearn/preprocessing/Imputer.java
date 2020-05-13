@@ -41,6 +41,6 @@ public class Imputer extends SimpleImputer {
 
 	@Override
 	public List<? extends Number> getStatistics(){
-		return getArray("statistics_", Number.class);
+		return getNumberArray("statistics_");
 	}
 }

@@ -96,7 +96,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	public List<? extends Number> getTheta(){
-		return getArray("theta_", Number.class);
+		return getNumberArray("theta_");
 	}
 
 	public int[] getThetaShape(){
@@ -104,7 +104,7 @@ public class GaussianNB extends Classifier {
 	}
 
 	public List<? extends Number> getSigma(){
-		return getArray("sigma_", Number.class);
+		return getNumberArray("sigma_");
 	}
 
 	static

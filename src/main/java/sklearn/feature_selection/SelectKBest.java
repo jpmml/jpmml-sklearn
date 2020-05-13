@@ -81,7 +81,7 @@ public class SelectKBest extends Selector {
 	}
 
 	public List<? extends Number> getScores(){
-		return getArray("scores_", Number.class);
+		return getNumberArray("scores_");
 	}
 
 	public int[] getScoresShape(){

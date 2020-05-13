@@ -120,7 +120,7 @@ public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getCenter(){
-		return getArray("center_", Number.class);
+		return getNumberArray("center_");
 	}
 
 	public int[] getCenterShape(){
@@ -128,7 +128,7 @@ public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public List<? extends Number> getScale(){
-		return getArray("scale_", Number.class);
+		return getNumberArray("scale_");
 	}
 
 	public int[] getScaleShape(){

@@ -94,7 +94,7 @@ public class LinearClassifier extends Classifier {
 	}
 
 	public List<? extends Number> getCoef(){
-		return getArray("coef_", Number.class);
+		return getNumberArray("coef_");
 	}
 
 	public int[] getCoefShape(){
@@ -102,6 +102,6 @@ public class LinearClassifier extends Classifier {
 	}
 
 	public List<? extends Number> getIntercept(){
-		return getArray("intercept_", Number.class);
+		return getNumberArray("intercept_");
 	}
 }

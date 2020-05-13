@@ -121,7 +121,7 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 	}
 
 	public List<? extends Number> getClassPrior(){
-		return getArray("class_prior_", Number.class);
+		return getNumberArray("class_prior_");
 	}
 
 	public Object getConstant(){

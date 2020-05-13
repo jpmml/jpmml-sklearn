@@ -49,7 +49,7 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 		List<? extends Number> featureImportances;
 
 		try {
-			featureImportances = estimator.getArray("feature_importances_", Number.class);
+			featureImportances = estimator.getNumberArray("feature_importances_");
 		} catch(RuntimeException re){
 			String message = "The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute. " +
 				"Please use the " + (EstimatorProxy.class).getName() + " wrapper class to give the estimator object a persistent state (eg. " + ClassDictUtil.formatProxyExample(EstimatorProxy.class, estimator) +")";

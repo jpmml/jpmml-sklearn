@@ -98,7 +98,7 @@ public class LibSVMClassifier extends Classifier {
 	}
 
 	public List<? extends Number> getSupportVectors(){
-		return getArray("support_vectors_", Number.class);
+		return getNumberArray("support_vectors_");
 	}
 
 	public int[] getSupportVectorsShape(){
@@ -117,10 +117,10 @@ public class LibSVMClassifier extends Classifier {
 	}
 
 	public List<? extends Number> getDualCoef(){
-		return getArray("_dual_coef_", Number.class);
+		return getNumberArray("_dual_coef_");
 	}
 
 	public List<? extends Number> getIntercept(){
-		return getArray("_intercept_", Number.class);
+		return getNumberArray("_intercept_");
 	}
 }
