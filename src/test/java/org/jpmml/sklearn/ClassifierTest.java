@@ -204,7 +204,7 @@ public class ClassifierTest extends EstimatorTest {
 
 	@Test
 	public void evaluateXGBRFAudit() throws Exception {
-		evaluate("XGBRF", "Audit", excludeFields(ClassifierTest.falseProbabilityField), new FloatEquivalence(2));
+		evaluate("XGBRF", "Audit", excludeFields(ClassifierTest.falseProbabilityField), new FloatEquivalence(4));
 	}
 
 	@Test
