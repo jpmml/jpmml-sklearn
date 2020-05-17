@@ -50,13 +50,13 @@ public class UFuncUtil {
 		switch(name){
 			case "absolute":
 				return PMMLUtil.createApply(PMMLFunctions.ABS, expression);
-			case "acos":
+			case "arccos":
 				return PMMLUtil.createApply(PMMLFunctions.ACOS, expression);
-			case "asin":
+			case "arcsin":
 				return PMMLUtil.createApply(PMMLFunctions.ASIN, expression);
-			case "atan":
+			case "arctan":
 				return PMMLUtil.createApply(PMMLFunctions.ATAN, expression);
-			case "atan2":
+			case "arctan2":
 				return PMMLUtil.createApply(PMMLFunctions.ATAN2, expression);
 			case "ceil":
 				return PMMLUtil.createApply(PMMLFunctions.CEIL, expression);
