@@ -192,7 +192,14 @@ public class PickleUtil {
 		} else
 
 		if((PyClassDict.class).isAssignableFrom(clazz)){
-			constructor = new ObjectConstructor(module, name, (Class<? extends PyClassDict>)clazz);
+
+			if((NamedTuple.class).isAssignableFrom(clazz)){
+				constructor = new NamedTupleConstructor(module, name, (Class<? extends NamedTuple>)clazz);
+			} else
+
+			{
+				constructor = new ObjectConstructor(module, name, (Class<? extends PyClassDict>)clazz);
+			}
 		} else
 
 		{

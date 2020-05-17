@@ -20,7 +20,7 @@ from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.impute import MissingIndicator, SimpleImputer
 from sklearn.isotonic import IsotonicRegression
-from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDRegressor, TheilSenRegressor
+from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, PoissonRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDRegressor, TheilSenRegressor
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -62,7 +62,7 @@ def make_interaction(left, right):
 	])
 	return pipeline
 
-datasets = "Audit,Auto,Housing,Iris,Sentiment,Versicolor,Wheat"
+datasets = "Audit,Auto,Housing,Iris,Sentiment,Versicolor,Visit,Wheat"
 
 with_h2o = False
 
@@ -776,6 +776,28 @@ if "Housing" in datasets:
 	build_housing(LinearSVR(random_state = 13), "LinearSVRHousing")
 	build_housing(NuSVR(gamma = "auto"), "NuSVRHousing")
 	build_housing(VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("lr", LinearRegression())]), "VotingEnsembleHousing")
+
+visit_X, visit_y = load_visit("Visit")
+
+def build_visit(regressor, name):
+	mapper = DataFrameMapper(
+		[(["edlevel"], [CategoricalDomain(), OneHotEncoder()])] +
+		[([bin_column], [CategoricalDomain(), OneHotEncoder()]) for bin_column in ["outwork", "female", "married", "kids", "self"]] +
+		[(["age"], ContinuousDomain())] +
+		[(["hhninc", "educ"], ContinuousDomain())]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	])
+	pipeline.fit(visit_X, visit_y)
+	pipeline.verify(visit_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+	docvis = DataFrame(pipeline.predict(visit_X), columns = ["docvis"])
+	store_csv(docvis, name)
+
+if "Visit" in datasets:
+	build_visit(PoissonRegressor(), "PoissonRegressionVisit")
 
 #
 # Outlier detection

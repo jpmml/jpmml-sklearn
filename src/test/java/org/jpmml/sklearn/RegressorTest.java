@@ -268,4 +268,9 @@ public class RegressorTest extends EstimatorTest {
 	public void evaluateXGBRFLMHousing() throws Exception {
 		evaluate("XGBRFLM", "Housing");
 	}
+
+	@Test
+	public void evaluatePoissonRegressionVisit() throws Exception {
+		evaluate("PoissonRegression", "Visit");
+	}
 }

@@ -73,6 +73,11 @@ def load_versicolor(name):
 	df["Species"] = df["Species"].astype(int)
 	return split_csv(df)
 
+def load_visit(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	return split_csv(df)
+
 def load_wheat(name):
 	df = load_csv(name)
 	print(df.dtypes)
