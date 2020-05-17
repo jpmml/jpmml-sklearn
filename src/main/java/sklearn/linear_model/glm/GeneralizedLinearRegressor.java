@@ -22,9 +22,9 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import sklearn.linear_model.LinearRegressor;
 
-public class PoissonRegressor extends LinearRegressor {
+public class GeneralizedLinearRegressor extends LinearRegressor {
 
-	public PoissonRegressor(String module, String name){
+	public GeneralizedLinearRegressor(String module, String name){
 		super(module, name);
 	}
 

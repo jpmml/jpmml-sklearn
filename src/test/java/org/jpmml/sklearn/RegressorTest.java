@@ -270,6 +270,11 @@ public class RegressorTest extends EstimatorTest {
 	}
 
 	@Test
+	public void evaluateGammaRegressionVisit() throws Exception {
+		evaluate("GammaRegression", "Visit");
+	}
+
+	@Test
 	public void evaluatePoissonRegressionVisit() throws Exception {
 		evaluate("PoissonRegression", "Visit");
 	}
