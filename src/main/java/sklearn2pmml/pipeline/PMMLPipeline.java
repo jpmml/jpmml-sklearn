@@ -34,6 +34,7 @@ import numpy.core.NDArray;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Extension;
 import org.dmg.pmml.FieldName;
@@ -259,7 +260,7 @@ public class PMMLPipeline extends Pipeline {
 
 				output.addOutputFields(predictField);
 
-				encodeOutput(output, Collections.singletonList(predictField), predictTransformer);
+				encodeOutput(output, Collections.singletonList(predictField), predictTransformer, encoder);
 			} // End if
 
 			if(predictProbaTransformer != null){
@@ -267,14 +268,14 @@ public class PMMLPipeline extends Pipeline {
 
 				List<OutputField> predictProbaFields = ModelUtil.createProbabilityFields(DataType.DOUBLE, categoricalLabel.getValues());
 
-				encodeOutput(output, predictProbaFields, predictProbaTransformer);
+				encodeOutput(output, predictProbaFields, predictProbaTransformer, encoder);
 			} // End if
 
 			if(applyTransformer != null){
 				OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
 					.setDataType(DataType.INTEGER);
 
-				encodeOutput(output, Collections.singletonList(nodeIdField), applyTransformer);
+				encodeOutput(output, Collections.singletonList(nodeIdField), applyTransformer, encoder);
 			}
 		} // End if
 
@@ -402,20 +403,20 @@ public class PMMLPipeline extends Pipeline {
 		return pmml;
 	}
 
-	private void encodeOutput(Output output, List<OutputField> outputFields, Transformer transformer){
-		SkLearnEncoder encoder = new SkLearnEncoder();
+	private void encodeOutput(Output output, List<OutputField> outputFields, Transformer transformer, SkLearnEncoder encoder){
+		SkLearnEncoder outputEncoder = new SkLearnEncoder();
 
 		List<Feature> features = new ArrayList<>();
 
 		for(OutputField outputField : outputFields){
-			DataField dataField = encoder.createDataField(outputField.getName(), outputField.getOpType(), outputField.getDataType());
+			DataField dataField = outputEncoder.createDataField(outputField.getName(), outputField.getOpType(), outputField.getDataType());
 
-			features.add(new WildcardFeature(encoder, dataField));
+			features.add(new WildcardFeature(outputEncoder, dataField));
 		}
 
-		transformer.encodeFeatures(features, encoder);
+		transformer.encodeFeatures(features, outputEncoder);
 
-		Map<FieldName, DerivedField> derivedFields = encoder.getDerivedFields();
+		Map<FieldName, DerivedField> derivedFields = outputEncoder.getDerivedFields();
 
 		for(DerivedField derivedField : derivedFields.values()){
 			OutputField outputField = new OutputField(derivedField.getName(), derivedField.getOpType(), derivedField.getDataType())
@@ -423,6 +424,12 @@ public class PMMLPipeline extends Pipeline {
 				.setExpression(derivedField.getExpression());
 
 			output.addOutputFields(outputField);
+		}
+
+		Map<String, DefineFunction> defineFunctions = outputEncoder.getDefineFunctions();
+
+		for(DefineFunction defineFunction : defineFunctions.values()){
+			encoder.addDefineFunction(defineFunction);
 		}
 	}
 
