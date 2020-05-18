@@ -1,12 +1,11 @@
 from common import *
 
+from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.decoration import DateTimeDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer, DaysSinceYearTransformer, SecondsSinceYearTransformer
-
-from pandas import DataFrame
 
 df = DataFrame([
 	["1968-12-21T12:51:00", None, "1968-12-27T15:51:42", True], # Apollo 8

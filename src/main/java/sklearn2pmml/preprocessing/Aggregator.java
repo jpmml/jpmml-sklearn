@@ -30,6 +30,7 @@ import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
@@ -53,7 +54,7 @@ public class Aggregator extends Transformer implements HasNumberOfFeatures {
 			return features;
 		}
 
-		Apply apply = new Apply(translateFunction(function));
+		Apply apply = PMMLUtil.createApply(translateFunction(function));
 
 		for(Feature feature : features){
 			apply.addExpressions(feature.ref());

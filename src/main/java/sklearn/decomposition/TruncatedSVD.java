@@ -59,7 +59,7 @@ public class TruncatedSVD extends BasePCA {
 		for(int i = 0; i < numberOfComponents; i++){
 			List<? extends Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
-			Apply apply = new Apply(PMMLFunctions.SUM);
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.SUM);
 
 			for(int j = 0; j < numberOfFeatures; j++){
 				Feature feature = features.get(j);

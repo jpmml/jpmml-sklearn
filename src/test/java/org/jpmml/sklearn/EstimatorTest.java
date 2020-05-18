@@ -32,8 +32,10 @@ import h2o.estimators.BaseEstimator;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.Batch;
+import org.jpmml.evaluator.EvaluatorBuilder;
 import org.jpmml.evaluator.IntegrationTest;
 import org.jpmml.evaluator.IntegrationTestBatch;
+import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.PMMLEquivalence;
 import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
@@ -43,6 +45,10 @@ public class EstimatorTest extends IntegrationTest {
 
 	public EstimatorTest(){
 		super(new PMMLEquivalence(1e-13, 1e-13));
+	}
+
+	public boolean isGuarded(){
+		return true;
 	}
 
 	@Override
@@ -64,6 +70,20 @@ public class EstimatorTest extends IntegrationTest {
 
 					throw ioe;
 				}
+			}
+
+			@Override
+			public EvaluatorBuilder getEvaluatorBuilder() throws Exception {
+				EvaluatorBuilder evaluatorBuilder = super.getEvaluatorBuilder();
+
+				boolean guarded = isGuarded();
+				if(!guarded){
+					evaluatorBuilder = ((ModelEvaluatorBuilder)evaluatorBuilder)
+						.setDerivedFieldGuard(null)
+						.setFunctionGuard(null);
+				}
+
+				return evaluatorBuilder;
 			}
 
 			@Override
