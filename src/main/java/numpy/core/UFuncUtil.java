@@ -64,6 +64,8 @@ public class UFuncUtil {
 				return PMMLUtil.createApply(PMMLFunctions.COS, expression);
 			case "cosh":
 				return PMMLUtil.createApply(PMMLFunctions.COSH, expression);
+			case "degrees":
+				return PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, PMMLUtil.createConstant(180d / Math.PI));
 			case "exp":
 				return PMMLUtil.createApply(PMMLFunctions.EXP, expression);
 			case "expm1":
@@ -80,6 +82,8 @@ public class UFuncUtil {
 				return PMMLUtil.createApply(PMMLFunctions.LOG10, expression);
 			case "negative":
 				return PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(-1), expression);
+			case "radians":
+				return PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, PMMLUtil.createConstant(Math.PI / 180d));
 			case "reciprocal":
 				return PMMLUtil.createApply(PMMLFunctions.DIVIDE, PMMLUtil.createConstant(1), expression);
 			case "rint":
