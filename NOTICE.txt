@@ -207,7 +207,8 @@ JPMML-SkLearn includes third-party dependencies that are released under the Apac
 --------------------------------------------------------------------------------
 
 Additionally, JPMML-SkLearn includes third-party dependencies that are released under the MIT License:
-  * Pyrolite - https://github.com/irmen/Pyrolite
+  * Pickle - https://github.com/irmen/pickle
+  * Serpent - https://github.com/irmen/Serpent
   * Simple Logging Facade for Java (SLF4J) - http://www.slf4j.org/
 
 Copyright (c) by Irmen de Jong (irmen@razorvine.net)
