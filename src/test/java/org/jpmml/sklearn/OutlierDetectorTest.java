@@ -18,7 +18,7 @@
  */
 package org.jpmml.sklearn;
 
-import org.jpmml.evaluator.PMMLEquivalence;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
 
 public class OutlierDetectorTest extends EstimatorTest {

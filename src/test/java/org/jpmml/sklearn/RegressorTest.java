@@ -19,8 +19,8 @@
 package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
-import org.jpmml.evaluator.FloatEquivalence;
-import org.jpmml.evaluator.RealNumberEquivalence;
+import org.jpmml.evaluator.testing.FloatEquivalence;
+import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 
 public class RegressorTest extends EstimatorTest {

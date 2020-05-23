@@ -58,10 +58,10 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
-import org.jpmml.model.ValueUtil;
 import org.jpmml.sklearn.ClassDictUtil;
 import org.jpmml.sklearn.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -157,7 +157,7 @@ public class PMMLPipeline extends Pipeline {
 										if(value != null){
 											value = ScalarUtil.decode(value);
 
-											addExtension(pmmlValue, ValueUtil.toString(value));
+											addExtension(pmmlValue, ValueUtil.asString(value));
 										}
 
 										return super.visit(pmmlValue);

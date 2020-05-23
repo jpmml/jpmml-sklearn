@@ -27,16 +27,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.google.common.base.Equivalence;
 import com.google.common.io.ByteStreams;
 import h2o.estimators.BaseEstimator;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
-import org.jpmml.evaluator.Batch;
 import org.jpmml.evaluator.EvaluatorBuilder;
-import org.jpmml.evaluator.IntegrationTest;
-import org.jpmml.evaluator.IntegrationTestBatch;
 import org.jpmml.evaluator.ModelEvaluatorBuilder;
-import org.jpmml.evaluator.PMMLEquivalence;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.testing.Batch;
+import org.jpmml.evaluator.testing.IntegrationTest;
+import org.jpmml.evaluator.testing.IntegrationTestBatch;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
 
@@ -52,8 +54,8 @@ public class EstimatorTest extends IntegrationTest {
 	}
 
 	@Override
-	protected Batch createBatch(String name, String dataset, Predicate<FieldName> predicate){
-		Batch result = new IntegrationTestBatch(name, dataset, predicate){
+	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
+		Batch result = new IntegrationTestBatch(name, dataset, predicate, equivalence){
 
 			@Override
 			public IntegrationTest getIntegrationTest(){
@@ -87,7 +89,7 @@ public class EstimatorTest extends IntegrationTest {
 			}
 
 			@Override
-			public PMML getPMML() throws IOException {
+			public PMML getPMML() throws Exception {
 				PMMLPipeline pipeline;
 
 				try(Storage storage = openStorage("/pkl/" + getName() + getDataset() + ".pkl")){
@@ -117,7 +119,7 @@ public class EstimatorTest extends IntegrationTest {
 
 				PMML pmml = pipeline.encodePMML();
 
-				ensureValidity(pmml);
+				validatePMML(pmml);
 
 				if(tmpFile != null){
 					tmpFile.delete();

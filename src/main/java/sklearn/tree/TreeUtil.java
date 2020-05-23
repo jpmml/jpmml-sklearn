@@ -43,9 +43,9 @@ import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.tree.ClassifierNode;
 import org.dmg.pmml.tree.CountingBranchNode;
 import org.dmg.pmml.tree.CountingLeafNode;
-import org.dmg.pmml.tree.DefaultNodeTransformer;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.NodeTransformer;
+import org.dmg.pmml.tree.SimplifyingNodeTransformer;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalLabel;
@@ -121,7 +121,7 @@ public class TreeUtil {
 
 				Visitor nodeExtender = new AbstractExtender(name){
 
-					private NodeTransformer nodeTransformer = DefaultNodeTransformer.INSTANCE;
+					private NodeTransformer nodeTransformer = SimplifyingNodeTransformer.INSTANCE;
 
 
 					@Override
@@ -146,7 +146,7 @@ public class TreeUtil {
 						if(value != null){
 							value = ScalarUtil.decode(value);
 
-							addExtension((Node & HasExtensions)node, org.jpmml.model.ValueUtil.toString(value));
+							addExtension((Node & HasExtensions)node, ValueUtil.asString(value));
 						}
 
 						return super.visit(node);
