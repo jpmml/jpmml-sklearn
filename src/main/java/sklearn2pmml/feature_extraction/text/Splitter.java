@@ -18,7 +18,7 @@
  */
 package sklearn2pmml.feature_extraction.text;
 
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 
 public class Splitter extends PyClassDict {
 

@@ -34,7 +34,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.sklearn.HasArray;
+import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class EncoderUtil {

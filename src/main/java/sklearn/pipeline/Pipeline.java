@@ -21,11 +21,11 @@ package sklearn.pipeline;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import org.jpmml.sklearn.CastFunction;
-import org.jpmml.sklearn.CastUtil;
-import org.jpmml.sklearn.Castable;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.TupleUtil;
+import org.jpmml.python.CastFunction;
+import org.jpmml.python.CastUtil;
+import org.jpmml.python.Castable;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
 import sklearn.Composite;
 import sklearn.Estimator;

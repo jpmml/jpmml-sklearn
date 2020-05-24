@@ -21,7 +21,7 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.List;
 
 import org.jpmml.converter.Transformation;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 import sklearn.HasPriorProbability;
 
 abstract

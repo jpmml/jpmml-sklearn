@@ -29,11 +29,12 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ModelEncoder;
+import org.jpmml.python.PickleUtil;
+import org.jpmml.python.PythonEncoder;
 import sklearn2pmml.decoration.Alias;
 import sklearn2pmml.decoration.Domain;
 
-public class SkLearnEncoder extends ModelEncoder {
+public class SkLearnEncoder extends PythonEncoder {
 
 	private Map<FieldName, Domain> domains = new LinkedHashMap<>();
 
@@ -56,7 +57,7 @@ public class SkLearnEncoder extends ModelEncoder {
 
 			String message = "Field " + name.getValue() + " is already defined. " +
 				"Please refactor the pipeline so that it would not contain duplicate field declarations, " +
-				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + ClassDictUtil.formatAliasExample() + ")";
+				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + Alias.formatAliasExample() + ")";
 
 			throw new IllegalArgumentException(message, re);
 		}
@@ -107,5 +108,9 @@ public class SkLearnEncoder extends ModelEncoder {
 		{
 			this.domains.remove(name);
 		}
+	}
+
+	static {
+		PickleUtil.init("sklearn2pmml.properties");
 	}
 }

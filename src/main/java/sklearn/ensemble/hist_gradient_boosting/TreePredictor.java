@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 
 public class TreePredictor extends PyClassDict {
 

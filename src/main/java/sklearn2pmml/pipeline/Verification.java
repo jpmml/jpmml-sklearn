@@ -20,7 +20,7 @@ package sklearn2pmml.pipeline;
 
 import java.util.List;
 
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 
 public class Verification extends PyClassDict {
 

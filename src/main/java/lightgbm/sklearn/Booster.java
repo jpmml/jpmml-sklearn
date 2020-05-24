@@ -25,7 +25,7 @@ import java.util.List;
 import com.google.common.io.CharStreams;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 
 public class Booster extends PyClassDict {
 

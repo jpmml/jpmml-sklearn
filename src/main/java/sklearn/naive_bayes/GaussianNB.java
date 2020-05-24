@@ -37,7 +37,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.python.ClassDictUtil;
 import sklearn.Classifier;
 
 public class GaussianNB extends Classifier {

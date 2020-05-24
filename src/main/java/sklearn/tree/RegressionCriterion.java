@@ -18,7 +18,7 @@
  */
 package sklearn.tree;
 
-import org.jpmml.sklearn.CClassDict;
+import org.jpmml.python.CClassDict;
 
 public class RegressionCriterion extends CClassDict {
 

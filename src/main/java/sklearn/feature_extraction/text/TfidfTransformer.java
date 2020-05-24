@@ -20,7 +20,7 @@ package sklearn.feature_extraction.text;
 
 import java.util.List;
 
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 import scipy.sparse.CSRMatrix;
 
 public class TfidfTransformer extends PyClassDict {

@@ -24,7 +24,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -68,5 +68,10 @@ public class Alias extends Transformer {
 
 	public String getName(){
 		return getString("name");
+	}
+
+	static
+	public String formatAliasExample(){
+		return (Alias.class).getSimpleName() + "(transformer = ..., name = ...)";
 	}
 }

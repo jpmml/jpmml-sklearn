@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
-import org.jpmml.sklearn.CClassDict;
+import org.jpmml.python.CClassDict;
 
 public class Tree extends CClassDict {
 

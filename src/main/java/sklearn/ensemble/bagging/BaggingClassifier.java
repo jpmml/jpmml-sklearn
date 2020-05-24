@@ -27,7 +27,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.HasArray;
+import org.jpmml.python.HasArray;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
 import sklearn.ensemble.EnsembleUtil;

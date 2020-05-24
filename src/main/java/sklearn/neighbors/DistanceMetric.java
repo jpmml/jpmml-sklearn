@@ -18,7 +18,7 @@
  */
 package sklearn.neighbors;
 
-import org.jpmml.sklearn.CClassDict;
+import org.jpmml.python.CClassDict;
 
 public class DistanceMetric extends CClassDict {
 

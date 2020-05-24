@@ -20,7 +20,7 @@ package sklearn.feature_selection;
 
 import java.util.List;
 
-import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.python.ClassDictUtil;
 import sklearn.Selector;
 import sklearn2pmml.SelectorProxy;
 
@@ -42,6 +42,6 @@ public class PySelector extends Selector {
 
 	private String formatMessage(){
 		return "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have persistent state. " +
-			"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + ClassDictUtil.formatProxyExample(SelectorProxy.class, this) + ")";
+			"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")";
 	}
 }

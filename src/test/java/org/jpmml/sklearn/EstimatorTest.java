@@ -39,6 +39,9 @@ import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.IntegrationTest;
 import org.jpmml.evaluator.testing.IntegrationTestBatch;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
+import org.jpmml.python.CompressedInputStreamStorage;
+import org.jpmml.python.PickleUtil;
+import org.jpmml.python.Storage;
 import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
 

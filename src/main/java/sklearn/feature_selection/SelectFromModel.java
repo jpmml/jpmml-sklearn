@@ -21,7 +21,7 @@ package sklearn.feature_selection;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
 import sklearn.Selector;
@@ -52,7 +52,7 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 			featureImportances = estimator.getNumberArray("feature_importances_");
 		} catch(RuntimeException re){
 			String message = "The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute. " +
-				"Please use the " + (EstimatorProxy.class).getName() + " wrapper class to give the estimator object a persistent state (eg. " + ClassDictUtil.formatProxyExample(EstimatorProxy.class, estimator) +")";
+				"Please use the " + (EstimatorProxy.class).getName() + " wrapper class to give the estimator object a persistent state (eg. " + EstimatorProxy.formatProxyExample(estimator) +")";
 
 			throw new IllegalArgumentException(message, re);
 		}
@@ -81,7 +81,7 @@ public class SelectFromModel extends Selector implements HasEstimator<Estimator>
 			threshold = getNumber("threshold_");
 		} catch(RuntimeException re){
 			String message = "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent \'threshold_\' attribute. " +
-				"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + ClassDictUtil.formatProxyExample(SelectorProxy.class, this) + ")";
+				"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")";
 
 			throw new IllegalArgumentException(message, re);
 		}

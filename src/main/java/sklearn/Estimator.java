@@ -25,8 +25,8 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PyClassDict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

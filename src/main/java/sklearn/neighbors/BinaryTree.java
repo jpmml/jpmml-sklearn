@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jpmml.sklearn.CClassDict;
+import org.jpmml.python.CClassDict;
 
 public class BinaryTree extends CClassDict {
 

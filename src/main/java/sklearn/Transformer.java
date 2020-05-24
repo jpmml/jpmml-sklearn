@@ -29,8 +29,8 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.ClassDictConstructorUtil;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.ClassDictConstructorUtil;
+import org.jpmml.python.PyClassDict;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract

@@ -20,7 +20,7 @@ package sklearn_pandas;
 
 import java.util.List;
 
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 
 public class TransformerPipeline extends PyClassDict {
 

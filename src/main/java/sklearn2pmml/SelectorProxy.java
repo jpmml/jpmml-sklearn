@@ -20,6 +20,7 @@ package sklearn2pmml;
 
 import java.util.List;
 
+import org.jpmml.python.ClassDictUtil;
 import sklearn.Selector;
 
 public class SelectorProxy extends Selector {
@@ -46,5 +47,10 @@ public class SelectorProxy extends Selector {
 
 	public int[] getSupportMaskShape(){
 		return getArrayShape("support_mask_", 1);
+	}
+
+	static
+	public String formatProxyExample(Selector selector){
+		return (SelectorProxy.class.getSimpleName() + "(" + ClassDictUtil.getSimpleName(selector) + "(...))");
 	}
 }

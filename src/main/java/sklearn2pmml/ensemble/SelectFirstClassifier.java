@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.TupleUtil;
+import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
 
 public class SelectFirstClassifier extends Classifier {

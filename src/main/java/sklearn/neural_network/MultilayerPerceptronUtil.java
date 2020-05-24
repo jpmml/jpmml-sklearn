@@ -38,8 +38,8 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.neural_network.NeuralNetworkUtil;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.HasArray;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.HasArray;
 
 public class MultilayerPerceptronUtil {
 

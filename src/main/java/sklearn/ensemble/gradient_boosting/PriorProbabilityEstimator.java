@@ -21,7 +21,7 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.PyClassDict;
 import sklearn.HasPriorProbability;
 
 public class PriorProbabilityEstimator extends PyClassDict implements HasPriorProbability {

@@ -23,7 +23,7 @@ import java.util.List;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.HasArray;
+import org.jpmml.python.HasArray;
 import sklearn.Regressor;
 
 public class MLPRegressor extends Regressor {

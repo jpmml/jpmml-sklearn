@@ -18,7 +18,7 @@
  */
 package sklearn.linear_model.glm;
 
-import org.jpmml.sklearn.NamedTuple;
+import org.jpmml.python.NamedTuple;
 
 public class DistributionBoundary extends NamedTuple {
 

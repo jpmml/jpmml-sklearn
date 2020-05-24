@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jpmml.converter.Feature;
+import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.TupleUtil;
 import sklearn.MultiTransformer;
 import sklearn.Transformer;
 

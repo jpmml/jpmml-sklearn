@@ -23,7 +23,7 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.HasArray;
+import org.jpmml.python.HasArray;
 
 public class EnsembleUtil {
 

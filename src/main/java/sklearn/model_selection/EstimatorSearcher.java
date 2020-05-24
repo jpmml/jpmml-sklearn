@@ -18,8 +18,8 @@
  */
 package sklearn.model_selection;
 
-import org.jpmml.sklearn.Castable;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.Castable;
+import org.jpmml.python.PyClassDict;
 import sklearn.Estimator;
 
 public class EstimatorSearcher extends PyClassDict implements Castable {

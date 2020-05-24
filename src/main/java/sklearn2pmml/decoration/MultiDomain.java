@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.MultiTransformer;
 

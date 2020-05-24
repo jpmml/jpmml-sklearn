@@ -30,8 +30,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.PredicateTranslator;
-import org.jpmml.sklearn.TupleUtil;
+import org.jpmml.python.PredicateTranslator;
+import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
 
 public class SelectFirstUtil {

@@ -18,7 +18,7 @@
  */
 package sklearn.linear_model.stochastic_gradient;
 
-import org.jpmml.sklearn.CClassDict;
+import org.jpmml.python.CClassDict;
 
 abstract
 public class LossFunction extends CClassDict {

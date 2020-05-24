@@ -28,8 +28,8 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.HasArray;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.MultiTransformer;
 

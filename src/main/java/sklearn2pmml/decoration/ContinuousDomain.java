@@ -32,7 +32,7 @@ import org.dmg.pmml.UnivariateStats;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.OutlierDecorator;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.sklearn.ClassDictUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 import sklearn.TransformerUtil;

@@ -25,9 +25,9 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.CastFunction;
-import org.jpmml.sklearn.ClassDictUtil;
-import org.jpmml.sklearn.PyClassDict;
+import org.jpmml.python.CastFunction;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PyClassDict;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasClasses;
@@ -123,5 +123,10 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		};
 
 		return castFunction.apply(estimator);
+	}
+
+	static
+	public String formatProxyExample(Estimator estimator){
+		return (EstimatorProxy.class.getSimpleName() + "(" + ClassDictUtil.getSimpleName(estimator) + "(...))");
 	}
 }

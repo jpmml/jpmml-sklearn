@@ -33,7 +33,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.sklearn.CalendarUtil;
+import org.jpmml.python.CalendarUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 

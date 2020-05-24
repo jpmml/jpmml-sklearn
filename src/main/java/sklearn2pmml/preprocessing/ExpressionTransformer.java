@@ -28,7 +28,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.ExpressionTranslator;
+import org.jpmml.python.ExpressionTranslator;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
