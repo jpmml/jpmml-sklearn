@@ -93,6 +93,8 @@ public class EstimatorTest extends IntegrationTest {
 
 			@Override
 			public PMML getPMML() throws Exception {
+				SkLearnEncoder encoder = new SkLearnEncoder();
+
 				PMMLPipeline pipeline;
 
 				try(Storage storage = openStorage("/pkl/" + getName() + getDataset() + ".pkl")){
@@ -120,7 +122,7 @@ public class EstimatorTest extends IntegrationTest {
 					baseEstimator.setMojoPath(tmpFile.getAbsolutePath());
 				}
 
-				PMML pmml = pipeline.encodePMML();
+				PMML pmml = pipeline.encodePMML(encoder);
 
 				validatePMML(pmml);
 

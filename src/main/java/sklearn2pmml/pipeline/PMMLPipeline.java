@@ -95,7 +95,7 @@ public class PMMLPipeline extends Pipeline {
 		return super.encodeFeatures(features, encoder);
 	}
 
-	public PMML encodePMML(){
+	public PMML encodePMML(SkLearnEncoder encoder){
 		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = null;
 
@@ -112,8 +112,6 @@ public class PMMLPipeline extends Pipeline {
 		List<String> targetFields = getTargetFields();
 		String repr = getRepr();
 		Verification verification = getVerification();
-
-		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		Label label = null;
 

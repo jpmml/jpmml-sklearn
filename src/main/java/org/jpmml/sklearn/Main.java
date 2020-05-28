@@ -152,6 +152,8 @@ public class Main {
 	}
 
 	public void run() throws Exception {
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
 		Object object;
 
 		try(Storage storage = PickleUtil.createStorage(this.input)){
@@ -228,7 +230,7 @@ public class Main {
 			logger.info("Converting..");
 
 			long begin = System.currentTimeMillis();
-			pmml = pipeline.encodePMML();
+			pmml = pipeline.encodePMML(encoder);
 			long end = System.currentTimeMillis();
 
 			logger.info("Converted in {} ms.", (end - begin));

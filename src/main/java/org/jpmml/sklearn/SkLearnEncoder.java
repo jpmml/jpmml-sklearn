@@ -39,6 +39,9 @@ public class SkLearnEncoder extends PythonEncoder {
 	private Map<FieldName, Domain> domains = new LinkedHashMap<>();
 
 
+	public SkLearnEncoder(){
+	}
+
 	public DataField createDataField(FieldName name){
 		return createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
 	}
