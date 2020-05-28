@@ -29,6 +29,7 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.Counts;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -256,7 +257,7 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 			case DATE_TIME:
 				return CalendarUtil.toLocalDateTime((GregorianCalendar)value);
 			default:
-				return value;
+				return checkValue(value);
 		}
 	}
 
@@ -284,14 +285,28 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 				};
 				break;
 			default:
-				function = null;
+				function = new Function<Object, Object>(){
+
+					@Override
+					public Object apply(Object object){
+						return checkValue(object);
+					}
+				};
 				break;
 		}
 
-		if(function != null){
-			values = Lists.transform(values, function);
+		return Lists.transform(values, function);
+	}
+
+	static
+	public Object checkValue(Object object){
+
+		if(object instanceof ClassDict){
+			ClassDict classDict = (ClassDict)object;
+
+			throw new IllegalArgumentException("Expected Java primitive value, got Python class " + classDict.getClassName() + " value");
 		}
 
-		return values;
+		return object;
 	}
 }

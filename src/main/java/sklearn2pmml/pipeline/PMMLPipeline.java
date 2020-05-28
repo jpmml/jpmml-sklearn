@@ -580,6 +580,7 @@ public class PMMLPipeline extends Pipeline {
 
 			@Override
 			public Object apply(Object value){
+				Domain.checkValue(value);
 
 				if(missingValues.contains(value)){
 					return null;

@@ -20,6 +20,9 @@ package sklearn2pmml.pipeline;
 
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import net.razorvine.pickle.IObjectConstructor;
 import org.jpmml.python.PyClassDict;
 
 public class Verification extends PyClassDict {
@@ -33,7 +36,25 @@ public class Verification extends PyClassDict {
 	}
 
 	public List<?> getActiveValues(){
-		return getArray("active_values");
+		List<?> values = getArray("active_values");
+
+		// XXX
+		Function<Object, Object> function = new Function<Object, Object>(){
+
+			@Override
+			public Object apply(Object object){
+
+				if(object instanceof IObjectConstructor){
+					IObjectConstructor objectConstructor = (IObjectConstructor)object;
+
+					return objectConstructor.construct(new Object[0]);
+				}
+
+				return object;
+			}
+		};
+
+		return Lists.transform(values, function);
 	}
 
 	public int[] getActiveValuesShape(){
