@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import numpy.core.UFunc;
@@ -51,7 +52,7 @@ public class FunctionTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			ContinuousFeature continuousFeature = (features.get(i)).toContinuousFeature();
 
-			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName(func.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, () -> UFuncUtil.encodeUFunc(func, continuousFeature.ref()));
+			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName(func.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, () -> UFuncUtil.encodeUFunc(func, Collections.singletonList(continuousFeature.ref())));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

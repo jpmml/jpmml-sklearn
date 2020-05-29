@@ -127,6 +127,6 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 
 	static
 	public String formatProxyExample(Estimator estimator){
-		return (EstimatorProxy.class.getSimpleName() + "(" + ClassDictUtil.getSimpleName(estimator) + "(...))");
+		return (EstimatorProxy.class.getSimpleName() + "(" + ClassDictUtil.getSimpleClassName(estimator) + "(...))");
 	}
 }

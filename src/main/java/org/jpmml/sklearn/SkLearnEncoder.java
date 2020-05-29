@@ -22,7 +22,6 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.razorvine.pickle.Unpickler;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -115,8 +114,6 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	static {
-		Unpickler.registerConstructor("pandas._libs.missing", "NA", new NullConstructor());
-
 		PickleUtil.init("sklearn2pmml.properties");
 	}
 }

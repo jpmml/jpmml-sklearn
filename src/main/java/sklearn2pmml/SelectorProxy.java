@@ -51,6 +51,6 @@ public class SelectorProxy extends Selector {
 
 	static
 	public String formatProxyExample(Selector selector){
-		return (SelectorProxy.class.getSimpleName() + "(" + ClassDictUtil.getSimpleName(selector) + "(...))");
+		return (SelectorProxy.class.getSimpleName() + "(" + ClassDictUtil.getSimpleClassName(selector) + "(...))");
 	}
 }

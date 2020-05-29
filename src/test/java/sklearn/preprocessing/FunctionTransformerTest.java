@@ -18,6 +18,8 @@
  */
 package sklearn.preprocessing;
 
+import java.util.Collections;
+
 import numpy.core.UFunc;
 import numpy.core.UFuncUtil;
 import org.dmg.pmml.DataType;
@@ -82,7 +84,7 @@ public class FunctionTransformerTest {
 		EvaluationContext context = new VirtualEvaluationContext();
 		context.declare(name, FieldValueUtil.create(dataType, OpType.CONTINUOUS, value));
 
-		Expression expression = UFuncUtil.encodeUFunc(ufunc, new FieldRef(name));
+		Expression expression = UFuncUtil.encodeUFunc(ufunc, Collections.singletonList(new FieldRef(name)));
 
 		FieldValue result = ExpressionUtil.evaluate(expression, context);
 

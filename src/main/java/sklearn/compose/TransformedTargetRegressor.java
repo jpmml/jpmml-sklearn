@@ -18,6 +18,8 @@
  */
 package sklearn.compose;
 
+import java.util.Collections;
+
 import numpy.core.UFunc;
 import numpy.core.UFuncUtil;
 import org.dmg.pmml.DataType;
@@ -65,7 +67,7 @@ public class TransformedTargetRegressor extends Regressor {
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return UFuncUtil.encodeUFunc(inverseFunc, fieldRef);
+				return UFuncUtil.encodeUFunc(inverseFunc, Collections.singletonList(fieldRef));
 			}
 		};
 
