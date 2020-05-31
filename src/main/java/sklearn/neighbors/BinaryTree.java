@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jpmml.python.CClassDict;
+import org.jpmml.python.CustomPythonObject;
 
-public class BinaryTree extends CClassDict {
+public class BinaryTree extends CustomPythonObject {
 
 	public BinaryTree(String module, String name){
 		super(module, name);

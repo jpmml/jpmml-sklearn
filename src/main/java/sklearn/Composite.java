@@ -27,11 +27,11 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Composite extends PyClassDict implements HasNumberOfFeatures, HasType {
+public class Composite extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public Composite(String module, String name){
 		super(module, name);

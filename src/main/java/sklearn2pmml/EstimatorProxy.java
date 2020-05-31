@@ -27,7 +27,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasClasses;
@@ -93,7 +93,7 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	/**
-	 * @see PyClassDict#get(String, Class)
+	 * @see PythonObject#get(String, Class)
 	 */
 	@Override
 	public Estimator getEstimator(){
@@ -127,6 +127,6 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 
 	static
 	public String formatProxyExample(Estimator estimator){
-		return (EstimatorProxy.class.getSimpleName() + "(" + ClassDictUtil.getSimpleClassName(estimator) + "(...))");
+		return (EstimatorProxy.class.getSimpleName() + "(" + estimator.getPythonName() + "(...))");
 	}
 }

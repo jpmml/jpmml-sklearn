@@ -22,9 +22,9 @@ import java.util.List;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 
-public class TreePredictor extends PyClassDict {
+public class TreePredictor extends PythonObject {
 
 	public TreePredictor(String module, String name){
 		super(module, name);

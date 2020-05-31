@@ -18,9 +18,9 @@
  */
 package sklearn.neighbors;
 
-import org.jpmml.python.CClassDict;
+import org.jpmml.python.CustomPythonObject;
 
-public class DistanceMetric extends CClassDict {
+public class DistanceMetric extends CustomPythonObject {
 
 	public DistanceMetric(String module, String name){
 		super(module, name);

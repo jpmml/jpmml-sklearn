@@ -32,7 +32,7 @@ public class PipelineClassifier extends Classifier {
 
 
 	public PipelineClassifier(Pipeline pipeline){
-		super(pipeline.getPyModule(), pipeline.getPyName());
+		super(pipeline.getPythonModule(), pipeline.getPythonName());
 
 		setPipeline(pipeline);
 	}

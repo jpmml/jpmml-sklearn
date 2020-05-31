@@ -18,10 +18,10 @@
  */
 package sklearn.ensemble.hist_gradient_boosting;
 
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 
 abstract
-public class BaseLoss extends PyClassDict {
+public class BaseLoss extends PythonObject {
 
 	public BaseLoss(String module, String name){
 		super(module, name);

@@ -19,10 +19,10 @@
 package sklearn.model_selection;
 
 import org.jpmml.python.Castable;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 import sklearn.Estimator;
 
-public class EstimatorSearcher extends PyClassDict implements Castable {
+public class EstimatorSearcher extends PythonObject implements Castable {
 
 	public EstimatorSearcher(String module, String name){
 		super(module, name);

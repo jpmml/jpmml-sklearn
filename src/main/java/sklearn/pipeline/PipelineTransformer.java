@@ -33,7 +33,7 @@ public class PipelineTransformer extends Transformer implements HasNumberOfFeatu
 
 
 	public PipelineTransformer(Pipeline pipeline){
-		super(pipeline.getPyModule(), pipeline.getPyName());
+		super(pipeline.getPythonModule(), pipeline.getPythonName());
 
 		setPipeline(pipeline);
 	}

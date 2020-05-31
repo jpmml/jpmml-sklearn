@@ -18,9 +18,9 @@
  */
 package sklearn.tree;
 
-import org.jpmml.python.CClassDict;
+import org.jpmml.python.CustomPythonObject;
 
-public class PresortBestSplitter extends CClassDict {
+public class PresortBestSplitter extends CustomPythonObject {
 
 	public PresortBestSplitter(String module, String name){
 		super(module, name);

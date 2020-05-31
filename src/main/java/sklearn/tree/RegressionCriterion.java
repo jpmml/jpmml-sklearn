@@ -18,9 +18,9 @@
  */
 package sklearn.tree;
 
-import org.jpmml.python.CClassDict;
+import org.jpmml.python.CustomPythonObject;
 
-public class RegressionCriterion extends CClassDict {
+public class RegressionCriterion extends CustomPythonObject {
 
 	public RegressionCriterion(String module, String name){
 		super(module, name);

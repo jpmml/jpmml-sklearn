@@ -30,7 +30,7 @@ public class PipelineRegressor extends Regressor {
 
 
 	public PipelineRegressor(Pipeline pipeline){
-		super(pipeline.getPyModule(), pipeline.getPyName());
+		super(pipeline.getPythonModule(), pipeline.getPythonName());
 
 		setPipeline(pipeline);
 	}

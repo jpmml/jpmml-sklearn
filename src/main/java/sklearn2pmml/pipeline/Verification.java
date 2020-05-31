@@ -23,9 +23,9 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import net.razorvine.pickle.IObjectConstructor;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 
-public class Verification extends PyClassDict {
+public class Verification extends PythonObject {
 
 	public Verification(String module, String name){
 		super(module, name);

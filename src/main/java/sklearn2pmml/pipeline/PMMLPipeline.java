@@ -63,7 +63,7 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,7 +187,7 @@ public class PMMLPipeline extends Pipeline {
 
 		List<Feature> features = new ArrayList<>();
 
-		PyClassDict featureInitializer = estimator;
+		PythonObject featureInitializer = estimator;
 
 		try {
 			Transformer transformer = TransformerUtil.getHead(transformers);
@@ -514,7 +514,7 @@ public class PMMLPipeline extends Pipeline {
 		return this;
 	}
 
-	private List<String> initActiveFields(PyClassDict object){
+	private List<String> initActiveFields(PythonObject object){
 		int numberOfFeatures = HasNumberOfFeatures.UNKNOWN;
 
 		if(object instanceof HasNumberOfFeatures){

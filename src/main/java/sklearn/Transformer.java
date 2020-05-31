@@ -30,11 +30,11 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictConstructorUtil;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Transformer extends PyClassDict implements HasType {
+public class Transformer extends PythonObject implements HasType {
 
 	public Transformer(String module, String name){
 		super(module, name);
@@ -130,9 +130,9 @@ public class Transformer extends PyClassDict implements HasType {
 		} else
 
 		if(dtype instanceof ClassDictConstructor){
-			ClassDictConstructor classDictConstructor = (ClassDictConstructor)dtype;
+			ClassDictConstructor dictConstructor = (ClassDictConstructor)dtype;
 
-			return ClassDictConstructorUtil.construct(classDictConstructor, DType.class);
+			return ClassDictConstructorUtil.construct(dictConstructor, DType.class);
 		}
 
 		return get("dtype", DType.class);

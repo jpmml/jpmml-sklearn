@@ -21,10 +21,10 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 import sklearn.HasPriorProbability;
 
-public class LogOddsEstimator extends PyClassDict implements HasPriorProbability {
+public class LogOddsEstimator extends PythonObject implements HasPriorProbability {
 
 	public LogOddsEstimator(String module, String name){
 		super(module, name);

@@ -23,11 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteOrder;
 
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
 
-public class Booster extends PyClassDict {
+public class Booster extends PythonObject {
 
 	private Learner learner = null;
 

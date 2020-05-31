@@ -25,9 +25,9 @@ import java.util.List;
 import com.google.common.io.CharStreams;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 
-public class Booster extends PyClassDict {
+public class Booster extends PythonObject {
 
 	private GBDT gbdt = null;
 

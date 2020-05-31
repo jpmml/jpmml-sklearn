@@ -20,9 +20,9 @@ package sklearn_pandas;
 
 import java.util.List;
 
-import org.jpmml.python.PyClassDict;
+import org.jpmml.python.PythonObject;
 
-public class TransformerPipeline extends PyClassDict {
+public class TransformerPipeline extends PythonObject {
 
 	public TransformerPipeline(String module, String name){
 		super(module, name);
