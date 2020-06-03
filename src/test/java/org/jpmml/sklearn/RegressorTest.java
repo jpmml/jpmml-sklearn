@@ -23,7 +23,7 @@ import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 
-public class RegressorTest extends EstimatorTest {
+public class RegressorTest extends SkLearnTest {
 
 	@Test
 	public void evaluateAdaBoostAuto() throws Exception {

@@ -20,7 +20,7 @@ package org.jpmml.sklearn;
 
 import org.junit.Test;
 
-public class ClustererTest extends EstimatorTest {
+public class ClustererTest extends SkLearnTest {
 
 	@Test
 	public void evaluateKMeansWheat() throws Exception {

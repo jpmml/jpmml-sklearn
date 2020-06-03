@@ -24,7 +24,7 @@ import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 
-public class ClassifierTest extends EstimatorTest {
+public class ClassifierTest extends SkLearnTest {
 
 	@Test
 	public void evaluateDurationInDaysApollo() throws Exception {

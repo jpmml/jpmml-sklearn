@@ -21,7 +21,7 @@ package org.jpmml.sklearn;
 import org.dmg.pmml.FieldName;
 import org.junit.Test;
 
-public class BSplineTest extends EstimatorTest {
+public class BSplineTest extends SkLearnTest {
 
 	@Override
 	public boolean isGuarded(){

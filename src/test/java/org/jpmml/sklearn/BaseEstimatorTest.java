@@ -21,7 +21,7 @@ package org.jpmml.sklearn;
 import org.dmg.pmml.FieldName;
 import org.junit.Test;
 
-public class BaseEstimatorTest extends EstimatorTest {
+public class BaseEstimatorTest extends SkLearnTest {
 
 	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {

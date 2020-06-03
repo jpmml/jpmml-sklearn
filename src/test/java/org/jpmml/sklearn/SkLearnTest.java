@@ -46,9 +46,9 @@ import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
 
 abstract
-public class EstimatorTest extends IntegrationTest {
+public class SkLearnTest extends IntegrationTest {
 
-	public EstimatorTest(){
+	public SkLearnTest(){
 		super(new PMMLEquivalence(1e-13, 1e-13));
 	}
 
@@ -62,19 +62,7 @@ public class EstimatorTest extends IntegrationTest {
 
 			@Override
 			public IntegrationTest getIntegrationTest(){
-				return EstimatorTest.this;
-			}
-
-			private Storage openStorage(String path) throws IOException {
-				InputStream is = open(path);
-
-				try {
-					return new CompressedInputStreamStorage(is);
-				} catch(IOException ioe){
-					is.close();
-
-					throw ioe;
-				}
+				return SkLearnTest.this;
 			}
 
 			@Override
@@ -146,6 +134,18 @@ public class EstimatorTest extends IntegrationTest {
 				}
 
 				return loadRecords("/csv/" + dataset + ".csv");
+			}
+
+			private Storage openStorage(String path) throws IOException {
+				InputStream is = open(path);
+
+				try {
+					return new CompressedInputStreamStorage(is);
+				} catch(IOException ioe){
+					is.close();
+
+					throw ioe;
+				}
 			}
 		};
 
