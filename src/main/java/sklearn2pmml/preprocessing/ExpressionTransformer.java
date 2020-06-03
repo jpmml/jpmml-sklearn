@@ -28,7 +28,9 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.ExpressionTranslator;
+import org.jpmml.python.Scope;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
@@ -44,7 +46,9 @@ public class ExpressionTransformer extends Transformer {
 		Object dtype = getDType();
 		String expr = getExpr();
 
-		Expression expression = ExpressionTranslator.translate(expr, features);
+		Scope scope = new DataFrameScope(FieldName.create("X"), features);
+
+		Expression expression = ExpressionTranslator.translate(expr, scope);
 
 		DataType dataType;
 
@@ -53,7 +57,7 @@ public class ExpressionTransformer extends Transformer {
 		} else
 
 		{
-			if(ExpressionTranslator.isString(expression, features)){
+			if(ExpressionTranslator.isString(expression, scope)){
 				dataType = DataType.STRING;
 			} else
 

@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.rule_set.RuleSelectionMethod;
@@ -34,7 +35,9 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.PredicateTranslator;
+import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
 
@@ -92,11 +95,13 @@ public class RuleSetClassifier extends Classifier {
 				.setDefaultScore(defaultScore);
 		}
 
+		Scope scope = new DataFrameScope(FieldName.create("X"), features);
+
 		for(Object[] rule : rules){
 			String predicate = TupleUtil.extractElement(rule, 0, String.class);
 			String score = TupleUtil.extractElement(rule, 1, String.class);
 
-			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, features);
+			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, scope);
 
 			SimpleRule simpleRule = new SimpleRule(score, pmmlPredicate);
 
