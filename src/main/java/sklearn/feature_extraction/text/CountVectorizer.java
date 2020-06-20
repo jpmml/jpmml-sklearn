@@ -244,7 +244,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public Map<String, ?> getVocabulary(){
-		return get("vocabulary_", Map.class);
+		return getDict("vocabulary_");
 	}
 
 	static

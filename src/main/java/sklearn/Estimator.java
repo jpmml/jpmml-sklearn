@@ -95,7 +95,13 @@ public class Estimator extends PythonObject implements HasNumberOfFeatures, HasT
 	}
 
 	public Map<String, ?> getPMMLOptions(){
-		return getOptional("pmml_options_", Map.class);
+		Object value = get("pmml_options_");
+
+		if(value == null){
+			return null;
+		}
+
+		return getDict("pmml_options_");
 	}
 
 	public Estimator setPMMLOptions(Map<String, ?> pmmlOptions){

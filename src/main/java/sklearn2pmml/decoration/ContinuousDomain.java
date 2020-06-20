@@ -186,7 +186,7 @@ public class ContinuousDomain extends Domain {
 	}
 
 	public Map<String, ?> getNumericInfo(){
-		return get("numeric_info_", Map.class);
+		return getDict("numeric_info_");
 	}
 
 	static

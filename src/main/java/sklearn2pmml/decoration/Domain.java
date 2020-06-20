@@ -176,7 +176,7 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 	}
 
 	public Map<String, ?> getCounts(){
-		return get("counts_", Map.class);
+		return getDict("counts_");
 	}
 
 	static
