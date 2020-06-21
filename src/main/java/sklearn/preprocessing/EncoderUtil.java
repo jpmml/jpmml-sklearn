@@ -34,6 +34,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -63,10 +64,21 @@ public class EncoderUtil {
 			}
 		}
 
+		return encodeIndexFeature(feature, categories, indexCategories, null, null, dataType, encoder);
+	}
+
+	static
+	public Feature encodeIndexFeature(Feature feature, List<?> categories, List<? extends Number> indexCategories, Number mapMissingTo, Number defaultValue, DataType dataType, SkLearnEncoder encoder){
+		ClassDictUtil.checkSize(categories, indexCategories);
+
 		encoder.toCategorical(feature.getName(), categories);
 
 		Supplier<MapValues> mapValuesSupplier = () -> {
-			return PMMLUtil.createMapValues(feature.getName(), categories, indexCategories);
+			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categories, indexCategories)
+				.setMapMissingTo(mapMissingTo)
+				.setDefaultValue(defaultValue);
+
+			return mapValues;
 		};
 
 		DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("encoder", feature), OpType.CATEGORICAL, dataType, mapValuesSupplier);

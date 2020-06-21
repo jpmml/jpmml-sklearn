@@ -141,6 +141,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`tree.ExtraTreeClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html)
     * [`tree.ExtraTreeRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
+  * [Category Encoders](http://contrib.scikit-learn.org/category_encoders/):
+    * [`category_encoders.OrdinalEncoder`](http://contrib.scikit-learn.org/category_encoders/ordinal.html)
   * [H2O.ai](https://www.h2o.ai/):
     * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
     * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)

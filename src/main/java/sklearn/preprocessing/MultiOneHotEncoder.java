@@ -68,6 +68,8 @@ public class MultiOneHotEncoder extends MultiTransformer {
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
 				ClassDictUtil.checkSize(featureCategories, categoricalFeature.getValues());
+
+				featureCategories = categoricalFeature.getValues();
 			} else
 
 			if(feature instanceof ObjectFeature){
