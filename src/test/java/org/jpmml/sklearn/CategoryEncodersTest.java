@@ -20,7 +20,7 @@ package org.jpmml.sklearn;
 
 import org.junit.Test;
 
-public class CategoryEncoderTest extends SkLearnTest {
+public class CategoryEncodersTest extends SkLearnTest {
 
 	@Test
 	public void evaluateOrdinalEncoderAudit() throws Exception {
