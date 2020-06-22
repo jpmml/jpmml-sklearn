@@ -1,6 +1,6 @@
 from common import *
 
-from category_encoders import BaseNEncoder, OrdinalEncoder
+from category_encoders import BaseNEncoder, BinaryEncoder, OrdinalEncoder
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.linear_model import LogisticRegression
@@ -46,3 +46,10 @@ mapper = DataFrameMapper([
 ])
 
 build_audit(mapper, classifier, "Base3EncoderAudit")
+
+mapper = DataFrameMapper([
+	(cat_cols, BinaryEncoder()),
+	(cont_cols, None)
+])
+
+build_audit(mapper, classifier, "BinaryEncoderAudit")

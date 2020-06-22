@@ -46,6 +46,14 @@ public class CategoryEncoder extends Transformer {
 		return DataType.STRING;
 	}
 
+	public List<String> getDropCols(){
+		return getList("drop_cols", String.class);
+	}
+
+	public Boolean getDropInvariant(){
+		return getBoolean("drop_invariant");
+	}
+
 	public String getHandleMissing(){
 		return getString("handle_missing");
 	}

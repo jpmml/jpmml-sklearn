@@ -42,9 +42,14 @@ public class OrdinalEncoder extends CategoryEncoder {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Boolean dropInvariant = getDropInvariant();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();
 		List<Mapping> mappings = getMapping();
+
+		if(dropInvariant){
+			throw new IllegalArgumentException();
+		}
 
 		ClassDictUtil.checkSize(mappings, features);
 

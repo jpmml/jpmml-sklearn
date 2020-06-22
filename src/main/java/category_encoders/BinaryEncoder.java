@@ -16,29 +16,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package category_encoders;
 
-import org.junit.Test;
+import java.util.List;
 
-public class CategoryEncodersTest extends SkLearnTest {
+import org.jpmml.converter.Feature;
+import org.jpmml.sklearn.SkLearnEncoder;
 
-	@Test
-	public void evaluateBase2EncoderAudit() throws Exception {
-		evaluate("Base2Encoder", "Audit");
+public class BinaryEncoder extends CategoryEncoder {
+
+	public BinaryEncoder(String module, String name){
+		super(module, name);
 	}
 
-	@Test
-	public void evaluateBase3EncoderAudit() throws Exception {
-		evaluate("Base3Encoder", "Audit");
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		BaseNEncoder baseNEncoder = getBaseNEncoder();
+
+		return baseNEncoder.encodeFeatures(features, encoder);
 	}
 
-	@Test
-	public void evaluateBinaryEncoderAudit() throws Exception {
-		evaluate("BinaryEncoder", "Audit");
-	}
-
-	@Test
-	public void evaluateOrdinalEncoderAudit() throws Exception {
-		evaluate("OrdinalEncoder", "Audit");
+	public BaseNEncoder getBaseNEncoder(){
+		return get("base_n_encoder", BaseNEncoder.class);
 	}
 }

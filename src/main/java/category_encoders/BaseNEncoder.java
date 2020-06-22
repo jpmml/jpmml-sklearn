@@ -181,14 +181,6 @@ public class BaseNEncoder extends CategoryEncoder {
 		return getInteger("base");
 	}
 
-	public List<String> getDropCols(){
-		return getList("drop_cols", String.class);
-	}
-
-	public Boolean getDropInvariant(){
-		return getBoolean("drop_invariant");
-	}
-
 	public OrdinalEncoder getOrdinalEncoder(){
 		return get("ordinal_encoder", OrdinalEncoder.class);
 	}
