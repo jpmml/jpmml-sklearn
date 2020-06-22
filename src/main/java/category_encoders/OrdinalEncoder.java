@@ -19,40 +19,25 @@
 package category_encoders;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import numpy.DType;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
-import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Index;
 import pandas.core.Series;
 import pandas.core.SingleBlockManager;
-import sklearn.Transformer;
 import sklearn.preprocessing.EncoderUtil;
 
-public class OrdinalEncoder extends Transformer {
+public class OrdinalEncoder extends CategoryEncoder {
 
 	public OrdinalEncoder(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.CATEGORICAL;
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.STRING;
 	}
 
 	@Override
@@ -65,21 +50,17 @@ public class OrdinalEncoder extends Transformer {
 
 		List<Feature> result = new ArrayList<>();
 
-		for(int i = 0; i < mappings.size(); i++){
+		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			Mapping mapping = mappings.get(i);
 
-			SingleBlockManager mappingData = (mapping.getMapping()).getData();
-
-			Index blockItems = mappingData.getOnlyBlockItem();
+			Map<Object, Integer> categoryMappings = getCategoryMapping(mapping);
 
 			List<Object> categories = new ArrayList<>();
-			categories.addAll((blockItems.getData()).getData());
-
-			HasArray blockValues = mappingData.getOnlyBlockValue();
+			categories.addAll(categoryMappings.keySet());
 
 			List<Integer> indices = new ArrayList<>();
-			indices.addAll(ValueUtil.asIntegers((List)blockValues.getArrayContent()));
+			indices.addAll(categoryMappings.values());
 
 			Number mapMissingTo = null;
 
@@ -124,47 +105,24 @@ public class OrdinalEncoder extends Transformer {
 		return result;
 	}
 
-	public String getHandleMissing(){
-		return getString("handle_missing");
-	}
+	static
+	public Map<Object, Integer> getCategoryMapping(Mapping mapping){
+		SingleBlockManager mappingData = (mapping.getMapping(Series.class)).getData();
 
-	public String getHandleUnknown(){
-		return getString("handle_unknown");
-	}
+		Index blockItem = mappingData.getOnlyBlockItem();
+		List<?> categories = (blockItem.getData()).getData();
 
-	public List<Mapping> getMapping(){
-		List<Map<String, ?>> mapping = (List)getList("mapping", Map.class);
+		HasArray blockValue = mappingData.getOnlyBlockValue();
+		List<Integer> indices = ValueUtil.asIntegers((List)blockValue.getArrayContent());
 
-		Function<Map<String, ?>, Mapping> function = new Function<Map<String, ?>, Mapping>(){
+		ClassDictUtil.checkSize(categories, indices);
 
-			@Override
-			public Mapping apply(Map<String, ?> map){
-				Mapping mapping = OrdinalEncoder.this.new Mapping("mapping");
-				mapping.putAll(map);
+		Map<Object, Integer> result = new LinkedHashMap<>();
 
-				return mapping;
-			}
-		};
-
-		return Lists.transform(mapping, function);
-	}
-
-	private class Mapping extends PythonObject {
-
-		private Mapping(String name){
-			super(OrdinalEncoder.this.getPythonModule() + "." + OrdinalEncoder.this.getPythonName(), name);
+		for(int i = 0; i < categories.size(); i++){
+			result.put(categories.get(i), indices.get(i));
 		}
 
-		public Integer getCol(){
-			return getInteger("col");
-		}
-
-		public DType getDataType(){
-			return get("data_type", DType.class);
-		}
-
-		public Series getMapping(){
-			return get("mapping", Series.class);
-		}
+		return result;
 	}
 }

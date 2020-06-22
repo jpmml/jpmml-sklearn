@@ -23,6 +23,16 @@ import org.junit.Test;
 public class CategoryEncodersTest extends SkLearnTest {
 
 	@Test
+	public void evaluateBase2EncoderAudit() throws Exception {
+		evaluate("Base2Encoder", "Audit");
+	}
+
+	@Test
+	public void evaluateBase3EncoderAudit() throws Exception {
+		evaluate("Base3Encoder", "Audit");
+	}
+
+	@Test
 	public void evaluateOrdinalEncoderAudit() throws Exception {
 		evaluate("OrdinalEncoder", "Audit");
 	}
