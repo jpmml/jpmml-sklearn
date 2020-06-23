@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.SetMultimap;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
@@ -31,6 +32,7 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -65,25 +67,38 @@ public class BaseNFeature extends Feature implements HasDerivedName {
 	public ContinuousFeature toContinuousFeature(){
 		FieldName name = getName();
 		DataType dataType = getDataType();
+		int base = getBase();
 		SetMultimap<Integer, ?> values = getValues();
 
 		Supplier<Expression> expressionSupplier = () -> {
+			Map<Integer, ? extends Collection<?>> valueMap = values.asMap();
+
+			if(base == 2){
+				Collection<?> categories = valueMap.get(1);
+
+				if(categories != null && categories.size() == 1){
+					Object category = Iterables.getOnlyElement(categories);
+
+					return new NormDiscrete(name, category);
+				}
+			}
+
 			Apply apply = null;
 
 			Apply prevIfApply = null;
 
-			Set<? extends Map.Entry<Integer, ? extends Collection<?>>> entries = (values.asMap()).entrySet();
+			Set<? extends Map.Entry<Integer, ? extends Collection<?>>> entries = valueMap.entrySet();
 			for(Map.Entry<Integer, ? extends Collection<?>> entry : entries){
 				Integer baseValue = entry.getKey();
 				Collection<?> categories = entry.getValue();
 
-				Apply isInApply = PMMLUtil.createApply(PMMLFunctions.ISIN, new FieldRef(name));
+				Apply valueApply = PMMLUtil.createApply((categories.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), new FieldRef(name));
 
 				for(Object category : categories){
-					isInApply.addExpressions(PMMLUtil.createConstant(category, dataType));
+					valueApply.addExpressions(PMMLUtil.createConstant(category, dataType));
 				}
 
-				Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF, isInApply)
+				Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF, valueApply)
 					.addExpressions(PMMLUtil.createConstant(baseValue));
 
 				if(apply == null){

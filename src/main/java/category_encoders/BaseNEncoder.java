@@ -27,7 +27,11 @@ import java.util.Map;
 import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.OpType;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -123,6 +127,17 @@ public class BaseNEncoder extends CategoryEncoder {
 						return derivedName;
 					}
 				};
+
+				if(base == 2){
+					ContinuousFeature continuousFeature = baseFeature.toContinuousFeature();
+
+					DerivedField derivedField = (DerivedField)encoder.getField(continuousFeature.getName());
+
+					// XXX
+					derivedField.setOpType(OpType.CATEGORICAL);
+
+					baseFeature = new BinaryFeature(encoder, derivedField, 1);
+				}
 
 				baseFeatures.add(baseFeature);
 			}
