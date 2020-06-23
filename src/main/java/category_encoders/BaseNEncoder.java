@@ -23,22 +23,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.dmg.pmml.Apply;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMMLFunctions;
-import org.jpmml.converter.ContinuousFeature;
+import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -112,63 +103,28 @@ public class BaseNEncoder extends CategoryEncoder {
 
 				SetMultimap<Integer, Object> values = LinkedHashMultimap.create();
 
-				{
-					Collection<Map.Entry<Object, String>> entries = baseCategoryMappings.entrySet();
-					for(Map.Entry<Object, String> entry : entries){
-						Object category = entry.getKey();
-						String baseValue = entry.getValue();
+				Collection<Map.Entry<Object, String>> entries = baseCategoryMappings.entrySet();
+				for(Map.Entry<Object, String> entry : entries){
+					Object category = entry.getKey();
+					String baseValue = entry.getValue();
 
-						char digit = baseValue.charAt(pos);
-						if(digit != '0'){
-							values.put(Character.getNumericValue(digit), category);
-						}
+					char digit = baseValue.charAt(pos);
+					if(digit != '0'){
+						values.put(Character.getNumericValue(digit), category);
 					}
 				}
 
-				Supplier<Expression> expressionSupplier = () -> {
-					Apply apply = null;
+				FieldName derivedName = FeatureUtil.createName("base" + base, feature, pos);
 
-					Apply prevIfApply = null;
+				Feature baseFeature = new BaseNFeature(encoder, feature, base, values){
 
-					Set<Map.Entry<Integer, Collection<Object>>> entries = (values.asMap()).entrySet();
-					for(Map.Entry<Integer, Collection<Object>> entry : entries){
-						Integer baseValue = entry.getKey();
-						Collection<?> categories = entry.getValue();
-
-						Apply isInApply = PMMLUtil.createApply(PMMLFunctions.ISIN, feature.ref());
-
-						for(Object category : categories){
-							isInApply.addExpressions(PMMLUtil.createConstant(category, null));
-						}
-
-						Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF, isInApply)
-							.addExpressions(PMMLUtil.createConstant(baseValue));
-
-						if(apply == null){
-							apply = ifApply;
-						} // End if
-
-						if(prevIfApply != null){
-							prevIfApply.addExpressions(ifApply);
-						}
-
-						prevIfApply = ifApply;
-					}
-
-					if(apply == null){
-						return PMMLUtil.createConstant(0);
-					} else
-
-					{
-						prevIfApply.addExpressions(PMMLUtil.createConstant(0));
-
-						return apply;
+					@Override
+					public FieldName getDerivedName(){
+						return derivedName;
 					}
 				};
 
-				DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("base" + base, feature, pos), OpType.CATEGORICAL, DataType.INTEGER, expressionSupplier);
-
-				baseFeatures.add(new ContinuousFeature(encoder, derivedField));
+				baseFeatures.add(baseFeature);
 			}
 
 			result.addAll(baseFeatures);
