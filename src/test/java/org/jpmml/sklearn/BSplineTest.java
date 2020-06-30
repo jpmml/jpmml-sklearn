@@ -18,14 +18,40 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.dmg.pmml.FieldName;
+import org.jpmml.evaluator.EvaluatorBuilder;
+import org.jpmml.evaluator.ModelEvaluatorBuilder;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.testing.Batch;
 import org.junit.Test;
 
 public class BSplineTest extends SkLearnTest {
 
 	@Override
-	public boolean isGuarded(){
-		return false;
+	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
+		Batch result = new SkLearnTestBatch(name, dataset, predicate, equivalence){
+
+			@Override
+			public BSplineTest getIntegrationTest(){
+				return BSplineTest.this;
+			}
+
+			@Override
+			public EvaluatorBuilder getEvaluatorBuilder() throws Exception {
+				EvaluatorBuilder evaluatorBuilder = super.getEvaluatorBuilder();
+
+				evaluatorBuilder = ((ModelEvaluatorBuilder)evaluatorBuilder)
+					.setDerivedFieldGuard(null)
+					.setFunctionGuard(null);
+
+				return evaluatorBuilder;
+			}
+		};
+
+		return result;
 	}
 
 	@Test

@@ -18,13 +18,49 @@
  */
 package org.jpmml.sklearn;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.dmg.pmml.FieldName;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 
 public class ClassifierTest extends SkLearnTest {
+
+	@Override
+	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
+		Batch result = new SkLearnTestBatch(name, dataset, predicate, equivalence){
+
+			@Override
+			public ClassifierTest getIntegrationTest(){
+				return ClassifierTest.this;
+			}
+
+			@Override
+			public List<Map<FieldName, String>> getInput() throws IOException {
+				String dataset = super.getDataset();
+
+				if(dataset.endsWith("Cat")){
+					dataset = dataset.substring(0, dataset.length() - "Cat".length());
+				} else
+
+				if(dataset.endsWith("Dict")){
+					dataset = dataset.substring(0, dataset.length() - "Dict".length());
+				}
+
+				return loadRecords("/csv/" + dataset + ".csv");
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluateDurationInDaysApollo() throws Exception {
