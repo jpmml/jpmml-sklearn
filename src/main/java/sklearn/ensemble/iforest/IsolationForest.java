@@ -99,7 +99,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			Tree tree = treeRegressor.getTree();
 
-			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, predicateManager, scoreDistributionManager, MiningFunction.REGRESSION, estimatorSchema);
+			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, predicateManager, scoreDistributionManager, estimatorSchema);
 
 			Visitor visitor = new AbstractVisitor(){
 

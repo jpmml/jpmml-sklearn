@@ -56,7 +56,7 @@ public class TreePredictorUtil {
 		int[] missingGoToLeft = treePredictor.getMissingGoToLeft();
 		double[] values = treePredictor.getValues();
 
-		Node root = encodeNode(True.INSTANCE, predicateManager, 0, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
+		Node root = encodeNode(0, True.INSTANCE, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, predicateManager, schema);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
@@ -66,7 +66,7 @@ public class TreePredictorUtil {
 	}
 
 	static
-	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, int index, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, double[] thresholds, int[] missingGoToLeft, double[] values, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, double[] thresholds, int[] missingGoToLeft, double[] values, PredicateManager predicateManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		if(leaf[index] == 0){
@@ -106,8 +106,8 @@ public class TreePredictorUtil {
 				defaultLeft = (missingGoToLeft[index] == 1);
 			}
 
-			Node leftChild = encodeNode(leftPredicate, predicateManager, leftChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
-			Node rightChild = encodeNode(rightPredicate, predicateManager, rightChildren[index], leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, schema);
+			Node leftChild = encodeNode(leftChildren[index], leftPredicate, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, predicateManager, schema);
+			Node rightChild = encodeNode(rightChildren[index], rightPredicate, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, predicateManager, schema);
 
 			Node result = new BranchNode(null, predicate)
 				.setId(id)

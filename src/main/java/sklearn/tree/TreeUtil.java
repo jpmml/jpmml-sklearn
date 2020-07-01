@@ -229,11 +229,11 @@ public class TreeUtil {
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModelEnsemble(estimator, predicateManager, scoreDistributionManager, miningFunction, schema);
+		return encodeTreeModelEnsemble(estimator, miningFunction, predicateManager, scoreDistributionManager, schema);
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
@@ -244,7 +244,7 @@ public class TreeUtil {
 			public TreeModel apply(T estimator){
 				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), segmentSchema);
 
-				return TreeUtil.encodeTreeModel(estimator, predicateManager, scoreDistributionManager, miningFunction, treeModelSchema);
+				return TreeUtil.encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, treeModelSchema);
 			}
 		};
 
@@ -258,11 +258,11 @@ public class TreeUtil {
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModel(estimator, predicateManager, scoreDistributionManager, miningFunction, schema);
+		return encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, schema);
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -271,7 +271,7 @@ public class TreeUtil {
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
 
-		Node root = encodeNode(True.INSTANCE, predicateManager, scoreDistributionManager, new CategoryManager(), 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
@@ -282,7 +282,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, CategoryManager categoryManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -356,8 +356,8 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftPredicate, predicateManager, scoreDistributionManager, leftCategoryManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
-			Node rightChild = encodeNode(rightPredicate, predicateManager, scoreDistributionManager, rightCategoryManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
 
 			Node result;
 
