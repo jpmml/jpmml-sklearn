@@ -27,10 +27,7 @@ import java.util.Map;
 import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.dmg.pmml.DerivedField;
 import org.jpmml.converter.BaseNFeature;
-import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -111,22 +108,11 @@ public class BaseNEncoder extends CategoryEncoder {
 					String baseValue = entry.getValue();
 
 					char digit = baseValue.charAt(pos);
-					if(digit != '0'){
-						values.put(Character.getNumericValue(digit), category);
-					}
+
+					values.put(Character.getNumericValue(digit), category);
 				}
 
-				Feature baseFeature = new BaseNFeature(encoder, feature, base, pos, values);
-
-				if(base == 2){
-					ContinuousFeature continuousFeature = baseFeature.toContinuousFeature();
-
-					DerivedField derivedField = (DerivedField)encoder.toCategorical(continuousFeature.getName(), null);
-
-					baseFeature = new BinaryFeature(encoder, derivedField, 1);
-				}
-
-				baseFeatures.add(baseFeature);
+				baseFeatures.add(new BaseNFeature(encoder, feature, base, pos, values));
 			}
 
 			result.addAll(baseFeatures);

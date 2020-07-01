@@ -23,8 +23,10 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.BaseNFeature;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.WildcardFeature;
@@ -63,6 +65,17 @@ public class MultiOneHotEncoder extends MultiTransformer {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			List<?> featureCategories = categories.get(i);
+
+			if(feature instanceof BaseNFeature){
+				BaseNFeature baseFeature = (BaseNFeature)feature;
+
+				ContinuousFeature continuousFeature = baseFeature.toContinuousFeature();
+
+				// XXX
+				encoder.toCategorical(continuousFeature.getName(), null);
+
+				feature = continuousFeature;
+			} else
 
 			if(feature instanceof CategoricalFeature){
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;

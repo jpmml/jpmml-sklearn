@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
+from xgboost import XGBClassifier
 
 audit_X, audit_y = load_audit("Audit")
 
@@ -43,11 +44,20 @@ mapper = DataFrameMapper([
 build_audit(mapper, classifier, "Base2EncoderAudit")
 
 mapper = DataFrameMapper([
-	(cat_cols, BaseNEncoder(base = 3, drop_invariant = True)),
+	(cat_cols, [BaseNEncoder(base = 3, drop_invariant = True), OneHotEncoder()]),
 	(cont_cols, None)
 ])
 
 build_audit(mapper, classifier, "Base3EncoderAudit")
+
+classifier = XGBClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 7, random_state = 13)
+
+mapper = DataFrameMapper([
+	(cat_cols, BaseNEncoder(base = 4, drop_invariant = True)),
+	(cont_cols, None)
+])
+
+build_audit(mapper, classifier, "Base4EncoderAudit", compact = False)
 
 classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
 

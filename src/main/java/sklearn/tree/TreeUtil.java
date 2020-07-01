@@ -47,8 +47,10 @@ import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.NodeTransformer;
 import org.dmg.pmml.tree.SimplifyingNodeTransformer;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.BaseNFeature;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
@@ -269,7 +271,7 @@ public class TreeUtil {
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
 
-		Node root = encodeNode(True.INSTANCE, predicateManager, scoreDistributionManager, 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+		Node root = encodeNode(True.INSTANCE, predicateManager, scoreDistributionManager, new CategoryManager(), 0, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
@@ -280,7 +282,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
+	private Node encodeNode(Predicate predicate, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, CategoryManager categoryManager, int index, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, MiningFunction miningFunction, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -291,8 +293,41 @@ public class TreeUtil {
 
 			double threshold = thresholds[index];
 
+			CategoryManager leftCategoryManager = categoryManager;
+			CategoryManager rightCategoryManager = categoryManager;
+
 			Predicate leftPredicate;
 			Predicate rightPredicate;
+
+			if(feature instanceof BaseNFeature){
+				BaseNFeature baseFeature = (BaseNFeature)feature;
+
+				FieldName name = baseFeature.getName();
+
+				java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
+
+				List<Object> leftValues = baseFeature.getValues((Integer base) -> base <= threshold).stream()
+					.filter(valueFilter)
+					.collect(Collectors.toList());
+
+				List<Object> rightValues = baseFeature.getValues((Integer base) -> base > threshold).stream()
+					.filter(valueFilter)
+					.collect(Collectors.toList());
+
+				if(leftValues.size() == 0){
+					throw new IllegalArgumentException("Left branch is not selectable");
+				} // End if
+
+				if(rightValues.size() == 0){
+					throw new IllegalArgumentException("Right branch is not selectable");
+				}
+
+				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
+				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
+
+				leftPredicate = predicateManager.createPredicate(baseFeature, leftValues);
+				rightPredicate = predicateManager.createPredicate(baseFeature, rightValues);
+			} else
 
 			if(feature instanceof BinaryFeature){
 				BinaryFeature binaryFeature = (BinaryFeature)feature;
@@ -321,8 +356,8 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftPredicate, predicateManager, scoreDistributionManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
-			Node rightChild = encodeNode(rightPredicate, predicateManager, scoreDistributionManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			Node leftChild = encodeNode(leftPredicate, predicateManager, scoreDistributionManager, leftCategoryManager, leftIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
+			Node rightChild = encodeNode(rightPredicate, predicateManager, scoreDistributionManager, rightCategoryManager, rightIndex, leftChildren, rightChildren, features, thresholds, values, miningFunction, schema);
 
 			Node result;
 
@@ -404,6 +439,12 @@ public class TreeUtil {
 
 			@Override
 			public Feature apply(Feature feature){
+
+				if(feature instanceof BaseNFeature){
+					BaseNFeature baseFeature = (BaseNFeature)feature;
+
+					return baseFeature;
+				} else
 
 				if(feature instanceof BinaryFeature){
 					BinaryFeature binaryFeature = (BinaryFeature)feature;

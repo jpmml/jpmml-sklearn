@@ -18,6 +18,8 @@
  */
 package org.jpmml.sklearn;
 
+import org.dmg.pmml.FieldName;
+import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.junit.Test;
 
 public class CategoryEncodersTest extends SkLearnTest {
@@ -33,6 +35,11 @@ public class CategoryEncodersTest extends SkLearnTest {
 	}
 
 	@Test
+	public void evaluateBase4EncoderAudit() throws Exception {
+		evaluate("Base4Encoder", "Audit", excludeFields(CategoryEncodersTest.falseProbabilityField), new FloatEquivalence(8));
+	}
+
+	@Test
 	public void evaluateBinaryEncoderAudit() throws Exception {
 		evaluate("BinaryEncoder", "Audit");
 	}
@@ -41,4 +48,7 @@ public class CategoryEncodersTest extends SkLearnTest {
 	public void evaluateOrdinalEncoderAudit() throws Exception {
 		evaluate("OrdinalEncoder", "Audit");
 	}
+
+	private static final FieldName falseProbabilityField = FieldName.create("probability(0)");
+	private static final FieldName trueProbabilityField = FieldName.create("probability(1)");
 }
