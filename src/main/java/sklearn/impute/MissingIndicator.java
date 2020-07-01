@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
@@ -56,7 +57,7 @@ public class MissingIndicator extends Transformer implements HasNumberOfFeatures
 		List<Integer> featureIndices = getFeatureIndices();
 		Object missingValues = getMissingValues();
 
-		if((Double.valueOf(Double.NaN)).equals(missingValues)){
+		if(ValueUtil.isNaN(missingValues)){
 			missingValues = null;
 		}
 

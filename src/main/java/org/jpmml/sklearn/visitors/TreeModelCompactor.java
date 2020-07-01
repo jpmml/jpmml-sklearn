@@ -56,7 +56,14 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 			Predicate secondPredicate = secondChild.getPredicate();
 
 			checkFieldReference(firstPredicate, secondPredicate);
-			checkValue(firstPredicate, secondPredicate);
+
+			if(firstPredicate instanceof SimplePredicate && secondPredicate instanceof SimplePredicate){
+				checkValue(firstPredicate, secondPredicate);
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			} // End if
 
 			if(hasOperator(firstPredicate, SimplePredicate.Operator.NOT_EQUAL) && hasOperator(secondPredicate, SimplePredicate.Operator.EQUAL)){
 				children = swapChildren(node);

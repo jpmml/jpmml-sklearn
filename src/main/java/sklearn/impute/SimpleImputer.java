@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
@@ -55,7 +56,7 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 
 		ClassDictUtil.checkSize(features, statistics);
 
-		if((Double.valueOf(Double.NaN)).equals(missingValues)){
+		if(ValueUtil.isNaN(missingValues)){
 			missingValues = null;
 		}
 

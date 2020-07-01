@@ -43,11 +43,9 @@ public class CategoricalDomain extends DiscreteDomain {
 		PMMLEncoder encoder = wildcardFeature.getEncoder();
 
 		if(values == null || values.isEmpty()){
-			DataField dataField = (DataField)encoder.getField(wildcardFeature.getName());
+			DataField dataField = (DataField)encoder.toCategorical(wildcardFeature.getName(), null);
 
-			dataField.setOpType(OpType.CATEGORICAL);
-
-			return new ObjectFeature(encoder, dataField.getName(), dataField.getDataType());
+			return new ObjectFeature(encoder, dataField);
 		}
 
 		return wildcardFeature.toCategoricalFeature(standardizeValues(wildcardFeature.getDataType(), values));

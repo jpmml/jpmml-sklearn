@@ -28,12 +28,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
-import org.dmg.pmml.OpType;
+import org.jpmml.converter.BaseNFeature;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -118,23 +116,12 @@ public class BaseNEncoder extends CategoryEncoder {
 					}
 				}
 
-				FieldName derivedName = FeatureUtil.createName("base" + base, feature, pos);
-
-				Feature baseFeature = new BaseNFeature(encoder, feature, base, values){
-
-					@Override
-					public FieldName getDerivedName(){
-						return derivedName;
-					}
-				};
+				Feature baseFeature = new BaseNFeature(encoder, feature, base, pos, values);
 
 				if(base == 2){
 					ContinuousFeature continuousFeature = baseFeature.toContinuousFeature();
 
-					DerivedField derivedField = (DerivedField)encoder.getField(continuousFeature.getName());
-
-					// XXX
-					derivedField.setOpType(OpType.CATEGORICAL);
+					DerivedField derivedField = (DerivedField)encoder.toCategorical(continuousFeature.getName(), null);
 
 					baseFeature = new BinaryFeature(encoder, derivedField, 1);
 				}

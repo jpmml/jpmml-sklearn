@@ -43,6 +43,7 @@ import org.jpmml.converter.OutlierTransformation;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -54,10 +55,9 @@ import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.ensemble.EnsembleUtil;
 import sklearn.tree.HasTreeOptions;
-import sklearn.tree.ScoreDistributionManager;
 import sklearn.tree.Tree;
-import sklearn.tree.TreeUtil;
 import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 
 public class IsolationForest extends EnsembleRegressor implements HasTreeOptions {
 

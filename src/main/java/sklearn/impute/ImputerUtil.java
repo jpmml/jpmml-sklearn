@@ -86,7 +86,7 @@ public class ImputerUtil {
 				case STRING:
 					return new StringFeature(encoder, derivedField);
 				default:
-					return new ObjectFeature(encoder, derivedField.getName(), derivedField.getDataType());
+					return new ObjectFeature(encoder, derivedField);
 			}
 		} else
 

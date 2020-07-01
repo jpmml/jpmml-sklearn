@@ -54,6 +54,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.visitors.AbstractVisitor;

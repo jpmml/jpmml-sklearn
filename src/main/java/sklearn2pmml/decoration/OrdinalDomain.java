@@ -20,10 +20,8 @@ package sklearn2pmml.decoration;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.WildcardFeature;
 
 public class OrdinalDomain extends DiscreteDomain {
@@ -39,20 +37,6 @@ public class OrdinalDomain extends DiscreteDomain {
 
 	@Override
 	public ObjectFeature encode(WildcardFeature wildcardFeature, List<?> values){
-		PMMLEncoder encoder = wildcardFeature.getEncoder();
-
-		DataField dataField;
-
-		if(values == null || values.isEmpty()){
-			dataField = (DataField)encoder.getField(wildcardFeature.getName());
-		} else
-
-		{
-			dataField = (DataField)encoder.toCategorical(wildcardFeature.getName(), standardizeValues(wildcardFeature.getDataType(), values));
-		}
-
-		dataField.setOpType(OpType.ORDINAL);
-
-		return new ObjectFeature(encoder, dataField.getName(), dataField.getDataType());
+		return wildcardFeature.toOrdinalFeature(values != null ? standardizeValues(wildcardFeature.getDataType(), values) : null);
 	}
 }

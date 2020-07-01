@@ -21,11 +21,9 @@ package sklearn2pmml.pipeline;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -572,17 +570,13 @@ public class PMMLPipeline extends Pipeline {
 
 	static
 	private List<?> cleanValues(Domain domain, List<?> values){
-		Set<Object> missingValues = new HashSet<>();
-		missingValues.add(Float.NaN);
-		missingValues.add(Double.NaN);
-
 		Function<Object, Object> function = new Function<Object, Object>(){
 
 			@Override
 			public Object apply(Object value){
 				Domain.checkValue(value);
 
-				if(missingValues.contains(value)){
+				if(ValueUtil.isNaN(value)){
 					return null;
 				}
 
