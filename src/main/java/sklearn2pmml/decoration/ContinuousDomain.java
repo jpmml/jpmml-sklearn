@@ -35,7 +35,7 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
-import sklearn.TransformerUtil;
+import sklearn.StepUtil;
 
 public class ContinuousDomain extends Domain {
 
@@ -69,7 +69,7 @@ public class ContinuousDomain extends Domain {
 		Object dtype = getDType();
 
 		if(dtype != null){
-			return TransformerUtil.getDataType(dtype);
+			return StepUtil.getDataType(dtype);
 		}
 
 		return DataType.DOUBLE;
