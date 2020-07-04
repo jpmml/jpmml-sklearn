@@ -23,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -48,6 +50,10 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 	abstract
 	public SkLearnTest getIntegrationTest();
 
+	public Map<String, ?> getOptions(){
+		return new LinkedHashMap<>();
+	}
+
 	@Override
 	public PMML getPMML() throws Exception {
 		SkLearnEncoder encoder = new SkLearnEncoder();
@@ -58,7 +64,20 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 			pipeline = (PMMLPipeline)PickleUtil.unpickle(storage);
 		}
 
+		Map<String, ?> options = getOptions();
+
 		Estimator estimator = pipeline.getFinalEstimator();
+
+		Map<String, ?> pmmlOptions = estimator.getPMMLOptions();
+
+		// Programmatic test batch options (empty by default) override pickle file options
+		if(pmmlOptions != null){
+			pmmlOptions.putAll((Map)options);
+
+			options = pmmlOptions;
+		}
+
+		estimator.setPMMLOptions(options);
 
 		File tmpFile = null;
 
