@@ -30,11 +30,10 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictConstructorUtil;
-import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Transformer extends PythonObject implements HasType {
+public class Transformer extends Step implements HasType {
 
 	public Transformer(String module, String name){
 		super(module, name);

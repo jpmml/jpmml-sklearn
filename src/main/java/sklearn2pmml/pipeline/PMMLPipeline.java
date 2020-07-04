@@ -71,6 +71,7 @@ import sklearn.Estimator;
 import sklearn.HasClassifierOptions;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
+import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 import sklearn.pipeline.Pipeline;
@@ -512,17 +513,17 @@ public class PMMLPipeline extends Pipeline {
 		return this;
 	}
 
-	private List<String> initActiveFields(PythonObject object){
+	private List<String> initActiveFields(Step step){
 		int numberOfFeatures = HasNumberOfFeatures.UNKNOWN;
 
-		if(object instanceof HasNumberOfFeatures){
-			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)object;
+		if(step instanceof HasNumberOfFeatures){
+			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)step;
 
 			numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
 		} // End if
 
 		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
-			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(object) + ") does not specify the number of input features");
+			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(step) + ") does not specify the number of input features");
 		}
 
 		List<String> activeFields = new ArrayList<>(numberOfFeatures);

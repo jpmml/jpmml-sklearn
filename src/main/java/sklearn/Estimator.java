@@ -26,12 +26,11 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PythonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract
-public class Estimator extends PythonObject implements HasNumberOfFeatures, HasType {
+public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 
 	public Estimator(String module, String name){
 		super(module, name);
