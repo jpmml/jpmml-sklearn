@@ -43,7 +43,7 @@ public class DurationTransformer extends Transformer {
 	}
 
 	abstract
-	public String getFunction();
+	public String getPMMLFunction();
 
 	@Override
 	public DataType getDataType(){
@@ -53,7 +53,7 @@ public class DurationTransformer extends Transformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		GregorianCalendar epoch = getEpoch();
-		String function = getFunction();
+		String pmmlFunction = getPMMLFunction();
 
 		LocalDateTime epochDateTime = CalendarUtil.toLocalDateTime(epoch);
 		if(epochDateTime.getMonthValue() != 1 || epochDateTime.getDayOfMonth() != 1){
@@ -62,20 +62,20 @@ public class DurationTransformer extends Transformer {
 
 		int year = epochDateTime.getYear();
 
-		String dateFunction = function;
+		String function = pmmlFunction;
 
-		if(dateFunction.startsWith("date")){
-			dateFunction = dateFunction.substring("date".length(), dateFunction.length());
+		if(function.startsWith("date")){
+			function = function.substring("date".length());
+
+			function = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, function);
 		}
-
-		dateFunction = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, dateFunction);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			ObjectFeature objectFeature = (ObjectFeature)features.get(i);
 
-			DerivedField derivedField = encoder.ensureDerivedField(createFieldName(dateFunction, objectFeature, year), OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(function, objectFeature.ref(), PMMLUtil.createConstant(year, DataType.INTEGER)));
+			DerivedField derivedField = encoder.ensureDerivedField(createFieldName(function, objectFeature, year), OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(pmmlFunction, objectFeature.ref(), PMMLUtil.createConstant(year, DataType.INTEGER)));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

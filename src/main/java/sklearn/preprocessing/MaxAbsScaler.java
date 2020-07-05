@@ -69,7 +69,7 @@ public class MaxAbsScaler extends Transformer implements HasNumberOfFeatures {
 			// "$name / scale"
 			Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, continuousFeature.ref(), PMMLUtil.createConstant(value));
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("max_abs_scaler", continuousFeature), apply);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("maxAbsScaler", continuousFeature), apply);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

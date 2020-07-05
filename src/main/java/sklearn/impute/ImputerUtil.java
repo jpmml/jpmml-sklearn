@@ -107,7 +107,7 @@ public class ImputerUtil {
 			expression = PMMLUtil.createApply(PMMLFunctions.ISMISSING, expression);
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("missing_indicator", feature), OpType.CATEGORICAL, DataType.BOOLEAN, expression);
+		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("missingIndicator", feature), OpType.CATEGORICAL, DataType.BOOLEAN, expression);
 
 		return new BooleanFeature(encoder, derivedField);
 	}

@@ -102,7 +102,7 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 				expression = PMMLUtil.createApply(PMMLFunctions.DIVIDE, expression, PMMLUtil.createConstant(stdValue));
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("standard_scaler", continuousFeature), expression);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("standardScaler", continuousFeature), expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

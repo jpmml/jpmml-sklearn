@@ -27,7 +27,7 @@ public class DaysSinceYearTransformer extends DurationTransformer {
 	}
 
 	@Override
-	public String getFunction(){
+	public String getPMMLFunction(){
 		return PMMLFunctions.DATEDAYSSINCEYEAR;
 	}
 }

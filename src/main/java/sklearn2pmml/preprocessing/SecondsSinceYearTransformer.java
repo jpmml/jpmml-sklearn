@@ -27,7 +27,7 @@ public class SecondsSinceYearTransformer extends DurationTransformer {
 	}
 
 	@Override
-	public String getFunction(){
+	public String getPMMLFunction(){
 		return PMMLFunctions.DATESECONDSSINCEYEAR;
 	}
 }

@@ -50,7 +50,7 @@ public class SecondsSinceMidnightTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			ObjectFeature objectFeature = (ObjectFeature)features.get(i);
 
-			DerivedField derivedField = encoder.ensureDerivedField(createFieldName("seconds_since_midnight", objectFeature), OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(PMMLFunctions.DATESECONDSSINCEMIDNIGHT, objectFeature.ref()));
+			DerivedField derivedField = encoder.ensureDerivedField(createFieldName("secondsSinceMidnight", objectFeature), OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(PMMLFunctions.DATESECONDSSINCEMIDNIGHT, objectFeature.ref()));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
