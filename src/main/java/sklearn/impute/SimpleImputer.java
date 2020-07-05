@@ -37,12 +37,7 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 
 	@Override
 	public int getNumberOfFeatures(){
-		Boolean addIndicator = getAddIndicator();
 		int[] shape = getStatisticsShape();
-
-		if(addIndicator){
-			return 2 * shape[0];
-		}
 
 		return shape[0];
 	}
