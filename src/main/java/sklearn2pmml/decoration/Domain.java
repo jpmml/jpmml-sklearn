@@ -58,20 +58,10 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 	}
 
 	@Override
-	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
-		FieldName name = dataField.getName();
+	public List<Feature> updateAndEncodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		features = updateFeatures(features, encoder);
 
-		if(encoder.isFrozen(name)){
-			throw new IllegalArgumentException("Field " + name.getValue() + " is frozen for type information updates");
-		}
-
-		dataField
-			.setDataType(dataType)
-			.setOpType(opType);
-
-		encoder.setDomain(name, this);
-
-		return dataField;
+		return encodeFeatures(features, encoder);
 	}
 
 	@Override
@@ -122,6 +112,23 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 		}
 
 		return features;
+	}
+
+	@Override
+	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
+		FieldName name = dataField.getName();
+
+		if(encoder.isFrozen(name)){
+			throw new IllegalArgumentException("Field " + name.getValue() + " is frozen for type information updates");
+		}
+
+		dataField
+			.setDataType(dataType)
+			.setOpType(opType);
+
+		encoder.setDomain(name, this);
+
+		return dataField;
 	}
 
 	public Object getDType(){

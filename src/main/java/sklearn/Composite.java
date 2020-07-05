@@ -26,7 +26,6 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -54,9 +53,7 @@ public class Composite extends Step implements HasNumberOfFeatures, HasType {
 		if(hasTransformers()){
 			List<? extends Transformer> transformers = getTransformers();
 
-			for(Transformer transformer : transformers){
-				return TransformerUtil.getNumberOfFeatures(transformer);
-			}
+			return StepUtil.getNumberOfFeatures(transformers);
 		} // End if
 
 		if(hasFinalEstimator()){
@@ -119,12 +116,6 @@ public class Composite extends Step implements HasNumberOfFeatures, HasType {
 
 		List<? extends Transformer> transformers = getTransformers();
 		for(Transformer transformer : transformers){
-			int numberOfFeatures = TransformerUtil.getNumberOfFeatures(transformer);
-
-			if(numberOfFeatures > -1){
-				ClassDictUtil.checkSize(numberOfFeatures, features);
-			}
-
 			features = transformer.updateAndEncodeFeatures(features, encoder);
 		}
 

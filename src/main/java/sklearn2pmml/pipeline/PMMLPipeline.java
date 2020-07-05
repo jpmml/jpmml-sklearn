@@ -73,6 +73,7 @@ import sklearn.HasClassifierOptions;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 import sklearn.pipeline.Pipeline;
@@ -223,10 +224,7 @@ public class PMMLPipeline extends Pipeline {
 			return encodePMML(null, repr, encoder);
 		}
 
-		int numberOfFeatures = estimator.getNumberOfFeatures();
-		if(numberOfFeatures != HasNumberOfFeatures.UNKNOWN){
-			ClassDictUtil.checkSize(numberOfFeatures, features);
-		}
+		StepUtil.checkNumberOfFeatures(estimator, features);
 
 		Schema schema = new Schema(label, features);
 
@@ -515,13 +513,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	private List<String> initActiveFields(Step step){
-		int numberOfFeatures = HasNumberOfFeatures.UNKNOWN;
-
-		if(step instanceof HasNumberOfFeatures){
-			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)step;
-
-			numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
-		} // End if
+		int numberOfFeatures = StepUtil.getNumberOfFeatures(step);
 
 		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(step) + ") does not specify the number of input features");

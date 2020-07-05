@@ -52,6 +52,14 @@ public class Transformer extends Step implements HasType {
 		return DataType.DOUBLE;
 	}
 
+	public List<Feature> updateAndEncodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		StepUtil.checkNumberOfFeatures(this, features);
+
+		features = updateFeatures(features, encoder);
+
+		return encodeFeatures(features, encoder);
+	}
+
 	public List<Feature> updateFeatures(List<Feature> features, SkLearnEncoder encoder){
 		OpType opType;
 		DataType dataType;
@@ -109,12 +117,6 @@ public class Transformer extends Step implements HasType {
 			.setDataType(dataType);
 
 		return dataField;
-	}
-
-	public List<Feature> updateAndEncodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		features = updateFeatures(features, encoder);
-
-		return encodeFeatures(features, encoder);
 	}
 
 	protected Object getDType(boolean extended){

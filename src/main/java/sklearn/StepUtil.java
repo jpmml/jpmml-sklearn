@@ -18,13 +18,52 @@
  */
 package sklearn;
 
+import java.util.List;
+
 import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.Feature;
+import org.jpmml.python.ClassDictUtil;
 
 public class StepUtil {
 
 	private StepUtil(){
+	}
+
+	static
+	public void checkNumberOfFeatures(Step step, List<Feature> features){
+
+		if(step instanceof HasNumberOfFeatures){
+			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)step;
+
+			int numberOfFeatures = hasNumberOfFeatures.getNumberOfFeatures();
+			if((numberOfFeatures != HasNumberOfFeatures.UNKNOWN) && (numberOfFeatures != features.size())){
+				throw new IllegalArgumentException("Expected " + numberOfFeatures + " feature(s) (" + ClassDictUtil.formatClass(step)  + "), got " + features.size() + " feature(s)");
+			}
+		}
+	}
+
+	static
+	public int getNumberOfFeatures(List<? extends Step> steps){
+
+		for(Step step : steps){
+			return getNumberOfFeatures(step);
+		}
+
+		return HasNumberOfFeatures.UNKNOWN;
+	}
+
+	static
+	public int getNumberOfFeatures(Step step){
+
+		if(step instanceof HasNumberOfFeatures){
+			HasNumberOfFeatures hasNumberOfFeatures = (HasNumberOfFeatures)step;
+
+			return hasNumberOfFeatures.getNumberOfFeatures();
+		}
+
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	static
