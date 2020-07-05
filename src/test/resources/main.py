@@ -103,7 +103,7 @@ def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 	pipeline = make_pmml_pipeline(pipeline, wheat_X.columns.values)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
-	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["Cluster"])
+	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["cluster"])
 	if with_affinity == True:
 		Xt = pipeline_transform(pipeline, wheat_X)
 		affinity_0 = kmeans_distance(kmeans, 0, Xt)
