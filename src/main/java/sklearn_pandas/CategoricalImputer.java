@@ -47,7 +47,7 @@ public class CategoricalImputer extends Transformer {
 
 		Feature feature = features.get(0);
 
-		feature = ImputerUtil.encodeFeature(feature, false, missingValues, fill, MissingValueTreatmentMethod.AS_MODE, encoder);
+		feature = ImputerUtil.encodeFeature(this, feature, false, missingValues, fill, MissingValueTreatmentMethod.AS_MODE, encoder);
 
 		return Collections.singletonList(feature);
 	}

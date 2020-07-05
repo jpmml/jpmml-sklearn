@@ -86,7 +86,7 @@ public class OrdinalEncoder extends Transformer {
 			Feature feature = features.get(i);
 			List<?> featureCategories = categories.get(i);
 
-			result.add(EncoderUtil.encodeIndexFeature(feature, featureCategories, dataType, encoder));
+			result.add(EncoderUtil.encodeIndexFeature(this, feature, featureCategories, dataType, encoder));
 		}
 
 		return result;

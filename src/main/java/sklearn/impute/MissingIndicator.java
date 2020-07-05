@@ -66,7 +66,7 @@ public class MissingIndicator extends Transformer implements HasNumberOfFeatures
 		for(Integer featureIndex : featureIndices){
 			Feature feature = features.get(featureIndex);
 
-			feature = ImputerUtil.encodeIndicatorFeature(feature, missingValues, encoder);
+			feature = ImputerUtil.encodeIndicatorFeature(this, feature, missingValues, encoder);
 
 			result.add(feature);
 		}

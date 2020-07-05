@@ -28,7 +28,6 @@ import org.dmg.pmml.OutlierTreatmentMethod;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
@@ -70,7 +69,7 @@ public class IsotonicRegression extends Regressor {
 			normContinuous.addLinearNorms(new LinearNorm(orig, norm));
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("isotonicRegression", feature), normContinuous);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("isotonicRegression", feature), normContinuous);
 
 		feature = new ContinuousFeature(encoder, derivedField);
 

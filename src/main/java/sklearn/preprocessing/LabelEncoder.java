@@ -55,7 +55,7 @@ public class LabelEncoder extends Transformer {
 
 		Feature feature = features.get(0);
 
-		return Collections.singletonList(EncoderUtil.encodeIndexFeature(feature, classes, DataType.INTEGER, encoder));
+		return Collections.singletonList(EncoderUtil.encodeIndexFeature(this, feature, classes, DataType.INTEGER, encoder));
 	}
 
 	public List<?> getClasses(){

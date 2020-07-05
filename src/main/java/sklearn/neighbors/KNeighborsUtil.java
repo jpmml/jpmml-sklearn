@@ -50,6 +50,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.FieldNameUtil;
 
 public class KNeighborsUtil {
 
@@ -117,7 +118,7 @@ public class KNeighborsUtil {
 		for(int i = 0; i < numberOfNeighbors; i++){
 			int rank = (i + 1);
 
-			OutputField outputField = new OutputField(FieldName.create("neighbor(" + rank + ")"), OpType.CATEGORICAL, DataType.STRING)
+			OutputField outputField = new OutputField(FieldNameUtil.create("neighbor", rank), OpType.CATEGORICAL, DataType.STRING)
 				.setResultFeature(ResultFeature.ENTITY_ID)
 				.setRank(rank);
 

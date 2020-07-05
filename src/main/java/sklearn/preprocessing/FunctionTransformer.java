@@ -26,10 +26,10 @@ import numpy.core.UFunc;
 import numpy.core.UFuncUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -50,9 +50,13 @@ public class FunctionTransformer extends Transformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			ContinuousFeature continuousFeature = (features.get(i)).toContinuousFeature();
+			Feature feature = features.get(i);
 
-			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName(func.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, () -> UFuncUtil.encodeUFunc(func, Collections.singletonList(continuousFeature.ref())));
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+			Expression expression = UFuncUtil.encodeUFunc(func, Collections.singletonList(continuousFeature.ref()));
+
+			DerivedField derivedField = encoder.createDerivedField(createFieldName(func.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

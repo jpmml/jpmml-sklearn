@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.BiMap;
@@ -51,13 +50,13 @@ import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.FieldNameUtil;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn2pmml.feature_extraction.text.Splitter;
@@ -108,7 +107,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		if(lowercase){
 			Apply apply = PMMLUtil.createApply(PMMLFunctions.LOWERCASE, feature.ref());
 
-			DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("lowercase", feature), OpType.CATEGORICAL, DataType.STRING, () -> apply);
+			DerivedField derivedField = encoder.ensureDerivedField(FieldNameUtil.create("lowercase", feature), OpType.CATEGORICAL, DataType.STRING, () -> apply);
 
 			feature = new StringFeature(encoder, derivedField);
 		}
@@ -124,7 +123,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 			Apply apply = encodeApply(defineFunction.getName(), feature, i, term);
 
-			Feature termFeature = new ObjectFeature(encoder, FieldName.create(defineFunction.getName() + "(" + term + ")"), dataType){
+			Feature termFeature = new ObjectFeature(encoder, FieldNameUtil.create(defineFunction.getName(), term), dataType){
 
 				@Override
 				public ContinuousFeature toContinuousFeature(){
@@ -183,9 +182,9 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
 		}
 
-		String name = functionName() + "@" + String.valueOf(CountVectorizer.SEQUENCE.getAndIncrement());
+		FieldName name = createFieldName(functionName());
 
-		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.DOUBLE, null, textIndex)
+		DefineFunction defineFunction = new DefineFunction(name.getValue(), OpType.CONTINUOUS, DataType.DOUBLE, null, textIndex)
 			.addParameterFields(documentField, termField);
 
 		return defineFunction;
@@ -263,6 +262,4 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	private static final Joiner JOINER = Joiner.on("|");
-
-	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);
 }

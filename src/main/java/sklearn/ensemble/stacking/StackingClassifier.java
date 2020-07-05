@@ -38,6 +38,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
+import sklearn.FieldNameUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class StackingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
@@ -98,7 +99,7 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 				List<Feature> result = new ArrayList<>();
 
 				for(Object value : values){
-					OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldName.create(stackMethod + "(" + index + ", " + value + ")"), DataType.DOUBLE, value);
+					OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldNameUtil.create(stackMethod, index, value), DataType.DOUBLE, value);
 
 					DerivedOutputField predictedField = encoder.createDerivedField(model, probabilityOutputField, false);
 

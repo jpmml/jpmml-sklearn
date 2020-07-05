@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.function.IntFunction;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
@@ -36,6 +35,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.FieldNameUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasPriorProbability;
 import sklearn.tree.HasTreeOptions;
@@ -92,7 +92,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 			SchemaUtil.checkSize(2, categoricalLabel);
 
 			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(1) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("decisionFunction", categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.NONE, true, schema);
 		} else
@@ -116,7 +116,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 				};
 
 				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initialPredictions.apply(i), learningRate, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("decisionFunction", categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 				miningModels.add(miningModel);
 			}

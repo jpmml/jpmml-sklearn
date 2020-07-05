@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.regression.RegressionModel;
@@ -35,6 +34,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
 import sklearn.EstimatorEnsembleUtil;
+import sklearn.FieldNameUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
@@ -84,7 +84,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 				}
 
 				Output output = new Output()
-					.addOutputFields(ModelUtil.createProbabilityField(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), DataType.DOUBLE, categoricalLabel.getValue(i)));
+					.addOutputFields(ModelUtil.createProbabilityField(FieldNameUtil.create("decisionFunction", categoricalLabel.getValue(i)), DataType.DOUBLE, categoricalLabel.getValue(i)));
 
 				CategoricalLabel segmentCategoricalLabel = new CategoricalLabel(null, DataType.STRING, Arrays.asList("(other)", ValueUtil.asString(categoricalLabel.getValue(i))));
 

@@ -68,7 +68,7 @@ public class ExpressionTransformer extends Transformer {
 
 		OpType opType = StepUtil.getOpType(dataType);
 
-		DerivedField derivedField = encoder.createDerivedField(FieldName.create("eval(" + expr + ")"), opType, dataType, expression);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
 
 		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
 	}

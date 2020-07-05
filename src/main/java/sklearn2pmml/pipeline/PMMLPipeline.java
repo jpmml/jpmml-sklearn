@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
+import sklearn.FieldNameUtil;
 import sklearn.HasClassifierOptions;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
@@ -237,7 +238,7 @@ public class PMMLPipeline extends Pipeline {
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				FieldName name = FieldName.create("predict(" + (label.getName()).getValue() + ")");
+				FieldName name = FieldNameUtil.create("predict", label.getName());
 
 				OutputField predictField;
 

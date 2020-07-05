@@ -23,12 +23,10 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -52,9 +50,7 @@ public class SecondsSinceMidnightTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			ObjectFeature objectFeature = (ObjectFeature)features.get(i);
 
-			FieldName name = FieldName.create("seconds_since_midnight(" + (FeatureUtil.getName(objectFeature)).getValue() + ")");
-
-			DerivedField derivedField = encoder.ensureDerivedField(name, OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(PMMLFunctions.DATESECONDSSINCEMIDNIGHT, objectFeature.ref()));
+			DerivedField derivedField = encoder.ensureDerivedField(createFieldName("seconds_since_midnight", objectFeature), OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(PMMLFunctions.DATESECONDSSINCEMIDNIGHT, objectFeature.ref()));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

@@ -35,7 +35,6 @@ import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -63,7 +62,7 @@ public class BSplineTransformer extends Transformer {
 		Apply apply = PMMLUtil.createApply(defineFunction.getName())
 			.addExpressions(continuousFeature.ref());
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("bspline", feature), apply);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("bspline", continuousFeature), apply);
 
 		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
 	}

@@ -18,6 +18,10 @@
  */
 package sklearn;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.dmg.pmml.FieldName;
 import org.jpmml.python.PythonObject;
 
 abstract
@@ -25,5 +29,29 @@ public class Step extends PythonObject {
 
 	public Step(String module, String name){
 		super(module, name);
+	}
+
+	public FieldName createFieldName(String function, Object... args){
+		return createFieldName(function, Arrays.asList(args));
+	}
+
+	public FieldName createFieldName(String function, List<?> args){
+		String pmmlName = getPMMLName();
+
+		if(pmmlName != null){
+			return FieldName.create(pmmlName);
+		}
+
+		return FieldNameUtil.create(function, args);
+	}
+
+	public String getPMMLName(){
+		return getOptionalString("pmml_name_");
+	}
+
+	public Step setPMMLName(String name){
+		put("pmml_name_", name);
+
+		return this;
 	}
 }

@@ -41,6 +41,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
+import sklearn.FieldNameUtil;
 import sklearn.HasEstimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
@@ -90,7 +91,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 		encoder.addTransformer(model);
 
-		FieldName name = FieldName.create("stack(" + features.size() + ")");
+		FieldName name = createFieldName("stack", features);
 
 		List<Feature> result = new ArrayList<>();
 
@@ -104,7 +105,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 					if(classifier.hasProbabilityDistribution()){
 
 						for(Object category : categories){
-							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldName.create("probability(" + name.getValue() + ", " + category + ")"), DataType.DOUBLE, category)
+							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldNameUtil.create("probability", name, category), DataType.DOUBLE, category)
 								.setFinalResult(false);
 
 							DerivedOutputField probabilityField = encoder.createDerivedField(model, probabilityOutputField, false);

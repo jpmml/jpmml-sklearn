@@ -20,7 +20,6 @@ package sklearn.decomposition;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
@@ -34,6 +33,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.FieldNameUtil;
 
 public class TruncatedSVD extends BasePCA {
 
@@ -52,7 +52,7 @@ public class TruncatedSVD extends BasePCA {
 
 		ClassDictUtil.checkSize(numberOfFeatures, features);
 
-		String id = "svd@" + String.valueOf(TruncatedSVD.SEQUENCE.getAndIncrement());
+		FieldName name = createFieldName("svd", features);
 
 		List<Feature> result = new ArrayList<>();
 
@@ -80,13 +80,11 @@ public class TruncatedSVD extends BasePCA {
 				apply.addExpressions(expression);
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(FieldName.create(id + "[" + String.valueOf(i) + "]"), apply);
+			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(name, i), apply);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
 
 		return result;
 	}
-
-	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);
 }

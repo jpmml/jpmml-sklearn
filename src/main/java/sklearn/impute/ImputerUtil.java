@@ -32,12 +32,12 @@ import org.dmg.pmml.Value;
 import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Transformer;
 
 public class ImputerUtil {
 
@@ -45,7 +45,7 @@ public class ImputerUtil {
 	}
 
 	static
-	public Feature encodeFeature(Feature feature, Boolean addIndicator, Object missingValue, Object replacementValue, MissingValueTreatmentMethod missingValueTreatmentMethod, SkLearnEncoder encoder){
+	public Feature encodeFeature(Transformer transformer, Feature feature, Boolean addIndicator, Object missingValue, Object replacementValue, MissingValueTreatmentMethod missingValueTreatmentMethod, SkLearnEncoder encoder){
 		Field<?> field = feature.getField();
 
 		if(field instanceof DataField && !addIndicator){
@@ -75,7 +75,7 @@ public class ImputerUtil {
 				.addExpressions(expression)
 				.addExpressions(PMMLUtil.createConstant(replacementValue, feature.getDataType()), feature.ref());
 
-			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("imputer", feature), field.getOpType(), field.getDataType(), expression);
+			DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("imputer", feature), field.getOpType(), field.getDataType(), expression);
 
 			DataType dataType = derivedField.getDataType();
 			switch(dataType){
@@ -96,7 +96,7 @@ public class ImputerUtil {
 	}
 
 	static
-	public Feature encodeIndicatorFeature(Feature feature, Object missingValue, SkLearnEncoder encoder){
+	public Feature encodeIndicatorFeature(Transformer transformer, Feature feature, Object missingValue, SkLearnEncoder encoder){
 		Expression expression = feature.ref();
 
 		if(missingValue != null){
@@ -107,7 +107,7 @@ public class ImputerUtil {
 			expression = PMMLUtil.createApply(PMMLFunctions.ISMISSING, expression);
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("missing_indicator", feature), OpType.CATEGORICAL, DataType.BOOLEAN, expression);
+		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("missing_indicator", feature), OpType.CATEGORICAL, DataType.BOOLEAN, expression);
 
 		return new BooleanFeature(encoder, derivedField);
 	}

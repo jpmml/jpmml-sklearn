@@ -20,7 +20,6 @@ package sklearn.preprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -31,12 +30,12 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Transformer;
 
 public class EncoderUtil {
 
@@ -44,7 +43,7 @@ public class EncoderUtil {
 	}
 
 	static
-	public Feature encodeIndexFeature(Feature feature, List<?> categories, DataType dataType, SkLearnEncoder encoder){
+	public Feature encodeIndexFeature(Transformer transformer, Feature feature, List<?> categories, DataType dataType, SkLearnEncoder encoder){
 		List<Number> indexCategories = new ArrayList<>(categories.size());
 
 		for(int i = 0; i < categories.size(); i++){
@@ -64,24 +63,20 @@ public class EncoderUtil {
 			}
 		}
 
-		return encodeIndexFeature(feature, categories, indexCategories, null, null, dataType, encoder);
+		return encodeIndexFeature(transformer, feature, categories, indexCategories, null, null, dataType, encoder);
 	}
 
 	static
-	public Feature encodeIndexFeature(Feature feature, List<?> categories, List<? extends Number> indexCategories, Number mapMissingTo, Number defaultValue, DataType dataType, SkLearnEncoder encoder){
+	public Feature encodeIndexFeature(Transformer transformer, Feature feature, List<?> categories, List<? extends Number> indexCategories, Number mapMissingTo, Number defaultValue, DataType dataType, SkLearnEncoder encoder){
 		ClassDictUtil.checkSize(categories, indexCategories);
 
 		encoder.toCategorical(feature.getName(), categories);
 
-		Supplier<MapValues> mapValuesSupplier = () -> {
-			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categories, indexCategories)
-				.setMapMissingTo(mapMissingTo)
-				.setDefaultValue(defaultValue);
+		MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categories, indexCategories)
+			.setMapMissingTo(mapMissingTo)
+			.setDefaultValue(defaultValue);
 
-			return mapValues;
-		};
-
-		DerivedField derivedField = encoder.ensureDerivedField(FeatureUtil.createName("encoder", feature), OpType.CATEGORICAL, dataType, mapValuesSupplier);
+		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("encoder", feature), OpType.CATEGORICAL, dataType, mapValues);
 
 		Feature encodedFeature = new IndexFeature(encoder, derivedField, indexCategories);
 

@@ -27,7 +27,6 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
@@ -62,6 +61,7 @@ public class SubstringTransformer extends Transformer {
 		ClassDictUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
+
 		if(!(DataType.STRING).equals(feature.getDataType())){
 			throw new IllegalArgumentException();
 		}
@@ -70,7 +70,7 @@ public class SubstringTransformer extends Transformer {
 			.addExpressions(feature.ref())
 			.addExpressions(PMMLUtil.createConstant(begin + 1, DataType.INTEGER), PMMLUtil.createConstant((end - begin), DataType.INTEGER));
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("substring", feature), OpType.CATEGORICAL, DataType.STRING, apply);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("substring", feature), OpType.CATEGORICAL, DataType.STRING, apply);
 
 		return Collections.singletonList(new StringFeature(encoder, derivedField));
 	}

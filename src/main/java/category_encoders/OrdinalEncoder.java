@@ -104,7 +104,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 					throw new IllegalArgumentException(handleUnknown);
 			}
 
-			result.add(EncoderUtil.encodeIndexFeature(feature, categories, indices, mapMissingTo, defaultValue, DataType.INTEGER, encoder));
+			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indices, mapMissingTo, defaultValue, DataType.INTEGER, encoder));
 		}
 
 		return result;

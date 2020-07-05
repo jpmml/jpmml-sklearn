@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel;
@@ -35,6 +34,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Classifier;
+import sklearn.FieldNameUtil;
 
 public class LinearClassifier extends Classifier {
 
@@ -80,7 +80,7 @@ public class LinearClassifier extends Classifier {
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
 				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction(" + categoricalLabel.getValue(i) + ")"), OpType.CONTINUOUS, DataType.DOUBLE));
+					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("decisionFunction", categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 				regressionModels.add(regressionModel);
 			}

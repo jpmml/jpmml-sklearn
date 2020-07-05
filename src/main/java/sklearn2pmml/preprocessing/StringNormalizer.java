@@ -29,7 +29,6 @@ import org.dmg.pmml.Field;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -68,7 +67,7 @@ public class StringNormalizer extends Transformer {
 			// XXX: Should have been set by the previous transformer
 			field.setDataType(DataType.STRING);
 
-			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("normalize", feature), OpType.CATEGORICAL, DataType.STRING, expression);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("normalize", feature), OpType.CATEGORICAL, DataType.STRING, expression);
 
 			feature = new StringFeature(encoder, derivedField);
 

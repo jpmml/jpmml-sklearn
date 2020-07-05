@@ -21,7 +21,6 @@ package sklearn.ensemble.stacking;
 import java.util.Collections;
 import java.util.List;
 
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
@@ -33,6 +32,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.FieldNameUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 
@@ -60,7 +60,7 @@ public class StackingRegressor extends Regressor implements HasEstimatorEnsemble
 					throw new IllegalArgumentException(stackMethod);
 				}
 
-				OutputField predictedOutputField = ModelUtil.createPredictedField(FieldName.create(stackMethod + "(" + index + ")"), OpType.CONTINUOUS, continuousLabel.getDataType());
+				OutputField predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(stackMethod, index), OpType.CONTINUOUS, continuousLabel.getDataType());
 
 				DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 

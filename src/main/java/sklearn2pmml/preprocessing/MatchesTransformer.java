@@ -28,7 +28,6 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -46,6 +45,7 @@ public class MatchesTransformer extends PatternTransformer {
 		ClassDictUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
+
 		if(!(DataType.STRING).equals(feature.getDataType())){
 			throw new IllegalArgumentException();
 		}
@@ -54,7 +54,7 @@ public class MatchesTransformer extends PatternTransformer {
 			.addExpressions(feature.ref())
 			.addExpressions(PMMLUtil.createConstant(pattern, DataType.STRING));
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("matches", feature), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("matches", feature), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
 
 		return Collections.singletonList(new BooleanFeature(encoder, derivedField));
 	}

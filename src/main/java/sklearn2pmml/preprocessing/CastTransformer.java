@@ -23,12 +23,10 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -54,11 +52,9 @@ public class CastTransformer extends Transformer {
 			Feature feature = features.get(i);
 
 			if(!(dataType).equals(feature.getDataType())){
-				FieldName name = FeatureUtil.createName((dataType.name()).toLowerCase(), feature);
-
 				FieldRef fieldRef = feature.ref();
 
-				DerivedField derivedField = encoder.ensureDerivedField(name, opType, dataType, () -> fieldRef);
+				DerivedField derivedField = encoder.ensureDerivedField(createFieldName((dataType.name()).toLowerCase(), feature), opType, dataType, () -> fieldRef);
 
 				switch(dataType){
 					case STRING:
@@ -74,7 +70,7 @@ public class CastTransformer extends Transformer {
 					case DATE_TIME:
 						// Falls through
 					default:
-						feature = new ObjectFeature(encoder, name, dataType);
+						feature = new ObjectFeature(encoder, derivedField);
 						break;
 				}
 			}

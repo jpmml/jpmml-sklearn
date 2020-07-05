@@ -71,12 +71,12 @@ public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
 			Object statistic = statistics.get(i);
 
 			if(addIndicator){
-				Feature indicatorFeature = ImputerUtil.encodeIndicatorFeature(feature, missingValues, encoder);
+				Feature indicatorFeature = ImputerUtil.encodeIndicatorFeature(this, feature, missingValues, encoder);
 
 				indicatorFeatures.add(indicatorFeature);
 			}
 
-			feature = ImputerUtil.encodeFeature(feature, addIndicator, missingValues, statistic, missingValueTreatment, encoder);
+			feature = ImputerUtil.encodeFeature(this, feature, addIndicator, missingValues, statistic, missingValueTreatment, encoder);
 
 			result.add(feature);
 		}

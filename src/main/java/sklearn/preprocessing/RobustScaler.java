@@ -26,7 +26,6 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -103,7 +102,7 @@ public class RobustScaler extends Transformer implements HasNumberOfFeatures {
 				expression = PMMLUtil.createApply(PMMLFunctions.DIVIDE, expression, PMMLUtil.createConstant(scaleValue));
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("robust_scaler", continuousFeature), expression);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("robust_scaler", continuousFeature), expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

@@ -28,7 +28,6 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -58,7 +57,7 @@ public class ConcatTransformer extends Transformer {
 			expressions.add(feature.ref());
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FeatureUtil.createName("concat", features), OpType.CATEGORICAL, DataType.STRING, apply);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("concat", features), OpType.CATEGORICAL, DataType.STRING, apply);
 
 		return Collections.singletonList(new StringFeature(encoder, derivedField));
 	}
