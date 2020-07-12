@@ -58,13 +58,6 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 	}
 
 	@Override
-	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
-		features = updateFeatures(features, encoder);
-
-		return encodeFeatures(features, encoder);
-	}
-
-	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		MissingValueTreatmentMethod missingValueTreatment = DomainUtil.parseMissingValueTreatment(getMissingValueTreatment());
 		Object missingValueReplacement = getMissingValueReplacement();

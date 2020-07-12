@@ -157,6 +157,18 @@ public class ContinuousDomain extends Domain {
 		return result;
 	}
 
+	@Override
+	public int[] getArrayShape(String name){
+		int[] shape = super.getArrayShape(name);
+
+		// XXX
+		if(shape.length == 0){
+			return new int[]{1};
+		}
+
+		return shape;
+	}
+
 	public String getOutlierTreatment(){
 		return getOptionalString("outlier_treatment");
 	}
