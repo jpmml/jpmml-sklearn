@@ -116,7 +116,7 @@ public class Composite extends Step implements HasNumberOfFeatures, HasType {
 
 		List<? extends Transformer> transformers = getTransformers();
 		for(Transformer transformer : transformers){
-			features = transformer.updateAndEncodeFeatures(features, encoder);
+			features = transformer.encode(features, encoder);
 		}
 
 		return features;

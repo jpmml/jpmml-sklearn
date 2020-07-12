@@ -39,7 +39,7 @@ public class CategoricalDomain extends DiscreteDomain {
 	}
 
 	@Override
-	public Feature encode(WildcardFeature wildcardFeature, List<?> values){
+	public Feature encodeFeature(WildcardFeature wildcardFeature, List<?> values){
 		PMMLEncoder encoder = wildcardFeature.getEncoder();
 
 		if(values == null || values.isEmpty()){

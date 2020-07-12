@@ -70,7 +70,7 @@ public class DataFrameMapper extends Initializer {
 
 			List<Transformer> transformers = getTransformerList(row);
 			for(Transformer transformer : transformers){
-				rowFeatures = transformer.updateAndEncodeFeatures(rowFeatures, encoder);
+				rowFeatures = transformer.encode(rowFeatures, encoder);
 			}
 
 			if(row.length > 2){

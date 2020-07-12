@@ -410,7 +410,7 @@ public class PMMLPipeline extends Pipeline {
 			features.add(new WildcardFeature(outputEncoder, dataField));
 		}
 
-		transformer.encodeFeatures(features, outputEncoder);
+		transformer.encode(features, outputEncoder);
 
 		Map<FieldName, DerivedField> derivedFields = outputEncoder.getDerivedFields();
 

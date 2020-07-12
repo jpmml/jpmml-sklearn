@@ -52,7 +52,7 @@ public class Transformer extends Step implements HasType {
 		return DataType.DOUBLE;
 	}
 
-	public List<Feature> updateAndEncodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 		StepUtil.checkNumberOfFeatures(this, features);
 
 		features = updateFeatures(features, encoder);

@@ -60,7 +60,7 @@ public class ColumnTransformer extends Initializer {
 
 			List<Feature> rowFeatures = getFeatures(fittedTransformer, features, encoder);
 
-			rowFeatures = transformer.updateAndEncodeFeatures(rowFeatures, encoder);
+			rowFeatures = transformer.encode(rowFeatures, encoder);
 
 			result.addAll(rowFeatures);
 		}

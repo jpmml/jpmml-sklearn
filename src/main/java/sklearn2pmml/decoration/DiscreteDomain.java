@@ -42,7 +42,7 @@ public class DiscreteDomain extends Domain {
 	}
 
 	abstract
-	public Feature encode(WildcardFeature wildcardFeature, List<?> values);
+	public Feature encodeFeature(WildcardFeature wildcardFeature, List<?> values);
 
 	@Override
 	public int getNumberOfFeatures(){
@@ -83,11 +83,11 @@ public class DiscreteDomain extends Domain {
 		if(withData){
 			List<?> data = getData();
 
-			feature = encode(wildcardFeature, data);
+			feature = encodeFeature(wildcardFeature, data);
 		} else
 
 		{
-			feature = encode(wildcardFeature, Collections.emptyList());
+			feature = encodeFeature(wildcardFeature, Collections.emptyList());
 		} // End if
 
 		if(withStatistics){

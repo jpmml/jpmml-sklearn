@@ -58,7 +58,7 @@ public class Domain extends Transformer implements HasNumberOfFeatures {
 	}
 
 	@Override
-	public List<Feature> updateAndEncodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 		features = updateFeatures(features, encoder);
 
 		return encodeFeatures(features, encoder);

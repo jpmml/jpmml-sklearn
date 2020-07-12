@@ -36,7 +36,7 @@ public class OrdinalDomain extends DiscreteDomain {
 	}
 
 	@Override
-	public ObjectFeature encode(WildcardFeature wildcardFeature, List<?> values){
+	public ObjectFeature encodeFeature(WildcardFeature wildcardFeature, List<?> values){
 		return wildcardFeature.toOrdinalFeature(values != null ? standardizeValues(wildcardFeature.getDataType(), values) : null);
 	}
 }
