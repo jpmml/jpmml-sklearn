@@ -55,7 +55,7 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 		List<Model> models = new ArrayList<>();
 
 		for(Regressor estimator : estimators){
-			Model model = estimator.encodeModel(segmentSchema);
+			Model model = estimator.encode(segmentSchema);
 
 			models.add(model);
 		}

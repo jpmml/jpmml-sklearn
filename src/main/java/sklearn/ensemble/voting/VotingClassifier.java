@@ -57,7 +57,7 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 		List<Model> models = new ArrayList<>();
 
 		for(Classifier estimator : estimators){
-			Model model = estimator.encodeModel(schema);
+			Model model = estimator.encode(schema);
 
 			models.add(model);
 		}

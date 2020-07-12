@@ -45,7 +45,7 @@ public class VotingRegressor extends Regressor implements HasEstimatorEnsemble<R
 		List<Model> models = new ArrayList<>();
 
 		for(Regressor estimator : estimators){
-			Model model = estimator.encodeModel(schema);
+			Model model = estimator.encode(schema);
 
 			models.add(model);
 		}

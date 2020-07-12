@@ -57,7 +57,7 @@ public class StackingUtil {
 			E estimator = estimators.get(i);
 			String stackMethod = stackMethods.get(i);
 
-			Model model = estimator.encodeModel(schema);
+			Model model = estimator.encode(schema);
 
 			List<Feature> predictFeatures = predictFunction.apply(i, model, stackMethod, encoder);
 			if(predictFeatures != null && predictFeatures.size() > 0){
@@ -74,7 +74,7 @@ public class StackingUtil {
 		{
 			Schema stackSchema = new Schema(label, stackFeatures);
 
-			Model finalModel = finalEstimator.encodeModel(stackSchema);
+			Model finalModel = finalEstimator.encode(stackSchema);
 
 			models.add(finalModel);
 		}

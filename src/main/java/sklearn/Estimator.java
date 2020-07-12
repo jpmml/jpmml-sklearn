@@ -76,6 +76,10 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 		}
 	}
 
+	public Model encode(Schema schema){
+		return encodeModel(schema);
+	}
+
 	public Object getOption(String key, Object defaultValue){
 		Map<String, ?> pmmlOptions = getPMMLOptions();
 

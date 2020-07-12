@@ -77,7 +77,7 @@ public class SelectFirstUtil {
 
 			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, scope);
 
-			Model model = estimator.encodeModel(schema);
+			Model model = estimator.encode(schema);
 
 			Segment segment = new Segment(pmmlPredicate, model)
 				.setId(name);

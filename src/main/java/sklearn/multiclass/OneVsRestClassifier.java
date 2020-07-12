@@ -70,7 +70,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 				throw new IllegalArgumentException();
 			}
 
-			return estimator.encodeModel(schema);
+			return estimator.encode(schema);
 		} else
 
 		if(estimators.size() >= 2){
@@ -92,7 +92,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 
 				Schema segmentSchema = schema.toRelabeledSchema(segmentCategoricalLabel);
 
-				Model model = estimator.encodeModel(segmentSchema)
+				Model model = estimator.encode(segmentSchema)
 					.setOutput(output);
 
 				models.add(model);

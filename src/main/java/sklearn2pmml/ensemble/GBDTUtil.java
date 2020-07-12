@@ -62,7 +62,7 @@ public class GBDTUtil {
 			try {
 				gbdt.setPMMLOptions(hasNativeConfiguration.getNativeConfiguration());
 
-				model = gbdt.encodeModel(schema);
+				model = gbdt.encode(schema);
 			} finally {
 				gbdt.setPMMLOptions(pmmlOptions);
 			}

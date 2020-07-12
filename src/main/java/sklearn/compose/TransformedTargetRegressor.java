@@ -54,7 +54,7 @@ public class TransformedTargetRegressor extends Regressor {
 		UFunc inverseFunc = transformer.getInverseFunc();
 
 		if(inverseFunc == null){
-			return regressor.encodeModel(schema);
+			return regressor.encode(schema);
 		}
 
 		Label label = schema.getLabel();
@@ -76,7 +76,7 @@ public class TransformedTargetRegressor extends Regressor {
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		Model model = regressor.encodeModel(segmentSchema)
+		Model model = regressor.encode(segmentSchema)
 			.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("func", name), OpType.CONTINUOUS, DataType.DOUBLE, transformation));
 
 		return MiningModelUtil.createRegression(model, NormalizationMethod.NONE, schema);

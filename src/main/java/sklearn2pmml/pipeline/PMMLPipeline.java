@@ -228,7 +228,7 @@ public class PMMLPipeline extends Pipeline {
 
 		Schema schema = new Schema(label, features);
 
-		Model model = estimator.encodeModel(schema);
+		Model model = estimator.encode(schema);
 
 		if((predictTransformer != null) || (predictProbaTransformer != null) || (applyTransformer != null)){
 			Model finalModel = MiningModelUtil.getFinalModel(model);
