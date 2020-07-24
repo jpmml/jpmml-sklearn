@@ -24,8 +24,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import h2o.estimators.BaseEstimator;
 import numpy.core.NDArray;
@@ -35,9 +39,12 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Extension;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningBuildTask;
+import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
@@ -63,6 +70,7 @@ import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.visitors.FeatureExpander;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
@@ -386,6 +394,8 @@ public class PMMLPipeline extends Pipeline {
 	private PMML encodePMML(Model model, String repr, SkLearnEncoder encoder){
 		PMML pmml = encoder.encodePMML(model);
 
+		encodeFeatureImportances(pmml, encoder);
+
 		if(repr != null){
 			Extension extension = new Extension()
 				.addContent(repr);
@@ -426,6 +436,82 @@ public class PMMLPipeline extends Pipeline {
 
 		for(DefineFunction defineFunction : defineFunctions.values()){
 			encoder.addDefineFunction(defineFunction);
+		}
+	}
+
+	private void encodeFeatureImportances(PMML pmml, SkLearnEncoder encoder){
+		Map<Model, Map<FieldName, Number>> importances = encoder.getFeatureImportances();
+
+		if(importances.isEmpty()){
+			return;
+		}
+
+		Map<Model, Set<FieldName>> expandableFeatures = (importances.entrySet()).stream()
+			.collect(Collectors.toMap(entry -> entry.getKey(), entry -> (entry.getValue()).keySet()));
+
+		FeatureExpander featureExpander = new FeatureExpander(expandableFeatures);
+		featureExpander.applyTo(pmml);
+
+		Collection<? extends Map.Entry<Model, Map<FieldName, Number>>> entries = importances.entrySet();
+		for(Map.Entry<Model, Map<FieldName, Number>> entry : entries){
+			Model model = entry.getKey();
+			Map<FieldName, Number> featureImportances = entry.getValue();
+
+			Map<FieldName, Set<Field<?>>> featureFields = featureExpander.getExpandedFeatures(model);
+			if(featureFields == null){
+				throw new IllegalArgumentException();
+			}
+
+			ListMultimap<FieldName, Number> fieldImportances = ArrayListMultimap.create();
+
+			Collection<Map.Entry<FieldName, Number>> importanceEntries = featureImportances.entrySet();
+			for(Map.Entry<FieldName, Number> importanceEntry : importanceEntries){
+				FieldName featureName = importanceEntry.getKey();
+				Number featureImportance = importanceEntry.getValue();
+
+				if(ValueUtil.isZero(featureImportance)){
+					continue;
+				}
+
+				Set<Field<?>> fields = featureFields.get(featureName);
+				if(fields == null){
+					throw new IllegalArgumentException();
+				}
+
+				Number fieldImportance = (featureImportance.doubleValue() / fields.size());
+
+				for(Field<?> field : fields){
+					FieldName fieldName = field.getName();
+
+					fieldImportances.put(fieldName, fieldImportance);
+				}
+			}
+
+			MiningSchema miningSchema = model.getMiningSchema();
+
+			if(miningSchema != null && miningSchema.hasMiningFields()){
+				List<MiningField> miningFields = miningSchema.getMiningFields();
+
+				for(MiningField miningField : miningFields){
+					FieldName name = miningField.getName();
+					MiningField.UsageType usageType = miningField.getUsageType();
+
+					switch(usageType){
+						case ACTIVE:
+							break;
+						default:
+							continue;
+					}
+
+					List<Number> fieldImportance = fieldImportances.get(name);
+					if(fieldImportance != null){
+						Double fieldImportanceSum = fieldImportance.stream()
+							.collect(Collectors.summingDouble(Number::doubleValue));
+
+						miningField.setImportance(fieldImportanceSum);
+					}
+				}
+			}
 		}
 	}
 

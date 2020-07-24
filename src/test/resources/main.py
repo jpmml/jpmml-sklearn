@@ -31,7 +31,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
-from sklearn2pmml import SelectorProxy
+from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirstClassifier
 from sklearn2pmml.feature_extraction.text import Splitter
@@ -160,14 +160,14 @@ def build_audit(classifier, name, with_proba = True, fit_params = {}, predict_pa
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit(DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13), "DecisionTreeAudit", compact = False)
+	build_audit(EstimatorProxy(DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13)), "DecisionTreeAudit", compact = False)
 	build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
 	build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
-	build_audit(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesAudit")
+	build_audit(EstimatorProxy(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13)), "ExtraTreesAudit")
 	build_audit(GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression(multi_class = "ovr", solver = "liblinear")), "GBDTLRAudit")
 	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(multi_class = "ovr", solver = "liblinear")), "XGBLRAudit")
 	build_audit(GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
-	build_audit(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13), "GradientBoostingAudit")
+	build_audit(EstimatorProxy(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13)), "GradientBoostingAudit")
 	build_audit(HistGradientBoostingClassifier(max_iter = 71, random_state = 13), "HistGradientBoostingAudit")
 	build_audit(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAudit", predict_params = {"num_iteration" : 17}, predict_proba_params = {"num_iteration" : 17}, num_iteration = 17)
 	build_audit(LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
@@ -177,7 +177,7 @@ if "Audit" in datasets:
 	build_audit(BaggingClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear"), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleAudit")
 	build_audit(GaussianNB(), "NaiveBayesAudit")
 	build_audit(OneVsRestClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear")), "OneVsRestAudit")
-	build_audit(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAudit", flat = True)
+	build_audit(EstimatorProxy(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)), "RandomForestAudit", flat = True)
 	build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 	build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
 	build_audit(StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")

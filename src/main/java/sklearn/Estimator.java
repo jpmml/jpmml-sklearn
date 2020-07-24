@@ -18,14 +18,18 @@
  */
 package sklearn;
 
+import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +81,27 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 	}
 
 	public Model encode(Schema schema){
-		return encodeModel(schema);
+		List<? extends Number> featureImportances = getFeatureImportances();
+
+		Label label = schema.getLabel();
+		List<? extends Feature> features = schema.getFeatures();
+
+		Model model = encodeModel(schema);
+
+		if(featureImportances != null){
+			ClassDictUtil.checkSize(features, featureImportances);
+
+			for(int i = 0; i < features.size(); i++){
+				Feature feature = features.get(i);
+				Number featureImportance = featureImportances.get(i);
+
+				SkLearnEncoder encoder = (SkLearnEncoder)feature.getEncoder();
+
+				encoder.addFeatureImportance(model, feature.getName(), featureImportance);
+			}
+		}
+
+		return model;
 	}
 
 	public Object getOption(String key, Object defaultValue){
@@ -95,6 +119,15 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 		}
 
 		return defaultValue;
+	}
+
+	public List<? extends Number> getFeatureImportances(){
+
+		if(!containsKey("feature_importances_")){
+			return null;
+		}
+
+		return getNumberArray("feature_importances_");
 	}
 
 	public Map<String, ?> getPMMLOptions(){
