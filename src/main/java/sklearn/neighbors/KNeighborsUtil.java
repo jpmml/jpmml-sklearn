@@ -133,12 +133,21 @@ public class KNeighborsUtil {
 
 	static
 	private ComparisonMeasure encodeComparisonMeasure(String metric, int p){
+		Measure measure;
 
 		switch(metric){
+			case "euclidean":
+				{
+					measure = new Euclidean();
+				}
+				break;
+			case "manhattan":
+				{
+					measure = new CityBlock();
+				}
+				break;
 			case "minkowski":
 				{
-					Measure measure;
-
 					switch(p){
 						case 1:
 							measure = new CityBlock();
@@ -150,14 +159,15 @@ public class KNeighborsUtil {
 							measure = new Minkowski(p);
 							break;
 					}
-
-					ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, measure)
-						.setCompareFunction(CompareFunction.ABS_DIFF);
-
-					return comparisonMeasure;
 				}
+				break;
 			default:
 				throw new IllegalArgumentException(metric);
 		}
+
+		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, measure)
+			.setCompareFunction(CompareFunction.ABS_DIFF);
+
+		return comparisonMeasure;
 	}
 }
