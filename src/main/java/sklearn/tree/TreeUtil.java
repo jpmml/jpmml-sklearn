@@ -40,9 +40,9 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.dmg.pmml.tree.BranchNode;
 import org.dmg.pmml.tree.ClassifierNode;
-import org.dmg.pmml.tree.CountingBranchNode;
-import org.dmg.pmml.tree.CountingLeafNode;
+import org.dmg.pmml.tree.LeafNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.NodeTransformer;
 import org.dmg.pmml.tree.SimplifyingNodeTransformer;
@@ -368,7 +368,7 @@ public class TreeUtil {
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
 				double value = values[index];
 
-				result = new CountingBranchNode(value, predicate);
+				result = new BranchNode(value, predicate);
 			} else
 
 			{
@@ -421,7 +421,7 @@ public class TreeUtil {
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
 				double value = values[index];
 
-				result = new CountingLeafNode(value, predicate)
+				result = new LeafNode(value, predicate)
 					.setId(id);
 			} else
 
