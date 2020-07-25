@@ -21,6 +21,7 @@ package sklearn;
 import java.util.Arrays;
 import java.util.List;
 
+import numpy.core.NDArray;
 import org.dmg.pmml.FieldName;
 import org.jpmml.python.PythonObject;
 
@@ -53,5 +54,15 @@ public class Step extends PythonObject {
 		put("pmml_name_", name);
 
 		return this;
+	}
+
+	static
+	protected NDArray toArray(List<?> data){
+		NDArray result = new NDArray();
+		result.put("data", data);
+		result.put("fortran_order", Boolean.FALSE);
+		result.put("shape", new Object[]{data.size()});
+
+		return result;
 	}
 }

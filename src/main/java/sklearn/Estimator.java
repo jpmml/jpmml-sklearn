@@ -81,12 +81,21 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 	}
 
 	public Model encode(Schema schema){
-		List<? extends Number> featureImportances = getFeatureImportances();
+		Model model = encodeModel(schema);
+
+		addFeatureImportances(model, schema);
+
+		return model;
+	}
+
+	public void addFeatureImportances(Model model, Schema schema){
+		List<? extends Number> featureImportances = getPMMLFeatureImportances();
+		if(featureImportances == null){
+			featureImportances = getFeatureImportances();
+		}
 
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
-
-		Model model = encodeModel(schema);
 
 		if(featureImportances != null){
 			ClassDictUtil.checkSize(features, featureImportances);
@@ -100,8 +109,6 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 				encoder.addFeatureImportance(model, feature.getName(), featureImportance);
 			}
 		}
-
-		return model;
 	}
 
 	public Object getOption(String key, Object defaultValue){
@@ -121,6 +128,10 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 		return defaultValue;
 	}
 
+	public boolean hasFeatureImportances(){
+		return containsKey("feature_importances_") || containsKey("pmml_feature_importances_");
+	}
+
 	public List<? extends Number> getFeatureImportances(){
 
 		if(!containsKey("feature_importances_")){
@@ -128,6 +139,21 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 		}
 
 		return getNumberArray("feature_importances_");
+	}
+
+	public List<? extends Number> getPMMLFeatureImportances(){
+
+		if(!containsKey("pmml_feature_importances_")){
+			return null;
+		}
+
+		return getNumberArray("pmml_feature_importances_");
+	}
+
+	public Estimator setPMMLFeatureImportances(List<? extends Number> pmmlFeatureImportances){
+		put("pmml_feature_importances_", toArray(pmmlFeatureImportances));
+
+		return this;
 	}
 
 	public Map<String, ?> getPMMLOptions(){

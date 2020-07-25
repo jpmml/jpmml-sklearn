@@ -276,6 +276,13 @@ public class TreeUtil {
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
 
+		// XXX
+		if(estimator.hasFeatureImportances()){
+			Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(schema);
+
+			estimator.addFeatureImportances(treeModel, featureImportanceSchema);
+		}
+
 		ClassDictUtil.clearContent(tree);
 
 		return treeModel;
@@ -343,9 +350,7 @@ public class TreeUtil {
 			} else
 
 			{
-				ContinuousFeature continuousFeature = feature
-					.toContinuousFeature(DataType.FLOAT) // First, cast from any numeric type (including numpy.float64) to numpy.float32
-					.toContinuousFeature(DataType.DOUBLE); // Second, cast from numpy.float32 to numpy.float64
+				ContinuousFeature continuousFeature = toContinuousFeature(feature);
 
 				Double value = threshold;
 
@@ -461,6 +466,43 @@ public class TreeUtil {
 		};
 
 		return schema.toTransformedSchema(function);
+	}
+
+	static
+	private Schema toTreeModelFeatureImportanceSchema(Schema schema){
+		Function<Feature, Feature> function = new Function<Feature, Feature>(){
+
+			@Override
+			public Feature apply(Feature feature){
+
+				if(feature instanceof BaseNFeature){
+					BaseNFeature baseFeature = (BaseNFeature)feature;
+
+					return baseFeature;
+				} else
+
+				if(feature instanceof BinaryFeature){
+					BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+					return binaryFeature;
+				} else
+
+				{
+					ContinuousFeature continuousFeature = toContinuousFeature(feature);
+
+					return continuousFeature;
+				}
+			}
+		};
+
+		return schema.toTransformedSchema(function);
+	}
+
+	static
+	private ContinuousFeature toContinuousFeature(Feature feature){
+		return feature
+			.toContinuousFeature(DataType.FLOAT) // First, cast from any numeric type (including numpy.float64) to numpy.float32
+			.toContinuousFeature(DataType.DOUBLE); // Second, cast from numpy.float32 to numpy.float64
 	}
 
 	static

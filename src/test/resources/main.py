@@ -148,6 +148,18 @@ def build_audit(classifier, name, with_proba = True, fit_params = {}, predict_pa
 	pipeline.fit(audit_X, audit_y, **fit_params)
 	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
 	pipeline.configure(**pmml_options)
+	if isinstance(classifier, EstimatorProxy):
+		estimator = classifier.estimator
+		if hasattr(estimator, "estimators_"):
+			child_estimators = estimator.estimators_
+			if isinstance(child_estimators, numpy.ndarray):
+				child_estimators = child_estimators.flatten().tolist()
+			for child_estimator in child_estimators:
+				child_estimator.pmml_feature_importances_ = child_estimator.feature_importances_
+	elif isinstance(classifier, XGBClassifier):
+		classifier.pmml_feature_importances_ = classifier.feature_importances_
+	else:
+		pass
 	if isinstance(classifier, XGBClassifier):
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
@@ -183,7 +195,7 @@ if "Audit" in datasets:
 	build_audit(StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")
 	build_audit(SVC(gamma = "auto"), "SVCAudit", with_proba = False)
 	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
-	build_audit(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAudit", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
+	build_audit(XGBClassifier(objective = "binary:logistic", importance_type = "weight", random_state = 13), "XGBAudit", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
 	build_audit(XGBRFClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 5, random_state = 13), "XGBRFAudit")
 
 audit_X, audit_y = load_audit("Audit")

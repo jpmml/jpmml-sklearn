@@ -32,7 +32,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import h2o.estimators.BaseEstimator;
-import numpy.core.NDArray;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -440,7 +439,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	private void encodeFeatureImportances(PMML pmml, SkLearnEncoder encoder){
-		Map<Model, Map<FieldName, Number>> importances = encoder.getFeatureImportances();
+		Map<Model, ListMultimap<FieldName, Number>> importances = encoder.getFeatureImportances();
 
 		if(importances.isEmpty()){
 			return;
@@ -452,10 +451,10 @@ public class PMMLPipeline extends Pipeline {
 		FeatureExpander featureExpander = new FeatureExpander(expandableFeatures);
 		featureExpander.applyTo(pmml);
 
-		Collection<? extends Map.Entry<Model, Map<FieldName, Number>>> entries = importances.entrySet();
-		for(Map.Entry<Model, Map<FieldName, Number>> entry : entries){
+		Collection<? extends Map.Entry<Model, ListMultimap<FieldName, Number>>> entries = importances.entrySet();
+		for(Map.Entry<Model, ListMultimap<FieldName, Number>> entry : entries){
 			Model model = entry.getKey();
-			Map<FieldName, Number> featureImportances = entry.getValue();
+			ListMultimap<FieldName, Number> featureImportances = entry.getValue();
 
 			Map<FieldName, Set<Field<?>>> featureFields = featureExpander.getExpandedFeatures(model);
 			if(featureFields == null){
@@ -464,21 +463,24 @@ public class PMMLPipeline extends Pipeline {
 
 			ListMultimap<FieldName, Number> fieldImportances = ArrayListMultimap.create();
 
-			Collection<Map.Entry<FieldName, Number>> importanceEntries = featureImportances.entrySet();
-			for(Map.Entry<FieldName, Number> importanceEntry : importanceEntries){
+			Collection<Map.Entry<FieldName, Collection<Number>>> importanceEntries = (featureImportances.asMap()).entrySet();
+			for(Map.Entry<FieldName, Collection<Number>> importanceEntry : importanceEntries){
 				FieldName featureName = importanceEntry.getKey();
-				Number featureImportance = importanceEntry.getValue();
+				Double featureImportanceSum = (importanceEntry.getValue()).stream()
+					.collect(Collectors.summingDouble(Number::doubleValue));
 
-				if(ValueUtil.isZero(featureImportance)){
+				if(ValueUtil.isZero(featureImportanceSum)){
 					continue;
 				}
 
 				Set<Field<?>> fields = featureFields.get(featureName);
 				if(fields == null){
-					throw new IllegalArgumentException();
+					logger.warn("Unused feature \'" + featureName.getValue() + "\' has non-zero importance");
+
+					continue;
 				}
 
-				Number fieldImportance = (featureImportance.doubleValue() / fields.size());
+				Double fieldImportance = (featureImportanceSum.doubleValue() / fields.size());
 
 				for(Field<?> field : fields){
 					FieldName fieldName = field.getName();
@@ -665,15 +667,6 @@ public class PMMLPipeline extends Pipeline {
 		};
 
 		return Lists.transform(values, function);
-	}
-
-	static
-	private NDArray toArray(List<String> strings){
-		NDArray result = new NDArray();
-		result.put("data", strings);
-		result.put("fortran_order", Boolean.FALSE);
-
-		return result;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PMMLPipeline.class);

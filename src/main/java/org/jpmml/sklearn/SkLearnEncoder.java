@@ -23,6 +23,8 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -40,7 +42,7 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	private Map<FieldName, Domain> domains = new LinkedHashMap<>();
 
-	private Map<Model, Map<FieldName, Number>> featureImportances = new IdentityHashMap<>();
+	private Map<Model, ListMultimap<FieldName, Number>> featureImportances = new IdentityHashMap<>();
 
 
 	public SkLearnEncoder(){
@@ -118,10 +120,10 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public void addFeatureImportance(Model model, FieldName name, Number featureImportance){
-		Map<FieldName, Number> featureImportances = this.featureImportances.get(model);
+		ListMultimap<FieldName, Number> featureImportances = this.featureImportances.get(model);
 
 		if(featureImportances == null){
-			featureImportances = new LinkedHashMap<>();
+			featureImportances = ArrayListMultimap.create();
 
 			this.featureImportances.put(model, featureImportances);
 		}
@@ -129,7 +131,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		featureImportances.put(name, featureImportance);
 	}
 
-	public Map<Model, Map<FieldName, Number>> getFeatureImportances(){
+	public Map<Model, ListMultimap<FieldName, Number>> getFeatureImportances(){
 		return this.featureImportances;
 	}
 
