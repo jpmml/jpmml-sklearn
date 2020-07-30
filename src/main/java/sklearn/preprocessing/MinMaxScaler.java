@@ -80,7 +80,7 @@ public class MinMaxScaler extends Transformer implements HasNumberOfFeatures {
 				expression = PMMLUtil.createApply(PMMLFunctions.ADD, expression, PMMLUtil.createConstant(minValue));
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("mixMaxScaler", continuousFeature), expression);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("minMaxScaler", continuousFeature), expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
