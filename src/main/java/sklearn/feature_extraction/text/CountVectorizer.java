@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.BiMap;
@@ -197,7 +198,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	public String functionName(){
-		return "tf";
+		return "tf@" + String.valueOf(CountVectorizer.SEQUENCE.getAndIncrement());
 	}
 
 	public String getAnalyzer(){
@@ -262,4 +263,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 	}
 
 	private static final Joiner JOINER = Joiner.on("|");
+
+	private static final AtomicInteger SEQUENCE = new AtomicInteger(1);
+
 }
