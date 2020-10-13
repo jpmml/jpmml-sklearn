@@ -21,18 +21,20 @@ package sklearn.isotonic;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.LinearNorm;
 import org.dmg.pmml.NormContinuous;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutlierTreatmentMethod;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Regressor;
 
 public class IsotonicRegression extends Regressor {
@@ -49,13 +51,12 @@ public class IsotonicRegression extends Regressor {
 
 		ClassDictUtil.checkSize(necessaryX, necessaryY);
 
+		PMMLEncoder encoder = schema.getEncoder();
 		List<? extends Feature> features = schema.getFeatures();
 
 		SchemaUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
-
-		SkLearnEncoder encoder = (SkLearnEncoder)feature.getEncoder();
 
 		OutlierTreatmentMethod outlierTreatment = parseOutlierTreatment(outOfBounds);
 
@@ -69,7 +70,7 @@ public class IsotonicRegression extends Regressor {
 			normContinuous.addLinearNorms(new LinearNorm(orig, norm));
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("isotonicRegression", feature), normContinuous);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("isotonicRegression", feature), OpType.CONTINUOUS, DataType.DOUBLE, normContinuous);
 
 		feature = new ContinuousFeature(encoder, derivedField);
 

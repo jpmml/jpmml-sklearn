@@ -44,13 +44,13 @@ import org.dmg.pmml.nearest_neighbor.TrainingInstances;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
-import sklearn.FieldNameUtil;
 
 public class KNeighborsUtil {
 

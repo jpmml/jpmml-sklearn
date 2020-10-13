@@ -26,10 +26,9 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +93,7 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 			featureImportances = getFeatureImportances();
 		}
 
-		Label label = schema.getLabel();
+		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(featureImportances != null){
@@ -103,8 +102,6 @@ public class Estimator extends Step implements HasNumberOfFeatures, HasType {
 			for(int i = 0; i < features.size(); i++){
 				Feature feature = features.get(i);
 				Number featureImportance = featureImportances.get(i);
-
-				SkLearnEncoder encoder = (SkLearnEncoder)feature.getEncoder();
 
 				encoder.addFeatureImportance(model, feature.getName(), featureImportance);
 			}

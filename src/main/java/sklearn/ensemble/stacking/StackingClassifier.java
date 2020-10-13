@@ -33,12 +33,12 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
-import sklearn.FieldNameUtil;
 import sklearn.HasEstimatorEnsemble;
 
 public class StackingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
@@ -89,7 +89,9 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 							String stringValue = name.getValue();
 
 							if(stringValue.startsWith("probability(")){
-								stringValue = "probability(" + index + ", " + stringValue.substring("probability(".length());
+								FieldName indexedName = FieldNameUtil.create("probability", index, stringValue.substring("probability(".length()));
+
+								stringValue = indexedName.getValue();
 							}
 
 							outputField.setName(FieldName.create(stringValue));

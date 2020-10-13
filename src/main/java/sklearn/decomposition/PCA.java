@@ -29,11 +29,11 @@ import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.FieldNameUtil;
 
 public class PCA extends BasePCA {
 
@@ -104,7 +104,7 @@ public class PCA extends BasePCA {
 				}
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(name, i), apply);
+			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.select(name, i), apply);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

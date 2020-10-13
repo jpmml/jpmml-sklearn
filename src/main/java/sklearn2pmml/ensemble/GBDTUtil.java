@@ -163,7 +163,6 @@ public class GBDTUtil {
 		}
 
 		Label label = schema.getLabel();
-		List<?> features = schema.getFeatures();
 
 		ContinuousLabel continuousLabel;
 

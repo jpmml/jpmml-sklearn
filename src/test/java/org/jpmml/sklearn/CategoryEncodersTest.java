@@ -19,6 +19,7 @@
 package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.junit.Test;
 
@@ -49,6 +50,6 @@ public class CategoryEncodersTest extends SkLearnTest {
 		evaluate("OrdinalEncoder", "Audit");
 	}
 
-	private static final FieldName falseProbabilityField = FieldName.create("probability(0)");
-	private static final FieldName trueProbabilityField = FieldName.create("probability(1)");
+	private static final FieldName falseProbabilityField = FieldNameUtil.create("probability", "0");
+	private static final FieldName trueProbabilityField = FieldNameUtil.create("probability", "1");
 }

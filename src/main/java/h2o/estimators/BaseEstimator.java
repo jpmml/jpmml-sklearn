@@ -29,6 +29,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.h2o.Converter;
 import org.jpmml.h2o.ConverterFactory;
@@ -102,14 +103,14 @@ public class BaseEstimator extends Estimator implements HasClasses {
 			throw new IllegalArgumentException(e);
 		}
 
+		PMMLEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		H2OEncoder encoder = new H2OEncoder();
+		H2OEncoder h2oEncoder = new H2OEncoder();
 
-		Schema h2oSchema = converter.encodeSchema(encoder);
+		Schema h2oSchema = converter.encodeSchema(h2oEncoder);
 
-		Label h2oLabel = h2oSchema.getLabel();
 		List<? extends Feature> h2oFeatures = h2oSchema.getFeatures();
 
 		List<Feature> sortedFeatures = new ArrayList<>();
@@ -134,7 +135,7 @@ public class BaseEstimator extends Estimator implements HasClasses {
 			sortedFeatures.add(feature);
 		}
 
-		Schema mojoModelSchema = converter.toMojoModelSchema(new Schema(label, sortedFeatures));
+		Schema mojoModelSchema = converter.toMojoModelSchema(new Schema(encoder, label, sortedFeatures));
 
 		return converter.encodeModel(mojoModelSchema);
 	}

@@ -30,12 +30,12 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel.NormalizationMethod;
 import org.jpmml.converter.AbstractTransformation;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
-import sklearn.FieldNameUtil;
 import sklearn.Regressor;
 import sklearn.preprocessing.FunctionTransformer;
 

@@ -28,13 +28,13 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Classifier;
-import sklearn.FieldNameUtil;
 
 public class LinearClassifier extends Classifier {
 
@@ -62,7 +62,6 @@ public class LinearClassifier extends Classifier {
 		List<? extends Number> intercept = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){

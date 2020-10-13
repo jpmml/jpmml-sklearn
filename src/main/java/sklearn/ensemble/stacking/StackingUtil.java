@@ -20,15 +20,11 @@ package sklearn.ensemble.stacking;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -44,10 +40,9 @@ public class StackingUtil {
 	public <E extends Estimator> MiningModel encodeStacking(List<? extends E> estimators, List<String> stackMethods, PredictFunction predictFunction, E finalEstimator, boolean passthrough, Schema schema){
 		ClassDictUtil.checkSize(estimators, stackMethods);
 
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
-
-		SkLearnEncoder encoder = (SkLearnEncoder)getEncoder(features);
 
 		List<Feature> stackFeatures = new ArrayList<>();
 
@@ -72,7 +67,7 @@ public class StackingUtil {
 		}
 
 		{
-			Schema stackSchema = new Schema(label, stackFeatures);
+			Schema stackSchema = new Schema(encoder, label, stackFeatures);
 
 			Model finalModel = finalEstimator.encode(stackSchema);
 
@@ -80,15 +75,6 @@ public class StackingUtil {
 		}
 
 		return MiningModelUtil.createModelChain(models);
-	}
-
-	static
-	public PMMLEncoder getEncoder(List<? extends Feature> features){
-		Set<PMMLEncoder> encoders = features.stream()
-			.map(feature -> feature.getEncoder())
-			.collect(Collectors.toSet());
-
-		return Iterables.getOnlyElement(encoders);
 	}
 
 	static

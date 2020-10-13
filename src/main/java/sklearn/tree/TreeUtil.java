@@ -416,7 +416,7 @@ public class TreeUtil {
 
 				result = new ClassifierNode(score, predicate)
 					.setId(id)
-					.setRecordCount(totalRecordCount);
+					.setRecordCount(ValueUtil.narrow(totalRecordCount));
 
 				List<ScoreDistribution> scoreDistributions = scoreDistributionManager.createScoreDistribution(categoricalLabel, recordCounts);
 

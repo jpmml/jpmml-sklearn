@@ -227,15 +227,15 @@ public class Main {
 		PMML pmml;
 
 		try {
-			logger.info("Converting..");
+			logger.info("Converting PKL to PMML..");
 
 			long begin = System.currentTimeMillis();
 			pmml = pipeline.encodePMML(encoder);
 			long end = System.currentTimeMillis();
 
-			logger.info("Converted in {} ms.", (end - begin));
+			logger.info("Converted PKL to PMML in {} ms.", (end - begin));
 		} catch(Exception e){
-			logger.error("Failed to convert", e);
+			logger.error("Failed to convert PKL to PMML", e);
 
 			throw e;
 		}

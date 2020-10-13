@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.dmg.pmml.FieldName;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.FloatEquivalence;
@@ -468,7 +469,7 @@ public class ClassifierTest extends SkLearnTest {
 		FieldName[] result = new FieldName[count];
 
 		for(int i = 0; i < count; i++){
-			result[i] = FieldName.create(prefix + "(" + (i + 1) + ")");
+			result[i] = FieldNameUtil.create(prefix, String.valueOf(i + 1));
 		}
 
 		return result;
@@ -476,8 +477,8 @@ public class ClassifierTest extends SkLearnTest {
 
 	private static final FieldName[] neighborFields = createFields("neighbor", 5);
 
-	private static final FieldName falseProbabilityField = FieldName.create("probability(0)");
-	private static final FieldName trueProbabilityField = FieldName.create("probability(1)");
+	private static final FieldName falseProbabilityField = FieldNameUtil.create("probability", "0");
+	private static final FieldName trueProbabilityField = FieldNameUtil.create("probability", "1");
 
-	private static final FieldName[] irisProbabilityFields = {FieldName.create("probability(setosa)"), FieldName.create("probability(versicolor)"), FieldName.create("probability(virginica)")};
+	private static final FieldName[] irisProbabilityFields = {FieldNameUtil.create("probability", "setosa"), FieldNameUtil.create("probability", "versicolor"), FieldNameUtil.create("probability", "virginica")};
 }

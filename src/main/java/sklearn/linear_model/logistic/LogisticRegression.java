@@ -35,6 +35,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -80,8 +81,8 @@ public class LogisticRegression extends LinearClassifier {
 		List<? extends Number> coef = getCoef();
 		List<? extends Number> intercept = getIntercept();
 
+		PMMLEncoder encoder = schema.getEncoder();
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
@@ -99,7 +100,7 @@ public class LogisticRegression extends LinearClassifier {
 			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), null, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE));
 
-			Feature feature = new ContinuousFeature(null, FieldName.create("decisionFunction"), DataType.DOUBLE);
+			Feature feature = new ContinuousFeature(encoder, FieldName.create("decisionFunction"), DataType.DOUBLE);
 
 			RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(feature), Collections.singletonList(-1d), 0d)
 				.setTargetCategory(categoricalLabel.getValue(0));

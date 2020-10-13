@@ -19,18 +19,14 @@
 package org.jpmml.sklearn;
 
 import java.lang.reflect.Field;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.PickleUtil;
@@ -41,8 +37,6 @@ import sklearn2pmml.decoration.Domain;
 public class SkLearnEncoder extends PythonEncoder {
 
 	private Map<FieldName, Domain> domains = new LinkedHashMap<>();
-
-	private Map<Model, ListMultimap<FieldName, Number>> featureImportances = new IdentityHashMap<>();
 
 
 	public SkLearnEncoder(){
@@ -117,22 +111,6 @@ public class SkLearnEncoder extends PythonEncoder {
 		{
 			this.domains.remove(name);
 		}
-	}
-
-	public void addFeatureImportance(Model model, FieldName name, Number featureImportance){
-		ListMultimap<FieldName, Number> featureImportances = this.featureImportances.get(model);
-
-		if(featureImportances == null){
-			featureImportances = ArrayListMultimap.create();
-
-			this.featureImportances.put(model, featureImportances);
-		}
-
-		featureImportances.put(name, featureImportance);
-	}
-
-	public Map<Model, ListMultimap<FieldName, Number>> getFeatureImportances(){
-		return this.featureImportances;
 	}
 
 	static {

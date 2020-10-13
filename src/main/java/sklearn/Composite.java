@@ -126,18 +126,15 @@ public class Composite extends Step implements HasNumberOfFeatures, HasType {
 	 * @see Estimator
 	 */
 	public Model encodeModel(Schema schema){
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		// XXX
 		if(hasTransformers()){
-			Feature feature = features.get(0);
-
-			SkLearnEncoder encoder = (SkLearnEncoder)feature.getEncoder();
-
 			features = encodeFeatures((List)features, encoder);
 
-			schema = new Schema(label, features);
+			schema = new Schema(encoder, label, features);
 		} // End if
 
 		if(hasFinalEstimator()){

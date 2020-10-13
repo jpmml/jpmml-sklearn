@@ -33,6 +33,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -41,7 +42,6 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
-import sklearn.FieldNameUtil;
 import sklearn.HasEstimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
@@ -85,7 +85,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 				throw new IllegalArgumentException();
 		}
 
-		Schema schema = new Schema(label, features);
+		Schema schema = new Schema(encoder, label, features);
 
 		Model model = estimator.encode(schema);
 

@@ -28,13 +28,13 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnUtil;
-import sklearn.FieldNameUtil;
 import sklearn.linear_model.LinearClassifier;
 
 public class LinearDiscriminantAnalysis extends LinearClassifier {
@@ -74,7 +74,6 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 		List<? extends Number> intercept = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-
 		List<? extends Feature> features = schema.getFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/6848

@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.dmg.pmml.FieldName;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.EvaluatorBuilder;
 import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.ResultField;
@@ -69,5 +70,5 @@ public class BSplineTest extends SkLearnTest {
 		evaluate("Tanh", "BSpline", excludeFields(BSplineTest.predictedValue));
 	}
 
-	private static final FieldName predictedValue = FieldName.create("predict(y)");
+	private static final FieldName predictedValue = FieldNameUtil.create("predict", "y");
 }

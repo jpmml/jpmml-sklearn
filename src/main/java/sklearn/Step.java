@@ -23,6 +23,7 @@ import java.util.List;
 
 import numpy.core.NDArray;
 import org.dmg.pmml.FieldName;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.python.PythonObject;
 
 abstract
