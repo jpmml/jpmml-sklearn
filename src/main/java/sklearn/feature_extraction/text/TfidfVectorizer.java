@@ -78,10 +78,10 @@ public class TfidfVectorizer extends CountVectorizer {
 	}
 
 	@Override
-	public DefineFunction encodeDefineFunction(){
+	public DefineFunction encodeDefineFunction(Feature feature){
 		TfidfTransformer transformer = getTransformer();
 
-		DefineFunction defineFunction = super.encodeDefineFunction();
+		DefineFunction defineFunction = super.encodeDefineFunction(feature);
 
 		Expression expression = defineFunction.getExpression();
 

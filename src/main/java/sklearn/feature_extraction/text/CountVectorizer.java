@@ -112,7 +112,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			feature = new StringFeature(encoder, derivedField);
 		}
 
-		DefineFunction defineFunction = encodeDefineFunction();
+		DefineFunction defineFunction = encodeDefineFunction(feature);
 
 		encoder.addDefineFunction(defineFunction);
 
@@ -123,7 +123,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 
 			Apply apply = encodeApply(defineFunction.getName(), feature, i, term);
 
-			Feature termFeature = new ObjectFeature(encoder, FieldNameUtil.create(defineFunction.getName(), term), dataType){
+			Feature termFeature = new ObjectFeature(encoder, FieldNameUtil.create(functionName(), feature, term), dataType){
 
 				@Override
 				public ContinuousFeature toContinuousFeature(){
@@ -137,7 +137,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 		return result;
 	}
 
-	public DefineFunction encodeDefineFunction(){
+	public DefineFunction encodeDefineFunction(Feature feature){
 		String analyzer = getAnalyzer();
 		List<String> stopWords = getStopWords();
 		Object[] nGramRange = getNGramRange();
@@ -182,7 +182,7 @@ public class CountVectorizer extends Transformer implements HasNumberOfFeatures 
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
 		}
 
-		FieldName name = createFieldName(functionName());
+		FieldName name = createFieldName(functionName(), feature);
 
 		DefineFunction defineFunction = new DefineFunction(name.getValue(), OpType.CONTINUOUS, DataType.DOUBLE, null, textIndex)
 			.addParameterFields(documentField, termField);
