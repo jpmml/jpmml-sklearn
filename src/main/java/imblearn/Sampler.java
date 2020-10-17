@@ -22,23 +22,12 @@ import java.util.List;
 
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.MultiTransformer;
 
-public class Sampler extends MultiTransformer implements HasNumberOfFeatures {
+public class Sampler extends MultiTransformer {
 
 	public Sampler(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-
-		if(containsKey("n_features_in_")){
-			return getInteger("n_features_in_");
-		}
-
-		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	@Override

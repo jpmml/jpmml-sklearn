@@ -24,10 +24,9 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class PipelineTransformer extends Transformer implements HasNumberOfFeatures {
+public class PipelineTransformer extends Transformer {
 
 	private Pipeline pipeline = null;
 

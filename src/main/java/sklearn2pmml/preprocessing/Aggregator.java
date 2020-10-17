@@ -33,7 +33,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class Aggregator extends Transformer implements HasNumberOfFeatures {
+public class Aggregator extends Transformer {
 
 	public Aggregator(String module, String name){
 		super(module, name);

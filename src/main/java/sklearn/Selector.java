@@ -26,7 +26,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Selector extends MultiTransformer implements HasNumberOfFeatures {
+public class Selector extends MultiTransformer {
 
 	public Selector(String module, String name){
 		super(module, name);

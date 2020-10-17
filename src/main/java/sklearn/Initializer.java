@@ -34,6 +34,11 @@ public class Initializer extends MultiTransformer {
 	public List<Feature> initializeFeatures(SkLearnEncoder encoder);
 
 	@Override
+	public int getNumberOfFeatures(){
+		return HasNumberOfFeatures.UNKNOWN;
+	}
+
+	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 
 		if(features.size() != 0){

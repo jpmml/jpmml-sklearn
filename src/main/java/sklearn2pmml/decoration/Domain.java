@@ -47,11 +47,10 @@ import org.jpmml.python.CalendarUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
 abstract
-public class Domain extends Transformer implements HasNumberOfFeatures {
+public class Domain extends Transformer {
 
 	public Domain(String module, String name){
 		super(module, name);

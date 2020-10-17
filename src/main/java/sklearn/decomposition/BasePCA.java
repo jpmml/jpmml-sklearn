@@ -20,11 +20,10 @@ package sklearn.decomposition;
 
 import java.util.List;
 
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
 abstract
-public class BasePCA extends Transformer implements HasNumberOfFeatures {
+public class BasePCA extends Transformer {
 
 	public BasePCA(String module, String name){
 		super(module, name);

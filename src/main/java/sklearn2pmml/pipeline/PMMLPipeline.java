@@ -512,7 +512,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	private List<String> initActiveFields(Step step){
-		int numberOfFeatures = StepUtil.getNumberOfFeatures(step);
+		int numberOfFeatures = step.getNumberOfFeatures();
 
 		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(step) + ") does not specify the number of input features");

@@ -57,11 +57,10 @@ import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn2pmml.feature_extraction.text.Splitter;
 
-public class CountVectorizer extends Transformer implements HasNumberOfFeatures {
+public class CountVectorizer extends Transformer {
 
 	public CountVectorizer(String module, String name){
 		super(module, name);

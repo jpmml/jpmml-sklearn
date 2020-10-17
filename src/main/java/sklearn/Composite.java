@@ -29,7 +29,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Composite extends Step implements HasNumberOfFeatures, HasType {
+public class Composite extends Step {
 
 	public Composite(String module, String name){
 		super(module, name);

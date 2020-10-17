@@ -30,10 +30,9 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class StandardScaler extends Transformer implements HasNumberOfFeatures {
+public class StandardScaler extends Transformer {
 
 	public StandardScaler(String module, String name){
 		super(module, name);
@@ -55,7 +54,7 @@ public class StandardScaler extends Transformer implements HasNumberOfFeatures {
 		} else
 
 		{
-			return HasNumberOfFeatures.UNKNOWN;
+			return super.getNumberOfFeatures();
 		}
 
 		return shape[0];

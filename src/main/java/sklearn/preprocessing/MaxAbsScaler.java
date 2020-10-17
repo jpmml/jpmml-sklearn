@@ -30,10 +30,9 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class MaxAbsScaler extends Transformer implements HasNumberOfFeatures {
+public class MaxAbsScaler extends Transformer {
 
 	public MaxAbsScaler(String module, String name){
 		super(module, name);

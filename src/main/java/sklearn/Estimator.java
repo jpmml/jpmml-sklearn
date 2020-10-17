@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract
-public class Estimator extends Step implements HasNumberOfFeatures, HasType {
+public class Estimator extends Step {
 
 	public Estimator(String module, String name){
 		super(module, name);

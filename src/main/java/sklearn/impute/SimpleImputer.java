@@ -26,10 +26,9 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class SimpleImputer extends Transformer implements HasNumberOfFeatures {
+public class SimpleImputer extends Transformer {
 
 	public SimpleImputer(String module, String name){
 		super(module, name);

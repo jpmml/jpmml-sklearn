@@ -27,7 +27,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.python.PythonObject;
 
 abstract
-public class Step extends PythonObject {
+public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public Step(String module, String name){
 		super(module, name);

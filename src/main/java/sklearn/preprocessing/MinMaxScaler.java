@@ -30,10 +30,9 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class MinMaxScaler extends Transformer implements HasNumberOfFeatures {
+public class MinMaxScaler extends Transformer {
 
 	public MinMaxScaler(String module, String name){
 		super(module, name);

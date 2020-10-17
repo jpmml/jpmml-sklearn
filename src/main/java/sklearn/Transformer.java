@@ -33,7 +33,7 @@ import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Transformer extends Step implements HasType {
+public class Transformer extends Step {
 
 	public Transformer(String module, String name){
 		super(module, name);
@@ -41,6 +41,16 @@ public class Transformer extends Step implements HasType {
 
 	abstract
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder);
+
+	@Override
+	public int getNumberOfFeatures(){
+
+		if(containsKey("n_features_in_")){
+			return getInteger("n_features_in_");
+		}
+
+		return HasNumberOfFeatures.UNKNOWN;
+	}
 
 	@Override
 	public OpType getOpType(){

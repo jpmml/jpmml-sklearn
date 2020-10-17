@@ -26,10 +26,9 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class MissingIndicator extends Transformer implements HasNumberOfFeatures {
+public class MissingIndicator extends Transformer {
 
 	public MissingIndicator(String module, String name){
 		super(module, name);
