@@ -152,7 +152,9 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
     * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
   * [Imbalanced Learn (imblearn)](https://github.com/scikit-learn-contrib/imbalanced-learn):
+    * [`imblearn.ensemble.BalancedBaggingClassifier`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.ensemble.BalancedBaggingClassifier.html)
     * [`imblearn.pipeline.Pipeline`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.pipeline.Pipeline.html)
+    * [`imblearn.under_sampling.RandomUnderSampler`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.RandomUnderSampler.html)
   * [LightGBM](https://github.com/Microsoft/LightGBM):
     * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
     * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)

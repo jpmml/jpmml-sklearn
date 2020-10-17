@@ -91,6 +91,11 @@ public class ClassifierTest extends SkLearnTest {
 	}
 
 	@Test
+	public void evaluateBalancedDecisionTreeEnsembleAudit() throws Exception {
+		evaluate("BalancedDecisionTreeEnsemble", "Audit");
+	}
+
+	@Test
 	public void evaluateDecisionTreeEnsembleAudit() throws Exception {
 		evaluate("DecisionTreeEnsemble", "Audit");
 	}
