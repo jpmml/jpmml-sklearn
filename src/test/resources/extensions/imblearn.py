@@ -1,6 +1,6 @@
 from common import *
 
-from imblearn.ensemble import BalancedBaggingClassifier
+from imblearn.ensemble import BalancedBaggingClassifier, BalancedRandomForestClassifier
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import LabelBinarizer
@@ -29,3 +29,4 @@ def build_audit(classifier, name):
 	store_csv(adjusted, name)
 
 build_audit(BalancedBaggingClassifier(sampling_strategy = "auto", n_estimators = 3, random_state = 13), "BalancedDecisionTreeEnsembleAudit")
+build_audit(BalancedRandomForestClassifier(sampling_strategy = "auto", n_estimators = 10, random_state = 13), "BalancedRandomForestAudit")

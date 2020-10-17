@@ -198,6 +198,11 @@ public class ClassifierTest extends SkLearnTest {
 	}
 
 	@Test
+	public void evaluateBalancedRandomForestAudit() throws Exception {
+		evaluate("BalancedRandomForest", "Audit");
+	}
+
+	@Test
 	public void evaluateRidgeAudit() throws Exception {
 		evaluate("Ridge", "Audit");
 	}
