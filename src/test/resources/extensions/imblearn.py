@@ -28,5 +28,5 @@ def build_audit(classifier, name):
 	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
-build_audit(BalancedBaggingClassifier(sampling_strategy = "auto", n_estimators = 3, random_state = 13), "BalancedDecisionTreeEnsembleAudit")
-build_audit(BalancedRandomForestClassifier(sampling_strategy = "auto", n_estimators = 10, random_state = 13), "BalancedRandomForestAudit")
+build_audit(BalancedBaggingClassifier(n_estimators = 3, random_state = 13), "BalancedDecisionTreeEnsembleAudit")
+build_audit(BalancedRandomForestClassifier(n_estimators = 10, random_state = 13), "BalancedRandomForestAudit")
