@@ -328,8 +328,10 @@ def build_audit_na_hist(classifier, name):
 		[([column], [CategoricalDomain(), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
 	)
 	pipeline = PMMLPipeline([
-		("mapper", mapper),
-		("classifier", classifier)
+		("pipeline", Pipeline([
+			("mapper", mapper),
+			("classifier", classifier)
+		]))
 	])
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13))
