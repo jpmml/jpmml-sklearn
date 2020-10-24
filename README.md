@@ -151,7 +151,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`h2o.estimators.isolation_forest.H2OIsolationForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oisolationforestestimator)
     * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
     * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
-  * [Imbalanced Learn (imblearn)](https://github.com/scikit-learn-contrib/imbalanced-learn):
+  * [Imbalanced-Learn (imblearn)](https://github.com/scikit-learn-contrib/imbalanced-learn):
     * [`imblearn.combine.SMOTEENN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTEENN.html)
     * [`imblearn.combine.SMOTETomek`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTETomek.html)
     * [`imblearn.ensemble.BalancedBaggingClassifier`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.ensemble.BalancedBaggingClassifier.html)
@@ -380,6 +380,7 @@ java -jar target/jpmml-sklearn-executable-1.6-SNAPSHOT.jar --help
 
 Up-to-date:
 
+* [Converting Scikit-Learn based Imbalanced-Learn (imblearn) pipelines to PMML documents](https://openscoring.io/blog/2020/10/24/converting_sklearn_imblearn_pipeline_pmml/)
 * [Extending Scikit-Learn with date and datetime features](https://openscoring.io/blog/2020/03/08/sklearn_date_datetime_pmml/)
 * [Extending Scikit-Learn with feature specifications](https://openscoring.io/blog/2020/02/23/sklearn_feature_specification_pmml/)
 * [Converting logistic regression models to PMML documents](https://openscoring.io/blog/2020/01/19/converting_logistic_regression_pmml/)
