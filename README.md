@@ -208,6 +208,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Ternary conditional expression `<expression_true> if <condition> else <expression_false>`.
       * Array indexing expressions `X[<column index>]` and `X[<column name>]`.
       * String concatenation expressions.
+      * String slicing expressions `<str>[<start>:<stop>]`.
       * Arithmetic operators `+`, `-`, `*`, `/` and `%`.
       * Identity comparison operators `is None` and `is not None`.
       * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
@@ -215,6 +216,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Value missingness check functions `pandas.isnull` and `pandas.notnull`.
       * Numpy universal functions.
       * String functions `lower`, `upper` and `strip`.
+      * String length function `len(<str>)`
     * `sklearn2pmml.preprocessing.IdentityTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
