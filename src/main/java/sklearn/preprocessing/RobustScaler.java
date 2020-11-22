@@ -101,7 +101,7 @@ public class RobustScaler extends Transformer {
 				expression = PMMLUtil.createApply(PMMLFunctions.DIVIDE, expression, PMMLUtil.createConstant(scaleValue));
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("RobustScaler", continuousFeature), expression);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("robustScaler", continuousFeature), expression);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
