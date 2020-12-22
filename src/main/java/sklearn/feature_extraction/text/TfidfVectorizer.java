@@ -27,6 +27,7 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.Feature;
@@ -78,16 +79,18 @@ public class TfidfVectorizer extends CountVectorizer {
 	}
 
 	@Override
-	public DefineFunction encodeDefineFunction(Feature feature){
+	public DefineFunction encodeDefineFunction(Feature feature, SkLearnEncoder encoder){
 		TfidfTransformer transformer = getTransformer();
 
-		DefineFunction defineFunction = super.encodeDefineFunction(feature);
+		DefineFunction defineFunction = super.encodeDefineFunction(feature, encoder);
 
 		Expression expression = defineFunction.getExpression();
 
 		Boolean sublinearTf = transformer.getSublinearTf();
 		if(sublinearTf){
-			expression = PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, expression), PMMLUtil.createConstant(1d));
+			DefineFunction sublinearDefineFunction = ensureSublinearDefineFunction(encoder);
+
+			expression = PMMLUtil.createApply(sublinearDefineFunction.getName(), expression);
 		} // End if
 
 		Boolean useIdf = transformer.getUseIdf();
@@ -134,5 +137,26 @@ public class TfidfVectorizer extends CountVectorizer {
 
 	public TfidfTransformer getTransformer(){
 		return get("_tfidf", TfidfTransformer.class);
+	}
+
+	static
+	private DefineFunction ensureSublinearDefineFunction(SkLearnEncoder encoder){
+		DefineFunction defineFunction = encoder.getDefineFunction("sublinearize");
+
+		if(defineFunction == null){
+			ParameterField inputField = new ParameterField(FieldName.create("x"));
+
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.IF, PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(inputField.getName()), PMMLUtil.createConstant(0)),
+				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(inputField.getName())), PMMLUtil.createConstant(1)), // x > 0
+				PMMLUtil.createConstant(0)
+			);
+
+			defineFunction = new DefineFunction("sublinearize", OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
+				.addParameterFields(inputField);
+
+			encoder.addDefineFunction(defineFunction);
+		}
+
+		return defineFunction;
 	}
 }

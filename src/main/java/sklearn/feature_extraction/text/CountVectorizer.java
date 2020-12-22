@@ -111,7 +111,7 @@ public class CountVectorizer extends Transformer {
 			feature = new StringFeature(encoder, derivedField);
 		}
 
-		DefineFunction defineFunction = encodeDefineFunction(feature);
+		DefineFunction defineFunction = encodeDefineFunction(feature, encoder);
 
 		encoder.addDefineFunction(defineFunction);
 
@@ -136,7 +136,7 @@ public class CountVectorizer extends Transformer {
 		return result;
 	}
 
-	public DefineFunction encodeDefineFunction(Feature feature){
+	public DefineFunction encodeDefineFunction(Feature feature, SkLearnEncoder encoder){
 		String analyzer = getAnalyzer();
 		List<String> stopWords = getStopWords();
 		Object[] nGramRange = getNGramRange();
