@@ -132,7 +132,7 @@ public class ClassifierTest extends SkLearnTest {
 
 	@Test
 	public void evaluateLGBMAudit() throws Exception {
-		evaluate("LGBM", "Audit", new RealNumberEquivalence(1));
+		evaluate("LGBM", "Audit", new RealNumberEquivalence(2));
 	}
 
 	@Test
