@@ -1,4 +1,4 @@
-JPMML-SkLearn
+JPMML-SkLearn [![Build Status](https://github.com/jpmml/jpmml-sklearn/workflows/maven/badge.svg)](https://github.com/jpmml/jpmml-sklearn/actions?query=workflow%3A%22maven%22)
 =============
 
 Java library and command-line application for converting [Scikit-Learn](https://scikit-learn.org/) pipelines to PMML.
