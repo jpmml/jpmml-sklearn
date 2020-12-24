@@ -37,7 +37,7 @@ from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirst
 from sklearn2pmml.feature_extraction.text import Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer
+from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
@@ -536,7 +536,10 @@ sentiment_X, sentiment_y = load_sentiment("Sentiment")
 
 def build_sentiment(classifier, name, with_proba = True, **pmml_options):
 	pipeline = PMMLPipeline([
-		("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 2), norm = None, sublinear_tf = isinstance(classifier, LogisticRegressionCV), dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
+		("union", FeatureUnion([
+			("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 2), norm = None, sublinear_tf = isinstance(classifier, LogisticRegressionCV), dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
+			("count", WordCountTransformer())
+		])),
 		("selector", SelectKBest(f_classif, k = 500)),
 		("classifier", classifier)
 	])
