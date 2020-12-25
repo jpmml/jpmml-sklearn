@@ -79,7 +79,14 @@ public class Domain extends Transformer {
 			}
 		}
 
-		for(Feature feature : features){
+		List<String> displayName = getDisplayName();
+		if(displayName != null){
+			ClassDictUtil.checkSize(features, displayName);
+		}
+
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+
 			WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
 			DataField dataField = wildcardFeature.getField();
@@ -100,6 +107,10 @@ public class Domain extends Transformer {
 				Object pmmlInvalidValueReplacement = (invalidValueReplacement != null ? standardizeValue(dataType, invalidValueReplacement) : null);
 
 				encoder.addDecorator(dataField, new InvalidValueDecorator(invalidValueTreatment, pmmlInvalidValueReplacement));
+			} // End if
+
+			if(displayName != null){
+				dataField.setDisplayName(displayName.get(i));
 			}
 		}
 
@@ -172,6 +183,22 @@ public class Domain extends Transformer {
 
 	public Boolean getWithStatistics(){
 		return getOptionalBoolean("with_statistics", Boolean.FALSE);
+	}
+
+	public List<String> getDisplayName(){
+
+		if(!containsKey("display_name")){
+			return null;
+		}
+
+		Object object = get("display_name");
+
+		// XXX
+		if(object instanceof String){
+			return Collections.singletonList((String)object);
+		}
+
+		return getListLike("display_name", String.class);
 	}
 
 	public Map<String, ?> getCounts(){

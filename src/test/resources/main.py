@@ -202,12 +202,12 @@ audit_X, audit_y = load_audit("Audit")
 
 def build_audit_cat(classifier, name, with_proba = True, fit_params = {}):
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["Age", "Income"]] +
-		[(["Hours"], [ContinuousDomain(), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = False, right = False, include_lowest = True)])] +
-		[(["Employment", "Education"], [MultiDomain([CategoricalDomain(), CategoricalDomain()]), OrdinalEncoder(dtype = numpy.int_)])] +
-		[(["Marital"], [CategoricalDomain(), OrdinalEncoder(dtype = numpy.uint16)])] +
-		[(["Occupation"], [CategoricalDomain(), OrdinalEncoder(dtype = numpy.float_)])] +
-		[([column], [CategoricalDomain(), LabelEncoder()]) for column in ["Gender", "Deductions"]]
+		[([column], ContinuousDomain(display_name = column)) for column in ["Age", "Income"]] +
+		[(["Hours"], [ContinuousDomain(display_name = "Hours"), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = False, right = False, include_lowest = True)])] +
+		[(["Employment", "Education"], [MultiDomain([CategoricalDomain(display_name = "Employment"), CategoricalDomain(display_name = "Education")]), OrdinalEncoder(dtype = numpy.int_)])] +
+		[(["Marital"], [CategoricalDomain(display_name = "Marital"), OrdinalEncoder(dtype = numpy.uint16)])] +
+		[(["Occupation"], [CategoricalDomain(display_name = "Occupation"), OrdinalEncoder(dtype = numpy.float_)])] +
+		[([column], [CategoricalDomain(display_name = column), LabelEncoder()]) for column in ["Gender", "Deductions"]]
 	)
 	pipeline = Pipeline([
 		("mapper", mapper),
@@ -520,6 +520,7 @@ if "Iris" in datasets:
 		("X['Petal.Length'] >= 2.45", "virginica")
 	], default_score = "setosa")
 	pipeline = PMMLPipeline([
+		("domain", ContinuousDomain(display_name = ["Sepal length (cm)", "Sepal width (cm)", "Petal length (cm)", "Petal width (cm)"])),
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)
