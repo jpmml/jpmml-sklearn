@@ -42,4 +42,9 @@ public class PatternTransformer extends Transformer {
 	public String getPattern(){
 		return getString("pattern");
 	}
+
+	static
+	protected String formatArg(String string){
+		return ("\"" + string + "\"");
+	}
 }

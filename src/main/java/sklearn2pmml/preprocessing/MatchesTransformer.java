@@ -54,7 +54,7 @@ public class MatchesTransformer extends PatternTransformer {
 			.addExpressions(feature.ref())
 			.addExpressions(PMMLUtil.createConstant(pattern, DataType.STRING));
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("matches", feature), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("matches", feature, formatArg(pattern)), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
 
 		return Collections.singletonList(new BooleanFeature(encoder, derivedField));
 	}

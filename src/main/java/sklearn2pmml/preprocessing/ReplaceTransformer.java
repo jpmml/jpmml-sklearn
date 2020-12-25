@@ -55,7 +55,7 @@ public class ReplaceTransformer extends PatternTransformer {
 			.addExpressions(feature.ref())
 			.addExpressions(PMMLUtil.createConstant(pattern, DataType.STRING), PMMLUtil.createConstant(replacement, DataType.STRING));
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("replace", feature), OpType.CATEGORICAL, DataType.STRING, apply);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("replace", feature, formatArg(pattern), formatArg(replacement)), OpType.CATEGORICAL, DataType.STRING, apply);
 
 		return Collections.singletonList(new StringFeature(encoder, derivedField));
 	}
