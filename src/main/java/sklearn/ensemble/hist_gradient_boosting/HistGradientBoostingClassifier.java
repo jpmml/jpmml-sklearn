@@ -97,7 +97,14 @@ public class HistGradientBoostingClassifier extends Classifier {
 	}
 
 	public BaseLoss getLoss(){
-		return get("loss_", BaseLoss.class);
+
+		// SkLearn 0.23
+		if(containsKey("loss_")){
+			get("loss_", BaseLoss.class);
+		}
+
+		// SkLearn 0.24+
+		return get("_loss", BaseLoss.class);
 	}
 
 	public Integer getNumberOfTreesPerIteration(){

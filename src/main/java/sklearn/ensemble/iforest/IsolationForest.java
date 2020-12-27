@@ -191,12 +191,12 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 				Number threshold;
 
-				// SkLearn 0.19
+				// SkLearn 0.19 or SkLearn 0.24+
 				if(behaviour == null){
 					threshold = getThreshold();
 				} else
 
-				// SkLearn 0.20+
+				// SkLearn 0.20 through 0.23
 				{
 					if(("old").equals(behaviour)){
 						threshold = getThreshold();
@@ -251,7 +251,12 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		} else
 
 		// SkLearn 0.20+
-		return getNumber("_threshold_");
+		if(containsKey("_threshold_")){
+			return getNumber("_threshold_");
+		}
+
+		// SkLearn 0.24+
+		return 0d;
 	}
 
 	static

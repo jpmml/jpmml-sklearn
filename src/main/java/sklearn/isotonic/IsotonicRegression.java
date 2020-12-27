@@ -45,11 +45,11 @@ public class IsotonicRegression extends Regressor {
 
 	@Override
 	public RegressionModel encodeModel(Schema schema){
-		List<? extends Number> necessaryX = getNecessaryX();
-		List<? extends Number> necessaryY = getNecessaryY();
+		List<? extends Number> xThresholds = getXThresholds();
+		List<? extends Number> yThresholds = getYThresholds();
 		String outOfBounds = getOutOfBounds();
 
-		ClassDictUtil.checkSize(necessaryX, necessaryY);
+		ClassDictUtil.checkSize(xThresholds, yThresholds);
 
 		PMMLEncoder encoder = schema.getEncoder();
 		List<? extends Feature> features = schema.getFeatures();
@@ -63,9 +63,9 @@ public class IsotonicRegression extends Regressor {
 		NormContinuous normContinuous = new NormContinuous(feature.getName(), null)
 			.setOutliers(outlierTreatment);
 
-		for(int i = 0; i < necessaryX.size(); i++){
-			Number orig = necessaryX.get(i);
-			Number norm = necessaryY.get(i);
+		for(int i = 0; i < xThresholds.size(); i++){
+			Number orig = xThresholds.get(i);
+			Number norm = yThresholds.get(i);
 
 			normContinuous.addLinearNorms(new LinearNorm(orig, norm));
 		}
@@ -81,12 +81,24 @@ public class IsotonicRegression extends Regressor {
 		return getBoolean("increasing_");
 	}
 
-	public List<? extends Number> getNecessaryX(){
-		return getNumberArray("_necessary_X_");
+	public List<? extends Number> getXThresholds(){
+		// SkLearn 0.23
+		if(containsKey("_necessary_X_")){
+			return getNumberArray("_necessary_X_");
+		}
+
+		// SkLearn 0.24+
+		return getNumberArray("X_thresholds_");
 	}
 
-	public List<? extends Number> getNecessaryY(){
-		return getNumberArray("_necessary_y_");
+	public List<? extends Number> getYThresholds(){
+		// SkLearn 0.23
+		if(containsKey("_necessary_y_")){
+			getNumberArray("_necessary_y_");
+		}
+
+		// SkLearn 0.24+
+		return getNumberArray("y_thresholds_");
 	}
 
 	public String getOutOfBounds(){

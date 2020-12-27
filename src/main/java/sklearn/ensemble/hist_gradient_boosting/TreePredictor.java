@@ -43,7 +43,15 @@ public class TreePredictor extends PythonObject {
 	}
 
 	public double[] getThreshold(){
-		return Doubles.toArray(getNodeAttribute("threshold"));
+
+		// SkLearn 0.23
+		List<? extends Number> threshold = getNodeAttribute("threshold");
+		if(threshold != null){
+			return Doubles.toArray(threshold);
+		}
+
+		// SkLearn 0.24+
+		return Doubles.toArray(getNodeAttribute("num_threshold"));
 	}
 
 	public int[] getMissingGoToLeft(){
