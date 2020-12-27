@@ -193,6 +193,10 @@ public class Domain extends Transformer {
 
 		Object object = get("display_name");
 
+		if(object == null){
+			return null;
+		} else
+
 		// XXX
 		if(object instanceof String){
 			return Collections.singletonList((String)object);
