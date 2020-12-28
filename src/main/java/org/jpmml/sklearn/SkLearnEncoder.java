@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import numpy.DType;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -31,6 +32,9 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
+import sklearn.ensemble.hist_gradient_boosting.TreePredictor;
+import sklearn.neighbors.BinaryTree;
+import sklearn.tree.Tree;
 import sklearn2pmml.decoration.Alias;
 import sklearn2pmml.decoration.Domain;
 
@@ -115,5 +119,10 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	static {
 		PickleUtil.init("sklearn2pmml.properties");
+
+		DType.addDefinition(BinaryTree.DTYPE_NODEDATA);
+		DType.addDefinition(Tree.DTYPE_TREE);
+		DType.addDefinition(TreePredictor.DTYPE_PREDICTOR_OLD);
+		DType.addDefinition(TreePredictor.DTYPE_PREDICTOR_NEW);
 	}
 }

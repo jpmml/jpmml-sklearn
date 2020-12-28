@@ -18,6 +18,7 @@
  */
 package sklearn.ensemble.hist_gradient_boosting;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.primitives.Doubles;
@@ -77,4 +78,7 @@ public class TreePredictor extends PythonObject {
 	private List<? extends Number> getNodeAttribute(String key){
 		return (List)getArray("nodes", key);
 	}
+
+	public static final List<String> DTYPE_PREDICTOR_OLD = Arrays.asList("value", "count", "feature_idx", "threshold", "missing_go_to_left", "left", "right", "gain", "depth", "is_leaf", "bin_threshold");
+	public static final List<String> DTYPE_PREDICTOR_NEW = Arrays.asList("value", "count", "feature_idx", "num_threshold", "missing_go_to_left", "left", "right", "gain", "depth", "is_leaf", "bin_threshold", "is_categorical", "bitset_idx");
 }

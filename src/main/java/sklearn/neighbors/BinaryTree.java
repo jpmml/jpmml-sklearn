@@ -68,6 +68,8 @@ public class BinaryTree extends CustomPythonObject {
 		"dist_metric"
 	};
 
+	public static final List<String> DTYPE_NODEDATA = Arrays.asList("idx_start", "idx_end", "is_leaf", "radius");
+
 	private static final String[] SETSTATE_ATTRIBUTES_WEIGHTED;
 
 	static {

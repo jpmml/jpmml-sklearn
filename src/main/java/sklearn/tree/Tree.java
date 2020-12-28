@@ -18,6 +18,7 @@
  */
 package sklearn.tree;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.primitives.Doubles;
@@ -36,7 +37,7 @@ public class Tree extends CustomPythonObject {
 	}
 
 	public double[] getValues(){
-		return Doubles.toArray((List)getArray("values"));
+		return Doubles.toArray(getNumberArray("values"));
 	}
 
 	public int[] getChildrenLeft(){
@@ -62,6 +63,8 @@ public class Tree extends CustomPythonObject {
 	private List<? extends Number> getNodeAttribute(String key){
 		return (List)getArray("nodes", key);
 	}
+
+	public static final List<String> DTYPE_TREE = Arrays.asList("left_child", "right_child", "feature", "threshold", "impurity", "n_node_samples", "weighted_n_node_samples");
 
 	private static final String[] INIT_ATTRIBUTES = {
 		"n_features",

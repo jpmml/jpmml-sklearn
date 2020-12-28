@@ -186,20 +186,10 @@ public class Domain extends Transformer {
 	}
 
 	public List<String> getDisplayName(){
-
-		if(!containsKey("display_name")){
-			return null;
-		}
-
 		Object object = get("display_name");
 
 		if(object == null){
 			return null;
-		} else
-
-		// XXX
-		if(object instanceof String){
-			return Collections.singletonList((String)object);
 		}
 
 		return getListLike("display_name", String.class);
