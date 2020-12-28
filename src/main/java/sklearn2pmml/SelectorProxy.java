@@ -50,6 +50,6 @@ public class SelectorProxy extends Selector {
 
 	static
 	public String formatProxyExample(Selector selector){
-		return (SelectorProxy.class.getSimpleName() + "(" + selector.getPythonName() + "(...))");
+		return ((SelectorProxy.class).getSimpleName() + "(" + selector.getPythonName() + "(...))");
 	}
 }

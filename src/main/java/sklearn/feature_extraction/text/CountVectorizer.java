@@ -247,7 +247,7 @@ public class CountVectorizer extends Transformer {
 
 	static
 	private List<String> loadStopWords(String stopWords){
-		InputStream is = CountVectorizer.class.getResourceAsStream("/stop_words/" + stopWords + ".txt");
+		InputStream is = (CountVectorizer.class).getResourceAsStream("/stop_words/" + stopWords + ".txt");
 
 		if(is == null){
 			throw new IllegalArgumentException(stopWords);

@@ -82,7 +82,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		DerivedField derivedField = removeDerivedField(name);
 
 		try {
-			Field field = Feature.class.getDeclaredField("name");
+			Field field = (Feature.class).getDeclaredField("name");
 
 			if(!field.isAccessible()){
 				field.setAccessible(true);

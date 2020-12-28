@@ -78,7 +78,7 @@ public class Pipeline extends Composite implements Castable {
 
 		estimator = CastUtil.deepCastTo(estimator, Estimator.class);
 
-		return Estimator.class.isInstance(estimator);
+		return (Estimator.class).isInstance(estimator);
 	}
 
 	@Override
