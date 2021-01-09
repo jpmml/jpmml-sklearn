@@ -53,6 +53,18 @@
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-python</artifactId>
 			<version>1.0.9</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jpmml</groupId>
+					<artifactId>pmml-model</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-model</artifactId>
+			<version>1.5.10</version>
 		</dependency>
 
 		<dependency>
@@ -83,7 +95,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator-testing</artifactId>
-			<version>1.5.5</version>
+			<version>1.5.10</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
