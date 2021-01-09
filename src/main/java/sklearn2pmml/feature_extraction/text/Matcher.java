@@ -25,6 +25,10 @@ import org.dmg.pmml.TextIndex;
 
 public class Matcher extends Tokenizer {
 
+	public Matcher(){
+		this("sklearn2pmml.feature_extraction.text", "Matcher");
+	}
+
 	public Matcher(String module, String name){
 		super(module, name);
 	}
@@ -48,7 +52,7 @@ public class Matcher extends Tokenizer {
 
 		Joiner joiner = Joiner.on("|");
 
-		return "(\\W+)(" + joiner.join(stopWords) + ")(\\W+)";
+		return "\\b(" + joiner.join(stopWords) + ")\\b";
 	}
 
 	public void __setstate__(String wordRE){

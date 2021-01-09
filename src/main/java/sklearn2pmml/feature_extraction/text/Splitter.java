@@ -25,6 +25,10 @@ import org.dmg.pmml.TextIndex;
 
 public class Splitter extends Tokenizer {
 
+	public Splitter(){
+		this("sklearn2pmml.feature_extraction.text", "Splitter");
+	}
+
 	public Splitter(String module, String name){
 		super(module, name);
 	}
