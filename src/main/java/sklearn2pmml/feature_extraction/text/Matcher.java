@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Villu Ruusmann
+ * Copyright (c) 2021 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -23,40 +23,44 @@ import java.util.List;
 import com.google.common.base.Joiner;
 import org.dmg.pmml.TextIndex;
 
-public class Splitter extends Tokenizer {
+public class Matcher extends Tokenizer {
 
-	public Splitter(String module, String name){
+	public Matcher(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public TextIndex configure(TextIndex textIndex){
-		String wordSeparatorRE = getWordSeparatorRE();
+		String wordRE = getWordRE();
 
 		return textIndex
 			.setTokenize(Boolean.TRUE)
-			.setWordSeparatorCharacterRE(wordSeparatorRE);
+			.setWordRE(wordRE);
 	}
 
 	@Override
 	public String formatStopWordsRE(List<String> stopWords){
-		String wordSeparatorRE = getWordSeparatorRE();
+		String wordRE = getWordRE();
+
+		if(!("\\w+").equals(wordRE)){
+			throw new IllegalArgumentException(wordRE);
+		}
 
 		Joiner joiner = Joiner.on("|");
 
-		return "(^|" + wordSeparatorRE + ")\\p{Punct}*(" + joiner.join(stopWords) + ")\\p{Punct}*(" + wordSeparatorRE + "|$)";
+		return "(\\W+)(" + joiner.join(stopWords) + ")(\\W+)";
 	}
 
-	public void __setstate__(String wordSeparatorRE){
-		setWordSeparatorRE(wordSeparatorRE);
+	public void __setstate__(String wordRE){
+		setWordRE(wordRE);
 	}
 
-	public String getWordSeparatorRE(){
-		return getString("word_separator_re");
+	public String getWordRE(){
+		return getString("word_re");
 	}
 
-	public Splitter setWordSeparatorRE(String wordSeparatorRE){
-		put("word_separator_re", wordSeparatorRE);
+	public Matcher setWordRE(String wordRE){
+		put("word_re", wordRE);
 
 		return this;
 	}

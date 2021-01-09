@@ -30,7 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.io.CharStreams;
@@ -58,7 +57,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn2pmml.feature_extraction.text.Splitter;
+import sklearn2pmml.feature_extraction.text.Tokenizer;
 
 public class CountVectorizer extends Transformer {
 
@@ -143,7 +142,7 @@ public class CountVectorizer extends Transformer {
 		Boolean binary = getBinary();
 		Object preprocessor = getPreprocessor();
 		String stripAccents = getStripAccents();
-		Splitter tokenizer = getTokenizer();
+		Tokenizer tokenizer = getTokenizer();
 
 		switch(analyzer){
 			case "word":
@@ -165,13 +164,13 @@ public class CountVectorizer extends Transformer {
 		ParameterField termField = new ParameterField(FieldName.create("term"));
 
 		TextIndex textIndex = new TextIndex(documentField.getName(), new FieldRef(termField.getName()))
-			.setTokenize(Boolean.TRUE)
-			.setWordSeparatorCharacterRE(tokenizer.getWordSeparatorRE())
 			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null);
+
+		textIndex = tokenizer.configure(textIndex);
 
 		if((stopWords != null && stopWords.size() > 0) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){
 			Map<String, List<String>> data = new LinkedHashMap<>();
-			data.put("string", Collections.singletonList("(^|\\s+)\\p{Punct}*(" + JOINER.join(stopWords) + ")\\p{Punct}*(\\s+|$)"));
+			data.put("string", Collections.singletonList(tokenizer.formatStopWordsRE(stopWords)));
 			data.put("stem", Collections.singletonList(" "));
 			data.put("regex", Collections.singletonList("true"));
 
@@ -237,8 +236,8 @@ public class CountVectorizer extends Transformer {
 		return getOptionalString("strip_accents");
 	}
 
-	public Splitter getTokenizer(){
-		return get("tokenizer", Splitter.class);
+	public Tokenizer getTokenizer(){
+		return get("tokenizer", Tokenizer.class);
 	}
 
 	public Map<String, ?> getVocabulary(){
@@ -259,6 +258,4 @@ public class CountVectorizer extends Transformer {
 			throw new IllegalArgumentException(stopWords, ioe);
 		}
 	}
-
-	private static final Joiner JOINER = Joiner.on("|");
 }
