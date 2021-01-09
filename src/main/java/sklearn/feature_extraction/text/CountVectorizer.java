@@ -166,7 +166,7 @@ public class CountVectorizer extends Transformer {
 
 		TextIndex textIndex = new TextIndex(documentField.getName(), new FieldRef(termField.getName()))
 			.setTokenize(Boolean.TRUE)
-			.setWordSeparatorCharacterRE(tokenizer.getSeparatorRE())
+			.setWordSeparatorCharacterRE(tokenizer.getWordSeparatorRE())
 			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null);
 
 		if((stopWords != null && stopWords.size() > 0) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){

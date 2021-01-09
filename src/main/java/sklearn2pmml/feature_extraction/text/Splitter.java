@@ -26,11 +26,11 @@ public class Splitter extends PythonObject {
 		super(module, name);
 	}
 
-	public void __setstate__(String separatorRE){
-		put("separator_re", separatorRE);
+	public void __setstate__(String wordSeparatorRE){
+		put("word_separator_re", wordSeparatorRE);
 	}
 
-	public String getSeparatorRE(){
-		return getString("separator_re");
+	public String getWordSeparatorRE(){
+		return getString("word_separator_re");
 	}
 }
