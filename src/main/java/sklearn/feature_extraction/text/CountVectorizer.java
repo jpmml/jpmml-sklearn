@@ -175,9 +175,16 @@ public class CountVectorizer extends Transformer {
 
 		textIndex = tokenizer.configure(textIndex);
 
+		stopWords:
 		if((stopWords != null && stopWords.size() > 0) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){
+			String stopWordsRE = tokenizer.formatStopWordsRE(stopWords);
+
+			if(stopWordsRE == null){
+				break stopWords;
+			}
+
 			Map<String, List<String>> data = new LinkedHashMap<>();
-			data.put("string", Collections.singletonList(tokenizer.formatStopWordsRE(stopWords)));
+			data.put("string", Collections.singletonList(stopWordsRE));
 			data.put("stem", Collections.singletonList(" "));
 			data.put("regex", Collections.singletonList("true"));
 

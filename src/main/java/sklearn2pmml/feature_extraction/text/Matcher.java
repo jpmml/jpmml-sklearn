@@ -19,6 +19,8 @@
 package sklearn2pmml.feature_extraction.text;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
 import org.dmg.pmml.TextIndex;
@@ -46,6 +48,16 @@ public class Matcher extends Tokenizer {
 	@Override
 	public String formatStopWordsRE(List<String> stopWords){
 		String wordRE = getWordRE();
+
+		Pattern pattern = Pattern.compile(wordRE);
+
+		stopWords = stopWords.stream()
+			.filter(pattern.asPredicate())
+			.collect(Collectors.toList());
+
+		if(stopWords.isEmpty()){
+			return null;
+		}
 
 		boolean unicode = wordRE.startsWith("(?u)");
 
