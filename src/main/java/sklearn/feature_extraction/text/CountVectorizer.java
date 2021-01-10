@@ -58,7 +58,6 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn2pmml.feature_extraction.text.Matcher;
-import sklearn2pmml.feature_extraction.text.Tokenizer;
 
 public class CountVectorizer extends Transformer {
 

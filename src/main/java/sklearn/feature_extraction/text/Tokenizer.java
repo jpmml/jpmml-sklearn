@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.feature_extraction.text;
+package sklearn.feature_extraction.text;
 
 import java.util.List;
 

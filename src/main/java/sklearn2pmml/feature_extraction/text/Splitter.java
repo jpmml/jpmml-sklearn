@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.google.common.base.Joiner;
 import org.dmg.pmml.TextIndex;
+import sklearn.feature_extraction.text.Tokenizer;
 
 public class Splitter extends Tokenizer {
 

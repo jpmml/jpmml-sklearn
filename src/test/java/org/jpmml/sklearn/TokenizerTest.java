@@ -35,9 +35,9 @@ import org.jpmml.evaluator.TextUtil;
 import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.Conflict;
 import org.junit.Test;
+import sklearn.feature_extraction.text.Tokenizer;
 import sklearn2pmml.feature_extraction.text.Matcher;
 import sklearn2pmml.feature_extraction.text.Splitter;
-import sklearn2pmml.feature_extraction.text.Tokenizer;
 
 import static org.junit.Assert.fail;
 
