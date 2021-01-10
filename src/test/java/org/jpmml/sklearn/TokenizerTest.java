@@ -35,6 +35,7 @@ import org.jpmml.evaluator.TextUtil;
 import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.Conflict;
 import org.junit.Test;
+import sklearn.feature_extraction.text.CountVectorizer;
 import sklearn.feature_extraction.text.Tokenizer;
 import sklearn2pmml.feature_extraction.text.Matcher;
 import sklearn2pmml.feature_extraction.text.Splitter;
@@ -54,7 +55,7 @@ public class TokenizerTest extends SkLearnTest {
 	@Test
 	public void match() throws Exception {
 		Matcher matcher = new Matcher()
-			.setWordRE("(?u)\\b\\w\\w+\\b");
+			.setWordRE(CountVectorizer.TOKEN_PATTERN);
 
 		evaluate("CountVectorizer", "Sentiment", matcher);
 

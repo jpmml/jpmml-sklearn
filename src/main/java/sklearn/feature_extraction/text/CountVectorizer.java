@@ -254,6 +254,9 @@ public class CountVectorizer extends Transformer {
 		return getOptional("tokenizer", Tokenizer.class);
 	}
 
+	/**
+	 * @see CountVectorizer#TOKEN_PATTERN
+	 */
 	public String getTokenPattern(){
 		return getString("token_pattern");
 	}
@@ -276,4 +279,6 @@ public class CountVectorizer extends Transformer {
 			throw new IllegalArgumentException(stopWords, ioe);
 		}
 	}
+
+	public static final String TOKEN_PATTERN = "(?u)\\b\\w\\w+\\b";
 }
