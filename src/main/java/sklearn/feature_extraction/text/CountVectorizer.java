@@ -57,6 +57,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
+import sklearn2pmml.feature_extraction.text.Matcher;
 import sklearn2pmml.feature_extraction.text.Tokenizer;
 
 public class CountVectorizer extends Transformer {
@@ -157,6 +158,13 @@ public class CountVectorizer extends Transformer {
 
 		if(stripAccents != null){
 			throw new IllegalArgumentException(stripAccents);
+		} // End if
+
+		if(tokenizer == null){
+			String tokenPattern = getTokenPattern();
+
+			tokenizer = new Matcher()
+				.setWordRE(tokenPattern);
 		}
 
 		ParameterField documentField = new ParameterField(FieldName.create("document"));
@@ -237,7 +245,11 @@ public class CountVectorizer extends Transformer {
 	}
 
 	public Tokenizer getTokenizer(){
-		return get("tokenizer", Tokenizer.class);
+		return getOptional("tokenizer", Tokenizer.class);
+	}
+
+	public String getTokenPattern(){
+		return getString("token_pattern");
 	}
 
 	public Map<String, ?> getVocabulary(){

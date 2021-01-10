@@ -34,7 +34,7 @@ from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
 from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirstClassifier
-from sklearn2pmml.feature_extraction.text import Splitter
+from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
@@ -535,13 +535,13 @@ if "Iris" in datasets:
 
 sentiment_X, sentiment_y = load_sentiment("Sentiment")
 
-def build_sentiment(classifier, name, with_proba = True, **pmml_options):
+def build_sentiment(classifier, tokenizer, name, with_proba = True, **pmml_options):
 	pipeline = PMMLPipeline([
 		("union", FeatureUnion([
-			("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, token_pattern = None, tokenizer = Splitter(), stop_words = "english", ngram_range = (1, 2), norm = None, sublinear_tf = isinstance(classifier, LogisticRegressionCV), dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
+			("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, tokenizer = tokenizer, stop_words = "english", ngram_range = (1, 2), norm = None, sublinear_tf = isinstance(classifier, LogisticRegressionCV), dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
 			("count", WordCountTransformer())
 		])),
-		("selector", SelectKBest(f_classif, k = 500)),
+		("selector", SelectKBest(f_classif, k = 1000)),
 		("classifier", classifier)
 	])
 	pipeline.fit(sentiment_X, sentiment_y)
@@ -554,9 +554,9 @@ def build_sentiment(classifier, name, with_proba = True, **pmml_options):
 	store_csv(score, name)
 
 if "Sentiment" in datasets:
-	build_sentiment(LinearSVC(random_state = 13), "LinearSVCSentiment", with_proba = False)
-	build_sentiment(LogisticRegressionCV(multi_class = "ovr", cv = 3), "LogisticRegressionSentiment")
-	build_sentiment(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestSentiment", compact = False)
+	build_sentiment(LinearSVC(random_state = 13), Splitter(), "LinearSVCSentiment", with_proba = False)
+	build_sentiment(LogisticRegressionCV(multi_class = "ovr", cv = 3), None, "LogisticRegressionSentiment")
+	build_sentiment(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), Matcher(), "RandomForestSentiment", compact = False)
 
 #
 # Regression

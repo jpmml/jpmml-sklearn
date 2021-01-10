@@ -54,6 +54,11 @@ public class TokenizerTest extends SkLearnTest {
 	@Test
 	public void match() throws Exception {
 		Matcher matcher = new Matcher()
+			.setWordRE("(?u)\\b\\w\\w+\\b");
+
+		evaluate("CountVectorizer", "Sentiment", matcher);
+
+		matcher = new Matcher()
 			.setWordRE("\\w+");
 
 		evaluate("Matcher", "Sentiment", matcher);

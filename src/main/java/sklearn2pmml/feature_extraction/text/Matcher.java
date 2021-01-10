@@ -46,13 +46,11 @@ public class Matcher extends Tokenizer {
 	public String formatStopWordsRE(List<String> stopWords){
 		String wordRE = getWordRE();
 
-		if(!("\\w+").equals(wordRE)){
-			throw new IllegalArgumentException(wordRE);
-		}
+		boolean unicode = wordRE.startsWith("(?u)");
 
 		Joiner joiner = Joiner.on("|");
 
-		return "\\b(" + joiner.join(stopWords) + ")\\b";
+		return (unicode ? "(?u)" : "") + "\\b(" + joiner.join(stopWords) + ")\\b";
 	}
 
 	public void __setstate__(String wordRE){

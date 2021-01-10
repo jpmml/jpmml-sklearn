@@ -14,5 +14,7 @@ def tokenize(tokenizer, name):
 	sentiment_processed_X = sentiment_X.apply(process)
 	store_csv(sentiment_processed_X, name)
 
+tokenize(Matcher("(?u)\\b\\w\\w+\\b"), "CountVectorizerSentiment");
+
 tokenize(Matcher("\\w+"), "MatcherSentiment")
 tokenize(Splitter("\\s+"), "SplitterSentiment")
