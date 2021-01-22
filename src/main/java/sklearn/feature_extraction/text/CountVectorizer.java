@@ -196,7 +196,7 @@ public class CountVectorizer extends Transformer {
 
 		FieldName name = createFieldName(functionName(), feature);
 
-		DefineFunction defineFunction = new DefineFunction(name.getValue(), OpType.CONTINUOUS, DataType.DOUBLE, null, textIndex)
+		DefineFunction defineFunction = new DefineFunction(name.getValue(), OpType.CONTINUOUS, DataType.INTEGER, null, textIndex)
 			.addParameterFields(documentField, termField);
 
 		return defineFunction;

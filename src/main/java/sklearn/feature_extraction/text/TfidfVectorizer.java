@@ -82,18 +82,23 @@ public class TfidfVectorizer extends CountVectorizer {
 	public DefineFunction encodeDefineFunction(Feature feature, SkLearnEncoder encoder){
 		TfidfTransformer transformer = getTransformer();
 
+		Boolean sublinearTf = transformer.getSublinearTf();
+		Boolean useIdf = transformer.getUseIdf();
+
 		DefineFunction defineFunction = super.encodeDefineFunction(feature, encoder);
+
+		if(!(sublinearTf || useIdf)){
+			return defineFunction;
+		}
 
 		Expression expression = defineFunction.getExpression();
 
-		Boolean sublinearTf = transformer.getSublinearTf();
 		if(sublinearTf){
 			DefineFunction sublinearDefineFunction = ensureSublinearDefineFunction(encoder);
 
 			expression = PMMLUtil.createApply(sublinearDefineFunction.getName(), expression);
 		} // End if
 
-		Boolean useIdf = transformer.getUseIdf();
 		if(useIdf){
 			ParameterField weight = new ParameterField(FieldName.create("weight"));
 
@@ -102,7 +107,9 @@ public class TfidfVectorizer extends CountVectorizer {
 			expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weight.getName()));
 		}
 
-		defineFunction.setExpression(expression);
+		defineFunction
+			.setDataType(DataType.DOUBLE)
+			.setExpression(expression);
 
 		return defineFunction;
 	}
