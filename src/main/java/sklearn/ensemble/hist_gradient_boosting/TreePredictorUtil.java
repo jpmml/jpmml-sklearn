@@ -18,7 +18,12 @@
  */
 package sklearn.ensemble.hist_gradient_boosting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.False;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
@@ -28,6 +33,8 @@ import org.dmg.pmml.tree.LeafNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
@@ -40,23 +47,26 @@ public class TreePredictorUtil {
 	}
 
 	static
-	public TreeModel encodeTreeModel(TreePredictor treePredictor, Schema schema){
+	public TreeModel encodeTreeModel(TreePredictor treePredictor, BinMapper binMapper, Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
 
-		return encodeTreeModel(treePredictor, predicateManager, schema);
+		return encodeTreeModel(treePredictor, binMapper, predicateManager, schema);
 	}
 
 	static
-	public TreeModel encodeTreeModel(TreePredictor treePredictor, PredicateManager predicateManager, Schema schema){
+	public TreeModel encodeTreeModel(TreePredictor treePredictor, BinMapper binMapper, PredicateManager predicateManager, Schema schema){
 		int[] leaf = treePredictor.isLeaf();
 		int[] leftChildren = treePredictor.getLeft();
 		int[] rightChildren = treePredictor.getRight();
 		int[] featureIdx = treePredictor.getFeatureIdx();
+		int[] isCategorical = treePredictor.isCategorical();
 		double[] thresholds = treePredictor.getThreshold();
+		int[] bitsetIdx = treePredictor.getBitsetIdx();
 		int[] missingGoToLeft = treePredictor.getMissingGoToLeft();
 		double[] values = treePredictor.getValues();
+		int[] rawLeftCatBitsets = treePredictor.getRawLeftCatBitsets();
 
-		Node root = encodeNode(0, True.INSTANCE, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, predicateManager, schema);
+		Node root = encodeNode(0, True.INSTANCE, leaf, leftChildren, rightChildren, featureIdx, isCategorical, thresholds, bitsetIdx, missingGoToLeft, values, binMapper, rawLeftCatBitsets, new CategoryManager(), predicateManager, schema);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
@@ -66,48 +76,114 @@ public class TreePredictorUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, double[] thresholds, int[] missingGoToLeft, double[] values, PredicateManager predicateManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, int[] isCategorical, double[] thresholds, int[] bitsetIdx, int[] missingGoToLeft, double[] values, BinMapper binMapper, int[] rawLeftCatBitsets, CategoryManager categoryManager, PredicateManager predicateManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		if(leaf[index] == 0){
 			Feature feature = schema.getFeature(featureIdx[index]);
 
-			double threshold = thresholds[index];
+			CategoryManager leftCategoryManager = categoryManager;
+			CategoryManager rightCategoryManager = categoryManager;
 
 			Predicate leftPredicate;
 			Predicate rightPredicate;
 
 			boolean defaultLeft;
 
-			if(feature instanceof BinaryFeature){
-				BinaryFeature binaryFeature = (BinaryFeature)feature;
+			boolean categorical = ((isCategorical != null) && (isCategorical[index] == 1));
+			if(categorical){
 
-				if(threshold != 0.5d){
+				if(feature instanceof CategoricalFeature){
+					CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+
+					FieldName name = categoricalFeature.getName();
+
+					java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
+
+					int row = bitsetIdx[index];
+
+					// XXX
+					int rawLeftCatBitset = rawLeftCatBitsets[row * 8];
+
+					List<Object> leftValues = new ArrayList<>();
+					List<Object> rightValues = new ArrayList<>();
+
+					for(int i = 0; i < categoricalFeature.size(); i++){
+						Object value = categoricalFeature.getValue(i);
+
+						if(!valueFilter.test(value)){
+							continue;
+						} // End if
+
+						if(((rawLeftCatBitset >> i) & 1) == 1){
+							leftValues.add(value);
+						} else
+
+						{
+							rightValues.add(value);
+						}
+					}
+
+					leftCategoryManager = categoryManager.fork(name, leftValues);
+					rightCategoryManager = categoryManager.fork(name, rightValues);
+
+					if(!leftValues.isEmpty()){
+						leftPredicate = predicateManager.createPredicate(categoricalFeature, leftValues);
+					} else
+
+					{
+						leftPredicate = False.INSTANCE;
+					} // End if
+
+					if(!rightValues.isEmpty()){
+						rightPredicate = predicateManager.createPredicate(categoricalFeature, rightValues);
+					} else
+
+					{
+						rightPredicate = False.INSTANCE;
+					}
+
+					defaultLeft = (missingGoToLeft[index] == 1);
+				} else
+
+				{
 					throw new IllegalArgumentException();
 				}
-
-				Object value = binaryFeature.getValue();
-
-				leftPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.NOT_EQUAL, value);
-				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
-
-				// XXX
-				defaultLeft = true;
 			} else
 
 			{
-				ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.DOUBLE);
+				double threshold = thresholds[index];
 
-				Double value = threshold;
+				if(feature instanceof BinaryFeature){
+					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
-				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
-				rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);
+					if(threshold != 0.5d){
+						throw new IllegalArgumentException();
+					}
 
-				defaultLeft = (missingGoToLeft[index] == 1);
+					Object value = binaryFeature.getValue();
+
+					leftPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.NOT_EQUAL, value);
+					rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
+
+					// XXX
+					defaultLeft = true;
+				} else
+
+				{
+					ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.DOUBLE);
+
+					Double value = threshold;
+
+					leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
+					rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);
+
+					defaultLeft = (missingGoToLeft[index] == 1);
+				}
 			}
 
-			Node leftChild = encodeNode(leftChildren[index], leftPredicate, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, predicateManager, schema);
-			Node rightChild = encodeNode(rightChildren[index], rightPredicate, leaf, leftChildren, rightChildren, featureIdx, thresholds, missingGoToLeft, values, predicateManager, schema);
+			Node leftChild = encodeNode(leftChildren[index], leftPredicate, leaf, leftChildren, rightChildren, featureIdx, isCategorical, thresholds, bitsetIdx, missingGoToLeft, values, binMapper, rawLeftCatBitsets, leftCategoryManager, predicateManager, schema);
+			Node rightChild = encodeNode(rightChildren[index], rightPredicate, leaf, leftChildren, rightChildren, featureIdx, isCategorical, thresholds, bitsetIdx, missingGoToLeft, values, binMapper, rawLeftCatBitsets, rightCategoryManager, predicateManager, schema);
 
 			Node result = new BranchNode(null, predicate)
 				.setId(id)

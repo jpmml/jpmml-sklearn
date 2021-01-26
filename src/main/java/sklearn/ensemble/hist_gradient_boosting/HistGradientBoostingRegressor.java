@@ -33,14 +33,19 @@ public class HistGradientBoostingRegressor extends Regressor {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<List<TreePredictor>> predictors = getPredictors();
 		Number baselinePrediction = getBaselinePrediction();
+		BinMapper binMapper = getBinMapper();
+		List<List<TreePredictor>> predictors = getPredictors();
 
-		return HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, Collections.singletonList(baselinePrediction), 0, schema);
+		return HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, Collections.singletonList(baselinePrediction), 0, schema);
 	}
 
 	public Number getBaselinePrediction(){
 		return getNumber("_baseline_prediction");
+	}
+
+	public BinMapper getBinMapper(){
+		return getOptional("_bin_mapper", BinMapper.class);
 	}
 
 	public List<List<TreePredictor>> getPredictors(){

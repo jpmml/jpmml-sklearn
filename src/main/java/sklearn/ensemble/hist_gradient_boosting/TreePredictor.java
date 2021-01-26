@@ -31,6 +31,16 @@ public class TreePredictor extends PythonObject {
 		super(module, name);
 	}
 
+	public int[] getRawLeftCatBitsets(){
+
+		// SkLearn 0.23
+		if(!containsKey("raw_left_cat_bitsets")){
+			return null;
+		}
+
+		return Ints.toArray(getIntegerArray("raw_left_cat_bitsets"));
+	}
+
 	public double[] getValues(){
 		return Doubles.toArray(getNodeAttribute("value"));
 	}
@@ -44,9 +54,9 @@ public class TreePredictor extends PythonObject {
 	}
 
 	public double[] getThreshold(){
+		List<? extends Number> threshold = getNodeAttribute("threshold");
 
 		// SkLearn 0.23
-		List<? extends Number> threshold = getNodeAttribute("threshold");
 		if(threshold != null){
 			return Doubles.toArray(threshold);
 		}
@@ -73,6 +83,30 @@ public class TreePredictor extends PythonObject {
 
 	public int[] getBinThreshhold(){
 		return Ints.toArray(getNodeAttribute("bin_threshold"));
+	}
+
+	public int[] isCategorical(){
+		List<? extends Number> isCategorical = getNodeAttribute("is_categorical");
+
+		// SkLearn 0.23
+		if(isCategorical == null){
+			return null;
+		}
+
+		// SkLearn 0.24+
+		return Ints.toArray(isCategorical);
+	}
+
+	public int[] getBitsetIdx(){
+		List<? extends Number> bitsetIdx = getNodeAttribute("bitset_idx");
+
+		// SkLearn 0.23
+		if(bitsetIdx == null){
+			return null;
+		}
+
+		// SkLearn 0.24+
+		return Ints.toArray(bitsetIdx);
 	}
 
 	private List<? extends Number> getNodeAttribute(String key){

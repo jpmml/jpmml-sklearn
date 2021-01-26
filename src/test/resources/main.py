@@ -325,7 +325,7 @@ if "Audit" in datasets:
 def build_audit_na_hist(classifier, name):
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
-		[([column], [CategoricalDomain(), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+		[([column], [CategoricalDomain(), PMMLLabelEncoder()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
 	)
 	pipeline = PMMLPipeline([
 		("pipeline", Pipeline([
@@ -342,7 +342,7 @@ def build_audit_na_hist(classifier, name):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit_na_hist(HistGradientBoostingClassifier(max_iter = 71, random_state = 13), "HistGradientBoostingAuditNA")
+	build_audit_na_hist(HistGradientBoostingClassifier(max_iter = 71, categorical_features = [3, 4, 5, 6, 7], random_state = 13), "HistGradientBoostingAuditNA")
 
 versicolor_X, versicolor_y = load_versicolor("Versicolor")
 
@@ -612,7 +612,6 @@ if "Auto" in datasets:
 	build_auto(GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
 	build_auto(GBDTLMRegressor(XGBRFRegressor(n_estimators = 17, max_depth = 6, random_state = 13), ElasticNet(random_state = 13)), "XGBRFLMAuto")
 	build_auto(GradientBoostingRegressor(init = None, random_state = 13), "GradientBoostingAuto")
-	build_auto(HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingAuto")
 	build_auto(HuberRegressor(), "HuberAuto")
 	build_auto(LarsCV(cv = 3), "LarsAuto")
 	build_auto(LassoCV(cv = 3, random_state = 13), "LassoAuto")
@@ -630,6 +629,24 @@ if "Auto" in datasets:
 if "Auto" in datasets:
 	build_auto(TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
 	build_auto(TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedLinearRegressionAuto")
+
+def build_auto_hist(regressor, name):
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
+		[([column], [CategoricalDomain(), OrdinalEncoder()]) for column in ["cylinders", "model_year", "origin"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_X, auto_y)
+	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
+	store_csv(mpg, name)
+
+if "Auto" in datasets:
+	build_auto_hist(HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAuto")
 
 def build_auto_isotonic(regressor, auto_isotonic_X, name):
 	pipeline = PMMLPipeline([
@@ -736,7 +753,7 @@ auto_na_X["origin"] = auto_na_X["origin"].astype("Int64")
 def build_auto_na_hist(regressor, name):
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], [CategoricalDomain(), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+		[([column], [CategoricalDomain(), PMMLLabelEncoder()]) for column in ["cylinders", "model_year", "origin"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -749,7 +766,7 @@ def build_auto_na_hist(regressor, name):
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
-	build_auto_na_hist(HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingAutoNA")
+	build_auto_na_hist(HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAutoNA")
 
 housing_X, housing_y = load_housing("Housing")
 

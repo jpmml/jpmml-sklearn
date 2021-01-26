@@ -39,18 +39,18 @@ public class HistGradientBoostingUtil {
 	}
 
 	static
-	public MiningModel encodeHistGradientBoosting(List<List<TreePredictor>> predictors, List<? extends Number> baselinePredictions, int column, Schema schema){
+	public MiningModel encodeHistGradientBoosting(List<List<TreePredictor>> predictors, BinMapper binMapper, List<? extends Number> baselinePredictions, int column, Schema schema){
 		List<TreePredictor> treePredictors = predictors.stream()
 			.map(predictor -> predictor.get(column))
 			.collect(Collectors.toList());
 
 		Number baselinePrediction = baselinePredictions.get(column);
 
-		return encodeHistGradientBoosting(treePredictors, baselinePrediction, schema);
+		return encodeHistGradientBoosting(treePredictors, binMapper, baselinePrediction, schema);
 	}
 
 	static
-	public MiningModel encodeHistGradientBoosting(List<TreePredictor> treePredictors, Number baselinePrediction, Schema schema){
+	public MiningModel encodeHistGradientBoosting(List<TreePredictor> treePredictors, BinMapper binMapper, Number baselinePrediction, Schema schema){
 		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
 		PredicateManager predicateManager = new PredicateManager();
@@ -60,7 +60,7 @@ public class HistGradientBoostingUtil {
 		List<TreeModel> treeModels = new ArrayList<>();
 
 		for(TreePredictor treePredictor : treePredictors){
-			TreeModel treeModel = TreePredictorUtil.encodeTreeModel(treePredictor, predicateManager, segmentSchema);
+			TreeModel treeModel = TreePredictorUtil.encodeTreeModel(treePredictor, binMapper, predicateManager, segmentSchema);
 
 			treeModels.add(treeModel);
 		}
