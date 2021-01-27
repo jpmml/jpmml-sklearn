@@ -179,6 +179,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
     * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
     * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRegressor)
+  * [Mlxtend](https://github.com/rasbt/mlxtend):
+    * [`mlxtend.preprocessing.DenseTransformer`](http://rasbt.github.io/mlxtend/user_guide/preprocessing/DenseTransformer/)
   * [SkLearn2PMML](https://github.com/jpmml/sklearn2pmml):
     * `sklearn2pmml.EstimatorProxy`
     * `sklearn2pmml.SelectorProxy`
