@@ -21,6 +21,7 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BaseNFeature;
@@ -29,9 +30,12 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
+import org.jpmml.sklearn.MissingValueFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.MultiTransformer;
 
@@ -64,7 +68,7 @@ public class MultiOneHotEncoder extends MultiTransformer {
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
-			List<?> featureCategories = categories.get(i);
+			List<Object> featureCategories = new ArrayList<>(categories.get(i));
 
 			if(feature instanceof BaseNFeature){
 				BaseNFeature baseFeature = (BaseNFeature)feature;
@@ -80,9 +84,18 @@ public class MultiOneHotEncoder extends MultiTransformer {
 			if(feature instanceof CategoricalFeature){
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-				ClassDictUtil.checkSize(featureCategories, categoricalFeature.getValues());
+				if(EncoderUtil.hasNaNCategory(featureCategories)){
+					ClassDictUtil.checkSize(EncoderUtil.dropNaNCategory(featureCategories), categoricalFeature.getValues());
 
-				featureCategories = categoricalFeature.getValues();
+					featureCategories = new ArrayList<>(categoricalFeature.getValues());
+					featureCategories.add(Double.NaN);
+				} else
+
+				{
+					ClassDictUtil.checkSize(featureCategories, categoricalFeature.getValues());
+
+					featureCategories = new ArrayList<>(categoricalFeature.getValues());
+				}
 			} else
 
 			if(feature instanceof ObjectFeature){
@@ -92,7 +105,22 @@ public class MultiOneHotEncoder extends MultiTransformer {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				feature = wildcardFeature.toCategoricalFeature(featureCategories);
+				if(EncoderUtil.hasNaNCategory(featureCategories)){
+					feature = wildcardFeature.toCategoricalFeature(EncoderUtil.dropNaNCategory(featureCategories));
+				} else
+
+				{
+					feature = wildcardFeature.toCategoricalFeature(featureCategories);
+				}
+
+				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+
+				DataType dataType = TypeUtil.getDataType(categoricalFeature.getValues(), DataType.STRING);
+
+				DataField dataField = (DataField)categoricalFeature.getField();
+				if(!(dataField.getDataType()).equals(dataType)){
+					dataField.setDataType(dataType);
+				}
 			} else
 
 			{
@@ -103,14 +131,19 @@ public class MultiOneHotEncoder extends MultiTransformer {
 				// Unbox to primitive value in order to ensure correct List#remove(int) vs. List#remove(Object) method resolution
 				int index = dropIdx.get(i);
 
-				featureCategories = new ArrayList<>(featureCategories);
 				featureCategories.remove(index);
 			}
 
 			for(int j = 0; j < featureCategories.size(); j++){
 				Object featureCategory = featureCategories.get(j);
 
-				result.add(new BinaryFeature(encoder, feature, featureCategory));
+				if(ValueUtil.isNaN(featureCategory)){
+					result.add(new MissingValueFeature(encoder, feature));
+				} else
+
+				{
+					result.add(new BinaryFeature(encoder, feature, featureCategory));
+				}
 			}
 		}
 

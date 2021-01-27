@@ -302,10 +302,7 @@ def build_audit_na(classifier, name, with_proba = True, fit_params = {}, predict
 	], predict_transformer = predict_transformer, predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
 	pipeline.fit(audit_na_X, audit_na_y, **fit_params)
 	pipeline.configure(**pmml_options)
-	if isinstance(classifier, XGBClassifier):
-		pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
-	else:
-		pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
+	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X, **predict_params), columns = ["Adjusted"])
 	if with_proba == True:
@@ -320,7 +317,26 @@ def build_audit_na(classifier, name, with_proba = True, fit_params = {}, predict
 if "Audit" in datasets:
 	build_audit_na(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(LogisticRegression(multi_class = "ovr", solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
-	build_audit_na(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAuditNA", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, predict_transformer = Alias(ExpressionTransformer("X[0]"), name = "eval(Adjusted)", prefit = True), ntree_limit = 71)
+
+def build_audit_na_direct(classifier, name):
+	mapper = DataFrameMapper([
+		(["Age", "Hours", "Income"], None),
+		(["Employment", "Education", "Marital", "Occupation", "Gender"], OneHotEncoder())
+	])
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_na_X, audit_na_y)
+	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	store_pkl(pipeline, name)
+	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
+if "Audit" in datasets:
+	build_audit_na_direct(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAuditNA")
 
 def build_audit_na_hist(classifier, name):
 	mapper = DataFrameMapper(

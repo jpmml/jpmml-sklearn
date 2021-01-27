@@ -32,6 +32,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -89,6 +90,28 @@ public class EncoderUtil {
 		};
 
 		return result;
+	}
+
+	static
+	public boolean hasNaNCategory(List<?> categories){
+
+		if(!categories.isEmpty()){
+			Object lastCategory = categories.get(categories.size() - 1);
+
+			return ValueUtil.isNaN(lastCategory);
+		}
+
+		return false;
+	}
+
+	static
+	public List<?> dropNaNCategory(List<?> categories){
+
+		if(hasNaNCategory(categories)){
+			return categories.subList(0, categories.size() - 1);
+		}
+
+		return categories;
 	}
 
 	static
