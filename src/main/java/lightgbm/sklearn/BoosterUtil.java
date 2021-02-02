@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.HasLightGBMOptions;
@@ -54,9 +55,13 @@ public class BoosterUtil {
 		options.put(HasLightGBMOptions.OPTION_COMPACT, compact);
 		options.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);
 
+		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
+
 		Schema lgbmSchema = gbdt.toLightGBMSchema(schema);
 
 		MiningModel miningModel = gbdt.encodeMiningModel(options, lgbmSchema);
+
+		encoder.transferFeatureImportances(miningModel);
 
 		return miningModel;
 	}

@@ -36,6 +36,7 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
@@ -162,6 +163,7 @@ public class GBDTUtil {
 			treeModelVisitor.applyTo(treeModel);
 		}
 
+		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 
 		ContinuousLabel continuousLabel;
@@ -177,6 +179,8 @@ public class GBDTUtil {
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
 			.setTargets(ModelUtil.createRescaleTargets(null, intercept, continuousLabel));
+
+		encoder.transferFeatureImportances(model, miningModel);
 
 		return miningModel;
 	}

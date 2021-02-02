@@ -20,11 +20,12 @@ package sklearn.feature_extraction.text;
 
 import java.util.List;
 
+import collections.Callable;
 import org.dmg.pmml.TextIndex;
 import org.jpmml.python.PythonObject;
 
 abstract
-public class Tokenizer extends PythonObject {
+public class Tokenizer extends PythonObject implements Callable {
 
 	public Tokenizer(String module, String name){
 		super(module, name);
