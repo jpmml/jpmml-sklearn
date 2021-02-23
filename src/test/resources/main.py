@@ -336,7 +336,7 @@ def build_audit_na_direct(classifier, name):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit_na_direct(XGBClassifier(objective = "binary:logistic", random_state = 13), "XGBAuditNA")
+	build_audit_na_direct(XGBClassifier(objective = "binary:logistic", use_label_encoder = False, random_state = 13), "XGBAuditNA")
 
 def build_audit_na_hist(classifier, name):
 	mapper = DataFrameMapper(

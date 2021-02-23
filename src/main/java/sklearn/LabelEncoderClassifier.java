@@ -33,10 +33,14 @@ public class LabelEncoderClassifier extends Classifier {
 	public List<?> getClasses(){
 		LabelEncoder labelEncoder = getLabelEncoder();
 
-		return labelEncoder.getClasses();
+		if(labelEncoder != null){
+			return labelEncoder.getClasses();
+		}
+
+		return super.getClasses();
 	}
 
 	public LabelEncoder getLabelEncoder(){
-		return get("_le", LabelEncoder.class);
+		return getOptional("_le", LabelEncoder.class);
 	}
 }
