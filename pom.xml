@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator-testing</artifactId>
-			<version>1.5.11</version>
+			<version>1.5.14</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
