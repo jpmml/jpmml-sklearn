@@ -880,7 +880,11 @@ def build_ocsvm_housing(svm, name):
 	])
 	pipeline = Pipeline([
 		("mapper", mapper),
-		("scaler", MaxAbsScaler()),
+		("transformer-pipeline", Pipeline([
+			("none-transformer", None),
+			("scaler", MaxAbsScaler()),
+			("none-final-estimator", None)
+		])),
 		("estimator", svm)
 	])
 	pipeline.fit(housing_X)

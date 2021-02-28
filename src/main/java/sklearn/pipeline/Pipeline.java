@@ -29,6 +29,7 @@ import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
 import sklearn.Composite;
 import sklearn.Estimator;
+import sklearn.None;
 import sklearn.PassThrough;
 import sklearn.Regressor;
 import sklearn.Transformer;
@@ -95,6 +96,10 @@ public class Pipeline extends Composite implements Castable {
 
 			@Override
 			public Transformer apply(Object object){
+
+				if(object == null){
+					return None.INSTANCE;
+				} else
 
 				if(("passthrough").equals(object)){
 					return PassThrough.INSTANCE;
