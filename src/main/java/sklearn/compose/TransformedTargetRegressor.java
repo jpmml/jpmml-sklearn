@@ -20,8 +20,7 @@ package sklearn.compose;
 
 import java.util.Collections;
 
-import numpy.core.UFunc;
-import numpy.core.UFuncUtil;
+import numpy.core.FunctionUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
@@ -36,6 +35,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.Identifiable;
 import sklearn.Regressor;
 import sklearn.preprocessing.FunctionTransformer;
 
@@ -50,8 +50,8 @@ public class TransformedTargetRegressor extends Regressor {
 		Regressor regressor = getRegressor();
 		FunctionTransformer transformer = getTransformer();
 
-		UFunc func = transformer.getFunc();
-		UFunc inverseFunc = transformer.getInverseFunc();
+		Identifiable func = transformer.getFunc();
+		Identifiable inverseFunc = transformer.getInverseFunc();
 
 		if(inverseFunc == null){
 			return regressor.encode(schema);
@@ -68,7 +68,7 @@ public class TransformedTargetRegressor extends Regressor {
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return UFuncUtil.encodeUFunc(inverseFunc, Collections.singletonList(fieldRef));
+				return FunctionUtil.encodeFunction(inverseFunc, Collections.singletonList(fieldRef));
 			}
 		};
 

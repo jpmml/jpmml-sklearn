@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import numpy.core.UFunc;
-import numpy.core.UFuncUtil;
+import numpy.core.FunctionUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.Identifiable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -41,7 +41,7 @@ public class FunctionTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		UFunc func = getFunc();
+		Identifiable func = getFunc();
 
 		if(func == null){
 			return features;
@@ -54,7 +54,7 @@ public class FunctionTransformer extends Transformer {
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-			Expression expression = UFuncUtil.encodeUFunc(func, Collections.singletonList(continuousFeature.ref()));
+			Expression expression = FunctionUtil.encodeFunction(func, Collections.singletonList(continuousFeature.ref()));
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName(func.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, expression);
 
@@ -64,11 +64,11 @@ public class FunctionTransformer extends Transformer {
 		return result;
 	}
 
-	public UFunc getFunc(){
-		return getOptional("func", UFunc.class);
+	public Identifiable getFunc(){
+		return getOptional("func", Identifiable.class);
 	}
 
-	public UFunc getInverseFunc(){
-		return getOptional("inverse_func", UFunc.class);
+	public Identifiable getInverseFunc(){
+		return getOptional("inverse_func", Identifiable.class);
 	}
 }
