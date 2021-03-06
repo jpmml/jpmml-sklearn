@@ -99,19 +99,7 @@ public class LookupTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("lookup", features), OpType.CATEGORICAL, dataType, mapValues);
 
-		Feature feature = new ObjectFeature(encoder, derivedField){
-
-			@Override
-			public ContinuousFeature toContinuousFeature(){
-				PMMLEncoder encoder = getEncoder();
-
-				DerivedField derivedField = (DerivedField)encoder.toContinuous(getName());
-
-				return new ContinuousFeature(encoder, derivedField);
-			}
-		};
-
-		return Collections.singletonList(feature);
+		return Collections.singletonList(createObjectFeature(derivedField, encoder));
 	}
 
 	protected List<String> formatColumns(List<Feature> features){
@@ -156,5 +144,20 @@ public class LookupTransformer extends Transformer {
 
 	public Object getDefaultValue(){
 		return getOptionalScalar("default_value");
+	}
+
+	static
+	protected ObjectFeature createObjectFeature(DerivedField derivedField, SkLearnEncoder encoder){
+		return new ObjectFeature(encoder, derivedField){
+
+			@Override
+			public ContinuousFeature toContinuousFeature(){
+				PMMLEncoder encoder = getEncoder();
+
+				DerivedField derivedField = (DerivedField)encoder.toContinuous(getName());
+
+				return new ContinuousFeature(encoder, derivedField);
+			}
+		};
 	}
 }

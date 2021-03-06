@@ -37,7 +37,7 @@ from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirst
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
+from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
 from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
@@ -201,11 +201,14 @@ if "Audit" in datasets:
 audit_X, audit_y = load_audit("Audit")
 
 def build_audit_cat(classifier, name, with_proba = True, fit_params = {}):
+	marital_mapping = {
+		"Married-spouse-absent" : "Married"
+	}
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain(display_name = column)) for column in ["Age", "Income"]] +
 		[(["Hours"], [ContinuousDomain(display_name = "Hours"), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = False, right = False, include_lowest = True)])] +
 		[(["Employment", "Education"], [MultiDomain([CategoricalDomain(display_name = "Employment"), CategoricalDomain(display_name = "Education")]), OrdinalEncoder(dtype = numpy.int_)])] +
-		[(["Marital"], [CategoricalDomain(display_name = "Marital"), OrdinalEncoder(dtype = numpy.uint16)])] +
+		[(["Marital"], [CategoricalDomain(display_name = "Marital"), FilterLookupTransformer(marital_mapping), OrdinalEncoder(dtype = numpy.uint16)])] +
 		[(["Occupation"], [CategoricalDomain(display_name = "Occupation"), OrdinalEncoder(dtype = numpy.float_)])] +
 		[([column], [CategoricalDomain(display_name = column), LabelEncoder()]) for column in ["Gender", "Deductions"]]
 	)

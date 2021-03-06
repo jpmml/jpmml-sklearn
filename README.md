@@ -219,6 +219,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Numpy universal functions.
       * String functions `lower`, `upper` and `strip`.
       * String length function `len(<str>)`
+    * `sklearn2pmml.preprocessing.FilterLookupTransformer`
     * `sklearn2pmml.preprocessing.IdentityTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
@@ -325,8 +326,8 @@ from sklearn.pipeline import Pipeline
 from sklearn2pmml import SelectorProxy
 
 table_preprocessor = Pipeline([
-	("pca", PCA(n_components = 3)),
-	("selector", SelectorProxy(SelectKBest(k = 2)))
+    ("pca", PCA(n_components = 3)),
+    ("selector", SelectorProxy(SelectKBest(k = 2)))
 ])
 ```
 
