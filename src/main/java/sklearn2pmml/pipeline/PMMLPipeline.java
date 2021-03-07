@@ -35,6 +35,7 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Extension;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Header;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -106,6 +107,7 @@ public class PMMLPipeline extends Pipeline {
 			estimator = getFinalEstimator();
 		}
 
+		Map<?, ?> header = getHeader();
 		Transformer predictTransformer = getPredictTransformer();
 		Transformer predictProbaTransformer = getPredictProbaTransformer();
 		Transformer applyTransformer = getApplyTransformer();
@@ -223,7 +225,7 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		if(estimator == null){
-			return encodePMML(null, repr, encoder);
+			return encodePMML(header, null, repr, encoder);
 		}
 
 		StepUtil.checkNumberOfFeatures(estimator, features);
@@ -382,11 +384,19 @@ public class PMMLPipeline extends Pipeline {
 			model.setModelVerification(ModelUtil.createModelVerification(data));
 		}
 
-		return encodePMML(model, repr, encoder);
+		return encodePMML(header, model, repr, encoder);
 	}
 
-	private PMML encodePMML(Model model, String repr, SkLearnEncoder encoder){
+	private PMML encodePMML(Map<?, ?> header, Model model, String repr, SkLearnEncoder encoder){
 		PMML pmml = encoder.encodePMML(model);
+
+		if(header != null){
+			Header pmmlHeader = pmml.getHeader();
+
+			pmmlHeader.setCopyright((String)header.get("copyright"));
+			pmmlHeader.setDescription((String)header.get("description"));
+			pmmlHeader.setModelVersion((String)header.get("modelVersion"));
+		} // End if
 
 		if(repr != null){
 			Extension extension = new Extension()
@@ -440,6 +450,10 @@ public class PMMLPipeline extends Pipeline {
 		put("steps", steps);
 
 		return this;
+	}
+
+	public Map<?, ?> getHeader(){
+		return getOptional("header", Map.class);
 	}
 
 	public Transformer getPredictTransformer(){

@@ -258,10 +258,15 @@ if "Audit" in datasets and with_h2o:
 audit_dict_X = audit_X.to_dict("records")
 
 def build_audit_dict(classifier, name, with_proba = True):
+	header = {
+		"copyright" : "Copyright (c) 2021 Villu Ruusmann",
+		"description" : "Integration test for dictionary (key-value mappings) input",
+		"modelVersion" : "1.0.0"
+	}
 	pipeline = PMMLPipeline([
 		("dict-transformer", DictVectorizer()),
 		("classifier", classifier)
-	])
+	], header = header)
 	pipeline.fit(audit_dict_X, audit_y)
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_dict_X), columns = ["Adjusted"])
