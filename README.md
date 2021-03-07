@@ -187,8 +187,10 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.decoration.Alias`
     * `sklearn2pmml.decoration.CategoricalDomain`
     * `sklearn2pmml.decoration.ContinuousDomain`
+    * `sklearn2pmml.decoration.ContinuousDomainEraser`
     * `sklearn2pmml.decoration.DateDomain`
     * `sklearn2pmml.decoration.DateTimeDomain`
+    * `sklearn2pmml.decoration.DiscreteDomainEraser`
     * `sklearn2pmml.decoration.MultiDomain`
     * `sklearn2pmml.decoration.OrdinalDomain`
     * `sklearn2pmml.ensemble.GBDTLMRegressor`

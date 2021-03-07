@@ -32,7 +32,7 @@ from sklearn.preprocessing import Binarizer, FunctionTransformer, LabelBinarizer
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import EstimatorProxy, SelectorProxy
-from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiDomain
+from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, ContinuousDomainEraser, DiscreteDomainEraser, MultiDomain
 from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirstClassifier
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
@@ -300,8 +300,8 @@ def build_audit_na(classifier, name, with_proba = True, fit_params = {}, predict
 		[(["Age"], MissingIndicator())] +
 		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else X[0]"), name = "flag_missing(Hours, -999)"), SimpleImputer(missing_values = -999, add_indicator = True)])] +
 		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False), SimpleImputer(strategy = "median", add_indicator = True)])] +
-		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(missing_values = None), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()])] +
-		[([column], [CategoricalDomain(missing_values = None, missing_value_replacement = "N/A", with_data = False), SimpleImputer(missing_values = "N/A", strategy = "most_frequent"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer()]) for column in ["Education", "Marital", "Occupation"]] +
+		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(missing_values = None), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()])] +
+		[([column], [CategoricalDomain(missing_values = None, missing_value_replacement = "N/A", with_data = False), SimpleImputer(missing_values = "N/A", strategy = "most_frequent"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()]) for column in ["Education", "Marital", "Occupation"]] +
 		[(["Gender"], [CategoricalDomain(missing_values = None, with_data = False), SimpleImputer(strategy = "constant"), StringNormalizer(function = "uppercase"), LookupTransformer(gender_mapping, None)])]
 	)
 	pipeline = PMMLPipeline([
