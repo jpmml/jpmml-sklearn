@@ -91,6 +91,13 @@ public class Estimator extends Step {
 			}
 		}
 
+		String algorithmName = model.getAlgorithmName();
+		if(algorithmName == null){
+			String pyClassName = getClassName();
+
+			model.setAlgorithmName(pyClassName);
+		}
+
 		addFeatureImportances(model, schema);
 
 		return model;
