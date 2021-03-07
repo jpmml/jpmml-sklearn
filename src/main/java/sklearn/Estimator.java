@@ -82,6 +82,15 @@ public class Estimator extends Step {
 	public Model encode(Schema schema){
 		Model model = encodeModel(schema);
 
+		String modelName = model.getModelName();
+		if(modelName == null){
+			String pmmlName = getPMMLName();
+
+			if(pmmlName != null){
+				model.setModelName(pmmlName);
+			}
+		}
+
 		addFeatureImportances(model, schema);
 
 		return model;
