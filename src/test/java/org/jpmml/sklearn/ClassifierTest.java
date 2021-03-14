@@ -401,7 +401,7 @@ public class ClassifierTest extends SkLearnTest {
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", "Iris", new FloatEquivalence(8));
+		evaluate("XGB", "Iris", new FloatEquivalence(12));
 	}
 
 	@Test

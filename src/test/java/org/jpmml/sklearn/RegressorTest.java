@@ -192,12 +192,12 @@ public class RegressorTest extends SkLearnTest {
 
 	@Test
 	public void evaluateXGBAuto() throws Exception {
-		evaluate("XGB", "Auto", new FloatEquivalence(1));
+		evaluate("XGB", "Auto", new FloatEquivalence(4));
 	}
 
 	@Test
 	public void evaluateXGBRFAuto() throws Exception {
-		evaluate("XGBRF", "Auto", new FloatEquivalence(1));
+		evaluate("XGBRF", "Auto", new FloatEquivalence(2));
 	}
 
 	@Test

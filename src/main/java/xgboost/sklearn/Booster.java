@@ -49,7 +49,7 @@ public class Booster extends PythonObject {
 		byte[] handle = getHandle();
 
 		try(InputStream is = new ByteArrayInputStream(handle)){
-			return XGBoostUtil.loadLearner(is, byteOrder, charset);
+			return XGBoostUtil.loadLearner(is, byteOrder, charset, "$.Model");
 		} catch(IOException ioe){
 			throw new RuntimeException(ioe);
 		}

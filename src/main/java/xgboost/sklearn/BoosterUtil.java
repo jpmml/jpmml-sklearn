@@ -38,7 +38,7 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasXGBoostOptions> int getNumberOfFeatures(E estimator){
 		Learner learner = getLearner(estimator);
 
-		return learner.num_features();
+		return learner.num_feature();
 	}
 
 	static
