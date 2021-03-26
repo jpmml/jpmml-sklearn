@@ -112,12 +112,12 @@ public class OrdinalEncoder extends CategoryEncoder {
 
 	static
 	public Map<Object, Integer> getCategoryMapping(Mapping mapping){
-		SingleBlockManager mappingData = (mapping.getMapping(Series.class)).getData();
+		SingleBlockManager blockManager = (mapping.getMapping(Series.class)).getBlockManager();
 
-		Index blockItem = mappingData.getOnlyBlockItem();
+		Index blockItem = blockManager.getOnlyBlockItem();
 		List<?> categories = (blockItem.getData()).getData();
 
-		HasArray blockValue = mappingData.getOnlyBlockValue();
+		HasArray blockValue = blockManager.getOnlyBlockValue();
 		List<Integer> indices = ValueUtil.asIntegers((List)blockValue.getArrayContent());
 
 		ClassDictUtil.checkSize(categories, indices);
