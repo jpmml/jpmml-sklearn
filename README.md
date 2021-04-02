@@ -141,19 +141,19 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`tree.ExtraTreeClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html)
     * [`tree.ExtraTreeRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
 * Supported third-party Estimator and Transformer types:
-  * [Category Encoders](http://contrib.scikit-learn.org/category_encoders/):
-    * [`category_encoders.BaseNEncoder`](http://contrib.scikit-learn.org/category_encoders/basen.html)
-    * [`category_encoders.BinaryEncoder`](http://contrib.scikit-learn.org/category_encoders/binary.html)
-    * [`category_encoders.CountEncoder`](http://contrib.scikit-learn.org/category_encoders/count.html)
-    * [`category_encoders.OrdinalEncoder`](http://contrib.scikit-learn.org/category_encoders/ordinal.html)
-    * [`category_encoders.TargetEncoder`](http://contrib.scikit-learn.org/category_encoders/targetencoder.html)
-    * [`category_encoders.WOEEncoder`](http://contrib.scikit-learn.org/category_encoders/woe.html)
+  * [Category Encoders](https://contrib.scikit-learn.org/category_encoders/):
+    * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
+    * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
+    * [`category_encoders.CountEncoder`](https://contrib.scikit-learn.org/category_encoders/count.html)
+    * [`category_encoders.OrdinalEncoder`](https://contrib.scikit-learn.org/category_encoders/ordinal.html)
+    * [`category_encoders.TargetEncoder`](https://contrib.scikit-learn.org/category_encoders/targetencoder.html)
+    * [`category_encoders.WOEEncoder`](https://contrib.scikit-learn.org/category_encoders/woe.html)
   * [H2O.ai](https://www.h2o.ai/):
-    * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
-    * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
-    * [`h2o.estimators.isolation_forest.H2OIsolationForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oisolationforestestimator)
-    * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
-    * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
+    * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
+    * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
+    * [`h2o.estimators.isolation_forest.H2OIsolationForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oisolationforestestimator)
+    * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
+    * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
   * [Imbalanced-Learn (imblearn)](https://github.com/scikit-learn-contrib/imbalanced-learn):
     * [`imblearn.combine.SMOTEENN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTEENN.html)
     * [`imblearn.combine.SMOTETomek`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTETomek.html)
@@ -183,7 +183,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
     * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRegressor)
   * [Mlxtend](https://github.com/rasbt/mlxtend):
-    * [`mlxtend.preprocessing.DenseTransformer`](http://rasbt.github.io/mlxtend/user_guide/preprocessing/DenseTransformer/)
+    * [`mlxtend.preprocessing.DenseTransformer`](https://rasbt.github.io/mlxtend/user_guide/preprocessing/DenseTransformer/)
   * [SkLearn2PMML](https://github.com/jpmml/sklearn2pmml):
     * `sklearn2pmml.EstimatorProxy`
     * `sklearn2pmml.SelectorProxy`
