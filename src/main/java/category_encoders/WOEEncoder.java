@@ -35,37 +35,16 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
 
-public class TargetEncoder extends CategoryEncoder {
+public class WOEEncoder extends CategoryEncoder {
 
-	public TargetEncoder(String module, String name){
+	public WOEEncoder(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Boolean dropInvariant = getDropInvariant();
-		String handleMissing = getHandleMissing();
-		String handleUnknown = getHandleUnknown();
 		Map<Integer, Series> mapping = getMapping();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
-
-		if(dropInvariant){
-			throw new IllegalArgumentException();
-		}
-
-		switch(handleMissing){
-			case "value":
-				break;
-			default:
-				throw new IllegalArgumentException(handleMissing);
-		} // End switch
-
-		switch(handleUnknown){
-			case "value":
-				break;
-			default:
-				throw new IllegalArgumentException(handleUnknown);
-		}
 
 		List<OrdinalEncoder.Mapping> ordinalMappings = ordinalEncoder.getMapping();
 
@@ -84,32 +63,32 @@ public class TargetEncoder extends CategoryEncoder {
 
 			Series series = mapping.get((Integer)i);
 
-			Map<Integer, Double> targetMappings = CategoryEncoderUtil.toMap(series, key -> ValueUtil.asInt((Number)key), ValueUtil::asDouble);
+			Map<Integer, Double> woeMappings = CategoryEncoderUtil.toMap(series, key -> ValueUtil.asInt((Number)key), ValueUtil::asDouble);
 
-			Map<?, Double> categoryMeans = CategoryEncoderUtil.toCategoryValueMap(ordinalCategoryMappings, targetMappings);
+			Map<?, Double> categoryScores = CategoryEncoderUtil.toCategoryValueMap(ordinalCategoryMappings, woeMappings);
 
 			List<Object> categories = new ArrayList<>();
-			categories.addAll(categoryMeans.keySet());
+			categories.addAll(categoryScores.keySet());
 
 			encoder.toCategorical(feature.getName(), categories);
 
-			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categoryMeans);
+			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categoryScores);
 
-			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("target", feature), OpType.CATEGORICAL, DataType.DOUBLE, mapValues);
+			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("woe", feature), OpType.CATEGORICAL, DataType.DOUBLE, mapValues);
 
-			result.add(new ThresholdFeature(encoder, derivedField, categoryMeans));
+			result.add(new ThresholdFeature(encoder, derivedField, categoryScores));
 		}
 
 		return result;
-	}
-
-	public OrdinalEncoder getOrdinalEncoder(){
-		return get("ordinal_encoder", OrdinalEncoder.class);
 	}
 
 	public Map<Integer, Series> getMapping(){
 		Map<?, ?> mapping = get("mapping", Map.class);
 
 		return CategoryEncoderUtil.toTransformedMap(mapping, key -> ValueUtil.asInteger((Number)ScalarUtil.decode(key)), value -> (Series)value);
+	}
+
+	public OrdinalEncoder getOrdinalEncoder(){
+		return get("ordinal_encoder", OrdinalEncoder.class);
 	}
 }

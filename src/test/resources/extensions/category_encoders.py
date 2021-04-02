@@ -1,6 +1,6 @@
 from common import *
 
-from category_encoders import BaseNEncoder, BinaryEncoder, CountEncoder, OrdinalEncoder, TargetEncoder
+from category_encoders import BaseNEncoder, BinaryEncoder, CountEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.ensemble import RandomForestClassifier
@@ -87,3 +87,12 @@ mapper = DataFrameMapper([
 classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
 
 build_audit(mapper, classifier, "TargetEncoderAudit", compact = False)
+
+mapper = DataFrameMapper([
+	(cat_cols, WOEEncoder()),
+	(cont_cols, None)
+])
+
+classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
+
+build_audit(mapper, classifier, "WOEEncoderAudit", compact = False)

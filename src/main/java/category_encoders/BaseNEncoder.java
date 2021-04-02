@@ -43,9 +43,9 @@ public class BaseNEncoder extends CategoryEncoder {
 		Integer base = getBase();
 		List<String> dropCols = null;
 		Boolean dropInvariant = getDropInvariant();
-		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();
+		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 
 		if(base < 2 || base > 36){
 			throw new IllegalArgumentException(Integer.toString(base));

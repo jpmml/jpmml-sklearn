@@ -60,6 +60,11 @@ public class CategoryEncodersTest extends SkLearnTest {
 		evaluate("TargetEncoder", "Audit");
 	}
 
+	@Test
+	public void evaluateWOEEncoderAudit() throws Exception {
+		evaluate("WOEEncoder", "Audit");
+	}
+
 	private static final FieldName falseProbabilityField = FieldNameUtil.create("probability", "0");
 	private static final FieldName trueProbabilityField = FieldNameUtil.create("probability", "1");
 }
