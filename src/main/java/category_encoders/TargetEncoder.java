@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Villu Ruusmann
+ * Copyright (c) 2021 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -24,35 +24,35 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.SetMultimap;
-import org.jpmml.converter.BaseNFeature;
+import numpy.core.ScalarUtil;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.MapValues;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pandas.core.Series;
 
-public class BaseNEncoder extends CategoryEncoder {
+public class TargetEncoder extends CategoryEncoder {
 
-	public BaseNEncoder(String module, String name){
+	public TargetEncoder(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Integer base = getBase();
-		List<String> dropCols = null;
 		Boolean dropInvariant = getDropInvariant();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();
-
-		if(base < 2 || base > 36){
-			throw new IllegalArgumentException(Integer.toString(base));
-		} // End if
+		Map<Integer, Series> mapping = getMapping();
 
 		if(dropInvariant){
-			dropCols = getDropCols();
+			throw new IllegalArgumentException();
 		}
 
 		switch(handleMissing){
@@ -84,69 +84,62 @@ public class BaseNEncoder extends CategoryEncoder {
 			// XXX
 			ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_MISSING);
 
-			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base);
+			Series series = mapping.get((Integer)i);
 
-			Map<Object, String> baseCategoryMappings = baseEncodeValues(ordinalCategoryMappings, base, requiredDigits);
+			Map<Integer, Double> targetMappings = (Map)SeriesUtil.toMap(series, index -> ValueUtil.asInt((Number)index), ValueUtil::asDouble);
 
-			List<Feature> baseFeatures = new ArrayList<>();
+			Map<?, Double> categoryMeans = targetEncode(ordinalCategoryMappings, targetMappings);
 
-			for(int pos = 0; pos < requiredDigits; pos++){
-				String col = (String.valueOf(i) + "_" + String.valueOf(pos));
+			List<Object> categories = new ArrayList<>();
+			categories.addAll(categoryMeans.keySet());
 
-				if(dropCols != null && dropCols.contains(col)){
-					continue;
-				}
+			encoder.toCategorical(feature.getName(), categories);
 
-				SetMultimap<Integer, Object> values = LinkedHashMultimap.create();
+			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categoryMeans);
 
-				Collection<Map.Entry<Object, String>> entries = baseCategoryMappings.entrySet();
-				for(Map.Entry<Object, String> entry : entries){
-					Object category = entry.getKey();
-					String baseValue = entry.getValue();
+			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("target", feature), OpType.CATEGORICAL, DataType.DOUBLE, mapValues);
 
-					char digit = baseValue.charAt(pos);
-
-					values.put(Character.getNumericValue(digit), category);
-				}
-
-				baseFeatures.add(new BaseNFeature(encoder, feature, base, pos, values));
-			}
-
-			result.addAll(baseFeatures);
+			result.add(new ThresholdFeature(encoder, derivedField, categoryMeans));
 		}
 
 		return result;
-	}
-
-	public Integer getBase(){
-		return getInteger("base");
 	}
 
 	public OrdinalEncoder getOrdinalEncoder(){
 		return get("ordinal_encoder", OrdinalEncoder.class);
 	}
 
-	static
-	private int calcRequiredDigits(Map<?, Integer> ordinalCategoryMappings, int base){
+	public Map<Integer, Series> getMapping(){
+		Map<?, ?> mapping = get("mapping", Map.class);
 
-		if(base == 1){
-			return ordinalCategoryMappings.size() + 1;
-		} else
+		Map<Integer, Series> result = new LinkedHashMap<>();
 
-		{
-			return (int)Math.ceil(Math.log(ordinalCategoryMappings.size()) / Math.log(base)) + 1;
+		Collection<? extends Map.Entry<?, ?>> entries = mapping.entrySet();
+		for(Map.Entry<?, ?> entry : entries){
+			Integer key = ValueUtil.asInteger((Number)ScalarUtil.decode(entry.getKey()));
+			Series value = (Series)(entry.getValue());
+
+			result.put(key, value);
 		}
+
+		return result;
 	}
 
 	static
-	public Map<Object, String> baseEncodeValues(Map<?, Integer> categoryMappings, int base, int requiredDigits){
-		Map<Object, String> result = new LinkedHashMap<>();
+	public Map<?, Double> targetEncode(Map<?, Integer> categoryMappings, Map<Integer, Double> targetMappings){
+		Map<Object, Double> result = new LinkedHashMap<>();
 
 		Collection<? extends Map.Entry<?, Integer>> entries = categoryMappings.entrySet();
 		for(Map.Entry<?, Integer> entry : entries){
-			String baseValue = Strings.padStart(Integer.toString(entry.getValue(), base), requiredDigits, '0');
+			Object category = entry.getKey();
+			Integer index = entry.getValue();
 
-			result.put(entry.getKey(), baseValue);
+			Double mean = targetMappings.get(index);
+			if(mean == null){
+				throw new IllegalArgumentException();
+			}
+
+			result.put(category, mean);
 		}
 
 		return result;

@@ -19,14 +19,9 @@
 package category_encoders;
 
 import java.util.List;
-import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
-import org.jpmml.python.PythonObject;
 import sklearn.Transformer;
 
 abstract
@@ -60,42 +55,6 @@ public class CategoryEncoder extends Transformer {
 
 	public String getHandleUnknown(){
 		return getString("handle_unknown");
-	}
-
-	public List<Mapping> getMapping(){
-		List<Map<String, ?>> mapping = (List)getList("mapping", Map.class);
-
-		Function<Map<String, ?>, Mapping> function = new Function<Map<String, ?>, Mapping>(){
-
-			@Override
-			public Mapping apply(Map<String, ?> map){
-				Mapping mapping = CategoryEncoder.this.new Mapping("mapping");
-				mapping.putAll(map);
-
-				return mapping;
-			}
-		};
-
-		return Lists.transform(mapping, function);
-	}
-
-	public class Mapping extends PythonObject {
-
-		private Mapping(String name){
-			super(CategoryEncoder.this.getPythonModule() + "." + CategoryEncoder.this.getPythonName(), name);
-		}
-
-		public Integer getCol(){
-			return getInteger("col");
-		}
-
-		public DType getDataType(){
-			return get("data_type", DType.class);
-		}
-
-		public <E extends PythonObject> E getMapping(Class<? extends E> clazz){
-			return get("mapping", clazz);
-		}
 	}
 
 	public static final Object CATEGORY_MISSING = Double.NaN;

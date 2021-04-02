@@ -145,6 +145,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`category_encoders.BaseNEncoder`](http://contrib.scikit-learn.org/category_encoders/basen.html)
     * [`category_encoders.BinaryEncoder`](http://contrib.scikit-learn.org/category_encoders/binary.html)
     * [`category_encoders.OrdinalEncoder`](http://contrib.scikit-learn.org/category_encoders/ordinal.html)
+    * [`category_encoders.TargetEncoder`](http://contrib.scikit-learn.org/category_encoders/targetencoder.html)
   * [H2O.ai](https://www.h2o.ai/):
     * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
     * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](http://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)

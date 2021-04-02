@@ -1,11 +1,12 @@
 from common import *
 
-from category_encoders import BaseNEncoder, BinaryEncoder, OrdinalEncoder
+from category_encoders import BaseNEncoder, BinaryEncoder, OrdinalEncoder, TargetEncoder
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.pipeline import PMMLPipeline
 from xgboost import XGBClassifier
 
@@ -67,3 +68,12 @@ mapper = DataFrameMapper([
 ])
 
 build_audit(mapper, classifier, "BinaryEncoderAudit", compact = False)
+
+mapper = DataFrameMapper([
+	(cat_cols, TargetEncoder()),
+	(cont_cols, None)
+])
+
+classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
+
+build_audit(mapper, classifier, "TargetEncoderAudit", compact = False)

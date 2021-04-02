@@ -19,19 +19,19 @@
 package category_encoders;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
+import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
-import pandas.core.Index;
 import pandas.core.Series;
-import pandas.core.SingleBlockManager;
 import sklearn.preprocessing.EncoderUtil;
 
 public class OrdinalEncoder extends CategoryEncoder {
@@ -59,7 +59,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 			Feature feature = features.get(i);
 			Mapping mapping = mappings.get(i);
 
-			Map<Object, Integer> categoryMappings = getCategoryMapping(mapping);
+			Map<?, Integer> categoryMappings = mapping.getCategoryMapping();
 
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryMappings.keySet());
@@ -110,24 +110,34 @@ public class OrdinalEncoder extends CategoryEncoder {
 		return result;
 	}
 
+	public List<Mapping> getMapping(){
+		List<Map<String, ?>> mapping = (List)getList("mapping", Map.class);
+
+		Function<Map<String, ?>, Mapping> function = new Function<Map<String, ?>, Mapping>(){
+
+			@Override
+			public Mapping apply(Map<String, ?> map){
+				Mapping mapping = new Mapping(getClassName(), "mapping");
+				mapping.putAll(map);
+
+				return mapping;
+			}
+		};
+
+		return Lists.transform(mapping, function);
+	}
+
 	static
-	public Map<Object, Integer> getCategoryMapping(Mapping mapping){
-		SingleBlockManager blockManager = (mapping.getMapping(Series.class)).getBlockManager();
+	public class Mapping extends PythonObject {
 
-		Index blockItem = blockManager.getOnlyBlockItem();
-		List<?> categories = (blockItem.getData()).getData();
-
-		HasArray blockValue = blockManager.getOnlyBlockValue();
-		List<Integer> indices = ValueUtil.asIntegers((List)blockValue.getArrayContent());
-
-		ClassDictUtil.checkSize(categories, indices);
-
-		Map<Object, Integer> result = new LinkedHashMap<>();
-
-		for(int i = 0; i < categories.size(); i++){
-			result.put(categories.get(i), indices.get(i));
+		private Mapping(String module, String name){
+			super(module, name);
 		}
 
-		return result;
+		public Map<?, Integer> getCategoryMapping(){
+			Series mapping = get("mapping", Series.class);
+
+			return SeriesUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
+		}
 	}
 }
