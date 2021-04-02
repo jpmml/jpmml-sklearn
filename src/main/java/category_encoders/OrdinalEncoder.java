@@ -137,7 +137,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 		public Map<?, Integer> getCategoryMapping(){
 			Series mapping = get("mapping", Series.class);
 
-			return SeriesUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
+			return CategoryEncoderUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
 		}
 	}
 }

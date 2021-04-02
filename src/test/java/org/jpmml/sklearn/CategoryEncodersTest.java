@@ -46,6 +46,11 @@ public class CategoryEncodersTest extends SkLearnTest {
 	}
 
 	@Test
+	public void evaluateCountEncoderAudit() throws Exception {
+		evaluate("CountEncoder", "Audit");
+	}
+
+	@Test
 	public void evaluateOrdinalEncoderAudit() throws Exception {
 		evaluate("OrdinalEncoder", "Audit");
 	}

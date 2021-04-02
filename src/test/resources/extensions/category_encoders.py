@@ -1,6 +1,6 @@
 from common import *
 
-from category_encoders import BaseNEncoder, BinaryEncoder, OrdinalEncoder, TargetEncoder
+from category_encoders import BaseNEncoder, BinaryEncoder, CountEncoder, OrdinalEncoder, TargetEncoder
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.ensemble import RandomForestClassifier
@@ -68,6 +68,16 @@ mapper = DataFrameMapper([
 ])
 
 build_audit(mapper, classifier, "BinaryEncoderAudit", compact = False)
+
+mapper = DataFrameMapper([
+	(["Education", "Employment", "Occupation"], CountEncoder(min_group_size = 100)),
+	(["Marital", "Gender"], CountEncoder(normalize = True, min_group_size = 0.05)),
+	(cont_cols, None)
+])
+
+classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
+
+build_audit(mapper, classifier, "CountEncoderAudit", compact = False)
 
 mapper = DataFrameMapper([
 	(cat_cols, TargetEncoder()),

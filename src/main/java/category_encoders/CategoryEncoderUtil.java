@@ -18,6 +18,7 @@
  */
 package category_encoders;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +31,24 @@ import pandas.core.Index;
 import pandas.core.Series;
 import pandas.core.SingleBlockManager;
 
-public class SeriesUtil {
+public class CategoryEncoderUtil {
 
-	private SeriesUtil(){
+	private CategoryEncoderUtil(){
+	}
+
+	static
+	public <K, V> Map<K, V> toTransformedMap(Map<?, ?> map, Function<Object, K> keyFunction, Function<Object, V> valueFunction){
+		Map<K, V> result = new LinkedHashMap<>();
+
+		Collection<? extends Map.Entry<?, ?>> entries = map.entrySet();
+		for(Map.Entry<?, ?> entry : entries){
+			K key = keyFunction.apply(entry.getKey());
+			V value = valueFunction.apply(entry.getValue());
+
+			result.put(key, value);
+		}
+
+		return result;
 	}
 
 	static
@@ -40,7 +56,7 @@ public class SeriesUtil {
 		SingleBlockManager blockManager = series.getBlockManager();
 
 		Index blockItem = blockManager.getOnlyBlockItem();
-		List<K> keys = Lists.transform((List)(blockItem.getData()).getData(), keyFunction);
+		List<K> keys = Lists.transform((List<?>)(blockItem.getData()).getData(), keyFunction);
 
 		HasArray blockValue = blockManager.getOnlyBlockValue();
 		List<V> values = Lists.transform((List<Number>)blockValue.getArrayContent(), valueFunction);

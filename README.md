@@ -144,6 +144,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * [Category Encoders](http://contrib.scikit-learn.org/category_encoders/):
     * [`category_encoders.BaseNEncoder`](http://contrib.scikit-learn.org/category_encoders/basen.html)
     * [`category_encoders.BinaryEncoder`](http://contrib.scikit-learn.org/category_encoders/binary.html)
+    * [`category_encoders.CountEncoder`](http://contrib.scikit-learn.org/category_encoders/count.html)
     * [`category_encoders.OrdinalEncoder`](http://contrib.scikit-learn.org/category_encoders/ordinal.html)
     * [`category_encoders.TargetEncoder`](http://contrib.scikit-learn.org/category_encoders/targetencoder.html)
   * [H2O.ai](https://www.h2o.ai/):

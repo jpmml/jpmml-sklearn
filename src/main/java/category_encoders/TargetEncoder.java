@@ -86,7 +86,7 @@ public class TargetEncoder extends CategoryEncoder {
 
 			Series series = mapping.get((Integer)i);
 
-			Map<Integer, Double> targetMappings = (Map)SeriesUtil.toMap(series, index -> ValueUtil.asInt((Number)index), ValueUtil::asDouble);
+			Map<Integer, Double> targetMappings = CategoryEncoderUtil.toMap(series, key -> ValueUtil.asInt((Number)key), ValueUtil::asDouble);
 
 			Map<?, Double> categoryMeans = targetEncode(ordinalCategoryMappings, targetMappings);
 
@@ -112,17 +112,7 @@ public class TargetEncoder extends CategoryEncoder {
 	public Map<Integer, Series> getMapping(){
 		Map<?, ?> mapping = get("mapping", Map.class);
 
-		Map<Integer, Series> result = new LinkedHashMap<>();
-
-		Collection<? extends Map.Entry<?, ?>> entries = mapping.entrySet();
-		for(Map.Entry<?, ?> entry : entries){
-			Integer key = ValueUtil.asInteger((Number)ScalarUtil.decode(entry.getKey()));
-			Series value = (Series)(entry.getValue());
-
-			result.put(key, value);
-		}
-
-		return result;
+		return CategoryEncoderUtil.toTransformedMap(mapping, key -> ValueUtil.asInteger((Number)ScalarUtil.decode(key)), value -> (Series)value);
 	}
 
 	static
