@@ -37,21 +37,39 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
 
-public class CountEncoder extends CategoryEncoder {
+public class CountEncoder extends MapEncoder {
 
 	public CountEncoder(String module, String name){
 		super(module, name);
 	}
 
 	@Override
+	public String functionName(){
+		return "count";
+	}
+
+	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Boolean dropInvariant = getDropInvariant();
+		String handleMissing = getHandleMissing();
+		String handleUnknown = getHandleUnknown();
 		Boolean normalize = getNormalize();
 		Map<Integer, Series> mapping = getMapping();
 		Map<Integer, Map<Object, String>> minGroupCategories = getMinGroupCategories();
 
 		if(dropInvariant){
 			throw new IllegalArgumentException();
+		}
+
+		switch(handleMissing){
+			case "count":
+				break;
+			default:
+				throw new IllegalArgumentException(handleMissing);
+		}
+
+		if(handleUnknown != null){
+			throw new IllegalArgumentException(handleUnknown);
 		}
 
 		List<Feature> result = new ArrayList<>();
@@ -85,7 +103,7 @@ public class CountEncoder extends CategoryEncoder {
 
 			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categoryCounts);
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("count", feature), OpType.CATEGORICAL, normalize ? DataType.DOUBLE : DataType.INTEGER, mapValues);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName(functionName(), feature), OpType.CATEGORICAL, normalize ? DataType.DOUBLE : DataType.INTEGER, mapValues);
 
 			result.add(new ThresholdFeature(encoder, derivedField, categoryCounts));
 		}
@@ -93,14 +111,13 @@ public class CountEncoder extends CategoryEncoder {
 		return result;
 	}
 
-	public Boolean getNormalize(){
-		return getBoolean("normalize");
+	@Override
+	public String getHandleUnknown(){
+		return getOptionalString("handle_unknown");
 	}
 
-	public Map<Integer, Series> getMapping(){
-		Map<?, ?> mapping = get("mapping", Map.class);
-
-		return CategoryEncoderUtil.toTransformedMap(mapping, key -> ValueUtil.asInteger((Number)ScalarUtil.decode(key)), value -> (Series)value);
+	public Boolean getNormalize(){
+		return getBoolean("normalize");
 	}
 
 	public Map<Integer, Map<Object, String>> getMinGroupCategories(){

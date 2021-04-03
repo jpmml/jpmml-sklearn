@@ -18,7 +18,7 @@
  */
 package category_encoders;
 
-public class WOEEncoder extends MapEncoder {
+public class WOEEncoder extends OrdinalMapEncoder {
 
 	public WOEEncoder(String module, String name){
 		super(module, name);

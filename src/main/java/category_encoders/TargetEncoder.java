@@ -18,7 +18,7 @@
  */
 package category_encoders;
 
-public class TargetEncoder extends MapEncoder {
+public class TargetEncoder extends OrdinalMapEncoder {
 
 	public TargetEncoder(String module, String name){
 		super(module, name);
