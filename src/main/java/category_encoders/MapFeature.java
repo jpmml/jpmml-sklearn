@@ -18,33 +18,64 @@
  */
 package category_encoders;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldName;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.HasDerivedName;
 import org.jpmml.converter.PMMLEncoder;
+import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.model.ToStringHelper;
 
-public class ThresholdFeature extends Feature {
+abstract
+public class MapFeature extends Feature implements HasDerivedName {
 
 	private Map<?, ? extends Number> mapping = null;
 
 
-	public ThresholdFeature(PMMLEncoder encoder, DerivedField derivedField, Map<?, ? extends Number> mapping){
-		super(encoder, derivedField.getName(), derivedField.getDataType());
+	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping){
+		super(encoder, feature.getName(), feature.getDataType());
 
 		setMapping(mapping);
 	}
 
 	@Override
 	public ContinuousFeature toContinuousFeature(){
-		PMMLEncoder encoder = getEncoder();
+		FieldName name = getName();
+		Map<?, ? extends Number> mapping = getMapping();
 
-		DerivedField derivedField = (DerivedField)encoder.toContinuous(getName());
+		Supplier<Expression> expressionSupplier = () -> {
+			return PMMLUtil.createMapValues(name, mapping);
+		};
 
-		return new ContinuousFeature(encoder, derivedField);
+		DataType dataType = TypeUtil.getDataType(mapping.values(), DataType.DOUBLE);
+
+		return toContinuousFeature(getDerivedName(), dataType, expressionSupplier);
+	}
+
+	public Set<?> getValues(Predicate<Number> predicate){
+		Map<?, ? extends Number> mapping = getMapping();
+
+		Set<Object> result = new LinkedHashSet<>();
+
+		Collection<? extends Map.Entry<?, ? extends Number>> entries = mapping.entrySet();
+
+		entries.stream()
+			.filter(entry -> predicate.test(entry.getValue()))
+			.map(entry -> entry.getKey())
+			.forEach(result::add);
+
+		return result;
 	}
 
 	@Override

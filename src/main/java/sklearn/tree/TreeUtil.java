@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import category_encoders.MapFeature;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
@@ -349,6 +350,36 @@ public class TreeUtil {
 				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
 			} else
 
+			if(feature instanceof MapFeature){
+				MapFeature mapFeature = (MapFeature)feature;
+
+				FieldName name = mapFeature.getName();
+
+				java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
+
+				List<Object> leftValues = mapFeature.getValues((Number value) -> (value.doubleValue() <= threshold)).stream()
+					.filter(valueFilter)
+					.collect(Collectors.toList());
+
+				List<Object> rightValues = mapFeature.getValues((Number value) -> (value.doubleValue()) > threshold).stream()
+					.filter(valueFilter)
+					.collect(Collectors.toList());
+
+				if(leftValues.size() == 0){
+					throw new IllegalArgumentException("Left branch not selectable");
+				} // End if
+
+				if(rightValues.size() == 0){
+					throw new IllegalArgumentException("Right branch not selectable");
+				}
+
+				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
+				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
+
+				leftPredicate = predicateManager.createPredicate(mapFeature, leftValues);
+				rightPredicate = predicateManager.createPredicate(mapFeature, rightValues);
+			} else
+
 			{
 				ContinuousFeature continuousFeature = toContinuousFeature(feature);
 
@@ -457,6 +488,12 @@ public class TreeUtil {
 					return binaryFeature;
 				} else
 
+				if(feature instanceof MapFeature){
+					MapFeature mapFeature = (MapFeature)feature;
+
+					return mapFeature;
+				} else
+
 				{
 					ContinuousFeature continuousFeature = feature.toContinuousFeature(dataType);
 
@@ -485,6 +522,12 @@ public class TreeUtil {
 					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
 					return binaryFeature;
+				} else
+
+				if(feature instanceof MapFeature){
+					MapFeature mapFeature = (MapFeature)feature;
+
+					return mapFeature;
 				} else
 
 				{

@@ -27,12 +27,8 @@ import java.util.Set;
 import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import numpy.core.ScalarUtil;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.MapValues;
-import org.dmg.pmml.OpType;
+import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
@@ -101,11 +97,15 @@ public class CountEncoder extends MapEncoder {
 
 			encoder.toCategorical(feature.getName(), categories);
 
-			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categoryCounts);
+			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts){
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName(functionName(), feature), OpType.CATEGORICAL, normalize ? DataType.DOUBLE : DataType.INTEGER, mapValues);
+				@Override
+				public FieldName getDerivedName(){
+					return createFieldName(functionName(), getName());
+				}
+			};
 
-			result.add(new ThresholdFeature(encoder, derivedField, categoryCounts));
+			result.add(mapFeature);
 		}
 
 		return result;

@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
@@ -94,11 +95,15 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 			encoder.toCategorical(feature.getName(), categories);
 
-			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categoryValues);
+			Feature mapFeature = new MapFeature(encoder, feature, categoryValues){
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName(functionName(), feature), OpType.CATEGORICAL, DataType.DOUBLE, mapValues);
+				@Override
+				public FieldName getDerivedName(){
+					return createFieldName(functionName(), getName());
+				}
+			};
 
-			result.add(new ThresholdFeature(encoder, derivedField, categoryValues));
+			result.add(mapFeature);
 		}
 
 		return result;
