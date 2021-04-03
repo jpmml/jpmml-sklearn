@@ -6,6 +6,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
 # Table of Contents #
 
 * [Features](#features)
+  * [Overview](#overview)
+  * [Supported packages](#supported-packages)
 * [Prerequisites](#prerequisites)
   * [The Python side of operations](#the-python-side-of-operations)
   * [The JPMML-SkLearn side of operations](#the-jpmml-sklearn-side-of-operations)
@@ -19,23 +21,49 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
 # Features #
 
-* Supported Estimator and Transformer types:
+### Overview
+
+* Functionality:
+  * Three times more supported Python packages, transformers and estimators than all the competitors combined!
+  * Thorough collection, analysis and encoding of feature information:
+    * Names.
+    * Data and operational types.
+    * Valid, invalid and missing value spaces.
+    * Descriptive statistics.
+  * Pipeline extensions:
+    * Pruning.
+    * Decision engineering (prediction post-processing).
+    * Model verification.
+  * Conversion options.
+* Extensibility:
+  * Rich Java APIs for developing custom converters.
+  * Automatic discovery and registration of custom converters based on `META-INF/sklearn2pmml.properties` resource files.
+  * Direct interfacing with other JPMML conversion libraries such as [JPMML-H2O](https://github.com/jpmml/jpmml-h2o), [JPMML-LightGBM](https://github.com/jpmml/jpmml-lightgbm) and [JPMML-XGBoost](https://github.com/jpmml/jpmml-xgboost).
+* Production quality:
+  * Complete test coverage.
+  * Fully compliant with the [JPMML-Evaluator](https://github.com/jpmml/jpmml-evaluator) library.
+
+### Supported packages
+
+<details>
+  <summary>Scikit-Learn</summary>
+
   * Clustering:
     * [`cluster.KMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
     * [`cluster.MiniBatchKMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html)
-  * Composite Estimators:
+  * Composite estimators:
     * [`compose.ColumnTransformer`](https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html)
     * [`compose.TransformedTargetRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.compose.TransformedTargetRegressor.html)
-  * Matrix Decomposition:
+  * Matrix decomposition:
     * [`decomposition.PCA`](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)
     * [`decomposition.IncrementalPCA`](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.IncrementalPCA.html)
     * [`decomposition.TruncatedSVD`](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html)
-  * Discriminant Analysis:
+  * Discriminant analysis:
     * [`discriminant_analysis.LinearDiscriminantAnalysis`](https://scikit-learn.org/stable/modules/generated/sklearn.discriminant_analysis.LinearDiscriminantAnalysis.html)
   * Dummies:
     * [`dummy.DummyClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html)
     * [`dummy.DummyRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyRegressor.html)
-  * Ensemble Methods:
+  * Ensemble methods:
     * [`ensemble.AdaBoostRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html)
     * [`ensemble.BaggingClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingClassifier.html)
     * [`ensemble.BaggingRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html)
@@ -52,11 +80,11 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`ensemble.StackingRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.StackingRegressor.html)
     * [`ensemble.VotingClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html)
     * [`ensemble.VotingRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingRegressor.html)
-  * Feature Extraction:
+  * Feature extraction:
     * [`feature_extraction.DictVectorizer`](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.DictVectorizer.html)
     * [`feature_extraction.text.CountVectorizer`](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html)
     * [`feature_extraction.text.TfidfVectorizer`](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html)
-  * Feature Selection:
+  * Feature selection:
     * [`feature_selection.GenericUnivariateSelect`](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.GenericUnivariateSelect.html) (only via `sklearn2pmml.SelectorProxy`)
     * [`feature_selection.RFE`](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html) (only via `sklearn2pmml.SelectorProxy`)
     * [`feature_selection.RFECV`](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFECV.html) (only via `sklearn2pmml.SelectorProxy`)
@@ -72,7 +100,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`impute.SimpleImputer`](https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html)
   * Isotonic regression:
     * [`isotonic.IsotonicRegression`](https://scikit-learn.org/stable/modules/generated/sklearn.isotonic.IsotonicRegression.html)
-  * Generalized Linear Models:
+  * Generalized linear models:
     * [`linear_model.ARDRegression`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html)
     * [`linear_model.BayesianRidge`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html)
     * [`linear_model.ElasticNet`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
@@ -98,14 +126,14 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`linear_model.SGDClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html)
     * [`linear_model.SGDRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDRegressor.html)
     * [`linear_model.TheilSenRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html)
-  * Model Selection:
+  * Model selection:
     * [`model_selection.GridSearchCV`](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html)
     * [`model_selection.RandomizedSearchCV`](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.RandomizedSearchCV.html)
   * Multiclass classification:
     * [`multiclass.OneVsRestClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html)
   * Naive Bayes:
     * [`naive_bayes.GaussianNB`](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)
-  * Nearest Neighbors:
+  * Nearest neighbors:
     * [`neighbors.KNeighborsClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html)
     * [`neighbors.KNeighborsRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html)
   * Pipelines:
@@ -114,7 +142,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * Neural network models:
     * [`neural_network.MLPClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html)
     * [`neural_network.MLPRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html)
-  * Preprocessing and Normalization:
+  * Preprocessing and normalization:
     * [`preprocessing.Binarizer`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Binarizer.html)
     * [`preprocessing.FunctionTransformer`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)
     * [`preprocessing.Imputer`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Imputer.html)
@@ -127,7 +155,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`preprocessing.PolynomialFeatures`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PolynomialFeatures.html)
     * [`preprocessing.RobustScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)
     * [`preprocessing.StandardScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
-  * Support Vector Machines:
+  * Support vector machines:
     * [`svm.LinearSVC`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html)
     * [`svm.LinearSVR`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html)
     * [`svm.OneClassSVM`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html)
@@ -135,38 +163,38 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`svm.NuSVC`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVC.html)
     * [`svm.SVR`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
     * [`svm.NuSVR`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html)
-  * Decision Trees:
+  * Decision trees:
     * [`tree.DecisionTreeClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
     * [`tree.DecisionTreeRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html)
     * [`tree.ExtraTreeClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html)
     * [`tree.ExtraTreeRegressor`](https://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeRegressor.html)
-* Supported third-party Estimator and Transformer types:
-  * [Category Encoders](https://contrib.scikit-learn.org/category_encoders/):
-    * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
-    * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
-    * [`category_encoders.CountEncoder`](https://contrib.scikit-learn.org/category_encoders/count.html)
-    * [`category_encoders.OrdinalEncoder`](https://contrib.scikit-learn.org/category_encoders/ordinal.html)
-    * [`category_encoders.TargetEncoder`](https://contrib.scikit-learn.org/category_encoders/targetencoder.html)
-    * [`category_encoders.WOEEncoder`](https://contrib.scikit-learn.org/category_encoders/woe.html)
-  * [H2O.ai](https://www.h2o.ai/):
-    * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
-    * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
-    * [`h2o.estimators.isolation_forest.H2OIsolationForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oisolationforestestimator)
-    * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
-    * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
-  * [Imbalanced-Learn (imblearn)](https://github.com/scikit-learn-contrib/imbalanced-learn):
-    * [`imblearn.combine.SMOTEENN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTEENN.html)
-    * [`imblearn.combine.SMOTETomek`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTETomek.html)
-    * [`imblearn.ensemble.BalancedBaggingClassifier`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.ensemble.BalancedBaggingClassifier.html)
-    * [`imblearn,ensemble,BalancedRandomForestClassifier`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.ensemble.BalancedRandomForestClassifier.html)
-    * [`imblearn.over_sampling.ADASYN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.ADASYN.html)
-    * [`imblearn.over_sampling.BorderlineSMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.BorderlineSMOTE.html)
-    * [`imblearn.over_sampling.KMeansSMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.KMeansSMOTE.html)
-    * [`imblearn.over_sampling.RandomOverSampler`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.RandomOverSampler.html)
-    * [`imblearn.over_sampling.SMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html)
-    * [`imblearn.over_sampling.SMOTENC`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTENC.html)
-    * [`imblearn.over_sampling.SVMSMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SVMSMOTE.html)
-    * [`imblearn.pipeline.Pipeline`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.pipeline.Pipeline.html)
+</details>
+
+<details>
+  <summary>Category Encoders</summary>
+
+  * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
+  * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
+  * [`category_encoders.CountEncoder`](https://contrib.scikit-learn.org/category_encoders/count.html)
+  * [`category_encoders.OrdinalEncoder`](https://contrib.scikit-learn.org/category_encoders/ordinal.html)
+  * [`category_encoders.TargetEncoder`](https://contrib.scikit-learn.org/category_encoders/targetencoder.html)
+  * [`category_encoders.WOEEncoder`](https://contrib.scikit-learn.org/category_encoders/woe.html)
+</details>
+
+<details>
+  <summary>H2O.ai</summary>
+
+  * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
+  * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
+  * [`h2o.estimators.isolation_forest.H2OIsolationForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oisolationforestestimator)
+  * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
+  * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
+</details>
+
+<details>
+  <summary>Imbalanced-Learn</summary>
+
+  * Under-sampling methods:
     * [`imblearn.under_sampling.AllKNN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.AllKNN.html)
     * [`imblearn.under_sampling.ClusterCentroids`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.ClusterCentroids.html)
     * [`imblearn.under_sampling.CondensedNearestNeighbour`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.CondensedNearestNeighbour.html)
@@ -178,15 +206,45 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * [`imblearn.under_sampling.RandomUnderSampler`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.RandomUnderSampler.html)
     * [`imblearn.under_sampling.RepeatedEditedNearestNeighbours`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.RepeatedEditedNearestNeighbours.html)
     * [`imblearn.under_sampling.TomekLinks`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.TomekLinks.html)
-  * [LightGBM](https://github.com/Microsoft/LightGBM):
-    * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
-    * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
-    * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRegressor)
-  * [Mlxtend](https://github.com/rasbt/mlxtend):
-    * [`mlxtend.preprocessing.DenseTransformer`](https://rasbt.github.io/mlxtend/user_guide/preprocessing/DenseTransformer/)
-  * [SkLearn2PMML](https://github.com/jpmml/sklearn2pmml):
+  * Over-sampling methods:
+    * [`imblearn.over_sampling.ADASYN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.ADASYN.html)
+    * [`imblearn.over_sampling.BorderlineSMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.BorderlineSMOTE.html)
+    * [`imblearn.over_sampling.KMeansSMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.KMeansSMOTE.html)
+    * [`imblearn.over_sampling.RandomOverSampler`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.RandomOverSampler.html)
+    * [`imblearn.over_sampling.SMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html)
+    * [`imblearn.over_sampling.SMOTENC`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTENC.html)
+    * [`imblearn.over_sampling.SVMSMOTE`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SVMSMOTE.html)
+  * Combination of over- and under-sampling methods:
+    * [`imblearn.combine.SMOTEENN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTEENN.html)
+    * [`imblearn.combine.SMOTETomek`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.combine.SMOTETomek.html)
+  * Ensemble methods:
+    * [`imblearn.ensemble.BalancedBaggingClassifier`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.ensemble.BalancedBaggingClassifier.html)
+    * [`imblearn,ensemble,BalancedRandomForestClassifier`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.ensemble.BalancedRandomForestClassifier.html)
+  * Pipeline:
+    * [`imblearn.pipeline.Pipeline`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.pipeline.Pipeline.html)
+</details>
+
+<details>
+  <summary>LightGBM</summary>
+
+  * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
+  * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
+  * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRegressor)
+</details>
+
+<details>
+  <summary>Mlxtend</summary>
+
+  * [`mlxtend.preprocessing.DenseTransformer`](https://rasbt.github.io/mlxtend/user_guide/preprocessing/DenseTransformer/)
+</details>
+
+<details>
+  <summary>SkLearn2PMML</summary>
+
+  * Helpers:
     * `sklearn2pmml.EstimatorProxy`
     * `sklearn2pmml.SelectorProxy`
+  * Feature specification and decoration:
     * `sklearn2pmml.decoration.Alias`
     * `sklearn2pmml.decoration.CategoricalDomain`
     * `sklearn2pmml.decoration.ContinuousDomain`
@@ -196,6 +254,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.decoration.DiscreteDomainEraser`
     * `sklearn2pmml.decoration.MultiDomain`
     * `sklearn2pmml.decoration.OrdinalDomain`
+  * Ensemble methods:
     * `sklearn2pmml.ensemble.GBDTLMRegressor`
       * The GBDT side: All Scikit-Learn decision tree ensemble regressors, `LGBMRegressor`, `XGBRegressor`, `XGBRFRegressor`.
       * The LM side: A Scikit-Learn linear regressor (eg. `ElasticNet`, `LinearRegression`, `SGDRegressor`).
@@ -204,8 +263,11 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * The LR side: A Scikit-Learn binary linear classifier (eg. `LinearSVC`, `LogisticRegression`, `SGDClassifier`).
     * `sklearn2pmml.ensemble.SelectFirstClassifier`
     * `sklearn2pmml.ensemble.SelectFirstRegressor`
+  * Feature selection:
     * `sklearn2pmml.feature_selection.SelectUnique`
+  * Pipeline:
     * `sklearn2pmml.pipeline.PMMLPipeline`
+  * Preprocessing:
     * `sklearn2pmml.preprocessing.Aggregator`
     * `sklearn2pmml.preprocessing.CastTransformer`
     * `sklearn2pmml.preprocessing.ConcatTransformer`
@@ -240,21 +302,32 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.WordCountTransformer`
     * `sklearn2pmml.preprocessing.h2o.H2OFrameCreator`
     * `sklearn2pmml.preprocessing.scipy.BSplineTransformer`
+  * Rule sets:
     * `sklearn2pmml.ruleset.RuleSetClassifier`
-  * [Sklearn-Pandas](https://github.com/paulgb/sklearn-pandas):
-    * `sklearn_pandas.CategoricalImputer`
-    * `sklearn_pandas.DataFrameMapper`
-  * [TPOT](https://github.com/rhiever/tpot):
-    * `tpot.builtins.stacking_estimator.StackingEstimator`
-  * [XGBoost](https://github.com/dmlc/xgboost):
-    * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
-    * [`xgboost.XGBRanker`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRanker)
-    * [`xgboost.XGBRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
-    * [`xgboost.XGBRFClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFClassifier)
-    * [`xgboost.XGBRFRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFRegressor)
-* Production quality:
-  * Complete test coverage.
-  * Fully compliant with the [JPMML-Evaluator](https://github.com/jpmml/jpmml-evaluator) library.
+</details>
+
+<details>
+  <summary>Sklearn-Pandas</summary>
+
+  * `sklearn_pandas.CategoricalImputer`
+  * `sklearn_pandas.DataFrameMapper`
+</details>
+
+<details>
+  <summary>TPOT</summary>
+
+  * `tpot.builtins.stacking_estimator.StackingEstimator`
+</details>
+
+<details>
+  <summary>XGBoost</summary>
+
+  * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
+  * [`xgboost.XGBRanker`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRanker)
+  * [`xgboost.XGBRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
+  * [`xgboost.XGBRFClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFClassifier)
+  * [`xgboost.XGBRFRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRFRegressor)
+</details>
 
 # Prerequisites #
 
