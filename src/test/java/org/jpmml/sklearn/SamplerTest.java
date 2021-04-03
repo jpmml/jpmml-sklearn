@@ -20,55 +20,55 @@ package org.jpmml.sklearn;
 
 import org.junit.Test;
 
-public class SamplerTest extends SkLearnTest {
+public class SamplerTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateADASYNIris() throws Exception {
-		evaluate("ADASYN", "Iris");
+		evaluate("ADASYN", IRIS);
 	}
 
 	@Test
 	public void evaluateClusterCentroidsIris() throws Exception {
-		evaluate("ClusterCentroids", "Iris");
+		evaluate("ClusterCentroids", IRIS);
 	}
 
 	@Test
 	public void evaluateNearMissIris() throws Exception {
-		evaluate("NearMiss", "Iris");
+		evaluate("NearMiss", IRIS);
 	}
 
 	@Test
 	public void evaluateOneSidedSelectionIris() throws Exception {
-		evaluate("OneSidedSelection", "Iris");
+		evaluate("OneSidedSelection", IRIS);
 	}
 
 	@Test
 	public void evaluateRandomOverSamplerIris() throws Exception {
-		evaluate("RandomOverSampler", "Iris");
+		evaluate("RandomOverSampler", IRIS);
 	}
 
 	@Test
 	public void evaluateRandomUnderSamplerIris() throws Exception {
-		evaluate("RandomUnderSampler", "Iris");
+		evaluate("RandomUnderSampler", IRIS);
 	}
 
 	@Test
 	public void evaluateSMOTEIris() throws Exception {
-		evaluate("SMOTE", "Iris");
+		evaluate("SMOTE", IRIS);
 	}
 
 	@Test
 	public void evaluateSMOTEENNIris() throws Exception {
-		evaluate("SMOTEENN", "Iris");
+		evaluate("SMOTEENN", IRIS);
 	}
 
 	@Test
 	public void evaluateSMOTETomekIris() throws Exception {
-		evaluate("SMOTETomek", "Iris");
+		evaluate("SMOTETomek", IRIS);
 	}
 
 	@Test
 	public void evaluateTomekLinksIris() throws Exception {
-		evaluate("TomekLinks", "Iris");
+		evaluate("TomekLinks", IRIS);
 	}
 }

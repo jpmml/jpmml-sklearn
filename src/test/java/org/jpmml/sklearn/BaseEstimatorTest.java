@@ -19,43 +19,49 @@
 package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
+import org.jpmml.converter.FieldNameUtil;
 import org.junit.Test;
 
-public class BaseEstimatorTest extends SkLearnTest {
+public class BaseEstimatorTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {
-		FieldName[] targetFields = {FieldName.create("Adjusted"), FieldName.create("h2o(Adjusted)")};
+		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
-		evaluate("H2OGradientBoosting", "Audit", excludeFields(targetFields));
+		evaluate("H2OGradientBoosting", AUDIT, excludeFields(targetFields));
 	}
 
 	@Test
 	public void evaluateGradientBoostingAuto() throws Exception {
-		evaluate("H2OGradientBoosting", "Auto");
+		evaluate("H2OGradientBoosting", AUTO);
 	}
 
 	@Test
 	public void evaluateLogisticRegressionAudit() throws Exception {
-		FieldName[] targetFields = {FieldName.create("Adjusted"), FieldName.create("h2o(Adjusted)")};
+		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
-		evaluate("H2OLogisticRegression", "Audit", excludeFields(targetFields));
+		evaluate("H2OLogisticRegression", AUDIT, excludeFields(targetFields));
 	}
 
 	@Test
 	public void evaluateLinearRegressionAuto() throws Exception {
-		evaluate("H2OLinearRegression", "Auto");
+		evaluate("H2OLinearRegression", AUTO);
 	}
 
 	@Test
 	public void evaluateRandomForestAudit() throws Exception {
-		FieldName[] targetFields = {FieldName.create("Adjusted"), FieldName.create("h2o(Adjusted)")};
+		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
-		evaluate("H2ORandomForest", "Audit", excludeFields(targetFields));
+		evaluate("H2ORandomForest", AUDIT, excludeFields(targetFields));
 	}
 
 	@Test
 	public void evaluateRandomForestAuto() throws Exception {
-		evaluate("H2ORandomForest", "Auto");
+		evaluate("H2ORandomForest", AUTO);
+	}
+
+	static
+	private FieldName[] createTargetFields(FieldName name){
+		return new FieldName[]{name, FieldNameUtil.create("h2o", name)};
 	}
 }

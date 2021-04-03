@@ -42,14 +42,14 @@ import sklearn2pmml.feature_extraction.text.Splitter;
 
 import static org.junit.Assert.fail;
 
-public class TokenizerTest extends SkLearnTest {
+public class TokenizerTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void split() throws Exception {
 		Splitter splitter = new Splitter()
 			.setWordSeparatorRE("\\s+");
 
-		evaluate("Splitter", "Sentiment", splitter);
+		evaluate("Splitter", SENTIMENT, splitter);
 	}
 
 	@Test
@@ -57,12 +57,12 @@ public class TokenizerTest extends SkLearnTest {
 		Matcher matcher = new Matcher()
 			.setWordRE(CountVectorizer.TOKEN_PATTERN);
 
-		evaluate("CountVectorizer", "Sentiment", matcher);
+		evaluate("CountVectorizer", SENTIMENT, matcher);
 
 		matcher = new Matcher()
 			.setWordRE("\\w+");
 
-		evaluate("Matcher", "Sentiment", matcher);
+		evaluate("Matcher", SENTIMENT, matcher);
 	}
 
 	private void evaluate(String name, String dataset, Tokenizer tokenizer) throws Exception {

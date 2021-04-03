@@ -33,7 +33,7 @@ import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 
-public class ClassifierTest extends SkLearnTest {
+public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Override
 	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
@@ -65,430 +65,423 @@ public class ClassifierTest extends SkLearnTest {
 
 	@Test
 	public void evaluateDurationInDaysApollo() throws Exception {
-		evaluate("DurationInDays", "Apollo");
+		evaluate("DurationInDays", APOLLO);
 	}
 
 	@Test
 	public void evaluateDurationInSecondsApollo() throws Exception {
-		evaluate("DurationInSeconds", "Apollo");
+		evaluate("DurationInSeconds", APOLLO);
 	}
 
 	@Test
 	public void evaluateDecisionTreeAudit() throws Exception {
-		evaluate("DecisionTree", "Audit");
+		evaluate(DECISION_TREE, AUDIT);
 	}
 
 	@Test
 	public void evaluateDecisionTreeAuditDict() throws Exception {
-		evaluate("DecisionTree", "AuditDict");
+		evaluate(DECISION_TREE, AUDIT_DICT);
 	}
 
 	@Test
 	public void evaluateDecisionTreeAuditNA() throws Exception {
-		FieldName[] transformFields = {FieldName.create("eval(nodeId)")};
+		FieldName[] transformFields = {FieldNameUtil.create("eval", "nodeId")};
 
-		evaluate("DecisionTree", "AuditNA", excludeFields(transformFields));
+		evaluate(DECISION_TREE, AUDIT_NA, excludeFields(transformFields));
 	}
 
 	@Test
 	public void evaluateBalancedDecisionTreeEnsembleAudit() throws Exception {
-		evaluate("BalancedDecisionTreeEnsemble", "Audit");
+		evaluate(BALANCED_DECISION_TREE_ENSEMBLE, AUDIT);
 	}
 
 	@Test
 	public void evaluateDecisionTreeEnsembleAudit() throws Exception {
-		evaluate("DecisionTreeEnsemble", "Audit");
+		evaluate(DECISION_TREE_ENSEMBLE, AUDIT);
 	}
 
 	@Test
 	public void evaluateDummyAudit() throws Exception {
-		evaluate("Dummy", "Audit");
+		evaluate(DUMMY, AUDIT);
 	}
 
 	@Test
 	public void evaluatExtraTreesAudit() throws Exception {
-		evaluate("ExtraTrees", "Audit");
+		evaluate(EXTRA_TREES, AUDIT);
 	}
 
 	@Test
 	public void evaluateGBDTLRAudit() throws Exception {
-		evaluate("GBDTLR", "Audit");
+		evaluate(GBDT_LR, AUDIT);
 	}
 
 	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {
-		evaluate("GradientBoosting", "Audit");
+		evaluate(GRADIENT_BOOSTING, AUDIT);
 	}
 
 	@Test
 	public void evaluateHistGradientBoostingAudit() throws Exception {
-		evaluate("HistGradientBoosting", "Audit");
+		evaluate(HIST_GRADIENT_BOOSTING, AUDIT);
 	}
 
 	@Test
 	public void evaluateHistGradientBoostingAuditNA() throws Exception {
-		evaluate("HistGradientBoosting", "AuditNA");
+		evaluate(HIST_GRADIENT_BOOSTING, AUDIT_NA);
 	}
 
 	@Test
 	public void evaluateLGBMAudit() throws Exception {
-		evaluate("LGBM", "Audit", new RealNumberEquivalence(2));
+		evaluate(LGBM, AUDIT, new RealNumberEquivalence(2));
 	}
 
 	@Test
 	public void evaluateLGBMAuditCat() throws Exception {
-		evaluate("LGBM", "AuditCat", new RealNumberEquivalence(2));
+		evaluate(LGBM, AUDIT_CAT, new RealNumberEquivalence(2));
 	}
 
 	@Test
 	public void evaluateLGBMLRAuditCat() throws Exception {
-		evaluate("LGBMLR", "AuditCat");
+		evaluate(LGBM_LR, AUDIT_CAT);
 	}
 
 	@Test
 	public void evaluateLinearDiscriminantAnalysisAudit() throws Exception {
-		evaluate("LinearDiscriminantAnalysis", "Audit");
+		evaluate(LINEAR_DISCRIMINANT_ANALYSIS, AUDIT);
 	}
 
 	@Test
 	public void evaluateLinearSVCAudit() throws Exception {
-		evaluate("LinearSVC", "Audit");
+		evaluate(LINEAR_SVC, AUDIT);
 	}
 
 	@Test
 	public void evaluateMultinomialLogisticRegressionAudit() throws Exception {
-		evaluate("MultinomialLogisticRegression", "Audit");
+		evaluate(MULTINOMIAL_LOGISTIC_REGRESSION, AUDIT);
 	}
 
 	@Test
 	public void evaluateOvRLogisticRegressionAudit() throws Exception {
-		evaluate("OvRLogisticRegression", "Audit");
+		evaluate(OVR_LOGISTIC_REGRESSION, AUDIT);
 	}
 
 	@Test
 	public void evaluateLogisticRegressionAuditDict() throws Exception {
-		evaluate("LogisticRegression", "AuditDict");
+		evaluate(LOGISTIC_REGRESSION, AUDIT_DICT);
 	}
 
 	@Test
 	public void evaluateLogisticRegressionAuditNA() throws Exception {
-		FieldName[] transformFields = {FieldName.create("eval(probability(1))")};
+		FieldName[] transformFields = {FieldNameUtil.create("eval", AUDIT_PROBABILITY_TRUE)};
 
-		evaluate("LogisticRegression", "AuditNA", excludeFields(transformFields));
+		evaluate(LOGISTIC_REGRESSION, AUDIT_NA, excludeFields(transformFields));
 	}
 
 	@Test
 	public void evaluateLogisticRegressionEnsembleAudit() throws Exception {
-		evaluate("LogisticRegressionEnsemble", "Audit");
+		evaluate(LOGISTIC_REGRESSION_ENSEMBLE, AUDIT);
 	}
 
 	@Test
 	public void evaluateNaiveBayesAudit() throws Exception {
-		evaluate("NaiveBayes", "Audit", new PMMLEquivalence(1e-12, 1e-12));
+		evaluate(NAIVE_BAYES, AUDIT, new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
 	public void evaluateOneVsRestAudit() throws Exception {
-		evaluate("OneVsRest", "Audit");
+		evaluate(ONE_VS_REST, AUDIT);
 	}
 
 	@Test
 	public void evaluateRandomForestAudit() throws Exception {
-		evaluate("RandomForest", "Audit");
+		evaluate(RANDOM_FOREST, AUDIT);
 	}
 
 	@Test
 	public void evaluateBalancedRandomForestAudit() throws Exception {
-		evaluate("BalancedRandomForest", "Audit");
+		evaluate(BALANCED_RANDOM_FOREST, AUDIT);
 	}
 
 	@Test
 	public void evaluateRidgeAudit() throws Exception {
-		evaluate("Ridge", "Audit");
+		evaluate(RIDGE, AUDIT);
 	}
 
 	@Test
 	public void evaluateRidgeEnsembleAudit() throws Exception {
-		evaluate("RidgeEnsemble", "Audit");
+		evaluate(RIDGE_ENSEMBLE, AUDIT);
 	}
 
 	@Test
 	public void evaluateStackingEnsembleAudit() throws Exception {
-		evaluate("StackingEnsemble", "Audit");
+		evaluate(STACKING_ENSEMBLE, AUDIT);
 	}
 
 	@Test
 	public void evaluateSVCAudit() throws Exception {
-		evaluate("SVC", "Audit");
+		evaluate(SVC, AUDIT);
 	}
 
 	@Test
 	public void evaluateTPOTAudit() throws Exception {
-		evaluate("TPOT", "Audit");
+		evaluate(TPOT, AUDIT);
 	}
 
 	@Test
 	public void evaluateVotingEnsembleAudit() throws Exception {
-		evaluate("VotingEnsemble", "Audit");
+		evaluate(VOTING_ENSEMBLE, AUDIT);
 	}
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-		evaluate("XGB", "Audit", excludeFields(ClassifierTest.falseProbabilityField), new FloatEquivalence(8));
+		evaluate(XGB, AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(8));
 	}
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
-		FieldName[] transformFields = {ClassifierTest.falseProbabilityField, FieldName.create("predict(Adjusted)"), FieldName.create("eval(Adjusted)")};
+		FieldName[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create("predict", AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
 
-		evaluate("XGB", "AuditNA", excludeFields(transformFields), new FloatEquivalence(8));
+		evaluate(XGB, AUDIT_NA, excludeFields(transformFields), new FloatEquivalence(8));
 	}
 
 	@Test
 	public void evaluateXGBLRAudit() throws Exception {
-		evaluate("XGBLR", "Audit");
+		evaluate(XGB_LR, AUDIT);
 	}
 
 	@Test
 	public void evaluateXGBRFAudit() throws Exception {
-		evaluate("XGBRF", "Audit", excludeFields(ClassifierTest.falseProbabilityField), new FloatEquivalence(4));
+		evaluate(XGBRF, AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(4));
 	}
 
 	@Test
 	public void evaluateXGBRFLRAudit() throws Exception {
-		evaluate("XGBRFLR", "Audit");
+		evaluate(XGBRF_LR, AUDIT);
 	}
 
 	@Test
 	public void evaluateDecisionTreeIris() throws Exception {
-		evaluate("DecisionTree", "Iris");
+		evaluate(DECISION_TREE, IRIS);
 	}
 
 	@Test
 	public void evaluateDecisionTreeEnsembleIris() throws Exception {
-		evaluate("DecisionTreeEnsemble", "Iris");
+		evaluate(DECISION_TREE_ENSEMBLE, IRIS);
 	}
 
 	@Test
 	public void evaluateDummyIris() throws Exception {
-		evaluate("Dummy", "Iris");
+		evaluate(DUMMY, IRIS);
 	}
 
 	@Test
 	public void evaluateExtraTreesIris() throws Exception {
-		evaluate("ExtraTrees", "Iris");
+		evaluate(EXTRA_TREES, IRIS);
 	}
 
 	@Test
 	public void evaluateGradientBoostingIris() throws Exception {
-		evaluate("GradientBoosting", "Iris");
+		evaluate(GRADIENT_BOOSTING, IRIS);
 	}
 
 	@Test
 	public void evaluateHistGradientBoostingIris() throws Exception {
-		evaluate("HistGradientBoosting", "Iris");
+		evaluate(HIST_GRADIENT_BOOSTING, IRIS);
 	}
 
 	@Test
 	public void evaluateKNNIris() throws Exception {
-		evaluate("KNN", "Iris", excludeFields(ClassifierTest.neighborFields));
+		evaluate(KNN, IRIS, excludeFields(createNeighborFields(5)));
 	}
 
 	@Test
 	public void evaluateLGBMIris() throws Exception {
-		evaluate("LGBM", "Iris", new RealNumberEquivalence(1));
+		evaluate(LGBM, IRIS, new RealNumberEquivalence(1));
 	}
 
 	@Test
 	public void evaluateLinearDiscriminantAnalysisIris() throws Exception {
-		evaluate("LinearDiscriminantAnalysis", "Iris");
+		evaluate(LINEAR_DISCRIMINANT_ANALYSIS, IRIS);
 	}
 
 	@Test
 	public void evaluateLinearSVCIris() throws Exception {
-		evaluate("LinearSVC", "Iris");
+		evaluate(LINEAR_SVC, IRIS);
 	}
 
 	@Test
 	public void evaluateMultinomialLogisticRegressionIris() throws Exception {
-		evaluate("MultinomialLogisticRegression", "Iris");
+		evaluate(MULTINOMIAL_LOGISTIC_REGRESSION, IRIS);
 	}
 
 	@Test
 	public void evaluateOvRLogisticRegressionIris() throws Exception {
-		evaluate("OvRLogisticRegression", "Iris");
+		evaluate(OVR_LOGISTIC_REGRESSION, IRIS);
 	}
 
 	@Test
 	public void evaluateLogisticRegressionEnsembleIris() throws Exception {
-		evaluate("LogisticRegressionEnsemble", "Iris");
+		evaluate(LOGISTIC_REGRESSION_ENSEMBLE, IRIS);
 	}
 
 	@Test
 	public void evaluateMLPIris() throws Exception {
-		evaluate("MLP", "Iris");
+		evaluate(MLP, IRIS);
 	}
 
 	@Test
 	public void evaluateNaiveBayesIris() throws Exception {
-		evaluate("NaiveBayes", "Iris");
+		evaluate(NAIVE_BAYES, IRIS);
 	}
 
 	@Test
 	public void evaluateOneVsRestIris() throws Exception {
-		evaluate("OneVsRest", "Iris");
+		evaluate(ONE_VS_REST, IRIS);
 	}
 
 	@Test
 	public void evaluateRandomForestIris() throws Exception {
-		evaluate("RandomForest", "Iris");
+		evaluate(RANDOM_FOREST, IRIS);
 	}
 
 	@Test
 	public void evaluateRidgeIris() throws Exception {
-		evaluate("Ridge", "Iris");
+		evaluate(RIDGE, IRIS);
 	}
 
 	@Test
 	public void evaluateRidgeEnsembleIris() throws Exception {
-		evaluate("RidgeEnsemble", "Iris");
+		evaluate(RIDGE_ENSEMBLE, IRIS);
 	}
 
 	@Test
 	public void evaluateRuleSetIris() throws Exception {
-		evaluate("RuleSet", "Iris");
+		evaluate(RULE_SET, IRIS);
 	}
 
 	@Test
 	public void evaluateSelectFirstIris() throws Exception {
-		evaluate("SelectFirst", "Iris", excludeFields(ClassifierTest.irisProbabilityFields));
+		evaluate(SELECT_FIRST, IRIS, excludeFields(IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA));
 	}
 
 	@Test
 	public void evaluateSGDIris() throws Exception {
-		evaluate("SGD", "Iris");
+		evaluate(SGD, IRIS);
 	}
 
 	@Test
 	public void evaluateSGDLogIris() throws Exception {
-		evaluate("SGDLog", "Iris");
+		evaluate(SGD_LOG, IRIS);
 	}
 
 	@Test
 	public void evaluateStackingEnsembleIris() throws Exception {
-		evaluate("StackingEnsemble", "Iris");
+		evaluate(STACKING_ENSEMBLE, IRIS);
 	}
 
 	@Test
 	public void evaluateSVCIris() throws Exception {
-		evaluate("SVC", "Iris");
+		evaluate(SVC, IRIS);
 	}
 
 	@Test
 	public void evaluateNuSVCIris() throws Exception {
-		evaluate("NuSVC", "Iris");
+		evaluate(NU_SVC, IRIS);
 	}
 
 	@Test
 	public void evaluateTPOTIris() throws Exception {
-		evaluate("TPOT", "Iris");
+		evaluate(TPOT, IRIS);
 	}
 
 	@Test
 	public void evaluateVotingEnsembleIris() throws Exception {
-		evaluate("VotingEnsemble", "Iris", excludeFields(ClassifierTest.irisProbabilityFields));
+		evaluate(VOTING_ENSEMBLE, IRIS, excludeFields(IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA));
 	}
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", "Iris", new FloatEquivalence(12));
+		evaluate(XGB, IRIS, new FloatEquivalence(12));
 	}
 
 	@Test
 	public void evaluateLinearSVCSentiment() throws Exception {
-		evaluate("LinearSVC", "Sentiment");
+		evaluate(LINEAR_SVC, SENTIMENT);
 	}
 
 	@Test
 	public void evaluateLogisticRegressionSentiment() throws Exception {
-		evaluate("LogisticRegression", "Sentiment");
+		evaluate(LOGISTIC_REGRESSION, SENTIMENT);
 	}
 
 	@Test
 	public void evaluateRandomForestSentiment() throws Exception {
-		evaluate("RandomForest", "Sentiment");
+		evaluate(RANDOM_FOREST, SENTIMENT);
 	}
 
 	@Test
 	public void evaluateDecisionTreeVersicolor() throws Exception {
-		evaluate("DecisionTree", "Versicolor");
+		evaluate(DECISION_TREE, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateDummyVersicolor() throws Exception {
-		evaluate("Dummy", "Versicolor");
+		evaluate(DUMMY, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateGBDTLRVersicolor() throws Exception {
-		evaluate("GBDTLR", "Versicolor");
+		evaluate(GBDT_LR, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateKNNVersicolor() throws Exception {
-		evaluate("KNN", "Versicolor", excludeFields(ClassifierTest.neighborFields));
+		evaluate(KNN, VERSICOLOR, excludeFields(createNeighborFields(5)));
 	}
 
 	@Test
 	public void evaluateMLPVersicolor() throws Exception {
-		evaluate("MLP", "Versicolor");
+		evaluate(MLP, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateSGDVersicolor() throws Exception {
-		evaluate("SGD", "Versicolor");
+		evaluate(SGD, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateSGDLogVersicolor() throws Exception {
-		evaluate("SGDLog", "Versicolor");
+		evaluate(SGD_LOG, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateSVCVersicolor() throws Exception {
-		evaluate("SVC", "Versicolor");
+		evaluate(SVC, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateNuSVCVersicolor() throws Exception {
-		evaluate("NuSVC", "Versicolor");
+		evaluate(NU_SVC, VERSICOLOR);
 	}
 
 	@Test
 	public void evaluateTPOTVersicolor() throws Exception {
-		evaluate("TPOT", "Versicolor", new PMMLEquivalence(5e-13, 5e-13));
+		evaluate(TPOT, VERSICOLOR, new PMMLEquivalence(5e-13, 5e-13));
 	}
 
 	@Test
 	public void evaluateXGBRFLRVersicolor() throws Exception {
-		evaluate("XGBRFLR", "Versicolor");
+		evaluate(XGBRF_LR, VERSICOLOR);
 	}
 
 	static
-	private FieldName[] createFields(String prefix, int count){
+	private FieldName[] createNeighborFields(int count){
 		FieldName[] result = new FieldName[count];
 
 		for(int i = 0; i < count; i++){
-			result[i] = FieldNameUtil.create(prefix, String.valueOf(i + 1));
+			result[i] = FieldNameUtil.create("neighbor", String.valueOf(i + 1));
 		}
 
 		return result;
 	}
-
-	private static final FieldName[] neighborFields = createFields("neighbor", 5);
-
-	private static final FieldName falseProbabilityField = FieldNameUtil.create("probability", "0");
-	private static final FieldName trueProbabilityField = FieldNameUtil.create("probability", "1");
-
-	private static final FieldName[] irisProbabilityFields = {FieldNameUtil.create("probability", "setosa"), FieldNameUtil.create("probability", "versicolor"), FieldNameUtil.create("probability", "virginica")};
 }

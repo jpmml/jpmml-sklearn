@@ -20,15 +20,15 @@ package org.jpmml.sklearn;
 
 import org.junit.Test;
 
-public class ClustererTest extends SkLearnTest {
+public class ClustererTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateKMeansWheat() throws Exception {
-		evaluate("KMeans", "Wheat");
+		evaluate(K_MEANS, WHEAT);
 	}
 
 	@Test
 	public void evaluateMiniBatchKMeansWheat() throws Exception {
-		evaluate("MiniBatchKMeans", "Wheat");
+		evaluate(MINIBATCH_K_MEANS, WHEAT);
 	}
 }

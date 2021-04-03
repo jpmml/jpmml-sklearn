@@ -21,15 +21,15 @@ package org.jpmml.sklearn;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
 
-public class OutlierDetectorTest extends SkLearnTest {
+public class OutlierDetectorTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateIsolationForestHousing() throws Exception {
-		evaluate("IsolationForest", "Housing", new PMMLEquivalence(5e-12, 5e-12));
+		evaluate(ISOLATION_FOREST, HOUSING, new PMMLEquivalence(5e-12, 5e-12));
 	}
 
 	@Test
 	public void evaluateOneClassSVMHousing() throws Exception {
-		evaluate("OneClassSVM", "Housing");
+		evaluate(ONE_CLASS_SVM, HOUSING);
 	}
 }

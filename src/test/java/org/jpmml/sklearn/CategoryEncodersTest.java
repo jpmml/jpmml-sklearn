@@ -18,53 +18,48 @@
  */
 package org.jpmml.sklearn;
 
-import org.dmg.pmml.FieldName;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.junit.Test;
 
-public class CategoryEncodersTest extends SkLearnTest {
+public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateBase2EncoderAudit() throws Exception {
-		evaluate("Base2Encoder", "Audit");
+		evaluate("Base2Encoder", AUDIT);
 	}
 
 	@Test
 	public void evaluateBase3EncoderAudit() throws Exception {
-		evaluate("Base3Encoder", "Audit");
+		evaluate("Base3Encoder", AUDIT);
 	}
 
 	@Test
 	public void evaluateBase4EncoderAudit() throws Exception {
-		evaluate("Base4Encoder", "Audit", excludeFields(CategoryEncodersTest.falseProbabilityField), new FloatEquivalence(8));
+		evaluate("Base4Encoder", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(8));
 	}
 
 	@Test
 	public void evaluateBinaryEncoderAudit() throws Exception {
-		evaluate("BinaryEncoder", "Audit");
+		evaluate("BinaryEncoder", AUDIT);
 	}
 
 	@Test
 	public void evaluateCountEncoderAudit() throws Exception {
-		evaluate("CountEncoder", "Audit");
+		evaluate("CountEncoder", AUDIT);
 	}
 
 	@Test
 	public void evaluateOrdinalEncoderAudit() throws Exception {
-		evaluate("OrdinalEncoder", "Audit");
+		evaluate("OrdinalEncoder", AUDIT);
 	}
 
 	@Test
 	public void evaluateTargetEncoderAudit() throws Exception {
-		evaluate("TargetEncoder", "Audit");
+		evaluate("TargetEncoder", AUDIT);
 	}
 
 	@Test
 	public void evaluateWOEEncoderAudit() throws Exception {
-		evaluate("WOEEncoder", "Audit");
+		evaluate("WOEEncoder", AUDIT);
 	}
-
-	private static final FieldName falseProbabilityField = FieldNameUtil.create("probability", "0");
-	private static final FieldName trueProbabilityField = FieldNameUtil.create("probability", "1");
 }

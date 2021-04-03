@@ -39,26 +39,26 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FeatureImportancesTest extends SkLearnTest {
+public class FeatureImportancesTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void checkDecisionTreeAudit() throws Exception {
-		check("DecisionTree", "Audit");
+		check(DECISION_TREE, AUDIT);
 	}
 
 	@Test
 	public void checkExtraTreesAudit() throws Exception {
-		check("ExtraTrees", "Audit");
+		check(EXTRA_TREES, AUDIT);
 	}
 
 	@Test
 	public void checkGradientBoostingAudit() throws Exception {
-		check("GradientBoosting", "Audit");
+		check(GRADIENT_BOOSTING, AUDIT);
 	}
 
 	@Test
 	public void checkRandomForestAudit() throws Exception {
-		check("RandomForest", "Audit");
+		check(RANDOM_FOREST, AUDIT);
 	}
 
 	public void check(String name, String dataset) throws Exception {
