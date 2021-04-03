@@ -71,23 +71,4 @@ public class CategoryEncoderUtil {
 
 		return result;
 	}
-
-	static
-	public <K, V> Map<K, V> toCategoryValueMap(Map<K, Integer> categoryMap, Map<Integer, V> valueMap){
-		Map<K, V> result = new LinkedHashMap<>();
-
-		Collection<? extends Map.Entry<K, Integer>> entries = categoryMap.entrySet();
-		for(Map.Entry<K, Integer> entry : entries){
-			K category = entry.getKey();
-			V value = valueMap.get(entry.getValue());
-
-			if(value == null){
-				throw new IllegalArgumentException();
-			}
-
-			result.put(category, value);
-		}
-
-		return result;
-	}
 }

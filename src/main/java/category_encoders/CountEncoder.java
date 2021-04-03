@@ -32,7 +32,6 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -86,7 +85,7 @@ public class CountEncoder extends CategoryEncoder {
 
 			MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categoryCounts);
 
-			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("count", feature), OpType.CATEGORICAL, normalize ? DataType.DOUBLE : DataType.INTEGER, mapValues);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("count", feature), OpType.CATEGORICAL, normalize ? DataType.DOUBLE : DataType.INTEGER, mapValues);
 
 			result.add(new ThresholdFeature(encoder, derivedField, categoryCounts));
 		}
