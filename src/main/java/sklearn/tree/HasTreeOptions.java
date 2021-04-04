@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.SimplePredicate;
+import org.dmg.pmml.SimpleSetPredicate;
 import org.dmg.pmml.tree.Node;
 import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.sklearn.HasSkLearnOptions;
@@ -39,6 +41,12 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 	 * @see TreeModelFlattener
 	 */
 	String OPTION_FLAT = "flat";
+
+	/**
+	 * @see SimplePredicate
+	 * @see SimpleSetPredicate
+	 */
+	String OPTION_PLAIN = "plain";
 
 	/**
 	 * @see Node#hasExtensions()
@@ -67,6 +75,7 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 		Map<String, Object> result = new LinkedHashMap<>();
 		result.put(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+		result.put(HasTreeOptions.OPTION_PLAIN, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);

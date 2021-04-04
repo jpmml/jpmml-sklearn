@@ -42,6 +42,9 @@ import sklearn2pmml.pipeline.PMMLPipeline;
 abstract
 public class SkLearnTestBatch extends IntegrationTestBatch {
 
+	private Map<String, Object> options = new LinkedHashMap<>();
+
+
 	public SkLearnTestBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
 		super(name, dataset, predicate, equivalence);
 	}
@@ -49,10 +52,6 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 	@Override
 	abstract
 	public SkLearnTest getIntegrationTest();
-
-	public Map<String, ?> getOptions(){
-		return new LinkedHashMap<>();
-	}
 
 	@Override
 	public PMML getPMML() throws Exception {
@@ -107,6 +106,14 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 		}
 
 		return pmml;
+	}
+
+	public Map<String, ?> getOptions(){
+		return this.options;
+	}
+
+	public void putOptions(Map<String, ?> options){
+		this.options.putAll(options);
 	}
 
 	private Storage openStorage(String path) throws IOException {

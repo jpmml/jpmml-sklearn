@@ -32,7 +32,6 @@ import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.junit.Test;
 
@@ -65,8 +64,8 @@ public class FeatureImportancesTest extends SkLearnTest implements Algorithms, D
 		Predicate<ResultField> predicate = (resultField) -> true;
 		Equivalence<Object> equivalence = getEquivalence();
 
-		try(Batch batch = createBatch(name, dataset, predicate, equivalence)){
-			check((SkLearnTestBatch)batch);
+		try(SkLearnTestBatch batch = (SkLearnTestBatch)createBatch(name, dataset, predicate, equivalence)){
+			check(batch);
 		}
 	}
 
