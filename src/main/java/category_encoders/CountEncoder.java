@@ -30,6 +30,7 @@ import numpy.core.ScalarUtil;
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
 
@@ -46,12 +47,13 @@ public class CountEncoder extends MapEncoder {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		List<?> cols = getCols();
 		Boolean dropInvariant = getDropInvariant();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();
 		Boolean normalize = getNormalize();
-		Map<Integer, Series> mapping = getMapping();
-		Map<Integer, Map<Object, String>> minGroupCategories = getMinGroupCategories();
+		Map<Object, Series> mapping = getMapping();
+		Map<Object, Map<Object, String>> minGroupCategories = getMinGroupCategories();
 
 		if(dropInvariant){
 			throw new IllegalArgumentException();
@@ -68,16 +70,19 @@ public class CountEncoder extends MapEncoder {
 			throw new IllegalArgumentException(handleUnknown);
 		}
 
+		ClassDictUtil.checkSize(features, cols);
+
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
+			Object col = cols.get(i);
 
-			Series series = mapping.get((Integer)i);
+			Series series = mapping.get(col);
 
 			Map<Object, Number> categoryCounts = CategoryEncoderUtil.toMap(series, Functions.identity(), normalize ? ValueUtil::asDouble : ValueUtil::asInteger);
 
-			Map<?, String> leftoverCategories = minGroupCategories.get((Integer)i);
+			Map<?, String> leftoverCategories = minGroupCategories.get(col);
 			if(leftoverCategories != null){
 				String leftoverCategory = Iterables.getOnlyElement(new HashSet<>(leftoverCategories.values()));
 
@@ -120,9 +125,9 @@ public class CountEncoder extends MapEncoder {
 		return getBoolean("normalize");
 	}
 
-	public Map<Integer, Map<Object, String>> getMinGroupCategories(){
+	public Map<Object, Map<Object, String>> getMinGroupCategories(){
 		Map<?, ?> minGroupCategories = get("_min_group_categories", Map.class);
 
-		return CategoryEncoderUtil.toTransformedMap(minGroupCategories, key -> ValueUtil.asInteger((Number)ScalarUtil.decode(key)), value -> (Map)value);
+		return CategoryEncoderUtil.toTransformedMap(minGroupCategories, key -> ScalarUtil.decode(key), value -> (Map)value);
 	}
 }

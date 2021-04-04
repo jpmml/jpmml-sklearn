@@ -21,7 +21,6 @@ package category_encoders;
 import java.util.Map;
 
 import numpy.core.ScalarUtil;
-import org.jpmml.converter.ValueUtil;
 import pandas.core.Series;
 
 abstract
@@ -34,9 +33,9 @@ public class MapEncoder extends CategoryEncoder {
 	abstract
 	public String functionName();
 
-	public Map<Integer, Series> getMapping(){
+	public Map<Object, Series> getMapping(){
 		Map<?, ?> mapping = get("mapping", Map.class);
 
-		return CategoryEncoderUtil.toTransformedMap(mapping, key -> ValueUtil.asInteger((Number)ScalarUtil.decode(key)), value -> (Series)value);
+		return CategoryEncoderUtil.toTransformedMap(mapping, key -> ScalarUtil.decode(key), value -> (Series)value);
 	}
 }

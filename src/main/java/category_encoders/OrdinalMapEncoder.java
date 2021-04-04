@@ -24,13 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.MapValues;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -45,10 +40,11 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		List<?> cols = getCols();
 		Boolean dropInvariant = getDropInvariant();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();
-		Map<Integer, Series> mapping = getMapping();
+		Map<Object, Series> mapping = getMapping();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 
 		if(dropInvariant){
@@ -71,12 +67,13 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 		List<OrdinalEncoder.Mapping> ordinalMappings = ordinalEncoder.getMapping();
 
-		ClassDictUtil.checkSize(ordinalMappings, features);
+		ClassDictUtil.checkSize(features, cols, ordinalMappings);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
+			Object col = cols.get(i);
 			OrdinalEncoder.Mapping ordinalMapping = ordinalMappings.get(i);
 
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
@@ -84,9 +81,9 @@ public class OrdinalMapEncoder extends MapEncoder {
 			// XXX
 			ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_MISSING);
 
-			Series series = mapping.get((Integer)i);
+			Series series = mapping.get(col);
 
-			Map<Integer, Double> valueMappings = CategoryEncoderUtil.toMap(series, key -> ValueUtil.asInt((Number)key), ValueUtil::asDouble);
+			Map<Integer, Double> valueMappings = CategoryEncoderUtil.toMap(series, key -> ValueUtil.asInteger((Number)key), ValueUtil::asDouble);
 
 			Map<?, Double> categoryValues = mapEncodeValues(ordinalCategoryMappings, valueMappings);
 

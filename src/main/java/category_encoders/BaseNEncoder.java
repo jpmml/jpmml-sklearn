@@ -41,6 +41,7 @@ public class BaseNEncoder extends CategoryEncoder {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Integer base = getBase();
+		List<?> cols = getCols();
 		List<String> dropCols = null;
 		Boolean dropInvariant = getDropInvariant();
 		String handleMissing = getHandleMissing();
@@ -71,12 +72,13 @@ public class BaseNEncoder extends CategoryEncoder {
 
 		List<OrdinalEncoder.Mapping> ordinalMappings = ordinalEncoder.getMapping();
 
-		ClassDictUtil.checkSize(ordinalMappings, features);
+		ClassDictUtil.checkSize(features, cols, ordinalMappings);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
+			Object col = cols.get(i);
 			OrdinalEncoder.Mapping ordinalMapping = ordinalMappings.get(i);
 
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
@@ -91,9 +93,9 @@ public class BaseNEncoder extends CategoryEncoder {
 			List<Feature> baseFeatures = new ArrayList<>();
 
 			for(int pos = 0; pos < requiredDigits; pos++){
-				String col = (String.valueOf(i) + "_" + String.valueOf(pos));
+				String dropCol = String.valueOf(col) + "_" + String.valueOf(pos);
 
-				if(dropCols != null && dropCols.contains(col)){
+				if(dropCols != null && dropCols.contains(dropCol)){
 					continue;
 				}
 

@@ -51,7 +51,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 			throw new IllegalArgumentException();
 		}
 
-		ClassDictUtil.checkSize(mappings, features);
+		ClassDictUtil.checkSize(features, mappings);
 
 		List<Feature> result = new ArrayList<>();
 
