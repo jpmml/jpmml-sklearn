@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-python</artifactId>
-			<version>1.0.12</version>
+			<version>1.0.13</version>
 		</dependency>
 
 		<dependency>
