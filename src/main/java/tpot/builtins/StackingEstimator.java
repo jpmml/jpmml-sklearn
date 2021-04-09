@@ -101,6 +101,12 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 					List<?> categories = ClassifierUtil.getClasses(estimator);
 
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType());
+
+					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
+
+					result.add(new CategoricalFeature(encoder, predictedField, categories));
+
 					if(classifier.hasProbabilityDistribution()){
 
 						for(Object category : categories){
@@ -112,12 +118,6 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 							result.add(new ContinuousFeature(encoder, probabilityField));
 						}
 					}
-
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType());
-
-					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-					result.add(new CategoricalFeature(encoder, predictedField, categories));
 				}
 				break;
 			case REGRESSION:
