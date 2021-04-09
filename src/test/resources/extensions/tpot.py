@@ -26,8 +26,11 @@ def build_classifier(data, feature_pipeline, generations, population_size, name)
 	categories = pandas.unique(y)
 	config = make_tpot_pmml_config(classifier_config_dict)
 	config = filter_config(config)
+	del config["sklearn.decomposition.PCA"]
 	del config["sklearn.naive_bayes.GaussianNB"] # Does not support nesting - see http://mantis.dmg.org/view.php?id=208
 	del config["sklearn.neighbors.KNeighborsClassifier"]
+	del config["sklearn.neural_network.MLPClassifier"]
+	del config["sklearn.preprocessing.PolynomialFeatures"]
 	del config["sklearn.svm.LinearSVC"] # Does not support classifier.predict_proba(Xt)
 	del config["sklearn.tree.DecisionTreeClassifier"]
 	classifier = TPOTClassifier(generations = generations, population_size = population_size, random_state = 13, config_dict = config, verbosity = 2)
