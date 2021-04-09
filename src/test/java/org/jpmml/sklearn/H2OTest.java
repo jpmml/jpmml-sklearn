@@ -22,42 +22,42 @@ import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 import org.junit.Test;
 
-public class BaseEstimatorTest extends SkLearnTest implements Datasets {
+public class H2OTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {
 		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
-		evaluate("H2OGradientBoosting", AUDIT, excludeFields(targetFields));
+		evaluate("H2O" + GRADIENT_BOOSTING, AUDIT, excludeFields(targetFields));
 	}
 
 	@Test
 	public void evaluateGradientBoostingAuto() throws Exception {
-		evaluate("H2OGradientBoosting", AUTO);
+		evaluate("H2O" + GRADIENT_BOOSTING, AUTO);
 	}
 
 	@Test
 	public void evaluateLogisticRegressionAudit() throws Exception {
 		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
-		evaluate("H2OLogisticRegression", AUDIT, excludeFields(targetFields));
+		evaluate("H2O" + LOGISTIC_REGRESSION, AUDIT, excludeFields(targetFields));
 	}
 
 	@Test
 	public void evaluateLinearRegressionAuto() throws Exception {
-		evaluate("H2OLinearRegression", AUTO);
+		evaluate("H2O" + LINEAR_REGRESSION, AUTO);
 	}
 
 	@Test
 	public void evaluateRandomForestAudit() throws Exception {
 		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
-		evaluate("H2ORandomForest", AUDIT, excludeFields(targetFields));
+		evaluate("H2O" + RANDOM_FOREST, AUDIT, excludeFields(targetFields));
 	}
 
 	@Test
 	public void evaluateRandomForestAuto() throws Exception {
-		evaluate("H2ORandomForest", AUTO);
+		evaluate("H2O" + RANDOM_FOREST, AUTO);
 	}
 
 	static
