@@ -181,11 +181,6 @@ public class RegressorTest extends SkLearnTest implements Algorithms, Datasets {
 	}
 
 	@Test
-	public void evaluateTPOTAuto() throws Exception {
-		evaluate(TPOT, AUTO);
-	}
-
-	@Test
 	public void evaluateVotingEnsembleAuto() throws Exception {
 		evaluate(VOTING_ENSEMBLE, AUTO);
 	}
@@ -253,11 +248,6 @@ public class RegressorTest extends SkLearnTest implements Algorithms, Datasets {
 	@Test
 	public void evaluateNuSVRHousing() throws Exception {
 		evaluate(NU_SVR, HOUSING);
-	}
-
-	@Test
-	public void evaluateTPOTHousing() throws Exception {
-		evaluate(TPOT, HOUSING);
 	}
 
 	@Test

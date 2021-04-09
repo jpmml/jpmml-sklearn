@@ -223,11 +223,6 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 	}
 
 	@Test
-	public void evaluateTPOTAudit() throws Exception {
-		evaluate(TPOT, AUDIT);
-	}
-
-	@Test
 	public void evaluateVotingEnsembleAudit() throws Exception {
 		evaluate(VOTING_ENSEMBLE, AUDIT);
 	}
@@ -390,11 +385,6 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 	}
 
 	@Test
-	public void evaluateTPOTIris() throws Exception {
-		evaluate(TPOT, IRIS);
-	}
-
-	@Test
 	public void evaluateVotingEnsembleIris() throws Exception {
 		evaluate(VOTING_ENSEMBLE, IRIS, excludeFields(IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA));
 	}
@@ -462,11 +452,6 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 	@Test
 	public void evaluateNuSVCVersicolor() throws Exception {
 		evaluate(NU_SVC, VERSICOLOR);
-	}
-
-	@Test
-	public void evaluateTPOTVersicolor() throws Exception {
-		evaluate(TPOT, VERSICOLOR, new PMMLEquivalence(5e-13, 5e-13));
 	}
 
 	@Test

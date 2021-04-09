@@ -79,7 +79,6 @@ interface Algorithms {
 	String SVC = "SVC";
 	String SVR = "SVR";
 	String THEIL_SEN = "TheilSen";
-	String TPOT = "TPOT";
 	String VOTING = "Voting";
 	String VOTING_ENSEMBLE = VOTING + "Ensemble";
 	String XGB = "XGB";
