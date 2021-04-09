@@ -20,7 +20,7 @@ package org.jpmml.sklearn;
 
 import org.junit.Test;
 
-public class SamplerTest extends SkLearnTest implements Datasets {
+public class ImbLearnTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateADASYNIris() throws Exception {
