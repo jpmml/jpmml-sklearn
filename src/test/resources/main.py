@@ -176,8 +176,8 @@ if "Audit" in datasets:
 	build_audit(BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
 	build_audit(DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 	build_audit(EstimatorProxy(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13)), "ExtraTreesAudit")
-	build_audit(GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression(multi_class = "ovr", solver = "liblinear")), "GBDTLRAudit")
-	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression(multi_class = "ovr", solver = "liblinear")), "XGBLRAudit")
+	build_audit(GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "GBDTLRAudit")
+	build_audit(GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "XGBLRAudit")
 	build_audit(GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
 	build_audit(EstimatorProxy(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13)), "GradientBoostingAudit")
 	build_audit(HistGradientBoostingClassifier(max_iter = 71, random_state = 13), "HistGradientBoostingAudit")
@@ -186,15 +186,15 @@ if "Audit" in datasets:
 	build_audit(LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
 	build_audit(LogisticRegression(multi_class = "multinomial", solver = "newton-cg", max_iter = 500), "MultinomialLogisticRegressionAudit")
 	build_audit(LogisticRegressionCV(cv = 3, multi_class = "ovr"), "OvRLogisticRegressionAudit")
-	build_audit(BaggingClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear"), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleAudit")
+	build_audit(BaggingClassifier(LogisticRegression(), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleAudit")
 	build_audit(GaussianNB(), "NaiveBayesAudit")
-	build_audit(OneVsRestClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear")), "OneVsRestAudit")
+	build_audit(OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
 	build_audit(EstimatorProxy(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)), "RandomForestAudit", flat = True)
 	build_audit(RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 	build_audit(BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
-	build_audit(StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")
+	build_audit(StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression())], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")
 	build_audit(SVC(gamma = "auto"), "SVCAudit", with_proba = False)
-	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
+	build_audit(VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
 	build_audit(XGBClassifier(objective = "binary:logistic", importance_type = "weight", random_state = 13), "XGBAudit", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
 	build_audit(XGBRFClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 5, random_state = 13), "XGBRFAudit")
 
@@ -228,7 +228,7 @@ def build_audit_cat(classifier, name, with_proba = True, fit_params = {}):
 
 if "Audit" in datasets:
 	cat_indices = [2, 3, 4, 5, 6, 7, 8]
-	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression(multi_class = "ovr", solver = "liblinear")), "LGBMLRAuditCat", fit_params = {"classifier__gbdt__categorical_feature" : cat_indices})
+	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "LGBMLRAuditCat", fit_params = {"classifier__gbdt__categorical_feature" : cat_indices})
 	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", fit_params = {"classifier__categorical_feature" : cat_indices})
 
 def build_audit_h2o(classifier, name):
@@ -277,7 +277,7 @@ def build_audit_dict(classifier, name, with_proba = True):
 
 if "Audit" in datasets:
 	build_audit_dict(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditDict")
-	build_audit_dict(LogisticRegression(multi_class = "ovr", solver = "liblinear"), "LogisticRegressionAuditDict")
+	build_audit_dict(LogisticRegression(), "LogisticRegressionAuditDict")
 
 audit_na_X, audit_na_y = load_audit("AuditNA")
 
@@ -324,7 +324,7 @@ def build_audit_na(classifier, name, with_proba = True, fit_params = {}, predict
 
 if "Audit" in datasets:
 	build_audit_na(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
-	build_audit_na(LogisticRegression(multi_class = "ovr", solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
+	build_audit_na(LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 
 def build_audit_na_direct(classifier, name):
 	mapper = DataFrameMapper([
@@ -398,7 +398,7 @@ def build_versicolor(classifier, name, with_proba = True, **pmml_options):
 
 if "Versicolor" in datasets:
 	build_versicolor(DummyClassifier(strategy = "prior"), "DummyVersicolor")
-	build_versicolor(GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(multi_class = "ovr", solver = "liblinear")), "GBDTLRVersicolor")
+	build_versicolor(GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRVersicolor")
 	build_versicolor(GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, random_state = 13), LinearSVC(random_state = 13)), "XGBRFLRVersicolor", with_proba = False)
 	build_versicolor(KNeighborsClassifier(metric = "euclidean"), "KNNVersicolor", with_proba = False)
 	build_versicolor(MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPVersicolor")
@@ -579,7 +579,7 @@ def build_sentiment(classifier, tokenizer, name, with_proba = True, **pmml_optio
 
 if "Sentiment" in datasets:
 	build_sentiment(LinearSVC(random_state = 13), Splitter(), "LinearSVCSentiment", with_proba = False)
-	build_sentiment(LogisticRegressionCV(multi_class = "ovr", cv = 3), None, "LogisticRegressionSentiment")
+	build_sentiment(LogisticRegressionCV(cv = 3), None, "LogisticRegressionSentiment")
 	build_sentiment(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), Matcher(), "RandomForestSentiment", compact = False)
 
 #

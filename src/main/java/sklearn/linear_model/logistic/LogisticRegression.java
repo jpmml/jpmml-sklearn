@@ -52,7 +52,18 @@ public class LogisticRegression extends LinearClassifier {
 
 	@Override
 	public Model encodeModel(Schema schema){
+		String sklearnVersion = getSkLearnVersion();
 		String multiClass = getMultiClass();
+		String solver = getSolver();
+
+		if(("auto").equals(multiClass)){
+
+			if(sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.22") >= 0){
+				int[] shape = getCoefShape();
+
+				multiClass = getAutoMultiClass(solver, shape);
+			}
+		} // End if
 
 		if(("auto").equals(multiClass)){
 			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be explicitly set to the 'ovr' or 'multinomial' value");
@@ -156,5 +167,27 @@ public class LogisticRegression extends LinearClassifier {
 		}
 
 		return multiClass;
+	}
+
+	public String getSolver(){
+		return getString("solver");
+	}
+
+	static
+	private String getAutoMultiClass(String solver, int[] shape){
+		int numberOfClasses = shape[0];
+		int numberOfFeatures = shape[1];
+
+		if(("liblinear").equals(solver)){
+			return "ovr";
+		} // End if
+
+		if(numberOfClasses == 1){
+			return "ovr";
+		} else
+
+		{
+			return "multinomial";
+		}
 	}
 }
