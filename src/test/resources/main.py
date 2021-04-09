@@ -2,10 +2,6 @@ from common import *
 
 from sklearn.experimental import enable_hist_gradient_boosting
 
-from h2o import H2OFrame
-from h2o.estimators.gbm import H2OGradientBoostingEstimator
-from h2o.estimators.glm import H2OGeneralizedLinearEstimator
-from h2o.estimators.random_forest import H2ORandomForestEstimator
 from lightgbm import LGBMClassifier, LGBMRegressor
 from pandas import DataFrame
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -38,12 +34,10 @@ from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
-from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
 
-import h2o
 import numpy
 import pandas
 import sys
@@ -64,19 +58,11 @@ def make_interaction(left, right):
 
 datasets = "Audit,Auto,Housing,Iris,Sentiment,Versicolor,Visit,Wheat"
 
-with_h2o = False
-
 if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = sys.argv[1]
-	if len(sys.argv) > 2:
-		with_h2o = "H2O" in sys.argv[2]
 
 datasets = datasets.split(",")
-
-if with_h2o:
-	h2o.init()
-	h2o.connect()
 
 #
 # Clustering
@@ -230,30 +216,6 @@ if "Audit" in datasets:
 	cat_indices = [2, 3, 4, 5, 6, 7, 8]
 	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "LGBMLRAuditCat", fit_params = {"classifier__gbdt__categorical_feature" : cat_indices})
 	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", fit_params = {"classifier__categorical_feature" : cat_indices})
-
-def build_audit_h2o(classifier, name):
-	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
-		[([column], CategoricalDomain()) for column in ["Employment", "Education", "Marital", "Occupation", "Gender", "Deductions"]]
-	)
-	pipeline = PMMLPipeline([
-		("mapper", mapper),
-		("uploader", H2OFrameCreator()),
-		("classifier", classifier)
-	])
-	pipeline.fit(audit_X, H2OFrame(audit_y.to_frame(), column_types = ["categorical"]))
-	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
-	classifier = pipeline._final_estimator
-	store_mojo(classifier, name)
-	store_pkl(pipeline, name)
-	adjusted = pipeline.predict(audit_X)
-	adjusted.set_names(["h2o(Adjusted)", "probability(0)", "probability(1)"])
-	store_csv(adjusted.as_data_frame(), name)
-
-if "Audit" in datasets and with_h2o:
-	build_audit_h2o(H2OGradientBoostingEstimator(distribution = "bernoulli", ntrees = 17), "H2OGradientBoostingAudit")
-	build_audit_h2o(H2OGeneralizedLinearEstimator(family = "binomial"), "H2OLogisticRegressionAudit")
-	build_audit_h2o(H2ORandomForestEstimator(distribution = "bernoulli", seed = 13), "H2ORandomForestAudit")
 
 audit_dict_X = audit_X.to_dict("records")
 
@@ -705,30 +667,6 @@ def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
 if "Auto" in datasets:
 	build_auto_opt(LGBMRegressor(objective = "regression"), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 	build_auto_opt(XGBRegressor(objective = "reg:squarederror"), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
-
-def build_auto_h2o(regressor, name):
-	transformer = ColumnTransformer(
-		[(column, CategoricalDomain(), [column]) for column in ["cylinders", "model_year", "origin"]] +
-		[(column, ContinuousDomain(), [column]) for column in ["displacement", "horsepower", "weight", "acceleration"]]
-	)
-	pipeline = PMMLPipeline([
-		("transformer", transformer),
-		("uploader", H2OFrameCreator(column_names = ["cylinders", "model_year", "origin", "displacement", "horsepower", "weight", "acceleration"], column_types = ["enum", "enum", "enum", "numeric", "numeric", "numeric", "numeric"])),
-		("regressor", regressor)
-	])
-	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
-	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
-	regressor = pipeline._final_estimator
-	store_mojo(regressor, name)
-	store_pkl(pipeline, name)
-	mpg = pipeline.predict(auto_X)
-	mpg.set_names(["mpg"])
-	store_csv(mpg.as_data_frame(), name)
-
-if "Auto" in datasets and with_h2o:
-	build_auto_h2o(H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
-	build_auto_h2o(H2OGeneralizedLinearEstimator(family = "gaussian"), "H2OLinearRegressionAuto")
-	build_auto_h2o(H2ORandomForestEstimator(distribution = "gaussian", seed = 13), "H2ORandomForestAuto")
 
 auto_na_X, auto_na_y = load_auto("AutoNA")
 
