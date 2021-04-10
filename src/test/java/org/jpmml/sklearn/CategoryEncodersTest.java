@@ -18,7 +18,6 @@
  */
 package org.jpmml.sklearn;
 
-import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.junit.Test;
 
 public class CategoryEncodersTest extends SkLearnTest implements Datasets {
@@ -35,7 +34,7 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateBase4EncoderAudit() throws Exception {
-		evaluate("Base4Encoder", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(8));
+		evaluate("Base4Encoder", AUDIT);
 	}
 
 	@Test
