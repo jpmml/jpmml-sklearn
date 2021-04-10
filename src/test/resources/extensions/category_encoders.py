@@ -31,21 +31,21 @@ def build_audit(transformer, classifier, name, **pmml_options):
 classifier = LogisticRegression(multi_class = "multinomial")
 
 transformer = ColumnTransformer([
-	("cat", Pipeline([("ordinal", OrdinalEncoder()), ("ohe", OneHotEncoder())]), cat_cols),
+	("cat", Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "error")), ("ohe", OneHotEncoder())]), cat_cols),
 	("cont", "passthrough", cont_cols)
 ])
 
 build_audit(transformer, classifier, "OrdinalEncoderAudit")
 
 transformer = ColumnTransformer([
-	("cat", BaseNEncoder(base = 2, drop_invariant = True), cat_cols),
+	("cat", BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), cat_cols),
 	("cont", "passthrough", cont_cols)
 ])
 
 build_audit(transformer, classifier, "Base2EncoderAudit")
 
 transformer = ColumnTransformer([
-	("cat", Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True)), ("ohe", OneHotEncoder())]), cat_cols),
+	("cat", Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", OneHotEncoder())]), cat_cols),
 	("cont", "passthrough", cont_cols)
 ])
 
@@ -54,7 +54,7 @@ build_audit(transformer, classifier, "Base3EncoderAudit")
 classifier = XGBClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 7, random_state = 13)
 
 transformer = ColumnTransformer([
-	("cat", BaseNEncoder(base = 4, drop_invariant = True), cat_cols),
+	("cat", BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), cat_cols),
 	("cont", "passthrough", cont_cols)
 ])
 
@@ -63,15 +63,15 @@ build_audit(transformer, classifier, "Base4EncoderAudit", compact = False)
 classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
 
 transformer = ColumnTransformer([
-	("cat", BinaryEncoder(), cat_cols),
+	("cat", BinaryEncoder(handle_missing = "error", handle_unknown = "error"), cat_cols),
 	("cont", "passthrough", cont_cols)
 ])
 
 build_audit(transformer, classifier, "BinaryEncoderAudit", compact = False)
 
 transformer = ColumnTransformer([
-	("cat_int", CountEncoder(min_group_size = 100), ["Education", "Employment", "Occupation"]),
-	("cat_float64", CountEncoder(normalize = True, min_group_size = 0.05), ["Marital", "Gender"]),
+	("cat_int", CountEncoder(min_group_size = 100, handle_missing = "error", handle_unknown = "error"), ["Education", "Employment", "Occupation"]),
+	("cat_float64", CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "error"), ["Marital", "Gender"]),
 	("cont", "passthrough", cont_cols)
 ])
 
@@ -80,7 +80,7 @@ classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
 build_audit(transformer, classifier, "CountEncoderAudit", compact = False)
 
 transformer = ColumnTransformer([
-	("cat", TargetEncoder(), cat_cols),
+	("cat", TargetEncoder(handle_missing = "error", handle_unknown = "error"), cat_cols),
 	("cont", "passthrough", cont_cols)
 ])
 
@@ -89,7 +89,7 @@ classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
 build_audit(transformer, classifier, "TargetEncoderAudit", compact = False)
 
 transformer = ColumnTransformer([
-	("cat", WOEEncoder(), cat_cols),
+	("cat", WOEEncoder(handle_missing = "error", handle_unknown = "error"), cat_cols),
 	("cont", "passthrough", cont_cols)
 ])
 

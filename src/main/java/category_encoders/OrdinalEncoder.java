@@ -51,6 +51,20 @@ public class OrdinalEncoder extends CategoryEncoder {
 			throw new IllegalArgumentException();
 		}
 
+		switch(handleMissing){
+			case "error":
+				break;
+			default:
+				throw new IllegalArgumentException(handleMissing);
+		} // End switch
+
+		switch(handleUnknown){
+			case "error":
+				break;
+			default:
+				throw new IllegalArgumentException(handleUnknown);
+		}
+
 		ClassDictUtil.checkSize(features, mappings);
 
 		List<Feature> result = new ArrayList<>();
@@ -67,44 +81,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 			List<Integer> indices = new ArrayList<>();
 			indices.addAll(categoryMappings.values());
 
-			Number mapMissingTo = null;
-
-			switch(handleMissing){
-				case "value":
-					{
-						Number lastCategory = (Number)categories.get(categories.size() - 1);
-						if(!Double.isNaN(lastCategory.doubleValue())){
-							throw new IllegalArgumentException(String.valueOf(lastCategory));
-						}
-
-						Integer lastIndex = indices.get(indices.size() - 1);
-						if(lastIndex != -2){
-							throw new IllegalArgumentException(String.valueOf(lastIndex));
-						}
-
-						categories = categories.subList(0, categories.size() - 1);
-						indices = indices.subList(0, indices.size() - 1);
-
-						mapMissingTo = -2;
-					}
-					break;
-				default:
-					throw new IllegalArgumentException(handleMissing);
-			}
-
-			Number defaultValue = null;
-
-			switch(handleUnknown){
-				case "value":
-					{
-						defaultValue = -1;
-					}
-					break;
-				default:
-					throw new IllegalArgumentException(handleUnknown);
-			}
-
-			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indices, mapMissingTo, defaultValue, DataType.INTEGER, encoder));
+			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indices, null, null, DataType.INTEGER, encoder));
 		}
 
 		return result;

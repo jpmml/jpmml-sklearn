@@ -57,14 +57,14 @@ public class BaseNEncoder extends CategoryEncoder {
 		}
 
 		switch(handleMissing){
-			case "value":
+			case "error":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
 		} // End switch
 
 		switch(handleUnknown){
-			case "value":
+			case "error":
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
@@ -82,9 +82,6 @@ public class BaseNEncoder extends CategoryEncoder {
 			OrdinalEncoder.Mapping ordinalMapping = ordinalMappings.get(i);
 
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
-
-			// XXX
-			ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_MISSING);
 
 			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base);
 

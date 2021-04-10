@@ -60,14 +60,22 @@ public class CountEncoder extends MapEncoder {
 		}
 
 		switch(handleMissing){
-			case "count":
+			case "error":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
 		}
 
-		if(handleUnknown != null){
-			throw new IllegalArgumentException(handleUnknown);
+		// XXX
+		if(handleUnknown == null){
+			throw new IllegalArgumentException();
+		}
+
+		switch(handleUnknown){
+			case "error":
+				break;
+			default:
+				throw new IllegalArgumentException(handleUnknown);
 		}
 
 		ClassDictUtil.checkSize(features, cols);

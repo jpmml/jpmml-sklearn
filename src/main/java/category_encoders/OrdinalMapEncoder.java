@@ -52,14 +52,14 @@ public class OrdinalMapEncoder extends MapEncoder {
 		}
 
 		switch(handleMissing){
-			case "value":
+			case "error":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
 		} // End switch
 
 		switch(handleUnknown){
-			case "value":
+			case "error":
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
