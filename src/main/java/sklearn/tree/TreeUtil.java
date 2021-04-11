@@ -227,16 +227,16 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Schema schema){
-		Boolean plain = (Boolean)estimator.getOption(HasTreeOptions.OPTION_PLAIN, Boolean.FALSE);
+		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
 
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModelEnsemble(estimator, miningFunction, plain, predicateManager, scoreDistributionManager, schema);
+		return encodeTreeModelEnsemble(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, schema);
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Boolean plain, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Boolean numeric, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
@@ -245,9 +245,9 @@ public class TreeUtil {
 
 			@Override
 			public TreeModel apply(T estimator){
-				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), plain, segmentSchema);
+				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), numeric, segmentSchema);
 
-				return TreeUtil.encodeTreeModel(estimator, miningFunction, plain, predicateManager, scoreDistributionManager, treeModelSchema);
+				return TreeUtil.encodeTreeModel(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, treeModelSchema);
 			}
 		};
 
@@ -258,16 +258,16 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Schema schema){
-		Boolean plain = (Boolean)estimator.getOption(HasTreeOptions.OPTION_PLAIN, Boolean.FALSE);
+		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
 
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModel(estimator, miningFunction, plain, predicateManager, scoreDistributionManager, schema);
+		return encodeTreeModel(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, schema);
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Boolean plain, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Boolean numeric, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -276,14 +276,14 @@ public class TreeUtil {
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
 
-		Node root = encodeNode(0, True.INSTANCE, miningFunction, plain, leftChildren, rightChildren, features, thresholds, values, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
+		Node root = encodeNode(0, True.INSTANCE, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
 
 		// XXX
 		if(estimator.hasFeatureImportances()){
-			Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(plain, schema);
+			Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(numeric, schema);
 
 			estimator.addFeatureImportances(treeModel, featureImportanceSchema);
 		}
@@ -294,7 +294,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, boolean plain, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, boolean numeric, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -311,7 +311,7 @@ public class TreeUtil {
 			Predicate leftPredicate;
 			Predicate rightPredicate;
 
-			if(feature instanceof BaseNFeature && !plain){
+			if(feature instanceof BaseNFeature && !numeric){
 				BaseNFeature baseFeature = (BaseNFeature)feature;
 
 				FieldName name = baseFeature.getName();
@@ -354,7 +354,7 @@ public class TreeUtil {
 				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
 			} else
 
-			if(feature instanceof MapFeature && !plain){
+			if(feature instanceof MapFeature && !numeric){
 				MapFeature mapFeature = (MapFeature)feature;
 
 				FieldName name = mapFeature.getName();
@@ -396,8 +396,8 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, plain, leftChildren, rightChildren, features, thresholds, values, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
-			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, plain, leftChildren, rightChildren, features, thresholds, values, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
 
 			Node result;
 
@@ -474,13 +474,13 @@ public class TreeUtil {
 	}
 
 	static
-	private Schema toTreeModelSchema(DataType dataType, boolean plain, Schema schema){
+	private Schema toTreeModelSchema(DataType dataType, boolean numeric, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
 			public Feature apply(Feature feature){
 
-				if(feature instanceof BaseNFeature && !plain){
+				if(feature instanceof BaseNFeature && !numeric){
 					BaseNFeature baseFeature = (BaseNFeature)feature;
 
 					return baseFeature;
@@ -492,7 +492,7 @@ public class TreeUtil {
 					return binaryFeature;
 				} else
 
-				if(feature instanceof MapFeature && !plain){
+				if(feature instanceof MapFeature && !numeric){
 					MapFeature mapFeature = (MapFeature)feature;
 
 					return mapFeature;
@@ -510,13 +510,13 @@ public class TreeUtil {
 	}
 
 	static
-	private Schema toTreeModelFeatureImportanceSchema(boolean plain, Schema schema){
+	private Schema toTreeModelFeatureImportanceSchema(boolean numeric, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
 			public Feature apply(Feature feature){
 
-				if(feature instanceof BaseNFeature && !plain){
+				if(feature instanceof BaseNFeature && !numeric){
 					BaseNFeature baseFeature = (BaseNFeature)feature;
 
 					return baseFeature;
@@ -528,7 +528,7 @@ public class TreeUtil {
 					return binaryFeature;
 				} else
 
-				if(feature instanceof MapFeature && !plain){
+				if(feature instanceof MapFeature && !numeric){
 					MapFeature mapFeature = (MapFeature)feature;
 
 					return mapFeature;

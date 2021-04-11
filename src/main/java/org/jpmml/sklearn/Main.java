@@ -86,14 +86,14 @@ public class Main {
 	private Boolean flat = null;
 
 	/**
-	 * @see HasTreeOptions#OPTION_PLAIN
+	 * @see HasTreeOptions#OPTION_NUMERIC
 	 */
 	@Parameter (
-		names = "-X-plain",
+		names = "-X-numeric",
 		arity = 1,
 		hidden = true
 	)
-	private Boolean plain = null;
+	private Boolean numeric = null;
 
 	/**
 	 * @see HasTreeOptions#OPTION_NODE_ID
@@ -213,7 +213,7 @@ public class Main {
 
 			options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
 			options.put(HasTreeOptions.OPTION_FLAT, this.flat);
-			options.put(HasTreeOptions.OPTION_PLAIN, this.plain);
+			options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
 			options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
 			options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
 			options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);

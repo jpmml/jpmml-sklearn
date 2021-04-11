@@ -82,7 +82,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		// See https://github.com/scikit-learn/scikit-learn/issues/11839
 		boolean nodeSampleCorrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.21") >= 0);
 
-		Boolean plain = (Boolean)getOption(HasTreeOptions.OPTION_PLAIN, Boolean.FALSE);
+		Boolean numeric = (Boolean)getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
 
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
@@ -101,7 +101,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			Tree tree = treeRegressor.getTree();
 
-			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, plain, predicateManager, scoreDistributionManager, estimatorSchema);
+			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, numeric, predicateManager, scoreDistributionManager, estimatorSchema);
 
 			Visitor visitor = new AbstractVisitor(){
 

@@ -40,16 +40,16 @@ import static org.junit.Assert.assertTrue;
 public class PredicateTest extends SkLearnTest implements Datasets {
 
 	@Test
-	public void checkPlain() throws Exception {
-		Map<String, Object> options = Collections.singletonMap(HasTreeOptions.OPTION_PLAIN, Boolean.TRUE);
+	public void checkNumeric() throws Exception {
+		Map<String, Object> options = Collections.singletonMap(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
 
 		check("BinaryEncoder", AUDIT, options);
 		check("CountEncoder", AUDIT, options);
 	}
 
 	@Test
-	public void checkNonPlain() throws Exception {
-		Map<String, Object> options = Collections.singletonMap(HasTreeOptions.OPTION_PLAIN, Boolean.FALSE);
+	public void checkNonNumeric() throws Exception {
+		Map<String, Object> options = Collections.singletonMap(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
 
 		check("BinaryEncoder", AUDIT, options);
 		check("CountEncoder", AUDIT, options);
@@ -62,14 +62,14 @@ public class PredicateTest extends SkLearnTest implements Datasets {
 		try(SkLearnTestBatch batch = (SkLearnTestBatch)createBatch(name, dataset, predicate, equivalence)){
 			batch.putOptions(options);
 
-			Boolean plain = (Boolean)options.get(HasTreeOptions.OPTION_PLAIN);
+			Boolean numeric = (Boolean)options.get(HasTreeOptions.OPTION_NUMERIC);
 
-			check(batch, plain);
+			check(batch, numeric);
 		}
 	}
 
 	static
-	private void check(SkLearnTestBatch batch, boolean plain) throws Exception {
+	private void check(SkLearnTestBatch batch, boolean numeric) throws Exception {
 		PMML pmml = batch.getPMML();
 
 		Visitor visitor = new AbstractVisitor(){
@@ -86,7 +86,7 @@ public class PredicateTest extends SkLearnTest implements Datasets {
 				if(parent instanceof PMML){
 					PMML pmml = (PMML)parent;
 
-					if(plain){
+					if(numeric){
 						assertTrue(simplePredicateCount > 100);
 						assertEquals(0, simpleSetPredicateCount);
 					} else

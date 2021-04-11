@@ -46,7 +46,7 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 	 * @see SimplePredicate
 	 * @see SimpleSetPredicate
 	 */
-	String OPTION_PLAIN = "plain";
+	String OPTION_NUMERIC = "numeric";
 
 	/**
 	 * @see Node#hasExtensions()
@@ -75,7 +75,7 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 		Map<String, Object> result = new LinkedHashMap<>();
 		result.put(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
-		result.put(HasTreeOptions.OPTION_PLAIN, Boolean.FALSE);
+		result.put(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
