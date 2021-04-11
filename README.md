@@ -48,7 +48,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Scikit-Learn</summary>
 
-  Python examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
 
   * Clustering:
     * [`cluster.KMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
@@ -175,7 +175,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Category Encoders</summary>
 
-  Python examples: [extensions/category_encoders.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/category_encoders.py)
+  Examples: [extensions/category_encoders.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/category_encoders.py)
 
   * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
   * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
@@ -188,7 +188,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>H2O.ai</summary>
 
-  Python examples: [extensions/h2o.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/h2o.py)
+  Examples: [extensions/h2o.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/h2o.py)
 
   * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
   * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
@@ -200,7 +200,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Imbalanced-Learn</summary>
 
-  Python examples: [extensions/imblearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/imblearn.py)
+  Examples: [extensions/imblearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/imblearn.py)
 
   * Under-sampling methods:
     * [`imblearn.under_sampling.AllKNN`](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.under_sampling.AllKNN.html)
@@ -235,7 +235,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>LightGBM</summary>
 
-  Python examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
 
   * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
   * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
@@ -245,7 +245,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Mlxtend</summary>
 
-  Python examples: N/A
+  Examples: N/A
 
   * [`mlxtend.preprocessing.DenseTransformer`](https://rasbt.github.io/mlxtend/user_guide/preprocessing/DenseTransformer/)
 </details>
@@ -253,7 +253,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>SkLearn2PMML</summary>
 
-  Python examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
 
   * Helpers:
     * `sklearn2pmml.EstimatorProxy`
@@ -323,7 +323,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Sklearn-Pandas</summary>
 
-  Python examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
 
   * `sklearn_pandas.CategoricalImputer`
   * `sklearn_pandas.DataFrameMapper`
@@ -332,7 +332,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>TPOT</summary>
 
-  Python examples: [extensions/tpot.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/tpot.py)
+  Examples: [extensions/tpot.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/tpot.py)
 
   * `tpot.builtins.stacking_estimator.StackingEstimator`
 </details>
@@ -340,7 +340,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>XGBoost</summary>
 
-  Python examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
 
   * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
   * [`xgboost.XGBRanker`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRanker)
