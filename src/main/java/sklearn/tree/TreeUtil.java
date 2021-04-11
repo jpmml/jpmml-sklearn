@@ -318,11 +318,11 @@ public class TreeUtil {
 
 				java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
 
-				List<Object> leftValues = baseFeature.getValues((Integer base) -> base <= threshold).stream()
+				List<Object> leftValues = baseFeature.getValues((Integer base) -> (toSplitValue(base) <= threshold)).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
-				List<Object> rightValues = baseFeature.getValues((Integer base) -> base > threshold).stream()
+				List<Object> rightValues = baseFeature.getValues((Integer base) -> (toSplitValue(base) > threshold)).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
@@ -361,11 +361,11 @@ public class TreeUtil {
 
 				java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
 
-				List<Object> leftValues = mapFeature.getValues((Number value) -> (value.doubleValue() <= threshold)).stream()
+				List<Object> leftValues = mapFeature.getValues((Number mapValue) -> (toSplitValue(mapValue) <= threshold)).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
-				List<Object> rightValues = mapFeature.getValues((Number value) -> (value.doubleValue()) > threshold).stream()
+				List<Object> rightValues = mapFeature.getValues((Number mapValue) -> (toSplitValue(mapValue)) > threshold).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
@@ -550,6 +550,11 @@ public class TreeUtil {
 		return feature
 			.toContinuousFeature(DataType.FLOAT) // First, cast from any numeric type (including numpy.float64) to numpy.float32
 			.toContinuousFeature(DataType.DOUBLE); // Second, cast from numpy.float32 to numpy.float64
+	}
+
+	static
+	private double toSplitValue(Number value){
+		return (double)value.floatValue();
 	}
 
 	static
