@@ -18,19 +18,22 @@
  */
 package category_encoders;
 
-public class LeaveOneOutEncoder extends MeanEncoder {
+import org.jpmml.converter.ValueUtil;
 
-	public LeaveOneOutEncoder(String module, String name){
+public class CatBoostEncoder extends MeanEncoder {
+
+	public CatBoostEncoder(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public String functionName(){
-		return "loo";
+		return "catBoost";
 	}
 
 	@Override
 	public MeanFunction createFunction(){
+		Double a = getA();
 		Double mean = getMean();
 
 		MeanFunction function = new MeanFunction(){
@@ -39,7 +42,7 @@ public class LeaveOneOutEncoder extends MeanEncoder {
 			public Double apply(Double sum, Integer count){
 
 				if(count > 1){
-					return (sum / count);
+					return ((sum + mean) / (count + a));
 				} else
 
 				{
@@ -49,5 +52,9 @@ public class LeaveOneOutEncoder extends MeanEncoder {
 		};
 
 		return function;
+	}
+
+	public Double getA(){
+		return ValueUtil.asDouble(getNumber("a"));
 	}
 }

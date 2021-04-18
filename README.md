@@ -179,6 +179,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
   * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
   * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
+  * [`category_encoders.CatBoostEncoder`](https://contrib.scikit-learn.org/category_encoders/catboost.html)
   * [`category_encoders.CountEncoder`](https://contrib.scikit-learn.org/category_encoders/count.html)
   * [`category_encoders.LeaveOneOutEncoder`](https://contrib.scikit-learn.org/category_encoders/leaveoneout.html)
   * [`category_encoders.OneHotEncoder`](https://contrib.scikit-learn.org/category_encoders/onehot.html)

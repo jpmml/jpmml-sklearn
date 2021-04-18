@@ -1,6 +1,6 @@
 from common import *
 
-from category_encoders import BaseNEncoder, BinaryEncoder, CountEncoder, LeaveOneOutEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
+from category_encoders import BaseNEncoder, BinaryEncoder, CatBoostEncoder, CountEncoder, LeaveOneOutEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
 from pandas import DataFrame
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
@@ -51,6 +51,7 @@ build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "erro
 classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
 
 build_audit(BinaryEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "BinaryEncoderAudit", compact = False)
+build_audit(CatBoostEncoder(a = 0.5, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "CatBoostEncoderAudit", compact = False, numeric = True)
 build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "CountEncoderAudit", compact = False)
 build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "LeaveOneOutEncoderAudit", compact = False, numeric = True)
 build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "TargetEncoderAudit", compact = False)

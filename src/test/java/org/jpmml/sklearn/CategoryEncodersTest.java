@@ -43,6 +43,11 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateCatBoostEncoderAudit() throws Exception {
+		evaluate("CatBoostEncoder", AUDIT);
+	}
+
+	@Test
 	public void evaluateCountEncoderAudit() throws Exception {
 		evaluate("CountEncoder", AUDIT);
 	}
