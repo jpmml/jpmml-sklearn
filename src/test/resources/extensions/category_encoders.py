@@ -40,7 +40,7 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 
 classifier = LogisticRegression()
 
-build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "error")), ("ohe", OneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
+build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "value")), ("ohe", OneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
 build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", OneHotEncoder())]), SimpleImputer(), clone(classifier), "OrdinalEncoderAuditNA")
 build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base2EncoderAudit")
 build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", OneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")

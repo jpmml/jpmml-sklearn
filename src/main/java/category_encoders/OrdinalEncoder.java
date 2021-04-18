@@ -61,6 +61,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 
 		switch(handleUnknown){
 			case "error":
+			case "value":
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
@@ -82,7 +83,17 @@ public class OrdinalEncoder extends CategoryEncoder {
 			List<Integer> indices = new ArrayList<>();
 			indices.addAll(categoryMappings.values());
 
-			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indices, null, null, DataType.INTEGER, encoder));
+			Integer defaultValue = null;
+
+			switch(handleUnknown){
+				case "value":
+					defaultValue = -2;
+					break;
+				default:
+					break;
+			}
+
+			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indices, null, defaultValue, DataType.INTEGER, encoder));
 		}
 
 		return result;
