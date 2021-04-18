@@ -48,6 +48,11 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateLeaveOneOutEncoderAudit() throws Exception {
+		evaluate("LeaveOneOutEncoder", AUDIT);
+	}
+
+	@Test
 	public void evaluateOneHotEncoderAudit() throws Exception {
 		evaluate("OneHotEncoder", AUDIT);
 	}
