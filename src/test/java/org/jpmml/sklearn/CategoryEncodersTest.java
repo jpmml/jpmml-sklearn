@@ -48,6 +48,16 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateOneHotEncoderAudit() throws Exception {
+		evaluate("OneHotEncoder", AUDIT);
+	}
+
+	@Test
+	public void evaluateOneHotEncoderAuditNA() throws Exception {
+		evaluate("OneHotEncoder", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateOrdinalEncoderAudit() throws Exception {
 		evaluate("OrdinalEncoder", AUDIT);
 	}

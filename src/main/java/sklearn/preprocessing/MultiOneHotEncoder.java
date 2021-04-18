@@ -84,8 +84,8 @@ public class MultiOneHotEncoder extends MultiTransformer {
 			if(feature instanceof CategoricalFeature){
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-				if(EncoderUtil.hasNaNCategory(featureCategories)){
-					ClassDictUtil.checkSize(EncoderUtil.dropNaNCategory(featureCategories), categoricalFeature.getValues());
+				if(hasNaNCategory(featureCategories)){
+					ClassDictUtil.checkSize(dropNaNCategory(featureCategories), categoricalFeature.getValues());
 
 					featureCategories = new ArrayList<>(categoricalFeature.getValues());
 					featureCategories.add(Double.NaN);
@@ -105,8 +105,8 @@ public class MultiOneHotEncoder extends MultiTransformer {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				if(EncoderUtil.hasNaNCategory(featureCategories)){
-					feature = wildcardFeature.toCategoricalFeature(EncoderUtil.dropNaNCategory(featureCategories));
+				if(hasNaNCategory(featureCategories)){
+					feature = wildcardFeature.toCategoricalFeature(dropNaNCategory(featureCategories));
 				} else
 
 				{
@@ -160,5 +160,27 @@ public class MultiOneHotEncoder extends MultiTransformer {
 
 	public List<Integer> getDropIdx(){
 		return getIntegerArray("drop_idx_");
+	}
+
+	static
+	private boolean hasNaNCategory(List<?> categories){
+
+		if(!categories.isEmpty()){
+			Object lastCategory = categories.get(categories.size() - 1);
+
+			return ValueUtil.isNaN(lastCategory);
+		}
+
+		return false;
+	}
+
+	static
+	private <E> List<E> dropNaNCategory(List<E> categories){
+
+		if(hasNaNCategory(categories)){
+			return categories.subList(0, categories.size() - 1);
+		}
+
+		return categories;
 	}
 }

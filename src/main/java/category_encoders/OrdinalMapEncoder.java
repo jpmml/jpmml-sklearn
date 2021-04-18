@@ -79,7 +79,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
 
 			// XXX
-			ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_MISSING);
+			ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_NAN);
 
 			Series series = mapping.get(col);
 

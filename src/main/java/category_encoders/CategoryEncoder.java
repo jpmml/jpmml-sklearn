@@ -61,5 +61,5 @@ public class CategoryEncoder extends Transformer {
 		return getString("handle_unknown");
 	}
 
-	public static final Object CATEGORY_MISSING = Double.NaN;
+	public static final Object CATEGORY_NAN = Double.NaN;
 }

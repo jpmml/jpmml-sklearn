@@ -71,7 +71,7 @@ public class EncoderUtil {
 	public Feature encodeIndexFeature(Transformer transformer, Feature feature, List<?> categories, List<? extends Number> indexCategories, Number mapMissingTo, Number defaultValue, DataType dataType, SkLearnEncoder encoder){
 		ClassDictUtil.checkSize(categories, indexCategories);
 
-		encoder.toCategorical(feature.getName(), categories);
+		encoder.toCategorical(feature.getName(), filterCategories(categories));
 
 		MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categories, indexCategories)
 			.setMapMissingTo(mapMissingTo)
@@ -93,28 +93,6 @@ public class EncoderUtil {
 	}
 
 	static
-	public boolean hasNaNCategory(List<?> categories){
-
-		if(!categories.isEmpty()){
-			Object lastCategory = categories.get(categories.size() - 1);
-
-			return ValueUtil.isNaN(lastCategory);
-		}
-
-		return false;
-	}
-
-	static
-	public List<?> dropNaNCategory(List<?> categories){
-
-		if(hasNaNCategory(categories)){
-			return categories.subList(0, categories.size() - 1);
-		}
-
-		return categories;
-	}
-
-	static
 	public List<List<?>> transformCategories(List<HasArray> arrays){
 		Function<HasArray, List<?>> function = new Function<HasArray, List<?>>(){
 
@@ -125,5 +103,22 @@ public class EncoderUtil {
 		};
 
 		return Lists.transform(arrays, function);
+	}
+
+	static
+	private <E> List<E> filterCategories(List<E> categories){
+		List<E> result = new ArrayList<>(categories.size());
+
+		for(int i = 0; i < categories.size(); i++){
+			E category = categories.get(i);
+
+			if(ValueUtil.isNaN(category)){
+				continue;
+			}
+
+			result.add(category);
+		}
+
+		return result;
 	}
 }

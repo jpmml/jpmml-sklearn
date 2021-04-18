@@ -1,6 +1,6 @@
 from common import *
 
-from category_encoders import BaseNEncoder, BinaryEncoder, CountEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
+from category_encoders import BaseNEncoder, BinaryEncoder, CountEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
 from pandas import DataFrame
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder as SkLearnOneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
 from xgboost import XGBClassifier
 
@@ -40,10 +40,12 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 
 classifier = LogisticRegression()
 
-build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "value")), ("ohe", OneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
-build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", OneHotEncoder())]), SimpleImputer(), clone(classifier), "OrdinalEncoderAuditNA")
+build_audit(OneHotEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAudit")
+build_audit(OneHotEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "OneHotEncoderAuditNA")
+build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
+build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), SimpleImputer(), clone(classifier), "OrdinalEncoderAuditNA")
 build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base2EncoderAudit")
-build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", OneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
+build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
 build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", compact = False)
 
 classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)

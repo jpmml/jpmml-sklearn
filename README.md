@@ -180,6 +180,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
   * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
   * [`category_encoders.CountEncoder`](https://contrib.scikit-learn.org/category_encoders/count.html)
+  * [`category_encoders.OneHotEncoder`](https://contrib.scikit-learn.org/category_encoders/onehot.html)
   * [`category_encoders.OrdinalEncoder`](https://contrib.scikit-learn.org/category_encoders/ordinal.html)
   * [`category_encoders.TargetEncoder`](https://contrib.scikit-learn.org/category_encoders/targetencoder.html)
   * [`category_encoders.WOEEncoder`](https://contrib.scikit-learn.org/category_encoders/woe.html)
