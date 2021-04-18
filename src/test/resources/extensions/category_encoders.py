@@ -5,6 +5,7 @@ from pandas import DataFrame
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
@@ -40,6 +41,7 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 classifier = LogisticRegression()
 
 build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "error")), ("ohe", OneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
+build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", OneHotEncoder())]), SimpleImputer(), clone(classifier), "OrdinalEncoderAuditNA")
 build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base2EncoderAudit")
 build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", OneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
 build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", compact = False)

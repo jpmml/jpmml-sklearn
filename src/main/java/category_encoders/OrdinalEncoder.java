@@ -53,6 +53,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "value":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
