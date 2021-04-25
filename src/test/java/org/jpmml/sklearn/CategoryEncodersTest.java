@@ -28,8 +28,18 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateBase2EncoderAuditNA() throws Exception {
+		evaluate("Base2Encoder", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateBase3EncoderAudit() throws Exception {
 		evaluate("Base3Encoder", AUDIT);
+	}
+
+	@Test
+	public void evaluateBase3EncoderAuditNA() throws Exception {
+		evaluate("Base3Encoder", AUDIT_NA);
 	}
 
 	@Test
@@ -38,8 +48,18 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateBase4EncoderAuditNA() throws Exception {
+		evaluate("Base4Encoder", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateBinaryEncoderAudit() throws Exception {
 		evaluate("BinaryEncoder", AUDIT);
+	}
+
+	@Test
+	public void evaluateBinaryEncoderAuditNA() throws Exception {
+		evaluate("BinaryEncoder", AUDIT_NA);
 	}
 
 	@Test

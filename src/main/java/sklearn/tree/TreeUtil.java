@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import category_encoders.MapFeature;
+import category_encoders.RichBaseNFeature;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
@@ -332,6 +333,16 @@ public class TreeUtil {
 
 				if(rightValues.size() == 0){
 					throw new IllegalArgumentException("Right branch is not selectable");
+				} // End if
+
+				if(baseFeature instanceof RichBaseNFeature){
+					RichBaseNFeature richBaseFeature = (RichBaseNFeature)baseFeature;
+
+					Object missingCategory = richBaseFeature.getMissingCategory();
+
+					if(leftValues.contains(missingCategory) || rightValues.contains(missingCategory)){
+						throw new IllegalArgumentException();
+					}
 				}
 
 				leftCategoryManager = leftCategoryManager.fork(name, leftValues);

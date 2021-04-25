@@ -27,7 +27,6 @@ import java.util.Map;
 import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.jpmml.converter.BaseNFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -58,6 +57,7 @@ public class BaseNEncoder extends CategoryEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "value":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -108,7 +108,20 @@ public class BaseNEncoder extends CategoryEncoder {
 					values.put(Character.getNumericValue(digit), category);
 				}
 
-				baseFeatures.add(new BaseNFeature(encoder, feature, base, pos, values));
+				Feature baseFeature = new RichBaseNFeature(encoder, feature, base, pos, values){
+
+					{
+						switch(handleMissing){
+							case "value":
+								setMissingCategory(CategoryEncoder.CATEGORY_NAN);
+								break;
+							default:
+								break;
+						}
+					}
+				};
+
+				baseFeatures.add(baseFeature);
 			}
 
 			result.addAll(baseFeatures);

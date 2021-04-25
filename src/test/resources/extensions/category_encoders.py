@@ -45,8 +45,11 @@ build_audit(OneHotEncoder(handle_missing = "value", handle_unknown = "error"), S
 build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
 build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), SimpleImputer(), clone(classifier), "OrdinalEncoderAuditNA")
 build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base2EncoderAudit")
+build_audit(BaseNEncoder(base = 2, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "Base2EncoderAuditNA")
 build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
-build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", compact = False)
+build_audit(Pipeline([("basen", BaseNEncoder(base = 3, handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), SimpleImputer(), clone(classifier), "Base3EncoderAuditNA")
+build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit")
+build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "Base4EncoderAuditNA")
 
 classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
 
@@ -59,6 +62,7 @@ build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "error"), "pas
 
 classifier = LogisticRegression()
 
+build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "BinaryEncoderAuditNA")
 build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "CatBoostEncoderAuditNA")
 build_audit(CountEncoder(min_group_size = 10, handle_missing = "count", handle_unknown = "error"), SimpleImputer(), clone(classifier), "CountEncoderAuditNA")
 build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "LeaveOneOutEncoderAuditNA")
