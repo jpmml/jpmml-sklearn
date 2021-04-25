@@ -59,6 +59,8 @@ build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "error"), "pas
 
 classifier = LogisticRegression()
 
+build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "CatBoostEncoderAuditNA")
 build_audit(CountEncoder(min_group_size = 10, handle_missing = "count", handle_unknown = "error"), SimpleImputer(), clone(classifier), "CountEncoderAuditNA")
+build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "LeaveOneOutEncoderAuditNA")
 build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "TargetEncoderAuditNA")
 build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "WOEEncoderAuditNA")

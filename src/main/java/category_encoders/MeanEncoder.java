@@ -37,6 +37,7 @@ import pandas.core.DataFrame;
 import pandas.core.Index;
 import pandas.core.Series;
 import pandas.core.SingleBlockManager;
+import sklearn.preprocessing.EncoderUtil;
 
 abstract
 public class MeanEncoder extends MapEncoder {
@@ -62,6 +63,7 @@ public class MeanEncoder extends MapEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "value":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -87,9 +89,19 @@ public class MeanEncoder extends MapEncoder {
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryMeans.keySet());
 
-			encoder.toCategorical(feature.getName(), categories);
+			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			Feature mapFeature = new MapFeature(encoder, feature, categoryMeans){
+
+				{
+					switch(handleMissing){
+						case "value":
+							setMissingCategory(CategoryEncoder.CATEGORY_NAN);
+							break;
+						default:
+							break;
+					}
+				}
 
 				@Override
 				public FieldName getDerivedName(){
