@@ -33,6 +33,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
+import sklearn.preprocessing.EncoderUtil;
 
 public class CountEncoder extends MapEncoder {
 
@@ -61,6 +62,8 @@ public class CountEncoder extends MapEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "count":
+			case "value":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -108,9 +111,20 @@ public class CountEncoder extends MapEncoder {
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryCounts.keySet());
 
-			encoder.toCategorical(feature.getName(), categories);
+			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts){
+
+				{
+					switch(handleMissing){
+						case "count":
+						case "value":
+							setMissingCategory(CategoryEncoder.CATEGORY_NAN);
+							break;
+						default:
+							break;
+					}
+				}
 
 				@Override
 				public FieldName getDerivedName(){
