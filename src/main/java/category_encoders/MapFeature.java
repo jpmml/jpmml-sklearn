@@ -19,6 +19,7 @@
 package category_encoders;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import java.util.function.Supplier;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.MapValues;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.HasDerivedName;
@@ -39,6 +41,8 @@ import org.jpmml.model.ToStringHelper;
 
 abstract
 public class MapFeature extends Feature implements HasDerivedName {
+
+	private Object missingCategory = null;
 
 	private Map<?, ? extends Number> mapping = null;
 
@@ -55,7 +59,14 @@ public class MapFeature extends Feature implements HasDerivedName {
 		Map<?, ? extends Number> mapping = getMapping();
 
 		Supplier<Expression> expressionSupplier = () -> {
-			return PMMLUtil.createMapValues(name, mapping);
+			Map<?, ? extends Number> validMapping = new LinkedHashMap<>(mapping);
+
+			Number mapMissingTo = validMapping.remove(getMissingCategory());
+
+			MapValues mapValues = PMMLUtil.createMapValues(name, validMapping)
+				.setMapMissingTo(mapMissingTo);
+
+			return mapValues;
 		};
 
 		DataType dataType = TypeUtil.getDataType(mapping.values(), DataType.DOUBLE);
@@ -82,6 +93,14 @@ public class MapFeature extends Feature implements HasDerivedName {
 	protected ToStringHelper toStringHelper(){
 		return new ToStringHelper(this)
 			.add("mapping", getMapping());
+	}
+
+	public Object getMissingCategory(){
+		return this.missingCategory;
+	}
+
+	protected void setMissingCategory(Object missingCategory){
+		this.missingCategory = missingCategory;
 	}
 
 	public Map<?, ? extends Number> getMapping(){

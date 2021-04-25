@@ -377,6 +377,12 @@ public class TreeUtil {
 					throw new IllegalArgumentException("Right branch not selectable");
 				}
 
+				Object missingCategory = mapFeature.getMissingCategory();
+
+				if(leftValues.contains(missingCategory) || rightValues.contains(missingCategory)){
+					throw new IllegalArgumentException();
+				}
+
 				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
 				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
 

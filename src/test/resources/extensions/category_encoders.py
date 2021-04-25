@@ -56,3 +56,8 @@ build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing
 build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "LeaveOneOutEncoderAudit", compact = False, numeric = True)
 build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "TargetEncoderAudit", compact = False)
 build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "WOEEncoderAudit", compact = False)
+
+classifier = LogisticRegression()
+
+build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "TargetEncoderAuditNA")
+build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "WOEEncoderAuditNA")

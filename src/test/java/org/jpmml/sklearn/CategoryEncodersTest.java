@@ -83,7 +83,17 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateTargetEncoderAuditNA() throws Exception {
+		evaluate("TargetEncoder", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateWOEEncoderAudit() throws Exception {
 		evaluate("WOEEncoder", AUDIT);
+	}
+
+	@Test
+	public void evaluateWOEEncoderAuditNA() throws Exception {
+		evaluate("WOEEncoder", AUDIT_NA);
 	}
 }

@@ -106,7 +106,7 @@ public class EncoderUtil {
 	}
 
 	static
-	private <E> List<E> filterCategories(List<E> categories){
+	public <E> List<E> filterCategories(List<E> categories){
 		List<E> result = new ArrayList<>(categories.size());
 
 		for(int i = 0; i < categories.size(); i++){

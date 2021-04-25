@@ -30,6 +30,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
+import sklearn.preprocessing.EncoderUtil;
 
 abstract
 public class OrdinalMapEncoder extends MapEncoder {
@@ -53,6 +54,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "value":
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -78,8 +80,13 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
 
-			// XXX
-			ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_NAN);
+			switch(handleMissing){
+				case "error":
+					ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_NAN);
+					break;
+				default:
+					break;
+			}
 
 			Series series = mapping.get(col);
 
@@ -90,9 +97,19 @@ public class OrdinalMapEncoder extends MapEncoder {
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryValues.keySet());
 
-			encoder.toCategorical(feature.getName(), categories);
+			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			Feature mapFeature = new MapFeature(encoder, feature, categoryValues){
+
+				{
+					switch(handleMissing){
+						case "value":
+							setMissingCategory(CategoryEncoder.CATEGORY_NAN);
+							break;
+						default:
+							break;
+					}
+				}
 
 				@Override
 				public FieldName getDerivedName(){
