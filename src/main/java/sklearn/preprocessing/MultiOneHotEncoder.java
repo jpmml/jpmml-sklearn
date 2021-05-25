@@ -21,6 +21,7 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -128,10 +129,14 @@ public class MultiOneHotEncoder extends MultiTransformer {
 			} // End if
 
 			if(dropIdx != null){
-				// Unbox to primitive value in order to ensure correct List#remove(int) vs. List#remove(Object) method resolution
-				int index = dropIdx.get(i);
+				Integer index = dropIdx.get(i);
 
-				featureCategories.remove(index);
+				if(index != null){
+					// Unbox to primitive value in order to ensure correct List#remove(int) vs. List#remove(Object) method resolution
+					int intIndex = dropIdx.get(i);
+
+					featureCategories.remove(intIndex);
+				}
 			}
 
 			for(int j = 0; j < featureCategories.size(); j++){
@@ -159,7 +164,13 @@ public class MultiOneHotEncoder extends MultiTransformer {
 	}
 
 	public List<Integer> getDropIdx(){
-		return getIntegerArray("drop_idx_");
+		List<? extends Number> dropIdx = getNumberArray("drop_idx_");
+
+		if(dropIdx == null){
+			return null;
+		}
+
+		return Lists.transform(dropIdx, number -> number != null ? ValueUtil.asInteger(number) : null);
 	}
 
 	static
