@@ -18,6 +18,7 @@
  */
 package org.jpmml.sklearn;
 
+import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.junit.Test;
 
 public class CategoryEncodersTest extends SkLearnTest implements Datasets {
@@ -44,12 +45,12 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateBase4EncoderAudit() throws Exception {
-		evaluate("Base4Encoder", AUDIT);
+		evaluate("Base4Encoder", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(12));
 	}
 
 	@Test
 	public void evaluateBase4EncoderAuditNA() throws Exception {
-		evaluate("Base4Encoder", AUDIT_NA);
+		evaluate("Base4Encoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(12));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateBinaryEncoderAuditNA() throws Exception {
-		evaluate("BinaryEncoder", AUDIT_NA);
+		evaluate("BinaryEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(12));
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateCatBoostEncoderAuditNA() throws Exception {
-		evaluate("CatBoostEncoder", AUDIT_NA);
+		evaluate("CatBoostEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(12));
 	}
 
 	@Test
@@ -79,7 +80,7 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateCountEncoderAuditNA() throws Exception {
-		evaluate("CountEncoder", AUDIT_NA);
+		evaluate("CountEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(12));
 	}
 
 	@Test
@@ -89,7 +90,7 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateLeaveOneOutEncoderAuditNA() throws Exception {
-		evaluate("LeaveOneOutEncoder", AUDIT_NA);
+		evaluate("LeaveOneOutEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(8));
 	}
 
 	@Test
@@ -119,7 +120,7 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateTargetEncoderAuditNA() throws Exception {
-		evaluate("TargetEncoder", AUDIT_NA);
+		evaluate("TargetEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(12));
 	}
 
 	@Test
@@ -129,6 +130,6 @@ public class CategoryEncodersTest extends SkLearnTest implements Datasets {
 
 	@Test
 	public void evaluateWOEEncoderAuditNA() throws Exception {
-		evaluate("WOEEncoder", AUDIT_NA);
+		evaluate("WOEEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(12));
 	}
 }

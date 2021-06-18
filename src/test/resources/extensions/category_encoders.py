@@ -48,8 +48,13 @@ build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "erro
 build_audit(BaseNEncoder(base = 2, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "Base2EncoderAuditNA")
 build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
 build_audit(Pipeline([("basen", BaseNEncoder(base = 3, handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), SimpleImputer(), clone(classifier), "Base3EncoderAuditNA")
-build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit")
-build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "Base4EncoderAuditNA")
+
+xgb_pmml_options = {"compact": False, "numeric": False}
+
+classifier = XGBClassifier(n_estimators = 101, random_state = 13)
+
+build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", **xgb_pmml_options)
+build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAuditNA", **xgb_pmml_options)
 
 classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
 
@@ -60,11 +65,14 @@ build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "error
 build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "TargetEncoderAudit", compact = False)
 build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "WOEEncoderAudit", compact = False)
 
-classifier = LogisticRegression()
+classifier = XGBClassifier(n_estimators = 101, random_state = 13)
 
-build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "BinaryEncoderAuditNA")
-build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "CatBoostEncoderAuditNA")
-build_audit(CountEncoder(min_group_size = 10, handle_missing = "count", handle_unknown = "error"), SimpleImputer(), clone(classifier), "CountEncoderAuditNA")
-build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "LeaveOneOutEncoderAuditNA")
-build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "TargetEncoderAuditNA")
-build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "WOEEncoderAuditNA")
+build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "BinaryEncoderAuditNA", **xgb_pmml_options)
+build_audit(CountEncoder(min_group_size = 10, handle_missing = "count", handle_unknown = "error"), "passthrough", clone(classifier), "CountEncoderAuditNA", **xgb_pmml_options)
+build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "TargetEncoderAuditNA", **xgb_pmml_options)
+build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "WOEEncoderAuditNA", **xgb_pmml_options)
+
+xgb_pmml_options = {"compact": False, "numeric": False, "prune": True}
+
+build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "CatBoostEncoderAuditNA", **xgb_pmml_options)
+build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "LeaveOneOutEncoderAuditNA", **xgb_pmml_options)
