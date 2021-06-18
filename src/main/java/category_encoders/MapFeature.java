@@ -29,39 +29,55 @@ import java.util.function.Supplier;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MapValues;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.HasDerivedName;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ThresholdFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.model.ToStringHelper;
 
-abstract
-public class MapFeature extends Feature implements HasDerivedName {
-
-	private Object missingCategory = null;
+public class MapFeature extends ThresholdFeature {
 
 	private Map<?, ? extends Number> mapping = null;
 
+	private Object missingValue = null;
 
-	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping){
-		super(encoder, feature.getName(), feature.getDataType());
+
+	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingValue){
+		this(encoder, feature.getName(), feature.getDataType(), mapping, missingValue);
+	}
+
+	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingValue){
+		this(encoder, field.getName(), field.getDataType(), mapping, missingValue);
+	}
+
+	public MapFeature(PMMLEncoder encoder, FieldName name, DataType dataType, Map<?, ? extends Number> mapping, Object missingValue){
+		super(encoder, name, dataType);
 
 		setMapping(mapping);
+		setMissingValue(missingValue);
+	}
+
+	@Override
+	public FieldName getDerivedName(){
+		return FieldNameUtil.create("map", getName());
 	}
 
 	@Override
 	public ContinuousFeature toContinuousFeature(){
 		FieldName name = getName();
 		Map<?, ? extends Number> mapping = getMapping();
+		Object missingValue = getMissingValue();
 
 		Supplier<Expression> expressionSupplier = () -> {
 			Map<?, ? extends Number> validMapping = new LinkedHashMap<>(mapping);
 
-			Number mapMissingTo = validMapping.remove(getMissingCategory());
+			Number mapMissingTo = validMapping.remove(missingValue);
 
 			MapValues mapValues = PMMLUtil.createMapValues(name, validMapping)
 				.setMapMissingTo(mapMissingTo);
@@ -74,6 +90,7 @@ public class MapFeature extends Feature implements HasDerivedName {
 		return toContinuousFeature(getDerivedName(), dataType, expressionSupplier);
 	}
 
+	@Override
 	public Set<?> getValues(Predicate<Number> predicate){
 		Map<?, ? extends Number> mapping = getMapping();
 
@@ -90,17 +107,32 @@ public class MapFeature extends Feature implements HasDerivedName {
 	}
 
 	@Override
+	public int hashCode(){
+		int result = super.hashCode();
+
+		result = (31 * result) + Objects.hash(this.getMapping());
+		result = (31 * result) + Objects.hash(this.getMissingValue());
+
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object object){
+
+		if(object instanceof MapFeature){
+			MapFeature that = (MapFeature)object;
+
+			return super.equals(object) && Objects.equals(this.getMapping(), that.getMapping()) && Objects.equals(this.getMissingValue(), that.getMissingValue());
+		}
+
+		return false;
+	}
+
+	@Override
 	protected ToStringHelper toStringHelper(){
 		return new ToStringHelper(this)
-			.add("mapping", getMapping());
-	}
-
-	public Object getMissingCategory(){
-		return this.missingCategory;
-	}
-
-	protected void setMissingCategory(Object missingCategory){
-		this.missingCategory = missingCategory;
+			.add("mapping", getMapping())
+			.add("missingValue", getMissingValue());
 	}
 
 	public Map<?, ? extends Number> getMapping(){
@@ -109,5 +141,14 @@ public class MapFeature extends Feature implements HasDerivedName {
 
 	private void setMapping(Map<?, ? extends Number> mapping){
 		this.mapping = Objects.requireNonNull(mapping);
+	}
+
+	@Override
+	public Object getMissingValue(){
+		return this.missingValue;
+	}
+
+	private void setMissingValue(Object missingValue){
+		this.missingValue = missingValue;
 	}
 }

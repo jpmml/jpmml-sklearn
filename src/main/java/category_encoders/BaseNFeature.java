@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2020 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -19,7 +19,11 @@
 package category_encoders;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -28,23 +32,51 @@ import com.google.common.collect.SetMultimap;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.PMMLFunctions;
-import org.jpmml.converter.BaseNFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ThresholdFeature;
+import org.jpmml.model.ToStringHelper;
 
-public class RichBaseNFeature extends BaseNFeature {
+public class BaseNFeature extends ThresholdFeature {
 
-	private Object missingCategory = null;
+	private int base = -1;
+
+	private int index = -1;
+
+	private SetMultimap<Integer, ?> values = null;
+
+	private Object missingValue = null;
 
 
-	public RichBaseNFeature(PMMLEncoder encoder, Feature feature, int base, int index, SetMultimap<Integer, ?> values){
-		super(encoder, feature.getName(), feature.getDataType(), base, index, values);
+	public BaseNFeature(PMMLEncoder encoder, Field<?> field, int base, int index, SetMultimap<Integer, ?> values, Object missingValue){
+		this(encoder, field.getName(), field.getDataType(), base, index, values, missingValue);
+	}
+
+	public BaseNFeature(PMMLEncoder encoder, Feature feature, int base, int index, SetMultimap<Integer, ?> values, Object missingValue){
+		this(encoder, feature.getName(), feature.getDataType(), base, index, values, missingValue);
+	}
+
+	public BaseNFeature(PMMLEncoder encoder, FieldName name, DataType dataType, int base, int index, SetMultimap<Integer, ?> values, Object missingValue){
+		super(encoder, name, dataType);
+
+		setBase(base);
+		setIndex(index);
+
+		setValues(values);
+		setMissingValue(missingValue);
+	}
+
+	@Override
+	public FieldName getDerivedName(){
+		return FieldNameUtil.create("base" + getBase(), getName(), getIndex());
 	}
 
 	@Override
@@ -52,10 +84,10 @@ public class RichBaseNFeature extends BaseNFeature {
 		FieldName name = getName();
 		DataType dataType = getDataType();
 		int base = getBase();
-		Object missingCategory = getMissingCategory();
 		SetMultimap<Integer, ?> values = getValues();
+		Object missingValue = getMissingValue();
 
-		boolean missingValueAware = values.containsValue(missingCategory);
+		boolean missingValueAware = values.containsValue(missingValue);
 
 		Supplier<Expression> expressionSupplier = () -> {
 			Map<Integer, ? extends Collection<?>> valueMap = values.asMap();
@@ -92,8 +124,8 @@ public class RichBaseNFeature extends BaseNFeature {
 
 				if(missingValueAware){
 
-					if(categories.contains(missingCategory)){
-						categories.remove(missingCategory);
+					if(categories.contains(missingValue)){
+						categories.remove(missingValue);
 
 						missingBaseValue = baseValue;
 					} // End if
@@ -143,11 +175,88 @@ public class RichBaseNFeature extends BaseNFeature {
 		return toContinuousFeature(getDerivedName(), DataType.INTEGER, expressionSupplier);
 	}
 
-	public Object getMissingCategory(){
-		return this.missingCategory;
+	@Override
+	public Set<?> getValues(Predicate<Number> predicate){
+		SetMultimap<Integer, ?> values = getValues();
+
+		Map<Integer, ? extends Collection<?>> valueMap = values.asMap();
+
+		Set<Object> result = new LinkedHashSet<>();
+
+		Set<? extends Map.Entry<Integer, ? extends Collection<?>>> entries = valueMap.entrySet();
+
+		entries.stream()
+			.sorted((left, right) -> Integer.compare(left.getKey(), right.getKey()))
+			.filter((entry) -> predicate.test(entry.getKey()))
+			.map((entry) -> entry.getValue())
+			.forEach(result::addAll);
+
+		return result;
 	}
 
-	protected void setMissingCategory(Object missingCategory){
-		this.missingCategory = missingCategory;
+	@Override
+	public int hashCode(){
+		int result = super.hashCode();
+
+		result = (31 * result) + Objects.hash(this.getBase());
+		result = (31 * result) + Objects.hash(this.getIndex());
+		result = (31 * result) + Objects.hash(this.getValues());
+		result = (31 * result) + Objects.hash(this.getMissingValue());
+
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object object){
+
+		if(object instanceof BaseNFeature){
+			BaseNFeature that = (BaseNFeature)object;
+
+			return super.equals(object) && Objects.equals(this.getBase(), that.getBase()) && Objects.equals(this.getIndex(), that.getIndex()) && Objects.equals(this.getValues(), that.getValues()) && Objects.equals(this.getMissingValue(), that.getMissingValue());
+		}
+
+		return false;
+	}
+
+	@Override
+	protected ToStringHelper toStringHelper(){
+		return super.toStringHelper()
+			.add("base", getBase())
+			.add("index", getIndex())
+			.add("values", getValues())
+			.add("missingValue", getMissingValue());
+	}
+
+	public int getBase(){
+		return this.base;
+	}
+
+	private void setBase(int base){
+		this.base = base;
+	}
+
+	public int getIndex(){
+		return this.index;
+	}
+
+	private void setIndex(int index){
+		this.index = index;
+	}
+
+	public SetMultimap<Integer, ?> getValues(){
+		return this.values;
+	}
+
+	private void setValues(SetMultimap<Integer, ?> values){
+		this.values = Objects.requireNonNull(values);
+	}
+
+	@Override
+	public Object getMissingValue(){
+		return this.missingValue;
+	}
+
+	private void setMissingValue(Object missingValue){
+		this.missingValue = missingValue;
 	}
 }

@@ -48,13 +48,17 @@ public class BoosterUtil {
 		Integer bestNTreeLimit = (Integer)estimator.getOptionalScalar("best_ntree_limit");
 
 		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
+		Boolean numeric = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
+		Boolean prune = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
 		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
 
 		Map<String, Object> options = new LinkedHashMap<>();
 		options.put(HasXGBoostOptions.OPTION_COMPACT, compact);
+		options.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
+		options.put(HasXGBoostOptions.OPTION_PRUNE, prune);
 		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
-		Schema xgbSchema = learner.toXGBoostSchema(schema);
+		Schema xgbSchema = learner.toXGBoostSchema(numeric, schema);
 
 		MiningModel miningModel = learner.encodeMiningModel(options, xgbSchema);
 

@@ -32,6 +32,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
+import pandas.core.SeriesUtil;
 import sklearn.preprocessing.EncoderUtil;
 
 public class OrdinalEncoder extends CategoryEncoder {
@@ -126,7 +127,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 		public Map<?, Integer> getCategoryMapping(){
 			Series mapping = get("mapping", Series.class);
 
-			return CategoryEncoderUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
+			return SeriesUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
 		}
 	}
 }

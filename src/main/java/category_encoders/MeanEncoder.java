@@ -20,7 +20,6 @@ package category_encoders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -36,6 +35,7 @@ import pandas.core.BlockManager;
 import pandas.core.DataFrame;
 import pandas.core.Index;
 import pandas.core.Series;
+import pandas.core.SeriesUtil;
 import pandas.core.SingleBlockManager;
 import sklearn.preprocessing.EncoderUtil;
 
@@ -61,9 +61,13 @@ public class MeanEncoder extends MapEncoder {
 			throw new IllegalArgumentException();
 		}
 
+		Object missingCategory = null;
+
 		switch(handleMissing){
 			case "error":
+				break;
 			case "value":
+				missingCategory = CategoryEncoder.CATEGORY_NAN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -84,24 +88,14 @@ public class MeanEncoder extends MapEncoder {
 
 			Series series = mapping.get(col);
 
-			Map<Object, Double> categoryMeans = CategoryEncoderUtil.toMap(series, Functions.identity(), ValueUtil::asDouble);
+			Map<Object, Double> categoryMeans = SeriesUtil.toMap(series, Functions.identity(), ValueUtil::asDouble);
 
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryMeans.keySet());
 
 			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Feature mapFeature = new MapFeature(encoder, feature, categoryMeans){
-
-				{
-					switch(handleMissing){
-						case "value":
-							setMissingCategory(CategoryEncoder.CATEGORY_NAN);
-							break;
-						default:
-							break;
-					}
-				}
+			Feature mapFeature = new MapFeature(encoder, feature, categoryMeans, missingCategory){
 
 				@Override
 				public FieldName getDerivedName(){
@@ -128,15 +122,15 @@ public class MeanEncoder extends MapEncoder {
 
 	static
 	private Series toMeanSeries(DataFrame dataFrame, MeanFunction function){
-		BlockManager blockManager = dataFrame.get("_mgr", BlockManager.class);
+		BlockManager blockManager = dataFrame.getData();
 
 		List<Index> axes = blockManager.getAxesArray();
 		if(axes.size() != 2){
 			throw new IllegalArgumentException();
 		}
 
-		List<?> firstDim = (axes.get(0)).getData().getData();
-		List<?> secondDim = (axes.get(1)).getData().getData();
+		List<?> firstDim = (axes.get(0)).getDataData();
+		List<?> secondDim = (axes.get(1)).getDataData();
 
 		if(!(Arrays.asList("sum", "count")).equals(firstDim)){
 			throw new IllegalArgumentException();
@@ -174,12 +168,12 @@ public class MeanEncoder extends MapEncoder {
 			}
 		};
 
-		SingleBlockManager singleBlockManager = new SingleBlockManager("pandas.core.internals.managers", "SingleBlockManager");
-		singleBlockManager.put("block_items", Collections.singletonList(axes.get(1)));
-		singleBlockManager.put("block_values", Collections.singletonList(hasArray));
+		SingleBlockManager singleBlockManager = new SingleBlockManager();
+		singleBlockManager.setOnlyBlockItem(axes.get(1));
+		singleBlockManager.setOnlyBlockValue(hasArray);
 
-		Series result = new Series("pandas.core.series", "Series");
-		result.put("_data", singleBlockManager);
+		Series result = new Series();
+		result.setBlockManager(singleBlockManager);
 
 		return result;
 	}

@@ -30,6 +30,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.ExpressionTranslator;
+import org.jpmml.python.ExpressionUtil;
 import org.jpmml.python.Scope;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.StepUtil;
@@ -57,7 +58,7 @@ public class ExpressionTransformer extends Transformer {
 		} else
 
 		{
-			if(ExpressionTranslator.isString(expression, scope)){
+			if(ExpressionUtil.isString(expression, scope)){
 				dataType = DataType.STRING;
 			} else
 

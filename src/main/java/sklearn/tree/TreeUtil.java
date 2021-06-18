@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import category_encoders.MapFeature;
-import category_encoders.RichBaseNFeature;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
@@ -49,7 +47,6 @@ import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.NodeTransformer;
 import org.dmg.pmml.tree.SimplifyingNodeTransformer;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.BaseNFeature;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.CategoryManager;
@@ -59,6 +56,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
+import org.jpmml.converter.ThresholdFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.visitors.AbstractVisitor;
@@ -312,46 +310,6 @@ public class TreeUtil {
 			Predicate leftPredicate;
 			Predicate rightPredicate;
 
-			if(feature instanceof BaseNFeature && !numeric){
-				BaseNFeature baseFeature = (BaseNFeature)feature;
-
-				FieldName name = baseFeature.getName();
-
-				java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
-
-				List<Object> leftValues = baseFeature.getValues((Integer base) -> (toSplitValue(base) <= threshold)).stream()
-					.filter(valueFilter)
-					.collect(Collectors.toList());
-
-				List<Object> rightValues = baseFeature.getValues((Integer base) -> (toSplitValue(base) > threshold)).stream()
-					.filter(valueFilter)
-					.collect(Collectors.toList());
-
-				if(leftValues.size() == 0){
-					throw new IllegalArgumentException("Left branch is not selectable");
-				} // End if
-
-				if(rightValues.size() == 0){
-					throw new IllegalArgumentException("Right branch is not selectable");
-				} // End if
-
-				if(baseFeature instanceof RichBaseNFeature){
-					RichBaseNFeature richBaseFeature = (RichBaseNFeature)baseFeature;
-
-					Object missingCategory = richBaseFeature.getMissingCategory();
-
-					if(leftValues.contains(missingCategory) || rightValues.contains(missingCategory)){
-						throw new IllegalArgumentException();
-					}
-				}
-
-				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
-				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
-
-				leftPredicate = predicateManager.createPredicate(baseFeature, leftValues);
-				rightPredicate = predicateManager.createPredicate(baseFeature, rightValues);
-			} else
-
 			if(feature instanceof BinaryFeature){
 				BinaryFeature binaryFeature = (BinaryFeature)feature;
 
@@ -365,18 +323,20 @@ public class TreeUtil {
 				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
 			} else
 
-			if(feature instanceof MapFeature && !numeric){
-				MapFeature mapFeature = (MapFeature)feature;
+			if(feature instanceof ThresholdFeature && !numeric){
+				ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
-				FieldName name = mapFeature.getName();
+				FieldName name = thresholdFeature.getName();
+
+				Object missingValue = thresholdFeature.getMissingValue();
 
 				java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
 
-				List<Object> leftValues = mapFeature.getValues((Number mapValue) -> (toSplitValue(mapValue) <= threshold)).stream()
+				List<Object> leftValues = thresholdFeature.getValues((Number value) -> (toSplitValue(value) <= threshold)).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
-				List<Object> rightValues = mapFeature.getValues((Number mapValue) -> (toSplitValue(mapValue)) > threshold).stream()
+				List<Object> rightValues = thresholdFeature.getValues((Number value) -> (toSplitValue(value)) > threshold).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
@@ -386,19 +346,17 @@ public class TreeUtil {
 
 				if(rightValues.size() == 0){
 					throw new IllegalArgumentException("Right branch not selectable");
-				}
+				} // End if
 
-				Object missingCategory = mapFeature.getMissingCategory();
-
-				if(leftValues.contains(missingCategory) || rightValues.contains(missingCategory)){
+				if(leftValues.contains(missingValue) || rightValues.contains(missingValue)){
 					throw new IllegalArgumentException();
 				}
 
 				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
 				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
 
-				leftPredicate = predicateManager.createPredicate(mapFeature, leftValues);
-				rightPredicate = predicateManager.createPredicate(mapFeature, rightValues);
+				leftPredicate = predicateManager.createPredicate(thresholdFeature, leftValues);
+				rightPredicate = predicateManager.createPredicate(thresholdFeature, rightValues);
 			} else
 
 			{
@@ -497,22 +455,16 @@ public class TreeUtil {
 			@Override
 			public Feature apply(Feature feature){
 
-				if(feature instanceof BaseNFeature && !numeric){
-					BaseNFeature baseFeature = (BaseNFeature)feature;
-
-					return baseFeature;
-				} else
-
 				if(feature instanceof BinaryFeature){
 					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
 					return binaryFeature;
 				} else
 
-				if(feature instanceof MapFeature && !numeric){
-					MapFeature mapFeature = (MapFeature)feature;
+				if(feature instanceof ThresholdFeature && !numeric){
+					ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
-					return mapFeature;
+					return thresholdFeature;
 				} else
 
 				{
@@ -533,22 +485,16 @@ public class TreeUtil {
 			@Override
 			public Feature apply(Feature feature){
 
-				if(feature instanceof BaseNFeature && !numeric){
-					BaseNFeature baseFeature = (BaseNFeature)feature;
-
-					return baseFeature;
-				} else
-
 				if(feature instanceof BinaryFeature){
 					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
 					return binaryFeature;
 				} else
 
-				if(feature instanceof MapFeature && !numeric){
-					MapFeature mapFeature = (MapFeature)feature;
+				if(feature instanceof ThresholdFeature && !numeric){
+					ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
-					return mapFeature;
+					return thresholdFeature;
 				} else
 
 				{

@@ -119,7 +119,7 @@ public class Estimator extends Step {
 				Feature feature = features.get(i);
 				Number featureImportance = featureImportances.get(i);
 
-				encoder.addFeatureImportance(model, feature.getName(), featureImportance);
+				encoder.addFeatureImportance(model, feature, featureImportance);
 			}
 		}
 	}

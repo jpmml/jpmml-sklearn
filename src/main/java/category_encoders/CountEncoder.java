@@ -33,6 +33,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.Series;
+import pandas.core.SeriesUtil;
 import sklearn.preprocessing.EncoderUtil;
 
 public class CountEncoder extends MapEncoder {
@@ -60,10 +61,14 @@ public class CountEncoder extends MapEncoder {
 			throw new IllegalArgumentException();
 		}
 
+		Object missingCategory = null;
+
 		switch(handleMissing){
 			case "error":
+				break;
 			case "count":
 			case "value":
+				missingCategory = CategoryEncoder.CATEGORY_NAN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -91,7 +96,7 @@ public class CountEncoder extends MapEncoder {
 
 			Series series = mapping.get(col);
 
-			Map<Object, Number> categoryCounts = CategoryEncoderUtil.toMap(series, Functions.identity(), normalize ? ValueUtil::asDouble : ValueUtil::asInteger);
+			Map<Object, Number> categoryCounts = SeriesUtil.toMap(series, Functions.identity(), normalize ? ValueUtil::asDouble : ValueUtil::asInteger);
 
 			Map<?, String> leftoverCategories = minGroupCategories.get(col);
 			if(leftoverCategories != null){
@@ -113,18 +118,7 @@ public class CountEncoder extends MapEncoder {
 
 			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts){
-
-				{
-					switch(handleMissing){
-						case "count":
-						case "value":
-							setMissingCategory(CategoryEncoder.CATEGORY_NAN);
-							break;
-						default:
-							break;
-					}
-				}
+			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts, missingCategory){
 
 				@Override
 				public FieldName getDerivedName(){

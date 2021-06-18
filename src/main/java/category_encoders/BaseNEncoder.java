@@ -55,9 +55,13 @@ public class BaseNEncoder extends CategoryEncoder {
 			dropCols = getDropCols();
 		}
 
+		Object missingCategory = null;
+
 		switch(handleMissing){
 			case "error":
+				break;
 			case "value":
+				missingCategory = CategoryEncoder.CATEGORY_NAN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -108,18 +112,7 @@ public class BaseNEncoder extends CategoryEncoder {
 					values.put(Character.getNumericValue(digit), category);
 				}
 
-				Feature baseFeature = new RichBaseNFeature(encoder, feature, base, pos, values){
-
-					{
-						switch(handleMissing){
-							case "value":
-								setMissingCategory(CategoryEncoder.CATEGORY_NAN);
-								break;
-							default:
-								break;
-						}
-					}
-				};
+				Feature baseFeature = new BaseNFeature(encoder, feature, base, pos, values, missingCategory);
 
 				baseFeatures.add(baseFeature);
 			}

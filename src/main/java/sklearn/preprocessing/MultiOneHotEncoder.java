@@ -21,11 +21,11 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import category_encoders.BaseNFeature;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.BaseNFeature;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;

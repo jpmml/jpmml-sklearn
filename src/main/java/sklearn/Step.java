@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import numpy.core.NDArray;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.python.PythonObject;
@@ -31,6 +32,10 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public Step(String module, String name){
 		super(module, name);
+	}
+
+	public FieldName createFieldName(DataType dataType, Object... args){
+		return createFieldName((dataType.name()).toLowerCase(), args);
 	}
 
 	public FieldName createFieldName(String function, Object... args){

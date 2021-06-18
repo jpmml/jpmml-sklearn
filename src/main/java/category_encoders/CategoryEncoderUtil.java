@@ -20,16 +20,9 @@ package category_encoders;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
-import pandas.core.Index;
-import pandas.core.Series;
-import pandas.core.SingleBlockManager;
 
 public class CategoryEncoderUtil {
 
@@ -46,27 +39,6 @@ public class CategoryEncoderUtil {
 			V value = valueFunction.apply(entry.getValue());
 
 			result.put(key, value);
-		}
-
-		return result;
-	}
-
-	static
-	public <K, V> Map<K, V> toMap(Series series, Function<Object, K> keyFunction, Function<Number, V> valueFunction){
-		SingleBlockManager blockManager = series.getBlockManager();
-
-		Index blockItem = blockManager.getOnlyBlockItem();
-		List<K> keys = Lists.transform((List<?>)(blockItem.getData()).getData(), keyFunction);
-
-		HasArray blockValue = blockManager.getOnlyBlockValue();
-		List<V> values = Lists.transform((List<Number>)blockValue.getArrayContent(), valueFunction);
-
-		ClassDictUtil.checkSize(keys, values);
-
-		Map<K, V> result = new LinkedHashMap<>();
-
-		for(int i = 0; i < keys.size(); i++){
-			result.put(keys.get(i), values.get(i));
 		}
 
 		return result;
