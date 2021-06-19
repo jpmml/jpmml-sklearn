@@ -348,7 +348,7 @@ public class TreeUtil {
 				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
 				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
 
-				if(leftValues.size() > 0){
+				if(!leftValues.isEmpty()){
 					leftPredicate = predicateManager.createPredicate(thresholdFeature, leftValues);
 				} else
 
@@ -356,7 +356,7 @@ public class TreeUtil {
 					leftPredicate = False.INSTANCE;
 				} // End if
 
-				if(rightValues.size() > 0){
+				if(!rightValues.isEmpty()){
 					rightPredicate = predicateManager.createPredicate(thresholdFeature, rightValues);
 				} else
 
