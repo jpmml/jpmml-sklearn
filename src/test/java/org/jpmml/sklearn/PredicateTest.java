@@ -45,6 +45,8 @@ public class PredicateTest extends SkLearnTest implements Datasets {
 
 		check("BinaryEncoder", AUDIT, options);
 		check("CountEncoder", AUDIT, options);
+		check("LeaveOneOutEncoder", AUDIT, options);
+		check("TargetEncoder", AUDIT, options);
 	}
 
 	@Test
@@ -53,6 +55,8 @@ public class PredicateTest extends SkLearnTest implements Datasets {
 
 		check("BinaryEncoder", AUDIT, options);
 		check("CountEncoder", AUDIT, options);
+		check("LeaveOneOutEncoder", AUDIT, options);
+		check("TargetEncoder", AUDIT, options);
 	}
 
 	public void check(String name, String dataset, Map<String, ?> options) throws Exception {

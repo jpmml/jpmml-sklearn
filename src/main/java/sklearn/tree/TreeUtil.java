@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.False;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.HasExtensions;
 import org.dmg.pmml.MiningFunction;
@@ -340,14 +341,6 @@ public class TreeUtil {
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
-				if(leftValues.size() == 0){
-					throw new IllegalArgumentException("Left branch not selectable");
-				} // End if
-
-				if(rightValues.size() == 0){
-					throw new IllegalArgumentException("Right branch not selectable");
-				} // End if
-
 				if(leftValues.contains(missingValue) || rightValues.contains(missingValue)){
 					throw new IllegalArgumentException();
 				}
@@ -355,8 +348,21 @@ public class TreeUtil {
 				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
 				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
 
-				leftPredicate = predicateManager.createPredicate(thresholdFeature, leftValues);
-				rightPredicate = predicateManager.createPredicate(thresholdFeature, rightValues);
+				if(leftValues.size() > 0){
+					leftPredicate = predicateManager.createPredicate(thresholdFeature, leftValues);
+				} else
+
+				{
+					leftPredicate = False.INSTANCE;
+				} // End if
+
+				if(rightValues.size() > 0){
+					rightPredicate = predicateManager.createPredicate(thresholdFeature, rightValues);
+				} else
+
+				{
+					rightPredicate = False.INSTANCE;
+				}
 			} else
 
 			{
