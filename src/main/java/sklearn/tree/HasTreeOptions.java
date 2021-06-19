@@ -75,7 +75,7 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 		Map<String, Object> result = new LinkedHashMap<>();
 		result.put(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
-		result.put(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
+		result.put(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
