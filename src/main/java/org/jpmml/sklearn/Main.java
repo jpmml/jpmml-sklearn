@@ -65,61 +65,43 @@ public class Main {
 	)
 	private File output = null;
 
-	/**
-	 * @see HasTreeOptions#OPTION_COMPACT
-	 */
 	@Parameter (
-		names = "-X-compact",
+		names = "--X-" + HasTreeOptions.OPTION_COMPACT,
 		arity = 1,
 		hidden = true
 	)
 	private Boolean compact = null;
 
-	/**
-	 * @see HasTreeOptions#OPTION_FLAT
-	 */
 	@Parameter (
-		names = "-X-flat",
+		names = "--X-" + HasTreeOptions.OPTION_FLAT,
 		arity = 1,
 		hidden = true
 	)
 	private Boolean flat = null;
 
-	/**
-	 * @see HasTreeOptions#OPTION_NUMERIC
-	 */
 	@Parameter (
-		names = "-X-numeric",
+		names = "--X-" + HasTreeOptions.OPTION_NUMERIC,
 		arity = 1,
 		hidden = true
 	)
 	private Boolean numeric = null;
 
-	/**
-	 * @see HasTreeOptions#OPTION_NODE_ID
-	 */
 	@Parameter (
-		names = "-X-node_id",
+		names = "--X-" + HasTreeOptions.OPTION_NODE_ID,
 		arity = 1,
 		hidden = true
 	)
 	private Boolean nodeId = null;
 
-	/**
-	 * @see HasTreeOptions#OPTION_NODE_SCORE
-	 */
 	@Parameter (
-		names = "-X-node_score",
+		names = "--X-" + HasTreeOptions.OPTION_NODE_SCORE,
 		arity = 1,
 		hidden = true
 	)
 	private Boolean nodeScore = null;
 
-	/**
-	 * @see HasTreeOptions#OPTION_WINNER_ID
-	 */
 	@Parameter (
-		names = {"-X-winner_id"},
+		names = {"--X-" + HasTreeOptions.OPTION_WINNER_ID},
 		arity = 1,
 		hidden = true
 	)
