@@ -37,6 +37,7 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
@@ -88,7 +89,7 @@ public class TreePredictorUtil {
 			Predicate leftPredicate;
 			Predicate rightPredicate;
 
-			boolean defaultLeft;
+			boolean defaultLeft = (missingGoToLeft[index] == 1);
 
 			boolean categorical = ((isCategorical != null) && (isCategorical[index] == 1));
 			if(categorical){
@@ -142,8 +143,6 @@ public class TreePredictorUtil {
 					{
 						rightPredicate = False.INSTANCE;
 					}
-
-					defaultLeft = (missingGoToLeft[index] == 1);
 				} else
 
 				{
@@ -170,6 +169,17 @@ public class TreePredictorUtil {
 					defaultLeft = true;
 				} else
 
+				if(feature instanceof MissingValueFeature){
+					MissingValueFeature missingValueFeature = (MissingValueFeature)feature;
+
+					if(threshold != 0.5d){
+						throw new IllegalArgumentException();
+					}
+
+					leftPredicate = predicateManager.createSimplePredicate(missingValueFeature, SimplePredicate.Operator.IS_NOT_MISSING, null);
+					rightPredicate = predicateManager.createSimplePredicate(missingValueFeature, SimplePredicate.Operator.IS_MISSING, null);
+				} else
+
 				{
 					ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.DOUBLE);
 
@@ -177,8 +187,6 @@ public class TreePredictorUtil {
 
 					leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
 					rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);
-
-					defaultLeft = (missingGoToLeft[index] == 1);
 				}
 			}
 

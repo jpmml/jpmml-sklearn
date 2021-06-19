@@ -1,10 +1,13 @@
 from common import *
 
+from sklearn.experimental import enable_hist_gradient_boosting
+
 from category_encoders import BaseNEncoder, BinaryEncoder, CatBoostEncoder, CountEncoder, LeaveOneOutEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
+from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -23,13 +26,18 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 	else:
 		raise ValueError()
 
-	pipeline = PMMLPipeline([
+	steps = [
 		("mapper", ColumnTransformer([
 			("cat", cat_encoder, cat_cols),
 			("cont", cont_encoder, cont_cols)
 		])),
 		("classifier", classifier)
-	])
+	]
+
+	if isinstance(classifier, HistGradientBoostingClassifier):
+		steps.insert(1, ("formatter", DenseTransformer()))
+
+	pipeline = PMMLPipeline(steps)
 	pipeline.fit(audit_X, audit_y)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
@@ -41,9 +49,15 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 classifier = LogisticRegression()
 
 build_audit(OneHotEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAudit")
-build_audit(OneHotEncoder(handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "OneHotEncoderAuditNA")
 build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
-build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), SimpleImputer(), clone(classifier), "OrdinalEncoderAuditNA")
+
+classifier = HistGradientBoostingClassifier(random_state = 13)
+
+build_audit(OneHotEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAuditNA")
+build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAuditNA")
+
+classifier = LogisticRegression()
+
 build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base2EncoderAudit")
 build_audit(BaseNEncoder(base = 2, handle_missing = "value", handle_unknown = "error"), SimpleImputer(), clone(classifier), "Base2EncoderAuditNA")
 build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
