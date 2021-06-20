@@ -254,6 +254,14 @@ Java library and command-line application for converting [Scikit-Learn](https://
 </details>
 
 <details>
+  <summary>Scikit-Lego</summary>
+
+  Examples: [extensions/sklego.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/sklego.py)
+
+  * `sklego.meta.EstimatorTransformer`
+</details>
+
+<details>
   <summary>SkLearn2PMML</summary>
 
   Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
