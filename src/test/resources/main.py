@@ -24,7 +24,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, FunctionTransformer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, RobustScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretizer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import EstimatorProxy, SelectorProxy
@@ -111,7 +111,8 @@ audit_X, audit_y = load_audit("Audit", stringify = False)
 
 def build_audit(classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, **pmml_options):
 	continuous_mapper = DataFrameMapper([
-		(["Age", "Income", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 3)]))
+		(["Age", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 2)])),
+		(["Income"], [ContinuousDomain(), KBinsDiscretizer(n_bins = 3, strategy = "quantile")])
 	])
 	categorical_mapper = DataFrameMapper([
 		(["Employment"], [CategoricalDomain(), SubstringTransformer(0, 3), OneHotEncoder(drop = ["Vol"]), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
@@ -146,7 +147,9 @@ def build_audit(classifier, name, with_proba = True, fit_params = {}, predict_pa
 		classifier.pmml_feature_importances_ = classifier.feature_importances_
 	else:
 		pass
-	if isinstance(classifier, XGBClassifier):
+	if isinstance(classifier, GaussianNB):
+		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-12, zeroThreshold = 1e-12)
+	elif isinstance(classifier, XGBClassifier):
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
@@ -191,7 +194,8 @@ def build_audit_cat(classifier, name, with_proba = True, fit_params = {}):
 		"Married-spouse-absent" : "Married"
 	}
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain(display_name = column)) for column in ["Age", "Income"]] +
+		[(["Age"], [ContinuousDomain(display_name = "Age"), KBinsDiscretizer(n_bins = 7, encode = "ordinal", strategy = "quantile")])] +
+		[(["Income"], [ContinuousDomain(display_name = "Income"), KBinsDiscretizer(n_bins = 11, encode = "ordinal", strategy = "kmeans")])] +
 		[(["Hours"], [ContinuousDomain(display_name = "Hours"), CutTransformer(bins = [0, 20, 40, 60, 80, 100], labels = False, right = False, include_lowest = True)])] +
 		[(["Employment", "Education"], [MultiDomain([CategoricalDomain(display_name = "Employment"), CategoricalDomain(display_name = "Education")]), OrdinalEncoder(dtype = numpy.int_)])] +
 		[(["Marital"], [CategoricalDomain(display_name = "Marital"), FilterLookupTransformer(marital_mapping), OrdinalEncoder(dtype = numpy.uint16)])] +
@@ -213,9 +217,9 @@ def build_audit_cat(classifier, name, with_proba = True, fit_params = {}):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	cat_indices = [2, 3, 4, 5, 6, 7, 8]
+	cat_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 	build_audit_cat(GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "LGBMLRAuditCat", fit_params = {"classifier__gbdt__categorical_feature" : cat_indices})
-	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 37), "LGBMAuditCat", fit_params = {"classifier__categorical_feature" : cat_indices})
+	build_audit_cat(LGBMClassifier(objective = "binary", n_estimators = 101), "LGBMAuditCat", fit_params = {"classifier__categorical_feature" : cat_indices})
 
 audit_dict_X = audit_X.to_dict("records")
 
