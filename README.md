@@ -261,6 +261,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   Examples: [extensions/sklego.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/sklego.py)
 
   * `sklego.meta.EstimatorTransformer`
+  * `sklego.preprocessing.IdentityTransformer`
 </details>
 
 <details>
@@ -314,7 +315,6 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * String functions `lower`, `upper` and `strip`.
       * String length function `len(<str>)`
     * `sklearn2pmml.preprocessing.FilterLookupTransformer`
-    * `sklearn2pmml.preprocessing.IdentityTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`

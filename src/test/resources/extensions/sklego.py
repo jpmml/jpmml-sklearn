@@ -10,6 +10,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklego.meta import EstimatorTransformer
+from sklego.preprocessing import IdentityTransformer
 
 def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimator, final_estimator):
 	cat_encoder = Pipeline([
@@ -17,7 +18,7 @@ def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimato
 		("formatter", DenseTransformer()),
 		("estimator", EstimatorTransformer(transformer_estimator))
 	])
-	cont_encoder = "passthrough"
+	cont_encoder = IdentityTransformer()
 	pipeline = PMMLPipeline([
 		("mapper", ColumnTransformer([
 			("cat", cat_encoder, cat_cols),

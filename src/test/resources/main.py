@@ -33,7 +33,7 @@ from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier, SelectFirst
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, IdentityTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
+from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
@@ -75,7 +75,7 @@ def kmeans_distance(kmeans, center, X):
 
 def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 	mapper = DataFrameMapper([
-		(wheat_X.columns.values, [ContinuousDomain(dtype = float), IdentityTransformer(), PowerTransformer(method = "box-cox")])
+		(wheat_X.columns.values, [ContinuousDomain(dtype = float), PowerTransformer(method = "box-cox")])
 	])
 	scaler = ColumnTransformer([
 		("robust", RobustScaler(), [0, 5])
