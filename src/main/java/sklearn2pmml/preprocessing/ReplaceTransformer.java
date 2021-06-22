@@ -51,9 +51,7 @@ public class ReplaceTransformer extends PatternTransformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.REPLACE)
-			.addExpressions(feature.ref())
-			.addExpressions(PMMLUtil.createConstant(pattern, DataType.STRING), PMMLUtil.createConstant(replacement, DataType.STRING));
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), PMMLUtil.createConstant(pattern, DataType.STRING), PMMLUtil.createConstant(replacement, DataType.STRING));
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("replace", feature, formatArg(pattern), formatArg(replacement)), OpType.CATEGORICAL, DataType.STRING, apply);
 

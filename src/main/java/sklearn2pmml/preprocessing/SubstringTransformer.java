@@ -66,9 +66,7 @@ public class SubstringTransformer extends Transformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.SUBSTRING)
-			.addExpressions(feature.ref())
-			.addExpressions(PMMLUtil.createConstant(begin + 1, DataType.INTEGER), PMMLUtil.createConstant((end - begin), DataType.INTEGER));
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.SUBSTRING, feature.ref(), PMMLUtil.createConstant(begin + 1, DataType.INTEGER), PMMLUtil.createConstant((end - begin), DataType.INTEGER));
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("substring", feature), OpType.CATEGORICAL, DataType.STRING, apply);
 

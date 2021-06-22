@@ -50,9 +50,7 @@ public class MatchesTransformer extends PatternTransformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.MATCHES)
-			.addExpressions(feature.ref())
-			.addExpressions(PMMLUtil.createConstant(pattern, DataType.STRING));
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.MATCHES, feature.ref(), PMMLUtil.createConstant(pattern, DataType.STRING));
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("matches", feature, formatArg(pattern)), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
 

@@ -165,8 +165,7 @@ public class KBinsDiscretizer extends Transformer {
 			encoder.addDefineFunction(defineFunction);
 		}
 
-		Apply apply = PMMLUtil.createApply(defineFunction.getName())
-			.addExpressions(continuousFeature.ref());
+		Apply apply = PMMLUtil.createApply(defineFunction.getName(), continuousFeature.ref());
 
 		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(defineFunction.getName(), continuousFeature.getName()), OpType.CONTINUOUS, continuousFeature.getDataType(), apply);
 
@@ -177,17 +176,11 @@ public class KBinsDiscretizer extends Transformer {
 	private DefineFunction encodeDefineFunction(String name){
 		ParameterField valueField = new ParameterField(FieldName.create("x"));
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.ADD)
-			.addExpressions(PMMLUtil.createConstant(1.0e-8))
-			.addExpressions(PMMLUtil.createApply(PMMLFunctions.MULTIPLY)
-				.addExpressions(PMMLUtil.createConstant(1.0e-5))
-				.addExpressions(PMMLUtil.createApply(PMMLFunctions.ABS)
-					.addExpressions(new FieldRef(valueField.getName()))
-				)
-			);
+		Double atol = 1.0e-8;
+		Double rtol = 1.0e-5;
 
-		apply = PMMLUtil.createApply(PMMLFunctions.ADD)
-			.addExpressions(new FieldRef(valueField.getName()), apply);
+		// $name + (atol + rtol * abs($name))
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.ADD, new FieldRef(valueField.getName()), PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createConstant(atol), PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(rtol), PMMLUtil.createApply(PMMLFunctions.ABS, new FieldRef(valueField.getName())))));
 
 		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
 			.addParameterFields(valueField);

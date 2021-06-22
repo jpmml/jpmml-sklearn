@@ -66,11 +66,8 @@ public class PowerTransformer extends Transformer {
 			Apply apply;
 
 			if(!ValueUtil.isZero(lambda)){
-				apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE)
-					.addExpressions(
-						PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createApply(PMMLFunctions.POW, continuousFeature.ref(), PMMLUtil.createConstant(lambda)), PMMLUtil.createConstant(1d)),
-						PMMLUtil.createConstant(lambda)
-					);
+				// "($name ^ lambda - 1) / lambda"
+				apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createApply(PMMLFunctions.POW, continuousFeature.ref(), PMMLUtil.createConstant(lambda)), PMMLUtil.createConstant(1d)), PMMLUtil.createConstant(lambda));
 			} else
 
 			{

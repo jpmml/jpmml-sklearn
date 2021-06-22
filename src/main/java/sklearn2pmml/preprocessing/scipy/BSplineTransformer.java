@@ -59,8 +59,7 @@ public class BSplineTransformer extends Transformer {
 
 		DefineFunction defineFunction = createBSplineFunction(bspline, encoder);
 
-		Apply apply = PMMLUtil.createApply(defineFunction.getName())
-			.addExpressions(continuousFeature.ref());
+		Apply apply = PMMLUtil.createApply(defineFunction.getName(), continuousFeature.ref());
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("bspline", continuousFeature), apply);
 
@@ -96,9 +95,7 @@ public class BSplineTransformer extends Transformer {
 				createBFunction(t, i, j, encoder);
 			}
 
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY)
-				.addExpressions(PMMLUtil.createConstant(c.get(i)))
-				.addExpressions(PMMLUtil.createApply(formatBFunction(i, k), new FieldRef(paramterField.getName())));
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(c.get(i)), PMMLUtil.createApply(formatBFunction(i, k), new FieldRef(paramterField.getName())));
 
 			sumApply.addExpressions(apply);
 		}
@@ -123,12 +120,14 @@ public class BSplineTransformer extends Transformer {
 		if(k == 0){
 
 			if(!(t.get(i)).equals(t.get(i + 1))){
-				expression = PMMLUtil.createApply(PMMLFunctions.IF)
-					.addExpressions(PMMLUtil.createApply(PMMLFunctions.AND)
-						.addExpressions(PMMLUtil.createApply(PMMLFunctions.GREATEROREQUAL, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i))))
-						.addExpressions(PMMLUtil.createApply(PMMLFunctions.LESSTHAN, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i + 1))))
-					)
-					.addExpressions(PMMLUtil.createConstant(1d), PMMLUtil.createConstant(0d));
+				expression = PMMLUtil.createApply(PMMLFunctions.IF,
+					PMMLUtil.createApply(PMMLFunctions.AND,
+						PMMLUtil.createApply(PMMLFunctions.GREATEROREQUAL, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i))),
+						PMMLUtil.createApply(PMMLFunctions.LESSTHAN, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i + 1)))
+					),
+					PMMLUtil.createConstant(1d),
+					PMMLUtil.createConstant(0d)
+				);
 			} else
 
 			{
@@ -140,30 +139,29 @@ public class BSplineTransformer extends Transformer {
 			List<Apply> expressions = new ArrayList<>(2);
 
 			if(!(t.get(i + k)).equals(t.get(i))){
-				Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE)
-					.addExpressions(PMMLUtil.createApply(PMMLFunctions.SUBTRACT, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i))))
-					.addExpressions(PMMLUtil.createConstant((t.get(i + k)).doubleValue() - (t.get(i)).doubleValue()));
+				Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE,
+					PMMLUtil.createApply(PMMLFunctions.SUBTRACT, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i))),
+					PMMLUtil.createConstant((t.get(i + k)).doubleValue() - (t.get(i)).doubleValue())
+				);
 
-				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply)
-					.addExpressions(PMMLUtil.createApply(formatBFunction(i, k - 1), new FieldRef(parameterField.getName())));
+				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply, PMMLUtil.createApply(formatBFunction(i, k - 1), new FieldRef(parameterField.getName())));
 
 				expressions.add(apply);
 			} // End if
 
 			if(!(t.get(i + k + 1)).equals(t.get(i + 1))){
-				Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE)
-					.addExpressions(PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(t.get(i + k + 1)), new FieldRef(parameterField.getName())))
-					.addExpressions(PMMLUtil.createConstant((t.get(i + k + 1)).doubleValue() - (t.get(i + 1)).doubleValue()));
+				Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE,
+					PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(t.get(i + k + 1)), new FieldRef(parameterField.getName())),
+					PMMLUtil.createConstant((t.get(i + k + 1)).doubleValue() - (t.get(i + 1)).doubleValue())
+				);
 
-				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply)
-					.addExpressions(PMMLUtil.createApply(formatBFunction(i + 1, k - 1), new FieldRef(parameterField.getName())));
+				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply, PMMLUtil.createApply(formatBFunction(i + 1, k - 1), new FieldRef(parameterField.getName())));
 
 				expressions.add(apply);
 			} // End if
 
 			if(expressions.size() == 2){
-				expression = PMMLUtil.createApply(PMMLFunctions.ADD)
-					.addExpressions(expressions.get(0), expressions.get(1));
+				expression = PMMLUtil.createApply(PMMLFunctions.ADD, expressions.get(0), expressions.get(1));
 			} else
 
 			if(expressions.size() == 1){

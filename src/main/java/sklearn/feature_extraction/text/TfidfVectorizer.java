@@ -153,8 +153,9 @@ public class TfidfVectorizer extends CountVectorizer {
 		if(defineFunction == null){
 			ParameterField inputField = new ParameterField(FieldName.create("x"));
 
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.IF, PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(inputField.getName()), PMMLUtil.createConstant(0)),
-				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(inputField.getName())), PMMLUtil.createConstant(1)), // x > 0
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
+				PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(inputField.getName()), PMMLUtil.createConstant(0)),
+				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(inputField.getName())), PMMLUtil.createConstant(1)),
 				PMMLUtil.createConstant(0)
 			);
 

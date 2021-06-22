@@ -71,9 +71,11 @@ public class ImputerUtil {
 				expression = PMMLUtil.createApply(PMMLFunctions.ISMISSING, expression);
 			}
 
-			expression = PMMLUtil.createApply(PMMLFunctions.IF)
-				.addExpressions(expression)
-				.addExpressions(PMMLUtil.createConstant(replacementValue, feature.getDataType()), feature.ref());
+			expression = PMMLUtil.createApply(PMMLFunctions.IF,
+				expression,
+				PMMLUtil.createConstant(replacementValue, feature.getDataType()),
+				feature.ref()
+			);
 
 			DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("imputer", feature), field.getOpType(), field.getDataType(), expression);
 

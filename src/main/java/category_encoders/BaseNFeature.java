@@ -141,8 +141,10 @@ public class BaseNFeature extends ThresholdFeature {
 					valueApply.addExpressions(PMMLUtil.createConstant(category, dataType));
 				}
 
-				Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF, valueApply)
-					.addExpressions(PMMLUtil.createConstant(baseValue));
+				Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF,
+					valueApply,
+					PMMLUtil.createConstant(baseValue)
+				);
 
 				if(apply == null){
 					apply = ifApply;
@@ -163,9 +165,11 @@ public class BaseNFeature extends ThresholdFeature {
 				prevIfApply.addExpressions(PMMLUtil.createConstant(0));
 
 				if(missingValueAware){
-					apply = PMMLUtil.createApply(PMMLFunctions.IF)
-						.addExpressions(PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, new FieldRef(name)))
-						.addExpressions(apply, PMMLUtil.createConstant(missingBaseValue));
+					apply = PMMLUtil.createApply(PMMLFunctions.IF,
+						PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, new FieldRef(name)),
+						apply,
+						PMMLUtil.createConstant(missingBaseValue)
+					);
 				}
 
 				return apply;

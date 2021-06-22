@@ -48,9 +48,11 @@ public class FilterLookupTransformer extends LookupTransformer {
 
 		Feature mappedFeature = mappedFeatures.get(0);
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.IF)
-			.addExpressions(PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, mappedFeature.ref()))
-			.addExpressions(mappedFeature.ref(), feature.ref());
+		Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
+			PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, mappedFeature.ref()),
+			mappedFeature.ref(),
+			feature.ref()
+		);
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("filterLookup", features), OpType.CATEGORICAL, feature.getDataType(), apply);
 
