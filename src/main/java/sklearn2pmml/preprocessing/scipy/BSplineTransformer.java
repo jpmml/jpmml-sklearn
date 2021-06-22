@@ -82,7 +82,7 @@ public class BSplineTransformer extends Transformer {
 
 		int n = (t.size() - k - 1);
 
-		ParameterField paramterField = new ParameterField()
+		ParameterField valueField = new ParameterField()
 			.setName(FieldName.create("x"))
 			.setOpType(OpType.CONTINUOUS)
 			.setDataType(DataType.DOUBLE);
@@ -95,13 +95,13 @@ public class BSplineTransformer extends Transformer {
 				createBFunction(t, i, j, encoder);
 			}
 
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(c.get(i)), PMMLUtil.createApply(formatBFunction(i, k), new FieldRef(paramterField.getName())));
+			Apply apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(c.get(i)), PMMLUtil.createApply(formatBFunction(i, k), new FieldRef(valueField.getName())));
 
 			sumApply.addExpressions(apply);
 		}
 
 		DefineFunction defineFunction = new DefineFunction(formatBSplineFunction(k), OpType.CONTINUOUS, DataType.DOUBLE, null, sumApply)
-			.addParameterFields(paramterField);
+			.addParameterFields(valueField);
 
 		encoder.addDefineFunction(defineFunction);
 
@@ -110,7 +110,7 @@ public class BSplineTransformer extends Transformer {
 
 	static
 	private DefineFunction createBFunction(List<Number> t, int i, int k, SkLearnEncoder encoder){
-		ParameterField parameterField = new ParameterField()
+		ParameterField valueField = new ParameterField()
 			.setName(FieldName.create("x"))
 			.setOpType(OpType.CONTINUOUS)
 			.setDataType(DataType.DOUBLE);
@@ -122,8 +122,8 @@ public class BSplineTransformer extends Transformer {
 			if(!(t.get(i)).equals(t.get(i + 1))){
 				expression = PMMLUtil.createApply(PMMLFunctions.IF,
 					PMMLUtil.createApply(PMMLFunctions.AND,
-						PMMLUtil.createApply(PMMLFunctions.GREATEROREQUAL, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i))),
-						PMMLUtil.createApply(PMMLFunctions.LESSTHAN, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i + 1)))
+						PMMLUtil.createApply(PMMLFunctions.GREATEROREQUAL, new FieldRef(valueField.getName()), PMMLUtil.createConstant(t.get(i))),
+						PMMLUtil.createApply(PMMLFunctions.LESSTHAN, new FieldRef(valueField.getName()), PMMLUtil.createConstant(t.get(i + 1)))
 					),
 					PMMLUtil.createConstant(1d),
 					PMMLUtil.createConstant(0d)
@@ -140,22 +140,22 @@ public class BSplineTransformer extends Transformer {
 
 			if(!(t.get(i + k)).equals(t.get(i))){
 				Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE,
-					PMMLUtil.createApply(PMMLFunctions.SUBTRACT, new FieldRef(parameterField.getName()), PMMLUtil.createConstant(t.get(i))),
+					PMMLUtil.createApply(PMMLFunctions.SUBTRACT, new FieldRef(valueField.getName()), PMMLUtil.createConstant(t.get(i))),
 					PMMLUtil.createConstant((t.get(i + k)).doubleValue() - (t.get(i)).doubleValue())
 				);
 
-				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply, PMMLUtil.createApply(formatBFunction(i, k - 1), new FieldRef(parameterField.getName())));
+				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply, PMMLUtil.createApply(formatBFunction(i, k - 1), new FieldRef(valueField.getName())));
 
 				expressions.add(apply);
 			} // End if
 
 			if(!(t.get(i + k + 1)).equals(t.get(i + 1))){
 				Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE,
-					PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(t.get(i + k + 1)), new FieldRef(parameterField.getName())),
+					PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(t.get(i + k + 1)), new FieldRef(valueField.getName())),
 					PMMLUtil.createConstant((t.get(i + k + 1)).doubleValue() - (t.get(i + 1)).doubleValue())
 				);
 
-				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply, PMMLUtil.createApply(formatBFunction(i + 1, k - 1), new FieldRef(parameterField.getName())));
+				apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, apply, PMMLUtil.createApply(formatBFunction(i + 1, k - 1), new FieldRef(valueField.getName())));
 
 				expressions.add(apply);
 			} // End if
@@ -174,7 +174,7 @@ public class BSplineTransformer extends Transformer {
 		}
 
 		DefineFunction defineFunction = new DefineFunction(formatBFunction(i, k), OpType.CONTINUOUS, DataType.DOUBLE, null, expression)
-			.addParameterFields(parameterField);
+			.addParameterFields(valueField);
 
 		encoder.addDefineFunction(defineFunction);
 

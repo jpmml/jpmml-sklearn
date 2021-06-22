@@ -100,11 +100,11 @@ public class TfidfVectorizer extends CountVectorizer {
 		} // End if
 
 		if(useIdf){
-			ParameterField weight = new ParameterField(FieldName.create("weight"));
+			ParameterField weightField = new ParameterField(FieldName.create("weight"));
 
-			defineFunction.addParameterFields(weight);
+			defineFunction.addParameterFields(weightField);
 
-			expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weight.getName()));
+			expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weightField.getName()));
 		}
 
 		defineFunction
@@ -151,16 +151,16 @@ public class TfidfVectorizer extends CountVectorizer {
 		DefineFunction defineFunction = encoder.getDefineFunction("sublinearize");
 
 		if(defineFunction == null){
-			ParameterField inputField = new ParameterField(FieldName.create("x"));
+			ParameterField valueField = new ParameterField(FieldName.create("x"));
 
 			Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-				PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(inputField.getName()), PMMLUtil.createConstant(0)),
-				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(inputField.getName())), PMMLUtil.createConstant(1)),
+				PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(valueField.getName()), PMMLUtil.createConstant(0)),
+				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(valueField.getName())), PMMLUtil.createConstant(1)),
 				PMMLUtil.createConstant(0)
 			);
 
 			defineFunction = new DefineFunction("sublinearize", OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
-				.addParameterFields(inputField);
+				.addParameterFields(valueField);
 
 			encoder.addDefineFunction(defineFunction);
 		}
