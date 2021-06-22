@@ -24,7 +24,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretizer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, RobustScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretizer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, PowerTransformer, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import EstimatorProxy, SelectorProxy
@@ -75,7 +75,7 @@ def kmeans_distance(kmeans, center, X):
 
 def build_wheat(kmeans, name, with_affinity = True, **pmml_options):
 	mapper = DataFrameMapper([
-		(wheat_X.columns.values, [ContinuousDomain(dtype = float), IdentityTransformer()])
+		(wheat_X.columns.values, [ContinuousDomain(dtype = float), IdentityTransformer(), PowerTransformer(method = "box-cox")])
 	])
 	scaler = ColumnTransformer([
 		("robust", RobustScaler(), [0, 5])
