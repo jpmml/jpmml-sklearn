@@ -60,6 +60,11 @@ public class FeatureImportancesTest extends SkLearnTest implements Algorithms, D
 		check(RANDOM_FOREST, AUDIT);
 	}
 
+	@Test
+	public void checkXGBoostAudit() throws Exception {
+		check(XGB, AUDIT);
+	}
+
 	public void check(String name, String dataset) throws Exception {
 		Predicate<ResultField> predicate = (resultField) -> true;
 		Equivalence<Object> equivalence = getEquivalence();
@@ -79,7 +84,13 @@ public class FeatureImportancesTest extends SkLearnTest implements Algorithms, D
 				PMMLObject parent = getParent();
 
 				if(parent instanceof PMML){
+					String algorithmName = miningModel.getAlgorithmName();
+
 					check(miningModel, null);
+
+					if(algorithmName != null && algorithmName.contains("XGBoost")){
+						return VisitorAction.TERMINATE;
+					}
 				}
 
 				return super.visit(miningModel);

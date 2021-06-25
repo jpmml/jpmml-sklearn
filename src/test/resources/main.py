@@ -137,12 +137,15 @@ def build_audit(classifier, name, with_proba = True, fit_params = {}, predict_pa
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, EstimatorProxy):
 		estimator = classifier.estimator
+		if hasattr(estimator, "feature_importances_"):
+			estimator.pmml_feature_importances_ = estimator.feature_importances_
 		if hasattr(estimator, "estimators_"):
 			child_estimators = estimator.estimators_
 			if isinstance(child_estimators, numpy.ndarray):
 				child_estimators = child_estimators.flatten().tolist()
 			for child_estimator in child_estimators:
-				child_estimator.pmml_feature_importances_ = child_estimator.feature_importances_
+				if hasattr(child_estimator, "feature_importances_"):
+					child_estimator.pmml_feature_importances_ = child_estimator.feature_importances_
 	elif isinstance(classifier, XGBClassifier):
 		classifier.pmml_feature_importances_ = classifier.feature_importances_
 	else:

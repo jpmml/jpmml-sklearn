@@ -247,7 +247,16 @@ public class TreeUtil {
 			public TreeModel apply(T estimator){
 				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), numeric, segmentSchema);
 
-				return TreeUtil.encodeTreeModel(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, treeModelSchema);
+				TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, treeModelSchema);
+
+				// XXX
+				if(estimator.hasFeatureImportances()){
+					Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(numeric, treeModelSchema);
+
+					estimator.addFeatureImportances(treeModel, featureImportanceSchema);
+				}
+
+				return treeModel;
 			}
 		};
 
@@ -280,13 +289,6 @@ public class TreeUtil {
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
-
-		// XXX
-		if(estimator.hasFeatureImportances()){
-			Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(numeric, schema);
-
-			estimator.addFeatureImportances(treeModel, featureImportanceSchema);
-		}
 
 		ClassDictUtil.clearContent(tree);
 
