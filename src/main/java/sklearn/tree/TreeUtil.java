@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.False;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.HasExtensions;
 import org.dmg.pmml.MiningFunction;
@@ -58,6 +57,7 @@ import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.ThresholdFeature;
+import org.jpmml.converter.ThresholdFeatureUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.visitors.AbstractVisitor;
@@ -343,6 +343,7 @@ public class TreeUtil {
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
+				// XXX
 				if(leftValues.contains(missingValue) || rightValues.contains(missingValue)){
 					throw new IllegalArgumentException();
 				}
@@ -350,21 +351,8 @@ public class TreeUtil {
 				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
 				rightCategoryManager = rightCategoryManager.fork(name, rightValues);
 
-				if(!leftValues.isEmpty()){
-					leftPredicate = predicateManager.createPredicate(thresholdFeature, leftValues);
-				} else
-
-				{
-					leftPredicate = False.INSTANCE;
-				} // End if
-
-				if(!rightValues.isEmpty()){
-					rightPredicate = predicateManager.createPredicate(thresholdFeature, rightValues);
-				} else
-
-				{
-					rightPredicate = False.INSTANCE;
-				}
+				leftPredicate = ThresholdFeatureUtil.createPredicate(thresholdFeature, leftValues, missingValue, predicateManager);
+				rightPredicate = ThresholdFeatureUtil.createPredicate(thresholdFeature, rightValues, missingValue, predicateManager);
 			} else
 
 			{

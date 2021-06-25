@@ -33,7 +33,6 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Extension;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Header;
 import org.dmg.pmml.MiningBuildTask;
@@ -55,6 +54,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
@@ -399,11 +399,8 @@ public class PMMLPipeline extends Pipeline {
 		} // End if
 
 		if(repr != null){
-			Extension extension = new Extension()
-				.addContent(repr);
-
 			MiningBuildTask miningBuildTask = new MiningBuildTask()
-				.addExtensions(extension);
+				.addExtensions(PMMLUtil.createExtension("repr", (Object)repr));
 
 			pmml.setMiningBuildTask(miningBuildTask);
 		}

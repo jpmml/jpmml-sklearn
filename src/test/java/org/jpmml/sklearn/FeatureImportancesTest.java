@@ -86,10 +86,14 @@ public class FeatureImportancesTest extends SkLearnTest implements Algorithms, D
 				if(parent instanceof PMML){
 					String algorithmName = miningModel.getAlgorithmName();
 
-					check(miningModel, null);
-
 					if(algorithmName != null && algorithmName.contains("XGBoost")){
+						check(miningModel, null);
+
 						return VisitorAction.TERMINATE;
+					} else
+
+					{
+						check(miningModel, 1d);
 					}
 				}
 
