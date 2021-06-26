@@ -234,6 +234,28 @@ public class PMMLPipeline extends Pipeline {
 
 		Model model = estimator.encode(schema);
 
+		if(!estimator.hasFeatureImportances()){
+			List<? extends Number> featureImportances = getPMMLFeatureImportances();
+
+			if(featureImportances != null){
+				ClassDictUtil.checkSize(activeFields, featureImportances);
+
+				for(int i = 0; i < activeFields.size(); i++){
+					String activeField = activeFields.get(i);
+					Number featureImportance = featureImportances.get(i);
+
+					DataField dataField = encoder.getDataField(FieldName.create(activeField));
+					if(dataField == null){
+						throw new IllegalArgumentException("Field " + activeField + " is undefined");
+					}
+
+					Feature feature = new WildcardFeature(encoder, dataField);
+
+					encoder.addFeatureImportance(model, feature, featureImportance);
+				}
+			}
+		} // End if
+
 		if((predictTransformer != null) || (predictProbaTransformer != null) || (applyTransformer != null)){
 			Model finalModel = MiningModelUtil.getFinalModel(model);
 
@@ -451,6 +473,15 @@ public class PMMLPipeline extends Pipeline {
 
 	public Map<?, ?> getHeader(){
 		return getOptional("header", Map.class);
+	}
+
+	public List<? extends Number> getPMMLFeatureImportances(){
+
+		if(!containsKey("pmml_feature_importances_")){
+			return null;
+		}
+
+		return getNumberArray("pmml_feature_importances_");
 	}
 
 	public Transformer getPredictTransformer(){
