@@ -45,7 +45,7 @@ import sklearn2pmml.pipeline.PMMLPipeline;
 public class Main {
 
 	@Parameter (
-		names = "--help",
+		names = {"--help"},
 		description = "Show the list of configuration options and exit",
 		help = true
 	)
@@ -59,51 +59,51 @@ public class Main {
 	private File input = null;
 
 	@Parameter (
-		names = "--pmml-output",
+		names = {"--pmml-output"},
 		description = "PMML output file",
 		required = true
 	)
 	private File output = null;
 
 	@Parameter (
-		names = "--X-" + HasTreeOptions.OPTION_COMPACT,
-		arity = 1,
-		hidden = true
+		names = {"--X-" + HasTreeOptions.OPTION_COMPACT},
+		description = "Transform SkLearn-style trees to PMML-style trees",
+		arity = 1
 	)
 	private Boolean compact = null;
 
 	@Parameter (
-		names = "--X-" + HasTreeOptions.OPTION_FLAT,
-		arity = 1,
-		hidden = true
+		names = {"--X-" + HasTreeOptions.OPTION_FLAT},
+		description = "Flatten trees",
+		arity = 1
 	)
 	private Boolean flat = null;
 
 	@Parameter (
-		names = "--X-" + HasTreeOptions.OPTION_NUMERIC,
-		arity = 1,
-		hidden = true
+		names = {"--X-" + HasTreeOptions.OPTION_NUMERIC},
+		description = "Simplify non-numeric split conditions to numeric split conditions",
+		arity = 1
 	)
 	private Boolean numeric = null;
 
 	@Parameter (
-		names = "--X-" + HasTreeOptions.OPTION_NODE_ID,
-		arity = 1,
-		hidden = true
+		names = {"--X-" + HasTreeOptions.OPTION_NODE_ID},
+		description = "Keep SkLearn node identifiers",
+		arity = 1
 	)
 	private Boolean nodeId = null;
 
 	@Parameter (
-		names = "--X-" + HasTreeOptions.OPTION_NODE_SCORE,
-		arity = 1,
-		hidden = true
+		names = {"--X-" + HasTreeOptions.OPTION_NODE_SCORE},
+		description = "Keep SkLearn node scores for branch (non-leaf) nodes",
+		arity = 1
 	)
 	private Boolean nodeScore = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_WINNER_ID},
-		arity = 1,
-		hidden = true
+		description = "Output node identifiers",
+		arity = 1
 	)
 	private Boolean winnerId = null;
 
