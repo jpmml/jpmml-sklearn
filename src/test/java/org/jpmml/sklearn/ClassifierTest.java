@@ -32,6 +32,7 @@ import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
+import sklearn.Estimator;
 
 public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets {
 
@@ -234,7 +235,7 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
-		FieldName[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create("predict", AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
+		FieldName[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create(Estimator.FIELD_PREDICT, AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
 
 		evaluate(XGB, AUDIT_NA, excludeFields(transformFields), new FloatEquivalence(8));
 	}

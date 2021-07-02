@@ -34,6 +34,7 @@ import org.jpmml.converter.OutlierTransformation;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
+import sklearn.Estimator;
 
 public class OneClassSVM extends LibSVMRegressor {
 
@@ -57,7 +58,7 @@ public class OneClassSVM extends LibSVMRegressor {
 		};
 
 		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
-			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE, outlier));
+			.setOutput(ModelUtil.createPredictedOutput(FieldName.create(Estimator.FIELD_DECISION_FUNCTION), OpType.CONTINUOUS, DataType.DOUBLE, outlier));
 
 		Output output = supportVectorMachineModel.getOutput();
 

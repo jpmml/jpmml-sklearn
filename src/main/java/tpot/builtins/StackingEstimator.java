@@ -110,7 +110,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 					if(classifier.hasProbabilityDistribution()){
 
 						for(Object category : categories){
-							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldNameUtil.create("probability", name, category), DataType.DOUBLE, category)
+							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, name, category), DataType.DOUBLE, category)
 								.setFinalResult(false);
 
 							DerivedOutputField probabilityField = encoder.createDerivedField(model, probabilityOutputField, false);

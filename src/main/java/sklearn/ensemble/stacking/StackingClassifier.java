@@ -89,7 +89,7 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 							String stringValue = name.getValue();
 
 							if(stringValue.startsWith("probability(")){
-								FieldName indexedName = FieldNameUtil.create("probability", index, stringValue.substring("probability(".length()));
+								FieldName indexedName = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, index, stringValue.substring("probability(".length()));
 
 								stringValue = indexedName.getValue();
 							}

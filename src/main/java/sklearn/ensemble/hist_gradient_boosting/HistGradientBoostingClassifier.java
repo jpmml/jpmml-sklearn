@@ -33,6 +33,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Classifier;
+import sklearn.Estimator;
 
 public class HistGradientBoostingClassifier extends Classifier {
 
@@ -64,7 +65,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 			}
 
 			MiningModel miningModel = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("decisionFunction", categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
+				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, true, schema);
 		} else
@@ -80,7 +81,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 
 			for(int i = 0, columns = categoricalLabel.size(); i < columns; i++){
 				MiningModel miningModel = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, i, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("decisionFunction", categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
+					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 				miningModels.add(miningModel);
 			}

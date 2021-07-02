@@ -42,4 +42,6 @@ public class Classifier extends Estimator implements HasClasses {
 	public List<?> getClasses(){
 		return getArray("classes_");
 	}
+
+	public static final String FIELD_PROBABILITY = "probability";
 }

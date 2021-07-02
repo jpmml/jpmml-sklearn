@@ -262,7 +262,7 @@ public class PMMLPipeline extends Pipeline {
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				FieldName name = FieldNameUtil.create("predict", label.getName());
+				FieldName name = FieldNameUtil.create(Estimator.FIELD_PREDICT, label.getName());
 
 				OutputField predictField;
 

@@ -34,6 +34,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
+import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.StepUtil;
 
@@ -86,7 +87,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 				}
 
 				Output output = new Output()
-					.addOutputFields(ModelUtil.createProbabilityField(FieldNameUtil.create("decisionFunction", categoricalLabel.getValue(i)), DataType.DOUBLE, categoricalLabel.getValue(i)));
+					.addOutputFields(ModelUtil.createProbabilityField(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), DataType.DOUBLE, categoricalLabel.getValue(i)));
 
 				CategoricalLabel segmentCategoricalLabel = new CategoricalLabel(null, DataType.STRING, Arrays.asList("(other)", ValueUtil.asString(categoricalLabel.getValue(i))));
 

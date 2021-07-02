@@ -189,5 +189,8 @@ public class Estimator extends Step {
 		return getOptionalString("_sklearn_version");
 	}
 
+	public static final String FIELD_DECISION_FUNCTION = "decisionFunction";
+	public static final String FIELD_PREDICT = "predict";
+
 	private static final Logger logger = LoggerFactory.getLogger(Estimator.class);
 }

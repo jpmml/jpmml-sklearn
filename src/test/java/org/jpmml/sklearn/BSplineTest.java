@@ -28,6 +28,7 @@ import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.Batch;
 import org.junit.Test;
+import sklearn.Estimator;
 
 public class BSplineTest extends SkLearnTest {
 
@@ -70,5 +71,5 @@ public class BSplineTest extends SkLearnTest {
 		evaluate("Tanh", "BSpline", excludeFields(BSplineTest.predictedValue));
 	}
 
-	private static final FieldName predictedValue = FieldNameUtil.create("predict", "y");
+	private static final FieldName predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "y");
 }

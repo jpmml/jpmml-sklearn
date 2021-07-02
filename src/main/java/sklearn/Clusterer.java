@@ -31,4 +31,6 @@ public class Clusterer extends Estimator {
 	public MiningFunction getMiningFunction(){
 		return MiningFunction.CLUSTERING;
 	}
+
+	public static final String FIELD_CLUSTER = "cluster";
 }

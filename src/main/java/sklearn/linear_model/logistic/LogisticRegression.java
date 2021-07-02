@@ -41,6 +41,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
+import sklearn.Estimator;
 import sklearn.SkLearnUtil;
 import sklearn.linear_model.LinearClassifier;
 
@@ -109,9 +110,9 @@ public class LogisticRegression extends LinearClassifier {
 			Schema segmentSchema = schema.toRelabeledSchema(null);
 
 			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), null, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldName.create("decisionFunction"), OpType.CONTINUOUS, DataType.DOUBLE));
+				.setOutput(ModelUtil.createPredictedOutput(FieldName.create(Estimator.FIELD_DECISION_FUNCTION), OpType.CONTINUOUS, DataType.DOUBLE));
 
-			Feature feature = new ContinuousFeature(encoder, FieldName.create("decisionFunction"), DataType.DOUBLE);
+			Feature feature = new ContinuousFeature(encoder, FieldName.create(Estimator.FIELD_DECISION_FUNCTION), DataType.DOUBLE);
 
 			RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(feature), Collections.singletonList(-1d), 0d)
 				.setTargetCategory(categoricalLabel.getValue(0));

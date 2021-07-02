@@ -33,6 +33,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 
@@ -56,11 +57,14 @@ public class StackingRegressor extends Regressor implements HasEstimatorEnsemble
 			@Override
 			public List<Feature> apply(int index, Model model, String stackMethod, SkLearnEncoder encoder){
 
-				if(!("predict").equals(stackMethod)){
-					throw new IllegalArgumentException(stackMethod);
+				switch(stackMethod){
+					case "predict":
+						break;
+					default:
+						throw new IllegalArgumentException(stackMethod);
 				}
 
-				OutputField predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(stackMethod, index), OpType.CONTINUOUS, continuousLabel.getDataType());
+				OutputField predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, index), OpType.CONTINUOUS, continuousLabel.getDataType());
 
 				DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 

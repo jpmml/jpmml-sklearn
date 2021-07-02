@@ -23,6 +23,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
+import sklearn.Estimator;
 
 public class RegressorTest extends SkLearnTest implements Algorithms, Datasets {
 
@@ -140,7 +141,7 @@ public class RegressorTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateLinearRegressionAutoNA() throws Exception {
-		FieldName[] transformFields = {FieldNameUtil.create("predict", AUTO_MPG), FieldNameUtil.create("cut", FieldNameUtil.create("predict", AUTO_MPG))};
+		FieldName[] transformFields = {FieldNameUtil.create(Estimator.FIELD_PREDICT, AUTO_MPG), FieldNameUtil.create("cut", FieldNameUtil.create(Estimator.FIELD_PREDICT, AUTO_MPG))};
 
 		evaluate(LINEAR_REGRESSION, AUTO_NA, excludeFields(transformFields));
 	}

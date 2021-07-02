@@ -81,7 +81,7 @@ public class KMeans extends Clusterer {
 			.setCompareFunction(CompareFunction.ABS_DIFF);
 
 		ClusteringModel clusteringModel = new ClusteringModel(MiningFunction.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema(schema.getLabel()), comparisonMeasure, ClusteringModelUtil.createClusteringFields(schema.getFeatures()), clusters)
-			.setOutput(ClusteringModelUtil.createOutput(FieldName.create("cluster"), DataType.DOUBLE, clusters));
+			.setOutput(ClusteringModelUtil.createOutput(FieldName.create(Clusterer.FIELD_CLUSTER), DataType.DOUBLE, clusters));
 
 		return clusteringModel;
 	}
