@@ -52,6 +52,11 @@ public class OneClassSVM extends LibSVMRegressor {
 		Transformation outlier = new OutlierTransformation(){
 
 			@Override
+			public FieldName getName(FieldName name){
+				return createFieldName("outlier");
+			}
+
+			@Override
 			public Expression createExpression(FieldRef fieldRef){
 				return PMMLUtil.createApply(PMMLFunctions.LESSOREQUAL, fieldRef, PMMLUtil.createConstant(0d));
 			}

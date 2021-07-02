@@ -189,6 +189,11 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		Transformation outlier = new OutlierTransformation(){
 
 			@Override
+			public FieldName getName(FieldName name){
+				return createFieldName("outlier");
+			}
+
+			@Override
 			public Expression createExpression(FieldRef fieldRef){
 				String behaviour = getBehaviour();
 
