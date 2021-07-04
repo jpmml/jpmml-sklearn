@@ -3,20 +3,27 @@ from common import *
 from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import IsolationForest
 from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.svm import OneClassSVM
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
+from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
+from sklearn2pmml.preprocessing import ExpressionTransformer
 from sklego.meta import EstimatorTransformer
 from sklego.preprocessing import IdentityTransformer
+
+def make_estimator_transformer(estimator, pmml_name):
+	estimator.pmml_name_ = pmml_name
+	return EstimatorTransformer(estimator)
 
 def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimator, final_estimator):
 	cat_encoder = Pipeline([
 		("encoder", OneHotEncoder()),
 		("formatter", DenseTransformer()),
-		("estimator", EstimatorTransformer(transformer_estimator))
+		("transformer", make_estimator_transformer(transformer_estimator, "transformer"))
 	])
 	cont_encoder = IdentityTransformer()
 	pipeline = PMMLPipeline([
@@ -24,7 +31,7 @@ def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimato
 			("cat", cat_encoder, cat_cols),
 			("cont", cont_encoder, cont_cols)
 		])),
-		("classifier", final_estimator)
+		("estimator", final_estimator)
 	])
 	return pipeline
 
@@ -40,6 +47,26 @@ def build_estimatortransformer_audit(name):
 	store_csv(adjusted, name)
 
 build_estimatortransformer_audit("EstimatorTransformerAudit")
+
+def build_estimatortransformer_iris(outlier_detector_estimator, final_estimator, name):
+	iris_X, iris_y = load_iris("Iris")
+
+	pipeline = PMMLPipeline([
+		("decorator", ContinuousDomain()),
+		("outlier_detector", FeatureUnion([
+			("original", IdentityTransformer()),
+			("flag", make_estimator_transformer(outlier_detector_estimator, "outlierDetector")),	
+		])),
+		("estimator", final_estimator)
+	])
+	pipeline.fit(iris_X, iris_y)
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
+build_estimatortransformer_iris(IsolationForest(n_estimators = 3, max_features = 2, contamination = 0.03, random_state = 13), LogisticRegression(random_state = 13), "EstimatorTransformerIris")
 
 def build_estimatortransformer_auto(name):
 	auto_X, auto_y = load_auto("Auto")

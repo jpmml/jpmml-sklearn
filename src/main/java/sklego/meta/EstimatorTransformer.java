@@ -19,6 +19,7 @@
 package sklego.meta;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -28,6 +29,8 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.ResultFeature;
+import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
@@ -55,10 +58,6 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		Estimator estimator = getEstimator();
 		String predictFunc = getPredictFunc();
 
-		if(!estimator.isSupervised()){
-			throw new IllegalArgumentException();
-		}
-
 		switch(predictFunc){
 			case "predict":
 				break;
@@ -66,67 +65,122 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 				throw new IllegalArgumentException(predictFunc);
 		}
 
-		MiningFunction miningFunction = estimator.getMiningFunction();
+		Label label = null;
 
-		Label label;
+		if(estimator.isSupervised()){
+			MiningFunction miningFunction = estimator.getMiningFunction();
 
-		switch(miningFunction){
-			case CLASSIFICATION:
-				{
-					List<?> categories = ClassifierUtil.getClasses(estimator);
+			switch(miningFunction){
+				case CLASSIFICATION:
+					{
+						List<?> categories = ClassifierUtil.getClasses(estimator);
 
-					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
+						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-					label = new CategoricalLabel(null, dataType, categories);
-				}
-				break;
-			case REGRESSION:
-				{
-					label = new ContinuousLabel(null, DataType.DOUBLE);
-				}
-				break;
-			default:
-				throw new IllegalArgumentException();
+						label = new CategoricalLabel(null, dataType, categories);
+					}
+					break;
+				case REGRESSION:
+					{
+						label = new ContinuousLabel(null, DataType.DOUBLE);
+					}
+					break;
+				default:
+					throw new IllegalArgumentException();
+			}
 		}
 
 		Schema schema = new Schema(encoder, label, features);
 
 		Model model = estimator.encode(schema);
 
+		DerivedOutputField finalOutputField = null;
+
 		Output output = model.getOutput();
 		if(output != null && output.hasOutputFields()){
 			List<OutputField> outputFields = output.getOutputFields();
 
-			outputFields.clear();
+			for(Iterator<OutputField> it = outputFields.iterator(); it.hasNext(); ){
+				OutputField outputField = it.next();
+
+				ResultFeature resultFeature = outputField.getResultFeature();
+				switch(resultFeature){
+					case PREDICTED_VALUE:
+					case TRANSFORMED_VALUE:
+						{
+							finalOutputField = encoder.createDerivedField(model, outputField, true);
+						}
+						break;
+					default:
+						break;
+				}
+
+				it.remove();
+			}
 		}
 
 		encoder.addTransformer(model);
 
-		FieldName name = createFieldName("estimator");
+		if(estimator.isSupervised()){
+			MiningFunction miningFunction = estimator.getMiningFunction();
 
-		switch(miningFunction){
-			case CLASSIFICATION:
-				{
-					CategoricalLabel categoricalLabel = (CategoricalLabel)label;
-
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, categoricalLabel.getDataType());
-
-					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-					return Collections.singletonList(new CategoricalFeature(encoder, predictedField, categoricalLabel.getValues()));
-				}
-			case REGRESSION:
-				{
-					ContinuousLabel continuousLabel = (ContinuousLabel)label;
-
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, continuousLabel.getDataType());
-
-					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-					return Collections.singletonList(new ContinuousFeature(encoder, predictedField));
-				}
-			default:
+			if(finalOutputField != null){
 				throw new IllegalArgumentException();
+			}
+
+			FieldName name = createFieldName(Estimator.FIELD_PREDICT);
+
+			switch(miningFunction){
+				case CLASSIFICATION:
+					{
+						CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+
+						OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, categoricalLabel.getDataType());
+
+						DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
+
+						return Collections.singletonList(new CategoricalFeature(encoder, predictedField, categoricalLabel.getValues()));
+					}
+				case REGRESSION:
+					{
+						ContinuousLabel continuousLabel = (ContinuousLabel)label;
+
+						OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, continuousLabel.getDataType());
+
+						DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
+
+						return Collections.singletonList(new ContinuousFeature(encoder, predictedField));
+					}
+				default:
+					throw new IllegalArgumentException();
+			}
+		} else
+
+		{
+			if(finalOutputField == null){
+				throw new IllegalArgumentException();
+			}
+
+			OpType opType = finalOutputField.getOpType();
+			switch(opType){
+				case CATEGORICAL:
+					{
+						DataType dataType = finalOutputField.getDataType();
+
+						switch(dataType){
+							case BOOLEAN:
+								return Collections.singletonList(new BooleanFeature(encoder, finalOutputField));
+							default:
+								throw new IllegalArgumentException();
+						}
+					}
+				case CONTINUOUS:
+					{
+						return Collections.singletonList(new ContinuousFeature(encoder, finalOutputField));
+					}
+				default:
+					throw new IllegalArgumentException();
+			}
 		}
 	}
 
