@@ -30,7 +30,6 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
-import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
@@ -165,14 +164,13 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 			switch(opType){
 				case CATEGORICAL:
 					{
-						DataType dataType = finalOutputField.getDataType();
+						OutputField finalPmmlOutputField = finalOutputField.getOutputField();
 
-						switch(dataType){
-							case BOOLEAN:
-								return Collections.singletonList(new BooleanFeature(encoder, finalOutputField));
-							default:
-								throw new IllegalArgumentException();
+						if(!finalPmmlOutputField.hasValues()){
+							throw new IllegalArgumentException();
 						}
+
+						return Collections.singletonList(new CategoricalFeature(encoder, finalOutputField, finalPmmlOutputField.getValues()));
 					}
 				case CONTINUOUS:
 					{

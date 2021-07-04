@@ -35,6 +35,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 import sklearn.Estimator;
+import sklearn.SkLearnOutlierTransformation;
 
 public class OneClassSVM extends LibSVMRegressor {
 
@@ -62,21 +63,22 @@ public class OneClassSVM extends LibSVMRegressor {
 			}
 		};
 
-		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
-			.setOutput(ModelUtil.createPredictedOutput(FieldName.create(Estimator.FIELD_DECISION_FUNCTION), OpType.CONTINUOUS, DataType.DOUBLE, outlier));
+		Transformation sklearnOutlier = new SkLearnOutlierTransformation();
 
-		Output output = supportVectorMachineModel.getOutput();
+		Output output = ModelUtil.createPredictedOutput(FieldName.create(Estimator.FIELD_DECISION_FUNCTION), OpType.CONTINUOUS, DataType.DOUBLE, outlier, sklearnOutlier);
 
 		List<OutputField> outputFields = output.getOutputFields();
-		if(outputFields.size() != 2){
-			throw new IllegalArgumentException();
-		}
 
 		OutputField decisionFunctionOutputField = outputFields.get(0);
 
 		if(!decisionFunctionOutputField.isFinalResult()){
 			decisionFunctionOutputField.setFinalResult(true);
 		}
+
+		SkLearnOutlierTransformation.decorate(output);
+
+		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
+			.setOutput(output);
 
 		return supportVectorMachineModel;
 	}

@@ -29,6 +29,7 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.Output;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
@@ -52,6 +53,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import sklearn.Estimator;
 import sklearn.Regressor;
+import sklearn.SkLearnOutlierTransformation;
 import sklearn.SkLearnUtil;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.ensemble.EnsembleUtil;
@@ -223,9 +225,15 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			}
 		};
 
+		Transformation sklearnOutlier = new SkLearnOutlierTransformation();
+
+		Output output = ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier, sklearnOutlier);
+
+		SkLearnOutlierTransformation.decorate(output);
+
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, treeModels))
-			.setOutput(ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier));
+			.setOutput(output);
 
 		return TreeUtil.transform(this, miningModel);
 	}
