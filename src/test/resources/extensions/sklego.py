@@ -15,9 +15,9 @@ from sklearn2pmml.preprocessing import ExpressionTransformer
 from sklego.meta import EstimatorTransformer
 from sklego.preprocessing import IdentityTransformer
 
-def make_estimator_transformer(estimator, pmml_name):
+def make_estimator_transformer(estimator, pmml_name, predict_func = "predict"):
 	estimator.pmml_name_ = pmml_name
-	return EstimatorTransformer(estimator)
+	return EstimatorTransformer(estimator, predict_func = predict_func)
 
 def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimator, final_estimator):
 	cat_encoder = Pipeline([
@@ -55,7 +55,7 @@ def build_estimatortransformer_iris(outlier_detector_estimator, final_estimator,
 		("decorator", ContinuousDomain()),
 		("outlier_detector", FeatureUnion([
 			("original", IdentityTransformer()),
-			("flag", make_estimator_transformer(outlier_detector_estimator, "outlierDetector")),	
+			("flag", make_estimator_transformer(outlier_detector_estimator, "outlierDetector", predict_func = "decision_function")),	
 		])),
 		("estimator", final_estimator)
 	])

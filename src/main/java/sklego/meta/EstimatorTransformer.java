@@ -20,8 +20,11 @@ package sklego.meta;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
@@ -43,6 +46,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
+import sklearn.HasDecisionFunctionField;
 import sklearn.HasEstimator;
 import sklearn.Transformer;
 
@@ -57,13 +61,144 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		Estimator estimator = getEstimator();
 		String predictFunc = getPredictFunc();
 
+		FieldName inputName;
+
 		switch(predictFunc){
 			case "predict":
+				{
+					inputName = null;
+				}
+				break;
+			case "decision_function":
+				{
+					if(estimator instanceof HasDecisionFunctionField){
+						HasDecisionFunctionField hasDecisionFunctionField = (HasDecisionFunctionField)estimator;
+
+						inputName = hasDecisionFunctionField.getDecisionFunctionField();
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
+				}
 				break;
 			default:
 				throw new IllegalArgumentException(predictFunc);
 		}
 
+		Schema schema = createSchema(estimator, features, encoder);
+
+		Model model = estimator.encode(schema);
+
+		Map<FieldName, DerivedOutputField> derivedOutputFields = new LinkedHashMap<>();
+
+		Output output = model.getOutput();
+		if(output != null && output.hasOutputFields()){
+			List<OutputField> outputFields = output.getOutputFields();
+
+			for(Iterator<OutputField> it = outputFields.iterator(); it.hasNext(); ){
+				OutputField outputField = it.next();
+
+				ResultFeature resultFeature = outputField.getResultFeature();
+				switch(resultFeature){
+					case PREDICTED_VALUE:
+					case TRANSFORMED_VALUE:
+						{
+							DerivedOutputField derivedOutputField = encoder.createDerivedField(model, outputField, true);
+
+							derivedOutputFields.put(derivedOutputField.getName(), derivedOutputField);
+						}
+						break;
+					default:
+						break;
+				}
+
+				it.remove();
+			}
+		}
+
+		encoder.addTransformer(model);
+
+		if(inputName == null){
+
+			if(!derivedOutputFields.isEmpty()){
+				throw new IllegalArgumentException();
+			} // End if
+
+			if(estimator.isSupervised()){
+				Label label = schema.getLabel();
+
+				FieldName name = createFieldName(Estimator.FIELD_PREDICT);
+
+				MiningFunction miningFunction = estimator.getMiningFunction();
+				switch(miningFunction){
+					case CLASSIFICATION:
+						{
+							CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+
+							OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, categoricalLabel.getDataType());
+
+							DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
+
+							return Collections.singletonList(new CategoricalFeature(encoder, predictedField, categoricalLabel.getValues()));
+						}
+					case REGRESSION:
+						{
+							ContinuousLabel continuousLabel = (ContinuousLabel)label;
+
+							OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, continuousLabel.getDataType());
+
+							DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
+
+							return Collections.singletonList(new ContinuousFeature(encoder, predictedField));
+						}
+					default:
+						throw new IllegalArgumentException();
+				}
+			} else
+
+			{
+				inputName = Iterables.getLast(derivedOutputFields.keySet());
+			}
+		}
+
+		DerivedOutputField inputField = derivedOutputFields.get(inputName);
+		if(inputField == null){
+			throw new IllegalArgumentException();
+		}
+
+		OpType opType = inputField.getOpType();
+		switch(opType){
+			case CATEGORICAL:
+				{
+					OutputField outputField = inputField.getOutputField();
+
+					if(!outputField.hasValues()){
+						throw new IllegalArgumentException();
+					}
+
+					return Collections.singletonList(new CategoricalFeature(encoder, inputField, outputField.getValues()));
+				}
+			case CONTINUOUS:
+				{
+					return Collections.singletonList(new ContinuousFeature(encoder, inputField));
+				}
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
+	@Override
+	public Estimator getEstimator(){
+		return get("estimator_", Estimator.class);
+	}
+
+	public String getPredictFunc(){
+		return getString("predict_func");
+	}
+
+	static
+	private Schema createSchema(Estimator estimator, List<Feature> features, SkLearnEncoder encoder){
 		Label label = null;
 
 		if(estimator.isSupervised()){
@@ -89,105 +224,6 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 			}
 		}
 
-		Schema schema = new Schema(encoder, label, features);
-
-		Model model = estimator.encode(schema);
-
-		DerivedOutputField finalOutputField = null;
-
-		Output output = model.getOutput();
-		if(output != null && output.hasOutputFields()){
-			List<OutputField> outputFields = output.getOutputFields();
-
-			for(Iterator<OutputField> it = outputFields.iterator(); it.hasNext(); ){
-				OutputField outputField = it.next();
-
-				ResultFeature resultFeature = outputField.getResultFeature();
-				switch(resultFeature){
-					case PREDICTED_VALUE:
-					case TRANSFORMED_VALUE:
-						{
-							finalOutputField = encoder.createDerivedField(model, outputField, true);
-						}
-						break;
-					default:
-						break;
-				}
-
-				it.remove();
-			}
-		}
-
-		encoder.addTransformer(model);
-
-		if(estimator.isSupervised()){
-			MiningFunction miningFunction = estimator.getMiningFunction();
-
-			if(finalOutputField != null){
-				throw new IllegalArgumentException();
-			}
-
-			FieldName name = createFieldName(Estimator.FIELD_PREDICT);
-
-			switch(miningFunction){
-				case CLASSIFICATION:
-					{
-						CategoricalLabel categoricalLabel = (CategoricalLabel)label;
-
-						OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, categoricalLabel.getDataType());
-
-						DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-						return Collections.singletonList(new CategoricalFeature(encoder, predictedField, categoricalLabel.getValues()));
-					}
-				case REGRESSION:
-					{
-						ContinuousLabel continuousLabel = (ContinuousLabel)label;
-
-						OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, continuousLabel.getDataType());
-
-						DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-						return Collections.singletonList(new ContinuousFeature(encoder, predictedField));
-					}
-				default:
-					throw new IllegalArgumentException();
-			}
-		} else
-
-		{
-			if(finalOutputField == null){
-				throw new IllegalArgumentException();
-			}
-
-			OpType opType = finalOutputField.getOpType();
-			switch(opType){
-				case CATEGORICAL:
-					{
-						OutputField finalPmmlOutputField = finalOutputField.getOutputField();
-
-						if(!finalPmmlOutputField.hasValues()){
-							throw new IllegalArgumentException();
-						}
-
-						return Collections.singletonList(new CategoricalFeature(encoder, finalOutputField, finalPmmlOutputField.getValues()));
-					}
-				case CONTINUOUS:
-					{
-						return Collections.singletonList(new ContinuousFeature(encoder, finalOutputField));
-					}
-				default:
-					throw new IllegalArgumentException();
-			}
-		}
-	}
-
-	@Override
-	public Estimator getEstimator(){
-		return get("estimator_", Estimator.class);
-	}
-
-	public String getPredictFunc(){
-		return getString("predict_func");
+		return new Schema(encoder, label, features);
 	}
 }
