@@ -51,7 +51,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
-import sklearn.Estimator;
+import sklearn.HasDecisionFunctionField;
 import sklearn.Regressor;
 import sklearn.SkLearnOutlierTransformation;
 import sklearn.SkLearnUtil;
@@ -62,7 +62,7 @@ import sklearn.tree.Tree;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class IsolationForest extends EnsembleRegressor implements HasTreeOptions {
+public class IsolationForest extends EnsembleRegressor implements HasDecisionFunctionField, HasTreeOptions {
 
 	public IsolationForest(String module, String name){
 		super(module, name);
@@ -172,7 +172,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			@Override
 			public FieldName getName(FieldName name){
-				return FieldName.create(Estimator.FIELD_DECISION_FUNCTION);
+				return getDecisionFunctionField();
 			}
 
 			@Override

@@ -34,10 +34,10 @@ import org.jpmml.converter.OutlierTransformation;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
-import sklearn.Estimator;
+import sklearn.HasDecisionFunctionField;
 import sklearn.SkLearnOutlierTransformation;
 
-public class OneClassSVM extends LibSVMRegressor {
+public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionField {
 
 	public OneClassSVM(String module, String name){
 		super(module, name);
@@ -65,7 +65,7 @@ public class OneClassSVM extends LibSVMRegressor {
 
 		Transformation sklearnOutlier = new SkLearnOutlierTransformation();
 
-		Output output = ModelUtil.createPredictedOutput(FieldName.create(Estimator.FIELD_DECISION_FUNCTION), OpType.CONTINUOUS, DataType.DOUBLE, outlier, sklearnOutlier);
+		Output output = ModelUtil.createPredictedOutput(getDecisionFunctionField(), OpType.CONTINUOUS, DataType.DOUBLE, outlier, sklearnOutlier);
 
 		List<OutputField> outputFields = output.getOutputFields();
 
