@@ -3,6 +3,7 @@ from common import *
 from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import IsolationForest
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.pipeline import FeatureUnion, Pipeline
@@ -47,6 +48,26 @@ def build_estimatortransformer_audit(name):
 	store_csv(adjusted, name)
 
 build_estimatortransformer_audit("EstimatorTransformerAudit")
+
+def build_estimatortransformer_versicolor(outlier_detector_estimator, final_estimator, name):
+	versicolor_X, versicolor_y = load_versicolor("Versicolor")
+
+	pipeline = PMMLPipeline([
+		("decorator", ContinuousDomain()),
+		("outlier_detector", FeatureUnion([
+			("original", IdentityTransformer()),
+			("flag", make_estimator_transformer(outlier_detector_estimator, "outlierDetector")),	
+		])),
+		("estimator", final_estimator)
+	])
+	pipeline.fit(versicolor_X, versicolor_y)
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
+build_estimatortransformer_versicolor(OneClassSVM(), LinearDiscriminantAnalysis(), "EstimatorTransformerVersicolor")
 
 def build_estimatortransformer_iris(outlier_detector_estimator, final_estimator, name):
 	iris_X, iris_y = load_iris("Iris")

@@ -121,11 +121,12 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 		if(inputName == null){
 
-			if(!derivedOutputFields.isEmpty()){
-				throw new IllegalArgumentException();
-			} // End if
-
 			if(estimator.isSupervised()){
+
+				if(!derivedOutputFields.isEmpty()){
+					throw new IllegalArgumentException();
+				}
+
 				Label label = schema.getLabel();
 
 				FieldName name = createFieldName(Estimator.FIELD_PREDICT);
@@ -158,6 +159,10 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 			} else
 
 			{
+				if(derivedOutputFields.isEmpty()){
+					throw new IllegalArgumentException();
+				}
+
 				inputName = Iterables.getLast(derivedOutputFields.keySet());
 			}
 		}
