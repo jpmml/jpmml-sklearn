@@ -41,6 +41,7 @@ import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -182,7 +183,9 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 						throw new IllegalArgumentException();
 					}
 
-					return Collections.singletonList(new CategoricalFeature(encoder, inputField, outputField.getValues()));
+					List<?> values = PMMLUtil.getValues(outputField);
+
+					return Collections.singletonList(new CategoricalFeature(encoder, inputField, values));
 				}
 			case CONTINUOUS:
 				{

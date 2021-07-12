@@ -6,6 +6,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import IsolationForest
 from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.pipeline import make_pipeline
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.svm import OneClassSVM
@@ -56,7 +57,7 @@ def build_estimatortransformer_versicolor(outlier_detector_estimator, final_esti
 		("decorator", ContinuousDomain()),
 		("outlier_detector", FeatureUnion([
 			("original", IdentityTransformer()),
-			("flag", make_estimator_transformer(outlier_detector_estimator, "outlierDetector")),	
+			("flag", make_pipeline(make_estimator_transformer(outlier_detector_estimator, "outlierDetector"), OneHotEncoder(sparse = False))),	
 		])),
 		("estimator", final_estimator)
 	])
