@@ -465,6 +465,12 @@ pipeline = PMMLPipeline([
 pipeline.fit(iris_X, iris_y)
 ```
 
+Recording feature importance information in a `pickle` data format-compatible manner:
+
+```python
+classifier.pmml_feature_importances_ = classifier.feature_importances_
+```
+
 Embedding model verification data:
 
 ```python
