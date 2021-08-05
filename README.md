@@ -503,6 +503,7 @@ java -jar target/jpmml-sklearn-executable-1.6-SNAPSHOT.jar --help
 
 Up-to-date:
 
+* [Benchmarking Scikit-Learn against JPMML-Evaluator in Java and Python environments](https://openscoring.io/blog/2021/08/04/benchmarking_sklearn_jpmml_evaluator/)
 * [Extending Scikit-Learn with outlier detector transformer type](https://openscoring.io/blog/2021/07/16/sklearn_outlier_detector_transformer/)
 * [Analyzing Scikit-Learn feature importances via PMML](https://openscoring.io/blog/2021/07/11/analyzing_sklearn_feature_importances_pmml/)
 * [Training Scikit-Learn based TF(-IDF) plus XGBoost pipelines](https://openscoring.io/blog/2021/02/27/sklearn_tf_tfidf_xgboost_pipeline/)
