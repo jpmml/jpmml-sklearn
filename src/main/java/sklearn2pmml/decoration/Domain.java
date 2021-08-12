@@ -100,7 +100,7 @@ public class Domain extends Transformer {
 			} // End if
 
 			if(missingValues != null){
-				PMMLUtil.addValues(dataField, standardizeValues(dataType, missingValues), Value.Property.MISSING);
+				PMMLUtil.addValues(dataField, Value.Property.MISSING, standardizeValues(dataType, missingValues));
 			} // End if
 
 			if(invalidValueTreatment != null){

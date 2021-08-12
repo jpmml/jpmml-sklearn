@@ -38,7 +38,6 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.AbstractTransformation;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.OutlierTransformation;
 import org.jpmml.converter.PMMLUtil;
@@ -145,16 +144,11 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		}
 
 		// "rawAnomalyScore / averagePathLength(maxSamples)"
-		Transformation normalizedAnomalyScore = new AbstractTransformation(){
+		Transformation normalizedAnomalyScore = new Transformation(){
 
 			@Override
 			public FieldName getName(FieldName name){
 				return FieldName.create("normalizedAnomalyScore");
-			}
-
-			@Override
-			public boolean isFinalResult(){
-				return false;
 			}
 
 			@Override
@@ -168,7 +162,7 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		};
 
 		// "0.5 - 2 ^ (-1 * normalizedAnomalyScore)"
-		Transformation decisionFunction = new AbstractTransformation(){
+		Transformation decisionFunction = new Transformation(){
 
 			@Override
 			public FieldName getName(FieldName name){
@@ -228,8 +222,6 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		Transformation sklearnOutlier = new SkLearnOutlierTransformation();
 
 		Output output = ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier, sklearnOutlier);
-
-		SkLearnOutlierTransformation.decorate(output);
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, treeModels))

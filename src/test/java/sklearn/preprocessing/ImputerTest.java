@@ -30,6 +30,7 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
@@ -62,7 +63,7 @@ public class ImputerTest {
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
 
-		List<Decorator> decorators = encoder.getDecorators(name);
+		List<Decorator> decorators = getDecorators(encoder, name);
 
 		assertEquals(1, decorators.size());
 
@@ -84,7 +85,7 @@ public class ImputerTest {
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
 
-		decorators = encoder.getDecorators(name);
+		decorators = getDecorators(encoder, name);
 
 		assertEquals(2, decorators.size());
 
@@ -111,7 +112,7 @@ public class ImputerTest {
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
 
-		List<Decorator> decorators = encoder.getDecorators(name);
+		List<Decorator> decorators = getDecorators(encoder, name);
 
 		assertEquals(1, decorators.size());
 
@@ -130,7 +131,7 @@ public class ImputerTest {
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
 
-		decorators = encoder.getDecorators(name);
+		decorators = getDecorators(encoder, name);
 
 		assertEquals(2, decorators.size());
 
@@ -148,12 +149,17 @@ public class ImputerTest {
 		assertNotNull(encoder.getDerivedField(binarizedName));
 		assertNotNull(encoder.getDerivedField(imputedBinarizedName));
 
-		decorators = encoder.getDecorators(name);
+		decorators = getDecorators(encoder, name);
 
 		assertEquals(1, decorators.size());
 
 		assertTrue(feature instanceof ContinuousFeature);
 		assertEquals(imputedBinarizedName, feature.getName());
+	}
+
+	static
+	private List<Decorator> getDecorators(ModelEncoder encoder, FieldName name){
+		return (encoder.getDecorators()).get(null).get(name);
 	}
 
 	static

@@ -180,7 +180,7 @@ public class GBDTUtil {
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
 			.setTargets(ModelUtil.createRescaleTargets(null, intercept, continuousLabel));
 
-		encoder.transferFeatureImportances(model, miningModel);
+		encoder.transferContent(model, miningModel);
 
 		return miningModel;
 	}

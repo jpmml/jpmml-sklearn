@@ -41,7 +41,6 @@ import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -138,11 +137,13 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 						{
 							CategoricalLabel categoricalLabel = (CategoricalLabel)label;
 
+							List<?> categories = categoricalLabel.getValues();
+
 							OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, categoricalLabel.getDataType());
 
 							DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 
-							return Collections.singletonList(new CategoricalFeature(encoder, predictedField, categoricalLabel.getValues()));
+							return Collections.singletonList(new CategoricalFeature(encoder, predictedField, categories));
 						}
 					case REGRESSION:
 						{
@@ -177,15 +178,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		switch(opType){
 			case CATEGORICAL:
 				{
-					OutputField outputField = inputField.getOutputField();
-
-					if(!outputField.hasValues()){
-						throw new IllegalArgumentException();
-					}
-
-					List<?> values = PMMLUtil.getValues(outputField);
-
-					return Collections.singletonList(new CategoricalFeature(encoder, inputField, values));
+					return Collections.singletonList(new CategoricalFeature(encoder, inputField.getOutputField()));
 				}
 			case CONTINUOUS:
 				{

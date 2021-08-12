@@ -28,7 +28,6 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel.NormalizationMethod;
-import org.jpmml.converter.AbstractTransformation;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
@@ -59,7 +58,7 @@ public class TransformedTargetRegressor extends Regressor {
 
 		Label label = schema.getLabel();
 
-		Transformation transformation = new AbstractTransformation(){
+		Transformation transformation = new Transformation(){
 
 			@Override
 			public FieldName getName(FieldName name){

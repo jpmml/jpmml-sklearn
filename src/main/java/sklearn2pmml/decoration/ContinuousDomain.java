@@ -148,7 +148,7 @@ public class ContinuousDomain extends Domain {
 					.setCounts(createCounts(counts))
 					.setNumericInfo(createNumericInfo(wildcardFeature.getDataType(), numericInfo));
 
-				encoder.putUnivariateStats(univariateStats);
+				encoder.addUnivariateStats(univariateStats);
 			}
 
 			result.add(feature);

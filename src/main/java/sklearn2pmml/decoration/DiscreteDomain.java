@@ -99,7 +99,7 @@ public class DiscreteDomain extends Domain {
 				.setCounts(createCounts(counts))
 				.setDiscrStats(createDiscrStats(wildcardFeature.getDataType(), discrStats));
 
-			encoder.putUnivariateStats(univariateStats);
+			encoder.addUnivariateStats(univariateStats);
 		}
 
 		return Collections.singletonList(feature);

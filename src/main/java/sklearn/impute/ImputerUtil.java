@@ -54,7 +54,7 @@ public class ImputerUtil {
 			encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatmentMethod, replacementValue));
 
 			if(missingValue != null){
-				PMMLUtil.addValues(dataField, Collections.singletonList(missingValue), Value.Property.MISSING);
+				PMMLUtil.addValues(dataField, Value.Property.MISSING, Collections.singletonList(missingValue));
 			}
 
 			return feature;

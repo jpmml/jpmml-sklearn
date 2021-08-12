@@ -26,8 +26,6 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLUtil;
@@ -56,20 +54,13 @@ public class SkLearnOutlierTransformation implements Transformation {
 	}
 
 	@Override
-	public Expression createExpression(FieldRef fieldRef){
-		return PMMLUtil.createApply(PMMLFunctions.IF, fieldRef, PMMLUtil.createConstant(VALUE_OUTLIER), PMMLUtil.createConstant(VALUE_INLIER));
+	public List<Integer> getValues(){
+		return Arrays.asList(VALUE_OUTLIER, VALUE_INLIER);
 	}
 
-	static
-	public void decorate(Output output){
-
-		if(output != null && output.hasOutputFields()){
-			List<OutputField> outputFields = output.getOutputFields();
-
-			OutputField finalOutputField = outputFields.get(outputFields.size() - 1);
-
-			PMMLUtil.addValues(finalOutputField, Arrays.asList(VALUE_OUTLIER, VALUE_INLIER));
-		}
+	@Override
+	public Expression createExpression(FieldRef fieldRef){
+		return PMMLUtil.createApply(PMMLFunctions.IF, fieldRef, PMMLUtil.createConstant(VALUE_OUTLIER), PMMLUtil.createConstant(VALUE_INLIER));
 	}
 
 	public static final Integer VALUE_INLIER = +1;

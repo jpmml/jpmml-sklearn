@@ -61,7 +61,7 @@ public class BoosterUtil {
 
 		MiningModel miningModel = gbdt.encodeMiningModel(options, lgbmSchema);
 
-		encoder.transferFeatureImportances(miningModel);
+		encoder.transferFeatureImportances(null, miningModel);
 
 		return miningModel;
 	}

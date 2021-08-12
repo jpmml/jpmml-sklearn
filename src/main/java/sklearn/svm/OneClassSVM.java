@@ -75,8 +75,6 @@ public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionF
 			decisionFunctionOutputField.setFinalResult(true);
 		}
 
-		SkLearnOutlierTransformation.decorate(output);
-
 		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
 			.setOutput(output);
 
