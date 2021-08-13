@@ -20,8 +20,11 @@ package xgboost.sklearn;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.HasXGBoostOptions;
+import org.jpmml.xgboost.ObjFunction;
+import org.jpmml.xgboost.Regression;
 import sklearn.Regressor;
 
 public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOptions {
@@ -38,6 +41,17 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
+	}
+
+	@Override
+	public void checkLabel(Label label){
+		ObjFunction objFunction = BoosterUtil.getObjFunction(this);
+
+		super.checkLabel(label);
+
+		if((objFunction != null) && !(objFunction instanceof Regression)){
+			throw new IllegalArgumentException("Expected a regression-type objective function, got " + (objFunction.getClass()).getName());
+		}
 	}
 
 	@Override

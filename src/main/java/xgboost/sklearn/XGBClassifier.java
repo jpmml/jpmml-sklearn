@@ -20,8 +20,11 @@ package xgboost.sklearn;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
+import org.jpmml.xgboost.Classification;
 import org.jpmml.xgboost.HasXGBoostOptions;
+import org.jpmml.xgboost.ObjFunction;
 import sklearn.LabelEncoderClassifier;
 
 public class XGBClassifier extends LabelEncoderClassifier implements HasBooster, HasXGBoostOptions {
@@ -38,6 +41,17 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
+	}
+
+	@Override
+	public void checkLabel(Label label){
+		ObjFunction objFunction = BoosterUtil.getObjFunction(this);
+
+		super.checkLabel(label);
+
+		if((objFunction != null) && !(objFunction instanceof Classification)){
+			throw new IllegalArgumentException("Expected a classification-type objective function, got " + (objFunction.getClass()).getName());
+		}
 	}
 
 	@Override

@@ -19,8 +19,11 @@
 package lightgbm.sklearn;
 
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.HasLightGBMOptions;
+import org.jpmml.lightgbm.ObjectiveFunction;
+import org.jpmml.lightgbm.Regression;
 import sklearn.Regressor;
 
 public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMOptions {
@@ -32,6 +35,17 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 	@Override
 	public int getNumberOfFeatures(){
 		return BoosterUtil.getNumberOfFeatures(this);
+	}
+
+	@Override
+	public void checkLabel(Label label){
+		ObjectiveFunction objectiveFunction = BoosterUtil.getObjectiveFunction(this);
+
+		super.checkLabel(label);
+
+		if((objectiveFunction != null) && !(objectiveFunction instanceof Regression)){
+			throw new IllegalArgumentException("Expected a regression-type objective function, got " + (objectiveFunction.getClass()).getName());
+		}
 	}
 
 	@Override

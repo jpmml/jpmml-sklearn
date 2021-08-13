@@ -27,6 +27,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.ByteOrderUtil;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
+import org.jpmml.xgboost.ObjFunction;
 import sklearn.Estimator;
 
 public class BoosterUtil {
@@ -39,6 +40,13 @@ public class BoosterUtil {
 		Learner learner = getLearner(estimator);
 
 		return learner.num_feature();
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> ObjFunction getObjFunction(E estimator){
+		Learner learner = getLearner(estimator);
+
+		return learner.obj();
 	}
 
 	static

@@ -19,8 +19,11 @@
 package lightgbm.sklearn;
 
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
+import org.jpmml.lightgbm.Classification;
 import org.jpmml.lightgbm.HasLightGBMOptions;
+import org.jpmml.lightgbm.ObjectiveFunction;
 import sklearn.LabelEncoderClassifier;
 
 public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster, HasLightGBMOptions {
@@ -32,6 +35,17 @@ public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster
 	@Override
 	public int getNumberOfFeatures(){
 		return BoosterUtil.getNumberOfFeatures(this);
+	}
+
+	@Override
+	public void checkLabel(Label label){
+		ObjectiveFunction objectiveFunction = BoosterUtil.getObjectiveFunction(this);
+
+		super.checkLabel(label);
+
+		if((objectiveFunction != null) && !(objectiveFunction instanceof Classification)){
+			throw new IllegalArgumentException("Expected a classification-type objective function, got " + (objectiveFunction.getClass()).getName());
+		}
 	}
 
 	@Override

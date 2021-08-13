@@ -108,6 +108,20 @@ public class Estimator extends Step {
 	}
 
 	public void checkLabel(Label label){
+		boolean supervised = isSupervised();
+
+		if(supervised){
+
+			if(label == null){
+				throw new IllegalArgumentException("Expected a label, got no label");
+			}
+		} else
+
+		{
+			if(label != null){
+				throw new IllegalArgumentException("Expected no label, got " + label);
+			}
+		}
 	}
 
 	public void checkFeatures(List<? extends Feature> features){
