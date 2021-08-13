@@ -73,7 +73,6 @@ import sklearn.HasClassifierOptions;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Step;
-import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.pipeline.FeatureUnion;
 import sklearn.pipeline.Pipeline;
@@ -227,8 +226,6 @@ public class PMMLPipeline extends Pipeline {
 		if(estimator == null){
 			return encodePMML(header, null, repr, encoder);
 		}
-
-		StepUtil.checkNumberOfFeatures(estimator, features);
 
 		Schema schema = new Schema(encoder, label, features);
 

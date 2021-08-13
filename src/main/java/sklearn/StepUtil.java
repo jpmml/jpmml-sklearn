@@ -32,7 +32,7 @@ public class StepUtil {
 	}
 
 	static
-	public void checkNumberOfFeatures(Step step, List<Feature> features){
+	public void checkNumberOfFeatures(Step step, List<? extends Feature> features){
 		int numberOfFeatures = step.getNumberOfFeatures();
 
 		if((numberOfFeatures != HasNumberOfFeatures.UNKNOWN) && (numberOfFeatures != features.size())){

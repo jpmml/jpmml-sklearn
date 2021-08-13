@@ -63,11 +63,15 @@ public class Transformer extends Step {
 	}
 
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
-		StepUtil.checkNumberOfFeatures(this, features);
+		checkFeatures(features);
 
 		features = updateFeatures(features, encoder);
 
 		return encodeFeatures(features, encoder);
+	}
+
+	public void checkFeatures(List<? extends Feature> features){
+		StepUtil.checkNumberOfFeatures(this, features);
 	}
 
 	public List<Feature> updateFeatures(List<Feature> features, SkLearnEncoder encoder){

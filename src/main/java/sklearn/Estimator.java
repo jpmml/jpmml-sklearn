@@ -26,6 +26,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
@@ -80,6 +81,9 @@ public class Estimator extends Step {
 	}
 
 	public Model encode(Schema schema){
+		checkLabel(schema.getLabel());
+		checkFeatures(schema.getFeatures());
+
 		Model model = encodeModel(schema);
 
 		String modelName = model.getModelName();
@@ -101,6 +105,13 @@ public class Estimator extends Step {
 		addFeatureImportances(model, schema);
 
 		return model;
+	}
+
+	public void checkLabel(Label label){
+	}
+
+	public void checkFeatures(List<? extends Feature> features){
+		StepUtil.checkNumberOfFeatures(this, features);
 	}
 
 	public void addFeatureImportances(Model model, Schema schema){

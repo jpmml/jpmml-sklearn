@@ -24,6 +24,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
@@ -90,6 +92,20 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		Estimator estimator = getEstimator();
 
 		return estimator.encodeModel(schema);
+	}
+
+	@Override
+	public void checkLabel(Label label){
+		Estimator estimator = getEstimator();
+
+		estimator.checkLabel(label);
+	}
+
+	@Override
+	public void checkFeatures(List<? extends Feature> features){
+		Estimator estimator = getEstimator();
+
+		estimator.checkFeatures(features);
 	}
 
 	/**
