@@ -44,7 +44,7 @@ public class EncoderUtil {
 	}
 
 	static
-	public Feature encodeIndexFeature(Transformer transformer, Feature feature, List<?> categories, DataType dataType, SkLearnEncoder encoder){
+	public Feature encodeIndexFeature(Transformer transformer, Feature feature, List<?> categories, Number mapMissingTo, Number defaultValue, DataType dataType, SkLearnEncoder encoder){
 		List<Number> indexCategories = new ArrayList<>(categories.size());
 
 		for(int i = 0; i < categories.size(); i++){
@@ -64,7 +64,7 @@ public class EncoderUtil {
 			}
 		}
 
-		return encodeIndexFeature(transformer, feature, categories, indexCategories, null, null, dataType, encoder);
+		return encodeIndexFeature(transformer, feature, categories, indexCategories, mapMissingTo, defaultValue, dataType, encoder);
 	}
 
 	static

@@ -26,6 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -75,8 +76,27 @@ public class OrdinalEncoder extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<List<?>> categories = getCategories();
 		DType dtype = getDType();
+		String handleUnknown = getHandleUnknown();
+		Number unknownValue = null;
 
 		ClassDictUtil.checkSize(categories, features);
+
+		if(handleUnknown != null){
+
+			switch(handleUnknown){
+				case "error":
+					break;
+				case "use_encoded_value":
+					unknownValue = getUnknownValue();
+
+					if(ValueUtil.isNaN(unknownValue)){
+						unknownValue = null;
+					}
+					break;
+				default:
+					throw new IllegalArgumentException(handleUnknown);
+			}
+		}
 
 		List<Feature> result = new ArrayList<>();
 
@@ -86,7 +106,7 @@ public class OrdinalEncoder extends Transformer {
 			Feature feature = features.get(i);
 			List<?> featureCategories = categories.get(i);
 
-			result.add(EncoderUtil.encodeIndexFeature(this, feature, featureCategories, dataType, encoder));
+			result.add(EncoderUtil.encodeIndexFeature(this, feature, featureCategories, null, unknownValue, dataType, encoder));
 		}
 
 		return result;
@@ -98,5 +118,13 @@ public class OrdinalEncoder extends Transformer {
 
 	public DType getDType(){
 		return (DType)getDType(false);
+	}
+
+	public String getHandleUnknown(){
+		return getOptionalString("handle_unknown");
+	}
+
+	public Number getUnknownValue(){
+		return getNumber("unknown_value");
 	}
 }
