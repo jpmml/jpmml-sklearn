@@ -298,7 +298,9 @@ if "Audit" in datasets:
 def build_audit_na_direct(classifier, name):
 	mapper = DataFrameMapper([
 		(["Age", "Hours", "Income"], None),
-		(["Employment", "Education", "Marital", "Occupation", "Gender"], OneHotEncoder())
+		(["Education", "Employment"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OrdinalEncoder(), OneHotEncoder()]),
+		(["Gender"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OrdinalEncoder(handle_unknown = "use_encoded_value", unknown_value = 11), OneHotEncoder()]),
+		(["Marital", "Occupation"], OneHotEncoder())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
