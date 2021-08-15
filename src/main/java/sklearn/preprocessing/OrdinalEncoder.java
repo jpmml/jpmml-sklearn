@@ -23,53 +23,15 @@ import java.util.List;
 
 import numpy.DType;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
-public class OrdinalEncoder extends Transformer {
+public class OrdinalEncoder extends BaseEncoder {
 
 	public OrdinalEncoder(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.CATEGORICAL;
-	}
-
-	@Override
-	public DataType getDataType(){
-		List<List<?>> categories = getCategories();
-
-		DataType result = null;
-
-		for(int i = 0; i < categories.size(); i++){
-			List<?> featureCategories = categories.get(i);
-
-			DataType dataType = TypeUtil.getDataType(featureCategories, null);
-
-			if(result == null){
-				result = dataType;
-			} else
-
-			{
-				if(!(result).equals(dataType)){
-					throw new UnsupportedOperationException();
-				}
-			}
-		}
-
-		if(result == null){
-			result = DataType.STRING;
-		}
-
-		return result;
 	}
 
 	@Override
@@ -110,18 +72,6 @@ public class OrdinalEncoder extends Transformer {
 		}
 
 		return result;
-	}
-
-	public List<List<?>> getCategories(){
-		return EncoderUtil.transformCategories(getList("categories_", HasArray.class));
-	}
-
-	public DType getDType(){
-		return (DType)getDType(false);
-	}
-
-	public String getHandleUnknown(){
-		return getOptionalString("handle_unknown");
 	}
 
 	public Number getUnknownValue(){

@@ -25,7 +25,6 @@ import category_encoders.BaseNFeature;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
@@ -36,24 +35,12 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
 
-public class MultiOneHotEncoder extends MultiTransformer {
+public class MultiOneHotEncoder extends BaseEncoder {
 
 	public MultiOneHotEncoder(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.CATEGORICAL;
-	}
-
-	@Override
-	public DataType getDataType(){
-		return super.getDataType();
 	}
 
 	@Override
@@ -153,10 +140,6 @@ public class MultiOneHotEncoder extends MultiTransformer {
 		}
 
 		return result;
-	}
-
-	public List<List<?>> getCategories(){
-		return EncoderUtil.transformCategories(getList("categories_", HasArray.class));
 	}
 
 	public Object getDrop(){
