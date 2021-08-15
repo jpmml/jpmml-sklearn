@@ -19,11 +19,13 @@
 package sklearn.preprocessing;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.HasArray;
 import sklearn.MultiTransformer;
 
@@ -47,6 +49,10 @@ public class BaseEncoder extends MultiTransformer {
 
 		for(int i = 0; i < categories.size(); i++){
 			List<?> featureCategories = categories.get(i);
+
+			featureCategories = featureCategories.stream()
+				.filter(value -> (value != null) && !ValueUtil.isNaN(value))
+				.collect(Collectors.toList());
 
 			DataType dataType = TypeUtil.getDataType(featureCategories, null);
 
