@@ -41,4 +41,9 @@ public class SkLegoTest extends SkLearnTest implements Datasets {
 	public void evaluateEstimatorTransformerVersicolor() throws Exception {
 		evaluate("EstimatorTransformer", VERSICOLOR);
 	}
+
+	@Test
+	public void evaluateEstimatorTransformerWheat() throws Exception {
+		evaluate("EstimatorTransformer", WHEAT);
+	}
 }

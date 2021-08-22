@@ -2,6 +2,7 @@ from common import *
 
 from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
+from sklearn.cluster import KMeans
 from sklearn.compose import ColumnTransformer
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import IsolationForest
@@ -36,6 +37,26 @@ def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimato
 		("estimator", final_estimator)
 	])
 	return pipeline
+
+def build_estimatortransformer_wheat(name):
+	wheat_X, wheat_y = load_wheat("Wheat")
+
+	pipeline = PMMLPipeline([
+		("decorator", ContinuousDomain()),
+		("cluster_assigner", FeatureUnion([
+			("original", IdentityTransformer()),
+			("cluster", make_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "clusterer"), OneHotEncoder(sparse = False)))
+		])),
+		("classifier", LogisticRegression(random_state = 13))
+	])
+	pipeline.fit(wheat_X, wheat_y)
+	store_pkl(pipeline, name)
+	variety = DataFrame(pipeline.predict(wheat_X), columns = ["Variety"])
+	variety_proba = DataFrame(pipeline.predict_proba(wheat_X), columns = ["probability(1)", "probability(2)", "probability(3)"])
+	variety = pandas.concat((variety, variety_proba), axis = 1)
+	store_csv(variety, name)
+
+build_estimatortransformer_wheat("EstimatorTransformerWheat")
 
 def build_estimatortransformer_audit(name):
 	audit_X, audit_y = load_audit("Audit")

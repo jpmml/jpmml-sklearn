@@ -20,6 +20,7 @@ package sklearn.cluster;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -27,6 +28,9 @@ import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.OpType;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.SquaredEuclidean;
 import org.dmg.pmml.clustering.Cluster;
 import org.dmg.pmml.clustering.ClusteringModel;
@@ -79,8 +83,21 @@ public class KMeans extends Clusterer {
 		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, new SquaredEuclidean())
 			.setCompareFunction(CompareFunction.ABS_DIFF);
 
+		List<String> ids = clusters.stream()
+			.map(cluster -> cluster.getId())
+			.collect(Collectors.toList());
+
+		OutputField predictField = ModelUtil.createPredictedField(getPredictField(), OpType.CATEGORICAL, DataType.STRING);
+		PMMLUtil.addValues(predictField, ids);
+
+		List<OutputField> affinityFields = ModelUtil.createAffinityFields(DataType.DOUBLE, clusters);
+
+		Output output = new Output();
+		output.addOutputFields(predictField);
+		output.addOutputFields(affinityFields.toArray(new OutputField[affinityFields.size()]));
+
 		ClusteringModel clusteringModel = new ClusteringModel(MiningFunction.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema(schema.getLabel()), comparisonMeasure, ClusteringModelUtil.createClusteringFields(schema.getFeatures()), clusters)
-			.setOutput(ClusteringModelUtil.createOutput(getPredictField(), DataType.DOUBLE, clusters));
+			.setOutput(output);
 
 		return clusteringModel;
 	}

@@ -48,6 +48,7 @@ import sklearn.ClassifierUtil;
 import sklearn.Estimator;
 import sklearn.HasDecisionFunctionField;
 import sklearn.HasEstimator;
+import sklearn.HasPredictField;
 import sklearn.Transformer;
 
 public class EstimatorTransformer extends Transformer implements HasEstimator<Estimator> {
@@ -66,7 +67,15 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		switch(predictFunc){
 			case "predict":
 				{
-					inputName = null;
+					if(estimator instanceof HasPredictField){
+						HasPredictField hasPredictField = (HasPredictField)estimator;
+
+						inputName = hasPredictField.getPredictField();
+					} else
+
+					{
+						inputName = null;
+					}
 				}
 				break;
 			case "decision_function":
