@@ -312,7 +312,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Logical operators `and`, `or` and `not`.
       * Value missingness check functions `pandas.isnull` and `pandas.notnull`.
       * Numpy universal functions.
-      * String functions `lower`, `upper` and `strip`.
+      * String functions `startswith(<prefix>)`, `endswith(<suffix>)`, `lower`, `upper` and `strip`.
       * String length function `len(<str>)`
     * `sklearn2pmml.preprocessing.FilterLookupTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
