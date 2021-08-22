@@ -36,6 +36,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
+import sklearn.SkLearnMethods;
 
 public class StackingRegressor extends Regressor implements HasEstimatorEnsemble<Regressor> {
 
@@ -58,7 +59,7 @@ public class StackingRegressor extends Regressor implements HasEstimatorEnsemble
 			public List<Feature> apply(int index, Model model, String stackMethod, SkLearnEncoder encoder){
 
 				switch(stackMethod){
-					case "predict":
+					case SkLearnMethods.PREDICT:
 						break;
 					default:
 						throw new IllegalArgumentException(stackMethod);

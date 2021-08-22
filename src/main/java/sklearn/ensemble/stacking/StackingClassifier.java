@@ -40,6 +40,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.SkLearnMethods;
 
 public class StackingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
 
@@ -71,8 +72,11 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 			@Override
 			public List<Feature> apply(int index, Model model, String stackMethod, SkLearnEncoder encoder){
 
-				if(!("predict_proba").equals(stackMethod)){
-					throw new IllegalArgumentException(stackMethod);
+				switch(stackMethod){
+					case SkLearnMethods.PREDICT_PROBA:
+						break;
+					default:
+						throw new IllegalArgumentException(stackMethod);
 				}
 
 				Model finalModel = MiningModelUtil.getFinalModel(model);
