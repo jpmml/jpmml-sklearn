@@ -26,7 +26,6 @@ import com.google.common.collect.Multiset;
 import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.SquaredEuclidean;
 import org.dmg.pmml.clustering.Cluster;
@@ -81,7 +80,7 @@ public class KMeans extends Clusterer {
 			.setCompareFunction(CompareFunction.ABS_DIFF);
 
 		ClusteringModel clusteringModel = new ClusteringModel(MiningFunction.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema(schema.getLabel()), comparisonMeasure, ClusteringModelUtil.createClusteringFields(schema.getFeatures()), clusters)
-			.setOutput(ClusteringModelUtil.createOutput(FieldName.create(Clusterer.FIELD_CLUSTER), DataType.DOUBLE, clusters));
+			.setOutput(ClusteringModelUtil.createOutput(getPredictField(), DataType.DOUBLE, clusters));
 
 		return clusteringModel;
 	}

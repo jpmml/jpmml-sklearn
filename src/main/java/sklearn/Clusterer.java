@@ -18,10 +18,12 @@
  */
 package sklearn;
 
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
+import org.jpmml.converter.FieldNameUtil;
 
 abstract
-public class Clusterer extends Estimator {
+public class Clusterer extends Estimator implements HasPredictField {
 
 	public Clusterer(String module, String name){
 		super(module, name);
@@ -30,6 +32,11 @@ public class Clusterer extends Estimator {
 	@Override
 	public MiningFunction getMiningFunction(){
 		return MiningFunction.CLUSTERING;
+	}
+
+	@Override
+	public FieldName getPredictField(){
+		return FieldNameUtil.create(Clusterer.FIELD_CLUSTER);
 	}
 
 	public static final String FIELD_CLUSTER = "cluster";
