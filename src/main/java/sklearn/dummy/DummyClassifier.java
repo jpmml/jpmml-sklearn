@@ -32,7 +32,7 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Classifier;
 import sklearn.HasPriorProbability;
@@ -80,6 +80,9 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 			case "constant":
 				{
 					index = classes.indexOf(constant);
+					if(index < 0){
+						throw new IllegalArgumentException();
+					}
 
 					probabilities = new double[classes.size()];
 					probabilities[index] = 1d;
@@ -87,7 +90,7 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 				break;
 			case "most_frequent":
 				{
-					index = classPrior.indexOf(Collections.max((List)classPrior));
+					index = indexOfMax(classPrior);
 
 					probabilities = new double[classes.size()];
 					probabilities[index] = 1d;
@@ -95,7 +98,7 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 				break;
 			case "prior":
 				{
-					index = classPrior.indexOf(Collections.max((List)classPrior));
+					index = indexOfMax(classPrior);
 
 					probabilities = Doubles.toArray(classPrior);
 				}
@@ -104,15 +107,12 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 				throw new IllegalArgumentException(strategy);
 		}
 
-		Node root = new ClassifierNode(ValueUtil.asString(classes.get(index)), True.INSTANCE);
+		Node root = new ClassifierNode(categoricalLabel.getValue(index), True.INSTANCE);
 
-		List<ScoreDistribution> scoreDistributions = root.getScoreDistributions();
+		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
+		List<ScoreDistribution> scoreDistributions = scoreDistributionManager.createScoreDistribution(categoricalLabel, probabilities);
 
-		for(int i = 0; i < classes.size(); i++){
-			ScoreDistribution scoreDistribution = new ScoreDistribution(ValueUtil.asString(classes.get(i)), probabilities[i]);
-
-			scoreDistributions.add(scoreDistribution);
-		}
+		(root.getScoreDistributions()).addAll(scoreDistributions);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root)
 			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
@@ -130,5 +130,12 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 
 	public String getStrategy(){
 		return getString("strategy");
+	}
+
+	static
+	private int indexOfMax(List<? extends Number> values){
+		Object maxValue = Collections.max((List)values);
+
+		return values.indexOf(maxValue);
 	}
 }
