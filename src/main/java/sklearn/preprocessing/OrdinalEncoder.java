@@ -23,7 +23,9 @@ import java.util.List;
 
 import numpy.DType;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -67,6 +69,23 @@ public class OrdinalEncoder extends BaseEncoder {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			List<?> featureCategories = categories.get(i);
+
+			if(handleUnknown != null){
+				InvalidValueTreatmentMethod invalidValueTreatmentMethod;
+
+				switch(handleUnknown){
+					case "error":
+						invalidValueTreatmentMethod = InvalidValueTreatmentMethod.RETURN_INVALID;
+						break;
+					case "use_encoded_value":
+						invalidValueTreatmentMethod = InvalidValueTreatmentMethod.AS_IS;
+						break;
+					default:
+						throw new IllegalArgumentException(handleUnknown);
+				}
+
+				EncoderUtil.addDecorator(feature, new InvalidValueDecorator(invalidValueTreatmentMethod, null));
+			}
 
 			result.add(EncoderUtil.encodeIndexFeature(this, feature, featureCategories, null, unknownValue, dataType, encoder));
 		}

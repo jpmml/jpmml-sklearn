@@ -25,10 +25,12 @@ import category_encoders.BaseNFeature;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.TypeUtil;
@@ -46,17 +48,32 @@ public class MultiOneHotEncoder extends BaseEncoder {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<List<?>> categories = getCategories();
-
-		ClassDictUtil.checkSize(categories, features);
-
 		Object drop = getDrop();
 		List<Integer> dropIdx = (drop != null ? getDropIdx() : null);
+		String handleUnknown = getHandleUnknown();
+
+		ClassDictUtil.checkSize(categories, features);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			List<Object> featureCategories = new ArrayList<>(categories.get(i));
+
+			InvalidValueTreatmentMethod invalidValueTreatmentMethod;
+
+			switch(handleUnknown){
+				case "error":
+					invalidValueTreatmentMethod = InvalidValueTreatmentMethod.RETURN_INVALID;
+					break;
+				case "ignore":
+					invalidValueTreatmentMethod = InvalidValueTreatmentMethod.AS_IS;
+					break;
+				default:
+					throw new IllegalArgumentException();
+			}
+
+			EncoderUtil.addDecorator(feature, new InvalidValueDecorator(invalidValueTreatmentMethod, null));
 
 			if(feature instanceof BaseNFeature){
 				BaseNFeature baseFeature = (BaseNFeature)feature;
