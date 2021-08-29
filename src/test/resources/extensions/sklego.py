@@ -22,6 +22,12 @@ def make_estimator_transformer(estimator, pmml_name, predict_func = "predict"):
 	estimator.pmml_name_ = pmml_name
 	return EstimatorTransformer(estimator, predict_func = predict_func)
 
+def make_enhancer(estimator_transformer):
+	return FeatureUnion([
+		("identity", IdentityTransformer()),
+		("estimator_transformer", estimator_transformer)
+	])
+
 def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimator, final_estimator):
 	cat_encoder = Pipeline([
 		("encoder", OneHotEncoder()),
@@ -43,10 +49,7 @@ def build_estimatortransformer_wheat(name):
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("cluster_assigner", FeatureUnion([
-			("original", IdentityTransformer()),
-			("cluster", make_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "labeler"), OneHotEncoder(sparse = False)))
-		])),
+		("cluster_labeler", make_enhancer(make_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "clusterLabeler"), OneHotEncoder(sparse = False)))),
 		("classifier", LogisticRegression(random_state = 13))
 	])
 	pipeline.fit(wheat_X, wheat_y)
@@ -76,10 +79,7 @@ def build_estimatortransformer_versicolor(outlier_detector_estimator, final_esti
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("outlier_detector", FeatureUnion([
-			("original", IdentityTransformer()),
-			("flag", make_pipeline(make_estimator_transformer(outlier_detector_estimator, "outlierDetector"), OneHotEncoder(sparse = False))),	
-		])),
+		("outlier_detector", make_enhancer(make_pipeline(make_estimator_transformer(outlier_detector_estimator, "outlierDetector"), OneHotEncoder(sparse = False)))),
 		("estimator", final_estimator)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
@@ -96,10 +96,7 @@ def build_estimatortransformer_iris(outlier_detector_estimator, final_estimator,
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("outlier_detector", FeatureUnion([
-			("original", IdentityTransformer()),
-			("flag", make_estimator_transformer(outlier_detector_estimator, "outlierDetector", predict_func = "decision_function")),	
-		])),
+		("outlier_detector", make_enhancer(make_estimator_transformer(outlier_detector_estimator, "outlierDetector", predict_func = "decision_function"))),
 		("estimator", final_estimator)
 	])
 	pipeline.fit(iris_X, iris_y)
@@ -127,10 +124,7 @@ def build_estimatortransformer_housing(name):
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("outlier_detector", FeatureUnion([
-			("original", IdentityTransformer()),
-			("leaf", make_pipeline(make_estimator_transformer(DecisionTreeRegressor(max_depth = 3, min_samples_leaf = 20, random_state = 13), "labeler", predict_func = "apply"), OneHotEncoder(sparse = False))),	
-		])),
+		("leaf_labeler", make_enhancer(make_pipeline(make_estimator_transformer(DecisionTreeRegressor(max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), OneHotEncoder(sparse = False)))),
 		("estimator", LinearRegression())
 	])
 	pipeline.fit(housing_X, housing_y)
