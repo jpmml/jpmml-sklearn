@@ -40,6 +40,9 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segment;
+import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.BranchNode;
 import org.dmg.pmml.tree.ClassifierNode;
 import org.dmg.pmml.tree.LeafNode;
@@ -52,6 +55,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
@@ -99,30 +103,7 @@ public class TreeUtil {
 		} // End if
 
 		if((Boolean.TRUE).equals(winnerId)){
-			Output output = ModelUtil.ensureOutput(model);
-
-			List<Integer> values = new ArrayList<>();
-
-			Visitor nodeIdCollector = new AbstractVisitor(){
-
-				@Override
-				public VisitorAction visit(Node node){
-
-					if(!node.hasNodes()){
-						values.add((Integer)node.getId());
-					}
-
-					return super.visit(node);
-				}
-			};
-			nodeIdCollector.applyTo(model);
-
-			OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
-				.setDataType(DataType.INTEGER);
-
-			PMMLUtil.addValues(nodeIdField, values);
-
-			output.addOutputFields(nodeIdField);
+			encodeNodeId(model);
 		}
 
 		List<Visitor> visitors = new ArrayList<>();
@@ -461,6 +442,71 @@ public class TreeUtil {
 
 			return result;
 		}
+	}
+
+	static
+	private void encodeNodeId(Model model){
+		Output output = ModelUtil.ensureOutput(model);
+
+		if(model instanceof MiningModel){
+			MiningModel miningModel = (MiningModel)model;
+
+			Segmentation segmentation = miningModel.getSegmentation();
+
+			List<Segment> segments = segmentation.getSegments();
+			for(Segment segment : segments){
+				TreeModel treeModel = (TreeModel)segment.getModel();
+
+				String segmentId = segment.getId();
+				if(segmentId == null){
+					throw new IllegalArgumentException();
+				}
+
+				encodeNodeId(output, treeModel, segmentId);
+			}
+		} else
+
+		{
+			TreeModel treeModel = (TreeModel)model;
+
+			encodeNodeId(output, treeModel, null);
+		}
+	}
+
+	static
+	private void encodeNodeId(Output output, TreeModel treeModel, String segmentId){
+		List<Integer> values = new ArrayList<>();
+
+		Visitor nodeIdCollector = new AbstractVisitor(){
+
+			@Override
+			public VisitorAction visit(Node node){
+
+				if(!node.hasNodes()){
+					values.add((Integer)node.getId());
+				}
+
+				return super.visit(node);
+			}
+		};
+		nodeIdCollector.applyTo(treeModel);
+
+		OutputField nodeIdField;
+
+		if(segmentId != null){
+			nodeIdField = ModelUtil.createEntityIdField(FieldNameUtil.create("nodeId", segmentId))
+				.setDataType(DataType.INTEGER)
+				.setSegmentId(segmentId);
+		} else
+
+		{
+			nodeIdField = ModelUtil.createEntityIdField(FieldNameUtil.create("nodeId"))
+				.setDataType(DataType.INTEGER);
+		}
+
+		PMMLUtil.addValues(nodeIdField, values);
+
+		output.addOutputFields(nodeIdField);
 	}
 
 	static

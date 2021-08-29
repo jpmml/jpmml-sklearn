@@ -39,6 +39,13 @@ public class ForestUtil {
 	}
 
 	static
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> int getNumberOfEstimators(E estimator){
+		List<? extends T> estimators = estimator.getEstimators();
+
+		return estimators.size();
+	}
+
+	static
 	public <E extends Estimator & HasEstimatorEnsemble<T> & HasTreeOptions, T extends Estimator & HasTree> MiningModel encodeBaseForest(E estimator, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
 		List<TreeModel> treeModels = TreeUtil.encodeTreeModelEnsemble(estimator, miningFunction, schema);
 

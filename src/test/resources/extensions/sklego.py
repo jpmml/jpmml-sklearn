@@ -5,8 +5,8 @@ from pandas import DataFrame
 from sklearn.cluster import KMeans
 from sklearn.compose import ColumnTransformer
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble import IsolationForest
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.ensemble import IsolationForest, RandomForestRegressor
+from sklearn.linear_model import LinearRegression, LogisticRegression, PoissonRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import OneHotEncoder
@@ -15,6 +15,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer
+from sklearn2pmml.util import Reshaper
 from sklego.meta import EstimatorTransformer
 from sklego.preprocessing import IdentityTransformer
 
@@ -133,3 +134,21 @@ def build_estimatortransformer_housing(name):
 	store_csv(medv, name)
 
 build_estimatortransformer_housing("EstimatorTransformerHousing")
+
+def build_estimatortransformer_visit(name):
+	visit_X, visit_y = load_visit("Visit")
+
+	pipeline = PMMLPipeline([
+		("mapper", ColumnTransformer([
+			("cat", OneHotEncoder(sparse = False), ["edlevel", "outwork", "female", "married", "kids", "self"]),
+			("cont", "passthrough", ["age", "hhninc", "educ"])
+		])),
+		("leaf_labeler", make_enhancer(make_pipeline(make_estimator_transformer(RandomForestRegressor(n_estimators = 7, max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), Reshaper(newshape = (-1, 7)), OneHotEncoder(sparse = False)))),
+		("estimator", PoissonRegressor())
+	])
+	pipeline.fit(visit_X, visit_y)
+	store_pkl(pipeline, name)
+	docvis = DataFrame(pipeline.predict(visit_X), columns = ["docvis"])
+	store_csv(docvis, name)
+
+build_estimatortransformer_visit("EstimatorTransformerVisit")

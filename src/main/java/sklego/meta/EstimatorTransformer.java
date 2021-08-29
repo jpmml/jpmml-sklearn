@@ -18,6 +18,7 @@
  */
 package sklego.meta;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -49,6 +50,7 @@ import sklearn.Estimator;
 import sklearn.HasApplyField;
 import sklearn.HasDecisionFunctionField;
 import sklearn.HasEstimator;
+import sklearn.HasMultiApplyField;
 import sklearn.HasPredictField;
 import sklearn.SkLearnMethods;
 import sklearn.Transformer;
@@ -65,22 +67,28 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		Estimator estimator = getEstimator();
 		String predictFunc = getPredictFunc();
 
-		FieldName inputName;
+		List<FieldName> inputNames;
 
 		switch(predictFunc){
 			case SkLearnMethods.APPLY:
 				{
+					if(estimator instanceof HasTreeOptions){
+						HasTreeOptions hasTreeOptions = (HasTreeOptions)estimator;
+
+						// XXX
+						estimator.putOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
+					} // End if
+
 					if(estimator instanceof HasApplyField){
 						HasApplyField hasApplyField = (HasApplyField)estimator;
 
-						if(estimator instanceof HasTreeOptions){
-							HasTreeOptions hasTreeOptions = (HasTreeOptions)estimator;
+						inputNames = Collections.singletonList(hasApplyField.getApplyField());
+					} else
 
-							// XXX
-							estimator.putOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
-						}
+					if(estimator instanceof HasMultiApplyField){
+						HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)estimator;
 
-						inputName = hasApplyField.getApplyField();
+						inputNames = hasMultiApplyField.getApplyFields();
 					} else
 
 					{
@@ -93,11 +101,11 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 					if(estimator instanceof HasPredictField){
 						HasPredictField hasPredictField = (HasPredictField)estimator;
 
-						inputName = hasPredictField.getPredictField();
+						inputNames = Collections.singletonList(hasPredictField.getPredictField());
 					} else
 
 					{
-						inputName = null;
+						inputNames = null;
 					}
 				}
 				break;
@@ -106,7 +114,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 					if(estimator instanceof HasDecisionFunctionField){
 						HasDecisionFunctionField hasDecisionFunctionField = (HasDecisionFunctionField)estimator;
 
-						inputName = hasDecisionFunctionField.getDecisionFunctionField();
+						inputNames = Collections.singletonList(hasDecisionFunctionField.getDecisionFunctionField());
 					} else
 
 					{
@@ -152,7 +160,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 		encoder.addTransformer(model);
 
-		if(inputName == null){
+		if(inputNames == null){
 
 			if(estimator.isSupervised()){
 
@@ -198,28 +206,36 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 					throw new IllegalArgumentException();
 				}
 
-				inputName = Iterables.getLast(derivedOutputFields.keySet());
+				inputNames = Collections.singletonList(Iterables.getLast(derivedOutputFields.keySet()));
 			}
 		}
 
-		DerivedOutputField inputField = derivedOutputFields.get(inputName);
-		if(inputField == null){
-			throw new IllegalArgumentException();
+		List<Feature> result = new ArrayList<>();
+
+		for(FieldName inputName : inputNames){
+			DerivedOutputField inputField = derivedOutputFields.get(inputName);
+			if(inputField == null){
+				throw new IllegalArgumentException();
+			}
+
+			Feature feature;
+
+			OpType opType = inputField.getOpType();
+			switch(opType){
+				case CATEGORICAL:
+					feature = new CategoricalFeature(encoder, inputField.getOutputField());
+					break;
+				case CONTINUOUS:
+					feature = new ContinuousFeature(encoder, inputField);
+					break;
+				default:
+					throw new IllegalArgumentException();
+			}
+
+			result.add(feature);
 		}
 
-		OpType opType = inputField.getOpType();
-		switch(opType){
-			case CATEGORICAL:
-				{
-					return Collections.singletonList(new CategoricalFeature(encoder, inputField.getOutputField()));
-				}
-			case CONTINUOUS:
-				{
-					return Collections.singletonList(new ContinuousFeature(encoder, inputField));
-				}
-			default:
-				throw new IllegalArgumentException();
-		}
+		return result;
 	}
 
 	@Override

@@ -21,16 +21,19 @@ package sklearn.ensemble.forest;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.HasMultiApplyField;
 import sklearn.Regressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 
-public class ForestRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
+public class ForestRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasMultiApplyField, HasTreeOptions {
 
 	public ForestRegressor(String module, String name){
 		super(module, name);
@@ -39,6 +42,16 @@ public class ForestRegressor extends Regressor implements HasEstimatorEnsemble<T
 	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
+	}
+
+	@Override
+	public int getNumberOfApplyFields(){
+		return ForestUtil.getNumberOfEstimators(this);
+	}
+
+	@Override
+	public FieldName getApplyField(int index){
+		return FieldNameUtil.create("nodeId", index + 1);
 	}
 
 	@Override
