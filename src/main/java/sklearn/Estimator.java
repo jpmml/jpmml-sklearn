@@ -18,6 +18,8 @@
  */
 package sklearn;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -164,6 +166,23 @@ public class Estimator extends Step {
 		}
 
 		return defaultValue;
+	}
+
+	public void putOption(String key, Object value){
+		putOptions(Collections.singletonMap(key, value));
+	}
+
+	public void putOptions(Map<String, ?> options){
+		Map<String, ?> pmmlOptions = getPMMLOptions();
+
+		if(pmmlOptions == null){
+			pmmlOptions = new LinkedHashMap<>();
+
+			setPMMLOptions(pmmlOptions);
+		}
+
+		// XXX
+		pmmlOptions.putAll((Map)options);
 	}
 
 	public boolean hasFeatureImportances(){

@@ -77,14 +77,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 							HasTreeOptions hasTreeOptions = (HasTreeOptions)estimator;
 
 							// XXX
-							Map<String, Object> pmmlOptions = (Map)estimator.getPMMLOptions();
-							if(pmmlOptions == null){
-								pmmlOptions = new LinkedHashMap<>();
-
-								estimator.setPMMLOptions(pmmlOptions);
-							}
-
-							pmmlOptions.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
+							estimator.putOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
 						}
 
 						inputName = hasApplyField.getApplyField();

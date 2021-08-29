@@ -203,18 +203,9 @@ public class Main {
 			// Ignore defaults
 			options.values().removeIf(Objects::isNull);
 
-			if(options.isEmpty()){
-				break options;
+			if(!options.isEmpty()){
+				estimator.putOptions(options);
 			}
-
-			Map<String, ?> pmmlOptions = estimator.getPMMLOptions();
-			if(pmmlOptions == null){
-				pmmlOptions = new LinkedHashMap<>();
-
-				estimator.setPMMLOptions(pmmlOptions);
-			}
-
-			pmmlOptions.putAll((Map)options);
 		}
 
 		PMML pmml;

@@ -67,16 +67,9 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 
 		Estimator estimator = pipeline.getFinalEstimator();
 
-		Map<String, ?> pmmlOptions = estimator.getPMMLOptions();
-
-		// Programmatic test batch options (empty by default) override pickle file options
-		if(pmmlOptions != null){
-			pmmlOptions.putAll((Map)options);
-
-			options = pmmlOptions;
+		if(!options.isEmpty()){
+			estimator.putOptions(options);
 		}
-
-		estimator.setPMMLOptions(options);
 
 		File tmpFile = null;
 
