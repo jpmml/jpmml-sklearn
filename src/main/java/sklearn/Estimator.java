@@ -214,6 +214,7 @@ public class Estimator extends Step {
 		return getOptionalString("_sklearn_version");
 	}
 
+	public static final String FIELD_APPLY = "apply";
 	public static final String FIELD_DECISION_FUNCTION = "decisionFunction";
 	public static final String FIELD_PREDICT = "predict";
 

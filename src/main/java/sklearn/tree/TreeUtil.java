@@ -53,6 +53,7 @@ import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
@@ -100,8 +101,26 @@ public class TreeUtil {
 		if((Boolean.TRUE).equals(winnerId)){
 			Output output = ModelUtil.ensureOutput(model);
 
+			List<Integer> values = new ArrayList<>();
+
+			Visitor nodeIdCollector = new AbstractVisitor(){
+
+				@Override
+				public VisitorAction visit(Node node){
+
+					if(!node.hasNodes()){
+						values.add((Integer)node.getId());
+					}
+
+					return super.visit(node);
+				}
+			};
+			nodeIdCollector.applyTo(model);
+
 			OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
 				.setDataType(DataType.INTEGER);
+
+			PMMLUtil.addValues(nodeIdField, values);
 
 			output.addOutputFields(nodeIdField);
 		}

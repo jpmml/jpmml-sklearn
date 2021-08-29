@@ -33,6 +33,11 @@ public class SkLegoTest extends SkLearnTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateEstimatorTransformerHousing() throws Exception {
+		evaluate("EstimatorTransformer", HOUSING);
+	}
+
+	@Test
 	public void evaluateEstimatorTransformerIris() throws Exception {
 		evaluate("EstimatorTransformer", IRIS);
 	}

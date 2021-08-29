@@ -46,11 +46,13 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.ClassifierUtil;
 import sklearn.Estimator;
+import sklearn.HasApplyField;
 import sklearn.HasDecisionFunctionField;
 import sklearn.HasEstimator;
 import sklearn.HasPredictField;
 import sklearn.SkLearnMethods;
 import sklearn.Transformer;
+import sklearn.tree.HasTreeOptions;
 
 public class EstimatorTransformer extends Transformer implements HasEstimator<Estimator> {
 
@@ -66,6 +68,33 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		FieldName inputName;
 
 		switch(predictFunc){
+			case SkLearnMethods.APPLY:
+				{
+					if(estimator instanceof HasApplyField){
+						HasApplyField hasApplyField = (HasApplyField)estimator;
+
+						if(estimator instanceof HasTreeOptions){
+							HasTreeOptions hasTreeOptions = (HasTreeOptions)estimator;
+
+							// XXX
+							Map<String, Object> pmmlOptions = (Map)estimator.getPMMLOptions();
+							if(pmmlOptions == null){
+								pmmlOptions = new LinkedHashMap<>();
+
+								estimator.setPMMLOptions(pmmlOptions);
+							}
+
+							pmmlOptions.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
+						}
+
+						inputName = hasApplyField.getApplyField();
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
+				}
+				break;
 			case SkLearnMethods.PREDICT:
 				{
 					if(estimator instanceof HasPredictField){
@@ -113,6 +142,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 				switch(resultFeature){
 					case PREDICTED_VALUE:
 					case TRANSFORMED_VALUE:
+					case ENTITY_ID:
 						{
 							DerivedOutputField derivedOutputField = encoder.createDerivedField(model, outputField, true);
 

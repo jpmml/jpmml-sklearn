@@ -19,12 +19,15 @@
 package sklearn.tree;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
+import sklearn.HasApplyField;
 import sklearn.Regressor;
 
-public class TreeRegressor extends Regressor implements HasTree, HasTreeOptions {
+public class TreeRegressor extends Regressor implements HasApplyField, HasTree, HasTreeOptions {
 
 	public TreeRegressor(String module, String name){
 		super(module, name);
@@ -33,6 +36,11 @@ public class TreeRegressor extends Regressor implements HasTree, HasTreeOptions 
 	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
+	}
+
+	@Override
+	public FieldName getApplyField(){
+		return FieldNameUtil.create("nodeId");
 	}
 
 	@Override

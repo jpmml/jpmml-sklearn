@@ -45,7 +45,7 @@ def build_estimatortransformer_wheat(name):
 		("decorator", ContinuousDomain()),
 		("cluster_assigner", FeatureUnion([
 			("original", IdentityTransformer()),
-			("cluster", make_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "clusterer"), OneHotEncoder(sparse = False)))
+			("cluster", make_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "labeler"), OneHotEncoder(sparse = False)))
 		])),
 		("classifier", LogisticRegression(random_state = 13))
 	])
@@ -121,3 +121,21 @@ def build_estimatortransformer_auto(name):
 	store_csv(mpg, name)
 
 build_estimatortransformer_auto("EstimatorTransformerAuto")
+
+def build_estimatortransformer_housing(name):
+	housing_X, housing_y = load_housing("Housing")
+
+	pipeline = PMMLPipeline([
+		("decorator", ContinuousDomain()),
+		("outlier_detector", FeatureUnion([
+			("original", IdentityTransformer()),
+			("leaf", make_pipeline(make_estimator_transformer(DecisionTreeRegressor(max_depth = 3, min_samples_leaf = 20, random_state = 13), "labeler", predict_func = "apply"), OneHotEncoder(sparse = False))),	
+		])),
+		("estimator", LinearRegression())
+	])
+	pipeline.fit(housing_X, housing_y)
+	store_pkl(pipeline, name)
+	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
+	store_csv(medv, name)
+
+build_estimatortransformer_housing("EstimatorTransformerHousing")
