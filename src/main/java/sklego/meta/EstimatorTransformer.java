@@ -96,19 +96,6 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 					}
 				}
 				break;
-			case SkLearnMethods.PREDICT:
-				{
-					if(estimator instanceof HasPredictField){
-						HasPredictField hasPredictField = (HasPredictField)estimator;
-
-						inputNames = Collections.singletonList(hasPredictField.getPredictField());
-					} else
-
-					{
-						inputNames = null;
-					}
-				}
-				break;
 			case SkLearnMethods.DECISION_FUNCTION:
 				{
 					if(estimator instanceof HasDecisionFunctionField){
@@ -119,6 +106,19 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 					{
 						throw new IllegalArgumentException();
+					}
+				}
+				break;
+			case SkLearnMethods.PREDICT:
+				{
+					if(estimator instanceof HasPredictField){
+						HasPredictField hasPredictField = (HasPredictField)estimator;
+
+						inputNames = Collections.singletonList(hasPredictField.getPredictField());
+					} else
+
+					{
+						inputNames = null;
 					}
 				}
 				break;
