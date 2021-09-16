@@ -75,7 +75,7 @@ public class Domain extends Transformer {
 		if(invalidValueReplacement != null){
 
 			if(invalidValueTreatment == null){
-				invalidValueTreatment = InvalidValueTreatmentMethod.AS_IS;
+				invalidValueTreatment = InvalidValueTreatmentMethod.AS_VALUE;
 			}
 		}
 

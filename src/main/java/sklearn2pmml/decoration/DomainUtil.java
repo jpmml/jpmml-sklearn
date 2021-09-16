@@ -64,6 +64,8 @@ public class DomainUtil {
 				return InvalidValueTreatmentMethod.AS_IS;
 			case "as_missing":
 				return InvalidValueTreatmentMethod.AS_MISSING;
+			case "as_value":
+				return InvalidValueTreatmentMethod.AS_VALUE;
 			case "return_invalid":
 				return InvalidValueTreatmentMethod.RETURN_INVALID;
 			default:
