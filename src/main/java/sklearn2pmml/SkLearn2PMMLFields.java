@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2021 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,32 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn;
+package sklearn2pmml;
 
-import java.util.List;
+public interface SkLearn2PMMLFields {
 
-import org.dmg.pmml.MiningFunction;
-
-abstract
-public class Classifier extends Estimator implements HasClasses {
-
-	public Classifier(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public MiningFunction getMiningFunction(){
-		return MiningFunction.CLASSIFICATION;
-	}
-
-	public boolean hasProbabilityDistribution(){
-		return true;
-	}
-
-	@Override
-	public List<?> getClasses(){
-		return getArray(SkLearnFields.CLASSES);
-	}
-
-	public static final String FIELD_PROBABILITY = "probability";
+	String PMML_FEATURE_IMPORTANCES = "pmml_feature_importances_";
+	String PMML_NAME = "pmml_name_";
+	String PMML_OPTIONS = "pmml_options_";
 }

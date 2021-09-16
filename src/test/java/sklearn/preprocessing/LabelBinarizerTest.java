@@ -34,6 +34,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
+import sklearn.SkLearnFields;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -53,7 +54,7 @@ public class LabelBinarizerTest {
 		array.put("fortran_order", Boolean.FALSE);
 
 		LabelBinarizer binarizer = new LabelBinarizer("sklearn.preprocessing.label", "LabelBinarizer");
-		binarizer.put("classes_", array);
+		binarizer.put(SkLearnFields.CLASSES, array);
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 

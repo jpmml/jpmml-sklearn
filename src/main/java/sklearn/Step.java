@@ -26,6 +26,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.python.PythonObject;
+import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
 public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
@@ -53,11 +54,11 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public String getPMMLName(){
-		return getOptionalString("pmml_name_");
+		return getOptionalString(SkLearn2PMMLFields.PMML_NAME);
 	}
 
 	public Step setPMMLName(String name){
-		put("pmml_name_", name);
+		put(SkLearn2PMMLFields.PMML_NAME, name);
 
 		return this;
 	}

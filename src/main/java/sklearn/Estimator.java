@@ -34,6 +34,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
 public class Estimator extends Step {
@@ -51,8 +52,8 @@ public class Estimator extends Step {
 	@Override
 	public int getNumberOfFeatures(){
 
-		if(containsKey("n_features_")){
-			return getInteger("n_features_");
+		if(containsKey(SkLearnFields.N_FEATURES)){
+			return getInteger(SkLearnFields.N_FEATURES);
 		}
 
 		return HasNumberOfFeatures.UNKNOWN;
@@ -160,7 +161,7 @@ public class Estimator extends Step {
 
 		// XXX
 		if(containsKey(key)){
-			logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "pmml_options_") + "\' is not set. Falling back to the surrogate attribute \'" + ClassDictUtil.formatMember(this, key) + "\'");
+			logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, SkLearn2PMMLFields.PMML_OPTIONS) + "\' is not set. Falling back to the surrogate attribute \'" + ClassDictUtil.formatMember(this, key) + "\'");
 
 			return get(key);
 		}
@@ -186,51 +187,51 @@ public class Estimator extends Step {
 	}
 
 	public boolean hasFeatureImportances(){
-		return containsKey("feature_importances_") || containsKey("pmml_feature_importances_");
+		return containsKey(SkLearnFields.FEATURE_IMPORTANCES) || containsKey(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES);
 	}
 
 	public List<? extends Number> getFeatureImportances(){
 
-		if(!containsKey("feature_importances_")){
+		if(!containsKey(SkLearnFields.FEATURE_IMPORTANCES)){
 			return null;
 		}
 
-		return getNumberArray("feature_importances_");
+		return getNumberArray(SkLearnFields.FEATURE_IMPORTANCES);
 	}
 
 	public List<? extends Number> getPMMLFeatureImportances(){
 
-		if(!containsKey("pmml_feature_importances_")){
+		if(!containsKey(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES)){
 			return null;
 		}
 
-		return getNumberArray("pmml_feature_importances_");
+		return getNumberArray(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES);
 	}
 
 	public Estimator setPMMLFeatureImportances(List<? extends Number> pmmlFeatureImportances){
-		put("pmml_feature_importances_", toArray(pmmlFeatureImportances));
+		put(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES, toArray(pmmlFeatureImportances));
 
 		return this;
 	}
 
 	public Map<String, ?> getPMMLOptions(){
-		Object value = get("pmml_options_");
+		Object value = get(SkLearn2PMMLFields.PMML_OPTIONS);
 
 		if(value == null){
 			return null;
 		}
 
-		return getDict("pmml_options_");
+		return getDict(SkLearn2PMMLFields.PMML_OPTIONS);
 	}
 
 	public Estimator setPMMLOptions(Map<String, ?> pmmlOptions){
-		put("pmml_options_", pmmlOptions);
+		put(SkLearn2PMMLFields.PMML_OPTIONS, pmmlOptions);
 
 		return this;
 	}
 
 	public String getSkLearnVersion(){
-		return getOptionalString("_sklearn_version");
+		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
 	}
 
 	public static final String FIELD_APPLY = "apply";

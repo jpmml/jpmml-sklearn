@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2021 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,30 +18,11 @@
  */
 package sklearn;
 
-import java.util.List;
+public interface SkLearnFields {
 
-import org.dmg.pmml.MiningFunction;
-
-abstract
-public class Classifier extends Estimator implements HasClasses {
-
-	public Classifier(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public MiningFunction getMiningFunction(){
-		return MiningFunction.CLASSIFICATION;
-	}
-
-	public boolean hasProbabilityDistribution(){
-		return true;
-	}
-
-	@Override
-	public List<?> getClasses(){
-		return getArray(SkLearnFields.CLASSES);
-	}
-
-	public static final String FIELD_PROBABILITY = "probability";
+	String CLASSES = "classes_";
+	String FEATURE_IMPORTANCES = "feature_importances_";
+	String N_FEATURES = "n_features_";
+	String N_FEATURES_IN = "n_features_in_";
+	String SKLEARN_VERSION = "_sklearn_version";
 }

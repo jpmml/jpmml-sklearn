@@ -45,8 +45,8 @@ public class Transformer extends Step {
 	@Override
 	public int getNumberOfFeatures(){
 
-		if(containsKey("n_features_in_")){
-			return getInteger("n_features_in_");
+		if(containsKey(SkLearnFields.N_FEATURES_IN)){
+			return getInteger(SkLearnFields.N_FEATURES_IN);
 		}
 
 		return HasNumberOfFeatures.UNKNOWN;

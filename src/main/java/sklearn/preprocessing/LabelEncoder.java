@@ -27,6 +27,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.SkLearnFields;
 import sklearn.Transformer;
 
 public class LabelEncoder extends Transformer {
@@ -59,6 +60,6 @@ public class LabelEncoder extends Transformer {
 	}
 
 	public List<?> getClasses(){
-		return getArray("classes_");
+		return getArray(SkLearnFields.CLASSES);
 	}
 }

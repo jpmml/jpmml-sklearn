@@ -35,6 +35,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.SkLearnFields;
 import sklearn.Transformer;
 
 public class LabelBinarizer extends Transformer {
@@ -120,7 +121,7 @@ public class LabelBinarizer extends Transformer {
 	}
 
 	public List<?> getClasses(){
-		return getArray("classes_");
+		return getArray(SkLearnFields.CLASSES);
 	}
 
 	public Number getPosLabel(){
