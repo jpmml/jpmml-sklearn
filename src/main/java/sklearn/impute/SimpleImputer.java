@@ -21,17 +21,58 @@ package sklearn.impute;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.StepUtil;
 import sklearn.Transformer;
 
 public class SimpleImputer extends Transformer {
 
 	public SimpleImputer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public OpType getOpType(){
+		String strategy = getStrategy();
+
+		switch(strategy){
+			case "constant":
+				DataType dataType = getDataType();
+
+				return StepUtil.getOpType(dataType);
+			case "mean":
+			case "median":
+				return OpType.CONTINUOUS;
+			case "most_frequent":
+				return OpType.CATEGORICAL;
+			default:
+				throw new IllegalArgumentException(strategy);
+		}
+	}
+
+	@Override
+	public DataType getDataType(){
+		String strategy = getStrategy();
+		List<?> statistics = getStatistics();
+
+		switch(strategy){
+			case "constant":
+				return TypeUtil.getDataType(statistics, DataType.STRING);
+			case "mean":
+			case "median":
+				return DataType.DOUBLE;
+			case "most_frequent":
+				return TypeUtil.getDataType(statistics, DataType.STRING);
+			default:
+				throw new IllegalArgumentException(strategy);
+		}
 	}
 
 	@Override
