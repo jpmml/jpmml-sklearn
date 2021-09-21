@@ -62,16 +62,28 @@ public class MultilayerPerceptronUtil {
 	public NeuralNetwork encodeNeuralNetwork(MiningFunction miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, Schema schema){
 		NeuralNetwork.ActivationFunction activationFunction = parseActivationFunction(activation);
 
-		ClassDictUtil.checkSize(coefs, intercepts);
-
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		NeuralInputs neuralInputs = NeuralNetworkUtil.createNeuralInputs(features, DataType.DOUBLE);
 
+		List<NeuralLayer> neuralLayers = encodeNeuralLayers(neuralInputs, coefs, intercepts);
+
+		NeuralOutputs neuralOutputs = encodeNeuralOutputs(miningFunction, neuralLayers, label);
+
+		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, ModelUtil.createMiningSchema(label), neuralInputs, neuralLayers)
+			.setNeuralOutputs(neuralOutputs);
+
+		return neuralNetwork;
+	}
+
+	static
+	public List<NeuralLayer> encodeNeuralLayers(NeuralInputs neuralInputs, List<? extends HasArray> coefs, List<? extends HasArray> intercepts){
+		ClassDictUtil.checkSize(coefs, intercepts);
+
 		List<? extends NeuralEntity> entities = neuralInputs.getNeuralInputs();
 
-		List<NeuralLayer> neuralLayers = new ArrayList<>();
+		List<NeuralLayer> result = new ArrayList<>();
 
 		for(int layer = 0; layer < coefs.size(); layer++){
 			HasArray coef = coefs.get(layer);
@@ -97,62 +109,58 @@ public class MultilayerPerceptronUtil {
 				neuralLayer.addNeurons(neuron);
 			}
 
-			neuralLayers.add(neuralLayer);
+			result.add(neuralLayer);
 
 			entities = neuralLayer.getNeurons();
-
-			if(layer == (coefs.size() - 1)){
-				neuralLayer.setActivationFunction(NeuralNetwork.ActivationFunction.IDENTITY);
-
-				switch(miningFunction){
-					case REGRESSION:
-						break;
-					case CLASSIFICATION:
-						CategoricalLabel categoricalLabel = (CategoricalLabel)label;
-
-						// Binary classification
-						if(categoricalLabel.size() == 2){
-							List<NeuralLayer> transformationNeuralLayers = NeuralNetworkUtil.createBinaryLogisticTransformation(Iterables.getOnlyElement(entities));
-
-							neuralLayers.addAll(transformationNeuralLayers);
-
-							neuralLayer = Iterables.getLast(transformationNeuralLayers);
-
-							entities = neuralLayer.getNeurons();
-						} else
-
-						// Multi-class classification
-						if(categoricalLabel.size() > 2){
-							neuralLayer.setNormalizationMethod(NeuralNetwork.NormalizationMethod.SOFTMAX);
-						} else
-
-						{
-							throw new IllegalArgumentException();
-						}
-						break;
-					default:
-						break;
-				}
-			}
 		}
 
-		NeuralOutputs neuralOutputs = null;
+		return result;
+	}
+
+	static
+	public NeuralOutputs encodeNeuralOutputs(MiningFunction miningFunction, List<NeuralLayer> neuralLayers, Label label){
+		NeuralLayer neuralLayer = Iterables.getLast(neuralLayers);
+
+		neuralLayer.setActivationFunction(NeuralNetwork.ActivationFunction.IDENTITY);
+
+		List<? extends NeuralEntity> entities = neuralLayer.getNeurons();
 
 		switch(miningFunction){
 			case REGRESSION:
-				neuralOutputs = NeuralNetworkUtil.createRegressionNeuralOutputs(entities, (ContinuousLabel)label);
-				break;
+				{
+					ContinuousLabel continuousLabel = (ContinuousLabel)label;
+
+					return NeuralNetworkUtil.createRegressionNeuralOutputs(entities, continuousLabel);
+				}
 			case CLASSIFICATION:
-				neuralOutputs = NeuralNetworkUtil.createClassificationNeuralOutputs(entities, (CategoricalLabel)label);
-				break;
+				{
+					CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+
+					// Binary classification
+					if(categoricalLabel.size() == 2){
+						List<NeuralLayer> transformationNeuralLayers = NeuralNetworkUtil.createBinaryLogisticTransformation(Iterables.getOnlyElement(entities));
+
+						neuralLayers.addAll(transformationNeuralLayers);
+
+						neuralLayer = Iterables.getLast(transformationNeuralLayers);
+
+						entities = neuralLayer.getNeurons();
+					} else
+
+					// Multi-class classification
+					if(categoricalLabel.size() > 2){
+						neuralLayer.setNormalizationMethod(NeuralNetwork.NormalizationMethod.SOFTMAX);
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
+
+					return NeuralNetworkUtil.createClassificationNeuralOutputs(entities, categoricalLabel);
+				}
 			default:
-				break;
+				throw new IllegalArgumentException();
 		}
-
-		NeuralNetwork neuralNetwork = new NeuralNetwork(miningFunction, activationFunction, ModelUtil.createMiningSchema(label), neuralInputs, neuralLayers)
-			.setNeuralOutputs(neuralOutputs);
-
-		return neuralNetwork;
 	}
 
 	static
