@@ -79,13 +79,18 @@ public class MultilayerPerceptronUtil {
 
 	static
 	public List<NeuralLayer> encodeNeuralLayers(NeuralInputs neuralInputs, List<? extends HasArray> coefs, List<? extends HasArray> intercepts){
+		return encodeNeuralLayers(neuralInputs, coefs.size(), coefs, intercepts);
+	}
+
+	static
+	public List<NeuralLayer> encodeNeuralLayers(NeuralInputs neuralInputs, int numberOfLayers, List<? extends HasArray> coefs, List<? extends HasArray> intercepts){
 		ClassDictUtil.checkSize(coefs, intercepts);
 
 		List<? extends NeuralEntity> entities = neuralInputs.getNeuralInputs();
 
 		List<NeuralLayer> result = new ArrayList<>();
 
-		for(int layer = 0; layer < coefs.size(); layer++){
+		for(int layer = 0; layer < numberOfLayers; layer++){
 			HasArray coef = coefs.get(layer);
 			HasArray intercept = intercepts.get(layer);
 
@@ -164,7 +169,7 @@ public class MultilayerPerceptronUtil {
 	}
 
 	static
-	private NeuralNetwork.ActivationFunction parseActivationFunction(String activation){
+	public NeuralNetwork.ActivationFunction parseActivationFunction(String activation){
 
 		switch(activation){
 			case "identity":

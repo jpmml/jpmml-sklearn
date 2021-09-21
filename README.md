@@ -294,6 +294,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.ensemble.SelectFirstRegressor`
   * Feature selection:
     * `sklearn2pmml.feature_selection.SelectUnique`
+  * Neural networks:
+    * `sklearn2pmml.neural_network.MLPTransformer`
   * Pipeline:
     * `sklearn2pmml.pipeline.PMMLPipeline`
   * Preprocessing:
