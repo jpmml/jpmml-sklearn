@@ -18,7 +18,6 @@
  */
 package lightgbm.sklearn;
 
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,7 +27,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.HasLightGBMOptions;
 import org.jpmml.lightgbm.ObjectiveFunction;
-import org.jpmml.model.ReflectionUtil;
 import sklearn.Estimator;
 
 public class BoosterUtil {
@@ -49,9 +47,7 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster> ObjectiveFunction getObjectiveFunction(E estimator){
 		GBDT gbdt = getGBDT(estimator);
 
-		Field field = ReflectionUtil.getField(GBDT.class, "object_function_");
-
-		return ReflectionUtil.getFieldValue(field, gbdt);
+		return gbdt.getObjectiveFunction();
 	}
 
 	static

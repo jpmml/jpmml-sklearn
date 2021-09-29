@@ -143,6 +143,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 				switch(resultFeature){
 					case PREDICTED_VALUE:
 					case TRANSFORMED_VALUE:
+					case DECISION:
 					case ENTITY_ID:
 						{
 							DerivedOutputField derivedOutputField = encoder.createDerivedField(model, outputField, true);

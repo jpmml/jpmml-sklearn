@@ -57,7 +57,6 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
@@ -424,9 +423,7 @@ public class TreeUtil {
 					.setId(id)
 					.setRecordCount(ValueUtil.narrow(totalRecordCount));
 
-				List<ScoreDistribution> scoreDistributions = scoreDistributionManager.createScoreDistribution(categoricalLabel, recordCounts);
-
-				(result.getScoreDistributions()).addAll(scoreDistributions);
+				scoreDistributionManager.addScoreDistributions(result, categoricalLabel.getValues(), recordCounts);
 			} else
 
 			if((MiningFunction.REGRESSION).equals(miningFunction)){
@@ -491,20 +488,13 @@ public class TreeUtil {
 		};
 		nodeIdCollector.applyTo(treeModel);
 
-		OutputField nodeIdField;
+		OutputField nodeIdField = ModelUtil.createEntityIdField(FieldNameUtil.create("nodeId"), DataType.INTEGER, values);
 
 		if(segmentId != null){
-			nodeIdField = ModelUtil.createEntityIdField(FieldNameUtil.create("nodeId", segmentId))
-				.setDataType(DataType.INTEGER)
+			nodeIdField
+				.setName(FieldNameUtil.create((nodeIdField.getName()).getValue(), segmentId))
 				.setSegmentId(segmentId);
-		} else
-
-		{
-			nodeIdField = ModelUtil.createEntityIdField(FieldNameUtil.create("nodeId"))
-				.setDataType(DataType.INTEGER);
 		}
-
-		PMMLUtil.addValues(nodeIdField, values);
 
 		output.addOutputFields(nodeIdField);
 	}

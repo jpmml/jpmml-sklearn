@@ -44,7 +44,7 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 		super.checkLabel(label);
 
 		if((objectiveFunction != null) && !(objectiveFunction instanceof Regression)){
-			throw new IllegalArgumentException("Expected a regression-type objective function, got " + (objectiveFunction.getClass()).getName());
+			throw new IllegalArgumentException("Expected a regression-type objective function, got '" + objectiveFunction.getName() + "'");
 		}
 	}
 

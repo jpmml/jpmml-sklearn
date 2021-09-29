@@ -34,6 +34,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.converter.transformations.AbstractTransformation;
 import org.jpmml.python.Identifiable;
 import sklearn.Regressor;
 import sklearn.preprocessing.FunctionTransformer;
@@ -58,7 +59,7 @@ public class TransformedTargetRegressor extends Regressor {
 
 		Label label = schema.getLabel();
 
-		Transformation transformation = new Transformation(){
+		Transformation transformation = new AbstractTransformation(){
 
 			@Override
 			public FieldName getName(FieldName name){

@@ -23,8 +23,8 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Decorable;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.MapValues;
@@ -32,7 +32,6 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
-import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.ModelEncoder;
@@ -53,7 +52,7 @@ public class EncoderUtil {
 		ModelEncoder encoder = (ModelEncoder)feature.getEncoder();
 		Field<?> field = feature.getField();
 
-		if((field instanceof DataField) || (field instanceof DerivedOutputField)){
+		if(field instanceof Decorable){
 			encoder.addDecorator(field, decorator);
 		} else
 

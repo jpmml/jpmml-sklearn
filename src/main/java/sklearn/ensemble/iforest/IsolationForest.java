@@ -39,7 +39,6 @@ import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.OutlierTransformation;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
@@ -47,6 +46,8 @@ import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.converter.transformations.AbstractTransformation;
+import org.jpmml.converter.transformations.OutlierTransformation;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
@@ -144,7 +145,7 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		}
 
 		// "rawAnomalyScore / averagePathLength(maxSamples)"
-		Transformation normalizedAnomalyScore = new Transformation(){
+		Transformation normalizedAnomalyScore = new AbstractTransformation(){
 
 			@Override
 			public FieldName getName(FieldName name){
@@ -162,7 +163,7 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		};
 
 		// "0.5 - 2 ^ (-1 * normalizedAnomalyScore)"
-		Transformation decisionFunction = new Transformation(){
+		Transformation decisionFunction = new AbstractTransformation(){
 
 			@Override
 			public FieldName getName(FieldName name){

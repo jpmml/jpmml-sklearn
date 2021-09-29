@@ -291,8 +291,7 @@ public class PMMLPipeline extends Pipeline {
 			} // End if
 
 			if(applyTransformer != null){
-				OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"))
-					.setDataType(DataType.INTEGER);
+				OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"), DataType.INTEGER);
 
 				encodeOutput(output, Collections.singletonList(nodeIdField), applyTransformer, encoder);
 			}

@@ -24,7 +24,6 @@ import java.util.List;
 import com.google.common.primitives.Doubles;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.True;
 import org.dmg.pmml.tree.ClassifierNode;
 import org.dmg.pmml.tree.Node;
@@ -110,9 +109,8 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 		Node root = new ClassifierNode(categoricalLabel.getValue(index), True.INSTANCE);
 
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
-		List<ScoreDistribution> scoreDistributions = scoreDistributionManager.createScoreDistribution(categoricalLabel, probabilities);
 
-		(root.getScoreDistributions()).addAll(scoreDistributions);
+		scoreDistributionManager.addScoreDistributions(root, categoricalLabel.getValues(), probabilities);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root)
 			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));

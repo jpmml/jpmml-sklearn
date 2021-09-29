@@ -21,7 +21,7 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jpmml.converter.ExpTransformation;
+import org.jpmml.converter.transformations.ExpTransformation;
 import sklearn.HasPriorProbability;
 
 public class MultinomialDeviance extends LossFunction {

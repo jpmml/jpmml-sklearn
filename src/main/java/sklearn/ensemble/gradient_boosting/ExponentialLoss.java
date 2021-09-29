@@ -21,7 +21,7 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jpmml.converter.SigmoidTransformation;
+import org.jpmml.converter.transformations.SigmoidTransformation;
 import sklearn.HasPriorProbability;
 
 public class ExponentialLoss extends LossFunction {

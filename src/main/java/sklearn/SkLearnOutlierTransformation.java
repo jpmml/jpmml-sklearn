@@ -19,19 +19,19 @@
 package sklearn;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Transformation;
+import org.jpmml.converter.transformations.AbstractTransformation;
 
-public class SkLearnOutlierTransformation implements Transformation {
+public class SkLearnOutlierTransformation extends AbstractTransformation {
 
 	@Override
 	public FieldName getName(FieldName name){
@@ -54,13 +54,17 @@ public class SkLearnOutlierTransformation implements Transformation {
 	}
 
 	@Override
-	public List<Integer> getValues(){
-		return Arrays.asList(VALUE_OUTLIER, VALUE_INLIER);
+	public Expression createExpression(FieldRef fieldRef){
+		return PMMLUtil.createApply(PMMLFunctions.IF, fieldRef, PMMLUtil.createConstant(VALUE_OUTLIER), PMMLUtil.createConstant(VALUE_INLIER));
 	}
 
 	@Override
-	public Expression createExpression(FieldRef fieldRef){
-		return PMMLUtil.createApply(PMMLFunctions.IF, fieldRef, PMMLUtil.createConstant(VALUE_OUTLIER), PMMLUtil.createConstant(VALUE_INLIER));
+	public OutputField createOutputField(OutputField outputField){
+		outputField = super.createOutputField(outputField);
+
+		PMMLUtil.addValues(outputField, Arrays.asList(VALUE_OUTLIER, VALUE_INLIER));
+
+		return outputField;
 	}
 
 	public static final Integer VALUE_INLIER = +1;

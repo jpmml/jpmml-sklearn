@@ -30,10 +30,10 @@ import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.OutlierTransformation;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
+import org.jpmml.converter.transformations.OutlierTransformation;
 import sklearn.HasDecisionFunctionField;
 import sklearn.SkLearnOutlierTransformation;
 
