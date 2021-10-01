@@ -26,7 +26,6 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.ExpressionTranslator;
@@ -58,11 +57,9 @@ public class ExpressionTransformer extends Transformer {
 		} else
 
 		{
-			if(ExpressionUtil.isString(expression, scope)){
-				dataType = DataType.STRING;
-			} else
+			dataType = ExpressionUtil.getDataType(expression, scope);
 
-			{
+			if(dataType == null){
 				dataType = DataType.DOUBLE;
 			}
 		}
@@ -71,7 +68,7 @@ public class ExpressionTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
 
-		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
+		return Collections.singletonList(TransformerUtil.createFeature(derivedField, encoder));
 	}
 
 	public Object getDType(){

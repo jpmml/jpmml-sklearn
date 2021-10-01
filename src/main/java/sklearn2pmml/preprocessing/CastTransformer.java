@@ -25,10 +25,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.StepUtil;
 import sklearn.Transformer;
@@ -56,23 +53,7 @@ public class CastTransformer extends Transformer {
 
 				DerivedField derivedField = encoder.ensureDerivedField(createFieldName(dataType, feature), opType, dataType, () -> fieldRef);
 
-				switch(dataType){
-					case STRING:
-						feature = new StringFeature(encoder, derivedField);
-						break;
-					case INTEGER:
-					case FLOAT:
-					case DOUBLE:
-						feature = new ContinuousFeature(encoder, derivedField);
-						break;
-					case BOOLEAN:
-					case DATE:
-					case DATE_TIME:
-						// Falls through
-					default:
-						feature = new ObjectFeature(encoder, derivedField);
-						break;
-				}
+				feature = TransformerUtil.createFeature(derivedField, encoder);
 			}
 
 			result.add(feature);

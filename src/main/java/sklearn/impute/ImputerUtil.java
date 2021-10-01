@@ -30,14 +30,12 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.BooleanFeature;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueDecorator;
-import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
+import sklearn2pmml.preprocessing.TransformerUtil;
 
 public class ImputerUtil {
 
@@ -79,17 +77,7 @@ public class ImputerUtil {
 
 			DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("imputer", feature), field.getOpType(), field.getDataType(), expression);
 
-			DataType dataType = derivedField.getDataType();
-			switch(dataType){
-				case INTEGER:
-				case FLOAT:
-				case DOUBLE:
-					return new ContinuousFeature(encoder, derivedField);
-				case STRING:
-					return new StringFeature(encoder, derivedField);
-				default:
-					return new ObjectFeature(encoder, derivedField);
-			}
+			return TransformerUtil.createFeature(derivedField, encoder);
 		} else
 
 		{

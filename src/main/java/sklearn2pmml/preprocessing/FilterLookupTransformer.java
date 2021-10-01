@@ -56,7 +56,7 @@ public class FilterLookupTransformer extends LookupTransformer {
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("filterLookup", features), OpType.CATEGORICAL, feature.getDataType(), apply);
 
-		return Collections.singletonList(createObjectFeature(derivedField, encoder));
+		return Collections.singletonList(TransformerUtil.createFeature(derivedField, encoder));
 	}
 
 	@Override

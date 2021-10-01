@@ -31,10 +31,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldColumnPair;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -99,7 +96,7 @@ public class LookupTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("lookup", features), OpType.CATEGORICAL, dataType, mapValues);
 
-		return Collections.singletonList(createObjectFeature(derivedField, encoder));
+		return Collections.singletonList(TransformerUtil.createFeature(derivedField, encoder));
 	}
 
 	protected List<String> formatColumns(List<Feature> features){
@@ -144,20 +141,5 @@ public class LookupTransformer extends Transformer {
 
 	public Object getDefaultValue(){
 		return getOptionalScalar("default_value");
-	}
-
-	static
-	protected ObjectFeature createObjectFeature(DerivedField derivedField, SkLearnEncoder encoder){
-		return new ObjectFeature(encoder, derivedField){
-
-			@Override
-			public ContinuousFeature toContinuousFeature(){
-				PMMLEncoder encoder = getEncoder();
-
-				DerivedField derivedField = (DerivedField)encoder.toContinuous(getName());
-
-				return new ContinuousFeature(encoder, derivedField);
-			}
-		};
 	}
 }
