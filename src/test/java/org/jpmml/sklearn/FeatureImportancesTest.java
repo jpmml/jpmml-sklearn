@@ -19,9 +19,7 @@
 package org.jpmml.sklearn;
 
 import java.util.List;
-import java.util.function.Predicate;
 
-import com.google.common.base.Equivalence;
 import org.dmg.pmml.MiningField;
 import org.dmg.pmml.MiningSchema;
 import org.dmg.pmml.Model;
@@ -31,14 +29,13 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.evaluator.ResultField;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FeatureImportancesTest extends SkLearnTest implements Algorithms, Datasets {
+public class FeatureImportancesTest extends MarkupTest implements Algorithms, Datasets {
 
 	@Test
 	public void checkDecisionTreeAudit() throws Exception {
@@ -65,18 +62,8 @@ public class FeatureImportancesTest extends SkLearnTest implements Algorithms, D
 		check(XGB, AUDIT);
 	}
 
-	public void check(String name, String dataset) throws Exception {
-		Predicate<ResultField> predicate = (resultField) -> true;
-		Equivalence<Object> equivalence = getEquivalence();
-
-		try(SkLearnTestBatch batch = (SkLearnTestBatch)createBatch(name, dataset, predicate, equivalence)){
-			check(batch);
-		}
-	}
-
-	private void check(SkLearnTestBatch batch) throws Exception {
-		PMML pmml = batch.getPMML();
-
+	@Override
+	public void check(PMML pmml){
 		Visitor visitor = new AbstractVisitor(){
 
 			@Override

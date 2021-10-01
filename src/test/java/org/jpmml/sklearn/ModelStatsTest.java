@@ -20,22 +20,19 @@ package org.jpmml.sklearn;
 
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.function.Predicate;
 
-import com.google.common.base.Equivalence;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.ModelStats;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
-import org.jpmml.evaluator.ResultField;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ModelStatsTest extends SkLearnTest implements Algorithms, Datasets {
+public class ModelStatsTest extends MarkupTest implements Algorithms, Datasets {
 
 	@Test
 	public void checkGBDTLRAudit() throws Exception {
@@ -57,18 +54,8 @@ public class ModelStatsTest extends SkLearnTest implements Algorithms, Datasets 
 		check("EstimatorTransformer", WHEAT);
 	}
 
-	public void check(String name, String dataset) throws Exception {
-		Predicate<ResultField> predicate = (resultField) -> true;
-		Equivalence<Object> equivalence = getEquivalence();
-
-		try(SkLearnTestBatch batch = (SkLearnTestBatch)createBatch(name, dataset, predicate, equivalence)){
-			check(batch);
-		}
-	}
-
-	private void check(SkLearnTestBatch batch) throws Exception {
-		PMML pmml = batch.getPMML();
-
+	@Override
+	public void check(PMML pmml){
 		Visitor visitor = new AbstractVisitor(){
 
 			@Override
