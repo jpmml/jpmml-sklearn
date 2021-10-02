@@ -268,7 +268,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>SkLearn2PMML</summary>
 
-  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) and [extensions/sklearn2pmml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/sklearn2pmml.py)
 
   * Helpers:
     * `sklearn2pmml.EstimatorProxy`
