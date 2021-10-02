@@ -123,8 +123,8 @@ public class MLPTransformer extends Transformer {
 			DataField dataField = dataFields.get(i);
 
 			OutputField outputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, dataField.getName()), dataField.getOpType(), dataField.getDataType())
-				.setTargetField(dataField.getName())
-				.setFinalResult(false);
+				.setFinalResult(false)
+				.setTargetField(dataField.getName());
 
 			DerivedOutputField derivedOutputField = encoder.createDerivedField(neuralNetwork, outputField, false);
 

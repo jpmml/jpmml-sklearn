@@ -50,6 +50,7 @@ import org.dmg.pmml.VisitorAction;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
@@ -231,6 +232,8 @@ public class PMMLPipeline extends Pipeline {
 
 		Model model = estimator.encode(schema);
 
+		encoder.setModel(model);
+
 		if(!estimator.hasFeatureImportances()){
 			List<? extends Number> featureImportances = getPMMLFeatureImportances();
 
@@ -255,6 +258,9 @@ public class PMMLPipeline extends Pipeline {
 
 		if((predictTransformer != null) || (predictProbaTransformer != null) || (applyTransformer != null)){
 			Model finalModel = MiningModelUtil.getFinalModel(model);
+
+			// XXX
+			encoder.setModel(finalModel);
 
 			Output output = ModelUtil.ensureOutput(finalModel);
 
@@ -295,6 +301,8 @@ public class PMMLPipeline extends Pipeline {
 
 				encodeOutput(output, Collections.singletonList(nodeIdField), applyTransformer, encoder);
 			}
+
+			encoder.setModel(model);
 		} // End if
 
 		verification:
@@ -429,6 +437,11 @@ public class PMMLPipeline extends Pipeline {
 	private void encodeOutput(Output output, List<OutputField> outputFields, Transformer transformer, SkLearnEncoder encoder){
 		SkLearnEncoder outputEncoder = new SkLearnEncoder();
 
+		Model model = encoder.getModel();
+		if(model != null){
+			outputEncoder.setModel(model);
+		}
+
 		List<Feature> features = new ArrayList<>();
 
 		for(OutputField outputField : outputFields){
@@ -442,9 +455,19 @@ public class PMMLPipeline extends Pipeline {
 		Map<FieldName, DerivedField> derivedFields = outputEncoder.getDerivedFields();
 
 		for(DerivedField derivedField : derivedFields.values()){
-			OutputField outputField = new OutputField(derivedField.getName(), derivedField.getOpType(), derivedField.getDataType())
-				.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-				.setExpression(derivedField.getExpression());
+			OutputField outputField;
+
+			if(derivedField instanceof DerivedOutputField){
+				DerivedOutputField derivedOutputField = (DerivedOutputField)derivedField;
+
+				outputField = derivedOutputField.getOutputField();
+			} else
+
+			{
+				outputField = new OutputField(derivedField.getName(), derivedField.getOpType(), derivedField.getDataType())
+					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+					.setExpression(derivedField.getExpression());
+			}
 
 			output.addOutputFields(outputField);
 		}

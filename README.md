@@ -298,6 +298,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.neural_network.MLPTransformer`
   * Pipeline:
     * `sklearn2pmml.pipeline.PMMLPipeline`
+  * Postprocessing:
+    * `sklearn2pmml.postprocessing.BusinessDecisionTransformer`
   * Preprocessing:
     * `sklearn2pmml.preprocessing.Aggregator`
     * `sklearn2pmml.preprocessing.CastTransformer`

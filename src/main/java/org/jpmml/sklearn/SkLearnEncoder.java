@@ -28,6 +28,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.PickleUtil;
@@ -41,6 +42,8 @@ import sklearn2pmml.decoration.Domain;
 public class SkLearnEncoder extends PythonEncoder {
 
 	private Map<FieldName, Domain> domains = new LinkedHashMap<>();
+
+	private Model model = null;
 
 
 	public SkLearnEncoder(){
@@ -115,6 +118,14 @@ public class SkLearnEncoder extends PythonEncoder {
 		{
 			this.domains.remove(name);
 		}
+	}
+
+	public Model getModel(){
+		return this.model;
+	}
+
+	public void setModel(Model model){
+		this.model = model;
 	}
 
 	static {
