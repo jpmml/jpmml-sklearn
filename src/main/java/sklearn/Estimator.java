@@ -52,6 +52,19 @@ public class Estimator extends Step {
 	@Override
 	public int getNumberOfFeatures(){
 
+		// SkLearn 1.0+
+		nFeaturesIn:
+		if(containsKey(SkLearnFields.N_FEATURES_IN)){
+
+			// Deprecated attributes are explicitly set to None values
+			if(get(SkLearnFields.N_FEATURES_IN) == null){
+				break nFeaturesIn;
+			}
+
+			return getInteger(SkLearnFields.N_FEATURES_IN);
+		} // End if
+
+		// SkLearn 0.24
 		if(containsKey(SkLearnFields.N_FEATURES)){
 			return getInteger(SkLearnFields.N_FEATURES);
 		}
