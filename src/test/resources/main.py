@@ -657,7 +657,7 @@ if "Auto" in datasets:
 	build_auto_isotonic(IsotonicRegression(increasing = True, out_of_bounds = "nan"), auto_X["acceleration"], "IsotonicRegressionIncrAuto")
 	build_auto_isotonic(IsotonicRegression(increasing = False, y_min = 12, y_max = 36, out_of_bounds = "clip"), auto_X["weight"], "IsotonicRegressionDecrAuto")
 
-auto_train_mask = numpy.random.choice([False, True], size = (392,), p = [0.5, 0.5])
+auto_train_mask = numpy.random.choice([False, True], size = (392,), p = [0.8, 0.2])
 auto_test_mask = ~auto_train_mask
 
 def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
@@ -674,8 +674,8 @@ def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
-	build_auto_opt(LGBMRegressor(objective = "regression"), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
-	build_auto_opt(XGBRegressor(objective = "reg:squarederror"), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
+	build_auto_opt(LGBMRegressor(objective = "regression", random_state = 13), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
+	build_auto_opt(XGBRegressor(objective = "reg:squarederror", random_state = 13), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 
 auto_na_X, auto_na_y = load_auto("AutoNA")
 
