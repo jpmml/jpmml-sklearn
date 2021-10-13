@@ -334,6 +334,10 @@ public class TreeUtil {
 
 				java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
 
+				if(!ValueUtil.isNaN(missingValue)){
+					valueFilter = valueFilter.and(value -> !ValueUtil.isNaN(value));
+				}
+
 				List<Object> leftValues = thresholdFeature.getValues((Number value) -> (toSplitValue(value) <= threshold)).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
@@ -341,11 +345,6 @@ public class TreeUtil {
 				List<Object> rightValues = thresholdFeature.getValues((Number value) -> (toSplitValue(value)) > threshold).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
-
-				// XXX
-				if(leftValues.contains(missingValue) || rightValues.contains(missingValue)){
-					throw new IllegalArgumentException();
-				}
 
 				leftCategoryManager = leftCategoryManager.fork(name, leftValues);
 				rightCategoryManager = rightCategoryManager.fork(name, rightValues);

@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -30,14 +31,23 @@ import java.util.function.Predicate;
 import com.google.common.base.Equivalence;
 import com.google.common.io.ByteStreams;
 import h2o.estimators.BaseEstimator;
+import org.dmg.pmml.Array;
+import org.dmg.pmml.HasValue;
+import org.dmg.pmml.HasValueSet;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.PMMLObject;
+import org.dmg.pmml.Visitor;
+import org.dmg.pmml.VisitorAction;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.IntegrationTestBatch;
+import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.CompressedInputStreamStorage;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.Storage;
 import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
+
+import static org.junit.Assert.assertFalse;
 
 abstract
 public class SkLearnTestBatch extends IntegrationTestBatch {
@@ -99,6 +109,60 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 		}
 
 		return pmml;
+	}
+
+	@Override
+	protected void validatePMML(PMML pmml) throws Exception {
+		super.validatePMML(pmml);
+
+		Visitor visitor = new AbstractVisitor(){
+
+			@Override
+			public VisitorAction visit(PMMLObject object){
+
+				if(object instanceof HasValue){
+					checkValue((HasValue<?>)object);
+				} // End if
+
+				if(object instanceof HasValueSet){
+					checkValueSet((HasValueSet<?>)object);
+				}
+
+				return super.visit(object);
+			}
+
+			private void checkValue(HasValue<?> hasValue){
+				Object value = hasValue.getValue();
+
+				assertFalse(isNaN(value));
+			}
+
+			private void checkValueSet(HasValueSet<?> hasValueSet){
+				Array array = hasValueSet.getArray();
+
+				Object arrayValue = array.getValue();
+
+				if(arrayValue instanceof Collection){
+					Collection<?> values = (Collection<?>)arrayValue;
+
+					for(Object value : values){
+						assertFalse(isNaN(value));
+					}
+				}
+			}
+
+			private boolean isNaN(Object value){
+
+				if(value instanceof Number){
+					Number number = (Number)value;
+
+					return Double.isNaN(number.doubleValue());
+				}
+
+				return false;
+			}
+		};
+		visitor.applyTo(pmml);
 	}
 
 	public Map<String, ?> getOptions(){
