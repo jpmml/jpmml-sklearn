@@ -44,7 +44,7 @@ import sys
 
 def pipeline_transform(pipeline, X):
 	identity_pipeline = Pipeline(pipeline.steps[: -1] + [("estimator", None)])
-	return identity_pipeline._transform(X)
+	return identity_pipeline.transform(X)
 
 def make_interaction(left, right):
 	pipeline = Pipeline([

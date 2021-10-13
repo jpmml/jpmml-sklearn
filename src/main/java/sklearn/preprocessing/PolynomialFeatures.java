@@ -36,6 +36,7 @@ import org.jpmml.converter.InteractionFeature;
 import org.jpmml.converter.PowerFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.SkLearnFields;
 import sklearn.Transformer;
 
 public class PolynomialFeatures extends Transformer {
@@ -166,6 +167,13 @@ public class PolynomialFeatures extends Transformer {
 	}
 
 	public int getNumberOfInputFeatures(){
+
+		// SkLearn 1.0+
+		if(containsKey(SkLearnFields.N_FEATURES_IN)){
+			return getInteger(SkLearnFields.N_FEATURES_IN);
+		}
+
+		// SkLearn 0.24
 		return getInteger("n_input_features_");
 	}
 

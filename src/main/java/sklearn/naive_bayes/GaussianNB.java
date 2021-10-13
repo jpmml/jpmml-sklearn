@@ -104,6 +104,13 @@ public class GaussianNB extends Classifier {
 	}
 
 	public List<? extends Number> getSigma(){
+
+		// SkLearn 1.0+
+		if(containsKey("var_")){
+			return getNumberArray("var_");
+		}
+
+		// SkLearn 0.24
 		return getNumberArray("sigma_");
 	}
 

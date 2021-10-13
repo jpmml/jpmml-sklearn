@@ -392,7 +392,7 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate(XGB, IRIS, new FloatEquivalence(12));
+		evaluate(XGB, IRIS, excludeFields(IRIS_PROBABILITY_SETOSA), new FloatEquivalence(16));
 	}
 
 	@Test
