@@ -675,7 +675,7 @@ def build_auto_opt(regressor, name, fit_params = {}, **pmml_options):
 
 if "Auto" in datasets:
 	build_auto_opt(LGBMRegressor(objective = "regression", random_state = 13), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
-	build_auto_opt(XGBRegressor(objective = "reg:squarederror", random_state = 13), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
+	build_auto_opt(XGBRegressor(objective = "reg:squarederror", missing = 1, random_state = 13), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
 
 auto_na_X, auto_na_y = load_auto("AutoNA")
 
