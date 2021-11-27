@@ -18,6 +18,7 @@
  */
 package category_encoders;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -27,6 +28,7 @@ import java.util.Map;
 import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
+import com.google.common.math.IntMath;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -43,6 +45,7 @@ public class BaseNEncoder extends CategoryEncoder {
 		List<?> cols = getCols();
 		List<String> dropCols = null;
 		Boolean dropInvariant = getDropInvariant();
+		List<String> featureNames = getFeatureNames();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
@@ -78,6 +81,29 @@ public class BaseNEncoder extends CategoryEncoder {
 
 		ClassDictUtil.checkSize(features, cols, ordinalMappings);
 
+		int numberOfBaseNFeatures = 0;
+
+		for(int i = 0; i < features.size(); i++){
+			Object col = cols.get(i);
+			OrdinalEncoder.Mapping ordinalMapping = ordinalMappings.get(i);
+
+			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
+
+			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base, true);
+
+			for(int pos = 0; pos < requiredDigits; pos++){
+				String dropCol = String.valueOf(col) + "_" + String.valueOf(pos);
+
+				if(dropCols != null && dropCols.contains(dropCol)){
+					continue;
+				}
+
+				numberOfBaseNFeatures++;
+			}
+		}
+
+		boolean pre23Mode = (numberOfBaseNFeatures == featureNames.size());
+
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
@@ -87,7 +113,7 @@ public class BaseNEncoder extends CategoryEncoder {
 
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
 
-			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base);
+			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base, pre23Mode);
 
 			Map<Object, String> baseCategoryMappings = baseEncodeValues(ordinalCategoryMappings, base, requiredDigits);
 
@@ -131,16 +157,41 @@ public class BaseNEncoder extends CategoryEncoder {
 		return get("ordinal_encoder", OrdinalEncoder.class);
 	}
 
+	public List<String> getFeatureNames(){
+		return getList("feature_names", String.class);
+	}
+
 	static
-	private int calcRequiredDigits(Map<?, Integer> ordinalCategoryMappings, int base){
+	private int calcRequiredDigits(Map<?, Integer> ordinalCategoryMappings, int base, boolean pre23Mode){
 
 		if(base == 1){
 			return ordinalCategoryMappings.size() + 1;
 		} else
 
 		{
-			return (int)Math.ceil(Math.log(ordinalCategoryMappings.size()) / Math.log(base)) + 1;
+			if(pre23Mode){
+				return (int)Math.ceil(Math.log(ordinalCategoryMappings.size()) / Math.log(base)) + 1;
+			} else
+
+			{
+				return ceillogint(ordinalCategoryMappings.size() + 1, base);
+			}
 		}
+	}
+
+	static
+	private int ceillogint(int n, int base){
+		int result = 0;
+
+		n -= 1;
+
+		while(n > 0){
+			result += 1;
+
+			n = IntMath.divide(n, base, RoundingMode.FLOOR);
+		}
+
+		return result;
 	}
 
 	static

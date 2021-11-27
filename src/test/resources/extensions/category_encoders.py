@@ -84,7 +84,7 @@ build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "error"), "pas
 classifier = XGBClassifier(n_estimators = 101, random_state = 13)
 
 build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "BinaryEncoderAuditNA", **xgb_pmml_options)
-build_audit(CountEncoder(min_group_size = 10, handle_missing = "count", handle_unknown = "error"), "passthrough", clone(classifier), "CountEncoderAuditNA", **xgb_pmml_options)
+build_audit(CountEncoder(min_group_size = 10, handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "CountEncoderAuditNA", **xgb_pmml_options)
 build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "TargetEncoderAuditNA", **xgb_pmml_options)
 build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "WOEEncoderAuditNA", **xgb_pmml_options)
 
