@@ -47,20 +47,23 @@ public class MapFeature extends ThresholdFeature {
 
 	private Object missingCategory = null;
 
+	private Number defaultValue = null;
 
-	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingCategory){
-		this(encoder, feature.getName(), feature.getDataType(), mapping, missingCategory);
+
+	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
+		this(encoder, feature.getName(), feature.getDataType(), mapping, missingCategory, defaultValue);
 	}
 
-	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingCategory){
-		this(encoder, field.getName(), field.getDataType(), mapping, missingCategory);
+	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
+		this(encoder, field.getName(), field.getDataType(), mapping, missingCategory, defaultValue);
 	}
 
-	public MapFeature(PMMLEncoder encoder, FieldName name, DataType dataType, Map<?, ? extends Number> mapping, Object missingCategory){
+	public MapFeature(PMMLEncoder encoder, FieldName name, DataType dataType, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
 		super(encoder, name, dataType);
 
 		setMapping(mapping);
 		setMissingCategory(missingCategory);
+		setDefaultValue(defaultValue);
 	}
 
 	@Override
@@ -73,6 +76,7 @@ public class MapFeature extends ThresholdFeature {
 		FieldName name = getName();
 		Map<?, ? extends Number> mapping = getMapping();
 		Object missingCategory = getMissingCategory();
+		Number defaultValue = getDefaultValue();
 
 		Supplier<Expression> expressionSupplier = () -> {
 			Map<?, ? extends Number> validMapping = new LinkedHashMap<>(mapping);
@@ -80,7 +84,8 @@ public class MapFeature extends ThresholdFeature {
 			Number mapMissingTo = validMapping.remove(missingCategory);
 
 			MapValues mapValues = PMMLUtil.createMapValues(name, validMapping)
-				.setMapMissingTo(mapMissingTo);
+				.setMapMissingTo(mapMissingTo)
+				.setDefaultValue(defaultValue);
 
 			return mapValues;
 		};
@@ -93,6 +98,12 @@ public class MapFeature extends ThresholdFeature {
 	@Override
 	public Set<?> getValues(Predicate<Number> predicate){
 		Map<?, ? extends Number> mapping = getMapping();
+		Number defaultValue = getDefaultValue();
+
+		// XXX
+		if(defaultValue != null){
+			throw new IllegalArgumentException();
+		}
 
 		Set<Object> result = new LinkedHashSet<>();
 
@@ -112,6 +123,7 @@ public class MapFeature extends ThresholdFeature {
 
 		result = (31 * result) + Objects.hash(this.getMapping());
 		result = (31 * result) + Objects.hash(this.getMissingCategory());
+		result = (31 * result) + Objects.hash(this.getDefaultValue());
 
 		return result;
 	}
@@ -122,7 +134,7 @@ public class MapFeature extends ThresholdFeature {
 		if(object instanceof MapFeature){
 			MapFeature that = (MapFeature)object;
 
-			return super.equals(object) && Objects.equals(this.getMapping(), that.getMapping()) && Objects.equals(this.getMissingCategory(), that.getMissingCategory());
+			return super.equals(object) && Objects.equals(this.getMapping(), that.getMapping()) && Objects.equals(this.getMissingCategory(), that.getMissingCategory()) && Objects.equals(this.getDefaultValue(), that.getDefaultValue());
 		}
 
 		return false;
@@ -132,7 +144,8 @@ public class MapFeature extends ThresholdFeature {
 	protected ToStringHelper toStringHelper(){
 		return new ToStringHelper(this)
 			.add("mapping", getMapping())
-			.add("missingCategory", getMissingCategory());
+			.add("missingCategory", getMissingCategory())
+			.add("defaultValue", getDefaultValue());
 	}
 
 	public Map<?, ? extends Number> getMapping(){
@@ -154,5 +167,13 @@ public class MapFeature extends ThresholdFeature {
 
 	private void setMissingCategory(Object missingCategory){
 		this.missingCategory = missingCategory;
+	}
+
+	public Number getDefaultValue(){
+		return this.defaultValue;
+	}
+
+	private void setDefaultValue(Number defaultValue){
+		this.defaultValue = defaultValue;
 	}
 }

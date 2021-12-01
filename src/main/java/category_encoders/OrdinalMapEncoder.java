@@ -24,8 +24,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dmg.pmml.Decorable;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -63,10 +67,15 @@ public class OrdinalMapEncoder extends MapEncoder {
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
-		} // End switch
+		}
+
+		Object unknownCategory = null;
 
 		switch(handleUnknown){
 			case "error":
+				break;
+			case "value":
+				unknownCategory = OrdinalEncoder.CATEGORY_UNKNOWN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
@@ -102,9 +111,33 @@ public class OrdinalMapEncoder extends MapEncoder {
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryValues.keySet());
 
-			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
+			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Feature mapFeature = new MapFeature(encoder, feature, categoryValues, missingCategory){
+			Double defaultValue = null;
+
+			switch(handleUnknown){
+				case "value":
+					{
+						if(!valueMappings.containsKey(unknownCategory)){
+							throw new IllegalArgumentException();
+						}
+
+						defaultValue = valueMappings.get(unknownCategory);
+
+						if(field instanceof Decorable){
+							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
+						} else
+
+						{
+							throw new IllegalArgumentException();
+						}
+					}
+					break;
+				default:
+					break;
+			}
+
+			Feature mapFeature = new MapFeature(encoder, feature, categoryValues, missingCategory, defaultValue){
 
 				@Override
 				public FieldName getDerivedName(){

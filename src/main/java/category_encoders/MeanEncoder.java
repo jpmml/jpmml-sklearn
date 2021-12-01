@@ -95,7 +95,7 @@ public class MeanEncoder extends MapEncoder {
 
 			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Feature mapFeature = new MapFeature(encoder, feature, categoryMeans, missingCategory){
+			Feature mapFeature = new MapFeature(encoder, feature, categoryMeans, missingCategory, null){
 
 				@Override
 				public FieldName getDerivedName(){

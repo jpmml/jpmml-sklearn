@@ -118,7 +118,7 @@ public class CountEncoder extends MapEncoder {
 
 			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts, missingCategory){
+			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts, missingCategory, null){
 
 				@Override
 				public FieldName getDerivedName(){

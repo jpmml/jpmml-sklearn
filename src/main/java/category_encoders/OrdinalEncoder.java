@@ -130,4 +130,6 @@ public class OrdinalEncoder extends CategoryEncoder {
 			return SeriesUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
 		}
 	}
+
+	public static final Object CATEGORY_UNKNOWN = -1;
 }
