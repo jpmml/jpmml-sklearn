@@ -45,22 +45,22 @@ public class MapFeature extends ThresholdFeature {
 
 	private Map<?, ? extends Number> mapping = null;
 
-	private Object missingValue = null;
+	private Object missingCategory = null;
 
 
-	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingValue){
-		this(encoder, feature.getName(), feature.getDataType(), mapping, missingValue);
+	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingCategory){
+		this(encoder, feature.getName(), feature.getDataType(), mapping, missingCategory);
 	}
 
-	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingValue){
-		this(encoder, field.getName(), field.getDataType(), mapping, missingValue);
+	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingCategory){
+		this(encoder, field.getName(), field.getDataType(), mapping, missingCategory);
 	}
 
-	public MapFeature(PMMLEncoder encoder, FieldName name, DataType dataType, Map<?, ? extends Number> mapping, Object missingValue){
+	public MapFeature(PMMLEncoder encoder, FieldName name, DataType dataType, Map<?, ? extends Number> mapping, Object missingCategory){
 		super(encoder, name, dataType);
 
 		setMapping(mapping);
-		setMissingValue(missingValue);
+		setMissingCategory(missingCategory);
 	}
 
 	@Override
@@ -72,12 +72,12 @@ public class MapFeature extends ThresholdFeature {
 	public ContinuousFeature toContinuousFeature(){
 		FieldName name = getName();
 		Map<?, ? extends Number> mapping = getMapping();
-		Object missingValue = getMissingValue();
+		Object missingCategory = getMissingCategory();
 
 		Supplier<Expression> expressionSupplier = () -> {
 			Map<?, ? extends Number> validMapping = new LinkedHashMap<>(mapping);
 
-			Number mapMissingTo = validMapping.remove(missingValue);
+			Number mapMissingTo = validMapping.remove(missingCategory);
 
 			MapValues mapValues = PMMLUtil.createMapValues(name, validMapping)
 				.setMapMissingTo(mapMissingTo);
@@ -111,7 +111,7 @@ public class MapFeature extends ThresholdFeature {
 		int result = super.hashCode();
 
 		result = (31 * result) + Objects.hash(this.getMapping());
-		result = (31 * result) + Objects.hash(this.getMissingValue());
+		result = (31 * result) + Objects.hash(this.getMissingCategory());
 
 		return result;
 	}
@@ -122,7 +122,7 @@ public class MapFeature extends ThresholdFeature {
 		if(object instanceof MapFeature){
 			MapFeature that = (MapFeature)object;
 
-			return super.equals(object) && Objects.equals(this.getMapping(), that.getMapping()) && Objects.equals(this.getMissingValue(), that.getMissingValue());
+			return super.equals(object) && Objects.equals(this.getMapping(), that.getMapping()) && Objects.equals(this.getMissingCategory(), that.getMissingCategory());
 		}
 
 		return false;
@@ -132,7 +132,7 @@ public class MapFeature extends ThresholdFeature {
 	protected ToStringHelper toStringHelper(){
 		return new ToStringHelper(this)
 			.add("mapping", getMapping())
-			.add("missingValue", getMissingValue());
+			.add("missingCategory", getMissingCategory());
 	}
 
 	public Map<?, ? extends Number> getMapping(){
@@ -145,10 +145,14 @@ public class MapFeature extends ThresholdFeature {
 
 	@Override
 	public Object getMissingValue(){
-		return this.missingValue;
+		return getMissingCategory();
 	}
 
-	private void setMissingValue(Object missingValue){
-		this.missingValue = missingValue;
+	public Object getMissingCategory(){
+		return this.missingCategory;
+	}
+
+	private void setMissingCategory(Object missingCategory){
+		this.missingCategory = missingCategory;
 	}
 }
