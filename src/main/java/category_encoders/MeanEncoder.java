@@ -26,8 +26,12 @@ import java.util.function.BiFunction;
 
 import com.google.common.base.Functions;
 import numpy.core.ScalarUtil;
+import org.dmg.pmml.Decorable;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -73,8 +77,13 @@ public class MeanEncoder extends MapEncoder {
 				throw new IllegalArgumentException(handleMissing);
 		}
 
+		Number defaultValue = null;
+
 		switch(handleUnknown){
 			case "error":
+				break;
+			case "value":
+				defaultValue = getMean();
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
@@ -93,9 +102,25 @@ public class MeanEncoder extends MapEncoder {
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryMeans.keySet());
 
-			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
+			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Feature mapFeature = new MapFeature(encoder, feature, categoryMeans, missingCategory, null){
+			switch(handleUnknown){
+				case "value":
+					{
+						if(field instanceof Decorable){
+							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
+						} else
+
+						{
+							throw new IllegalArgumentException();
+						}
+					}
+					break;
+				default:
+					break;
+			}
+
+			Feature mapFeature = new MapFeature(encoder, feature, categoryMeans, missingCategory, defaultValue){
 
 				@Override
 				public FieldName getDerivedName(){

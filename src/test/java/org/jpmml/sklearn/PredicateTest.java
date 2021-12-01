@@ -55,8 +55,8 @@ public class PredicateTest extends SkLearnTest implements Datasets {
 
 		check("BinaryEncoder", AUDIT, options);
 		check("CountEncoder", AUDIT, options);
-		check("LeaveOneOutEncoder", AUDIT, options);
 		// XXX
+		//check("LeaveOneOutEncoder", AUDIT, options);
 		//check("TargetEncoder", AUDIT, options);
 	}
 
