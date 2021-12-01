@@ -15,16 +15,43 @@ from sklearn.preprocessing import OneHotEncoder as SkLearnOneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
 from xgboost import XGBClassifier
 
+import numpy
+
 cat_cols = ["Employment", "Education", "Marital", "Occupation", "Gender"]
 cont_cols = ["Age", "Income", "Hours"]
 
-def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
+def load_filter_audit(name, filter = False):
 	if name.endswith("Audit"):
 		audit_X, audit_y = load_audit("Audit")
 	elif name.endswith("AuditNA"):
 		audit_X, audit_y = load_audit("AuditNA")
 	else:
 		raise ValueError()
+
+	if filter:
+		mask = numpy.ones((audit_X.shape[0], ), dtype = bool)
+
+		mask = numpy.logical_and(mask, audit_X.Employment != "SelfEmp")
+		mask = numpy.logical_and(mask, audit_X.Education != "Professional")
+		mask = numpy.logical_and(mask, audit_X.Marital != "Divorced")
+		mask = numpy.logical_and(mask, audit_X.Occupation != "Service")
+
+		audit_X = audit_X[mask]
+		audit_y = audit_y[mask]
+
+	return (audit_X, audit_y)
+
+def can_handle_unknown(cat_encoder):
+	if isinstance(cat_encoder, Pipeline):
+		cat_encoder = cat_encoder.steps[0][1]
+
+	if isinstance(cat_encoder, OrdinalEncoder):
+		return (cat_encoder.handle_unknown != "error") and (cat_encoder.handle_unknown != "value")
+	else:
+		return cat_encoder.handle_unknown != "error"
+
+def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
+	audit_X, audit_y = load_filter_audit(name, can_handle_unknown(cat_encoder))
 
 	steps = [
 		("mapper", ColumnTransformer([
@@ -41,6 +68,9 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 	pipeline.fit(audit_X, audit_y)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
+
+	audit_X, audit_y = load_filter_audit(name, False)
+
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
 	adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
 	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
