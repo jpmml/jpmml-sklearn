@@ -32,6 +32,7 @@ import com.google.common.base.Equivalence;
 import com.google.common.io.ByteStreams;
 import h2o.estimators.BaseEstimator;
 import org.dmg.pmml.Array;
+import org.dmg.pmml.Constant;
 import org.dmg.pmml.HasValue;
 import org.dmg.pmml.HasValueSet;
 import org.dmg.pmml.PMML;
@@ -129,6 +130,15 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 				}
 
 				return super.visit(object);
+			}
+
+			@Override
+			public VisitorAction visit(Constant constant){
+				Object value = constant.getValue();
+
+				assertFalse(isNaN(value));
+
+				return super.visit(constant);
 			}
 
 			private void checkValue(HasValue<?> hasValue){

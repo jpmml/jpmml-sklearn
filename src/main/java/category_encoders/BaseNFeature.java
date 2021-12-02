@@ -92,7 +92,7 @@ public class BaseNFeature extends ThresholdFeature {
 		Object missingCategory = getMissingCategory();
 		Integer defaultValue = getDefaultValue();
 
-		boolean missingValueAware = values.containsValue(missingCategory);
+		boolean missingValueAware = (missingCategory != null && values.containsValue(missingCategory));
 
 		if(defaultValue != null && defaultValue != 0){
 			throw new IllegalArgumentException();
@@ -137,11 +137,17 @@ public class BaseNFeature extends ThresholdFeature {
 						categories.remove(missingCategory);
 
 						missingBaseValue = baseValue;
-					} // End if
-
-					if(categories.isEmpty()){
-						continue entries;
 					}
+				} else
+
+				{
+					if(categories.contains(CategoryEncoder.CATEGORY_NAN)){
+						categories.remove(CategoryEncoder.CATEGORY_NAN);
+					}
+				} // End if
+
+				if(categories.isEmpty()){
+					continue entries;
 				}
 
 				Apply valueApply = PMMLUtil.createApply((categories.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), new FieldRef(name));
