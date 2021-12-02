@@ -32,6 +32,7 @@ import com.google.common.math.IntMath;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.preprocessing.EncoderUtil;
 
 public class BaseNEncoder extends CategoryEncoder {
 
@@ -112,6 +113,10 @@ public class BaseNEncoder extends CategoryEncoder {
 			OrdinalEncoder.Mapping ordinalMapping = ordinalMappings.get(i);
 
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
+
+			List<?> categories = new ArrayList<>(ordinalCategoryMappings.keySet());
+
+			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base, pre23Mode);
 
