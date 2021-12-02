@@ -27,8 +27,12 @@ import java.util.Set;
 import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import numpy.core.ScalarUtil;
+import org.dmg.pmml.Decorable;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -79,8 +83,13 @@ public class CountEncoder extends MapEncoder {
 			throw new IllegalArgumentException();
 		}
 
+		Integer defaultValue = null;
+
 		switch(handleUnknown){
 			case "error":
+				break;
+			case "value":
+				defaultValue = getDefaultValue();
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
@@ -116,9 +125,25 @@ public class CountEncoder extends MapEncoder {
 			List<Object> categories = new ArrayList<>();
 			categories.addAll(categoryCounts.keySet());
 
-			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
+			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts, missingCategory, null){
+			switch(handleUnknown){
+				case "value":
+					{
+						if(field instanceof Decorable){
+							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
+						} else
+
+						{
+							throw new IllegalArgumentException();
+						}
+					}
+					break;
+				default:
+					break;
+			}
+
+			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts, missingCategory, defaultValue){
 
 				@Override
 				public FieldName getDerivedName(){
@@ -132,8 +157,24 @@ public class CountEncoder extends MapEncoder {
 		return result;
 	}
 
+	public Integer getDefaultValue(){
+		Object handleUnknown = getOptionalObject("handle_unknown");
+
+		if(handleUnknown instanceof String){
+			return 0;
+		}
+
+		return getInteger("handle_unknown");
+	}
+
 	@Override
 	public String getHandleUnknown(){
+		Object handleUnknown = getOptionalObject("handle_unknown");
+
+		if(handleUnknown instanceof Integer){
+			return "value";
+		}
+
 		return getOptionalString("handle_unknown");
 	}
 

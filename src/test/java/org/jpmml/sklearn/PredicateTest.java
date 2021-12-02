@@ -54,8 +54,8 @@ public class PredicateTest extends SkLearnTest implements Datasets {
 		Map<String, Object> options = Collections.singletonMap(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
 
 		check("BinaryEncoder", AUDIT, options);
-		check("CountEncoder", AUDIT, options);
 		// XXX
+		//check("CountEncoder", AUDIT, options);
 		//check("LeaveOneOutEncoder", AUDIT, options);
 		//check("TargetEncoder", AUDIT, options);
 	}

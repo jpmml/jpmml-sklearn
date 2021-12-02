@@ -105,11 +105,11 @@ rf_pmml_options = {"compact" : False, "numeric": False}
 classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
 
 build_audit(BinaryEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "BinaryEncoderAudit", **rf_pmml_options)
-build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "CountEncoderAudit", **rf_pmml_options)
 
 rf_pmml_options = {"compact" : False, "numeric": True}
 
 build_audit(CatBoostEncoder(a = 0.5, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAudit", **rf_pmml_options)
+build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CountEncoderAudit", **rf_pmml_options)
 build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAudit", **rf_pmml_options)
 
 build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "TargetEncoderAudit", **rf_pmml_options)
@@ -118,11 +118,11 @@ build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "value"), "pas
 classifier = XGBClassifier(n_estimators = 101, random_state = 13)
 
 build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "BinaryEncoderAuditNA", **xgb_pmml_options)
-build_audit(CountEncoder(min_group_size = 10, handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "CountEncoderAuditNA", **xgb_pmml_options)
 
 xgb_pmml_options = {"compact": False, "numeric": True, "prune": True}
 
 build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAuditNA", **xgb_pmml_options)
+build_audit(CountEncoder(min_group_size = 10, handle_missing = "value", handle_unknown = 10), "passthrough", clone(classifier), "CountEncoderAuditNA", **xgb_pmml_options)
 build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAuditNA", **xgb_pmml_options)
 
 xgb_pmml_options = {"compact": False, "numeric": True}
