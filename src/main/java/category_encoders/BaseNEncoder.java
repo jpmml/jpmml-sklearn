@@ -29,7 +29,11 @@ import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.math.IntMath;
+import org.dmg.pmml.Decorable;
+import org.dmg.pmml.Field;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.preprocessing.EncoderUtil;
@@ -69,10 +73,15 @@ public class BaseNEncoder extends CategoryEncoder {
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
-		} // End switch
+		}
+
+		Integer defaultValue = null;
 
 		switch(handleUnknown){
 			case "error":
+				break;
+			case "value":
+				defaultValue = 0;
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
@@ -116,7 +125,23 @@ public class BaseNEncoder extends CategoryEncoder {
 
 			List<?> categories = new ArrayList<>(ordinalCategoryMappings.keySet());
 
-			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
+			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
+
+			switch(handleUnknown){
+				case "value":
+					{
+						if(field instanceof Decorable){
+							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
+						} else
+
+						{
+							throw new IllegalArgumentException();
+						}
+					}
+					break;
+				default:
+					break;
+			}
 
 			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base, pre23Mode);
 
@@ -143,7 +168,7 @@ public class BaseNEncoder extends CategoryEncoder {
 					values.put(Character.getNumericValue(digit), category);
 				}
 
-				Feature baseFeature = new BaseNFeature(encoder, feature, base, pos, values, missingCategory);
+				Feature baseFeature = new BaseNFeature(encoder, feature, base, pos, values, missingCategory, defaultValue);
 
 				baseFeatures.add(baseFeature);
 			}

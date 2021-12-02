@@ -53,8 +53,8 @@ public class PredicateTest extends SkLearnTest implements Datasets {
 	public void checkNonNumeric() throws Exception {
 		Map<String, Object> options = Collections.singletonMap(HasTreeOptions.OPTION_NUMERIC, Boolean.FALSE);
 
-		check("BinaryEncoder", AUDIT, options);
 		// XXX
+		//check("BinaryEncoder", AUDIT, options);
 		//check("CountEncoder", AUDIT, options);
 		//check("LeaveOneOutEncoder", AUDIT, options);
 		//check("TargetEncoder", AUDIT, options);
