@@ -27,7 +27,6 @@ import java.util.Set;
 import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import numpy.core.ScalarUtil;
-import org.dmg.pmml.Decorable;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
@@ -122,21 +121,14 @@ public class CountEncoder extends MapEncoder {
 				}
 			}
 
-			List<Object> categories = new ArrayList<>();
-			categories.addAll(categoryCounts.keySet());
+			List<Object> categories = new ArrayList<>(categoryCounts.keySet());
 
 			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			switch(handleUnknown){
 				case "value":
 					{
-						if(field instanceof Decorable){
-							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
-						} else
-
-						{
-							throw new IllegalArgumentException();
-						}
+						EncoderUtil.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null), encoder);
 					}
 					break;
 				default:

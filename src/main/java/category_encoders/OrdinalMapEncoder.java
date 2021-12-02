@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dmg.pmml.Decorable;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
@@ -108,8 +107,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 			Map<?, Double> categoryValues = mapEncodeValues(ordinalCategoryMappings, valueMappings);
 
-			List<Object> categories = new ArrayList<>();
-			categories.addAll(categoryValues.keySet());
+			List<Object> categories = new ArrayList<>(categoryValues.keySet());
 
 			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
@@ -124,13 +122,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 						defaultValue = valueMappings.get(unknownCategory);
 
-						if(field instanceof Decorable){
-							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
-						} else
-
-						{
-							throw new IllegalArgumentException();
-						}
+						EncoderUtil.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null), encoder);
 					}
 					break;
 				default:

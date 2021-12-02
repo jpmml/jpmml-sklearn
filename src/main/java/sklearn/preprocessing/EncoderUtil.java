@@ -20,6 +20,7 @@ package sklearn.preprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -49,8 +50,11 @@ public class EncoderUtil {
 
 	static
 	public void addDecorator(Feature feature, Decorator decorator){
-		ModelEncoder encoder = (ModelEncoder)feature.getEncoder();
-		Field<?> field = feature.getField();
+		addDecorator(feature.getField(), decorator, (ModelEncoder)feature.getEncoder());
+	}
+
+	static
+	public void addDecorator(Field<?> field, Decorator decorator, ModelEncoder encoder){
 
 		if(field instanceof Decorable){
 			encoder.addDecorator(field, decorator);
@@ -129,18 +133,8 @@ public class EncoderUtil {
 
 	static
 	public <E> List<E> filterCategories(List<E> categories){
-		List<E> result = new ArrayList<>(categories.size());
-
-		for(int i = 0; i < categories.size(); i++){
-			E category = categories.get(i);
-
-			if(ValueUtil.isNaN(category)){
-				continue;
-			}
-
-			result.add(category);
-		}
-
-		return result;
+		return categories.stream()
+			.filter(category -> !ValueUtil.isNaN(category))
+			.collect(Collectors.toList());
 	}
 }

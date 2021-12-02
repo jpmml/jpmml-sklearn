@@ -26,7 +26,6 @@ import java.util.function.BiFunction;
 
 import com.google.common.base.Functions;
 import numpy.core.ScalarUtil;
-import org.dmg.pmml.Decorable;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
@@ -99,21 +98,14 @@ public class MeanEncoder extends MapEncoder {
 
 			Map<Object, Double> categoryMeans = SeriesUtil.toMap(series, Functions.identity(), ValueUtil::asDouble);
 
-			List<Object> categories = new ArrayList<>();
-			categories.addAll(categoryMeans.keySet());
+			List<Object> categories = new ArrayList<>(categoryMeans.keySet());
 
 			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			switch(handleUnknown){
 				case "value":
 					{
-						if(field instanceof Decorable){
-							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
-						} else
-
-						{
-							throw new IllegalArgumentException();
-						}
+						EncoderUtil.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null), encoder);
 					}
 					break;
 				default:

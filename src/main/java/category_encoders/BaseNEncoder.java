@@ -29,7 +29,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.math.IntMath;
-import org.dmg.pmml.Decorable;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
@@ -130,13 +129,7 @@ public class BaseNEncoder extends CategoryEncoder {
 			switch(handleUnknown){
 				case "value":
 					{
-						if(field instanceof Decorable){
-							encoder.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null));
-						} else
-
-						{
-							throw new IllegalArgumentException();
-						}
+						EncoderUtil.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null), encoder);
 					}
 					break;
 				default:
