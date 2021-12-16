@@ -27,7 +27,6 @@ import java.util.Map;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
@@ -67,7 +66,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		Estimator estimator = getEstimator();
 		String predictFunc = getPredictFunc();
 
-		List<FieldName> inputNames;
+		List<String> inputNames;
 
 		switch(predictFunc){
 			case SkLearnMethods.APPLY:
@@ -130,7 +129,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 		Model model = estimator.encode(schema);
 
-		Map<FieldName, DerivedOutputField> derivedOutputFields = new LinkedHashMap<>();
+		Map<String, DerivedOutputField> derivedOutputFields = new LinkedHashMap<>();
 
 		Output output = model.getOutput();
 		if(output != null && output.hasOutputFields()){
@@ -171,7 +170,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 				Label label = schema.getLabel();
 
-				FieldName name = createFieldName(Estimator.FIELD_PREDICT);
+				String name = createFieldName(Estimator.FIELD_PREDICT);
 
 				MiningFunction miningFunction = estimator.getMiningFunction();
 				switch(miningFunction){
@@ -213,7 +212,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 		List<Feature> result = new ArrayList<>();
 
-		for(FieldName inputName : inputNames){
+		for(String inputName : inputNames){
 			DerivedOutputField inputField = derivedOutputFields.get(inputName);
 			if(inputField == null){
 				throw new IllegalArgumentException();

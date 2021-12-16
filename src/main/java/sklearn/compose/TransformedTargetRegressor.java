@@ -23,7 +23,6 @@ import java.util.Collections;
 import numpy.core.FunctionUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
@@ -62,7 +61,7 @@ public class TransformedTargetRegressor extends Regressor {
 		Transformation transformation = new AbstractTransformation(){
 
 			@Override
-			public FieldName getName(FieldName name){
+			public String getName(String name){
 				return FieldNameUtil.create("inverseFunc", name);
 			}
 
@@ -72,7 +71,7 @@ public class TransformedTargetRegressor extends Regressor {
 			}
 		};
 
-		FieldName name = label.getName();
+		String name = label.getName();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 

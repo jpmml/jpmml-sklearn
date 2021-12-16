@@ -31,7 +31,6 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Discretize;
 import org.dmg.pmml.DiscretizeBin;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.OpType;
@@ -174,7 +173,7 @@ public class KBinsDiscretizer extends Transformer {
 
 	static
 	private DefineFunction encodeDefineFunction(String name){
-		ParameterField valueField = new ParameterField(FieldName.create("x"));
+		ParameterField valueField = new ParameterField("x");
 
 		Double atol = 1.0e-8;
 		Double rtol = 1.0e-5;

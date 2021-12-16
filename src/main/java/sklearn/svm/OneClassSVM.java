@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
@@ -53,7 +52,7 @@ public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionF
 		Transformation outlier = new OutlierTransformation(){
 
 			@Override
-			public FieldName getName(FieldName name){
+			public String getName(String name){
 				return createFieldName("outlier");
 			}
 

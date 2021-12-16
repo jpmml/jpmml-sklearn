@@ -27,7 +27,6 @@ import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Euclidean;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Measure;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Minkowski;
@@ -92,7 +91,7 @@ public class KNeighborsUtil {
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature(estimator.getDataType());
 
-			FieldName name = continuousFeature.getName();
+			String name = continuousFeature.getName();
 
 			InstanceField instanceField = new InstanceField(name)
 				.setColumn("data:x" + String.valueOf(i + 1));

@@ -28,7 +28,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
@@ -83,7 +82,7 @@ public class BSplineTransformer extends Transformer {
 		int n = (t.size() - k - 1);
 
 		ParameterField valueField = new ParameterField()
-			.setName(FieldName.create("x"))
+			.setName("x")
 			.setOpType(OpType.CONTINUOUS)
 			.setDataType(DataType.DOUBLE);
 
@@ -111,7 +110,7 @@ public class BSplineTransformer extends Transformer {
 	static
 	private DefineFunction createBFunction(List<Number> t, int i, int k, SkLearnEncoder encoder){
 		ParameterField valueField = new ParameterField()
-			.setName(FieldName.create("x"))
+			.setName("x")
 			.setOpType(OpType.CONTINUOUS)
 			.setDataType(DataType.DOUBLE);
 

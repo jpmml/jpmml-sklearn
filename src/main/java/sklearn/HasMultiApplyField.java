@@ -21,7 +21,6 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 
 public interface HasMultiApplyField {
@@ -29,11 +28,11 @@ public interface HasMultiApplyField {
 	int getNumberOfApplyFields();
 
 	default
-	List<FieldName> getApplyFields(){
-		List<FieldName> result = new ArrayList<>();
+	List<String> getApplyFields(){
+		List<String> result = new ArrayList<>();
 
 		for(int i = 0, max = getNumberOfApplyFields(); i < max; i++){
-			FieldName name = getApplyField(i);
+			String name = getApplyField(i);
 
 			result.add(name);
 		}
@@ -42,7 +41,7 @@ public interface HasMultiApplyField {
 	}
 
 	default
-	FieldName getApplyField(int index){
+	String getApplyField(int index){
 		return FieldNameUtil.create(Estimator.FIELD_APPLY, index);
 	}
 }

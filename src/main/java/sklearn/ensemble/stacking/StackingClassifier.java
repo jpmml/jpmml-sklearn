@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
@@ -88,17 +87,13 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 					outputFields.stream()
 						.filter(outputField -> (ResultFeature.PROBABILITY).equals(outputField.getResultFeature()))
 						.forEach(outputField -> {
-							FieldName name = outputField.getName();
+							String name = outputField.getName();
 
-							String stringValue = name.getValue();
+							if(name.startsWith("probability(")){
+								name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, index, name.substring("probability(".length()));
 
-							if(stringValue.startsWith("probability(")){
-								FieldName indexedName = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, index, stringValue.substring("probability(".length()));
-
-								stringValue = indexedName.getValue();
+								outputField.setName(name);
 							}
-
-							outputField.setName(FieldName.create(stringValue));
 						});
 				}
 

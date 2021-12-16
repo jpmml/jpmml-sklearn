@@ -24,7 +24,6 @@ import java.util.List;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
@@ -59,7 +58,7 @@ public class PCA extends BasePCA {
 
 		ClassDictUtil.checkSize(numberOfComponents, explainedVariance);
 
-		FieldName name = createFieldName("pca", features);
+		String name = createFieldName("pca", features);
 
 		List<Feature> result = new ArrayList<>();
 

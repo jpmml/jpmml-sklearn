@@ -28,7 +28,6 @@ import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.Field;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
@@ -138,7 +137,7 @@ public class CountEncoder extends MapEncoder {
 			Feature mapFeature = new MapFeature(encoder, feature, categoryCounts, missingCategory, defaultValue){
 
 				@Override
-				public FieldName getDerivedName(){
+				public String getDerivedName(){
 					return createFieldName(functionName(), getName());
 				}
 			};

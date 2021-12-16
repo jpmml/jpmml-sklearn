@@ -18,13 +18,10 @@
  */
 package sklearn;
 
-import org.dmg.pmml.FieldName;
-import org.jpmml.converter.FieldNameUtil;
-
 public interface HasPredictField {
 
 	default
-	FieldName getPredictField(){
-		return FieldNameUtil.create(Estimator.FIELD_PREDICT);
+	String getPredictField(){
+		return Estimator.FIELD_PREDICT;
 	}
 }

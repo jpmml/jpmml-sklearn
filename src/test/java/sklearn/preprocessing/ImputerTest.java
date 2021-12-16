@@ -25,11 +25,11 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import numpy.core.NDArray;
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -48,8 +48,8 @@ public class ImputerTest {
 
 	@Test
 	public void encodeCategorical(){
-		FieldName name = FieldName.create("x");
-		FieldName imputedName = FieldName.create("imputer(x)");
+		String name = "x";
+		String imputedName = FieldNameUtil.create("imputer", name);
 
 		Imputer imputer = new Imputer("sklearn.preprocessing.imputation", "Imputer");
 		imputer.put("strategy", "most_frequent");
@@ -58,7 +58,7 @@ public class ImputerTest {
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		Feature feature = encodeFeature(name.getValue(), Arrays.asList(imputer), encoder);
+		Feature feature = encodeFeature(name, Arrays.asList(imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -80,7 +80,7 @@ public class ImputerTest {
 
 		encoder = new SkLearnEncoder();
 
-		feature = encodeFeature(name.getValue(), Arrays.asList(categoricalDomain, imputer), encoder);
+		feature = encodeFeature(name, Arrays.asList(categoricalDomain, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -95,10 +95,10 @@ public class ImputerTest {
 
 	@Test
 	public void encodeContinuous(){
-		FieldName name = FieldName.create("x");
-		FieldName imputedName = FieldName.create("imputer(x)");
-		FieldName binarizedName = FieldName.create("binarizer(x)");
-		FieldName imputedBinarizedName = FieldName.create("imputer(" + binarizedName.getValue() + ")");
+		String name = "x";
+		String imputedName = FieldNameUtil.create("imputer", name);
+		String binarizedName = FieldNameUtil.create("binarizer", name);
+		String imputedBinarizedName = FieldNameUtil.create("imputer", binarizedName);
 
 		Imputer imputer = new Imputer("sklearn.preprocessing.imputation", "Imputer");
 		imputer.put("strategy", "mean");
@@ -107,7 +107,7 @@ public class ImputerTest {
 
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		Feature feature = encodeFeature(name.getValue(), Arrays.asList(imputer), encoder);
+		Feature feature = encodeFeature(name, Arrays.asList(imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -126,7 +126,7 @@ public class ImputerTest {
 
 		encoder = new SkLearnEncoder();
 
-		feature = encodeFeature(name.getValue(), Arrays.asList(continuousDomain, imputer), encoder);
+		feature = encodeFeature(name, Arrays.asList(continuousDomain, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNull(encoder.getDerivedField(imputedName));
@@ -143,7 +143,7 @@ public class ImputerTest {
 
 		encoder = new SkLearnEncoder();
 
-		feature = encodeFeature(name.getValue(), Arrays.asList(continuousDomain, binarizer, imputer), encoder);
+		feature = encodeFeature(name, Arrays.asList(continuousDomain, binarizer, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
 		assertNotNull(encoder.getDerivedField(binarizedName));
@@ -158,7 +158,7 @@ public class ImputerTest {
 	}
 
 	static
-	private List<Decorator> getDecorators(ModelEncoder encoder, FieldName name){
+	private List<Decorator> getDecorators(ModelEncoder encoder, String name){
 		return (encoder.getDecorators()).get(null).get(name);
 	}
 

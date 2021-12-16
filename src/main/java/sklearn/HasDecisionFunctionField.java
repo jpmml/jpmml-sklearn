@@ -18,12 +18,10 @@
  */
 package sklearn;
 
-import org.dmg.pmml.FieldName;
-
 public interface HasDecisionFunctionField {
 
 	default
-	FieldName getDecisionFunctionField(){
-		return FieldName.create(Estimator.FIELD_DECISION_FUNCTION);
+	String getDecisionFunctionField(){
+		return Estimator.FIELD_DECISION_FUNCTION;
 	}
 }

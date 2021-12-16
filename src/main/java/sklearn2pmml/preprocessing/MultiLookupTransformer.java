@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.XMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -51,9 +50,9 @@ public class MultiLookupTransformer extends LookupTransformer {
 		List<String> result = new ArrayList<>();
 
 		for(Feature feature : features){
-			FieldName name = feature.getName();
+			String name = feature.getName();
 
-			result.add("data:" + XMLUtil.createTagName(name.getValue()));
+			result.add("data:" + XMLUtil.createTagName(name));
 		}
 
 		if(result.contains("data:output")){

@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.False;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
@@ -97,7 +96,7 @@ public class TreePredictorUtil {
 				if(feature instanceof CategoricalFeature){
 					CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-					FieldName name = categoricalFeature.getName();
+					String name = categoricalFeature.getName();
 
 					java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
 

@@ -24,7 +24,6 @@ import java.util.List;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
@@ -52,7 +51,7 @@ public class TruncatedSVD extends BasePCA {
 
 		ClassDictUtil.checkSize(numberOfFeatures, features);
 
-		FieldName name = createFieldName("svd", features);
+		String name = createFieldName("svd", features);
 
 		List<Feature> result = new ArrayList<>();
 

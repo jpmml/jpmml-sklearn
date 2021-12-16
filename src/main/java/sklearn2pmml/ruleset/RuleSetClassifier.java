@@ -24,7 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.rule_set.RuleSelectionMethod;
@@ -95,7 +94,7 @@ public class RuleSetClassifier extends Classifier {
 				.setDefaultScore(defaultScore);
 		}
 
-		Scope scope = new DataFrameScope(FieldName.create("X"), features);
+		Scope scope = new DataFrameScope("X", features);
 
 		for(Object[] rule : rules){
 			String predicate = TupleUtil.extractElement(rule, 0, String.class);

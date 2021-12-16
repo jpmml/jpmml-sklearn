@@ -33,7 +33,6 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Header;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.MiningFunction;
@@ -139,7 +138,7 @@ public class PMMLPipeline extends Pipeline {
 
 						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CATEGORICAL, dataType, categories);
+						DataField dataField = encoder.createDataField(targetField, OpType.CATEGORICAL, dataType, categories);
 
 						List<Visitor> visitors = new ArrayList<>();
 
@@ -180,7 +179,7 @@ public class PMMLPipeline extends Pipeline {
 					break;
 				case REGRESSION:
 					{
-						DataField dataField = encoder.createDataField(FieldName.create(targetField), OpType.CONTINUOUS, DataType.DOUBLE);
+						DataField dataField = encoder.createDataField(targetField, OpType.CONTINUOUS, DataType.DOUBLE);
 
 						label = new ContinuousLabel(dataField);
 					}
@@ -244,7 +243,7 @@ public class PMMLPipeline extends Pipeline {
 					String activeField = activeFields.get(i);
 					Number featureImportance = featureImportances.get(i);
 
-					DataField dataField = encoder.getDataField(FieldName.create(activeField));
+					DataField dataField = encoder.getDataField(activeField);
 					if(dataField == null){
 						throw new IllegalArgumentException("Field " + activeField + " is undefined");
 					}
@@ -265,7 +264,7 @@ public class PMMLPipeline extends Pipeline {
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				FieldName name = FieldNameUtil.create(Estimator.FIELD_PREDICT, label.getName());
+				String name = FieldNameUtil.create(Estimator.FIELD_PREDICT, label.getName());
 
 				OutputField predictField;
 
@@ -297,7 +296,7 @@ public class PMMLPipeline extends Pipeline {
 			} // End if
 
 			if(applyTransformer != null){
-				OutputField nodeIdField = ModelUtil.createEntityIdField(FieldName.create("nodeId"), DataType.INTEGER);
+				OutputField nodeIdField = ModelUtil.createEntityIdField("nodeId", DataType.INTEGER);
 
 				encodeOutput(output, Collections.singletonList(nodeIdField), applyTransformer, encoder);
 			}
@@ -366,7 +365,7 @@ public class PMMLPipeline extends Pipeline {
 			if(activeFields != null){
 
 				for(int i = 0; i < activeFields.size(); i++){
-					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(activeFields.get(i)));
+					VerificationField verificationField = ModelUtil.createVerificationField(activeFields.get(i));
 
 					Domain domain = encoder.getDomain(verificationField.getField());
 
@@ -377,7 +376,7 @@ public class PMMLPipeline extends Pipeline {
 			if(probabilityFields != null){
 
 				for(int i = 0; i < probabilityFields.size(); i++){
-					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(probabilityFields.get(i)))
+					VerificationField verificationField = ModelUtil.createVerificationField(probabilityFields.get(i))
 						.setPrecision(precision)
 						.setZeroThreshold(zeroThreshold);
 
@@ -387,7 +386,7 @@ public class PMMLPipeline extends Pipeline {
 
 			{
 				for(int i = 0; i < targetFields.size(); i++){
-					VerificationField verificationField = ModelUtil.createVerificationField(FieldName.create(targetFields.get(i)));
+					VerificationField verificationField = ModelUtil.createVerificationField(targetFields.get(i));
 
 					DataType dataType = label.getDataType();
 					switch(dataType){
@@ -452,7 +451,7 @@ public class PMMLPipeline extends Pipeline {
 
 		transformer.encode(features, outputEncoder);
 
-		Map<FieldName, DerivedField> derivedFields = outputEncoder.getDerivedFields();
+		Map<String, DerivedField> derivedFields = outputEncoder.getDerivedFields();
 
 		for(DerivedField derivedField : derivedFields.values()){
 			OutputField outputField;
@@ -617,7 +616,7 @@ public class PMMLPipeline extends Pipeline {
 		List<Feature> result = new ArrayList<>();
 
 		for(String activeField : activeFields){
-			DataField dataField = encoder.createDataField(FieldName.create(activeField), opType, dataType);
+			DataField dataField = encoder.createDataField(activeField, opType, dataType);
 
 			result.add(new WildcardFeature(encoder, dataField));
 		}

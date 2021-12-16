@@ -24,7 +24,6 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.DataFrameScope;
@@ -46,7 +45,7 @@ public class ExpressionTransformer extends Transformer {
 		Object dtype = getDType();
 		String expr = getExpr();
 
-		Scope scope = new DataFrameScope(FieldName.create("X"), features);
+		Scope scope = new DataFrameScope("X", features);
 
 		Expression expression = ExpressionTranslator.translate(expr, scope);
 
@@ -71,7 +70,7 @@ public class ExpressionTransformer extends Transformer {
 		return Collections.singletonList(TransformerUtil.createFeature(derivedField, encoder));
 	}
 
-	protected DerivedField encodeDerivedField(FieldName name, OpType opType, DataType dataType, Expression expression, SkLearnEncoder encoder){
+	protected DerivedField encodeDerivedField(String name, OpType opType, DataType dataType, Expression expression, SkLearnEncoder encoder){
 		return encoder.createDerivedField(name, opType, dataType, expression);
 	}
 

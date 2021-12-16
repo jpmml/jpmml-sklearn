@@ -24,7 +24,6 @@ import java.util.List;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BinaryFeature;
@@ -93,7 +92,7 @@ public class LabelBinarizer extends Transformer {
 					PMMLUtil.createConstant(negLabel)
 				);
 
-				FieldName name = (classes.size() > 1 ? createFieldName("labelBinarizer", feature, value) : createFieldName("label_binarizer", feature));
+				String name = (classes.size() > 1 ? createFieldName("labelBinarizer", feature, value) : createFieldName("label_binarizer", feature));
 
 				DerivedField derivedField = encoder.createDerivedField(name, apply);
 

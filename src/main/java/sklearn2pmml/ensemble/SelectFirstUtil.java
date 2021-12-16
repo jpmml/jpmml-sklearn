@@ -20,7 +20,6 @@ package sklearn2pmml.ensemble;
 
 import java.util.List;
 
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
@@ -64,7 +63,7 @@ public class SelectFirstUtil {
 
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.SELECT_FIRST, null);
 
-		Scope scope = new DataFrameScope(FieldName.create("X"), features);
+		Scope scope = new DataFrameScope("X", features);
 
 		for(Object[] step : steps){
 			String name = TupleUtil.extractElement(step, 0, String.class);

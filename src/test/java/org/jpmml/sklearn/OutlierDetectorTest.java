@@ -18,7 +18,6 @@
  */
 package org.jpmml.sklearn;
 
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
@@ -36,5 +35,5 @@ public class OutlierDetectorTest extends SkLearnTest implements Algorithms, Data
 		evaluate(ONE_CLASS_SVM, HOUSING, excludeFields(OutlierDetectorTest.predictedValue));
 	}
 
-	private static final FieldName predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "outlier");
+	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "outlier");
 }

@@ -25,7 +25,6 @@ import net.razorvine.pickle.objects.ClassDictConstructor;
 import numpy.DType;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
@@ -92,11 +91,11 @@ public class Transformer extends Step {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				FieldName name = wildcardFeature.getName();
+				String name = wildcardFeature.getName();
 
 				DataField dataField = encoder.getDataField(name);
 				if(dataField == null){
-					throw new IllegalArgumentException("Field " + name.getValue() + " is undefined");
+					throw new IllegalArgumentException("Field " + name + " is undefined");
 				}
 
 				dataField = updateDataField(dataField, opType, dataType, encoder);
@@ -111,7 +110,7 @@ public class Transformer extends Step {
 	}
 
 	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
-		FieldName name = dataField.getName();
+		String name = dataField.getName();
 
 		if(encoder.isFrozen(name)){
 			return dataField;

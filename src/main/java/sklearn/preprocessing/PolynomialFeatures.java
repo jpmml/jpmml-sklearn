@@ -26,7 +26,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ConstantFeature;
 import org.jpmml.converter.ContinuousFeature;
@@ -138,16 +137,16 @@ public class PolynomialFeatures extends Transformer {
 				String sep = "";
 
 				for(Feature powerFeature : powerFeatures){
-					FieldName name = FeatureUtil.getName(powerFeature);
+					String name = FeatureUtil.getName(powerFeature);
 
 					sb.append(sep);
 
 					sep = ":";
 
-					sb.append(name.getValue());
+					sb.append(name);
 				}
 
-				result.add(new InteractionFeature(encoder, FieldName.create(sb.toString()), DataType.DOUBLE, powerFeatures));
+				result.add(new InteractionFeature(encoder, sb.toString(), DataType.DOUBLE, powerFeatures));
 			}
 		}
 

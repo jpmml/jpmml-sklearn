@@ -18,13 +18,10 @@
  */
 package sklearn;
 
-import org.dmg.pmml.FieldName;
-import org.jpmml.converter.FieldNameUtil;
-
 public interface HasApplyField {
 
 	default
-	FieldName getApplyField(){
-		return FieldNameUtil.create(Estimator.FIELD_APPLY);
+	String getApplyField(){
+		return Estimator.FIELD_APPLY;
 	}
 }

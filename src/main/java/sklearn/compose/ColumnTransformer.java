@@ -25,7 +25,6 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CastFunction;
@@ -126,9 +125,9 @@ public class ColumnTransformer extends Initializer {
 					if(features.size() > 0){
 
 						for(Feature feature : features){
-							FieldName name = feature.getName();
+							String name = feature.getName();
 
-							if((column).equals(name.getValue())){
+							if((column).equals(name)){
 								return feature;
 							}
 						}
@@ -136,7 +135,7 @@ public class ColumnTransformer extends Initializer {
 						throw new IllegalArgumentException("Column \'" + column + "\' is undefined");
 					}
 
-					return createWildcardFeature(FieldName.create(column));
+					return createWildcardFeature(column);
 				} else
 
 				if(object instanceof Integer){
@@ -148,7 +147,7 @@ public class ColumnTransformer extends Initializer {
 						return feature;
 					}
 
-					return createWildcardFeature(FieldName.create("x" + (index.intValue() + 1)));
+					return createWildcardFeature(("x" + (index.intValue() + 1)));
 				} else
 
 				{
@@ -156,7 +155,7 @@ public class ColumnTransformer extends Initializer {
 				}
 			}
 
-			private Feature createWildcardFeature(FieldName name){
+			private Feature createWildcardFeature(String name){
 				DataField dataField = encoder.getDataField(name);
 				if(dataField == null){
 					dataField = encoder.createDataField(name);

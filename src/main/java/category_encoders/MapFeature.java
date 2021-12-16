@@ -30,7 +30,6 @@ import java.util.function.Supplier;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MapValues;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -58,7 +57,7 @@ public class MapFeature extends ThresholdFeature {
 		this(encoder, field.getName(), field.getDataType(), mapping, missingCategory, defaultValue);
 	}
 
-	public MapFeature(PMMLEncoder encoder, FieldName name, DataType dataType, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
+	public MapFeature(PMMLEncoder encoder, String name, DataType dataType, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
 		super(encoder, name, dataType);
 
 		setMapping(mapping);
@@ -67,13 +66,13 @@ public class MapFeature extends ThresholdFeature {
 	}
 
 	@Override
-	public FieldName getDerivedName(){
+	public String getDerivedName(){
 		return FieldNameUtil.create("map", getName());
 	}
 
 	@Override
 	public ContinuousFeature toContinuousFeature(){
-		FieldName name = getName();
+		String name = getName();
 		Map<?, ? extends Number> mapping = getMapping();
 		Object missingCategory = getMissingCategory();
 		Number defaultValue = getDefaultValue();

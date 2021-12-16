@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
@@ -73,7 +72,7 @@ public class GBDTLRClassifier extends Classifier {
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		MiningModel miningModel = GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), segmentSchema)
-			.setOutput(ModelUtil.createPredictedOutput(FieldName.create(Estimator.FIELD_DECISION_FUNCTION), OpType.CONTINUOUS, DataType.DOUBLE));
+			.setOutput(ModelUtil.createPredictedOutput(Estimator.FIELD_DECISION_FUNCTION, OpType.CONTINUOUS, DataType.DOUBLE));
 
 		return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, lr.hasProbabilityDistribution(), schema);
 	}

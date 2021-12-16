@@ -25,7 +25,6 @@ import java.util.List;
 import numpy.core.NDArray;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
@@ -45,7 +44,7 @@ public class LabelBinarizerTest {
 	public void encode(){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = encoder.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.STRING);
+		DataField dataField = encoder.createDataField("x", OpType.CATEGORICAL, DataType.STRING);
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 

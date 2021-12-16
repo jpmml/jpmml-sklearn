@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
@@ -50,16 +49,14 @@ public class DictVectorizer extends Initializer {
 		Feature[] featureArray = new Feature[featureNames.size()];
 
 		for(String featureName : featureNames){
-			String key = featureName;
+			String name = featureName;
 			String value = null;
 
 			int index = featureName.indexOf(separator);
 			if(index > -1){
-				key = featureName.substring(0, index);
+				name = featureName.substring(0, index);
 				value = featureName.substring(index + separator.length());
 			}
-
-			FieldName name = FieldName.create(key);
 
 			DataField dataField = encoder.getDataField(name);
 			if(dataField == null){

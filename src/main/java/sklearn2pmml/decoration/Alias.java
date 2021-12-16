@@ -21,7 +21,6 @@ package sklearn2pmml.decoration;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
@@ -57,7 +56,7 @@ public class Alias extends Transformer {
 
 		ClassDictUtil.checkSize(1, result);
 
-		encoder.renameFeature(result.get(0), FieldName.create(name));
+		encoder.renameFeature(result.get(0), name);
 
 		return result;
 	}

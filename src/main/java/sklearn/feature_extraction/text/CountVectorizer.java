@@ -40,7 +40,6 @@ import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
@@ -166,9 +165,9 @@ public class CountVectorizer extends Transformer {
 				.setWordRE(tokenPattern);
 		}
 
-		ParameterField documentField = new ParameterField(FieldName.create("document"));
+		ParameterField documentField = new ParameterField("document");
 
-		ParameterField termField = new ParameterField(FieldName.create("term"));
+		ParameterField termField = new ParameterField("term");
 
 		TextIndex textIndex = new TextIndex(documentField.getName(), new FieldRef(termField.getName()))
 			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null);
@@ -194,9 +193,9 @@ public class CountVectorizer extends Transformer {
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
 		}
 
-		FieldName name = createFieldName(functionName(), feature);
+		String name = createFieldName(functionName(), feature);
 
-		DefineFunction defineFunction = new DefineFunction(name.getValue(), OpType.CONTINUOUS, DataType.INTEGER, null, textIndex)
+		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.INTEGER, null, textIndex)
 			.addParameterFields(documentField, termField);
 
 		return defineFunction;

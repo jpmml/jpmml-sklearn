@@ -22,7 +22,6 @@ import java.util.Arrays;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
@@ -34,7 +33,7 @@ import org.jpmml.converter.transformations.AbstractTransformation;
 public class SkLearnOutlierTransformation extends AbstractTransformation {
 
 	@Override
-	public FieldName getName(FieldName name){
+	public String getName(String name){
 		return FieldNameUtil.create(Estimator.FIELD_PREDICT, name);
 	}
 

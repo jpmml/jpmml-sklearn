@@ -18,9 +18,7 @@
  */
 package sklearn;
 
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
-import org.jpmml.converter.FieldNameUtil;
 
 abstract
 public class Clusterer extends Estimator implements HasPredictField {
@@ -35,8 +33,8 @@ public class Clusterer extends Estimator implements HasPredictField {
 	}
 
 	@Override
-	public FieldName getPredictField(){
-		return FieldNameUtil.create(Clusterer.FIELD_CLUSTER);
+	public String getPredictField(){
+		return Clusterer.FIELD_CLUSTER;
 	}
 
 	public static final String FIELD_CLUSTER = "cluster";

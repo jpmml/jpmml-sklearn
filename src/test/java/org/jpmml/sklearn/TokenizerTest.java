@@ -27,7 +27,6 @@ import java.util.Map;
 import com.google.common.base.Equivalence;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.PMMLUtil;
@@ -74,8 +73,8 @@ public class TokenizerTest extends SkLearnTest implements Datasets {
 			}
 		};
 
-		List<? extends Map<FieldName, ?>> input = batch.getInput();
-		List<? extends Map<FieldName, ?>> output = batch.getOutput();
+		List<? extends Map<String, ?>> input = batch.getInput();
+		List<? extends Map<String, ?>> output = batch.getOutput();
 
 		if(input.size() != output.size()){
 			throw new IllegalArgumentException();
@@ -95,12 +94,12 @@ public class TokenizerTest extends SkLearnTest implements Datasets {
 			String outputSentence = getSentence(output.get(i));
 
 			List<String> actualTokens = tokenize(textIndex, inputSentence.toLowerCase());
-			Map<FieldName, List<String>> actualResults = Collections.singletonMap(FieldName.create("Sentence"), actualTokens);
+			Map<String, List<String>> actualResults = Collections.singletonMap("Sentence", actualTokens);
 
 			List<String> expectedTokens = Arrays.asList(outputSentence.split("\t"));
-			Map<FieldName, List<String>> expectedResults = Collections.singletonMap(FieldName.create("Sentence"), expectedTokens);
+			Map<String, List<String>> expectedResults = Collections.singletonMap("Sentence", expectedTokens);
 
-			MapDifference<FieldName, ?> difference = Maps.<FieldName, Object>difference(expectedResults, actualResults, equivalence);
+			MapDifference<String, ?> difference = Maps.<String, Object>difference(expectedResults, actualResults, equivalence);
 			if(!difference.areEqual()){
 				Conflict conflict = new Conflict(i, Collections.emptyMap(), difference);
 
@@ -116,8 +115,8 @@ public class TokenizerTest extends SkLearnTest implements Datasets {
 	}
 
 	static
-	private String getSentence(Map<FieldName, ?> map){
-		return (String)map.get(FieldName.create("Sentence"));
+	private String getSentence(Map<String, ?> map){
+		return (String)map.get("Sentence");
 	}
 
 	static

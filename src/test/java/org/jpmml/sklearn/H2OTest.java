@@ -18,7 +18,6 @@
  */
 package org.jpmml.sklearn;
 
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 import org.junit.Test;
 
@@ -26,7 +25,7 @@ public class H2OTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {
-		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
+		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
 		evaluate("H2O" + GRADIENT_BOOSTING, AUDIT, excludeFields(targetFields));
 	}
@@ -38,7 +37,7 @@ public class H2OTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateLogisticRegressionAudit() throws Exception {
-		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
+		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
 		evaluate("H2O" + LOGISTIC_REGRESSION, AUDIT, excludeFields(targetFields));
 	}
@@ -50,7 +49,7 @@ public class H2OTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateRandomForestAudit() throws Exception {
-		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
+		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
 		evaluate("H2O" + RANDOM_FOREST, AUDIT, excludeFields(targetFields));
 	}
@@ -61,7 +60,7 @@ public class H2OTest extends SkLearnTest implements Algorithms, Datasets {
 	}
 
 	static
-	private FieldName[] createTargetFields(FieldName name){
-		return new FieldName[]{name, FieldNameUtil.create("h2o", name)};
+	private String[] createTargetFields(String name){
+		return new String[]{name, FieldNameUtil.create("h2o", name)};
 	}
 }

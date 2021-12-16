@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
@@ -90,7 +89,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 		encoder.addTransformer(model);
 
-		FieldName name = createFieldName("stack", features);
+		String name = createFieldName("stack", features);
 
 		List<Feature> result = new ArrayList<>();
 

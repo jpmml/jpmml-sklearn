@@ -25,7 +25,6 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CastFunction;
@@ -58,7 +57,7 @@ public class DataFrameMapper extends Initializer {
 
 			List<String> columns = getColumnList(row);
 			for(String column : columns){
-				FieldName name = FieldName.create(column);
+				String name = column;
 
 				DataField dataField = encoder.getDataField(name);
 				if(dataField == null){
@@ -82,7 +81,7 @@ public class DataFrameMapper extends Initializer {
 					for(int i = 0; i < rowFeatures.size(); i++){
 						Feature rowFeature = rowFeatures.get(i);
 
-						encoder.renameFeature(rowFeature, rowFeatures.size() > 1 ? FieldName.create(alias + "_" + i) : FieldName.create(alias));
+						encoder.renameFeature(rowFeature, rowFeatures.size() > 1 ? (alias + "_" + i) : alias);
 					}
 				}
 			}

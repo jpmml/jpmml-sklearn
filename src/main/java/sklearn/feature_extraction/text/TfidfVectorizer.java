@@ -25,7 +25,6 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
@@ -100,7 +99,7 @@ public class TfidfVectorizer extends CountVectorizer {
 		} // End if
 
 		if(useIdf){
-			ParameterField weightField = new ParameterField(FieldName.create("weight"));
+			ParameterField weightField = new ParameterField("weight");
 
 			defineFunction.addParameterFields(weightField);
 
@@ -151,7 +150,7 @@ public class TfidfVectorizer extends CountVectorizer {
 		DefineFunction defineFunction = encoder.getDefineFunction("sublinearize");
 
 		if(defineFunction == null){
-			ParameterField valueField = new ParameterField(FieldName.create("x"));
+			ParameterField valueField = new ParameterField("x");
 
 			Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
 				PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(valueField.getName()), PMMLUtil.createConstant(0)),

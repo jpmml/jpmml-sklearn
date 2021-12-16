@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.Batch;
@@ -46,7 +45,7 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 			}
 
 			@Override
-			public List<Map<FieldName, String>> getInput() throws IOException {
+			public List<Map<String, String>> getInput() throws IOException {
 				String dataset = super.getDataset();
 
 				if(dataset.endsWith("Cat")){
@@ -86,7 +85,7 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 
 	@Test
 	public void evaluateDecisionTreeAuditNA() throws Exception {
-		FieldName[] transformFields = {FieldNameUtil.create("eval", "nodeId")};
+		String[] transformFields = {FieldNameUtil.create("eval", "nodeId")};
 
 		evaluate(DECISION_TREE, AUDIT_NA, excludeFields(transformFields));
 	}
@@ -173,7 +172,7 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 
 	@Test
 	public void evaluateLogisticRegressionAuditNA() throws Exception {
-		FieldName[] transformFields = {FieldNameUtil.create("eval", AUDIT_PROBABILITY_TRUE)};
+		String[] transformFields = {FieldNameUtil.create("eval", AUDIT_PROBABILITY_TRUE)};
 
 		evaluate(LOGISTIC_REGRESSION, AUDIT_NA, excludeFields(transformFields));
 	}
@@ -235,7 +234,7 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
-		FieldName[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create(Estimator.FIELD_PREDICT, AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
+		String[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create(Estimator.FIELD_PREDICT, AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
 
 		evaluate(XGB, AUDIT_NA, excludeFields(transformFields), new FloatEquivalence(8));
 	}
@@ -461,8 +460,8 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 	}
 
 	static
-	private FieldName[] createNeighborFields(int count){
-		FieldName[] result = new FieldName[count];
+	private String[] createNeighborFields(int count){
+		String[] result = new String[count];
 
 		for(int i = 0; i < count; i++){
 			result[i] = FieldNameUtil.create("neighbor", String.valueOf(i + 1));

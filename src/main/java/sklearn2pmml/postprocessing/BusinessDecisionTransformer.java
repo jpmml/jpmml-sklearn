@@ -25,7 +25,6 @@ import org.dmg.pmml.Decision;
 import org.dmg.pmml.Decisions;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
@@ -41,7 +40,7 @@ public class BusinessDecisionTransformer extends ExpressionTransformer {
 	}
 
 	@Override
-	protected DerivedField encodeDerivedField(FieldName name, OpType opType, DataType dataType, Expression expression, SkLearnEncoder encoder){
+	protected DerivedField encodeDerivedField(String name, OpType opType, DataType dataType, Expression expression, SkLearnEncoder encoder){
 		String businessProblem = getBusinessProblem();
 		List<Object[]> decisions = getDecisions();
 

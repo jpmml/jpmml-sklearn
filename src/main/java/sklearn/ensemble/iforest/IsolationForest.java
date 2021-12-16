@@ -25,7 +25,6 @@ import java.util.List;
 import com.google.common.primitives.Ints;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
@@ -148,8 +147,8 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		Transformation normalizedAnomalyScore = new AbstractTransformation(){
 
 			@Override
-			public FieldName getName(FieldName name){
-				return FieldName.create("normalizedAnomalyScore");
+			public String getName(String name){
+				return "normalizedAnomalyScore";
 			}
 
 			@Override
@@ -166,7 +165,7 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		Transformation decisionFunction = new AbstractTransformation(){
 
 			@Override
-			public FieldName getName(FieldName name){
+			public String getName(String name){
 				return getDecisionFunctionField();
 			}
 
@@ -186,7 +185,7 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 		Transformation outlier = new OutlierTransformation(){
 
 			@Override
-			public FieldName getName(FieldName name){
+			public String getName(String name){
 				return createFieldName("outlier");
 			}
 
@@ -222,7 +221,7 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 
 		Transformation sklearnOutlier = new SkLearnOutlierTransformation();
 
-		Output output = ModelUtil.createPredictedOutput(FieldName.create("rawAnomalyScore"), OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier, sklearnOutlier);
+		Output output = ModelUtil.createPredictedOutput("rawAnomalyScore", OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier, sklearnOutlier);
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, treeModels))

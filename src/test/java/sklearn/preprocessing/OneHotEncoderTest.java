@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
@@ -41,7 +40,7 @@ public class OneHotEncoderTest {
 	public void encode(){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = encoder.createDataField(FieldName.create("x"), OpType.CATEGORICAL, DataType.INTEGER);
+		DataField dataField = encoder.createDataField("x", OpType.CATEGORICAL, DataType.INTEGER);
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 

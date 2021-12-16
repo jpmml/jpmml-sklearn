@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.HasExtensions;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -328,7 +327,7 @@ public class TreeUtil {
 			if(feature instanceof ThresholdFeature && !numeric){
 				ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
-				FieldName name = thresholdFeature.getName();
+				String name = thresholdFeature.getName();
 
 				Object missingValue = thresholdFeature.getMissingValue();
 
@@ -487,11 +486,11 @@ public class TreeUtil {
 		};
 		nodeIdCollector.applyTo(treeModel);
 
-		OutputField nodeIdField = ModelUtil.createEntityIdField(FieldNameUtil.create("nodeId"), DataType.INTEGER, values);
+		OutputField nodeIdField = ModelUtil.createEntityIdField("nodeId", DataType.INTEGER, values);
 
 		if(segmentId != null){
 			nodeIdField
-				.setName(FieldNameUtil.create((nodeIdField.getName()).getValue(), segmentId))
+				.setName(FieldNameUtil.create(nodeIdField.getName(), segmentId))
 				.setSegmentId(segmentId);
 		}
 

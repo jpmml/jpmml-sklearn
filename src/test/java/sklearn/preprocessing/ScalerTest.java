@@ -24,7 +24,6 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -40,7 +39,7 @@ class ScalerTest {
 	void assertSameFeature(Transformer transformer){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = encoder.createDataField(FieldName.create("x"));
+		DataField dataField = encoder.createDataField("x");
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList(inputFeature), encoder));
@@ -51,7 +50,7 @@ class ScalerTest {
 	void assertTransformedFeature(Transformer transformer, String function){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		DataField dataField = encoder.createDataField(FieldName.create("x"));
+		DataField dataField = encoder.createDataField("x");
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 		Feature outputFeature = Iterables.getOnlyElement(transformer.encodeFeatures(Collections.singletonList(inputFeature), encoder));

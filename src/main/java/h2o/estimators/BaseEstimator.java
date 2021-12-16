@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import hex.genmodel.MojoModel;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Feature;
@@ -116,18 +115,18 @@ public class BaseEstimator extends Estimator implements HasClasses {
 		List<Feature> sortedFeatures = new ArrayList<>();
 
 		for(Feature h2oFeature : h2oFeatures){
-			FieldName name = h2oFeature.getName();
+			String name = h2oFeature.getName();
 
 			Feature feature;
 
 			if(features instanceof FeatureList){
 				FeatureList namedFeatures = (FeatureList)features;
 
-				feature = namedFeatures.getFeature(name.getValue());
+				feature = namedFeatures.getFeature(name);
 			} else
 
 			{
-				int index = Integer.parseInt((name.getValue()).substring(1)) - 1;
+				int index = Integer.parseInt(name.substring(1)) - 1;
 
 				feature = features.get(index);
 			}

@@ -18,7 +18,6 @@
  */
 package org.jpmml.sklearn;
 
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 
 interface Datasets {
@@ -37,14 +36,14 @@ interface Datasets {
 	String VISIT = "Visit";
 	String WHEAT = "Wheat";
 
-	FieldName AUDIT_ADJUSTED = FieldName.create("Adjusted");
-	FieldName AUDIT_PROBABILITY_TRUE = FieldNameUtil.create("probability", 1);
-	FieldName AUDIT_PROBABILITY_FALSE = FieldNameUtil.create("probability", 0);
+	String AUDIT_ADJUSTED = "Adjusted";
+	String AUDIT_PROBABILITY_TRUE = FieldNameUtil.create("probability", 1);
+	String AUDIT_PROBABILITY_FALSE = FieldNameUtil.create("probability", 0);
 
-	FieldName AUTO_MPG = FieldName.create("mpg");
+	String AUTO_MPG = "mpg";
 
-	FieldName IRIS_SPECIES = FieldName.create("Species");
-	FieldName IRIS_PROBABILITY_SETOSA = FieldNameUtil.create("probability", "setosa");
-	FieldName IRIS_PROBABILITY_VERSICOLOR = FieldNameUtil.create("probability", "versicolor");
-	FieldName IRIS_PROBABILITY_VIRGINICA = FieldNameUtil.create("probability", "virginica");
+	String IRIS_SPECIES = "Species";
+	String IRIS_PROBABILITY_SETOSA = FieldNameUtil.create("probability", "setosa");
+	String IRIS_PROBABILITY_VERSICOLOR = FieldNameUtil.create("probability", "versicolor");
+	String IRIS_PROBABILITY_VIRGINICA = FieldNameUtil.create("probability", "virginica");
 }

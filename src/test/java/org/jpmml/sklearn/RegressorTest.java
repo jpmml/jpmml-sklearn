@@ -18,7 +18,6 @@
  */
 package org.jpmml.sklearn;
 
-import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
@@ -49,7 +48,7 @@ public class RegressorTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateDecisionTreeAutoNA() throws Exception {
-		FieldName[] transformFields = {FieldNameUtil.create("eval", "nodeId")};
+		String[] transformFields = {FieldNameUtil.create("eval", "nodeId")};
 
 		evaluate(DECISION_TREE, AUTO_NA, excludeFields(transformFields));
 	}
@@ -141,7 +140,7 @@ public class RegressorTest extends SkLearnTest implements Algorithms, Datasets {
 
 	@Test
 	public void evaluateLinearRegressionAutoNA() throws Exception {
-		FieldName[] transformFields = {FieldNameUtil.create(Estimator.FIELD_PREDICT, AUTO_MPG), FieldNameUtil.create("cut", FieldNameUtil.create(Estimator.FIELD_PREDICT, AUTO_MPG))};
+		String[] transformFields = {FieldNameUtil.create(Estimator.FIELD_PREDICT, AUTO_MPG), FieldNameUtil.create("cut", FieldNameUtil.create(Estimator.FIELD_PREDICT, AUTO_MPG))};
 
 		evaluate(LINEAR_REGRESSION, AUTO_NA, excludeFields(transformFields));
 	}

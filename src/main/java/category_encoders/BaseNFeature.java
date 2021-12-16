@@ -33,7 +33,6 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.PMMLFunctions;
@@ -67,7 +66,7 @@ public class BaseNFeature extends ThresholdFeature {
 		this(encoder, feature.getName(), feature.getDataType(), base, index, values, missingCategory, defaultValue);
 	}
 
-	public BaseNFeature(PMMLEncoder encoder, FieldName name, DataType dataType, int base, int index, SetMultimap<Integer, ?> values, Object missingCategory, Integer defaultValue){
+	public BaseNFeature(PMMLEncoder encoder, String name, DataType dataType, int base, int index, SetMultimap<Integer, ?> values, Object missingCategory, Integer defaultValue){
 		super(encoder, name, dataType);
 
 		setBase(base);
@@ -79,13 +78,13 @@ public class BaseNFeature extends ThresholdFeature {
 	}
 
 	@Override
-	public FieldName getDerivedName(){
+	public String getDerivedName(){
 		return FieldNameUtil.create("base" + getBase(), getName(), getIndex());
 	}
 
 	@Override
 	public ContinuousFeature toContinuousFeature(){
-		FieldName name = getName();
+		String name = getName();
 		DataType dataType = getDataType();
 		int base = getBase();
 		SetMultimap<Integer, ?> values = getValues();

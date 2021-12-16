@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
@@ -110,9 +109,9 @@ public class LogisticRegression extends LinearClassifier {
 			Schema segmentSchema = schema.toRelabeledSchema(null);
 
 			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), null, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldName.create(Estimator.FIELD_DECISION_FUNCTION), OpType.CONTINUOUS, DataType.DOUBLE));
+				.setOutput(ModelUtil.createPredictedOutput(Estimator.FIELD_DECISION_FUNCTION, OpType.CONTINUOUS, DataType.DOUBLE));
 
-			Feature feature = new ContinuousFeature(encoder, FieldName.create(Estimator.FIELD_DECISION_FUNCTION), DataType.DOUBLE);
+			Feature feature = new ContinuousFeature(encoder, Estimator.FIELD_DECISION_FUNCTION, DataType.DOUBLE);
 
 			RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(feature), Collections.singletonList(-1d), 0d)
 				.setTargetCategory(categoricalLabel.getValue(0));

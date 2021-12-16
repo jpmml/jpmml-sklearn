@@ -21,7 +21,6 @@ package sklearn.ensemble.forest;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
@@ -52,7 +51,7 @@ public class ForestClassifier extends Classifier implements HasEstimatorEnsemble
 	}
 
 	@Override
-	public FieldName getApplyField(int index){
+	public String getApplyField(int index){
 		return FieldNameUtil.create("nodeId", index + 1);
 	}
 

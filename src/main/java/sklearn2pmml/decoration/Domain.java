@@ -33,7 +33,6 @@ import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.Counts;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.FieldName;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.dmg.pmml.OpType;
@@ -119,10 +118,10 @@ public class Domain extends Transformer {
 
 	@Override
 	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
-		FieldName name = dataField.getName();
+		String name = dataField.getName();
 
 		if(encoder.isFrozen(name)){
-			throw new IllegalArgumentException("Field " + name.getValue() + " is frozen for type information updates");
+			throw new IllegalArgumentException("Field " + name + " is frozen for type information updates");
 		}
 
 		dataField
