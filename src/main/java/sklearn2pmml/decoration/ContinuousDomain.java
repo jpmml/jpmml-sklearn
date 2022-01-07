@@ -144,7 +144,7 @@ public class ContinuousDomain extends Domain {
 				Map<String, ?> numericInfo = extractMap(getNumericInfo(), i);
 
 				UnivariateStats univariateStats = new UnivariateStats()
-					.setField(dataField.getName())
+					.setField(dataField)
 					.setCounts(createCounts(counts))
 					.setNumericInfo(createNumericInfo(wildcardFeature.getDataType(), numericInfo));
 

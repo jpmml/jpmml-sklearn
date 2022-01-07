@@ -72,7 +72,7 @@ public class LookupTransformer extends Transformer {
 
 		Map<String, List<Object>> data = parseMapping(inputColumns, outputColumn, mapping);
 
-		MapValues mapValues = new MapValues(outputColumn, null, PMMLUtil.createInlineTable(data));
+		MapValues mapValues = new MapValues(outputColumn, PMMLUtil.createInlineTable(data));
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);

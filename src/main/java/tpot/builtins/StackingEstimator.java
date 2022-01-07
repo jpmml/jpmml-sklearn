@@ -71,12 +71,12 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-					label = new CategoricalLabel(null, dataType, categories);
+					label = new CategoricalLabel(dataType, categories);
 				}
 				break;
 			case REGRESSION:
 				{
-					label = new ContinuousLabel(null, DataType.DOUBLE);
+					label = new ContinuousLabel(DataType.DOUBLE);
 				}
 				break;
 			default:

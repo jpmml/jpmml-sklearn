@@ -369,11 +369,11 @@ public class TreeUtil {
 
 			Node result;
 
-			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
+			if(miningFunction == MiningFunction.CLASSIFICATION){
 				result = new ClassifierNode(null, predicate);
 			} else
 
-			if((MiningFunction.REGRESSION).equals(miningFunction)){
+			if(miningFunction == MiningFunction.REGRESSION){
 				double value = values[index];
 
 				result = new BranchNode(value, predicate);
@@ -394,7 +394,7 @@ public class TreeUtil {
 		{
 			Node result;
 
-			if((MiningFunction.CLASSIFICATION).equals(miningFunction)){
+			if(miningFunction == MiningFunction.CLASSIFICATION){
 				CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 				double[] recordCounts = getRow(values, leftChildren.length, categoricalLabel.size(), index);
@@ -424,7 +424,7 @@ public class TreeUtil {
 				scoreDistributionManager.addScoreDistributions(result, categoricalLabel.getValues(), recordCounts);
 			} else
 
-			if((MiningFunction.REGRESSION).equals(miningFunction)){
+			if(miningFunction == MiningFunction.REGRESSION){
 				double value = values[index];
 
 				result = new LeafNode(value, predicate)
@@ -446,11 +446,11 @@ public class TreeUtil {
 		if(model instanceof MiningModel){
 			MiningModel miningModel = (MiningModel)model;
 
-			Segmentation segmentation = miningModel.getSegmentation();
+			Segmentation segmentation = miningModel.requireSegmentation();
 
 			List<Segment> segments = segmentation.getSegments();
 			for(Segment segment : segments){
-				TreeModel treeModel = (TreeModel)segment.getModel();
+				TreeModel treeModel = (TreeModel)segment.requireModel();
 
 				String segmentId = segment.getId();
 				if(segmentId == null){
@@ -490,7 +490,7 @@ public class TreeUtil {
 
 		if(segmentId != null){
 			nodeIdField
-				.setName(FieldNameUtil.create(nodeIdField.getName(), segmentId))
+				.setName(FieldNameUtil.create(nodeIdField.requireName(), segmentId))
 				.setSegmentId(segmentId);
 		}
 

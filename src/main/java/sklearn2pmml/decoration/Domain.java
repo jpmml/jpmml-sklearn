@@ -90,7 +90,7 @@ public class Domain extends Transformer {
 
 			DataField dataField = wildcardFeature.getField();
 
-			DataType dataType = dataField.getDataType();
+			DataType dataType = dataField.requireDataType();
 
 			if(missingValueTreatment != null){
 				Object pmmlMissingValueReplacement = (missingValueReplacement != null ? standardizeValue(dataType, missingValueReplacement) : null);
@@ -118,7 +118,7 @@ public class Domain extends Transformer {
 
 	@Override
 	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
-		String name = dataField.getName();
+		String name = dataField.requireName();
 
 		if(encoder.isFrozen(name)){
 			throw new IllegalArgumentException("Field " + name + " is frozen for type information updates");

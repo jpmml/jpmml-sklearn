@@ -104,7 +104,7 @@ public class CountVectorizer extends Transformer {
 		if(lowercase){
 			Apply apply = PMMLUtil.createApply(PMMLFunctions.LOWERCASE, feature.ref());
 
-			DerivedField derivedField = encoder.ensureDerivedField(FieldNameUtil.create("lowercase", feature), OpType.CATEGORICAL, DataType.STRING, () -> apply);
+			DerivedField derivedField = encoder.ensureDerivedField(FieldNameUtil.create(PMMLFunctions.LOWERCASE, feature), OpType.CATEGORICAL, DataType.STRING, () -> apply);
 
 			feature = new StringFeature(encoder, derivedField);
 		}
@@ -118,7 +118,7 @@ public class CountVectorizer extends Transformer {
 		for(int i = 0, max = indexTermMap.size(); i < max; i++){
 			String term = indexTermMap.get(i);
 
-			Apply apply = encodeApply(defineFunction.getName(), feature, i, term);
+			Apply apply = encodeApply(defineFunction, feature, i, term);
 
 			Feature termFeature = new ObjectFeature(encoder, FieldNameUtil.create(functionName(), feature, term), dataType){
 
@@ -169,7 +169,7 @@ public class CountVectorizer extends Transformer {
 
 		ParameterField termField = new ParameterField("term");
 
-		TextIndex textIndex = new TextIndex(documentField.getName(), new FieldRef(termField.getName()))
+		TextIndex textIndex = new TextIndex(documentField, new FieldRef(termField))
 			.setLocalTermWeights(binary ? TextIndex.LocalTermWeights.BINARY : null);
 
 		textIndex = tokenizer.configure(textIndex);
@@ -187,7 +187,7 @@ public class CountVectorizer extends Transformer {
 			data.put("stem", Collections.singletonList(" "));
 			data.put("regex", Collections.singletonList("true"));
 
-			TextIndexNormalization textIndexNormalization = new TextIndexNormalization(null, PMMLUtil.createInlineTable(data))
+			TextIndexNormalization textIndexNormalization = new TextIndexNormalization(PMMLUtil.createInlineTable(data))
 				.setRecursive(Boolean.TRUE); // Handles consecutive matches. See http://stackoverflow.com/a/25085385
 
 			textIndex.addTextIndexNormalizations(textIndexNormalization);
@@ -201,10 +201,10 @@ public class CountVectorizer extends Transformer {
 		return defineFunction;
 	}
 
-	public Apply encodeApply(String function, Feature feature, int index, String term){
+	public Apply encodeApply(DefineFunction defineFunction, Feature feature, int index, String term){
 		Constant constant = PMMLUtil.createConstant(term, DataType.STRING);
 
-		return PMMLUtil.createApply(function, feature.ref(), constant);
+		return PMMLUtil.createApply(defineFunction, feature.ref(), constant);
 	}
 
 	public String functionName(){

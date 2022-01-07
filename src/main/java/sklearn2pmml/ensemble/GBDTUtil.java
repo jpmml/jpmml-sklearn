@@ -173,7 +173,7 @@ public class GBDTUtil {
 		} else
 
 		{
-			continuousLabel = new ContinuousLabel(null, DataType.DOUBLE);
+			continuousLabel = new ContinuousLabel(DataType.DOUBLE);
 		}
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))

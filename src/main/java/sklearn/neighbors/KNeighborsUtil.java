@@ -25,15 +25,10 @@ import java.util.Map;
 import org.dmg.pmml.CityBlock;
 import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.Euclidean;
 import org.dmg.pmml.Measure;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Minkowski;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
-import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.nearest_neighbor.InstanceField;
 import org.dmg.pmml.nearest_neighbor.InstanceFields;
 import org.dmg.pmml.nearest_neighbor.KNNInput;
@@ -43,11 +38,11 @@ import org.dmg.pmml.nearest_neighbor.TrainingInstances;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.nearest_neighbor.NearestNeighborModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 
@@ -105,27 +100,15 @@ public class KNeighborsUtil {
 			data.put(instanceField.getColumn(), CMatrixUtil.getColumn(fitX, numberOfInstances, numberOfFeatures, i));
 		}
 
-		TrainingInstances trainingInstances = new TrainingInstances(instanceFields, null, PMMLUtil.createInlineTable(data))
+		TrainingInstances trainingInstances = new TrainingInstances(instanceFields, PMMLUtil.createInlineTable(data))
 			.setTransformed(true);
 
 		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator.getMetric(), estimator.getP());
 
 		int numberOfNeighbors = estimator.getNumberOfNeighbors();
 
-		Output output = new Output();
-
-		for(int i = 0; i < numberOfNeighbors; i++){
-			int rank = (i + 1);
-
-			OutputField outputField = new OutputField(FieldNameUtil.create("neighbor", rank), OpType.CATEGORICAL, DataType.STRING)
-				.setResultFeature(ResultFeature.ENTITY_ID)
-				.setRank(rank);
-
-			output.addOutputFields(outputField);
-		}
-
 		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunction.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs)
-			.setOutput(output);
+			.setOutput(NearestNeighborModelUtil.createOutput(numberOfNeighbors));
 
 		return nearestNeighborModel;
 	}

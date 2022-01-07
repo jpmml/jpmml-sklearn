@@ -90,12 +90,12 @@ public class TfidfVectorizer extends CountVectorizer {
 			return defineFunction;
 		}
 
-		Expression expression = defineFunction.getExpression();
+		Expression expression = defineFunction.requireExpression();
 
 		if(sublinearTf){
 			DefineFunction sublinearDefineFunction = ensureSublinearDefineFunction(encoder);
 
-			expression = PMMLUtil.createApply(sublinearDefineFunction.getName(), expression);
+			expression = PMMLUtil.createApply(sublinearDefineFunction, expression);
 		} // End if
 
 		if(useIdf){
@@ -103,7 +103,7 @@ public class TfidfVectorizer extends CountVectorizer {
 
 			defineFunction.addParameterFields(weightField);
 
-			expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weightField.getName()));
+			expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weightField));
 		}
 
 		defineFunction
@@ -114,10 +114,10 @@ public class TfidfVectorizer extends CountVectorizer {
 	}
 
 	@Override
-	public Apply encodeApply(String function, Feature feature, int index, String term){
+	public Apply encodeApply(DefineFunction defineFunction, Feature feature, int index, String term){
 		TfidfTransformer transformer = getTransformer();
 
-		Apply apply = super.encodeApply(function, feature, index, term);
+		Apply apply = super.encodeApply(defineFunction, feature, index, term);
 
 		Boolean useIdf = transformer.getUseIdf();
 		if(useIdf){
@@ -153,8 +153,8 @@ public class TfidfVectorizer extends CountVectorizer {
 			ParameterField valueField = new ParameterField("x");
 
 			Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-				PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(valueField.getName()), PMMLUtil.createConstant(0)),
-				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(valueField.getName())), PMMLUtil.createConstant(1)),
+				PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(valueField), PMMLUtil.createConstant(0)),
+				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(valueField)), PMMLUtil.createConstant(1)),
 				PMMLUtil.createConstant(0)
 			);
 

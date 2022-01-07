@@ -48,7 +48,7 @@ public class CastTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			if(!(dataType).equals(feature.getDataType())){
+			if(feature.getDataType() != dataType){
 				FieldRef fieldRef = feature.ref();
 
 				DerivedField derivedField = encoder.ensureDerivedField(createFieldName(dataType, feature), opType, dataType, () -> fieldRef);

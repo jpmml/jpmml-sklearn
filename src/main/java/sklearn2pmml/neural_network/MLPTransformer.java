@@ -97,11 +97,11 @@ public class MLPTransformer extends Transformer {
 
 			DataField dataField = encoder.createDataField(FieldNameUtil.create("mlp", i), OpType.CONTINUOUS, DataType.DOUBLE);
 
-			MiningField miningField = ModelUtil.createMiningField(dataField.getName(), MiningField.UsageType.TARGET);
+			MiningField miningField = ModelUtil.createMiningField(dataField.requireName(), MiningField.UsageType.TARGET);
 
 			miningSchema.addMiningFields(miningField);
 
-			DerivedField derivedField = new DerivedField(null, OpType.CONTINUOUS, DataType.DOUBLE, new FieldRef(dataField.getName()));
+			DerivedField derivedField = new DerivedField(null, OpType.CONTINUOUS, DataType.DOUBLE, new FieldRef(dataField));
 
 			NeuralOutput neuralOutput = new NeuralOutput()
 				.setOutputNeuron(neuron.getId())
@@ -122,9 +122,9 @@ public class MLPTransformer extends Transformer {
 		for(int i = 0; i < dataFields.size(); i++){
 			DataField dataField = dataFields.get(i);
 
-			OutputField outputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, dataField.getName()), dataField.getOpType(), dataField.getDataType())
+			OutputField outputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, dataField.requireName()), dataField.requireOpType(), dataField.requireDataType())
 				.setFinalResult(false)
-				.setTargetField(dataField.getName());
+				.setTargetField(dataField.requireName());
 
 			DerivedOutputField derivedOutputField = encoder.createDerivedField(neuralNetwork, outputField, false);
 

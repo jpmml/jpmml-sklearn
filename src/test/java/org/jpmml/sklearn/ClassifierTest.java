@@ -24,7 +24,10 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
+import org.dmg.pmml.OutputField;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.FloatEquivalence;
@@ -33,7 +36,7 @@ import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets {
+public class ClassifierTest extends SkLearnTest implements Algorithms, Fields, SkLearnDatasets {
 
 	@Override
 	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
@@ -461,12 +464,10 @@ public class ClassifierTest extends SkLearnTest implements Algorithms, Datasets 
 
 	static
 	private String[] createNeighborFields(int count){
-		String[] result = new String[count];
+		List<OutputField> neighborFields = ModelUtil.createNeighborFields(count);
 
-		for(int i = 0; i < count; i++){
-			result[i] = FieldNameUtil.create("neighbor", String.valueOf(i + 1));
-		}
-
-		return result;
+		return neighborFields.stream()
+			.map(OutputField::requireName)
+			.toArray(String[]::new);
 	}
 }

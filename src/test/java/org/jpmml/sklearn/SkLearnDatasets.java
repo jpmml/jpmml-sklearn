@@ -18,32 +18,11 @@
  */
 package org.jpmml.sklearn;
 
-import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.testing.Datasets;
 
-interface Datasets {
+interface SkLearnDatasets extends Datasets {
 
 	String APOLLO = "Apollo";
-	String AUDIT = "Audit";
 	String AUDIT_CAT = AUDIT + "Cat";
 	String AUDIT_DICT = AUDIT + "Dict";
-	String AUDIT_NA = AUDIT + "NA";
-	String AUTO = "Auto";
-	String AUTO_NA = AUTO + "NA";
-	String HOUSING = "Housing";
-	String IRIS = "Iris";
-	String SENTIMENT = "Sentiment";
-	String VERSICOLOR = "Versicolor";
-	String VISIT = "Visit";
-	String WHEAT = "Wheat";
-
-	String AUDIT_ADJUSTED = "Adjusted";
-	String AUDIT_PROBABILITY_TRUE = FieldNameUtil.create("probability", 1);
-	String AUDIT_PROBABILITY_FALSE = FieldNameUtil.create("probability", 0);
-
-	String AUTO_MPG = "mpg";
-
-	String IRIS_SPECIES = "Species";
-	String IRIS_PROBABILITY_SETOSA = FieldNameUtil.create("probability", "setosa");
-	String IRIS_PROBABILITY_VERSICOLOR = FieldNameUtil.create("probability", "versicolor");
-	String IRIS_PROBABILITY_VIRGINICA = FieldNameUtil.create("probability", "virginica");
 }

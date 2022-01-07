@@ -19,12 +19,13 @@
 package org.jpmml.sklearn;
 
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class RegressorTest extends SkLearnTest implements Algorithms, Datasets {
+public class RegressorTest extends SkLearnTest implements Algorithms, Fields, SkLearnDatasets {
 
 	@Test
 	public void evaluateAdaBoostAuto() throws Exception {

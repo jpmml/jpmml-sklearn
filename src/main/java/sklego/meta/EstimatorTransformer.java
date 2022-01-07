@@ -261,12 +261,12 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-						label = new CategoricalLabel(null, dataType, categories);
+						label = new CategoricalLabel(dataType, categories);
 					}
 					break;
 				case REGRESSION:
 					{
-						label = new ContinuousLabel(null, DataType.DOUBLE);
+						label = new ContinuousLabel(DataType.DOUBLE);
 					}
 					break;
 				default:

@@ -59,8 +59,8 @@ class ScalerTest {
 
 		DerivedField derivedField = (DerivedField)encoder.getField(outputFeature.getName());
 
-		Apply apply = (Apply)derivedField.getExpression();
+		Apply apply = (Apply)derivedField.requireExpression();
 
-		assertEquals(function, apply.getFunction());
+		assertEquals(function, apply.requireFunction());
 	}
 }

@@ -37,7 +37,7 @@ import sklearn.tree.HasTreeOptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class PredicateTest extends SkLearnTest implements Datasets {
+public class PredicateTest extends SkLearnTest implements SkLearnDatasets {
 
 	@Test
 	public void checkNumeric() throws Exception {

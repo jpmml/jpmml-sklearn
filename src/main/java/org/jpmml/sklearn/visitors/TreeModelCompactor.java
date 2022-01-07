@@ -52,8 +52,8 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 			Node firstChild = children.get(0);
 			Node secondChild = children.get(1);
 
-			Predicate firstPredicate = firstChild.getPredicate();
-			Predicate secondPredicate = secondChild.getPredicate();
+			Predicate firstPredicate = firstChild.requirePredicate();
+			Predicate secondPredicate = secondChild.requirePredicate();
 
 			checkFieldReference(firstPredicate, secondPredicate);
 
@@ -94,23 +94,23 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 
 	@Override
 	public void exitNode(Node node){
-		Predicate predicate = node.getPredicate();
+		Predicate predicate = node.requirePredicate();
 
 		if(predicate instanceof True){
 			Node parentNode = getParentNode();
 
 			if(parentNode == null){
 				return;
-			}
+			} // End if
 
-			if((MiningFunction.REGRESSION).equals(this.miningFunction)){
+			if(this.miningFunction == MiningFunction.REGRESSION){
 				parentNode.setScore(null);
 
 				initScore(parentNode, node);
 				replaceChildWithGrandchildren(parentNode, node);
 			} else
 
-			if((MiningFunction.CLASSIFICATION).equals(this.miningFunction)){
+			if(this.miningFunction == MiningFunction.CLASSIFICATION){
 
 				// Replace intermediate nodes, but not terminal nodes
 				if(node.hasNodes()){
@@ -130,11 +130,11 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 		TreeModel.NoTrueChildStrategy noTrueChildStrategy = treeModel.getNoTrueChildStrategy();
 		TreeModel.SplitCharacteristic splitCharacteristic = treeModel.getSplitCharacteristic();
 
-		if(!(TreeModel.MissingValueStrategy.NONE).equals(missingValueStrategy) || !(TreeModel.NoTrueChildStrategy.RETURN_NULL_PREDICTION).equals(noTrueChildStrategy) || !(TreeModel.SplitCharacteristic.BINARY_SPLIT).equals(splitCharacteristic)){
+		if((missingValueStrategy != TreeModel.MissingValueStrategy.NONE) || (noTrueChildStrategy != TreeModel.NoTrueChildStrategy.RETURN_NULL_PREDICTION) || (splitCharacteristic != TreeModel.SplitCharacteristic.BINARY_SPLIT)){
 			throw new IllegalArgumentException();
 		}
 
-		this.miningFunction = treeModel.getMiningFunction();
+		this.miningFunction = treeModel.requireMiningFunction();
 	}
 
 	@Override

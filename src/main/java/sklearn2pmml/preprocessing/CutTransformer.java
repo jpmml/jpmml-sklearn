@@ -83,7 +83,7 @@ public class CutTransformer extends Transformer {
 				.setLeftMargin(formatMargin(leftMargin))
 				.setRightMargin(formatMargin(rightMargin));
 
-			if(i == 0 && includeLowest && (interval.getClosure()).equals(Interval.Closure.OPEN_CLOSED)){
+			if(i == 0 && includeLowest && (interval.requireClosure() == Interval.Closure.OPEN_CLOSED)){
 				interval.setClosure(Interval.Closure.CLOSED_CLOSED);
 			}
 

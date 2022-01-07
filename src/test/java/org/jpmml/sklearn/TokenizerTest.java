@@ -31,6 +31,7 @@ import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.evaluator.TextUtil;
+import org.jpmml.evaluator.TokenizedString;
 import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.Conflict;
 import org.junit.Test;
@@ -41,7 +42,7 @@ import sklearn2pmml.feature_extraction.text.Splitter;
 
 import static org.junit.Assert.fail;
 
-public class TokenizerTest extends SkLearnTest implements Datasets {
+public class TokenizerTest extends SkLearnTest implements SkLearnDatasets {
 
 	@Test
 	public void split() throws Exception {
@@ -93,11 +94,11 @@ public class TokenizerTest extends SkLearnTest implements Datasets {
 			String inputSentence = getSentence(input.get(i));
 			String outputSentence = getSentence(output.get(i));
 
-			List<String> actualTokens = tokenize(textIndex, inputSentence.toLowerCase());
-			Map<String, List<String>> actualResults = Collections.singletonMap("Sentence", actualTokens);
+			TokenizedString actualTokens = tokenize(textIndex, inputSentence.toLowerCase());
+			Map<String, TokenizedString> actualResults = Collections.singletonMap("Sentence", actualTokens);
 
-			List<String> expectedTokens = Arrays.asList(outputSentence.split("\t"));
-			Map<String, List<String>> expectedResults = Collections.singletonMap("Sentence", expectedTokens);
+			TokenizedString expectedTokens = new TokenizedString(outputSentence.split("\t"));
+			Map<String, TokenizedString> expectedResults = Collections.singletonMap("Sentence", expectedTokens);
 
 			MapDifference<String, ?> difference = Maps.<String, Object>difference(expectedResults, actualResults, equivalence);
 			if(!difference.areEqual()){
@@ -120,7 +121,7 @@ public class TokenizerTest extends SkLearnTest implements Datasets {
 	}
 
 	static
-	private List<String> tokenize(TextIndex textIndex, String string){
+	private TokenizedString tokenize(TextIndex textIndex, String string){
 		string = TextUtil.normalize(textIndex, string);
 
 		return TextUtil.tokenize(textIndex, string);
@@ -137,7 +138,7 @@ public class TokenizerTest extends SkLearnTest implements Datasets {
 		data.put("stem", Collections.singletonList(" "));
 		data.put("regex", Collections.singletonList("true"));
 
-		TextIndexNormalization textIndexNormalization = new TextIndexNormalization(null, PMMLUtil.createInlineTable(data))
+		TextIndexNormalization textIndexNormalization = new TextIndexNormalization(PMMLUtil.createInlineTable(data))
 			.setRecursive(Boolean.TRUE);
 
 		textIndex.addTextIndexNormalizations(textIndexNormalization);

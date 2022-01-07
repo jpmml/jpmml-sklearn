@@ -315,7 +315,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Identity comparison operators `is None` and `is not None`.
       * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.
-      * Value missingness check functions `pandas.isnull` and `pandas.notnull`.
+      * Value missingness check functions 'numpy.isnan', `pandas.isnull` and `pandas.notnull`.
       * Numpy universal functions.
       * String functions `startswith(<prefix>)`, `endswith(<suffix>)`, `lower`, `upper` and `strip`.
       * String length function `len(<str>)`

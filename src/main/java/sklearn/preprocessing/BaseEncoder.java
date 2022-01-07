@@ -61,7 +61,7 @@ public class BaseEncoder extends MultiTransformer {
 			} else
 
 			{
-				if(!(result).equals(dataType)){
+				if(result != dataType){
 					throw new UnsupportedOperationException();
 				}
 			}

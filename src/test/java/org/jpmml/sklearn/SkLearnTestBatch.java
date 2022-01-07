@@ -148,7 +148,7 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 			}
 
 			private void checkValueSet(HasValueSet<?> hasValueSet){
-				Array array = hasValueSet.getArray();
+				Array array = hasValueSet.requireArray();
 
 				Object arrayValue = array.getValue();
 

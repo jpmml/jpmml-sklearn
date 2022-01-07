@@ -76,7 +76,7 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
 	@Override
 	public void exitNode(Node node){
-		Predicate predicate = node.getPredicate();
+		Predicate predicate = node.requirePredicate();
 
 		if(predicate instanceof True){
 			Node parentNode = getParentNode();
@@ -95,13 +95,13 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 				throw new IllegalArgumentException();
 			} // End if
 
-			if((MiningFunction.REGRESSION).equals(this.miningFunction)){
+			if(this.miningFunction == MiningFunction.REGRESSION){
 				parentNode.setScore(null);
 
 				initScore(parentNode, node);
 			} else
 
-			if((MiningFunction.CLASSIFICATION).equals(this.miningFunction)){
+			if(this.miningFunction == MiningFunction.CLASSIFICATION){
 				initScoreDistribution(parentNode, node);
 			} else
 
@@ -113,7 +113,7 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
 	@Override
 	public void enterTreeModel(TreeModel treeModel){
-		this.miningFunction = treeModel.getMiningFunction();
+		this.miningFunction = treeModel.requireMiningFunction();
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
 	static
 	private Iterator<Node> getChildren(Node node){
-		Predicate predicate = node.getPredicate();
+		Predicate predicate = node.requirePredicate();
 
 		if(!(predicate instanceof SimplePredicate)){
 			return null;
@@ -143,9 +143,9 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 			int endPos = 0;
 
 			for(Node child : children){
-				Predicate childPredicate = child.getPredicate();
+				Predicate childPredicate = child.requirePredicate();
 
-				if(!hasFieldReference(childPredicate, simplePredicate.getField()) || !hasOperator(childPredicate, simplePredicate.getOperator())){
+				if(!hasFieldReference(childPredicate, simplePredicate.requireField()) || !hasOperator(childPredicate, simplePredicate.requireOperator())){
 					break;
 				}
 

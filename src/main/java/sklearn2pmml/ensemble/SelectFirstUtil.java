@@ -70,7 +70,7 @@ public class SelectFirstUtil {
 			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
 			String predicate = TupleUtil.extractElement(step, 2, String.class);
 
-			if(!(miningFunction).equals(estimator.getMiningFunction())){
+			if(estimator.getMiningFunction() != miningFunction){
 				throw new IllegalArgumentException();
 			}
 

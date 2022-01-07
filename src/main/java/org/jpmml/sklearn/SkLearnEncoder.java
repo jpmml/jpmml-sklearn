@@ -62,7 +62,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		try {
 			super.addDerivedField(derivedField);
 		} catch(RuntimeException re){
-			String name = derivedField.getName();
+			String name = derivedField.requireName();
 
 			String message = "Field " + name + " is already defined. " +
 				"Please refactor the pipeline so that it would not contain duplicate field declarations, " +

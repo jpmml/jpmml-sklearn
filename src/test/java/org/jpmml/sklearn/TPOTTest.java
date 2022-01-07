@@ -21,7 +21,7 @@ package org.jpmml.sklearn;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
 
-public class TPOTTest extends SkLearnTest implements Datasets {
+public class TPOTTest extends SkLearnTest implements SkLearnDatasets {
 
 	@Test
 	public void evaluateTPOTAudit() throws Exception {

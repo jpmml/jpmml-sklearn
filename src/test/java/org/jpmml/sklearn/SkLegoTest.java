@@ -20,7 +20,7 @@ package org.jpmml.sklearn;
 
 import org.junit.Test;
 
-public class SkLegoTest extends SkLearnTest implements Datasets {
+public class SkLegoTest extends SkLearnTest implements SkLearnDatasets {
 
 	@Test
 	public void evaluateEstimatorTransformerAudit() throws Exception {

@@ -123,7 +123,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				DataType dataType = TypeUtil.getDataType(categoricalFeature.getValues(), DataType.STRING);
 
 				DataField dataField = (DataField)categoricalFeature.getField();
-				if(!(dataField.getDataType()).equals(dataType)){
+				if(dataField.requireDataType() != dataType){
 					dataField.setDataType(dataType);
 				}
 			} else

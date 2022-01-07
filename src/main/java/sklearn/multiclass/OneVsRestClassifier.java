@@ -89,7 +89,7 @@ public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsem
 				Output output = new Output()
 					.addOutputFields(ModelUtil.createProbabilityField(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), DataType.DOUBLE, categoricalLabel.getValue(i)));
 
-				CategoricalLabel segmentCategoricalLabel = new CategoricalLabel(null, DataType.STRING, Arrays.asList("(other)", ValueUtil.asString(categoricalLabel.getValue(i))));
+				CategoricalLabel segmentCategoricalLabel = new CategoricalLabel(DataType.STRING, Arrays.asList("(other)", ValueUtil.asString(categoricalLabel.getValue(i))));
 
 				Schema segmentSchema = schema.toRelabeledSchema(segmentCategoricalLabel);
 

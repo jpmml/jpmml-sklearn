@@ -46,7 +46,7 @@ public class MatchesTransformer extends PatternTransformer {
 
 		Feature feature = features.get(0);
 
-		if(!(DataType.STRING).equals(feature.getDataType())){
+		if(feature.getDataType() != DataType.STRING){
 			throw new IllegalArgumentException();
 		}
 

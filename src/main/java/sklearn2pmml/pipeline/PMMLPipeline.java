@@ -154,7 +154,7 @@ public class PMMLPipeline extends Pipeline {
 
 									@Override
 									public VisitorAction visit(Value pmmlValue){
-										Object value = values.get(pmmlValue.getValue());
+										Object value = values.get(pmmlValue.requireValue());
 
 										if(value != null){
 											value = ScalarUtil.decode(value);
@@ -367,7 +367,7 @@ public class PMMLPipeline extends Pipeline {
 				for(int i = 0; i < activeFields.size(); i++){
 					VerificationField verificationField = ModelUtil.createVerificationField(activeFields.get(i));
 
-					Domain domain = encoder.getDomain(verificationField.getField());
+					Domain domain = encoder.getDomain(verificationField.requireField());
 
 					data.put(verificationField, CMatrixUtil.getColumn(cleanValues(domain, activeValues), rows, activeFields.size(), i));
 				}
@@ -400,7 +400,7 @@ public class PMMLPipeline extends Pipeline {
 							break;
 					}
 
-					Domain domain = encoder.getDomain(verificationField.getField());
+					Domain domain = encoder.getDomain(verificationField.requireField());
 
 					data.put(verificationField, CMatrixUtil.getColumn(cleanValues(domain, targetValues), rows, targetFields.size(), i));
 				}
@@ -416,7 +416,7 @@ public class PMMLPipeline extends Pipeline {
 		PMML pmml = encoder.encodePMML(model);
 
 		if(header != null){
-			Header pmmlHeader = pmml.getHeader();
+			Header pmmlHeader = pmml.requireHeader();
 
 			pmmlHeader.setCopyright((String)header.get("copyright"));
 			pmmlHeader.setDescription((String)header.get("description"));
@@ -444,7 +444,7 @@ public class PMMLPipeline extends Pipeline {
 		List<Feature> features = new ArrayList<>();
 
 		for(OutputField outputField : outputFields){
-			DataField dataField = outputEncoder.createDataField(outputField.getName(), outputField.getOpType(), outputField.getDataType());
+			DataField dataField = outputEncoder.createDataField(outputField.requireName(), outputField.getOpType(), outputField.requireDataType());
 
 			features.add(new WildcardFeature(outputEncoder, dataField));
 		}
@@ -463,9 +463,9 @@ public class PMMLPipeline extends Pipeline {
 			} else
 
 			{
-				outputField = new OutputField(derivedField.getName(), derivedField.getOpType(), derivedField.getDataType())
+				outputField = new OutputField(derivedField.requireName(), derivedField.getOpType(), derivedField.requireDataType())
 					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-					.setExpression(derivedField.getExpression());
+					.setExpression(derivedField.requireExpression());
 			}
 
 			output.addOutputFields(outputField);

@@ -110,7 +110,7 @@ public class Transformer extends Step {
 	}
 
 	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){
-		String name = dataField.getName();
+		String name = dataField.requireName();
 
 		if(encoder.isFrozen(name)){
 			return dataField;
@@ -119,8 +119,8 @@ public class Transformer extends Step {
 		switch(dataType){
 			case DOUBLE:
 				// If the DataField element already specifies a non-default data type, then keep it
-				if(!(DataType.DOUBLE).equals(dataField.getDataType())){
-					dataType = dataField.getDataType();
+				if(dataField.requireDataType() != DataType.DOUBLE){
+					dataType = dataField.requireDataType();
 				}
 				break;
 		}

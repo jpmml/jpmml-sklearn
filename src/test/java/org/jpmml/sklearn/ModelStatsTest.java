@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ModelStatsTest extends MarkupTest implements Algorithms, Datasets {
+public class ModelStatsTest extends MarkupTest implements Algorithms, SkLearnDatasets {
 
 	@Test
 	public void checkGBDTLRAudit() throws Exception {

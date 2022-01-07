@@ -35,7 +35,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FeatureImportancesTest extends MarkupTest implements Algorithms, Datasets {
+public class FeatureImportancesTest extends MarkupTest implements Algorithms, SkLearnDatasets {
 
 	@Test
 	public void checkDecisionTreeAudit() throws Exception {
@@ -95,11 +95,10 @@ public class FeatureImportancesTest extends MarkupTest implements Algorithms, Da
 			}
 
 			private void check(Model model, Number expectedSum){
-				MiningSchema miningSchema = model.getMiningSchema();
-
 				double sum = 0d;
 
-				if(miningSchema != null && miningSchema.hasMiningFields()){
+				MiningSchema miningSchema = model.requireMiningSchema();
+				if(miningSchema.hasMiningFields()){
 					List<MiningField> miningFields = miningSchema.getMiningFields();
 
 					for(MiningField miningField : miningFields){

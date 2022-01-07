@@ -49,12 +49,12 @@ public class MapFeature extends ThresholdFeature {
 	private Number defaultValue = null;
 
 
-	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
-		this(encoder, feature.getName(), feature.getDataType(), mapping, missingCategory, defaultValue);
+	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
+		this(encoder, field.requireName(), field.getDataType(), mapping, missingCategory, defaultValue);
 	}
 
-	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
-		this(encoder, field.getName(), field.getDataType(), mapping, missingCategory, defaultValue);
+	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
+		this(encoder, feature.getName(), feature.getDataType(), mapping, missingCategory, defaultValue);
 	}
 
 	public MapFeature(PMMLEncoder encoder, String name, DataType dataType, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){

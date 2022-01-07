@@ -32,6 +32,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNamePrefixes;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -85,12 +86,12 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 					List<OutputField> outputFields = finalOutput.getOutputFields();
 
 					outputFields.stream()
-						.filter(outputField -> (ResultFeature.PROBABILITY).equals(outputField.getResultFeature()))
+						.filter(outputField -> (outputField.getResultFeature() == ResultFeature.PROBABILITY))
 						.forEach(outputField -> {
-							String name = outputField.getName();
+							String name = outputField.requireName();
 
-							if(name.startsWith("probability(")){
-								name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, index, name.substring("probability(".length()));
+							if(name.startsWith(PREFIX_PROBABILITY)){
+								name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, index, name.substring(PREFIX_PROBABILITY.length()));
 
 								outputField.setName(name);
 							}
@@ -109,6 +110,8 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 
 				return result;
 			}
+
+			private static final String PREFIX_PROBABILITY = FieldNamePrefixes.PROBABILITY + "(";
 		};
 
 		return StackingUtil.encodeStacking(estimators, stackMethod, predictFunction, finalEstimator, passthrough, schema);

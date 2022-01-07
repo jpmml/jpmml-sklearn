@@ -59,7 +59,7 @@ public class BaseNFeature extends ThresholdFeature {
 
 
 	public BaseNFeature(PMMLEncoder encoder, Field<?> field, int base, int index, SetMultimap<Integer, ?> values, Object missingCategory, Integer defaultValue){
-		this(encoder, field.getName(), field.getDataType(), base, index, values, missingCategory, defaultValue);
+		this(encoder, field.requireName(), field.getDataType(), base, index, values, missingCategory, defaultValue);
 	}
 
 	public BaseNFeature(PMMLEncoder encoder, Feature feature, int base, int index, SetMultimap<Integer, ?> values, Object missingCategory, Integer defaultValue){
