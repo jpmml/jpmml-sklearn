@@ -35,7 +35,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FeatureImportancesTest extends MarkupTest implements Algorithms, SkLearnDatasets {
+public class FeatureImportancesTest extends MarkupTest implements SkLearnAlgorithms, SkLearnDatasets {
 
 	@Test
 	public void checkDecisionTreeAudit() throws Exception {

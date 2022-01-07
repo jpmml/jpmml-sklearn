@@ -18,7 +18,7 @@
  */
 package org.jpmml.sklearn;
 
-interface Algorithms {
+interface SkLearnAlgorithms {
 
 	String ADA_BOOST = "AdaBoost";
 	String ARD = "ARD";

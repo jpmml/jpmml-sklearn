@@ -25,7 +25,7 @@ import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class RegressorTest extends SkLearnTest implements Algorithms, Fields, SkLearnDatasets {
+public class RegressorTest extends SkLearnTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
 
 	@Test
 	public void evaluateAdaBoostAuto() throws Exception {

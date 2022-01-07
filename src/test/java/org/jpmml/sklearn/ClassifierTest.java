@@ -36,7 +36,7 @@ import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class ClassifierTest extends SkLearnTest implements Algorithms, Fields, SkLearnDatasets {
+public class ClassifierTest extends SkLearnTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
 
 	@Override
 	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
