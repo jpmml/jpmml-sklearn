@@ -200,6 +200,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * [`h2o.estimators.isolation_forest.H2OIsolationForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oisolationforestestimator)
   * [`h2o.estimators.random_forest.H2ORandomForestEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2orandomforestestimator)
   * [`h2o.estimators.stackedensemble.H2OStackedEnsembleEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ostackedensembleestimator)
+  * [`h2o.estimators.xgboost.H2OXGBoostEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2oxgboostestimator)
 </details>
 
 <details>
