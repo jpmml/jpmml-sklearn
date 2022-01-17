@@ -75,7 +75,7 @@ public class ImputerUtil {
 				feature.ref()
 			);
 
-			DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("imputer", feature), field.getOpType(), field.getDataType(), expression);
+			DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("imputer", feature), field.requireOpType(), field.requireDataType(), expression);
 
 			return TransformerUtil.createFeature(derivedField, encoder);
 		} else

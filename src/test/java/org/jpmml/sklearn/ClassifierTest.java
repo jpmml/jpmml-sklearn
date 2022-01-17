@@ -18,9 +18,7 @@
  */
 package org.jpmml.sklearn;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -29,7 +27,6 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
@@ -39,27 +36,22 @@ import sklearn.Estimator;
 public class ClassifierTest extends SkLearnTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
 
 	@Override
-	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
-		Batch result = new SkLearnTestBatch(name, dataset, predicate, equivalence){
+	public SkLearnTestBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnTestBatch result = new SkLearnTestBatch(algorithm, dataset, columnFilter, equivalence){
 
 			@Override
-			public ClassifierTest getIntegrationTest(){
+			public ClassifierTest getArchiveBatchTest(){
 				return ClassifierTest.this;
 			}
 
 			@Override
-			public List<Map<String, String>> getInput() throws IOException {
-				String dataset = super.getDataset();
+			public String getInputCsvPath(){
+				String path = super.getInputCsvPath();
 
-				if(dataset.endsWith("Cat")){
-					dataset = dataset.substring(0, dataset.length() - "Cat".length());
-				} else
+				path = path.replace("Cat", "");
+				path = path.replace("Dict", "");
 
-				if(dataset.endsWith("Dict")){
-					dataset = dataset.substring(0, dataset.length() - "Dict".length());
-				}
-
-				return loadRecords("/csv/" + dataset + ".csv");
+				return path;
 			}
 		};
 

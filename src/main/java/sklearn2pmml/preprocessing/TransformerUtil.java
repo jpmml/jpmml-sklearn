@@ -36,8 +36,8 @@ public class TransformerUtil {
 
 	static
 	public Feature createFeature(Field<?> field, SkLearnEncoder encoder){
-		OpType opType = field.getOpType();
-		DataType dataType = field.getDataType();
+		DataType dataType = field.requireDataType();
+		OpType opType = field.requireOpType();
 
 		switch(dataType){
 			case STRING:

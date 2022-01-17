@@ -25,18 +25,17 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.EvaluatorBuilder;
 import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.evaluator.testing.Batch;
 import org.junit.Test;
 import sklearn.Estimator;
 
 public class BSplineTest extends SkLearnTest {
 
 	@Override
-	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
-		Batch result = new SkLearnTestBatch(name, dataset, predicate, equivalence){
+	public SkLearnTestBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnTestBatch result = new SkLearnTestBatch(algorithm, dataset, columnFilter, equivalence){
 
 			@Override
-			public BSplineTest getIntegrationTest(){
+			public BSplineTest getArchiveBatchTest(){
 				return BSplineTest.this;
 			}
 

@@ -50,7 +50,7 @@ public class MapFeature extends ThresholdFeature {
 
 
 	public MapFeature(PMMLEncoder encoder, Field<?> field, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){
-		this(encoder, field.requireName(), field.getDataType(), mapping, missingCategory, defaultValue);
+		this(encoder, field.requireName(), field.requireDataType(), mapping, missingCategory, defaultValue);
 	}
 
 	public MapFeature(PMMLEncoder encoder, Feature feature, Map<?, ? extends Number> mapping, Object missingCategory, Number defaultValue){

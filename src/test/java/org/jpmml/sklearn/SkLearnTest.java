@@ -22,23 +22,22 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.evaluator.testing.Batch;
-import org.jpmml.evaluator.testing.IntegrationTest;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
+import org.jpmml.python.testing.PythonEncoderBatchTest;
 
 abstract
-public class SkLearnTest extends IntegrationTest {
+public class SkLearnTest extends PythonEncoderBatchTest {
 
 	public SkLearnTest(){
 		super(new PMMLEquivalence(1e-13, 1e-13));
 	}
 
 	@Override
-	protected Batch createBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
-		Batch result = new SkLearnTestBatch(name, dataset, predicate, equivalence){
+	public SkLearnTestBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnTestBatch result = new SkLearnTestBatch(algorithm, dataset, columnFilter, equivalence){
 
 			@Override
-			public SkLearnTest getIntegrationTest(){
+			public SkLearnTest getArchiveBatchTest(){
 				return SkLearnTest.this;
 			}
 		};

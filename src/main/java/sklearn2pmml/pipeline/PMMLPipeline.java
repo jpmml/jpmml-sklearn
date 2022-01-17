@@ -444,7 +444,7 @@ public class PMMLPipeline extends Pipeline {
 		List<Feature> features = new ArrayList<>();
 
 		for(OutputField outputField : outputFields){
-			DataField dataField = outputEncoder.createDataField(outputField.requireName(), outputField.getOpType(), outputField.requireDataType());
+			DataField dataField = outputEncoder.createDataField(outputField.requireName(), outputField.requireOpType(), outputField.requireDataType());
 
 			features.add(new WildcardFeature(outputEncoder, dataField));
 		}
@@ -463,7 +463,7 @@ public class PMMLPipeline extends Pipeline {
 			} else
 
 			{
-				outputField = new OutputField(derivedField.requireName(), derivedField.getOpType(), derivedField.requireDataType())
+				outputField = new OutputField(derivedField.requireName(), derivedField.requireOpType(), derivedField.requireDataType())
 					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 					.setExpression(derivedField.requireExpression());
 			}

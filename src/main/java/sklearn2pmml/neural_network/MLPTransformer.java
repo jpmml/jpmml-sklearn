@@ -104,7 +104,7 @@ public class MLPTransformer extends Transformer {
 			DerivedField derivedField = new DerivedField(null, OpType.CONTINUOUS, DataType.DOUBLE, new FieldRef(dataField));
 
 			NeuralOutput neuralOutput = new NeuralOutput()
-				.setOutputNeuron(neuron.getId())
+				.setOutputNeuron(neuron.requireId())
 				.setDerivedField(derivedField);
 
 			neuralOutputs.addNeuralOutputs(neuralOutput);

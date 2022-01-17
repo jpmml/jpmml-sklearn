@@ -27,7 +27,7 @@ public class OutlierDetectorTest extends SkLearnTest implements SkLearnAlgorithm
 
 	@Test
 	public void evaluateIsolationForestHousing() throws Exception {
-		evaluate(ISOLATION_FOREST, HOUSING, excludeFields(OutlierDetectorTest.predictedValue), new PMMLEquivalence(5e-12, 5e-12));
+		evaluate(ISOLATION_FOREST, HOUSING, excludeFields("rawAnomalyScore", "normalizedAnomalyScore", OutlierDetectorTest.predictedValue), new PMMLEquivalence(5e-12, 5e-12));
 	}
 
 	@Test

@@ -113,7 +113,7 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 				@Override
 				public VisitorAction visit(Node node){
 
-					if(node.getScore() != null){
+					if(node.hasScore()){
 						double nodeDepth = 0d;
 
 						Deque<PMMLObject> parents = getParents();

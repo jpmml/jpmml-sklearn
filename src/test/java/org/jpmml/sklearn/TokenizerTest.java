@@ -65,11 +65,11 @@ public class TokenizerTest extends SkLearnTest implements SkLearnDatasets {
 		evaluate("Matcher", SENTIMENT, matcher);
 	}
 
-	private void evaluate(String name, String dataset, Tokenizer tokenizer) throws Exception {
-		Batch batch = new SkLearnTestBatch(name, dataset, (x) -> true, Equivalence.equals()){
+	private void evaluate(String algorithm, String dataset, Tokenizer tokenizer) throws Exception {
+		Batch batch = new SkLearnTestBatch(algorithm, dataset, (x) -> true, Equivalence.equals()){
 
 			@Override
-			public SkLearnTest getIntegrationTest(){
+			public SkLearnTest getArchiveBatchTest(){
 				return TokenizerTest.this;
 			}
 		};

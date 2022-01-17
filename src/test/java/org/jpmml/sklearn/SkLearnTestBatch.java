@@ -20,11 +20,9 @@ package org.jpmml.sklearn;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -40,39 +38,32 @@ import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.evaluator.testing.IntegrationTestBatch;
+import org.jpmml.evaluator.visitors.DefaultModelEvaluatorBattery;
 import org.jpmml.model.visitors.AbstractVisitor;
-import org.jpmml.python.CompressedInputStreamStorage;
-import org.jpmml.python.PickleUtil;
-import org.jpmml.python.Storage;
+import org.jpmml.python.testing.PythonEncoderBatch;
 import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
 
 import static org.junit.Assert.assertFalse;
 
 abstract
-public class SkLearnTestBatch extends IntegrationTestBatch {
+public class SkLearnTestBatch extends PythonEncoderBatch {
 
-	private Map<String, Object> options = new LinkedHashMap<>();
-
-
-	public SkLearnTestBatch(String name, String dataset, Predicate<ResultField> predicate, Equivalence<Object> equivalence){
-		super(name, dataset, predicate, equivalence);
+	public SkLearnTestBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		super(algorithm, dataset, columnFilter, equivalence);
 	}
 
 	@Override
 	abstract
-	public SkLearnTest getIntegrationTest();
+	public SkLearnTest getArchiveBatchTest();
 
 	@Override
 	public PMML getPMML() throws Exception {
+		String algorithm = getAlgorithm();
+
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		PMMLPipeline pipeline;
-
-		try(Storage storage = openStorage("/pkl/" + getName() + getDataset() + ".pkl")){
-			pipeline = (PMMLPipeline)PickleUtil.unpickle(storage);
-		}
+		PMMLPipeline pipeline = (PMMLPipeline)loadPickle();
 
 		Map<String, ?> options = getOptions();
 
@@ -87,7 +78,7 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 		if(estimator instanceof BaseEstimator){
 			BaseEstimator baseEstimator = (BaseEstimator)estimator;
 
-			tmpFile = File.createTempFile(getName() + getDataset(), ".mojo.zip");
+			tmpFile = File.createTempFile(getAlgorithm() + getDataset(), ".mojo.zip");
 
 			String mojoPath = baseEstimator.getMojoPath();
 
@@ -104,6 +95,12 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 		PMML pmml = pipeline.encodePMML(encoder);
 
 		validatePMML(pmml);
+
+		// XXX
+		if(algorithm.equals(SkLearnAlgorithms.RIDGE_ENSEMBLE)){
+			DefaultModelEvaluatorBattery visitorBattery = new DefaultModelEvaluatorBattery();
+			visitorBattery.applyTo(pmml);
+		} // End if
 
 		if(tmpFile != null){
 			tmpFile.delete();
@@ -173,25 +170,5 @@ public class SkLearnTestBatch extends IntegrationTestBatch {
 			}
 		};
 		visitor.applyTo(pmml);
-	}
-
-	public Map<String, ?> getOptions(){
-		return this.options;
-	}
-
-	public void putOptions(Map<String, ?> options){
-		this.options.putAll(options);
-	}
-
-	private Storage openStorage(String path) throws IOException {
-		InputStream is = open(path);
-
-		try {
-			return new CompressedInputStreamStorage(is);
-		} catch(IOException ioe){
-			is.close();
-
-			throw ioe;
-		}
 	}
 }

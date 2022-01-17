@@ -60,12 +60,12 @@ public class PredicateTest extends SkLearnTest implements SkLearnDatasets {
 		//check("TargetEncoder", AUDIT, options);
 	}
 
-	public void check(String name, String dataset, Map<String, ?> options) throws Exception {
+	public void check(String name, String dataset, Map<String, Object> options) throws Exception {
 		Predicate<ResultField> predicate = (resultField) -> true;
 		Equivalence<Object> equivalence = getEquivalence();
 
 		try(SkLearnTestBatch batch = (SkLearnTestBatch)createBatch(name, dataset, predicate, equivalence)){
-			batch.putOptions(options);
+			batch.setOptions(options);
 
 			Boolean numeric = (Boolean)options.get(HasTreeOptions.OPTION_NUMERIC);
 
