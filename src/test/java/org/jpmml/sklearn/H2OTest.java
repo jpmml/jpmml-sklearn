@@ -20,6 +20,7 @@ package org.jpmml.sklearn;
 
 import org.dmg.pmml.FieldName;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.junit.Test;
 
 public class H2OTest extends SkLearnTest implements Algorithms, Datasets {
@@ -58,6 +59,18 @@ public class H2OTest extends SkLearnTest implements Algorithms, Datasets {
 	@Test
 	public void evaluateRandomForestAuto() throws Exception {
 		evaluate("H2O" + RANDOM_FOREST, AUTO);
+	}
+
+	@Test
+	public void evaluateXGBoostAudit() throws Exception {
+		FieldName[] targetFields = createTargetFields(AUDIT_ADJUSTED);
+
+		evaluate("H2O" + "XGBoost", AUDIT, excludeFields(targetFields), new FloatEquivalence(16));
+	}
+
+	@Test
+	public void evaluateXGBoostAuto() throws Exception {
+		evaluate("H2O" + "XGBoost", AUTO, new FloatEquivalence(4));
 	}
 
 	static

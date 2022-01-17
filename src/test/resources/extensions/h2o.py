@@ -4,6 +4,7 @@ from h2o import H2OFrame
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.estimators.glm import H2OGeneralizedLinearEstimator
 from h2o.estimators.random_forest import H2ORandomForestEstimator
+from h2o.estimators.xgboost import H2OXGBoostEstimator
 from sklearn.compose import ColumnTransformer
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -28,7 +29,10 @@ def build_audit(classifier, name):
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, H2OFrame(audit_y.to_frame(), column_types = ["categorical"]))
-	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
+	if isinstance(classifier, H2OXGBoostEstimator):
+		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
 	classifier = pipeline._final_estimator
 	store_mojo(classifier, name)
 	store_pkl(pipeline, name)
@@ -39,6 +43,7 @@ def build_audit(classifier, name):
 build_audit(H2OGradientBoostingEstimator(distribution = "bernoulli", ntrees = 17), "H2OGradientBoostingAudit")
 build_audit(H2OGeneralizedLinearEstimator(family = "binomial"), "H2OLogisticRegressionAudit")
 build_audit(H2ORandomForestEstimator(distribution = "bernoulli", seed = 13), "H2ORandomForestAudit")
+build_audit(H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAudit")
 
 auto_X, auto_y = load_auto("Auto")
 
@@ -57,7 +62,10 @@ def build_auto(regressor, name):
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
-	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
+	if isinstance(regressor, H2OXGBoostEstimator):
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
 	regressor = pipeline._final_estimator
 	store_mojo(regressor, name)
 	store_pkl(pipeline, name)
@@ -68,5 +76,6 @@ def build_auto(regressor, name):
 build_auto(H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
 build_auto(H2OGeneralizedLinearEstimator(family = "gaussian"), "H2OLinearRegressionAuto")
 build_auto(H2ORandomForestEstimator(distribution = "gaussian", seed = 13), "H2ORandomForestAuto")
+build_auto(H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAuto")
 
 h2o.shutdown()
