@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2021 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,19 +16,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package org.jpmml.sklearn.testing;
 
-import org.junit.Test;
+import java.util.function.Predicate;
 
-public class ClustererTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets {
+import com.google.common.base.Equivalence;
+import org.dmg.pmml.PMML;
+import org.jpmml.evaluator.ResultField;
 
-	@Test
-	public void evaluateKMeansWheat() throws Exception {
-		evaluate(K_MEANS, WHEAT);
-	}
+abstract
+public class MarkupTest extends SkLearnEncoderBatchTest {
 
-	@Test
-	public void evaluateMiniBatchKMeansWheat() throws Exception {
-		evaluate(MINIBATCH_K_MEANS, WHEAT);
+	abstract
+	public void check(PMML pmml);
+
+	public void check(String name, String dataset) throws Exception {
+		Predicate<ResultField> predicate = (resultField) -> true;
+		Equivalence<Object> equivalence = getEquivalence();
+
+		try(SkLearnEncoderBatch batch = (SkLearnEncoderBatch)createBatch(name, dataset, predicate, equivalence)){
+			PMML pmml = batch.getPMML();
+
+			check(pmml);
+		}
 	}
 }

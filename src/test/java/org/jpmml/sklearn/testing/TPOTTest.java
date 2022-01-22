@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Villu Ruusmann
+ * Copyright (c) 2021 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,24 +16,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package org.jpmml.sklearn.testing;
 
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
-import sklearn.Estimator;
 
-public class OutlierDetectorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets {
+public class TPOTTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
 
 	@Test
-	public void evaluateIsolationForestHousing() throws Exception {
-		evaluate(ISOLATION_FOREST, HOUSING, excludeFields("rawAnomalyScore", "normalizedAnomalyScore", OutlierDetectorTest.predictedValue), new PMMLEquivalence(5e-12, 5e-12));
+	public void evaluateTPOTAudit() throws Exception {
+		evaluate("TPOT", AUDIT);
 	}
 
 	@Test
-	public void evaluateOneClassSVMHousing() throws Exception {
-		evaluate(ONE_CLASS_SVM, HOUSING, excludeFields(OutlierDetectorTest.predictedValue));
+	public void evaluateTPOTAuto() throws Exception {
+		evaluate("TPOT", AUTO);
 	}
 
-	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "outlier");
+	@Test
+	public void evaluateTPOTHousing() throws Exception {
+		evaluate("TPOT", HOUSING);
+	}
+
+	@Test
+	public void evaluateTPOTIris() throws Exception {
+		evaluate("TPOT", IRIS);
+	}
+
+	@Test
+	public void evaluateTPOTVersicolor() throws Exception {
+		evaluate("TPOT", VERSICOLOR, new PMMLEquivalence(5e-13, 5e-13));
+	}
 }

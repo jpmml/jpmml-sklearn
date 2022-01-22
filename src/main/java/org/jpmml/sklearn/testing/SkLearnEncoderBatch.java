@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package org.jpmml.sklearn.testing;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,10 +41,9 @@ import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.visitors.DefaultModelEvaluatorBattery;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.testing.PythonEncoderBatch;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
-
-import static org.junit.Assert.assertFalse;
 
 abstract
 public class SkLearnEncoderBatch extends PythonEncoderBatch {
@@ -97,7 +96,7 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		validatePMML(pmml);
 
 		// XXX
-		if(algorithm.equals(SkLearnAlgorithms.RIDGE_ENSEMBLE)){
+		if(algorithm.equals("RidgeEnsemble")){
 			DefaultModelEvaluatorBattery visitorBattery = new DefaultModelEvaluatorBattery();
 			visitorBattery.applyTo(pmml);
 		} // End if
@@ -133,7 +132,9 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 			public VisitorAction visit(Constant constant){
 				Object value = constant.getValue();
 
-				assertFalse(isNaN(value));
+				if(isNaN(value)){
+					throw new AssertionError();
+				}
 
 				return super.visit(constant);
 			}
@@ -141,7 +142,9 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 			private void checkValue(HasValue<?> hasValue){
 				Object value = hasValue.getValue();
 
-				assertFalse(isNaN(value));
+				if(isNaN(value)){
+					throw new AssertionError();
+				}
 			}
 
 			private void checkValueSet(HasValueSet<?> hasValueSet){
@@ -153,7 +156,10 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 					Collection<?> values = (Collection<?>)arrayValue;
 
 					for(Object value : values){
-						assertFalse(isNaN(value));
+
+						if(isNaN(value)){
+							throw new AssertionError();
+						}
 					}
 				}
 			}

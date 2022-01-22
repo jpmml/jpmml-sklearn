@@ -45,6 +45,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-evaluator-testing</artifactId>
+			<version>1.6.2</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-h2o</artifactId>
 			<version>1.2.2</version>
 		</dependency>
@@ -60,6 +67,11 @@
 			<artifactId>pmml-python</artifactId>
 			<version>1.1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-python-testing</artifactId>
+			<version>1.1.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jpmml</groupId>
@@ -71,20 +83,6 @@
 			<groupId>com.beust</groupId>
 			<artifactId>jcommander</artifactId>
 			<version>1.72</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-evaluator-testing</artifactId>
-			<version>1.6.2</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-python-testing</artifactId>
-			<version>1.1.2</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>

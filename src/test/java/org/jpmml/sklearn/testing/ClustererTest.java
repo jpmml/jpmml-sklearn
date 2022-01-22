@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2015 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,13 +16,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package org.jpmml.sklearn.testing;
 
-import org.jpmml.converter.testing.Datasets;
+import org.junit.Test;
 
-interface SkLearnDatasets extends Datasets {
+public class ClustererTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets {
 
-	String APOLLO = "Apollo";
-	String AUDIT_CAT = AUDIT + "Cat";
-	String AUDIT_DICT = AUDIT + "Dict";
+	@Test
+	public void evaluateKMeansWheat() throws Exception {
+		evaluate(K_MEANS, WHEAT);
+	}
+
+	@Test
+	public void evaluateMiniBatchKMeansWheat() throws Exception {
+		evaluate(MINIBATCH_K_MEANS, WHEAT);
+	}
 }

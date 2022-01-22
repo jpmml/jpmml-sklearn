@@ -16,35 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package org.jpmml.sklearn.testing;
 
-import org.jpmml.evaluator.testing.PMMLEquivalence;
-import org.junit.Test;
+import org.jpmml.converter.testing.Datasets;
 
-public class TPOTTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
+interface SkLearnDatasets extends Datasets {
 
-	@Test
-	public void evaluateTPOTAudit() throws Exception {
-		evaluate("TPOT", AUDIT);
-	}
-
-	@Test
-	public void evaluateTPOTAuto() throws Exception {
-		evaluate("TPOT", AUTO);
-	}
-
-	@Test
-	public void evaluateTPOTHousing() throws Exception {
-		evaluate("TPOT", HOUSING);
-	}
-
-	@Test
-	public void evaluateTPOTIris() throws Exception {
-		evaluate("TPOT", IRIS);
-	}
-
-	@Test
-	public void evaluateTPOTVersicolor() throws Exception {
-		evaluate("TPOT", VERSICOLOR, new PMMLEquivalence(5e-13, 5e-13));
-	}
+	String APOLLO = "Apollo";
+	String AUDIT_CAT = AUDIT + "Cat";
+	String AUDIT_DICT = AUDIT + "Dict";
 }
