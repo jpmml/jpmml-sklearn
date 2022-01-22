@@ -19,6 +19,7 @@
 package sklearn;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.MiningFunction;
 
@@ -40,7 +41,11 @@ public class Classifier extends Estimator implements HasClasses {
 
 	@Override
 	public List<?> getClasses(){
-		return getArray(SkLearnFields.CLASSES);
+		List<?> values = getArray(SkLearnFields.CLASSES);
+
+		return values.stream()
+			.map(value -> (value instanceof Long) ? Math.toIntExact((Long)value) : value)
+			.collect(Collectors.toList());
 	}
 
 	public static final String FIELD_PROBABILITY = "probability";

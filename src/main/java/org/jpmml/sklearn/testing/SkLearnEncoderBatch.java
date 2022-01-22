@@ -38,7 +38,6 @@ import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.evaluator.visitors.DefaultModelEvaluatorBattery;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -94,12 +93,6 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		PMML pmml = pipeline.encodePMML(encoder);
 
 		validatePMML(pmml);
-
-		// XXX
-		if(algorithm.equals("RidgeEnsemble")){
-			DefaultModelEvaluatorBattery visitorBattery = new DefaultModelEvaluatorBattery();
-			visitorBattery.applyTo(pmml);
-		} // End if
 
 		if(tmpFile != null){
 			tmpFile.delete();
