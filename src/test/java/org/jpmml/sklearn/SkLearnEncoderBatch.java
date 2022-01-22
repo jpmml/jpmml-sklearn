@@ -47,15 +47,15 @@ import sklearn2pmml.pipeline.PMMLPipeline;
 import static org.junit.Assert.assertFalse;
 
 abstract
-public class SkLearnTestBatch extends PythonEncoderBatch {
+public class SkLearnEncoderBatch extends PythonEncoderBatch {
 
-	public SkLearnTestBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+	public SkLearnEncoderBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
 		super(algorithm, dataset, columnFilter, equivalence);
 	}
 
 	@Override
 	abstract
-	public SkLearnTest getArchiveBatchTest();
+	public SkLearnEncoderBatchTest getArchiveBatchTest();
 
 	@Override
 	public PMML getPMML() throws Exception {

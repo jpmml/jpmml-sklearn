@@ -26,19 +26,19 @@ import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.python.testing.PythonEncoderBatchTest;
 
 abstract
-public class SkLearnTest extends PythonEncoderBatchTest {
+public class SkLearnEncoderBatchTest extends PythonEncoderBatchTest {
 
-	public SkLearnTest(){
+	public SkLearnEncoderBatchTest(){
 		super(new PMMLEquivalence(1e-13, 1e-13));
 	}
 
 	@Override
-	public SkLearnTestBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
-		SkLearnTestBatch result = new SkLearnTestBatch(algorithm, dataset, columnFilter, equivalence){
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
 
 			@Override
-			public SkLearnTest getArchiveBatchTest(){
-				return SkLearnTest.this;
+			public SkLearnEncoderBatchTest getArchiveBatchTest(){
+				return SkLearnEncoderBatchTest.this;
 			}
 		};
 

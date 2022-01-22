@@ -42,7 +42,7 @@ import sklearn2pmml.feature_extraction.text.Splitter;
 
 import static org.junit.Assert.fail;
 
-public class TokenizerTest extends SkLearnTest implements SkLearnDatasets {
+public class TokenizerTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
 
 	@Test
 	public void split() throws Exception {
@@ -66,10 +66,10 @@ public class TokenizerTest extends SkLearnTest implements SkLearnDatasets {
 	}
 
 	private void evaluate(String algorithm, String dataset, Tokenizer tokenizer) throws Exception {
-		Batch batch = new SkLearnTestBatch(algorithm, dataset, (x) -> true, Equivalence.equals()){
+		Batch batch = new SkLearnEncoderBatch(algorithm, dataset, (x) -> true, Equivalence.equals()){
 
 			@Override
-			public SkLearnTest getArchiveBatchTest(){
+			public SkLearnEncoderBatchTest getArchiveBatchTest(){
 				return TokenizerTest.this;
 			}
 		};

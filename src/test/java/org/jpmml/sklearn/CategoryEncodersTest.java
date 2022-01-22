@@ -22,7 +22,7 @@ import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.junit.Test;
 
-public class CategoryEncodersTest extends SkLearnTest implements SkLearnDatasets, Fields {
+public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements SkLearnDatasets, Fields {
 
 	@Test
 	public void evaluateBase2EncoderAudit() throws Exception {

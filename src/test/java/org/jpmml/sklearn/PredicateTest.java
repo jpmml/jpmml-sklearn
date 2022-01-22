@@ -37,7 +37,7 @@ import sklearn.tree.HasTreeOptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class PredicateTest extends SkLearnTest implements SkLearnDatasets {
+public class PredicateTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
 
 	@Test
 	public void checkNumeric() throws Exception {
@@ -64,7 +64,7 @@ public class PredicateTest extends SkLearnTest implements SkLearnDatasets {
 		Predicate<ResultField> predicate = (resultField) -> true;
 		Equivalence<Object> equivalence = getEquivalence();
 
-		try(SkLearnTestBatch batch = (SkLearnTestBatch)createBatch(name, dataset, predicate, equivalence)){
+		try(SkLearnEncoderBatch batch = (SkLearnEncoderBatch)createBatch(name, dataset, predicate, equivalence)){
 			batch.setOptions(options);
 
 			Boolean numeric = (Boolean)options.get(HasTreeOptions.OPTION_NUMERIC);
@@ -74,7 +74,7 @@ public class PredicateTest extends SkLearnTest implements SkLearnDatasets {
 	}
 
 	static
-	private void check(SkLearnTestBatch batch, boolean numeric) throws Exception {
+	private void check(SkLearnEncoderBatch batch, boolean numeric) throws Exception {
 		PMML pmml = batch.getPMML();
 
 		Visitor visitor = new AbstractVisitor(){

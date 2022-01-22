@@ -22,7 +22,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Fields;
 import org.junit.Test;
 
-public class H2OTest extends SkLearnTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
+public class H2OTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
 
 	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {

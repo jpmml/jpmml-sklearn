@@ -25,7 +25,7 @@ import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ResultField;
 
 abstract
-public class MarkupTest extends SkLearnTest {
+public class MarkupTest extends SkLearnEncoderBatchTest {
 
 	abstract
 	public void check(PMML pmml);
@@ -34,7 +34,7 @@ public class MarkupTest extends SkLearnTest {
 		Predicate<ResultField> predicate = (resultField) -> true;
 		Equivalence<Object> equivalence = getEquivalence();
 
-		try(SkLearnTestBatch batch = (SkLearnTestBatch)createBatch(name, dataset, predicate, equivalence)){
+		try(SkLearnEncoderBatch batch = (SkLearnEncoderBatch)createBatch(name, dataset, predicate, equivalence)){
 			PMML pmml = batch.getPMML();
 
 			check(pmml);

@@ -20,7 +20,7 @@ package org.jpmml.sklearn;
 
 import org.junit.Test;
 
-public class SkLearn2PMMLTest extends SkLearnTest implements SkLearnDatasets {
+public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
 
 	@Test
 	public void evaluateMLPAutoencoderIris() throws Exception {

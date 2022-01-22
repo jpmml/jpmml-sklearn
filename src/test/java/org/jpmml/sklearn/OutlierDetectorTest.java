@@ -23,7 +23,7 @@ import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class OutlierDetectorTest extends SkLearnTest implements SkLearnAlgorithms, SkLearnDatasets {
+public class OutlierDetectorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets {
 
 	@Test
 	public void evaluateIsolationForestHousing() throws Exception {

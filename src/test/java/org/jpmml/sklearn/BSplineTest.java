@@ -28,11 +28,11 @@ import org.jpmml.evaluator.ResultField;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class BSplineTest extends SkLearnTest {
+public class BSplineTest extends SkLearnEncoderBatchTest {
 
 	@Override
-	public SkLearnTestBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
-		SkLearnTestBatch result = new SkLearnTestBatch(algorithm, dataset, columnFilter, equivalence){
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
 
 			@Override
 			public BSplineTest getArchiveBatchTest(){
