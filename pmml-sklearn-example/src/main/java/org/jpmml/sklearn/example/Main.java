@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package org.jpmml.sklearn.example;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,6 +35,7 @@ import org.jpmml.model.metro.MetroJAXBUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.Storage;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Estimator;

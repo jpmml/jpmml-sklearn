@@ -11,6 +11,7 @@
 	<groupId>org.jpmml</groupId>
 	<artifactId>jpmml-sklearn</artifactId>
 	<version>1.7-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
 	<name>JPMML-SkLearn</name>
 	<description>Java library and command-line application for converting Scikit-Learn models to PMML</description>
@@ -31,6 +32,11 @@
 		</developer>
 	</developers>
 
+	<modules>
+		<module>pmml-sklearn</module>
+		<module>pmml-sklearn-example</module>
+	</modules>
+
 	<scm>
 		<connection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</connection>
 		<developerConnection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</developerConnection>
@@ -42,56 +48,68 @@
 		<url>https://github.com/jpmml/jpmml-sklearn/issues</url>
 	</issueManagement>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-evaluator-testing</artifactId>
-			<version>1.6.2</version>
-			<scope>provided</scope>
-		</dependency>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-sklearn</artifactId>
+				<version>1.7-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-sklearn-example</artifactId>
+				<version>1.7-SNAPSHOT</version>
+			</dependency>
 
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-h2o</artifactId>
-			<version>1.2.2</version>
-		</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-evaluator-testing</artifactId>
+				<version>1.6.2</version>
+			</dependency>
 
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-lightgbm</artifactId>
-			<version>1.4.2</version>
-		</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-h2o</artifactId>
+				<version>1.2.2</version>
+			</dependency>
 
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-python</artifactId>
-			<version>1.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-python-testing</artifactId>
-			<version>1.1.2</version>
-		</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-lightgbm</artifactId>
+				<version>1.4.2</version>
+			</dependency>
 
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-xgboost</artifactId>
-			<version>1.6.2</version>
-		</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-python</artifactId>
+				<version>1.1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-python-testing</artifactId>
+				<version>1.1.2</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.beust</groupId>
-			<artifactId>jcommander</artifactId>
-			<version>1.72</version>
-		</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-xgboost</artifactId>
+				<version>1.6.2</version>
+			</dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.2</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+			<dependency>
+				<groupId>com.beust</groupId>
+				<artifactId>jcommander</artifactId>
+				<version>1.72</version>
+			</dependency>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.13.2</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>
@@ -102,21 +120,6 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-					</archive>
-					<excludes>
-						<exclude>*.py</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -135,40 +138,6 @@
 					<localCheckout>true</localCheckout>
 					<pushChanges>false</pushChanges>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.4</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<finalName>${project.artifactId}-executable-${project.version}</finalName>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.jpmml.sklearn.Main</mainClass>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
