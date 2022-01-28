@@ -8,11 +8,11 @@ from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
 
-iris_X, iris_y = load_iris("Iris")
-
 mlp = MLPRegressor(hidden_layer_sizes = (11, ), solver = "lbfgs", random_state = 13)
 
-def build_iris(name, transformer, predict_proba_transformer = None):
+def build_iris(iris_df, name, transformer, predict_proba_transformer = None):
+	iris_X, iris_y = split_csv(iris_df)
+
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
 		("transformer", transformer),
@@ -29,5 +29,7 @@ def build_iris(name, transformer, predict_proba_transformer = None):
 	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
 
-build_iris("MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")]), "decision", prefit = True))
-build_iris("MLPTransformerIris", MLPTransformer(mlp, transformer_output_layer = 1))
+iris_df = load_iris("Iris")
+
+build_iris(iris_df, "MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")]), "decision", prefit = True))
+build_iris(iris_df, "MLPTransformerIris", MLPTransformer(mlp, transformer_output_layer = 1))

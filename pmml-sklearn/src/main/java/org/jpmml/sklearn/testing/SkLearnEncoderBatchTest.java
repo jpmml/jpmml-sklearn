@@ -29,7 +29,11 @@ abstract
 public class SkLearnEncoderBatchTest extends PythonEncoderBatchTest {
 
 	public SkLearnEncoderBatchTest(){
-		super(new PMMLEquivalence(1e-13, 1e-13));
+		this(new PMMLEquivalence(1e-13, 1e-13));
+	}
+
+	public SkLearnEncoderBatchTest(Equivalence<Object> equivalence){
+		super(equivalence);
 	}
 
 	@Override

@@ -46,7 +46,8 @@ def make_estimatortransformer_pipeline(cat_cols, cont_cols, transformer_estimato
 	return pipeline
 
 def build_estimatortransformer_wheat(name):
-	wheat_X, wheat_y = load_wheat("Wheat")
+	wheat_df = load_wheat("Wheat")
+	wheat_X, wheat_y = split_csv(wheat_df)
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
@@ -63,7 +64,8 @@ def build_estimatortransformer_wheat(name):
 build_estimatortransformer_wheat("EstimatorTransformerWheat")
 
 def build_estimatortransformer_audit(name):
-	audit_X, audit_y = load_audit("Audit")
+	audit_df = load_audit("Audit")
+	audit_X, audit_y = split_csv(audit_df)
 
 	pipeline = make_estimatortransformer_pipeline(["Employment", "Education", "Marital", "Occupation", "Gender"], ["Age", "Income", "Hours"], LogisticRegression(random_state = 13), DecisionTreeClassifier(min_samples_split = 10, random_state = 13))
 	pipeline.fit(audit_X, audit_y)
@@ -76,7 +78,8 @@ def build_estimatortransformer_audit(name):
 build_estimatortransformer_audit("EstimatorTransformerAudit")
 
 def build_estimatortransformer_versicolor(outlier_detector_estimator, final_estimator, name):
-	versicolor_X, versicolor_y = load_versicolor("Versicolor")
+	versicolor_df = load_versicolor("Versicolor")
+	versicolor_X, versicolor_y = split_csv(versicolor_df)
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
@@ -93,7 +96,8 @@ def build_estimatortransformer_versicolor(outlier_detector_estimator, final_esti
 build_estimatortransformer_versicolor(OneClassSVM(), LinearDiscriminantAnalysis(), "EstimatorTransformerVersicolor")
 
 def build_estimatortransformer_iris(outlier_detector_estimator, final_estimator, name):
-	iris_X, iris_y = load_iris("Iris")
+	iris_df = load_iris("Iris")
+	iris_X, iris_y = split_csv(iris_df)
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
@@ -110,7 +114,8 @@ def build_estimatortransformer_iris(outlier_detector_estimator, final_estimator,
 build_estimatortransformer_iris(IsolationForest(n_estimators = 3, max_features = 2, contamination = 0.03, random_state = 13), LogisticRegression(random_state = 13), "EstimatorTransformerIris")
 
 def build_estimatortransformer_auto(name):
-	auto_X, auto_y = load_auto("Auto")
+	auto_df = load_auto("Auto")
+	auto_X, auto_y = split_csv(auto_df)
 
 	pipeline = make_estimatortransformer_pipeline(["cylinders", "model_year", "origin"], ["displacement", "horsepower", "weight", "acceleration"], LinearRegression(), DecisionTreeRegressor(min_samples_split = 25, random_state = 13))
 	pipeline.fit(auto_X, auto_y)
@@ -121,7 +126,8 @@ def build_estimatortransformer_auto(name):
 build_estimatortransformer_auto("EstimatorTransformerAuto")
 
 def build_estimatortransformer_housing(name):
-	housing_X, housing_y = load_housing("Housing")
+	housing_df = load_housing("Housing")
+	housing_X, housing_y = split_csv(housing_df)
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
@@ -136,7 +142,8 @@ def build_estimatortransformer_housing(name):
 build_estimatortransformer_housing("EstimatorTransformerHousing")
 
 def build_estimatortransformer_visit(name):
-	visit_X, visit_y = load_visit("Visit")
+	visit_df = load_visit("Visit")
+	visit_X, visit_y = split_csv(visit_df)
 
 	pipeline = PMMLPipeline([
 		("mapper", ColumnTransformer([

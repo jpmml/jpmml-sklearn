@@ -81,9 +81,4 @@ interface SkLearnAlgorithms {
 	String THEIL_SEN = "TheilSen";
 	String VOTING = "Voting";
 	String VOTING_ENSEMBLE = VOTING + "Ensemble";
-	String XGB = "XGB";
-	String XGB_LR = "XGBLR";
-	String XGBRF = "XGBRF";
-	String XGBRF_LM = "XGBRFLM";
-	String XGBRF_LR = "XGBRFLR";
 }

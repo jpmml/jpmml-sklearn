@@ -27,11 +27,9 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
-import sklearn.Estimator;
 
 public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
 
@@ -223,33 +221,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 	}
 
 	@Test
-	public void evaluateXGBAudit() throws Exception {
-		evaluate(XGB, AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(8));
-	}
-
-	@Test
-	public void evaluateXGBAuditNA() throws Exception {
-		String[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create(Estimator.FIELD_PREDICT, AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
-
-		evaluate(XGB, AUDIT_NA, excludeFields(transformFields), new FloatEquivalence(8));
-	}
-
-	@Test
-	public void evaluateXGBLRAudit() throws Exception {
-		evaluate(XGB_LR, AUDIT);
-	}
-
-	@Test
-	public void evaluateXGBRFAudit() throws Exception {
-		evaluate(XGBRF, AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(4));
-	}
-
-	@Test
-	public void evaluateXGBRFLRAudit() throws Exception {
-		evaluate(XGBRF_LR, AUDIT);
-	}
-
-	@Test
 	public void evaluateDecisionTreeIris() throws Exception {
 		evaluate(DECISION_TREE, IRIS);
 	}
@@ -385,11 +356,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 	}
 
 	@Test
-	public void evaluateXGBIris() throws Exception {
-		evaluate(XGB, IRIS, excludeFields(IRIS_PROBABILITY_SETOSA), new FloatEquivalence(16));
-	}
-
-	@Test
 	public void evaluateLinearSVCSentiment() throws Exception {
 		evaluate(LINEAR_SVC, SENTIMENT);
 	}
@@ -447,11 +413,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 	@Test
 	public void evaluateNuSVCVersicolor() throws Exception {
 		evaluate(NU_SVC, VERSICOLOR);
-	}
-
-	@Test
-	public void evaluateXGBRFLRVersicolor() throws Exception {
-		evaluate(XGBRF_LR, VERSICOLOR);
 	}
 
 	static

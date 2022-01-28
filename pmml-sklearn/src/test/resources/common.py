@@ -37,7 +37,7 @@ def load_audit(name, stringify = True):
 	if stringify:
 		df["Deductions"] = df["Deductions"].replace(True, "TRUE").replace(False, "FALSE").astype(str)
 	print(df.dtypes)
-	return split_csv(df)
+	return df
 
 def load_auto(name):
 	df = load_csv(name)
@@ -47,7 +47,7 @@ def load_auto(name):
 	df["horsepower"] = df["horsepower"].astype(float)
 	df["weight"] = df["weight"].astype(float)
 	print(df.dtypes)
-	return split_csv(df)
+	return df
 
 def load_housing(name):
 	df = load_csv(name)
@@ -55,30 +55,30 @@ def load_housing(name):
 	df["CHAS"] = df["CHAS"].astype(float)
 	df["RAD"] = df["RAD"].astype(float)
 	print(df.dtypes)
-	return split_csv(df)
+	return df
 
 def load_iris(name):
 	df = load_csv(name)
 	print(df.dtypes)
-	return split_csv(df)
+	return df
 
 def load_sentiment(name):
 	df = load_csv(name)
 	print(df.dtypes)
-	return (df["Sentence"], df["Score"])
+	return df
 
 def load_versicolor(name):
 	df = load_csv(name)
 	print(df.dtypes)
 	df["Species"] = df["Species"].astype(int)
-	return split_csv(df)
+	return df
 
 def load_visit(name):
 	df = load_csv(name)
 	print(df.dtypes)
-	return split_csv(df)
+	return df
 
 def load_wheat(name):
 	df = load_csv(name)
 	print(df.dtypes)
-	return split_csv(df)
+	return df

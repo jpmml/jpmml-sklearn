@@ -13,20 +13,18 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder as SkLearnOneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
-from xgboost import XGBClassifier
 
 import numpy
 
-cat_cols = ["Employment", "Education", "Marital", "Occupation", "Gender"]
-cont_cols = ["Age", "Income", "Hours"]
-
 def load_filter_audit(name, filter = False):
 	if name.endswith("Audit"):
-		audit_X, audit_y = load_audit("Audit")
+		audit_df = load_audit("Audit")
 	elif name.endswith("AuditNA"):
-		audit_X, audit_y = load_audit("AuditNA")
+		audit_df = load_audit("AuditNA")
 	else:
 		raise ValueError()
+
+	audit_X, audit_y = split_csv(audit_df)
 
 	if filter:
 		mask = numpy.ones((audit_X.shape[0], ), dtype = bool)
@@ -55,8 +53,8 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 
 	steps = [
 		("mapper", ColumnTransformer([
-			("cat", cat_encoder, cat_cols),
-			("cont", cont_encoder, cont_cols)
+			("cat", cat_encoder, ["Employment", "Education", "Marital", "Occupation", "Gender"]),
+			("cont", cont_encoder, ["Age", "Income", "Hours"])
 		])),
 		("classifier", classifier)
 	]
@@ -76,55 +74,47 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
-classifier = LogisticRegression()
+if __name__ == "__main__":
+	classifier = LogisticRegression()
 
-build_audit(OneHotEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAudit")
-build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
+	build_audit(OneHotEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAudit")
+	build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "error", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAudit")
 
-classifier = HistGradientBoostingClassifier(random_state = 13)
+	classifier = HistGradientBoostingClassifier(random_state = 13)
 
-build_audit(OneHotEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAuditNA")
-build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAuditNA")
+	build_audit(OneHotEncoder(handle_missing = "value", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAuditNA")
+	build_audit(Pipeline([("ordinal", OrdinalEncoder(handle_missing = "value", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "OrdinalEncoderAuditNA")
 
-classifier = LogisticRegression()
+	classifier = LogisticRegression()
 
-build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base2EncoderAudit")
-build_audit(BaseNEncoder(base = 2, handle_missing = "value", handle_unknown = "value"), SimpleImputer(), clone(classifier), "Base2EncoderAuditNA")
-build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
-build_audit(Pipeline([("basen", BaseNEncoder(base = 3, handle_missing = "value", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder(handle_unknown = "ignore"))]), SimpleImputer(), clone(classifier), "Base3EncoderAuditNA")
+	build_audit(BaseNEncoder(base = 2, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base2EncoderAudit")
+	build_audit(BaseNEncoder(base = 2, handle_missing = "value", handle_unknown = "value"), SimpleImputer(), clone(classifier), "Base2EncoderAuditNA")
+	build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
+	build_audit(Pipeline([("basen", BaseNEncoder(base = 3, handle_missing = "value", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder(handle_unknown = "ignore"))]), SimpleImputer(), clone(classifier), "Base3EncoderAuditNA")
 
-xgb_pmml_options = {"compact": False, "numeric": False}
+	classifier = HistGradientBoostingClassifier(random_state = 13)
 
-classifier = XGBClassifier(n_estimators = 101, random_state = 13)
+	build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit")
+	build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "Base4EncoderAuditNA")
 
-build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", **xgb_pmml_options)
+	rf_pmml_options = {"compact" : False, "numeric": True}
 
-xgb_pmml_options = {"compact": False, "numeric": True}
+	classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
 
-build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "Base4EncoderAuditNA", **xgb_pmml_options)
+	build_audit(BinaryEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAudit", **rf_pmml_options)
+	build_audit(CatBoostEncoder(a = 0.5, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAudit", **rf_pmml_options)
+	build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CountEncoderAudit", **rf_pmml_options)
+	build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAudit", **rf_pmml_options)
 
-rf_pmml_options = {"compact" : False, "numeric": True}
+	build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "TargetEncoderAudit", **rf_pmml_options)
+	build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "WOEEncoderAudit", **rf_pmml_options)
 
-classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
+	classifier = HistGradientBoostingClassifier(random_state = 13)
 
-build_audit(BinaryEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAudit", **rf_pmml_options)
-build_audit(CatBoostEncoder(a = 0.5, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAudit", **rf_pmml_options)
-build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CountEncoderAudit", **rf_pmml_options)
-build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAudit", **rf_pmml_options)
+	build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAuditNA")
+	build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAuditNA")
+	build_audit(CountEncoder(min_group_size = 10, handle_missing = "value", handle_unknown = 10), "passthrough", clone(classifier), "CountEncoderAuditNA")
+	build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAuditNA")
 
-build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "TargetEncoderAudit", **rf_pmml_options)
-build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "WOEEncoderAudit", **rf_pmml_options)
-
-xgb_pmml_options = {"compact": False, "numeric": True, "prune": True}
-
-classifier = XGBClassifier(n_estimators = 101, random_state = 13)
-
-build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAuditNA", **xgb_pmml_options)
-build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAuditNA", **xgb_pmml_options)
-build_audit(CountEncoder(min_group_size = 10, handle_missing = "value", handle_unknown = 10), "passthrough", clone(classifier), "CountEncoderAuditNA", **xgb_pmml_options)
-build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAuditNA", **xgb_pmml_options)
-
-xgb_pmml_options = {"compact": False, "numeric": True}
-
-build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "TargetEncoderAuditNA", **xgb_pmml_options)
-build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "WOEEncoderAuditNA", **xgb_pmml_options)
+	build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "TargetEncoderAuditNA")
+	build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "WOEEncoderAuditNA")

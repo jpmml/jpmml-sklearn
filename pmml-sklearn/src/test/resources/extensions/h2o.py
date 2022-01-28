@@ -16,9 +16,9 @@ import h2o
 h2o.init()
 h2o.connect()
 
-audit_X, audit_y = load_audit("Audit")
+def build_audit(audit_df, classifier, name):
+	audit_X, audit_y = split_csv(audit_df)
 
-def build_audit(classifier, name):
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
 		[([column], CategoricalDomain()) for column in ["Employment", "Education", "Marital", "Occupation", "Gender", "Deductions"]]
@@ -40,18 +40,16 @@ def build_audit(classifier, name):
 	adjusted.set_names(["h2o(Adjusted)", "probability(0)", "probability(1)"])
 	store_csv(adjusted.as_data_frame(), name)
 
-build_audit(H2OGradientBoostingEstimator(distribution = "bernoulli", ntrees = 17), "H2OGradientBoostingAudit")
-build_audit(H2OGeneralizedLinearEstimator(family = "binomial"), "H2OLogisticRegressionAudit")
-build_audit(H2ORandomForestEstimator(distribution = "bernoulli", seed = 13), "H2ORandomForestAudit")
-build_audit(H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAudit")
+audit_df = load_audit("Audit")
 
-auto_X, auto_y = load_auto("Auto")
+build_audit(audit_df, H2OGradientBoostingEstimator(distribution = "bernoulli", ntrees = 17), "H2OGradientBoostingAudit")
+build_audit(audit_df, H2OGeneralizedLinearEstimator(family = "binomial"), "H2OLogisticRegressionAudit")
+build_audit(audit_df, H2ORandomForestEstimator(distribution = "bernoulli", seed = 13), "H2ORandomForestAudit")
+build_audit(audit_df, H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAudit")
 
-auto_X["cylinders"] = auto_X["cylinders"].astype(int)
-auto_X["model_year"] = auto_X["model_year"].astype(int)
-auto_X["origin"] = auto_X["origin"].astype(int)
+def build_auto(auto_df, regressor, name):
+	auto_X, auto_y = split_csv(auto_df)
 
-def build_auto(regressor, name):
 	transformer = ColumnTransformer(
 		[(column, CategoricalDomain(), [column]) for column in ["cylinders", "model_year", "origin"]] +
 		[(column, ContinuousDomain(), [column]) for column in ["displacement", "horsepower", "weight", "acceleration"]]
@@ -73,9 +71,15 @@ def build_auto(regressor, name):
 	mpg.set_names(["mpg"])
 	store_csv(mpg.as_data_frame(), name)
 
-build_auto(H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
-build_auto(H2OGeneralizedLinearEstimator(family = "gaussian"), "H2OLinearRegressionAuto")
-build_auto(H2ORandomForestEstimator(distribution = "gaussian", seed = 13), "H2ORandomForestAuto")
-build_auto(H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAuto")
+auto_df = load_auto("Auto")
+
+auto_df["cylinders"] = auto_df["cylinders"].astype(int)
+auto_df["model_year"] = auto_df["model_year"].astype(int)
+auto_df["origin"] = auto_df["origin"].astype(int)
+
+build_auto(auto_df, H2OGradientBoostingEstimator(distribution = "gaussian", ntrees = 17), "H2OGradientBoostingAuto")
+build_auto(auto_df, H2OGeneralizedLinearEstimator(family = "gaussian"), "H2OLinearRegressionAuto")
+build_auto(auto_df, H2ORandomForestEstimator(distribution = "gaussian", seed = 13), "H2ORandomForestAuto")
+build_auto(auto_df, H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAuto")
 
 h2o.shutdown()

@@ -57,11 +57,6 @@ public class FeatureImportancesTest extends MarkupTest implements SkLearnAlgorit
 		check(RANDOM_FOREST, AUDIT);
 	}
 
-	@Test
-	public void checkXGBoostAudit() throws Exception {
-		check(XGB, AUDIT);
-	}
-
 	@Override
 	public void check(PMML pmml){
 		Visitor visitor = new AbstractVisitor(){
@@ -71,17 +66,7 @@ public class FeatureImportancesTest extends MarkupTest implements SkLearnAlgorit
 				PMMLObject parent = getParent();
 
 				if(parent instanceof PMML){
-					String algorithmName = miningModel.getAlgorithmName();
-
-					if(algorithmName != null && algorithmName.contains("XGBoost")){
-						check(miningModel, null);
-
-						return VisitorAction.TERMINATE;
-					} else
-
-					{
-						check(miningModel, 1d);
-					}
+					check(miningModel, 1d);
 				}
 
 				return super.visit(miningModel);

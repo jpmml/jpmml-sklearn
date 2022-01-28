@@ -20,7 +20,6 @@ package org.jpmml.sklearn.testing;
 
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Fields;
-import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
@@ -187,21 +186,6 @@ public class RegressorTest extends SkLearnEncoderBatchTest implements SkLearnAlg
 	}
 
 	@Test
-	public void evaluateXGBAuto() throws Exception {
-		evaluate(XGB, AUTO, new FloatEquivalence(4));
-	}
-
-	@Test
-	public void evaluateXGBRFAuto() throws Exception {
-		evaluate(XGBRF, AUTO, new FloatEquivalence(2));
-	}
-
-	@Test
-	public void evaluateXGBRFLMAuto() throws Exception {
-		evaluate(XGBRF_LM, AUTO);
-	}
-
-	@Test
 	public void evaluateAdaBoostHousing() throws Exception {
 		evaluate(ADA_BOOST, HOUSING);
 	}
@@ -254,11 +238,6 @@ public class RegressorTest extends SkLearnEncoderBatchTest implements SkLearnAlg
 	@Test
 	public void evaluateVotingEnsembleHousing() throws Exception {
 		evaluate(VOTING_ENSEMBLE, HOUSING);
-	}
-
-	@Test
-	public void evaluateXGBRFLMHousing() throws Exception {
-		evaluate(XGBRF_LM, HOUSING);
 	}
 
 	@Test

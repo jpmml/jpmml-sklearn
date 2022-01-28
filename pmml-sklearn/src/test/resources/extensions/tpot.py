@@ -19,8 +19,8 @@ def filter_config(config):
 # Classification
 #
 
-def build_classifier(data, feature_pipeline, generations, population_size, name):
-	X, y = data
+def build_classifier(df, feature_pipeline, generations, population_size, name):
+	X, y = split_csv(df)
 	Xt = feature_pipeline.fit_transform(X)
 	Xt = Xt.astype(float)
 	categories = pandas.unique(y)
@@ -46,7 +46,7 @@ def build_classifier(data, feature_pipeline, generations, population_size, name)
 		result = pandas.concat([result, probabilities], axis = 1)
 	store_csv(result, name)
 
-audit_data = load_audit("Audit")
+audit_df = load_audit("Audit")
 
 audit_feature_pipeline = Pipeline([
 	("mapper", DataFrameMapper(
@@ -56,28 +56,28 @@ audit_feature_pipeline = Pipeline([
 	, df_out = True))
 ])
 
-build_classifier(audit_data, audit_feature_pipeline, 3, 7, "TPOTAudit")
+build_classifier(audit_df, audit_feature_pipeline, 3, 7, "TPOTAudit")
 
-iris_data = load_iris("Iris")
+iris_df = load_iris("Iris")
 
 iris_feature_pipeline = Pipeline([
 	("mapper", DataFrameMapper([
-		(iris_data[0].columns.values, ContinuousDomain())
+		(["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], ContinuousDomain())
 	]))
 ])
 
-build_classifier(iris_data, iris_feature_pipeline, 7, 17, "TPOTIris")
+build_classifier(iris_df, iris_feature_pipeline, 7, 17, "TPOTIris")
 
-versicolor_data = load_iris("Versicolor")
+versicolor_df = load_iris("Versicolor")
 
-build_classifier(versicolor_data, iris_feature_pipeline, 7, 17, "TPOTVersicolor")
+build_classifier(versicolor_df, iris_feature_pipeline, 7, 17, "TPOTVersicolor")
 
 #
 # Regression
 #
 
-def build_regressor(data, feature_pipeline, generations, population_size, name):
-	X, y = data
+def build_regressor(df, feature_pipeline, generations, population_size, name):
+	X, y = split_csv(df)
 	Xt = feature_pipeline.fit_transform(X)
 	Xt = Xt.astype(float)
 	config = make_tpot_pmml_config(regressor_config_dict)
@@ -93,7 +93,7 @@ def build_regressor(data, feature_pipeline, generations, population_size, name):
 	result = DataFrame(regressor.predict(Xt), columns = [y.name])
 	store_csv(result, name)
 
-auto_data = load_auto("Auto")
+auto_df = load_auto("Auto")
 
 auto_feature_pipeline = Pipeline([
 	("mapper", DataFrameMapper(
@@ -104,14 +104,14 @@ auto_feature_pipeline = Pipeline([
 	))
 ])
 
-build_regressor(auto_data, auto_feature_pipeline, 7, 17, "TPOTAuto")
+build_regressor(auto_df, auto_feature_pipeline, 7, 17, "TPOTAuto")
 
-housing_data = load_housing("Housing")
+housing_df = load_housing("Housing")
 
 housing_feature_pipeline = Pipeline([
 	("mapper", DataFrameMapper([
-		(housing_data[0].columns.values, ContinuousDomain())
+		(["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"], ContinuousDomain())
 	]))
 ])
 
-build_regressor(housing_data, housing_feature_pipeline, 5, 11, "TPOTHousing")
+build_regressor(housing_df, housing_feature_pipeline, 5, 11, "TPOTHousing")

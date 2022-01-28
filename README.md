@@ -360,7 +360,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>XGBoost</summary>
 
-  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/main-xgboost.py)
 
   * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
   * [`xgboost.XGBRanker`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRanker)
