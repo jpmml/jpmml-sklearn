@@ -30,6 +30,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-sklearn-lightgbm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-sklearn-xgboost</artifactId>
 		</dependency>
 

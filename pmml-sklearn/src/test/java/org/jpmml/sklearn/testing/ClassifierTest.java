@@ -28,7 +28,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
-import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 
 public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
@@ -46,7 +45,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 			public String getInputCsvPath(){
 				String path = super.getInputCsvPath();
 
-				path = path.replace("Cat", "");
 				path = path.replace("Dict", "");
 
 				return path;
@@ -121,21 +119,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 	@Test
 	public void evaluateHistGradientBoostingAuditNA() throws Exception {
 		evaluate(HIST_GRADIENT_BOOSTING, AUDIT_NA);
-	}
-
-	@Test
-	public void evaluateLGBMAudit() throws Exception {
-		evaluate(LGBM, AUDIT, new RealNumberEquivalence(2));
-	}
-
-	@Test
-	public void evaluateLGBMAuditCat() throws Exception {
-		evaluate(LGBM, AUDIT_CAT, new RealNumberEquivalence(2));
-	}
-
-	@Test
-	public void evaluateLGBMLRAuditCat() throws Exception {
-		evaluate(LGBM_LR, AUDIT_CAT);
 	}
 
 	@Test
@@ -253,11 +236,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 	@Test
 	public void evaluateKNNIris() throws Exception {
 		evaluate(KNN, IRIS, excludeFields(createNeighborFields(5)));
-	}
-
-	@Test
-	public void evaluateLGBMIris() throws Exception {
-		evaluate(LGBM, IRIS, new RealNumberEquivalence(1));
 	}
 
 	@Test

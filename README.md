@@ -241,7 +241,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>LightGBM</summary>
 
-  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main-lightgbm.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-lightgbm/src/test/resources/main-lightgbm.py)
 
   * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
   * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)

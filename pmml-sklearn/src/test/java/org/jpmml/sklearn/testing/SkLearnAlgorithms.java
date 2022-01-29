@@ -46,8 +46,6 @@ interface SkLearnAlgorithms {
 	String LARS = "Lars";
 	String LASSO = "Lasso";
 	String LASSO_LARS = LASSO + LARS;
-	String LGBM = "LGBM";
-	String LGBM_LR = "LGBMLR";
 	String LINEAR_DISCRIMINANT_ANALYSIS = "LinearDiscriminantAnalysis";
 	String LINEAR_REGRESSION = "LinearRegression";
 	String TRANSFORMED_LINEAR_REGRESSION = "Transformed" + LINEAR_REGRESSION;

@@ -20,7 +20,6 @@ package org.jpmml.sklearn.testing;
 
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Fields;
-import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 
@@ -126,11 +125,6 @@ public class RegressorTest extends SkLearnEncoderBatchTest implements SkLearnAlg
 	@Test
 	public void evaluateLassoLarsAuto() throws Exception {
 		evaluate(LASSO_LARS, AUTO);
-	}
-
-	@Test
-	public void evaluateLGBMAuto() throws Exception {
-		evaluate(LGBM, AUTO, new RealNumberEquivalence(1));
 	}
 
 	@Test

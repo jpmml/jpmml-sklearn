@@ -23,6 +23,5 @@ import org.jpmml.converter.testing.Datasets;
 interface SkLearnDatasets extends Datasets {
 
 	String APOLLO = "Apollo";
-	String AUDIT_CAT = AUDIT + "Cat";
 	String AUDIT_DICT = AUDIT + "Dict";
 }
