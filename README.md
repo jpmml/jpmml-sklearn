@@ -48,7 +48,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Scikit-Learn</summary>
 
-  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/main.py)
 
   * Clustering:
     * [`cluster.KMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
@@ -193,7 +193,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>H2O.ai</summary>
 
-  Examples: [main-h2o.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-h2o/src/test/resources/extensions/main-h2o.py)
+  Examples: [main-h2o.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-h2o/src/test/resources/main-h2o.py)
 
   * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
   * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
@@ -269,7 +269,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>SkLearn2PMML</summary>
 
-  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) and [extensions/sklearn2pmml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/sklearn2pmml.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/main.py) and [extensions/sklearn2pmml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/extensions/sklearn2pmml.py)
 
   * Helpers:
     * `sklearn2pmml.EstimatorProxy`
@@ -343,7 +343,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Sklearn-Pandas</summary>
 
-  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py)
+  Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/main.py)
 
   * `sklearn_pandas.CategoricalImputer`
   * `sklearn_pandas.DataFrameMapper`
