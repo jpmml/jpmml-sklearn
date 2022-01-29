@@ -22,10 +22,10 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import h2o.estimators.BaseEstimator;
 import org.jpmml.python.HasArray;
+import org.jpmml.python.PythonObject;
 
-public class BinMapper extends BaseEstimator {
+public class BinMapper extends PythonObject {
 
 	public BinMapper(String module, String name){
 		super(module, name);

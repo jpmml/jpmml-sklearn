@@ -27,7 +27,6 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import h2o.estimators.BaseEstimator;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -327,12 +326,6 @@ public class PMMLPipeline extends Pipeline {
 			List<? extends Number> probabilityValues = null;
 
 			boolean hasProbabilityValues = verification.hasProbabilityValues();
-
-			if(estimator instanceof BaseEstimator){
-				BaseEstimator baseEstimator = (BaseEstimator)estimator;
-
-				hasProbabilityValues &= baseEstimator.hasProbabilityDistribution();
-			} else
 
 			if(estimator instanceof Classifier){
 				Classifier classifier = (Classifier)estimator;

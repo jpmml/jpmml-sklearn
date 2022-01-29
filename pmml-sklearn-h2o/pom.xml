@@ -9,11 +9,11 @@
 	</parent>
 
 	<groupId>org.jpmml</groupId>
-	<artifactId>pmml-sklearn</artifactId>
+	<artifactId>pmml-sklearn-h2o</artifactId>
 	<packaging>jar</packaging>
 
-	<name>JPMML SkLearn converter</name>
-	<description>JPMML Scikit-Learn to class model converter</description>
+	<name>JPMML SkLearn H2O.ai converter</name>
+	<description>JPMML Scikit-Learn H2O.ai to class model converter</description>
 
 	<licenses>
 		<license>
@@ -26,17 +26,18 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-sklearn</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator-testing</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-python</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-python-testing</artifactId>
+			<artifactId>pmml-h2o</artifactId>
 		</dependency>
 
 		<dependency>
@@ -44,25 +45,4 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Implementation-Title>JPMML-SkLearn library</Implementation-Title>
-							<Implementation-Version>${project.version}</Implementation-Version>
-						</manifestEntries>
-					</archive>
-					<excludes>
-						<exclude>*.py</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

@@ -18,17 +18,11 @@
  */
 package org.jpmml.sklearn.testing;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import com.google.common.io.ByteStreams;
-import h2o.estimators.BaseEstimator;
 import org.dmg.pmml.Array;
 import org.dmg.pmml.Constant;
 import org.dmg.pmml.HasValue;
@@ -57,12 +51,24 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 
 	@Override
 	public PMML getPMML() throws Exception {
-		String algorithm = getAlgorithm();
-
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		PMMLPipeline pipeline = (PMMLPipeline)loadPickle();
 
+		activate(pipeline);
+
+		try {
+			PMML pmml = pipeline.encodePMML(encoder);
+
+			validatePMML(pmml);
+
+			return pmml;
+		} finally {
+			deactivate(pipeline);
+		}
+	}
+
+	protected void activate(PMMLPipeline pipeline) throws Exception {
 		Map<String, ?> options = getOptions();
 
 		Estimator estimator = pipeline.getFinalEstimator();
@@ -70,35 +76,9 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		if(!options.isEmpty()){
 			estimator.putOptions(options);
 		}
+	}
 
-		File tmpFile = null;
-
-		if(estimator instanceof BaseEstimator){
-			BaseEstimator baseEstimator = (BaseEstimator)estimator;
-
-			tmpFile = File.createTempFile(getAlgorithm() + getDataset(), ".mojo.zip");
-
-			String mojoPath = baseEstimator.getMojoPath();
-
-			try(InputStream is = open("/" + mojoPath)){
-
-				try(OutputStream os = new FileOutputStream(tmpFile)){
-					ByteStreams.copy(is, os);
-				}
-			}
-
-			baseEstimator.setMojoPath(tmpFile.getAbsolutePath());
-		}
-
-		PMML pmml = pipeline.encodePMML(encoder);
-
-		validatePMML(pmml);
-
-		if(tmpFile != null){
-			tmpFile.delete();
-		}
-
-		return pmml;
+	protected void deactivate(PMMLPipeline pipeline) throws Exception {
 	}
 
 	@Override

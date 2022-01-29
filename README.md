@@ -193,7 +193,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>H2O.ai</summary>
 
-  Examples: [extensions/h2o.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/h2o.py)
+  Examples: [main-h2o.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-h2o/src/test/resources/extensions/main-h2o.py)
 
   * [`h2o.estimators.gbm.H2OGradientBoostingEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogradientboostingestimator)
   * [`h2o.estimators.glm.H2OGeneralizedLinearEstimator`](https://docs.h2o.ai/h2o/latest-stable/h2o-py/docs/modeling.html#h2ogeneralizedlinearestimator)
