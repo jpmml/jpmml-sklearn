@@ -65,10 +65,10 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.visitors.TreeModelCompactor;
-import org.jpmml.sklearn.visitors.TreeModelFlattener;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.tree.visitors.TreeModelCompactor;
+import sklearn.tree.visitors.TreeModelFlattener;
 
 public class TreeUtil {
 

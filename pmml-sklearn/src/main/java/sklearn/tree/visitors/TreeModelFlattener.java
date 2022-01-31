@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn.visitors;
+package sklearn.tree.visitors;
 
 import java.util.Iterator;
 import java.util.List;

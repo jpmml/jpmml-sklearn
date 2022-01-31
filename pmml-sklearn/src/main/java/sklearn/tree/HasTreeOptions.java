@@ -27,8 +27,8 @@ import org.dmg.pmml.SimpleSetPredicate;
 import org.dmg.pmml.tree.Node;
 import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.sklearn.HasSkLearnOptions;
-import org.jpmml.sklearn.visitors.TreeModelCompactor;
-import org.jpmml.sklearn.visitors.TreeModelFlattener;
+import sklearn.tree.visitors.TreeModelCompactor;
+import sklearn.tree.visitors.TreeModelFlattener;
 
 public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguration {
 
