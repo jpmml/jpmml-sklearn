@@ -26,7 +26,6 @@ interface SkLearnAlgorithms {
 	String DECISION_TREE = "DecisionTree";
 	String TRANSFORMED_DECISION_TREE = "Transformed" + DECISION_TREE;
 	String DECISION_TREE_ENSEMBLE = DECISION_TREE + "Ensemble";
-	String BALANCED_DECISION_TREE_ENSEMBLE = "Balanced" + DECISION_TREE_ENSEMBLE;
 	String DUMMY = "Dummy";
 	String ELASTIC_NET = "ElasticNet";
 	String EXTRA_TREES = "ExtraTrees";
@@ -65,7 +64,6 @@ interface SkLearnAlgorithms {
 	String ONE_VS_REST = "OneVsRest";
 	String POISSON_REGRESSION = "PoissonRegression";
 	String RANDOM_FOREST = "RandomForest";
-	String BALANCED_RANDOM_FOREST = "Balanced" + RANDOM_FOREST;
 	String RIDGE = "Ridge";
 	String BAYESIAN_RIDGE = "Bayesian" + RIDGE;
 	String RIDGE_ENSEMBLE = RIDGE + "Ensemble";

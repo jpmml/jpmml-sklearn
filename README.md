@@ -177,7 +177,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Category Encoders</summary>
 
-  Examples: [extensions/category_encoders.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/category_encoders.py)
+  Examples: [extensions/category_encoders.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/category_encoders.py)
 
   * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
   * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
@@ -206,7 +206,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Imbalanced-Learn</summary>
 
-  Examples: [extensions/imblearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/imblearn.py)
+  Examples: [extensions/imblearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/imblearn.py)
 
   * Under-sampling methods:
     * [`imblearn.under_sampling.AllKNN`](https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.AllKNN.html)
@@ -259,7 +259,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Scikit-Lego</summary>
 
-  Examples: [extensions/sklego.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/sklego.py)
+  Examples: [extensions/sklego.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/sklego.py)
 
   * `sklego.meta.EstimatorTransformer`
     * Predict functions `apply`, `decision_function`, `predict`.
@@ -352,7 +352,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>TPOT</summary>
 
-  Examples: [extensions/tpot.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/extensions/tpot.py)
+  Examples: [extensions/tpot.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/tpot.py)
 
   * `tpot.builtins.stacking_estimator.StackingEstimator`
 </details>

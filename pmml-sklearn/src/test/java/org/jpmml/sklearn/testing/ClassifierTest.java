@@ -82,11 +82,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 	}
 
 	@Test
-	public void evaluateBalancedDecisionTreeEnsembleAudit() throws Exception {
-		evaluate(BALANCED_DECISION_TREE_ENSEMBLE, AUDIT);
-	}
-
-	@Test
 	public void evaluateDecisionTreeEnsembleAudit() throws Exception {
 		evaluate(DECISION_TREE_ENSEMBLE, AUDIT);
 	}
@@ -171,11 +166,6 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 	@Test
 	public void evaluateRandomForestAudit() throws Exception {
 		evaluate(RANDOM_FOREST, AUDIT);
-	}
-
-	@Test
-	public void evaluateBalancedRandomForestAudit() throws Exception {
-		evaluate(BALANCED_RANDOM_FOREST, AUDIT);
 	}
 
 	@Test

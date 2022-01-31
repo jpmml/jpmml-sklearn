@@ -4,7 +4,9 @@ import os
 import sys
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/extensions/"))
+
+sys.path.append(os.path.abspath("../../../../pmml-sklearn-extension/src/test/resources/"))
+sys.path.append(os.path.abspath("../../../../pmml-sklearn-extension/src/test/resources/extensions/"))
 
 from extensions.category_encoders import *
 

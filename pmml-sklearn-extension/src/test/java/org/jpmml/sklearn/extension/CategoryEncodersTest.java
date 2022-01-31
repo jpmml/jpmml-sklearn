@@ -16,12 +16,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn.testing;
+package org.jpmml.sklearn.extension;
 
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 
-public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements SkLearnDatasets, Fields {
+public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
+
+	@Test
+	public void evaluateBalancedDecisionTreeEnsembleAudit() throws Exception {
+		evaluate("BalancedDecisionTreeEnsemble", AUDIT);
+	}
+
+	@Test
+	public void evaluateBalancedRandomForestAudit() throws Exception {
+		evaluate("BalancedRandomForest", AUDIT);
+	}
 
 	@Test
 	public void evaluateBase2EncoderAudit() throws Exception {

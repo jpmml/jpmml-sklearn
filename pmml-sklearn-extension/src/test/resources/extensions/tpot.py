@@ -1,5 +1,3 @@
-from common import *
-
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.pipeline import Pipeline
@@ -11,6 +9,12 @@ from tpot import TPOTClassifier, TPOTRegressor
 from tpot.config import classifier_config_dict, regressor_config_dict
 
 import pandas
+import os
+import sys
+
+sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
+
+from common import *
 
 def filter_config(config):
 	return { key: value for key, value in config.items() if not (key.startswith("sklearn.ensemble.") or key.startswith("xgboost.")) }

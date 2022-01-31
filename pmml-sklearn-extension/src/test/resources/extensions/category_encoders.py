@@ -1,5 +1,3 @@
-from common import *
-
 from sklearn.experimental import enable_hist_gradient_boosting
 
 from category_encoders import BaseNEncoder, BinaryEncoder, CatBoostEncoder, CountEncoder, LeaveOneOutEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
@@ -15,6 +13,12 @@ from sklearn.preprocessing import OneHotEncoder as SkLearnOneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
 
 import numpy
+import os
+import sys
+
+sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
+
+from common import *
 
 def load_filter_audit(name, filter = False):
 	if name.endswith("Audit"):

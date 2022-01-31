@@ -9,11 +9,11 @@
 	</parent>
 
 	<groupId>org.jpmml</groupId>
-	<artifactId>pmml-sklearn-xgboost</artifactId>
+	<artifactId>pmml-sklearn-extension</artifactId>
 	<packaging>jar</packaging>
 
-	<name>JPMML SkLearn XGBoost converter</name>
-	<description>JPMML Scikit-Learn XGBoost to class model converter</description>
+	<name>JPMML SkLearn extensions converter</name>
+	<description>JPMML Scikit-Learn extension packages to class model converter</description>
 
 	<licenses>
 		<license>
@@ -33,17 +33,6 @@
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator-testing</artifactId>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-xgboost</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-sklearn-extension</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>

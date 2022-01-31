@@ -21,7 +21,6 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import category_encoders.BaseNFeature;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -37,6 +36,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.BinaryThresholdFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class MultiOneHotEncoder extends BaseEncoder {
@@ -75,10 +75,10 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 			EncoderUtil.addDecorator(feature, new InvalidValueDecorator(invalidValueTreatmentMethod, null));
 
-			if(feature instanceof BaseNFeature){
-				BaseNFeature baseFeature = (BaseNFeature)feature;
+			if(feature instanceof BinaryThresholdFeature){
+				BinaryThresholdFeature thresholdFeature = (BinaryThresholdFeature)feature;
 
-				ContinuousFeature continuousFeature = baseFeature.toContinuousFeature();
+				ContinuousFeature continuousFeature = thresholdFeature.toContinuousFeature();
 
 				// XXX
 				encoder.toCategorical(continuousFeature.getName(), null);

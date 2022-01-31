@@ -1,5 +1,3 @@
-from common import *
-
 from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
 from sklearn.cluster import KMeans
@@ -18,6 +16,13 @@ from sklearn2pmml.preprocessing import ExpressionTransformer
 from sklearn2pmml.util import Reshaper
 from sklego.meta import EstimatorTransformer
 from sklego.preprocessing import IdentityTransformer
+
+import os
+import sys
+
+sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
+
+from common import *
 
 def make_estimator_transformer(estimator, pmml_name, predict_func = "predict"):
 	estimator.pmml_name_ = pmml_name

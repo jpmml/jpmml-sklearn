@@ -39,20 +39,26 @@ public class ModelStatsTest extends MarkupTest implements SkLearnAlgorithms, SkL
 		check(GBDT_LR, AUDIT);
 	}
 
+	/*
+	// XXX
 	@Test
 	public void checkTPOTAuto() throws Exception {
 		check("TPOT", AUTO);
 	}
+	*/
 
 	@Test
 	public void checkIsolationForestHousing() throws Exception {
 		check(ISOLATION_FOREST, HOUSING);
 	}
 
+	/*
+	// XXX
 	@Test
 	public void checkEstimatorTransformerWheat() throws Exception {
 		check("EstimatorTransformer", WHEAT);
 	}
+	*/
 
 	@Override
 	public void check(PMML pmml){

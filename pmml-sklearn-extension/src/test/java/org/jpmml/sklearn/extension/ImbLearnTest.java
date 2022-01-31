@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn.testing;
+package org.jpmml.sklearn.extension;
 
+import org.jpmml.converter.testing.Datasets;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 
-public class ImbLearnTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
+public class ImbLearnTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateADASYNIris() throws Exception {

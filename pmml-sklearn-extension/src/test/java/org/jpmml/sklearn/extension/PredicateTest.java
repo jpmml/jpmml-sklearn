@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn.testing;
+package org.jpmml.sklearn.extension;
 
 import java.util.Collections;
 import java.util.Map;
@@ -29,15 +29,18 @@ import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.SimpleSetPredicate;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 import sklearn.tree.HasTreeOptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class PredicateTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
+public class PredicateTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void checkNumeric() throws Exception {

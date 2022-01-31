@@ -41,10 +41,10 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.ThresholdFeature;
 import org.jpmml.model.ToStringHelper;
+import org.jpmml.sklearn.BinaryThresholdFeature;
 
-public class BaseNFeature extends ThresholdFeature {
+public class BaseNFeature extends BinaryThresholdFeature {
 
 	private int base = -1;
 
