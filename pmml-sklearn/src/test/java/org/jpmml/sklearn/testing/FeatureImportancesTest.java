@@ -29,13 +29,14 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FeatureImportancesTest extends MarkupTest implements SkLearnAlgorithms, SkLearnDatasets {
+public class FeatureImportancesTest extends MarkupTest implements SkLearnAlgorithms, Datasets {
 
 	@Test
 	public void checkDecisionTreeAudit() throws Exception {

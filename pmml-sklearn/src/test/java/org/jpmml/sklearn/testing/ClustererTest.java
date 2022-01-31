@@ -18,9 +18,10 @@
  */
 package org.jpmml.sklearn.testing;
 
+import org.jpmml.converter.testing.Datasets;
 import org.junit.Test;
 
-public class ClustererTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets {
+public class ClustererTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
 
 	@Test
 	public void evaluateKMeansWheat() throws Exception {

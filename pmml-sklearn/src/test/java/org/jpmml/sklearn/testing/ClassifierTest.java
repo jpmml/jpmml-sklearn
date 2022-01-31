@@ -25,12 +25,13 @@ import com.google.common.base.Equivalence;
 import org.dmg.pmml.OutputField;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
 
-public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
+public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
 
 	@Override
 	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
@@ -56,12 +57,12 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 
 	@Test
 	public void evaluateDurationInDaysApollo() throws Exception {
-		evaluate("DurationInDays", APOLLO);
+		evaluate("DurationInDays", "Apollo");
 	}
 
 	@Test
 	public void evaluateDurationInSecondsApollo() throws Exception {
-		evaluate("DurationInSeconds", APOLLO);
+		evaluate("DurationInSeconds", "Apollo");
 	}
 
 	@Test
@@ -71,7 +72,7 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 
 	@Test
 	public void evaluateDecisionTreeAuditDict() throws Exception {
-		evaluate(DECISION_TREE, AUDIT_DICT);
+		evaluate(DECISION_TREE, AUDIT + "Dict");
 	}
 
 	@Test
@@ -138,7 +139,7 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 
 	@Test
 	public void evaluateLogisticRegressionAuditDict() throws Exception {
-		evaluate(LOGISTIC_REGRESSION, AUDIT_DICT);
+		evaluate(LOGISTIC_REGRESSION, AUDIT + "Dict");
 	}
 
 	@Test

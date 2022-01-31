@@ -18,9 +18,10 @@
  */
 package org.jpmml.sklearn.testing;
 
+import org.jpmml.converter.testing.Datasets;
 import org.junit.Test;
 
-public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
+public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateMLPAutoencoderIris() throws Exception {

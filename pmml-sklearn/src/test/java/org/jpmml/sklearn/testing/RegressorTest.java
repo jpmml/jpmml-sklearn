@@ -19,11 +19,12 @@
 package org.jpmml.sklearn.testing;
 
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class RegressorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets, Fields {
+public class RegressorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
 
 	@Test
 	public void evaluateAdaBoostAuto() throws Exception {

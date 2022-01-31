@@ -27,12 +27,13 @@ import org.dmg.pmml.PMML;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ModelStatsTest extends MarkupTest implements SkLearnAlgorithms, SkLearnDatasets {
+public class ModelStatsTest extends MarkupTest implements SkLearnAlgorithms, Datasets {
 
 	@Test
 	public void checkGBDTLRAudit() throws Exception {

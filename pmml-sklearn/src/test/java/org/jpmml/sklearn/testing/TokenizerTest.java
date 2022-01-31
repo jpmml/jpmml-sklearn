@@ -30,6 +30,7 @@ import com.google.common.collect.Maps;
 import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.TextUtil;
 import org.jpmml.evaluator.TokenizedString;
 import org.jpmml.evaluator.testing.Batch;
@@ -42,7 +43,7 @@ import sklearn2pmml.feature_extraction.text.Splitter;
 
 import static org.junit.Assert.fail;
 
-public class TokenizerTest extends SkLearnEncoderBatchTest implements SkLearnDatasets {
+public class TokenizerTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void split() throws Exception {

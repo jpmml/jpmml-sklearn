@@ -19,11 +19,12 @@
 package org.jpmml.sklearn.testing;
 
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class OutlierDetectorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, SkLearnDatasets {
+public class OutlierDetectorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
 
 	@Test
 	public void evaluateIsolationForestHousing() throws Exception {

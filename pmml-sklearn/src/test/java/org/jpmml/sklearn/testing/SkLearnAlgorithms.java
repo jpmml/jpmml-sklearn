@@ -18,7 +18,7 @@
  */
 package org.jpmml.sklearn.testing;
 
-interface SkLearnAlgorithms {
+public interface SkLearnAlgorithms {
 
 	String ADA_BOOST = "AdaBoost";
 	String ARD = "ARD";
