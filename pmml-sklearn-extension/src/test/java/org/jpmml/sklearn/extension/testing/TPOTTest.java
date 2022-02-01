@@ -16,46 +16,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn.extension;
+package org.jpmml.sklearn.extension.testing;
 
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 
-public class SkLegoTest extends SkLearnEncoderBatchTest implements Datasets {
+public class TPOTTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
-	public void evaluateEstimatorTransformerAudit() throws Exception {
-		evaluate("EstimatorTransformer", AUDIT);
+	public void evaluateTPOTAudit() throws Exception {
+		evaluate("TPOT", AUDIT);
 	}
 
 	@Test
-	public void evaluateEstimatorTransformerAuto() throws Exception {
-		evaluate("EstimatorTransformer", AUTO);
+	public void evaluateTPOTAuto() throws Exception {
+		evaluate("TPOT", AUTO);
 	}
 
 	@Test
-	public void evaluateEstimatorTransformerHousing() throws Exception {
-		evaluate("EstimatorTransformer", HOUSING);
+	public void evaluateTPOTHousing() throws Exception {
+		evaluate("TPOT", HOUSING);
 	}
 
 	@Test
-	public void evaluateEstimatorTransformerIris() throws Exception {
-		evaluate("EstimatorTransformer", IRIS);
+	public void evaluateTPOTIris() throws Exception {
+		evaluate("TPOT", IRIS);
 	}
 
 	@Test
-	public void evaluateEstimatorTransformerVersicolor() throws Exception {
-		evaluate("EstimatorTransformer", VERSICOLOR);
-	}
-
-	@Test
-	public void evaluateEstimatorTransformerVisit() throws Exception {
-		evaluate("EstimatorTransformer", VISIT);
-	}
-
-	@Test
-	public void evaluateEstimatorTransformerWheat() throws Exception {
-		evaluate("EstimatorTransformer", WHEAT);
+	public void evaluateTPOTVersicolor() throws Exception {
+		evaluate("TPOT", VERSICOLOR, new PMMLEquivalence(5e-13, 5e-13));
 	}
 }
