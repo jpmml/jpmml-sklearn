@@ -26,6 +26,7 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.BinaryThresholdFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
@@ -36,7 +37,6 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.BinaryThresholdFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class MultiOneHotEncoder extends BaseEncoder {
@@ -70,7 +70,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 					invalidValueTreatmentMethod = InvalidValueTreatmentMethod.AS_IS;
 					break;
 				default:
-					throw new IllegalArgumentException();
+					throw new IllegalArgumentException(handleUnknown);
 			}
 
 			EncoderUtil.addDecorator(feature, new InvalidValueDecorator(invalidValueTreatmentMethod, null));

@@ -118,7 +118,7 @@ public class KBinsDiscretizer extends Transformer {
 					return Collections.singletonList(new IndexFeature(encoder, derivedField, labelCategories));
 				}
 			default:
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException(encode);
 		}
 	}
 

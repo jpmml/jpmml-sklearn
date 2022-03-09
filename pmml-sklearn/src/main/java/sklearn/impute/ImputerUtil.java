@@ -33,6 +33,7 @@ import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn2pmml.preprocessing.TransformerUtil;
@@ -81,7 +82,7 @@ public class ImputerUtil {
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new UnsupportedElementException(field);
 		}
 	}
 

@@ -128,7 +128,9 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	static {
-		PickleUtil.init("sklearn2pmml.properties");
+		ClassLoader clazzLoader = SkLearnEncoder.class.getClassLoader();
+
+		PickleUtil.init(clazzLoader, "sklearn2pmml.properties");
 
 		DType.addDefinition(BinaryTree.DTYPE_NODEDATA);
 		DType.addDefinition(Tree.DTYPE_TREE);

@@ -36,13 +36,13 @@ import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.BinaryThresholdFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.ToStringHelper;
-import org.jpmml.sklearn.BinaryThresholdFeature;
 
 public class BaseNFeature extends BinaryThresholdFeature {
 

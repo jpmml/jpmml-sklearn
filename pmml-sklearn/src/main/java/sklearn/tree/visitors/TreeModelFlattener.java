@@ -29,6 +29,8 @@ import org.dmg.pmml.True;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
+import org.jpmml.model.UnsupportedAttributeException;
+import org.jpmml.model.UnsupportedElementException;
 
 public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
@@ -92,7 +94,7 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
 			boolean success = parentChildren.remove(node);
 			if(!success){
-				throw new IllegalArgumentException();
+				throw new UnsupportedElementException(parentNode);
 			} // End if
 
 			if(this.miningFunction == MiningFunction.REGRESSION){
@@ -103,22 +105,31 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
 			if(this.miningFunction == MiningFunction.CLASSIFICATION){
 				initScoreDistribution(parentNode, node);
-			} else
-
-			{
-				throw new IllegalArgumentException();
 			}
 		}
 	}
 
 	@Override
 	public void enterTreeModel(TreeModel treeModel){
-		this.miningFunction = treeModel.requireMiningFunction();
+		super.enterTreeModel(treeModel);
+
+		treeModel.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
+
+		MiningFunction miningFunction = treeModel.requireMiningFunction();
+		switch(miningFunction){
+			case REGRESSION:
+			case CLASSIFICATION:
+				break;
+			default:
+				throw new UnsupportedAttributeException(treeModel, miningFunction);
+		}
+
+		this.miningFunction = miningFunction;
 	}
 
 	@Override
 	public void exitTreeModel(TreeModel treeModel){
-		treeModel.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
+		super.exitTreeModel(treeModel);
 
 		this.miningFunction = null;
 	}

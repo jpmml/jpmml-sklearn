@@ -63,6 +63,7 @@ import org.jpmml.converter.ThresholdFeature;
 import org.jpmml.converter.ThresholdFeatureUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
+import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
@@ -450,11 +451,11 @@ public class TreeUtil {
 
 			List<Segment> segments = segmentation.getSegments();
 			for(Segment segment : segments){
-				TreeModel treeModel = (TreeModel)segment.requireModel();
+				TreeModel treeModel = segment.requireModel(TreeModel.class);
 
 				String segmentId = segment.getId();
 				if(segmentId == null){
-					throw new IllegalArgumentException();
+					throw new UnsupportedElementException(segment);
 				}
 
 				encodeNodeId(output, treeModel, segmentId);

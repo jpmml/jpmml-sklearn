@@ -21,7 +21,7 @@ package sklearn2pmml.preprocessing.h2o;
 import java.util.List;
 
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.FeatureList;
+import org.jpmml.converter.FeatureList;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.MultiTransformer;
 

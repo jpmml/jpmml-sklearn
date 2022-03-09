@@ -18,21 +18,13 @@
  */
 package org.jpmml.sklearn.testing;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import org.dmg.pmml.Array;
-import org.dmg.pmml.Constant;
-import org.dmg.pmml.HasValue;
-import org.dmg.pmml.HasValueSet;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.PMMLObject;
-import org.dmg.pmml.Visitor;
-import org.dmg.pmml.VisitorAction;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.model.visitors.VisitorBattery;
 import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
@@ -82,72 +74,11 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	}
 
 	@Override
-	protected void validatePMML(PMML pmml) throws Exception {
-		super.validatePMML(pmml);
+	public VisitorBattery getValidators(){
+		VisitorBattery visitorBattery = super.getValidators();
 
-		Visitor visitor = new AbstractVisitor(){
+		visitorBattery.add(ValueInspector.class);
 
-			@Override
-			public VisitorAction visit(PMMLObject object){
-
-				if(object instanceof HasValue){
-					checkValue((HasValue<?>)object);
-				} // End if
-
-				if(object instanceof HasValueSet){
-					checkValueSet((HasValueSet<?>)object);
-				}
-
-				return super.visit(object);
-			}
-
-			@Override
-			public VisitorAction visit(Constant constant){
-				Object value = constant.getValue();
-
-				if(isNaN(value)){
-					throw new AssertionError();
-				}
-
-				return super.visit(constant);
-			}
-
-			private void checkValue(HasValue<?> hasValue){
-				Object value = hasValue.getValue();
-
-				if(isNaN(value)){
-					throw new AssertionError();
-				}
-			}
-
-			private void checkValueSet(HasValueSet<?> hasValueSet){
-				Array array = hasValueSet.requireArray();
-
-				Object arrayValue = array.getValue();
-
-				if(arrayValue instanceof Collection){
-					Collection<?> values = (Collection<?>)arrayValue;
-
-					for(Object value : values){
-
-						if(isNaN(value)){
-							throw new AssertionError();
-						}
-					}
-				}
-			}
-
-			private boolean isNaN(Object value){
-
-				if(value instanceof Number){
-					Number number = (Number)value;
-
-					return Double.isNaN(number.doubleValue());
-				}
-
-				return false;
-			}
-		};
-		visitor.applyTo(pmml);
+		return visitorBattery;
 	}
 }

@@ -41,9 +41,9 @@ public class BSplineTest extends SkLearnEncoderBatchTest {
 
 			@Override
 			public EvaluatorBuilder getEvaluatorBuilder() throws Exception {
-				EvaluatorBuilder evaluatorBuilder = super.getEvaluatorBuilder();
+				ModelEvaluatorBuilder evaluatorBuilder = (ModelEvaluatorBuilder)super.getEvaluatorBuilder();
 
-				evaluatorBuilder = ((ModelEvaluatorBuilder)evaluatorBuilder)
+				evaluatorBuilder
 					.setDerivedFieldGuard(null)
 					.setFunctionGuard(null);
 

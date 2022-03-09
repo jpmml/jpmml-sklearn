@@ -102,7 +102,7 @@ public class StepUtil {
 			case "datetime64[s]":
 				return DataType.DATE_TIME;
 			default:
-				throw new IllegalArgumentException(dtype);
+				throw new IllegalArgumentException("Python data type \'" + dtype + "\' is not supported");
 		}
 	}
 }

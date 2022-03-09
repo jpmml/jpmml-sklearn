@@ -26,9 +26,9 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.ExpressionTranslator;
-import org.jpmml.python.ExpressionUtil;
 import org.jpmml.python.Scope;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.StepUtil;
@@ -56,7 +56,7 @@ public class ExpressionTransformer extends Transformer {
 		} else
 
 		{
-			dataType = ExpressionUtil.getDataType(expression, scope);
+			dataType = TypeUtil.getDataType(expression, scope);
 
 			if(dataType == null){
 				dataType = DataType.DOUBLE;

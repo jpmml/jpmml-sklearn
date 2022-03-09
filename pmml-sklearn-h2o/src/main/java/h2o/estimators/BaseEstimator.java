@@ -27,6 +27,7 @@ import hex.genmodel.MojoModel;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureList;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
@@ -34,7 +35,6 @@ import org.jpmml.h2o.Converter;
 import org.jpmml.h2o.ConverterFactory;
 import org.jpmml.h2o.H2OEncoder;
 import org.jpmml.h2o.MojoModelUtil;
-import org.jpmml.sklearn.FeatureList;
 import sklearn.Estimator;
 import sklearn.HasClasses;
 
@@ -122,7 +122,7 @@ public class BaseEstimator extends Estimator implements HasClasses {
 			if(features instanceof FeatureList){
 				FeatureList namedFeatures = (FeatureList)features;
 
-				feature = namedFeatures.getFeature(name);
+				feature = namedFeatures.resolveFeature(name);
 			} else
 
 			{

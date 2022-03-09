@@ -20,7 +20,6 @@ package sklearn.compose;
 
 import java.util.Collections;
 
-import numpy.core.FunctionUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
@@ -34,6 +33,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.transformations.AbstractTransformation;
+import org.jpmml.python.FunctionUtil;
 import org.jpmml.python.Identifiable;
 import sklearn.Regressor;
 import sklearn.preprocessing.FunctionTransformer;

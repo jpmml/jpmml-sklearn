@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import numpy.core.FunctionUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.FunctionUtil;
 import org.jpmml.python.Identifiable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
