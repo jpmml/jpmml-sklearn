@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn converter</name>
-	<description>JPMML Scikit-Learn to class model converter</description>
+	<description>JPMML Scikit-Learn to PMML converter</description>
 
 	<licenses>
 		<license>
@@ -50,7 +50,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.2.2</version>
 				<configuration>
 					<archive>
 						<manifestEntries>

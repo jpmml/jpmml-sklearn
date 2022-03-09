@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn converter example applications</name>
-	<description>JPMML Scikit-Learn to class model converter example command-line applications</description>
+	<description>JPMML Scikit-Learn to PMML converter example command-line applications</description>
 
 	<licenses>
 		<license>

@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn XGBoost converter</name>
-	<description>JPMML Scikit-Learn XGBoost to class model converter</description>
+	<description>JPMML Scikit-Learn XGBoost to PMML converter</description>
 
 	<licenses>
 		<license>

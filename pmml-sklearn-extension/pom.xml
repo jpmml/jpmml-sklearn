@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn extensions converter</name>
-	<description>JPMML Scikit-Learn extension packages to class model converter</description>
+	<description>JPMML Scikit-Learn extension packages to PMML converter</description>
 
 	<licenses>
 		<license>
