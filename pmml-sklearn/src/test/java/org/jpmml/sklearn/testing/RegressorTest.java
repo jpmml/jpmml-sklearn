@@ -18,13 +18,54 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class RegressorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
+public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
+
+	@Override
+	public ValidatingSkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		ValidatingSkLearnEncoderBatch result = new ValidatingSkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public RegressorTest getArchiveBatchTest(){
+				return RegressorTest.this;
+			}
+
+			@Override
+			public VisitorBattery getValidators(){
+				VisitorBattery visitorBattery = super.getValidators();
+
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if((AUTO).equals(dataset) || (AUTO_NA).equals(dataset) || (HOUSING).equals(dataset) || (VISIT).equals(dataset)){
+
+					switch(algorithm){
+						case DUMMY:
+						case ISOTONIC_REGRESSION_INCR:
+						case ISOTONIC_REGRESSION_DECR:
+							break;
+						default:
+							visitorBattery.add(ModelStatsInspector.class);
+							break;
+					}
+				}
+
+				return visitorBattery;
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluateAdaBoostAuto() throws Exception {

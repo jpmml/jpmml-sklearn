@@ -18,13 +18,40 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
+import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 import sklearn.Estimator;
 
-public class OutlierDetectorTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
+public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
+
+	@Override
+	public ValidatingSkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		ValidatingSkLearnEncoderBatch result = new ValidatingSkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public OutlierDetectorTest getArchiveBatchTest(){
+				return OutlierDetectorTest.this;
+			}
+
+			@Override
+			public VisitorBattery getValidators(){
+				VisitorBattery visitorBattery = super.getValidators();
+
+				visitorBattery.add(ModelStatsInspector.class);
+
+				return visitorBattery;
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluateIsolationForestHousing() throws Exception {

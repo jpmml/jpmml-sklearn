@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2022 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -21,23 +21,27 @@ package org.jpmml.sklearn.testing;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ResultField;
 
-abstract
-public class MarkupTest extends SkLearnEncoderBatchTest {
+public class ValidatingSkLearnEncoderBatchTest extends SkLearnEncoderBatchTest {
 
-	abstract
-	public void check(PMML pmml);
+	public ValidatingSkLearnEncoderBatchTest(){
+	}
 
-	public void check(String name, String dataset) throws Exception {
-		Predicate<ResultField> predicate = (resultField) -> true;
-		Equivalence<Object> equivalence = getEquivalence();
+	public ValidatingSkLearnEncoderBatchTest(Equivalence<Object> equivalence){
+		super(equivalence);
+	}
 
-		try(SkLearnEncoderBatch batch = (SkLearnEncoderBatch)createBatch(name, dataset, predicate, equivalence)){
-			PMML pmml = batch.getPMML();
+	@Override
+	public ValidatingSkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		ValidatingSkLearnEncoderBatch result = new ValidatingSkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
 
-			check(pmml);
-		}
+			@Override
+			public ValidatingSkLearnEncoderBatchTest getArchiveBatchTest(){
+				return ValidatingSkLearnEncoderBatchTest.this;
+			}
+		};
+
+		return result;
 	}
 }

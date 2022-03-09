@@ -29,13 +29,14 @@ import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
+import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 
-public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
+public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
 
 	@Override
-	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
-		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+	public ValidatingSkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		ValidatingSkLearnEncoderBatch result = new ValidatingSkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
 
 			@Override
 			public ClassifierTest getArchiveBatchTest(){
@@ -49,6 +50,41 @@ public class ClassifierTest extends SkLearnEncoderBatchTest implements SkLearnAl
 				path = path.replace("Dict", "");
 
 				return path;
+			}
+
+			@Override
+			public VisitorBattery getValidators(){
+				VisitorBattery visitorBattery = super.getValidators();
+
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if((AUDIT).equals(dataset) || (AUDIT_NA).equals(dataset) || (IRIS).equals(dataset) || (IRIS_NA).equals(dataset)){
+
+					switch(algorithm){
+						case DUMMY:
+							break;
+						default:
+							visitorBattery.add(ModelStatsInspector.class);
+							break;
+					}
+				} // End if
+
+				if((AUDIT).equals(dataset)){
+
+					switch(algorithm){
+						case DECISION_TREE:
+						case EXTRA_TREES:
+						case GRADIENT_BOOSTING:
+						case RANDOM_FOREST:
+							visitorBattery.add(FeatureImportancesInspector.class);
+							break;
+						default:
+							break;
+					}
+				}
+
+				return visitorBattery;
 			}
 		};
 

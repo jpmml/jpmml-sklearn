@@ -18,10 +18,37 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 
-public class ClustererTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
+public class ClustererTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
+
+	@Override
+	public ValidatingSkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		ValidatingSkLearnEncoderBatch result = new ValidatingSkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public ClustererTest getArchiveBatchTest(){
+				return ClustererTest.this;
+			}
+
+			@Override
+			public VisitorBattery getValidators(){
+				VisitorBattery visitorBattery = super.getValidators();
+
+				visitorBattery.add(ModelStatsInspector.class);
+
+				return visitorBattery;
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluateKMeansWheat() throws Exception {

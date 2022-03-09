@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 import com.google.common.base.Equivalence;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ResultField;
-import org.jpmml.model.visitors.VisitorBattery;
 import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
@@ -71,14 +70,5 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	}
 
 	protected void deactivate(PMMLPipeline pipeline) throws Exception {
-	}
-
-	@Override
-	public VisitorBattery getValidators(){
-		VisitorBattery visitorBattery = super.getValidators();
-
-		visitorBattery.add(ValueInspector.class);
-
-		return visitorBattery;
 	}
 }
