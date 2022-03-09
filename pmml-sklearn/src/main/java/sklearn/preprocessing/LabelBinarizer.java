@@ -92,7 +92,7 @@ public class LabelBinarizer extends Transformer {
 					PMMLUtil.createConstant(negLabel)
 				);
 
-				String name = (classes.size() > 1 ? createFieldName("labelBinarizer", feature, value) : createFieldName("label_binarizer", feature));
+				String name = (classes.size() > 1 ? createFieldName("labelBinarizer", feature, value) : createFieldName("labelBinarizer", feature));
 
 				DerivedField derivedField = encoder.createDerivedField(name, apply);
 
