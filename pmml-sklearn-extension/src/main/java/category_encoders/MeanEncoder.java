@@ -145,8 +145,8 @@ public class MeanEncoder extends MapEncoder {
 			throw new IllegalArgumentException();
 		}
 
-		List<?> firstDim = (axes.get(0)).getDataData();
-		List<?> secondDim = (axes.get(1)).getDataData();
+		List<?> firstDim = (axes.get(0)).getValues();
+		List<?> secondDim = (axes.get(1)).getValues();
 
 		if(!(Arrays.asList("sum", "count")).equals(firstDim)){
 			throw new IllegalArgumentException();
@@ -181,6 +181,11 @@ public class MeanEncoder extends MapEncoder {
 			@Override
 			public int[] getArrayShape(){
 				return new int[]{meanValues.size()};
+			}
+
+			@Override
+			public Object getArrayType(){
+				throw new UnsupportedOperationException();
 			}
 		};
 
