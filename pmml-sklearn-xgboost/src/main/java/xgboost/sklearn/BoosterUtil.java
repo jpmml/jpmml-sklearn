@@ -66,9 +66,16 @@ public class BoosterUtil {
 
 	static
 	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel encodeBooster(E estimator, Schema schema){
+		Booster booster = estimator.getBooster();
+
+		Integer bestNTreeLimit = booster.getBestNTreeLimit();
+
 		Learner learner = getLearner(estimator);
 
-		Integer bestNTreeLimit = (Integer)estimator.getOptionalScalar("best_ntree_limit");
+		if(bestNTreeLimit == null){
+			bestNTreeLimit = (Integer)estimator.getOptionalScalar("best_ntree_limit");
+		}
+
 		Number missing = (Number)estimator.getOptionalScalar("missing");
 
 		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
