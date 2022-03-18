@@ -1,7 +1,5 @@
 from common import *
 
-from sklearn.experimental import enable_hist_gradient_boosting
-
 from pandas import DataFrame
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
@@ -263,7 +261,7 @@ if "Audit" in datasets:
 	build_audit_na(audit_na_df, LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 
 def build_audit_na_hist(audit_na_df, classifier, name):
-	audit_na_X, audit_na_y = split_csv(audit_df)
+	audit_na_X, audit_na_y = split_csv(audit_na_df)
 
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
@@ -555,8 +553,8 @@ if "Auto" in datasets:
 	auto_df["origin"] = auto_df["origin"].astype(int)
 
 	build_auto(auto_df, AdaBoostRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), random_state = 13, n_estimators = 17), "AdaBoostAuto")
-	build_auto(auto_df, ARDRegression(normalize = True), "BayesianARDAuto")
-	build_auto(auto_df, BayesianRidge(normalize = True), "BayesianRidgeAuto")
+	build_auto(auto_df, ARDRegression(), "BayesianARDAuto")
+	build_auto(auto_df, BayesianRidge(), "BayesianRidgeAuto")
 	build_auto(auto_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAuto", compact = False)
 	build_auto(auto_df, BaggingRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAuto")
 	build_auto(auto_df, DummyRegressor(strategy = "median"), "DummyAuto")

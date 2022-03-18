@@ -1,5 +1,3 @@
-from sklearn.experimental import enable_hist_gradient_boosting
-
 from category_encoders import BaseNEncoder, BinaryEncoder, CatBoostEncoder, CountEncoder, LeaveOneOutEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
 from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
