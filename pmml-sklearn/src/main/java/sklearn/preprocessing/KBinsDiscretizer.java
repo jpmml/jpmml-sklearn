@@ -166,7 +166,7 @@ public class KBinsDiscretizer extends Transformer {
 
 		Apply apply = PMMLUtil.createApply(defineFunction, continuousFeature.ref());
 
-		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(defineFunction, continuousFeature.getName()), OpType.CONTINUOUS, continuousFeature.getDataType(), apply);
+		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(defineFunction, continuousFeature.getName()), defineFunction.requireOpType(), defineFunction.requireDataType(), apply);
 
 		return new ContinuousFeature(encoder, derivedField);
 	}
