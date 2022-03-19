@@ -16,6 +16,9 @@ if __name__ == "__main__":
 
 if "Audit" in datasets:
 	audit_df = load_audit("Audit", stringify = False)
+	# XXX: keep integers as-is
+	audit_df["Age"] = audit_df["Age"].astype(float)
+	audit_df["Income"] = audit_df["Income"].astype(float)
 
 	build_audit(audit_df, GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "XGBLRAudit")
 	build_audit(audit_df, GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
