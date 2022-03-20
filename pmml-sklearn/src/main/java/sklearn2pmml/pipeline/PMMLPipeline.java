@@ -72,6 +72,7 @@ import sklearn.HasClassifierOptions;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.pipeline.FeatureUnion;
 import sklearn.pipeline.Pipeline;
@@ -521,7 +522,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public PMMLPipeline setActiveFields(List<String> activeFields){
-		put("active_fields", toArray(activeFields));
+		put("active_fields", StepUtil.toArray(activeFields));
 
 		return this;
 	}
@@ -542,7 +543,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public PMMLPipeline setTargetFields(List<String> targetFields){
-		put("target_fields", toArray(targetFields));
+		put("target_fields", StepUtil.toArray(targetFields));
 
 		return this;
 	}

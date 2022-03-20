@@ -21,7 +21,6 @@ package sklearn;
 import java.util.Arrays;
 import java.util.List;
 
-import numpy.core.NDArray;
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.python.PythonObject;
@@ -60,15 +59,5 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		put(SkLearn2PMMLFields.PMML_NAME, name);
 
 		return this;
-	}
-
-	static
-	protected NDArray toArray(List<?> data){
-		NDArray result = new NDArray();
-		result.put("data", data);
-		result.put("fortran_order", Boolean.FALSE);
-		result.put("shape", new Object[]{data.size()});
-
-		return result;
 	}
 }

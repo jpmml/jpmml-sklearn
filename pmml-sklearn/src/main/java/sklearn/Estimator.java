@@ -222,7 +222,7 @@ public class Estimator extends Step {
 	}
 
 	public Estimator setPMMLFeatureImportances(List<? extends Number> pmmlFeatureImportances){
-		put(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES, toArray(pmmlFeatureImportances));
+		put(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES, StepUtil.toArray(pmmlFeatureImportances));
 
 		return this;
 	}

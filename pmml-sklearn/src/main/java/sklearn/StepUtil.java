@@ -21,6 +21,7 @@ package sklearn;
 import java.util.List;
 
 import numpy.DType;
+import numpy.core.NDArray;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
@@ -104,5 +105,15 @@ public class StepUtil {
 			default:
 				throw new IllegalArgumentException("Python data type \'" + dtype + "\' is not supported");
 		}
+	}
+
+	static
+	public NDArray toArray(List<?> data){
+		NDArray result = new NDArray();
+		result.put("data", data);
+		result.put("fortran_order", Boolean.FALSE);
+		result.put("shape", new Object[]{data.size()});
+
+		return result;
 	}
 }
