@@ -39,7 +39,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
-import sklearn.ClassifierUtil;
+import sklearn.EstimatorUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
 import sklearn.Transformer;
@@ -67,7 +67,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 		switch(miningFunction){
 			case CLASSIFICATION:
 				{
-					List<?> categories = ClassifierUtil.getClasses(estimator);
+					List<?> categories = EstimatorUtil.getClasses(estimator);
 
 					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
@@ -98,7 +98,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 				{
 					Classifier classifier = (Classifier)estimator;
 
-					List<?> categories = ClassifierUtil.getClasses(estimator);
+					List<?> categories = EstimatorUtil.getClasses(estimator);
 
 					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType());
 

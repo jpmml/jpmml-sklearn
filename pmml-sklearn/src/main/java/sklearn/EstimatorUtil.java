@@ -20,15 +20,22 @@ package sklearn;
 
 import java.util.List;
 
-public class ClassifierUtil {
+import org.jpmml.python.ClassDictUtil;
 
-	private ClassifierUtil(){
+public class EstimatorUtil {
+
+	private EstimatorUtil(){
 	}
 
 	static
 	public List<?> getClasses(Estimator estimator){
-		HasClasses hasClasses = (HasClasses)estimator;
 
-		return hasClasses.getClasses();
+		if(estimator instanceof HasClasses){
+			HasClasses hasClasses = (HasClasses)estimator;
+
+			return hasClasses.getClasses();
+		}
+
+		throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
 	}
 }

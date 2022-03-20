@@ -44,7 +44,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.ClassifierUtil;
+import sklearn.EstimatorUtil;
 import sklearn.Estimator;
 import sklearn.HasApplyField;
 import sklearn.HasDecisionFunctionField;
@@ -257,7 +257,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 			switch(miningFunction){
 				case CLASSIFICATION:
 					{
-						List<?> categories = ClassifierUtil.getClasses(estimator);
+						List<?> categories = EstimatorUtil.getClasses(estimator);
 
 						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 

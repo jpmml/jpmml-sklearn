@@ -66,7 +66,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
-import sklearn.ClassifierUtil;
+import sklearn.EstimatorUtil;
 import sklearn.Estimator;
 import sklearn.HasClassifierOptions;
 import sklearn.HasNumberOfFeatures;
@@ -132,7 +132,7 @@ public class PMMLPipeline extends Pipeline {
 			switch(miningFunction){
 				case CLASSIFICATION:
 					{
-						List<?> categories = ClassifierUtil.getClasses(estimator);
+						List<?> categories = EstimatorUtil.getClasses(estimator);
 						Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
 
 						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
