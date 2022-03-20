@@ -220,7 +220,7 @@ public class CountVectorizer extends Transformer {
 	}
 
 	public DType getDType(){
-		return (DType)getDType(false);
+		return (DType)getDType("dtype", false);
 	}
 
 	public Boolean getLowercase(){

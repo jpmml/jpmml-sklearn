@@ -55,7 +55,7 @@ public class KBinsDiscretizer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		DType dtype = (DType)getDType(false);
+		DType dtype = getDType();
 		String encode = getEncode();
 		List<Integer> numberOfBins = getNumberOfBins();
 		List<List<Number>> binEdges = getBinEdges();
@@ -122,15 +122,8 @@ public class KBinsDiscretizer extends Transformer {
 		}
 	}
 
-	@Override
-	public Object getDType(boolean extended){
-		Object dtype = get("dtype");
-
-		if(dtype == null){
-			return null;
-		}
-
-		return super.getDType(extended);
+	public DType getDType(){
+		return (DType)getOptionalDType("dtype", false);
 	}
 
 	public String getEncode(){

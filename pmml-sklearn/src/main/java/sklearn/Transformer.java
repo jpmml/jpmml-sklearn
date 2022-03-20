@@ -132,8 +132,18 @@ public class Transformer extends Step {
 		return dataField;
 	}
 
-	protected Object getDType(boolean extended){
-		Object dtype = get("dtype");
+	public Object getOptionalDType(String name, boolean extended){
+		Object value = get(name);
+
+		if(value == null){
+			return null;
+		}
+
+		return getDType(name, extended);
+	}
+
+	public Object getDType(String name, boolean extended){
+		Object dtype = get(name);
 
 		if(dtype instanceof String){
 			String string = (String)dtype;
@@ -149,6 +159,6 @@ public class Transformer extends Step {
 			return ClassDictConstructorUtil.construct(dictConstructor, DType.class);
 		}
 
-		return get("dtype", DType.class);
+		return get(name, DType.class);
 	}
 }

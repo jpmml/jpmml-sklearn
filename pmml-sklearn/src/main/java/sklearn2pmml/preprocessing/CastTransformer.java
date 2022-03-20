@@ -63,6 +63,6 @@ public class CastTransformer extends Transformer {
 	}
 
 	public Object getDType(){
-		return getDType(true);
+		return getDType("dtype", true);
 	}
 }

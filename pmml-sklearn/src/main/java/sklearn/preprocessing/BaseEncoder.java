@@ -79,7 +79,7 @@ public class BaseEncoder extends MultiTransformer {
 	}
 
 	public DType getDType(){
-		return (DType)getDType(false);
+		return (DType)getDType("dtype", false);
 	}
 
 	public String getHandleUnknown(){

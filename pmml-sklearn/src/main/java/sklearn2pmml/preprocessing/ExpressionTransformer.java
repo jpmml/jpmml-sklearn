@@ -75,13 +75,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public Object getDType(){
-		Object dtype = get("dtype");
-
-		if(dtype == null){
-			return null;
-		}
-
-		return super.getDType(true);
+		return super.getOptionalDType("dtype", true);
 	}
 
 	public String getExpr(){

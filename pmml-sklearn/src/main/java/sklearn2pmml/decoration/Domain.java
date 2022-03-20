@@ -30,7 +30,6 @@ import java.util.Map;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import net.razorvine.pickle.objects.ClassDict;
-import numpy.DType;
 import org.dmg.pmml.Counts;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -135,27 +134,16 @@ public class Domain extends Transformer {
 	}
 
 	public Object getDType(){
-		Object dtype;
 
 		// SkLearn2PMML 0.78.0+
 		if(containsKey("dtype_")){
-			dtype = get("dtype_");
+			return getDType("dtype_", true);
 		} else
 
 		// SkLearn2PMML 0.77.2
 		{
-			dtype = get("dtype");
-		} // End if
-
-		if(dtype == null){
-			return null;
-		} else
-
-		if(dtype instanceof DType){
-			return dtype;
+			return getOptionalDType("dtype", true);
 		}
-
-		return super.getDType(true);
 	}
 
 	public String getMissingValueTreatment(){
