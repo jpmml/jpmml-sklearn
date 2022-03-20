@@ -30,6 +30,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pandas.core.CategoricalDtype;
 
 abstract
 public class Transformer extends Step {
@@ -153,10 +154,22 @@ public class Transformer extends Step {
 			}
 		} else
 
+		if(dtype instanceof CategoricalDtype){
+			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+			return categoricalDtype.getDType();
+		} else
+
 		if(dtype instanceof ClassDictConstructor){
 			ClassDictConstructor dictConstructor = (ClassDictConstructor)dtype;
 
 			return ClassDictConstructorUtil.construct(dictConstructor, DType.class);
+		} else
+
+		if(dtype instanceof DType){
+			DType numpyDType = (DType)dtype;
+
+			return numpyDType;
 		}
 
 		return get(name, DType.class);
