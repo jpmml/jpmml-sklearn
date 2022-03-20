@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2022 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.preprocessing;
+package sklearn;
 
+import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Field;
@@ -63,6 +64,62 @@ public class TransformerUtil {
 				}
 			default:
 				return new ObjectFeature(encoder, field);
+		}
+	}
+
+	static
+	public OpType getOpType(DataType dataType){
+
+		switch(dataType){
+			case STRING:
+				return OpType.CATEGORICAL;
+			case INTEGER:
+			case FLOAT:
+			case DOUBLE:
+				return OpType.CONTINUOUS;
+			case BOOLEAN:
+				return OpType.CATEGORICAL;
+			case DATE:
+			case DATE_TIME:
+				return OpType.ORDINAL;
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
+	static
+	public OpType getOpType(Object dtype){
+		DataType dataType = getDataType(dtype);
+
+		return getOpType(dataType);
+	}
+
+	static
+	public DataType getDataType(Object dtype){
+
+		if(dtype instanceof String){
+			String stringDType = (String)dtype;
+
+			return parseDataType(stringDType);
+		} else
+
+		{
+			DType numpyDType = (DType)dtype;
+
+			return numpyDType.getDataType();
+		}
+	}
+
+	static
+	public DataType parseDataType(String dtype){
+
+		switch(dtype){
+			case "datetime64[D]":
+				return DataType.DATE;
+			case "datetime64[s]":
+				return DataType.DATE_TIME;
+			default:
+				throw new IllegalArgumentException("Python data type \'" + dtype + "\' is not supported");
 		}
 	}
 }

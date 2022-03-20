@@ -36,7 +36,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn2pmml.preprocessing.TransformerUtil;
+import sklearn.TransformerUtil;
 
 public class ImputerUtil {
 

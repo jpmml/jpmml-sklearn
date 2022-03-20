@@ -29,6 +29,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.TransformerUtil;
 
 public class FilterLookupTransformer extends LookupTransformer {
 

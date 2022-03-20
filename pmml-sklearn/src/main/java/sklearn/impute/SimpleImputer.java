@@ -29,8 +29,8 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.StepUtil;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class SimpleImputer extends Transformer {
 
@@ -46,7 +46,7 @@ public class SimpleImputer extends Transformer {
 			case "constant":
 				DataType dataType = getDataType();
 
-				return StepUtil.getOpType(dataType);
+				return TransformerUtil.getOpType(dataType);
 			case "mean":
 			case "median":
 				return OpType.CONTINUOUS;

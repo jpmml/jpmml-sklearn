@@ -27,8 +27,8 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.StepUtil;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class CastTransformer extends Transformer {
 
@@ -40,8 +40,8 @@ public class CastTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Object dtype = getDType();
 
-		OpType opType = StepUtil.getOpType(dtype);
-		DataType dataType = StepUtil.getDataType(dtype);
+		OpType opType = TransformerUtil.getOpType(dtype);
+		DataType dataType = TransformerUtil.getDataType(dtype);
 
 		List<Feature> result = new ArrayList<>();
 

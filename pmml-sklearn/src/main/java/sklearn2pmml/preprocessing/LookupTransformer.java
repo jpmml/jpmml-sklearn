@@ -37,6 +37,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class LookupTransformer extends Transformer {
 

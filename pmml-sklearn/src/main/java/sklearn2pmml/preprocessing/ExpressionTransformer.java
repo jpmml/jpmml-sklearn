@@ -31,8 +31,8 @@ import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.ExpressionTranslator;
 import org.jpmml.python.Scope;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.StepUtil;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class ExpressionTransformer extends Transformer {
 
@@ -52,7 +52,7 @@ public class ExpressionTransformer extends Transformer {
 		DataType dataType;
 
 		if(dtype != null){
-			dataType = StepUtil.getDataType(dtype);
+			dataType = TransformerUtil.getDataType(dtype);
 		} else
 
 		{
@@ -63,7 +63,7 @@ public class ExpressionTransformer extends Transformer {
 			}
 		}
 
-		OpType opType = StepUtil.getOpType(dataType);
+		OpType opType = TransformerUtil.getOpType(dataType);
 
 		DerivedField derivedField = encodeDerivedField(createFieldName("eval", expr), opType, dataType, expression, encoder);
 
