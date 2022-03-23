@@ -24,7 +24,6 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import numpy.DType;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
@@ -44,6 +43,7 @@ import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -55,7 +55,7 @@ public class KBinsDiscretizer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		DType dtype = getDType();
+		TypeInfo dtype = getDType();
 		String encode = getEncode();
 		List<Integer> numberOfBins = getNumberOfBins();
 		List<List<Number>> binEdges = getBinEdges();
@@ -122,8 +122,8 @@ public class KBinsDiscretizer extends Transformer {
 		}
 	}
 
-	public DType getDType(){
-		return (DType)getOptionalDType("dtype", false);
+	public TypeInfo getDType(){
+		return getOptionalDType("dtype", false);
 	}
 
 	public String getEncode(){

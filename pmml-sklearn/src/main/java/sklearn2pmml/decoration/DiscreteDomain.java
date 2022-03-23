@@ -31,8 +31,8 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.TransformerUtil;
 
 abstract
 public class DiscreteDomain extends Domain {
@@ -51,11 +51,11 @@ public class DiscreteDomain extends Domain {
 
 	@Override
 	public DataType getDataType(){
-		Object dtype = getDType();
+		TypeInfo dtype = getDType();
 		Boolean withData = getWithData();
 
 		if(dtype != null){
-			return TransformerUtil.getDataType(dtype);
+			return dtype.getDataType();
 		} // End if
 
 		if(withData){

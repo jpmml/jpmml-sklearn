@@ -33,7 +33,6 @@ import java.util.Map;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.io.CharStreams;
-import numpy.DType;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
@@ -54,6 +53,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn2pmml.feature_extraction.text.Matcher;
@@ -97,7 +97,7 @@ public class CountVectorizer extends Transformer {
 
 		BiMap<Integer, String> indexTermMap = termIndexMap.inverse();
 
-		DType dtype = getDType();
+		TypeInfo dtype = getDType();
 
 		DataType dataType = (dtype != null ? dtype.getDataType() : DataType.DOUBLE);
 
@@ -219,8 +219,8 @@ public class CountVectorizer extends Transformer {
 		return getBoolean("binary");
 	}
 
-	public DType getDType(){
-		return (DType)getDType("dtype", false);
+	public TypeInfo getDType(){
+		return getDType("dtype", false);
 	}
 
 	public Boolean getLowercase(){

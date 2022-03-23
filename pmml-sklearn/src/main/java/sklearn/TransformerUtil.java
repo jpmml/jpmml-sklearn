@@ -18,7 +18,6 @@
  */
 package sklearn;
 
-import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Field;
@@ -84,29 +83,6 @@ public class TransformerUtil {
 				return OpType.ORDINAL;
 			default:
 				throw new IllegalArgumentException();
-		}
-	}
-
-	static
-	public OpType getOpType(Object dtype){
-		DataType dataType = getDataType(dtype);
-
-		return getOpType(dataType);
-	}
-
-	static
-	public DataType getDataType(Object dtype){
-
-		if(dtype instanceof String){
-			String stringDType = (String)dtype;
-
-			return parseDataType(stringDType);
-		} else
-
-		{
-			DType numpyDType = (DType)dtype;
-
-			return numpyDType.getDataType();
 		}
 	}
 

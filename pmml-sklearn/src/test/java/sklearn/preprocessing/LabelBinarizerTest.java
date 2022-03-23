@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -33,7 +34,6 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
 import sklearn.SkLearnFields;
-import sklearn.StepUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,7 +49,7 @@ public class LabelBinarizerTest {
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
 		LabelBinarizer binarizer = new LabelBinarizer("sklearn.preprocessing.label", "LabelBinarizer");
-		binarizer.put(SkLearnFields.CLASSES, StepUtil.toArray(Arrays.asList("low", "medium", "high")));
+		binarizer.put(SkLearnFields.CLASSES, NDArrayUtil.toArray(Arrays.asList("low", "medium", "high")));
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 

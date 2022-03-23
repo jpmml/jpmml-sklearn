@@ -21,12 +21,12 @@ package sklearn.preprocessing;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.HasArray;
+import org.jpmml.python.TypeInfo;
 import sklearn.MultiTransformer;
 
 abstract
@@ -78,8 +78,8 @@ public class BaseEncoder extends MultiTransformer {
 		return EncoderUtil.transformCategories(getList("categories_", HasArray.class));
 	}
 
-	public DType getDType(){
-		return (DType)getDType("dtype", false);
+	public TypeInfo getDType(){
+		return getDType("dtype", false);
 	}
 
 	public String getHandleUnknown(){

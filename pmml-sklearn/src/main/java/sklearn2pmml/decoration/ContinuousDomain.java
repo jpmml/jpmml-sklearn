@@ -33,9 +33,9 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.OutlierDecorator;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
-import sklearn.TransformerUtil;
 
 public class ContinuousDomain extends Domain {
 
@@ -66,10 +66,10 @@ public class ContinuousDomain extends Domain {
 
 	@Override
 	public DataType getDataType(){
-		Object dtype = getDType();
+		TypeInfo dtype = getDType();
 
 		if(dtype != null){
-			return TransformerUtil.getDataType(dtype);
+			return dtype.getDataType();
 		}
 
 		return DataType.DOUBLE;

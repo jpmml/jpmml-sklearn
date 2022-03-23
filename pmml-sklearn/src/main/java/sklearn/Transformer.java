@@ -21,16 +21,15 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.razorvine.pickle.objects.ClassDictConstructor;
-import numpy.DType;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.python.ClassDictConstructorUtil;
+import org.jpmml.python.CastFunction;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
-import pandas.core.CategoricalDtype;
 
 abstract
 public class Transformer extends Step {
@@ -133,7 +132,7 @@ public class Transformer extends Step {
 		return dataField;
 	}
 
-	public Object getOptionalDType(String name, boolean extended){
+	public TypeInfo getOptionalDType(String name, boolean extended){
 		Object value = get(name);
 
 		if(value == null){
@@ -143,35 +142,37 @@ public class Transformer extends Step {
 		return getDType(name, extended);
 	}
 
-	public Object getDType(String name, boolean extended){
+	public TypeInfo getDType(String name, boolean extended){
 		Object dtype = get(name);
 
-		if(dtype instanceof String){
-			String string = (String)dtype;
+		CastFunction<TypeInfo> castFunction = new CastFunction<TypeInfo>(TypeInfo.class){
 
-			if(extended){
-				return string;
+			@Override
+			public TypeInfo apply(Object object){
+
+				if(object instanceof String){
+					String string = (String)object;
+
+					if(extended){
+						return new TypeInfo(){
+
+							@Override
+							public DataType getDataType(){
+								return TransformerUtil.parseDataType(string);
+							}
+						};
+					}
+				}
+
+				return super.apply(object);
 			}
-		} else
 
-		if(dtype instanceof CategoricalDtype){
-			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+			@Override
+			protected String formatMessage(Object object){
+				return "Attribute (" + ClassDictUtil.formatMember(Transformer.this, name) + ") is not a supported type info";
+			}
+		};
 
-			return categoricalDtype.getDType();
-		} else
-
-		if(dtype instanceof ClassDictConstructor){
-			ClassDictConstructor dictConstructor = (ClassDictConstructor)dtype;
-
-			return ClassDictConstructorUtil.construct(dictConstructor, DType.class);
-		} else
-
-		if(dtype instanceof DType){
-			DType numpyDType = (DType)dtype;
-
-			return numpyDType;
-		}
-
-		return get(name, DType.class);
+		return castFunction.apply(dtype);
 	}
 }

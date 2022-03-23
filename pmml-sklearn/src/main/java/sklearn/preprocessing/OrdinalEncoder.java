@@ -21,13 +21,13 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import numpy.DType;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class OrdinalEncoder extends BaseEncoder {
@@ -39,7 +39,7 @@ public class OrdinalEncoder extends BaseEncoder {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<List<?>> categories = getCategories();
-		DType dtype = getDType();
+		TypeInfo dtype = getDType();
 		String handleUnknown = getHandleUnknown();
 		Number unknownValue = null;
 

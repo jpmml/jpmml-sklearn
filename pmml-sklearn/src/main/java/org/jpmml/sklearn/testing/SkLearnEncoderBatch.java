@@ -44,7 +44,7 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	public PMML getPMML() throws Exception {
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		PMMLPipeline pipeline = (PMMLPipeline)loadPickle();
+		PMMLPipeline pipeline = loadPickle(PMMLPipeline.class);
 
 		activate(pipeline);
 

@@ -27,6 +27,7 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import numpy.core.NDArrayUtil;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -66,13 +67,12 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasClassifierOptions;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Step;
-import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.pipeline.FeatureUnion;
 import sklearn.pipeline.Pipeline;
@@ -522,7 +522,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public PMMLPipeline setActiveFields(List<String> activeFields){
-		put("active_fields", StepUtil.toArray(activeFields));
+		put("active_fields", NDArrayUtil.toArray(activeFields));
 
 		return this;
 	}
@@ -543,7 +543,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	public PMMLPipeline setTargetFields(List<String> targetFields){
-		put("target_fields", StepUtil.toArray(targetFields));
+		put("target_fields", NDArrayUtil.toArray(targetFields));
 
 		return this;
 	}

@@ -45,6 +45,7 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CalendarUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -133,7 +134,7 @@ public class Domain extends Transformer {
 		return dataField;
 	}
 
-	public Object getDType(){
+	public TypeInfo getDType(){
 
 		// SkLearn2PMML 0.78.0+
 		if(containsKey("dtype_")){

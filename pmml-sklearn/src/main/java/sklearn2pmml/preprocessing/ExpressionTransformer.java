@@ -30,6 +30,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.ExpressionTranslator;
 import org.jpmml.python.Scope;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
@@ -42,7 +43,7 @@ public class ExpressionTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Object dtype = getDType();
+		TypeInfo dtype = getDType();
 		String expr = getExpr();
 
 		Scope scope = new DataFrameScope("X", features);
@@ -52,7 +53,7 @@ public class ExpressionTransformer extends Transformer {
 		DataType dataType;
 
 		if(dtype != null){
-			dataType = TransformerUtil.getDataType(dtype);
+			dataType = dtype.getDataType();
 		} else
 
 		{
@@ -74,7 +75,7 @@ public class ExpressionTransformer extends Transformer {
 		return encoder.createDerivedField(name, opType, dataType, expression);
 	}
 
-	public Object getDType(){
+	public TypeInfo getDType(){
 		return super.getOptionalDType("dtype", true);
 	}
 

@@ -18,9 +18,6 @@
  */
 package sklearn.metrics;
 
-import java.lang.reflect.Field;
-
-import net.razorvine.pickle.objects.ClassDict;
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.CustomPythonObject;
@@ -48,22 +45,6 @@ public class DistanceMetric extends CustomPythonObject {
 	@Override
 	public void __setstate__(Object[] args){
 		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
-	}
-
-	private void setClassName(String name){
-
-		try {
-			Field classNameField = ClassDict.class.getDeclaredField("classname");
-			if(!classNameField.isAccessible()){
-				classNameField.setAccessible(true);
-			}
-
-			classNameField.set(this, name);
-		} catch(ReflectiveOperationException roe){
-			throw new RuntimeException(roe);
-		}
-
-		put("__class__", name);
 	}
 
 	private static final String[] SETSTATE_ATTRIBUTES = {

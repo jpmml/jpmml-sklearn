@@ -20,7 +20,6 @@ package sklearn.feature_extraction.text;
 
 import java.util.List;
 
-import numpy.DType;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
@@ -31,6 +30,7 @@ import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class TfidfVectorizer extends CountVectorizer {
@@ -40,8 +40,8 @@ public class TfidfVectorizer extends CountVectorizer {
 	}
 
 	@Override
-	public DType getDType(){
-		DType dtype = super.getDType();
+	public TypeInfo getDType(){
+		TypeInfo dtype = super.getDType();
 
 		if(dtype != null){
 			TfidfTransformer transformer = getTransformer();

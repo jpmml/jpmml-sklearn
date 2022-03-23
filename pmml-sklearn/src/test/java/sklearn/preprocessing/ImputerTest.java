@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
+import numpy.core.NDArrayUtil;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
@@ -33,7 +34,6 @@ import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
-import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn2pmml.decoration.CategoricalDomain;
 import sklearn2pmml.decoration.ContinuousDomain;
@@ -72,7 +72,7 @@ public class ImputerTest {
 
 		CategoricalDomain categoricalDomain = new CategoricalDomain("sklearn2pmml.decoration", "CategoricalDomain");
 		categoricalDomain.put("invalid_value_treatment", "as_is");
-		categoricalDomain.put("data_", StepUtil.toArray(Arrays.asList(0, 1, 2, 3, 4, 5, 6)));
+		categoricalDomain.put("data_", NDArrayUtil.toArray(Arrays.asList(0, 1, 2, 3, 4, 5, 6)));
 
 		encoder = new SkLearnEncoder();
 

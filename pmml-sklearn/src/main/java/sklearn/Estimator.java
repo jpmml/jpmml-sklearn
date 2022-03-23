@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -222,7 +223,7 @@ public class Estimator extends Step {
 	}
 
 	public Estimator setPMMLFeatureImportances(List<? extends Number> pmmlFeatureImportances){
-		put(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES, StepUtil.toArray(pmmlFeatureImportances));
+		put(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES, NDArrayUtil.toArray(pmmlFeatureImportances));
 
 		return this;
 	}
