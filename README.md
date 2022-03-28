@@ -177,7 +177,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>Category Encoders</summary>
 
-  Examples: [extensions/category_encoders.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/category_encoders.py)
+  Examples: [extensions/category_encoders.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/category_encoders.py) and [extensions/category_encoders-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/extensions/category_encoders-xgboost.py)
 
   * [`category_encoders.BaseNEncoder`](https://contrib.scikit-learn.org/category_encoders/basen.html)
   * [`category_encoders.BinaryEncoder`](https://contrib.scikit-learn.org/category_encoders/binary.html)
@@ -364,7 +364,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>XGBoost</summary>
 
-  Examples: [main-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/main-xgboost.py)
+  Examples: [main-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/main-xgboost.py), [extensions/category_encoders-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/extensions/category_encoders-xgboost.py) and [extensions/categorical.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/extensions/categorical.py)
 
   * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
   * [`xgboost.XGBRanker`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRanker)
