@@ -54,7 +54,7 @@ public class SelectFirstUtil {
 	static
 	private MiningModel encodeModel(MiningFunction miningFunction, List<Object[]> steps, Schema schema){
 
-		if(steps.size() < 1){
+		if(steps.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 

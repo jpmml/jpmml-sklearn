@@ -35,7 +35,7 @@ public class SelectFirstClassifier extends Classifier {
 	public List<?> getClasses(){
 		List<Object[]> steps = getSteps();
 
-		if(steps.size() < 1){
+		if(steps.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 

@@ -48,9 +48,9 @@ public class Pipeline extends Composite implements Castable {
 	public boolean hasTransformers(){
 		List<Object[]> steps = getSteps();
 
-		if(steps.size() < 1){
+		if(steps.isEmpty()){
 			return false;
-		} else
+		} // End if
 
 		if(steps.size() == 1){
 			return !hasFinalEstimator();
@@ -65,7 +65,7 @@ public class Pipeline extends Composite implements Castable {
 	public boolean hasFinalEstimator(){
 		List<Object[]> steps = getSteps();
 
-		if(steps.size() < 1){
+		if(steps.isEmpty()){
 			return false;
 		}
 
@@ -125,7 +125,7 @@ public class Pipeline extends Composite implements Castable {
 	public <E extends Estimator> E getFinalEstimator(Class<? extends E> clazz){
 		List<Object[]> steps = getSteps();
 
-		if(steps.size() < 1){
+		if(steps.isEmpty()){
 			throw new IllegalArgumentException("Expected one or more steps, got zero steps");
 		}
 
