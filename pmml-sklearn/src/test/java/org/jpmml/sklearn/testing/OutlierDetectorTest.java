@@ -18,16 +18,21 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 import sklearn.Estimator;
+import sklearn.tree.HasTreeOptions;
 
 public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
 
@@ -38,6 +43,20 @@ public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest imple
 			@Override
 			public OutlierDetectorTest getArchiveBatchTest(){
 				return OutlierDetectorTest.this;
+			}
+
+			@Override
+			public List<Map<String, Object>> getOptionsMatrix(){
+				String algorithm = getAlgorithm();
+
+				if((ISOLATION_FOREST).equals(algorithm)){
+					Map<String, Object> options = new LinkedHashMap<>();
+					options.put(HasTreeOptions.OPTION_PRUNE, new Boolean[]{false, true});
+
+					return OptionsUtil.generateOptionsMatrix(options);
+				}
+
+				return super.getOptionsMatrix();
 			}
 
 			@Override

@@ -70,6 +70,7 @@ import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.visitors.TreeModelCompactor;
 import sklearn.tree.visitors.TreeModelFlattener;
+import sklearn.tree.visitors.TreeModelPruner;
 
 public class TreeUtil {
 
@@ -88,8 +89,9 @@ public class TreeUtil {
 
 		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
 		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+		Boolean prune = (Boolean)estimator.getOption(HasTreeOptions.OPTION_PRUNE, fixed ? Boolean.FALSE : Boolean.TRUE);
 
-		if(compact || flat){
+		if(compact || flat || prune){
 
 			if(fixed){
 				throw new IllegalArgumentException("Conflicting tree model options");
@@ -106,6 +108,11 @@ public class TreeUtil {
 		}
 
 		List<Visitor> visitors = new ArrayList<>();
+
+		// Prune first, in order to make the tree model smaller for subsequent transformers
+		if((Boolean.TRUE).equals(prune)){
+			visitors.add(new TreeModelPruner());
+		} // End if
 
 		if((Boolean.TRUE).equals(compact)){
 			visitors.add(new TreeModelCompactor());

@@ -82,13 +82,6 @@ public class Main {
 	private Boolean flat = null;
 
 	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_NUMERIC},
-		description = "Simplify non-numeric split conditions to numeric split conditions",
-		arity = 1
-	)
-	private Boolean numeric = null;
-
-	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_NODE_ID},
 		description = "Keep SkLearn node identifiers",
 		arity = 1
@@ -101,6 +94,20 @@ public class Main {
 		arity = 1
 	)
 	private Boolean nodeScore = null;
+
+	@Parameter (
+		names = {"--X-" + HasTreeOptions.OPTION_NUMERIC},
+		description = "Transform non-numeric node split conditions to numeric",
+		arity = 1
+	)
+	private Boolean numeric = null;
+
+	@Parameter (
+		names = {"--X-" + HasTreeOptions.OPTION_PRUNE},
+		description = "Truncate invariant leaf nodes",
+		arity = 1
+	)
+	private Boolean prune = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_WINNER_ID},
@@ -197,9 +204,10 @@ public class Main {
 
 			options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
 			options.put(HasTreeOptions.OPTION_FLAT, this.flat);
-			options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
 			options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
 			options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
+			options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
+			options.put(HasTreeOptions.OPTION_PRUNE, this.prune);
 			options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);
 
 			// Ignore defaults

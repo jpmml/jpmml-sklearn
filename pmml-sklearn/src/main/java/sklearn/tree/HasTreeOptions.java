@@ -29,6 +29,7 @@ import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import sklearn.tree.visitors.TreeModelCompactor;
 import sklearn.tree.visitors.TreeModelFlattener;
+import sklearn.tree.visitors.TreeModelPruner;
 
 public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguration {
 
@@ -41,12 +42,6 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 	 * @see TreeModelFlattener
 	 */
 	String OPTION_FLAT = "flat";
-
-	/**
-	 * @see SimplePredicate
-	 * @see SimpleSetPredicate
-	 */
-	String OPTION_NUMERIC = "numeric";
 
 	/**
 	 * @see Node#hasExtensions()
@@ -65,6 +60,17 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 	String OPTION_NODE_SCORE = "node_score";
 
 	/**
+	 * @see SimplePredicate
+	 * @see SimpleSetPredicate
+	 */
+	String OPTION_NUMERIC = "numeric";
+
+	/**
+	 * @see TreeModelPruner
+	 */
+	String OPTION_PRUNE = "prune";
+
+	/**
 	 * @see OutputField
 	 */
 	String OPTION_WINNER_ID = "winner_id";
@@ -75,9 +81,10 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 		Map<String, Object> result = new LinkedHashMap<>();
 		result.put(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
-		result.put(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
+		result.put(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
+		result.put(HasTreeOptions.OPTION_PRUNE, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
 
 		return result;
