@@ -263,6 +263,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
   * `sklego.meta.EstimatorTransformer`
     * Predict functions `apply`, `decision_function`, `predict`.
+  * `sklego.pipeline.DebugPipeline`
   * `sklego.preprocessing.IdentityTransformer`
 </details>
 

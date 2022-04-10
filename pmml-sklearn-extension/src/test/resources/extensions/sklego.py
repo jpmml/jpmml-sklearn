@@ -5,7 +5,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import IsolationForest, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression, PoissonRegressor
-from sklearn.pipeline import make_pipeline
+from sklearn.pipeline import _name_estimators
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.svm import OneClassSVM
@@ -15,6 +15,7 @@ from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer
 from sklearn2pmml.util import Reshaper
 from sklego.meta import EstimatorTransformer
+from sklego.pipeline import DebugPipeline
 from sklego.preprocessing import IdentityTransformer
 
 import os
@@ -23,6 +24,9 @@ import sys
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 
 from common import *
+
+def make_debug_pipeline(*steps):
+	return DebugPipeline(_name_estimators(steps))
 
 def make_estimator_transformer(estimator, pmml_name, predict_func = "predict"):
 	estimator.pmml_name_ = pmml_name
@@ -56,7 +60,7 @@ def build_estimatortransformer_wheat(name):
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("cluster_labeler", make_enhancer(make_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "clusterLabeler"), OneHotEncoder(sparse = False)))),
+		("cluster_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "clusterLabeler"), OneHotEncoder(sparse = False)))),
 		("classifier", LogisticRegression(random_state = 13))
 	])
 	pipeline.fit(wheat_X, wheat_y)
@@ -88,7 +92,7 @@ def build_estimatortransformer_versicolor(outlier_detector_estimator, final_esti
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("outlier_detector", make_enhancer(make_pipeline(make_estimator_transformer(outlier_detector_estimator, "outlierDetector"), OneHotEncoder(sparse = False)))),
+		("outlier_detector", make_enhancer(make_debug_pipeline(make_estimator_transformer(outlier_detector_estimator, "outlierDetector"), OneHotEncoder(sparse = False)))),
 		("estimator", final_estimator)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
@@ -136,7 +140,7 @@ def build_estimatortransformer_housing(name):
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("leaf_labeler", make_enhancer(make_pipeline(make_estimator_transformer(DecisionTreeRegressor(max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), OneHotEncoder(sparse = False)))),
+		("leaf_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(DecisionTreeRegressor(max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), OneHotEncoder(sparse = False)))),
 		("estimator", LinearRegression())
 	])
 	pipeline.fit(housing_X, housing_y)
@@ -155,7 +159,7 @@ def build_estimatortransformer_visit(name):
 			("cat", OneHotEncoder(sparse = False), ["edlevel", "outwork", "female", "married", "kids", "self"]),
 			("cont", "passthrough", ["age", "hhninc", "educ"])
 		])),
-		("leaf_labeler", make_enhancer(make_pipeline(make_estimator_transformer(RandomForestRegressor(n_estimators = 7, max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), Reshaper(newshape = (-1, 7)), OneHotEncoder(sparse = False)))),
+		("leaf_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(RandomForestRegressor(n_estimators = 7, max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), Reshaper(newshape = (-1, 7)), OneHotEncoder(sparse = False)))),
 		("estimator", PoissonRegressor())
 	])
 	pipeline.fit(visit_X, visit_y)
