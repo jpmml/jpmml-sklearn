@@ -338,7 +338,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.StringNormalizer`
     * `sklearn2pmml.preprocessing.SubstringTransformer`
     * `sklearn2pmml.preprocessing.WordCountTransformer`
-    * `sklearn2pmml.preprocessing.h2o.H2OFrameCreator`
+    * `sklearn2pmml.preprocessing.h2o.H2OFrameConstructor`
     * `sklearn2pmml.preprocessing.scipy.BSplineTransformer`
     * `sklearn2pmml.util.Reshaper`
   * Rule sets:

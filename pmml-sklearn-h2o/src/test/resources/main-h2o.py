@@ -6,7 +6,7 @@ from h2o.estimators.xgboost import H2OXGBoostEstimator
 from sklearn.compose import ColumnTransformer
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing.h2o import H2OFrameCreator
+from sklearn2pmml.preprocessing.h2o import H2OFrameConstructor
 from sklearn_pandas import DataFrameMapper
 
 import h2o
@@ -28,7 +28,7 @@ def build_audit(audit_df, classifier, name):
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
-		("uploader", H2OFrameCreator()),
+		("uploader", H2OFrameConstructor()),
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, H2OFrame(audit_y.to_frame(), column_types = ["categorical"]))
@@ -62,7 +62,7 @@ def build_auto(auto_df, regressor, name):
 	)
 	pipeline = PMMLPipeline([
 		("transformer", transformer),
-		("uploader", H2OFrameCreator(column_names = ["cylinders", "model_year", "origin", "displacement", "horsepower", "weight", "acceleration"], column_types = ["enum", "enum", "enum", "numeric", "numeric", "numeric", "numeric"])),
+		("uploader", H2OFrameConstructor(column_names = ["cylinders", "model_year", "origin", "displacement", "horsepower", "weight", "acceleration"], column_types = ["enum", "enum", "enum", "numeric", "numeric", "numeric", "numeric"])),
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))

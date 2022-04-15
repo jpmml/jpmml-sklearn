@@ -25,9 +25,9 @@ import org.jpmml.converter.FeatureList;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.MultiTransformer;
 
-public class H2OFrameCreator extends MultiTransformer {
+public class H2OFrameConstructor extends MultiTransformer {
 
-	public H2OFrameCreator(String module, String name){
+	public H2OFrameConstructor(String module, String name){
 		super(module, name);
 	}
 
