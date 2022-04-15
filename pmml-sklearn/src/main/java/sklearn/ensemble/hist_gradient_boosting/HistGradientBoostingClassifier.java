@@ -49,7 +49,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 		int numberOfTreesPerIteration = getNumberOfTreesPerIteration();
 		List<List<TreePredictor>> predictors = getPredictors();
 
-		if(predictors.size() > 0){
+		if(!predictors.isEmpty()){
 			ClassDictUtil.checkSize(numberOfTreesPerIteration, predictors.get(0), baselinePredictions);
 		}
 

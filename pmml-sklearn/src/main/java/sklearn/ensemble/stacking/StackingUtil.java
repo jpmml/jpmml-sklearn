@@ -55,7 +55,7 @@ public class StackingUtil {
 			Model model = estimator.encode(schema);
 
 			List<Feature> predictFeatures = predictFunction.apply(i, model, stackMethod, encoder);
-			if(predictFeatures != null && predictFeatures.size() > 0){
+			if(predictFeatures != null && !predictFeatures.isEmpty()){
 				stackFeatures.addAll(predictFeatures);
 			}
 

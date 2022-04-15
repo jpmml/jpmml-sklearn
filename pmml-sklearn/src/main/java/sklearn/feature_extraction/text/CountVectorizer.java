@@ -175,7 +175,7 @@ public class CountVectorizer extends Transformer {
 		textIndex = tokenizer.configure(textIndex);
 
 		stopWords:
-		if((stopWords != null && stopWords.size() > 0) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){
+		if((stopWords != null && !stopWords.isEmpty()) && !Arrays.equals(nGramRange, new Integer[]{1, 1})){
 			String stopWordsRE = tokenizer.formatStopWordsRE(stopWords);
 
 			if(stopWordsRE == null){

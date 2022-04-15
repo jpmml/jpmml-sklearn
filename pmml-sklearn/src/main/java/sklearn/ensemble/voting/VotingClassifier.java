@@ -64,7 +64,7 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 
 		String voting = getVoting();
 
-		Segmentation.MultipleModelMethod multipleModelMethod = parseVoting(voting, (weights != null && weights.size() > 0));
+		Segmentation.MultipleModelMethod multipleModelMethod = parseVoting(voting, (weights != null && !weights.isEmpty()));
 
 		MiningModel miningModel = new MiningModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models, weights))

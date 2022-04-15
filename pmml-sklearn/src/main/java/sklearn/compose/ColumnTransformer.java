@@ -122,7 +122,7 @@ public class ColumnTransformer extends Initializer {
 				if(object instanceof String){
 					String column = (String)object;
 
-					if(features.size() > 0){
+					if(!features.isEmpty()){
 
 						for(Feature feature : features){
 							String name = feature.getName();
@@ -141,7 +141,7 @@ public class ColumnTransformer extends Initializer {
 				if(object instanceof Integer){
 					Integer index = (Integer)object;
 
-					if(features.size() > 0){
+					if(!features.isEmpty()){
 						Feature feature = features.get(index);
 
 						return feature;

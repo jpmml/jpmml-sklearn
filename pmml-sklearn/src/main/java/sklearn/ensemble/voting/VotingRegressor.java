@@ -50,7 +50,7 @@ public class VotingRegressor extends Regressor implements HasEstimatorEnsemble<R
 			models.add(model);
 		}
 
-		Segmentation.MultipleModelMethod multipleModelMethod = (weights != null && weights.size() > 0 ? Segmentation.MultipleModelMethod.WEIGHTED_AVERAGE : Segmentation.MultipleModelMethod.AVERAGE);
+		Segmentation.MultipleModelMethod multipleModelMethod = ((weights != null && !weights.isEmpty()) ? Segmentation.MultipleModelMethod.WEIGHTED_AVERAGE : Segmentation.MultipleModelMethod.AVERAGE);
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models, weights));

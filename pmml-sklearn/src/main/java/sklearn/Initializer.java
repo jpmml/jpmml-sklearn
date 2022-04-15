@@ -41,7 +41,7 @@ public class Initializer extends MultiTransformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 
-		if(features.size() != 0){
+		if(!features.isEmpty()){
 			throw new IllegalArgumentException("Transformer \'" + getClassName() + "\' must be the first step of the pipeline");
 		}
 
