@@ -28,6 +28,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
@@ -48,15 +49,27 @@ public class ExpressionTransformerTest {
 
 		Expression expected = new FieldRef("x");
 
-		assertTrue(ReflectionUtil.equals(expected, encode(expr, null, null)));
+		assertTrue(ReflectionUtil.equals(expected, encode(expr, null, null, null)));
 
 		expected = ((FieldRef)expected)
 			.setMapMissingTo(String.valueOf(-1d));
 
-		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, null)));
+		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, null, null)));
 
 		try {
-			encode("X[0]", null, -1d);
+			encode(expr, null, -1d, null);
+
+			fail();
+		} catch(ClassCastException cce){
+			// Ignored
+		}
+
+		expr = "1.0";
+
+		expected = PMMLUtil.createConstant(1d, DataType.DOUBLE);
+
+		try {
+			encode(expr, null, null, "as_missing");
 
 			fail();
 		} catch(ClassCastException cce){
@@ -70,19 +83,21 @@ public class ExpressionTransformerTest {
 
 		expected = ((Apply)expected)
 			.setMapMissingTo(String.valueOf(-1d))
-			.setDefaultValue(null);
+			.setDefaultValue(null)
+			.setInvalidValueTreatment(InvalidValueTreatmentMethod.RETURN_INVALID);
 
-		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, Double.NaN)));
+		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, Double.NaN, "return_invalid")));
 
 		expected = ((Apply)expected)
 			.setMapMissingTo(null)
-			.setDefaultValue(String.valueOf(-1d));
+			.setDefaultValue(String.valueOf(-1d))
+			.setInvalidValueTreatment(InvalidValueTreatmentMethod.AS_MISSING);
 
-		assertTrue(ReflectionUtil.equals(expected, encode(expr, Double.NaN, -1d)));
+		assertTrue(ReflectionUtil.equals(expected, encode(expr, Double.NaN, -1d, "as_missing")));
 	}
 
 	static
-	private Expression encode(String expr, Object mapMissingTo, Object defaultValue){
+	private Expression encode(String expr, Object mapMissingTo, Object defaultValue, String invalidValueTreatment){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		DataField dataField = encoder.createDataField("x", OpType.CONTINUOUS, DataType.DOUBLE);
@@ -94,7 +109,8 @@ public class ExpressionTransformerTest {
 		expressionTransformer
 			.setExpr(expr)
 			.setMapMissingTo(mapMissingTo)
-			.setDefaultValue(defaultValue);
+			.setDefaultValue(defaultValue)
+			.setInvalidValueTreatment(invalidValueTreatment);
 
 		List<Feature> outputFeatures = expressionTransformer.encodeFeatures(Collections.singletonList(inputFeature), encoder);
 

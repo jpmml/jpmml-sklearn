@@ -21,11 +21,13 @@ package sklearn2pmml.preprocessing;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.HasDefaultValue;
 import org.dmg.pmml.HasMapMissingTo;
+import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.TypeUtil;
@@ -49,6 +51,7 @@ public class ExpressionTransformer extends Transformer {
 		String expr = getExpr();
 		Object mapMissingTo = getMapMissingTo();
 		Object defaultValue = getDefaultValue();
+		InvalidValueTreatmentMethod invalidValueTreatment = parseInvalidValueTreatment(getInvalidValueTreatment());
 		TypeInfo dtype = getDType();
 
 		if(ValueUtil.isNaN(defaultValue)){
@@ -73,6 +76,12 @@ public class ExpressionTransformer extends Transformer {
 			HasDefaultValue<?, Object> hasDefaultValue = (HasDefaultValue<?, Object>)expression;
 
 			hasDefaultValue.setDefaultValue(ValueUtil.asString(defaultValue));
+		} // End if
+
+		if(invalidValueTreatment != null){
+			Apply apply = (Apply)expression;
+
+			apply.setInvalidValueTreatment(invalidValueTreatment);
 		}
 
 		DataType dataType;
@@ -133,6 +142,16 @@ public class ExpressionTransformer extends Transformer {
 		return this;
 	}
 
+	public String getInvalidValueTreatment(){
+		return getOptionalString("invalid_value_treatment");
+	}
+
+	public ExpressionTransformer setInvalidValueTreatment(String invalidValueTreatment){
+		put("invalid_value_treatment", invalidValueTreatment);
+
+		return this;
+	}
+
 	public Object getMapMissingTo(){
 		return getOptionalScalar("map_missing_to");
 	}
@@ -141,5 +160,22 @@ public class ExpressionTransformer extends Transformer {
 		put("map_missing_to", mapMissingTo);
 
 		return this;
+	}
+
+	static
+	private InvalidValueTreatmentMethod parseInvalidValueTreatment(String invalidValueTreatment){
+
+		if(invalidValueTreatment == null){
+			return null;
+		}
+
+		switch(invalidValueTreatment){
+			case "return_invalid":
+				return InvalidValueTreatmentMethod.RETURN_INVALID;
+			case "as_missing":
+				return InvalidValueTreatmentMethod.AS_MISSING;
+			default:
+				throw new IllegalArgumentException(invalidValueTreatment);
+		}
 	}
 }
