@@ -143,7 +143,7 @@ public class Transformer extends Step {
 	}
 
 	public TypeInfo getDType(String name, boolean extended){
-		Object dtype = get(name);
+		Object dtype = getObject(name);
 
 		CastFunction<TypeInfo> castFunction = new CastFunction<TypeInfo>(TypeInfo.class){
 
