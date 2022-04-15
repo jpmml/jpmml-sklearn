@@ -24,9 +24,12 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.HasDefaultValue;
+import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.ExpressionTranslator;
 import org.jpmml.python.Scope;
@@ -43,12 +46,34 @@ public class ExpressionTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		TypeInfo dtype = getDType();
 		String expr = getExpr();
+		Object mapMissingTo = getMapMissingTo();
+		Object defaultValue = getDefaultValue();
+		TypeInfo dtype = getDType();
+
+		if(ValueUtil.isNaN(defaultValue)){
+			defaultValue = null;
+		} // End if
+
+		if(ValueUtil.isNaN(mapMissingTo)){
+			mapMissingTo = null;
+		}
 
 		Scope scope = new DataFrameScope("X", features);
 
 		Expression expression = ExpressionTranslator.translate(expr, scope);
+
+		if(mapMissingTo != null){
+			HasMapMissingTo<?, Object> hasMapMissingTp = (HasMapMissingTo<?, Object>)expression;
+
+			hasMapMissingTp.setMapMissingTo(ValueUtil.asString(mapMissingTo));
+		} // End if
+
+		if(defaultValue != null){
+			HasDefaultValue<?, Object> hasDefaultValue = (HasDefaultValue<?, Object>)expression;
+
+			hasDefaultValue.setDefaultValue(ValueUtil.asString(defaultValue));
+		}
 
 		DataType dataType;
 
@@ -75,6 +100,16 @@ public class ExpressionTransformer extends Transformer {
 		return encoder.createDerivedField(name, opType, dataType, expression);
 	}
 
+	public Object getDefaultValue(){
+		return getOptionalScalar("default_value");
+	}
+
+	public ExpressionTransformer setDefaultValue(Object defaultValue){
+		put("default_value", defaultValue);
+
+		return this;
+	}
+
 	public TypeInfo getDType(){
 		return super.getOptionalDType("dtype", true);
 	}
@@ -90,5 +125,21 @@ public class ExpressionTransformer extends Transformer {
 		{
 			return getString("expr");
 		}
+	}
+
+	public ExpressionTransformer setExpr(String expr){
+		put("expr", expr);
+
+		return this;
+	}
+
+	public Object getMapMissingTo(){
+		return getOptionalScalar("map_missing_to");
+	}
+
+	public ExpressionTransformer setMapMissingTo(Object mapMissingTo){
+		put("map_missing_to", mapMissingTo);
+
+		return this;
 	}
 }
