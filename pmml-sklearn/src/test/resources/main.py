@@ -31,6 +31,7 @@ from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
+from sklearn2pmml.preprocessing.pandas import DataFrameConstructor
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
@@ -369,6 +370,7 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 			]))
 		])),
 		("pca", IncrementalPCA(n_components = 3, whiten = True)),
+		("renamer", DataFrameConstructor(columns = ["pca(1)", "pca(2)", "pca(3)"], dtype = numpy.float64)),
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y, **fit_params)
