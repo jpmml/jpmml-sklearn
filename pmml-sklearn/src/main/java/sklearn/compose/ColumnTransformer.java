@@ -22,11 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
@@ -34,6 +30,7 @@ import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Drop;
 import sklearn.Initializer;
+import sklearn.InitializerUtil;
 import sklearn.PassThrough;
 import sklearn.Transformer;
 
@@ -114,57 +111,6 @@ public class ColumnTransformer extends Initializer {
 			columns = hasArray.getArrayContent();
 		}
 
-		Function<Object, Feature> castFunction = new Function<Object, Feature>(){
-
-			@Override
-			public Feature apply(Object object){
-
-				if(object instanceof String){
-					String column = (String)object;
-
-					if(!features.isEmpty()){
-
-						for(Feature feature : features){
-							String name = feature.getName();
-
-							if((column).equals(name)){
-								return feature;
-							}
-						}
-
-						throw new IllegalArgumentException("Column \'" + column + "\' is undefined");
-					}
-
-					return createWildcardFeature(column);
-				} else
-
-				if(object instanceof Integer){
-					Integer index = (Integer)object;
-
-					if(!features.isEmpty()){
-						Feature feature = features.get(index);
-
-						return feature;
-					}
-
-					return createWildcardFeature(("x" + (index.intValue() + 1)));
-				} else
-
-				{
-					throw new IllegalArgumentException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string or integer");
-				}
-			}
-
-			private Feature createWildcardFeature(String name){
-				DataField dataField = encoder.getDataField(name);
-				if(dataField == null){
-					dataField = encoder.createDataField(name);
-				}
-
-				return new WildcardFeature(encoder, dataField);
-			}
-		};
-
-		return Lists.transform((List)columns, castFunction);
+		return InitializerUtil.selectFeatures((List)columns, features, encoder);
 	}
 }

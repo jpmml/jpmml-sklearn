@@ -24,15 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataField;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
+import sklearn.InitializerUtil;
 import sklearn.Transformer;
 
 public class DataFrameMapper extends Initializer {
@@ -43,6 +42,11 @@ public class DataFrameMapper extends Initializer {
 
 	@Override
 	public List<Feature> initializeFeatures(SkLearnEncoder encoder){
+		return encodeFeatures(Collections.emptyList(), encoder);
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Object _default = getDefault();
 		List<Object[]> rows = getFeatures();
 
@@ -53,21 +57,11 @@ public class DataFrameMapper extends Initializer {
 		List<Feature> result = new ArrayList<>();
 
 		for(Object[] row : rows){
-			List<Feature> rowFeatures = new ArrayList<>();
-
 			List<String> columns = getColumnList(row);
-			for(String column : columns){
-				String name = column;
-
-				DataField dataField = encoder.getDataField(name);
-				if(dataField == null){
-					dataField = encoder.createDataField(name);
-				}
-
-				rowFeatures.add(new WildcardFeature(encoder, dataField));
-			}
-
 			List<Transformer> transformers = getTransformerList(row);
+
+			List<Feature> rowFeatures = InitializerUtil.selectFeatures(columns, features, encoder);
+
 			for(Transformer transformer : transformers){
 				rowFeatures = transformer.encode(rowFeatures, encoder);
 			}
