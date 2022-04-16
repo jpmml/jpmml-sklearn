@@ -173,9 +173,10 @@ public class CountEncoder extends MapEncoder {
 		return getBoolean("normalize");
 	}
 
+	@SuppressWarnings("unchecked")
 	public Map<Object, Map<Object, String>> getMinGroupCategories(){
-		Map<?, ?> minGroupCategories = get("_min_group_categories", Map.class);
+		Map<Object, String> minGroupCategories = get("_min_group_categories", Map.class);
 
-		return CategoryEncoderUtil.toTransformedMap(minGroupCategories, key -> ScalarUtil.decode(key), value -> (Map)value);
+		return CategoryEncoderUtil.toTransformedMap(minGroupCategories, key -> ScalarUtil.decode(key), value -> (Map<Object, String>)value);
 	}
 }

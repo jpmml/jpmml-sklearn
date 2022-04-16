@@ -65,7 +65,7 @@ public class SkLearnUtil {
 				break;
 			}
 
-			tokens.add(new Integer(token));
+			tokens.add(Integer.valueOf(token));
 		}
 
 		return tokens;

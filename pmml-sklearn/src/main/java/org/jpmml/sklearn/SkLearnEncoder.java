@@ -30,6 +30,7 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.model.ReflectionUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
 import sklearn.ensemble.hist_gradient_boosting.TreePredictor;
@@ -84,13 +85,9 @@ public class SkLearnEncoder extends PythonEncoder {
 		DerivedField derivedField = removeDerivedField(name);
 
 		try {
-			Field field = (Feature.class).getDeclaredField("name");
+			Field nameField = (Feature.class).getDeclaredField("name");
 
-			if(!field.isAccessible()){
-				field.setAccessible(true);
-			}
-
-			field.set(feature, renamedName);
+			ReflectionUtil.setFieldValue(nameField, feature, renamedName);
 		} catch(ReflectiveOperationException roe){
 			throw new RuntimeException(roe);
 		}

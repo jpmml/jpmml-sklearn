@@ -100,6 +100,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 		return result;
 	}
 
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public List<Mapping> getMapping(){
 		List<Map<String, ?>> mapping = (List)getList("mapping", Map.class);
 

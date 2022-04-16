@@ -113,9 +113,10 @@ public class DiscreteDomain extends Domain {
 		return getTuple("discr_stats_");
 	}
 
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	static
 	public DiscrStats createDiscrStats(DataType dataType, Object[] objects){
-		List<Object> values = (List)asArray(objects[0]);
+		List<?> values = asArray(objects[0]);
 		List<Integer> counts = ValueUtil.asIntegers((List)asArray(objects[1]));
 
 		ClassDictUtil.checkSize(values, counts);

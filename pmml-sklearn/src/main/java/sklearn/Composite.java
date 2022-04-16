@@ -125,6 +125,7 @@ public class Composite extends Step {
 	/**
 	 * @see Estimator
 	 */
+	@SuppressWarnings("unchecked")
 	public Model encodeModel(Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
@@ -132,7 +133,7 @@ public class Composite extends Step {
 
 		// XXX
 		if(hasTransformers()){
-			features = encodeFeatures((List)features, encoder);
+			features = encodeFeatures((List<Feature>)features, encoder);
 
 			schema = new Schema(encoder, label, features);
 		} // End if

@@ -45,6 +45,7 @@ public class DataFrameMapper extends Initializer {
 		return encodeFeatures(Collections.emptyList(), encoder);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Object _default = getDefault();
@@ -67,7 +68,7 @@ public class DataFrameMapper extends Initializer {
 			}
 
 			if(row.length > 2){
-				Map<String, ?> options = (Map)row[2];
+				Map<String, ?> options = (Map<String, ?>)row[2];
 
 				String alias = (String)options.get("alias");
 				if(alias != null){
@@ -125,7 +126,7 @@ public class DataFrameMapper extends Initializer {
 		};
 
 		if(key instanceof List){
-			return Lists.transform((List)key, castFunction);
+			return Lists.transform((List<?>)key, castFunction);
 		}
 
 		return Collections.singletonList(castFunction.apply(key));
@@ -156,7 +157,7 @@ public class DataFrameMapper extends Initializer {
 		};
 
 		if(value instanceof List){
-			return Lists.transform((List)value, castFunction);
+			return Lists.transform((List<?>)value, castFunction);
 		}
 
 		return Collections.singletonList(castFunction.apply(value));

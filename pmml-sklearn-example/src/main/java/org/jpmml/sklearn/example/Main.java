@@ -23,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -178,7 +177,7 @@ public class Main {
 				Pipeline pipeline = (Pipeline)object;
 
 				object = new PMMLPipeline()
-					.setSteps((List)pipeline.getSteps());
+					.setSteps(pipeline.getSteps());
 			} else
 
 			// Create a single-step PMMLPipeline from an Estimator

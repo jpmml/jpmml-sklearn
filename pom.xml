@@ -142,7 +142,12 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.10.0</version>
 				<configuration>
+					<!--
+					<compilerArgument>-Xlint:unchecked</compilerArgument>
+					-->
 					<source>1.8</source>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
 					<target>1.8</target>
 				</configuration>
 			</plugin>

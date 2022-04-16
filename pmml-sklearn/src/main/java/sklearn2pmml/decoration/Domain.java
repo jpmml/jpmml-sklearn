@@ -155,7 +155,7 @@ public class Domain extends Transformer {
 		return getOptionalScalar("missing_value_replacement");
 	}
 
-	public List<Object> getMissingValues(){
+	public List<?> getMissingValues(){
 		Object missingValues = getOptionalObject("missing_values");
 
 		if(missingValues != null){
@@ -166,7 +166,7 @@ public class Domain extends Transformer {
 			}
 
 			// SkLearn2PMML 0.38.1+
-			return (List)missingValues;
+			return (List<?>)missingValues;
 		}
 
 		return null;

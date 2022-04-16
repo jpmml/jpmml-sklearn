@@ -187,8 +187,9 @@ public class Estimator extends Step {
 		putOptions(Collections.singletonMap(key, value));
 	}
 
+	@SuppressWarnings("unchecked")
 	public void putOptions(Map<String, ?> options){
-		Map<String, ?> pmmlOptions = getPMMLOptions();
+		Map<String, Object> pmmlOptions = (Map<String, Object>)getPMMLOptions();
 
 		if(pmmlOptions == null){
 			pmmlOptions = new LinkedHashMap<>();
@@ -196,8 +197,7 @@ public class Estimator extends Step {
 			setPMMLOptions(pmmlOptions);
 		}
 
-		// XXX
-		pmmlOptions.putAll((Map)options);
+		pmmlOptions.putAll(options);
 	}
 
 	public boolean hasFeatureImportances(){
