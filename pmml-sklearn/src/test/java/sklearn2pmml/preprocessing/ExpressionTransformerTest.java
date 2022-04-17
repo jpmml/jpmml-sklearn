@@ -104,7 +104,7 @@ public class ExpressionTransformerTest {
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
-		ExpressionTransformer expressionTransformer = new ExpressionTransformer("sklearn2pmml.preprocessing", "ExpressionTransformer");
+		ExpressionTransformer expressionTransformer = new ExpressionTransformer();
 
 		expressionTransformer
 			.setExpr(expr)

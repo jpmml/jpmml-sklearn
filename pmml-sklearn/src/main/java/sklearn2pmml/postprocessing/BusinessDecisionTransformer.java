@@ -18,29 +18,34 @@
  */
 package sklearn2pmml.postprocessing;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Decision;
 import org.dmg.pmml.Decisions;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Expression;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Transformer;
+import sklearn.TransformerUtil;
 import sklearn2pmml.preprocessing.ExpressionTransformer;
 
-public class BusinessDecisionTransformer extends ExpressionTransformer {
+public class BusinessDecisionTransformer extends Transformer {
 
 	public BusinessDecisionTransformer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	protected DerivedField encodeDerivedField(String name, OpType opType, DataType dataType, Expression expression, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Transformer transformer = getTransformer();
 		String businessProblem = getBusinessProblem();
 		List<Object[]> decisions = getDecisions();
 
@@ -48,6 +53,17 @@ public class BusinessDecisionTransformer extends ExpressionTransformer {
 		if(model == null){
 			throw new IllegalArgumentException("Model is undefined");
 		}
+
+		List<Feature> transformerFeatures = transformer.encode(features, encoder);
+
+		SchemaUtil.checkSize(1, transformerFeatures);
+
+		Feature transformerFeature = transformerFeatures.get(0);
+
+		DerivedField derivedField = (DerivedField)transformerFeature.getField();
+
+		DataType dataType = derivedField.getDataType();
+		OpType opType = derivedField.getOpType();
 
 		switch(opType){
 			case CONTINUOUS:
@@ -71,13 +87,15 @@ public class BusinessDecisionTransformer extends ExpressionTransformer {
 			pmmlDecisions.addDecisions(pmmlDecision);
 		}
 
-		OutputField outputField = new OutputField(name, opType, dataType)
+		OutputField outputField = new OutputField(createFieldName("decision", transformerFeature), opType, dataType)
 			.setResultFeature(ResultFeature.DECISION)
 			.setFinalResult(true)
-			.setExpression(expression)
+			.setExpression(derivedField.getExpression())
 			.setDecisions(pmmlDecisions);
 
-		return encoder.createDerivedField(model, outputField, true);
+		DerivedField decisionDerivedField = encoder.createDerivedField(model, outputField, true);
+
+		return Collections.singletonList(TransformerUtil.createFeature(decisionDerivedField, encoder));
 	}
 
 	public String getBusinessProblem(){
@@ -88,8 +106,20 @@ public class BusinessDecisionTransformer extends ExpressionTransformer {
 		return getTupleList("decisions");
 	}
 
-	@Override
-	public String getExpr(){
-		return getString("expr");
+	public Transformer getTransformer(){
+
+		// SkLearn2PMML 0.80.0
+		if(containsKey("expr")){
+			String expr = getString("expr");
+			Object dtype = getOptionalObject("dtype");
+
+			ExpressionTransformer expressionTransformer = new ExpressionTransformer()
+				.setExpr(expr)
+				.setDType(dtype);
+
+			return expressionTransformer;
+		}
+
+		return get("transformer_", Transformer.class);
 	}
 }

@@ -42,6 +42,10 @@ import sklearn.TransformerUtil;
 
 public class ExpressionTransformer extends Transformer {
 
+	public ExpressionTransformer(){
+		this("sklearn2pmml.preprocessing", "ExpressionTransformer");
+	}
+
 	public ExpressionTransformer(String module, String name){
 		super(module, name);
 	}
@@ -100,13 +104,9 @@ public class ExpressionTransformer extends Transformer {
 
 		OpType opType = TransformerUtil.getOpType(dataType);
 
-		DerivedField derivedField = encodeDerivedField(createFieldName("eval", expr), opType, dataType, expression, encoder);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
 
 		return Collections.singletonList(TransformerUtil.createFeature(derivedField, encoder));
-	}
-
-	protected DerivedField encodeDerivedField(String name, OpType opType, DataType dataType, Expression expression, SkLearnEncoder encoder){
-		return encoder.createDerivedField(name, opType, dataType, expression);
 	}
 
 	public Object getDefaultValue(){
@@ -121,6 +121,12 @@ public class ExpressionTransformer extends Transformer {
 
 	public TypeInfo getDType(){
 		return super.getOptionalDType("dtype", true);
+	}
+
+	public ExpressionTransformer setDType(Object dtype){
+		put("dtype", dtype);
+
+		return this;
 	}
 
 	public String getExpr(){
