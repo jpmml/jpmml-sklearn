@@ -25,6 +25,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Decision;
 import org.dmg.pmml.Decisions;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
@@ -52,15 +53,17 @@ public class BusinessDecisionTransformer extends Transformer {
 		Model model = encoder.getModel();
 		if(model == null){
 			throw new IllegalArgumentException("Model is undefined");
+		} // End if
+
+		if(transformer != null){
+			features = transformer.encodeFeatures(features, encoder);
 		}
 
-		List<Feature> transformerFeatures = transformer.encode(features, encoder);
+		SchemaUtil.checkSize(1, features);
 
-		SchemaUtil.checkSize(1, transformerFeatures);
+		Feature feature = features.get(0);
 
-		Feature transformerFeature = transformerFeatures.get(0);
-
-		DerivedField derivedField = (DerivedField)transformerFeature.getField();
+		DerivedField derivedField = (DerivedField)feature.getField();
 
 		DataType dataType = derivedField.getDataType();
 		OpType opType = derivedField.getOpType();
@@ -76,6 +79,18 @@ public class BusinessDecisionTransformer extends Transformer {
 				break;
 		}
 
+		Expression expression;
+
+		if(isEmbedded()){
+			expression = derivedField.getExpression();
+
+			encoder.removeDerivedField(derivedField.requireName());
+		} else
+
+		{
+			expression = feature.ref();
+		}
+
 		Decisions pmmlDecisions = new Decisions()
 			.setBusinessProblem(businessProblem);
 
@@ -87,10 +102,10 @@ public class BusinessDecisionTransformer extends Transformer {
 			pmmlDecisions.addDecisions(pmmlDecision);
 		}
 
-		OutputField outputField = new OutputField(createFieldName("decision", transformerFeature), opType, dataType)
+		OutputField outputField = new OutputField(createFieldName("decision", feature), opType, dataType)
 			.setResultFeature(ResultFeature.DECISION)
 			.setFinalResult(true)
-			.setExpression(derivedField.getExpression())
+			.setExpression(expression)
 			.setDecisions(pmmlDecisions);
 
 		DerivedField decisionDerivedField = encoder.createDerivedField(model, outputField, true);
@@ -120,6 +135,31 @@ public class BusinessDecisionTransformer extends Transformer {
 			return expressionTransformer;
 		}
 
-		return get("transformer_", Transformer.class);
+		// SkLearn2PMML 0.81.0+
+		return getOptional("transformer_", Transformer.class);
+	}
+
+	private boolean isEmbedded(){
+
+		// SkLearn2PMML 0.80.0
+		if(containsKey("expr")){
+			return true;
+		}
+
+		// SkLearn2PMML 0.81.0+
+		Object transformer = getOptionalObject("transformer");
+		if(transformer != null){
+
+			if(transformer instanceof String){
+				return true;
+			} else
+
+			// Accept simple transformers, reject complex transformers and pipelines
+			if(transformer instanceof Transformer){
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

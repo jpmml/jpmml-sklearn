@@ -31,5 +31,5 @@ def build_iris(iris_df, name, transformer, predict_proba_transformer = None):
 
 iris_df = load_iris("Iris")
 
-build_iris(iris_df, "MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")]), "decision", prefit = True))
+build_iris(iris_df, "MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")], prefit = True), "decision", prefit = True))
 build_iris(iris_df, "MLPTransformerIris", MLPTransformer(mlp, transformer_output_layer = 1))
