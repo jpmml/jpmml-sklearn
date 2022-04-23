@@ -25,9 +25,10 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.HasExpression;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
@@ -38,6 +39,7 @@ import org.jpmml.model.ReflectionUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -47,9 +49,9 @@ public class ExpressionTransformerTest {
 	public void encode(){
 		String expr = "X[0]";
 
-		Expression expected = new FieldRef("x");
+		assertNull(encode(expr, null, null, null));
 
-		assertTrue(ReflectionUtil.equals(expected, encode(expr, null, null, null)));
+		Expression expected = new FieldRef("x");
 
 		expected = ((FieldRef)expected)
 			.setMapMissingTo(String.valueOf(-1d));
@@ -116,8 +118,14 @@ public class ExpressionTransformerTest {
 
 		Feature outputFeature = Iterables.getOnlyElement(outputFeatures);
 
-		DerivedField derivedField = (DerivedField)outputFeature.getField();
+		Field<?> field = outputFeature.getField();
 
-		return derivedField.getExpression();
+		if(field instanceof HasExpression){
+			HasExpression<?> hasExpression = (HasExpression<?>)field;
+
+			return hasExpression.getExpression();
+		}
+
+		return null;
 	}
 }

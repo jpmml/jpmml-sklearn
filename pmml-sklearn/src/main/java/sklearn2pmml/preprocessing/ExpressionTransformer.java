@@ -25,6 +25,8 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.Field;
+import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.HasDefaultValue;
 import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
@@ -103,6 +105,20 @@ public class ExpressionTransformer extends Transformer {
 		}
 
 		OpType opType = TransformerUtil.getOpType(dataType);
+
+		// Detect identity field reference
+		if((expression instanceof FieldRef) && (mapMissingTo == null)){
+			FieldRef fieldRef = (FieldRef)expression;
+
+			Feature feature = scope.resolveFeature(fieldRef.getField());
+			if(feature != null){
+				Field<?> field = feature.getField();
+
+				if((field.getOpType() == opType) && (field.getDataType() == dataType)){
+					return Collections.singletonList(feature);
+				}
+			}
+		}
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
 
