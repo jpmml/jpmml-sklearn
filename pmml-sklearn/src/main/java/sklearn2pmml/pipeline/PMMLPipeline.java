@@ -21,6 +21,7 @@ package sklearn2pmml.pipeline;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -445,9 +446,11 @@ public class PMMLPipeline extends Pipeline {
 
 		transformer.encode(features, outputEncoder);
 
-		Map<String, DerivedField> derivedFields = outputEncoder.getDerivedFields();
+		Collection<DerivedField> derivedFields = (outputEncoder.getDerivedFields()).values();
 
-		for(DerivedField derivedField : derivedFields.values()){
+		for(Iterator<DerivedField> it = derivedFields.iterator(); it.hasNext(); ){
+			DerivedField derivedField = it.next();
+
 			OutputField outputField;
 
 			if(derivedField instanceof DerivedOutputField){
@@ -459,6 +462,7 @@ public class PMMLPipeline extends Pipeline {
 			{
 				outputField = new OutputField(derivedField.requireName(), derivedField.requireOpType(), derivedField.requireDataType())
 					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+					.setFinalResult(!it.hasNext())
 					.setExpression(derivedField.requireExpression());
 			}
 
