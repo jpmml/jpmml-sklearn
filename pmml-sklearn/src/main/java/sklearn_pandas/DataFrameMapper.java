@@ -88,7 +88,7 @@ public class DataFrameMapper extends Initializer {
 	}
 
 	public Object getDefault(){
-		return getObject("default");
+		return getOptionalObject("default");
 	}
 
 	public DataFrameMapper setDefault(Object _default){
