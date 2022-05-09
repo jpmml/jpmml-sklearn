@@ -304,9 +304,11 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.postprocessing.BusinessDecisionTransformer`
   * Preprocessing:
     * `sklearn2pmml.preprocessing.Aggregator`
+    * `sklearn2pmml.preprocessing.BSplineTransformer`
     * `sklearn2pmml.preprocessing.CastTransformer`
     * `sklearn2pmml.preprocessing.ConcatTransformer`
     * `sklearn2pmml.preprocessing.CutTransformer`
+    * `sklearn2pmml.preprocessing.DataFrameConstructor`
     * `sklearn2pmml.preprocessing.DaysSinceYearTransformer`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
       * Ternary conditional expression `<expression_true> if <condition> else <expression_false>`.
@@ -339,8 +341,6 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.SubstringTransformer`
     * `sklearn2pmml.preprocessing.WordCountTransformer`
     * `sklearn2pmml.preprocessing.h2o.H2OFrameConstructor`
-    * `sklearn2pmml.preprocessing.pandas.DataFrameConstructor`
-    * `sklearn2pmml.preprocessing.scipy.BSplineTransformer`
     * `sklearn2pmml.util.Reshaper`
   * Rule sets:
     * `sklearn2pmml.ruleset.RuleSetClassifier`

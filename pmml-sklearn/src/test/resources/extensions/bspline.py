@@ -5,7 +5,7 @@ from scipy.interpolate import make_interp_spline
 from scipy.stats import norm
 from sklearn.linear_model import LinearRegression
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing.scipy import BSplineTransformer
+from sklearn2pmml.preprocessing import BSplineTransformer
 
 import numpy
 
