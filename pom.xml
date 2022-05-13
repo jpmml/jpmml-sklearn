@@ -14,7 +14,7 @@
 	<packaging>pom</packaging>
 
 	<name>JPMML-SkLearn</name>
-	<description>Java library and command-line application for converting Scikit-Learn models to PMML</description>
+	<description>Java library and command-line application for converting Scikit-Learn pipelines to PMML</description>
 	<url>https://github.com/jpmml/jpmml-sklearn</url>
 
 	<licenses>
@@ -140,7 +140,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.0</version>
+				<version>3.10.1</version>
 				<configuration>
 					<!--
 					<compilerArgument>-Xlint:unchecked</compilerArgument>
@@ -154,7 +154,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.3.2</version>
+				<version>3.4.0</version>
 				<configuration>
 					<javadocVersion>1.8</javadocVersion>
 				</configuration>
@@ -187,7 +187,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.7</version>
+				<version>0.8.8</version>
 				<executions>
 					<execution>
 						<id>pre-unit-test</id>
