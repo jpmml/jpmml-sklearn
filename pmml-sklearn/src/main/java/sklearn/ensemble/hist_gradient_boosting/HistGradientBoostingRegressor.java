@@ -41,7 +41,20 @@ public class HistGradientBoostingRegressor extends Regressor {
 	}
 
 	public Number getBaselinePrediction(){
-		return getNumber("_baseline_prediction");
+
+		// SkLearn 1.0.2
+		try {
+			return getNumber("_baseline_prediction");
+		// SkLearn 1.1.0+
+		} catch(ClassCastException cce){
+			List<Number> baselinePredictions = getNumberArray("_baseline_prediction");
+
+			if(baselinePredictions.size() != 1){
+				throw new IllegalArgumentException();
+			}
+
+			return baselinePredictions.get(0);
+		}
 	}
 
 	public BinMapper getBinMapper(){

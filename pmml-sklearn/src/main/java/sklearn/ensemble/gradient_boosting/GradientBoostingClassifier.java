@@ -130,7 +130,14 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 	}
 
 	public LossFunction getLoss(){
-		return get("loss_", LossFunction.class);
+
+		// SkLearn 1.0.2
+		if(containsKey("loss_")){
+			return get("loss_", LossFunction.class);
+		}
+
+		// SkLearn 1.1.0+
+		return get("_loss", LossFunction.class);
 	}
 
 	public HasPriorProbability getInit(){

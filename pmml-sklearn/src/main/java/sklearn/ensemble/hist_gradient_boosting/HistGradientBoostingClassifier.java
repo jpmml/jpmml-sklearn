@@ -32,8 +32,11 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PythonObject;
 import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.loss.HalfBinomialLoss;
+import sklearn.loss.HalfMultinomialLoss;
 
 public class HistGradientBoostingClassifier extends Classifier {
 
@@ -44,7 +47,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		List<? extends Number> baselinePredictions = getBaselinePrediction();
-		BaseLoss loss = getLoss();
+		PythonObject loss = getLoss();
 		BinMapper binMapper = getBinMapper();
 		int numberOfTreesPerIteration = getNumberOfTreesPerIteration();
 		List<List<TreePredictor>> predictors = getPredictors();
@@ -60,7 +63,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 		if(numberOfTreesPerIteration == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			if(!(loss instanceof BinaryCrossEntropy)){
+			if(!(loss instanceof BinaryCrossEntropy) && !(loss instanceof HalfBinomialLoss)){
 				throw new IllegalArgumentException();
 			}
 
@@ -73,7 +76,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 		if(numberOfTreesPerIteration >= 3){
 			SchemaUtil.checkSize(numberOfTreesPerIteration, categoricalLabel);
 
-			if(!(loss instanceof CategoricalCrossEntropy)){
+			if(!(loss instanceof CategoricalCrossEntropy) && !(loss instanceof HalfMultinomialLoss)){
 				throw new IllegalArgumentException();
 			}
 
@@ -102,7 +105,7 @@ public class HistGradientBoostingClassifier extends Classifier {
 		return getOptional("_bin_mapper", BinMapper.class);
 	}
 
-	public BaseLoss getLoss(){
+	public PythonObject getLoss(){
 
 		// SkLearn 0.23
 		if(containsKey("loss_")){
@@ -110,7 +113,13 @@ public class HistGradientBoostingClassifier extends Classifier {
 		}
 
 		// SkLearn 0.24+
-		return get("_loss", BaseLoss.class);
+		try {
+			return get("_loss", BaseLoss.class);
+
+		// SkLearn 1.1.0+
+		} catch(IllegalArgumentException iae){
+			return get("_loss", sklearn.loss.BaseLoss.class);
+		}
 	}
 
 	public Integer getNumberOfTreesPerIteration(){
