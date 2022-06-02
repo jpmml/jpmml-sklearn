@@ -19,6 +19,7 @@
 package sklearn;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -53,7 +54,11 @@ public class InitializerUtil {
 							}
 						}
 
-						throw new IllegalArgumentException("Column \'" + column + "\' is undefined");
+						List<String> names = features.stream()
+							.map(feature -> feature.getName())
+							.collect(Collectors.toList());
+
+						throw new IllegalArgumentException("Column \'" + column + "\' not found in " + (names));
 					}
 
 					return createWildcardFeature(column);
