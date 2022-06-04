@@ -18,10 +18,12 @@
  */
 package sklearn;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.jpmml.converter.Feature;
@@ -32,6 +34,13 @@ import org.jpmml.sklearn.SkLearnEncoder;
 public class InitializerUtil {
 
 	private InitializerUtil(){
+	}
+
+	static
+	public Feature selectFeature(String column, List<Feature> features, SkLearnEncoder encoder){
+		List<Feature> result = selectFeatures(Collections.singletonList(column), features, encoder);
+
+		return Iterables.getOnlyElement(result);
 	}
 
 	static

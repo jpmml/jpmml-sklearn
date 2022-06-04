@@ -257,6 +257,14 @@ Java library and command-line application for converting [Scikit-Learn](https://
 </details>
 
 <details>
+  <summary>OptBinning</summary>
+
+  Examples: [extensions/optbinning.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/optbinning.py)
+
+  * [`optbinning.BinningProcess`](https://gnpalencia.org/optbinning/binning_process.html#optbinning.BinningProcess)
+</details>
+
+<details>
   <summary>Scikit-Lego</summary>
 
   Examples: [extensions/sklego.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/sklego.py)
