@@ -46,7 +46,7 @@ public class HistGradientBoostingRegressor extends Regressor {
 		try {
 			return getNumber("_baseline_prediction");
 		// SkLearn 1.1.0+
-		} catch(ClassCastException cce){
+		} catch(IllegalArgumentException iae){
 			List<Number> baselinePredictions = getNumberArray("_baseline_prediction");
 
 			if(baselinePredictions.size() != 1){
