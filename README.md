@@ -352,6 +352,9 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.util.Reshaper`
   * Rule sets:
     * `sklearn2pmml.ruleset.RuleSetClassifier`
+  * Decision trees:
+    * `sklearn2pmml.tree.chaid.CHAIDClassifier`
+    * `sklearn2pmml.tree.chaid.CHAIDRegressor`
 </details>
 
 <details>
