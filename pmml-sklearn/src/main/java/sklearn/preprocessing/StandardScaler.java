@@ -128,7 +128,7 @@ public class StandardScaler extends Transformer {
 	public List<? extends Number> getStd(){
 
 		// SkLearn 0.16
-		if(containsKey("std_")){
+		if(containsKey("std_") && !containsKey("scale_")){
 			return getNumberArray("std_");
 		}
 
@@ -139,7 +139,7 @@ public class StandardScaler extends Transformer {
 	public int[] getStdShape(){
 
 		// SkLearn 0.16
-		if(containsKey("std_")){
+		if(containsKey("std_") && !containsKey("scale_")){
 			return getArrayShape("std_", 1);
 		}
 
