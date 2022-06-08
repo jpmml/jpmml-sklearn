@@ -19,9 +19,25 @@
 package org.jpmml.sklearn.testing;
 
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.converter.testing.Fields;
 import org.junit.Test;
 
-public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets {
+public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
+
+	@Test
+	public void evaluateCHAIDAudit() throws Exception {
+		evaluate("CHAID", AUDIT, excludeFields(AUDIT_ADJUSTED, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+	}
+
+	@Test
+	public void evaluateCHAIDAuto() throws Exception {
+		evaluate("CHAID", AUTO, excludeFields(AUTO_MPG));
+	}
+
+	@Test
+	public void evaluateCHAIDIris() throws Exception {
+		evaluate("CHAID", IRIS, excludeFields(IRIS_SPECIES, IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA));
+	}
 
 	@Test
 	public void evaluateMLPAutoencoderIris() throws Exception {
