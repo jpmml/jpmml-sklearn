@@ -47,11 +47,6 @@ public class RuleSetClassifier extends Classifier {
 	}
 
 	@Override
-	public boolean hasProbabilityDistribution(){
-		return false;
-	}
-
-	@Override
 	public List<String> getClasses(){
 		String defaultScore = getDefaultScore();
 		List<Object[]> rules = getRules();
@@ -73,6 +68,11 @@ public class RuleSetClassifier extends Classifier {
 		Collections.sort(result, String.CASE_INSENSITIVE_ORDER);
 
 		return result;
+	}
+
+	@Override
+	public boolean hasProbabilityDistribution(){
+		return false;
 	}
 
 	@Override

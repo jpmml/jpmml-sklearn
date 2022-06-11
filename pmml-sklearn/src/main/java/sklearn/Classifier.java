@@ -35,10 +35,6 @@ public class Classifier extends Estimator implements HasClasses {
 		return MiningFunction.CLASSIFICATION;
 	}
 
-	public boolean hasProbabilityDistribution(){
-		return true;
-	}
-
 	@Override
 	public List<?> getClasses(){
 		List<?> values = getArray(SkLearnFields.CLASSES);
@@ -46,6 +42,10 @@ public class Classifier extends Estimator implements HasClasses {
 		return values.stream()
 			.map(value -> (value instanceof Long) ? Math.toIntExact((Long)value) : value)
 			.collect(Collectors.toList());
+	}
+
+	public boolean hasProbabilityDistribution(){
+		return true;
 	}
 
 	public static final String FIELD_PROBABILITY = "probability";

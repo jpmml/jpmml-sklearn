@@ -30,16 +30,17 @@ public class RidgeClassifier extends LinearClassifier {
 	}
 
 	@Override
-	public boolean hasProbabilityDistribution(){
-		return false;
-	}
-
-	@Override
 	public List<?> getClasses(){
 		LabelBinarizer labelBinarizer = getLabelBinarizer();
 
 		return labelBinarizer.getClasses();
 	}
+
+	@Override
+	public boolean hasProbabilityDistribution(){
+		return false;
+	}
+
 
 	public LabelBinarizer getLabelBinarizer(){
 		return get("_label_binarizer", LabelBinarizer.class);

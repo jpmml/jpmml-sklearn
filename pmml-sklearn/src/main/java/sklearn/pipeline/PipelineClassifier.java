@@ -66,17 +66,17 @@ public class PipelineClassifier extends Classifier {
 	}
 
 	@Override
-	public boolean hasProbabilityDistribution(){
-		Classifier classifier = getFinalClassifier();
-
-		return classifier.hasProbabilityDistribution();
-	}
-
-	@Override
 	public List<?> getClasses(){
 		Classifier classifier = getFinalClassifier();
 
 		return classifier.getClasses();
+	}
+
+	@Override
+	public boolean hasProbabilityDistribution(){
+		Classifier classifier = getFinalClassifier();
+
+		return classifier.hasProbabilityDistribution();
 	}
 
 	@Override
