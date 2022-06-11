@@ -112,7 +112,8 @@ public class SelectFirstUtil {
 
 			removeCommonOutputFields(segmentation, commonOutputFields.keySet());
 
-			(output.getOutputFields()).addAll(commonOutputFields.values());
+			List<OutputField> outputFields = output.getOutputFields();
+			outputFields.addAll(commonOutputFields.values());
 		}
 	}
 

@@ -20,8 +20,12 @@ package sklearn2pmml.tree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -89,6 +93,20 @@ public class CHAIDUtil {
 
 		ClassDictUtil.checkSize(successors, splits);
 
+		Comparator<Node> comparator = new Comparator<Node>(){
+
+			@Override
+			public int compare(Node left, Node right){
+				chaid.Node leftTag = left.getTag(chaid.Node.class);
+				chaid.Node rightTag = right.getTag(chaid.Node.class);
+
+				List<?> leftIndices = leftTag.getIndices();
+				List<?> rightIndices = rightTag.getIndices();
+
+				return Integer.compare(leftIndices.size(), rightIndices.size());
+			}
+		};
+
 		if(!successors.isEmpty()){
 			CategoricalFeature categoricalFeature = (CategoricalFeature)schema.getFeature(columnId);
 
@@ -100,6 +118,39 @@ public class CHAIDUtil {
 				result = new CountingBranchNode(null, predicate);
 			}
 
+			Set<?> unusedValues = new LinkedHashSet<>(categoricalFeature.getValues());
+
+			for(int i = 0; i < successors.size(); i++){
+				List<Integer> splitValues = splits.get(i);
+
+				for(Integer splitValue : splitValues){
+
+					if(splitValue == -1){
+						throw new IllegalArgumentException();
+					} else
+
+					{
+						Object value = categoricalFeature.getValue(splitValue);
+
+						unusedValues.remove(value);
+					}
+				}
+			}
+
+			// The node with the most training data records
+			Node maxSuccessor = null;
+
+			if(!unusedValues.isEmpty()){
+
+				for(int i = 0; i < successors.size(); i++){
+					Node successor = successors.get(i);
+
+					if(maxSuccessor == null || comparator.compare(successor, maxSuccessor) >= 0){
+						maxSuccessor = successor;
+					}
+				}
+			}
+
 			for(int i = 0; i < successors.size(); i++){
 				Node successor = successors.get(i);
 
@@ -107,7 +158,20 @@ public class CHAIDUtil {
 
 				List<Integer> splitValues = splits.get(i);
 				for(Integer splitValue : splitValues){
-					values.add(categoricalFeature.getValue(splitValue));
+
+					if(splitValue == -1){
+						throw new IllegalArgumentException();
+					} else
+
+					{
+						Object value = categoricalFeature.getValue(splitValue);
+
+						values.add(value);
+					}
+				}
+
+				if(Objects.equals(successor, maxSuccessor)){
+					values.addAll(unusedValues);
 				}
 
 				Predicate successorPredicate = predicateManager.createPredicate(categoricalFeature, values);

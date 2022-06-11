@@ -18,8 +18,16 @@
  */
 package sklearn2pmml.tree;
 
+import java.util.List;
+
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
+import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import treelib.Tree;
@@ -34,7 +42,16 @@ public class CHAIDClassifier extends Classifier {
 	public Model encodeModel(Schema schema){
 		Tree tree = getTree();
 
-		return CHAIDUtil.encodeModel(MiningFunction.CLASSIFICATION, tree, schema);
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+		TreeModel treeModel = CHAIDUtil.encodeModel(MiningFunction.CLASSIFICATION, tree, schema);
+
+		Output output = ModelUtil.ensureOutput(treeModel);
+
+		List<OutputField> outputFields = output.getOutputFields();
+		outputFields.addAll(ModelUtil.createProbabilityFields(DataType.DOUBLE, categoricalLabel.getValues()));
+
+		return treeModel;
 	}
 
 	public Tree getTree(){

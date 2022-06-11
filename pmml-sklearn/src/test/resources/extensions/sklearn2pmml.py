@@ -2,6 +2,7 @@ from common import *
 
 from pandas import DataFrame, Series
 from sklearn_pandas import DataFrameMapper
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import KBinsDiscretizer
@@ -13,8 +14,8 @@ from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
 
 def make_chaid_dataframe_mapper(cont_cols, cat_cols):
 	return DataFrameMapper(
-		[([cont_col], [ContinuousDomain(), KBinsDiscretizer(encode = "ordinal")]) for cont_col in cont_cols] +
-		[([cat_col], CategoricalDomain()) for cat_col in cat_cols]
+		[([cont_col], [ContinuousDomain(), SimpleImputer(strategy = "mean"), KBinsDiscretizer(encode = "ordinal")]) for cont_col in cont_cols] +
+		[([cat_col], [CategoricalDomain(), SimpleImputer(strategy = "most_frequent")]) for cat_col in cat_cols]
 	, df_out = True)
 
 def build_chaid_audit(audit_df, name):
@@ -29,12 +30,16 @@ def build_chaid_audit(audit_df, name):
 	])
 	pipeline.fit(audit_X, audit_y)
 	store_pkl(pipeline, name)
-	node_id = Series(pipeline._final_estimator.tree_.node_predictions(), dtype = int, name = "nodeId")
+	node_id = Series(pipeline._final_estimator.apply(audit_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
 
 audit_df = load_audit("Audit")
 
 build_chaid_audit(audit_df, "CHAIDAudit")
+
+audit_df = load_audit("AuditNA")
+
+build_chaid_audit(audit_df, "CHAIDAuditNA")
 
 def build_chaid_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
@@ -45,7 +50,7 @@ def build_chaid_iris(iris_df, name):
 	])
 	pipeline.fit(iris_X, iris_y)
 	store_pkl(pipeline, name)
-	node_id = Series(pipeline._final_estimator.tree_.node_predictions(), dtype = int, name = "nodeId")
+	node_id = Series(pipeline._final_estimator.apply(iris_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
 
 def build_mlp_iris(iris_df, name, transformer, predict_proba_transformer = None):
@@ -88,9 +93,13 @@ def build_chaid_auto(auto_df, name):
 	])
 	pipeline.fit(auto_X, auto_y)
 	store_pkl(pipeline, name)
-	node_id = Series(pipeline._final_estimator.tree_.node_predictions(), dtype = int, name = "nodeId")
+	node_id = Series(pipeline._final_estimator.apply(auto_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
 
 auto_df = load_auto("Auto")
 
 build_chaid_auto(auto_df, "CHAIDAuto")
+
+auto_df = load_auto("AutoNA")
+
+build_chaid_auto(auto_df, "CHAIDAutoNA")

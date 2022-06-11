@@ -30,8 +30,18 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	}
 
 	@Test
+	public void evaluateCHAIDAuditNA() throws Exception {
+		evaluate("CHAID", AUDIT_NA, excludeFields(AUDIT_ADJUSTED, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+	}
+
+	@Test
 	public void evaluateCHAIDAuto() throws Exception {
 		evaluate("CHAID", AUTO, excludeFields(AUTO_MPG));
+	}
+
+	@Test
+	public void evaluateCHAIDAutoNA() throws Exception {
+		evaluate("CHAID", AUTO_NA, excludeFields(AUTO_MPG));
 	}
 
 	@Test
