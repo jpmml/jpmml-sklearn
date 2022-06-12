@@ -18,11 +18,19 @@
  */
 package sklearn2pmml.ensemble;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Predicate;
+import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
@@ -30,6 +38,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.model.ReflectionUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.PredicateTranslator;
 import org.jpmml.python.Scope;
@@ -87,6 +97,107 @@ public class SelectFirstUtil {
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(label))
 			.setSegmentation(segmentation);
 
+		optimizeOutputFields(miningModel);
+
 		return miningModel;
+	}
+
+	static
+	public void optimizeOutputFields(MiningModel miningModel){
+		Segmentation segmentation = miningModel.requireSegmentation();
+
+		Map<String, OutputField> commonOutputFields = collectCommonOutputFields(segmentation);
+		if(!commonOutputFields.isEmpty()){
+			Output output = ModelUtil.ensureOutput(miningModel);
+
+			removeCommonOutputFields(segmentation, commonOutputFields.keySet());
+
+			(output.getOutputFields()).addAll(commonOutputFields.values());
+		}
+	}
+
+	static
+	private Map<String, OutputField> collectCommonOutputFields(Segmentation segmentation){
+		List<Segment> segments = segmentation.requireSegments();
+
+		Map<String, OutputField> result = null;
+
+		for(Segment segment : segments){
+			Model model = segment.requireModel();
+
+			Model finalModel = MiningModelUtil.getFinalModel(model);
+
+			Output output = finalModel.getOutput();
+			if(output != null && output.hasOutputFields()){
+				List<OutputField> outputFields = output.getOutputFields();
+
+				if(result == null){
+					result = outputFields.stream()
+						.filter((outputField) -> {
+							ResultFeature resultFeature = outputField.getResultFeature();
+
+							switch(resultFeature){
+								case PROBABILITY:
+								case AFFINITY:
+									return true;
+								default:
+									return false;
+							}
+						})
+						.collect(Collectors.toMap(outputField -> outputField.requireName(), outputField -> outputField));
+				} else
+
+				{
+					Set<String> names = new LinkedHashSet<>();
+
+					for(OutputField outputField : outputFields){
+						String name = outputField.requireName();
+
+						names.add(name);
+
+						OutputField commonOutputField = result.get(name);
+						if(commonOutputField != null && !ReflectionUtil.equals(outputField, commonOutputField)){
+							result.remove(name);
+						}
+					}
+
+					(result.keySet()).retainAll(names);
+				}
+			} else
+
+			{
+				result = Collections.emptyMap();
+			} // End if
+
+			if(result.isEmpty()){
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	static
+	private void removeCommonOutputFields(Segmentation segmentation, Set<String> names){
+		List<Segment> segments = segmentation.requireSegments();
+
+		for(Segment segment : segments){
+			Model model = segment.requireModel();
+
+			Model finalModel = MiningModelUtil.getFinalModel(model);
+
+			Output output = finalModel.getOutput();
+			if(output != null && output.hasOutputFields()){
+				List<OutputField> outputFields = output.getOutputFields();
+
+				outputFields.removeIf((outputField) -> {
+					return names.contains(outputField.requireName());
+				});
+
+				if(outputFields.isEmpty()){
+					finalModel.setOutput(null);
+				}
+			}
+		}
 	}
 }

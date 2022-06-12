@@ -19,6 +19,7 @@
 package sklearn2pmml.ensemble;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
@@ -33,17 +34,37 @@ public class SelectFirstClassifier extends Classifier {
 
 	@Override
 	public List<?> getClasses(){
-		List<Object[]> steps = getSteps();
+		List<? extends Classifier> classifiers = getClassifiers();
 
-		if(steps.isEmpty()){
-			throw new IllegalArgumentException();
+		List<?> result = null;
+
+		for(Classifier classifier : classifiers){
+
+			if(result == null){
+				result = classifier.getClasses();
+			} else
+
+			{
+				if(!Objects.equals(result, classifier.getClasses())){
+					throw new IllegalArgumentException();
+				}
+			}
 		}
 
-		Object[] step = steps.get(0);
+		return result;
+	}
 
-		Classifier classifier = TupleUtil.extractElement(step, 1, Classifier.class);
+	@Override
+	public boolean hasProbabilityDistribution(){
+		List<? extends Classifier> classifiers = getClassifiers();
 
-		return classifier.getClasses();
+		boolean result = true;
+
+		for(Classifier classifier : classifiers){
+			result &= classifier.hasProbabilityDistribution();
+		}
+
+		return result;
 	}
 
 	@Override
@@ -51,6 +72,16 @@ public class SelectFirstClassifier extends Classifier {
 		List<Object[]> steps = getSteps();
 
 		return SelectFirstUtil.encodeClassifier(steps, schema);
+	}
+
+	public List<? extends Classifier> getClassifiers(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.isEmpty()){
+			throw new IllegalArgumentException();
+		}
+
+		return TupleUtil.extractElementList(steps, 1, Classifier.class);
 	}
 
 	public List<Object[]> getSteps(){

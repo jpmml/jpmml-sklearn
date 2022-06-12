@@ -81,9 +81,9 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 
 				Model finalModel = MiningModelUtil.getFinalModel(model);
 
-				Output finalOutput = finalModel.getOutput();
-				if(finalOutput != null && finalOutput.hasOutputFields()){
-					List<OutputField> outputFields = finalOutput.getOutputFields();
+				Output output = finalModel.getOutput();
+				if(output != null && output.hasOutputFields()){
+					List<OutputField> outputFields = output.getOutputFields();
 
 					outputFields.stream()
 						.filter(outputField -> (outputField.getResultFeature() == ResultFeature.PROBABILITY))
