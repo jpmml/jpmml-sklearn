@@ -51,11 +51,26 @@ public class Split extends PythonObject {
 		return decodeSplits(splits);
 	}
 
+	public List<List<?>> getSplitMap(){
+		List<?> splitMap = getList("split_map");
+
+		return decodeSplitMap(splitMap);
+	}
+
 	static
 	private List<List<Integer>> decodeSplits(List<?> splits){
 		return Lists.transform(splits, split -> {
 			return Lists.transform((List<?>)split, value -> {
 				return ValueUtil.asInteger((Number)ScalarUtil.decode(value));
+			});
+		});
+	}
+
+	static
+	public List<List<?>> decodeSplitMap(List<?> splits){
+		return Lists.transform(splits, split -> {
+			return Lists.transform((List<?>)split, value -> {
+				return ScalarUtil.decode(value);
 			});
 		});
 	}

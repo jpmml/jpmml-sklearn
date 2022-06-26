@@ -2,20 +2,38 @@ from common import *
 
 from pandas import DataFrame, Series
 from sklearn_pandas import DataFrameMapper
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPRegressor
-from sklearn.preprocessing import KBinsDiscretizer
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
+from sklearn2pmml.preprocessing import CutTransformer
 from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
 
-def make_chaid_dataframe_mapper(cont_cols, cat_cols):
+import numpy
+
+def make_bins(X, cols):
+	result = dict()
+	for col in cols:
+		bins = numpy.nanquantile(X[col], q = [0.0, 0.25, 0.50, 0.75, 1.0], interpolation = "nearest")
+		# Deduplicate
+		bins = list(dict.fromkeys(bins))
+		# Unbox Numpy float scalars to Python floats
+		bins = [float(bin) for bin in bins]
+		result[col] = bins
+	return result
+
+def make_bin_labels(bins):
+	result = dict()
+	for key, value in bins.items():
+		result[key] = list(range(0, len(value) - 1))
+	return result
+
+def make_chaid_dataframe_mapper(cont_cols, cat_cols, bins = {}, labels = {}):
 	return DataFrameMapper(
-		[([cont_col], [ContinuousDomain(), SimpleImputer(strategy = "mean"), KBinsDiscretizer(encode = "ordinal")]) for cont_col in cont_cols] +
-		[([cat_col], [CategoricalDomain(), SimpleImputer(strategy = "most_frequent")]) for cat_col in cat_cols]
+		[([cont_col], [ContinuousDomain(), CutTransformer(bins = bins[cont_col], labels = labels[cont_col])]) for cont_col in cont_cols] +
+		[([cat_col], [CategoricalDomain()]) for cat_col in cat_cols]
 	, df_out = True)
 
 def build_chaid_audit(audit_df, name):
@@ -24,8 +42,11 @@ def build_chaid_audit(audit_df, name):
 	cont_cols = ["Age", "Hours", "Income"]
 	cat_cols = ["Education", "Employment", "Marital", "Occupation", "Gender"]
 
+	bins = make_bins(audit_X, cont_cols)
+	labels = make_bin_labels(bins)
+
 	pipeline = PMMLPipeline([
-		("mapper", make_chaid_dataframe_mapper(cont_cols, cat_cols)),
+		("mapper", make_chaid_dataframe_mapper(cont_cols, cat_cols, bins, labels)),
 		("classifier", CHAIDClassifier(config = {"max_depth" : 9, "min_child_node_size" : 10}))
 	])
 	pipeline.fit(audit_X, audit_y)
@@ -43,9 +64,15 @@ build_chaid_audit(audit_df, "CHAIDAuditNA")
 
 def build_chaid_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
+	
+	cont_cols = list(iris_X.columns.values)
+	cat_cols = []
+
+	bins = make_bins(iris_X, cont_cols)
+	labels = make_bin_labels(bins)
 
 	pipeline = PMMLPipeline([
-		("mapper", make_chaid_dataframe_mapper(list(iris_X.columns.values), [])),
+		("mapper", make_chaid_dataframe_mapper(cont_cols, cat_cols, bins, labels)),
 		("classifier", CHAIDClassifier(config = {"max_depth" : 3, "min_child_node_size" : 10}))
 	])
 	pipeline.fit(iris_X, iris_y)
@@ -87,8 +114,11 @@ def build_chaid_auto(auto_df, name):
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
 	cat_cols = ["cylinders", "model_year", "origin"]
 
+	bins = make_bins(auto_X, cont_cols)
+	labels = make_bin_labels(bins)
+
 	pipeline = PMMLPipeline([
-		("mapper", make_chaid_dataframe_mapper(cont_cols, cat_cols)),
+		("mapper", make_chaid_dataframe_mapper(cont_cols, cat_cols, bins, labels)),
 		("regressor", CHAIDRegressor(config = {"max_depth" : 7, "min_child_node_size" : 10}))
 	])
 	pipeline.fit(auto_X, auto_y)

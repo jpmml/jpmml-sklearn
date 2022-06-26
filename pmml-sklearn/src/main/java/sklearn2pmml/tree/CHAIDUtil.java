@@ -21,6 +21,7 @@ package sklearn2pmml.tree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +32,14 @@ import java.util.stream.Collectors;
 
 import chaid.Column;
 import com.google.common.math.DoubleMath;
+import org.dmg.pmml.CompoundPredicate;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.False;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
+import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.tree.ClassifierNode;
 import org.dmg.pmml.tree.CountingBranchNode;
@@ -90,8 +94,9 @@ public class CHAIDUtil {
 
 		Integer columnId = split.getColumnId();
 		List<List<Integer>> splits = split.getSplits();
+		List<List<?>> splitMap = split.getSplitMap();
 
-		ClassDictUtil.checkSize(successors, splits);
+		ClassDictUtil.checkSize(successors, splits, splitMap);
 
 		Comparator<Node> comparator = new Comparator<Node>(){
 
@@ -110,6 +115,8 @@ public class CHAIDUtil {
 		if(!successors.isEmpty()){
 			CategoricalFeature categoricalFeature = (CategoricalFeature)schema.getFeature(columnId);
 
+			Collection<?> categories = categoricalFeature.getValues();
+
 			if(label instanceof CategoricalLabel){
 				result = new ClassifierNode(null, predicate);
 			} else
@@ -118,21 +125,24 @@ public class CHAIDUtil {
 				result = new CountingBranchNode(null, predicate);
 			}
 
-			Set<?> unusedValues = new LinkedHashSet<>(categoricalFeature.getValues());
+			Set<Object> unusedValues = new LinkedHashSet<>(categories);
 
 			for(int i = 0; i < successors.size(); i++){
-				List<Integer> splitValues = splits.get(i);
+				List<Integer> splitIndices = splits.get(i);
+				List<?> splitValues = splitMap.get(i);
 
-				for(Integer splitValue : splitValues){
+				ClassDictUtil.checkSize(splitIndices, splitValues);
 
-					if(splitValue == -1){
-						throw new IllegalArgumentException();
+				for(int j = 0; j < splitIndices.size(); j++){
+					Integer splitIndex = splitIndices.get(j);
+					Object splitValue = splitValues.get(j);
+
+					if(splitIndex == -1){
+						// Ignored
 					} else
 
 					{
-						Object value = categoricalFeature.getValue(splitValue);
-
-						unusedValues.remove(value);
+						removeCategory(unusedValues, splitValue);
 					}
 				}
 			}
@@ -154,17 +164,23 @@ public class CHAIDUtil {
 			for(int i = 0; i < successors.size(); i++){
 				Node successor = successors.get(i);
 
+				List<Integer> splitIndices = splits.get(i);
+				List<?> splitValues = splitMap.get(i);
+
 				List<Object> values = new ArrayList<>();
 
-				List<Integer> splitValues = splits.get(i);
-				for(Integer splitValue : splitValues){
+				boolean withMissing = false;
 
-					if(splitValue == -1){
-						throw new IllegalArgumentException();
+				for(int j = 0; j < splitIndices.size(); j++){
+					Integer splitIndex = splitIndices.get(j);
+					Object splitValue = splitValues.get(j);
+
+					if(splitIndex == -1){
+						withMissing = true;
 					} else
 
 					{
-						Object value = categoricalFeature.getValue(splitValue);
+						Object value = selectCategory(categories, splitValue);
 
 						values.add(value);
 					}
@@ -174,7 +190,26 @@ public class CHAIDUtil {
 					values.addAll(unusedValues);
 				}
 
-				Predicate successorPredicate = predicateManager.createPredicate(categoricalFeature, values);
+				Predicate successorPredicate;
+
+				if(!values.isEmpty()){
+					successorPredicate = predicateManager.createPredicate(categoricalFeature, values);
+
+					if(withMissing){
+						successorPredicate = predicateManager.createCompoundPredicate(CompoundPredicate.BooleanOperator.SURROGATE,
+							successorPredicate,
+							predicateManager.createSimplePredicate(categoricalFeature, SimplePredicate.Operator.IS_MISSING, null)
+						);
+					}
+				} else
+
+				{
+					successorPredicate = False.INSTANCE;
+
+					if(withMissing){
+						successorPredicate = predicateManager.createSimplePredicate(categoricalFeature, SimplePredicate.Operator.IS_MISSING, null);
+					}
+				}
 
 				result.addNodes(encodeNode(successorPredicate, successor, tree, predicateManager, schema));
 			}
@@ -234,5 +269,47 @@ public class CHAIDUtil {
 		}
 
 		return result;
+	}
+
+	static
+	private void removeCategory(Collection<?> values, Object splitValue){
+
+		for(Iterator<?> it = values.iterator(); it.hasNext(); ){
+			Object value = it.next();
+
+			boolean matches = equals(value, splitValue);
+			if(matches){
+				it.remove();
+
+				return;
+			}
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	static
+	private Object selectCategory(Collection<?> values, Object splitValue){
+
+		for(Iterator<?> it = values.iterator(); it.hasNext(); ){
+			Object value = it.next();
+
+			boolean matches = equals(value, splitValue);
+			if(matches){
+				return value;
+			}
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	static
+	private boolean equals(Object left, Object right){
+
+		if((left instanceof Number) && (right instanceof Number)){
+			return (Double.compare(((Number)left).doubleValue(), ((Number)right).doubleValue()) == 0);
+		}
+
+		return Objects.equals(left, right);
 	}
 }
