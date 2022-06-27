@@ -19,7 +19,6 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -60,66 +59,62 @@ public class KBinsDiscretizer extends Transformer {
 		List<Integer> numberOfBins = getNumberOfBins();
 		List<List<Number>> binEdges = getBinEdges();
 
-		ClassDictUtil.checkSize(1, features);
+		ClassDictUtil.checkSize(numberOfBins, binEdges, features);
 
-		Feature feature = features.get(0);
+		List<Feature> result = new ArrayList<>();
 
-		ContinuousFeature continuousFeature = feature.toContinuousFeature();
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+			List<Number> bins = binEdges.get(i);
 
-		continuousFeature = addEps(continuousFeature, encoder);
+			ClassDictUtil.checkSize(numberOfBins.get(i) + 1, bins);
 
-		List<Number> bins = binEdges.get(0);
-		if(bins.isEmpty()){
-			throw new IllegalArgumentException();
-		}
+			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-		ClassDictUtil.checkSize(numberOfBins.get(0) + 1, bins);
+			continuousFeature = addEps(continuousFeature, encoder);
 
-		List<Integer> labelCategories = new ArrayList<>();
+			List<Integer> labelCategories = new ArrayList<>();
 
-		Discretize discretize = new Discretize(continuousFeature.getName())
-			.setDataType((dtype != null ? dtype.getDataType() : continuousFeature.getDataType()));
+			Discretize discretize = new Discretize(continuousFeature.getName())
+				.setDataType((dtype != null ? dtype.getDataType() : continuousFeature.getDataType()));
 
-		for(int i = 0; i < bins.size() - 1; i++){
-			Number leftMargin = (i > 0 ? bins.get(i) : null);
-			Number rightMargin = (i < (bins.size() - 1) - 1 ? bins.get(i + 1) : null);
+			for(int j = 0; j < bins.size() - 1; j++){
+				Number leftMargin = (j > 0 ? bins.get(j) : null);
+				Number rightMargin = (j < (bins.size() - 1) - 1 ? bins.get(j + 1) : null);
 
-			Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
-				.setLeftMargin(leftMargin)
-				.setRightMargin(rightMargin);
+				Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
+					.setLeftMargin(leftMargin)
+					.setRightMargin(rightMargin);
 
-			Integer label = i;
+				Integer label = j;
 
-			labelCategories.add(label);
+				labelCategories.add(label);
 
-			DiscretizeBin discretizeBin = new DiscretizeBin(label, interval);
+				DiscretizeBin discretizeBin = new DiscretizeBin(label, interval);
 
-			discretize.addDiscretizeBins(discretizeBin);
-		}
+				discretize.addDiscretizeBins(discretizeBin);
+			}
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("discretize", continuousFeature), OpType.CATEGORICAL, discretize.getDataType(), discretize);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("discretize", continuousFeature), OpType.CATEGORICAL, discretize.getDataType(), discretize);
 
-		switch(encode){
-			case "onehot":
-			case "onehot-dense":
-				{
-					List<Feature> result = new ArrayList<>();
-
-					for(int i = 0; i < labelCategories.size(); i++){
-						Integer label = labelCategories.get(i);
+			switch(encode){
+				case "onehot":
+				case "onehot-dense":
+					for(int j = 0; j < labelCategories.size(); j++){
+						Integer label = labelCategories.get(j);
 
 						result.add(new BinaryFeature(encoder, derivedField, label));
 					}
-
-					return result;
-				}
-			case "ordinal":
-				{
-					return Collections.singletonList(new IndexFeature(encoder, derivedField, labelCategories));
-				}
-			default:
-				throw new IllegalArgumentException(encode);
+					break;
+				case "ordinal":
+					result.add(new IndexFeature(encoder, derivedField, labelCategories));
+					break;
+				default:
+					throw new IllegalArgumentException(encode);
+			}
 		}
+
+		return result;
 	}
 
 	public TypeInfo getDType(){

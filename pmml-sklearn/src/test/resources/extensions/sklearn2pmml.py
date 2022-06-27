@@ -4,6 +4,7 @@ from pandas import DataFrame, Series
 from sklearn_pandas import DataFrameMapper
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import KBinsDiscretizer
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -64,15 +65,13 @@ build_chaid_audit(audit_df, "CHAIDAuditNA")
 
 def build_chaid_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
-	
-	cont_cols = list(iris_X.columns.values)
-	cat_cols = []
 
-	bins = make_bins(iris_X, cont_cols)
-	labels = make_bin_labels(bins)
+	mapper = DataFrameMapper([
+		(iris_X.columns.values, KBinsDiscretizer(n_bins = 5, encode = "ordinal", strategy = "kmeans"))
+	])
 
 	pipeline = PMMLPipeline([
-		("mapper", make_chaid_dataframe_mapper(cont_cols, cat_cols, bins, labels)),
+		("mapper", mapper),
 		("classifier", CHAIDClassifier(config = {"max_depth" : 3, "min_child_node_size" : 10}))
 	])
 	pipeline.fit(iris_X, iris_y)
