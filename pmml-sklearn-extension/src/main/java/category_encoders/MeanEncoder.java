@@ -25,9 +25,11 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import com.google.common.base.Functions;
+import com.google.common.collect.Iterables;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.ValueUtil;
@@ -153,12 +155,26 @@ public class MeanEncoder extends MapEncoder {
 		}
 
 		List<HasArray> blockValues = blockManager.getBlockValues();
-		if(blockValues.size() != 2){
-			throw new IllegalArgumentException();
-		}
 
-		List<?> sumValues = (blockValues.get(0)).getArrayContent();
-		List<?> countValues = (blockValues.get(1)).getArrayContent();
+		List<?> sumValues;
+		List<?> countValues;
+
+		// CategoryEncoders 2.3
+		if(blockValues.size() == 2){
+			sumValues = (blockValues.get(0)).getArrayContent();
+			countValues = (blockValues.get(1)).getArrayContent();
+		} else
+
+		// CategoryEncoders 2.5+
+		{
+			HasArray blockValue = Iterables.getOnlyElement(blockValues);
+
+			List<?> blockValueContent = blockValue.getArrayContent();
+			int[] blockValueShape = blockValue.getArrayShape();
+
+			sumValues = CMatrixUtil.getRow(blockValueContent, blockValueShape[0], blockValueShape[1], 0);
+			countValues = CMatrixUtil.getRow(blockValueContent, blockValueShape[0], blockValueShape[1], 1);
+		}
 
 		List<Double> meanValues = new ArrayList<>();
 

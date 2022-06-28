@@ -45,8 +45,15 @@ public class CategoryEncoder extends Transformer {
 		return getList("cols");
 	}
 
-	public List<String> getDropCols(){
-		return getList("drop_cols", String.class);
+	public List<String> getInvariantCols(){
+
+		// CategoryEncoders 2.3
+		if(containsKey("drop_cols")){
+			return getList("drop_cols", String.class);
+		}
+
+		// CategoryEncoders 2.5+
+		return getList("invariant_cols", String.class);
 	}
 
 	public Boolean getDropInvariant(){

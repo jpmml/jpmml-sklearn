@@ -42,7 +42,8 @@ public class CatBoostEncoder extends MeanEncoder {
 			public Double apply(Double sum, Integer count){
 
 				if(count > 1){
-					return ((sum + mean) / (count + a));
+					// CategoryEncoders 2.5+
+					return ((sum + mean * a) / (count + a));
 				} else
 
 				{

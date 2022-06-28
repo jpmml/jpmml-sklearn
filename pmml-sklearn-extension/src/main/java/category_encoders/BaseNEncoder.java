@@ -47,7 +47,7 @@ public class BaseNEncoder extends CategoryEncoder {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Integer base = getBase();
 		List<?> cols = getCols();
-		List<String> dropCols = null;
+		List<String> invariantCols = null;
 		Boolean dropInvariant = getDropInvariant();
 		List<String> featureNames = getFeatureNames();
 		String handleMissing = getHandleMissing();
@@ -59,7 +59,7 @@ public class BaseNEncoder extends CategoryEncoder {
 		} // End if
 
 		if(dropInvariant){
-			dropCols = getDropCols();
+			invariantCols = getInvariantCols();
 		}
 
 		Object missingCategory = null;
@@ -101,9 +101,9 @@ public class BaseNEncoder extends CategoryEncoder {
 			int requiredDigits = calcRequiredDigits(ordinalCategoryMappings, base, true);
 
 			for(int pos = 0; pos < requiredDigits; pos++){
-				String dropCol = String.valueOf(col) + "_" + String.valueOf(pos);
+				String featureCol = String.valueOf(col) + "_" + String.valueOf(pos);
 
-				if(dropCols != null && dropCols.contains(dropCol)){
+				if(invariantCols != null && invariantCols.contains(featureCol)){
 					continue;
 				}
 
@@ -143,9 +143,9 @@ public class BaseNEncoder extends CategoryEncoder {
 			List<Feature> baseFeatures = new ArrayList<>();
 
 			for(int pos = 0; pos < requiredDigits; pos++){
-				String dropCol = String.valueOf(col) + "_" + String.valueOf(pos);
+				String featureCol = String.valueOf(col) + "_" + String.valueOf(pos);
 
-				if(dropCols != null && dropCols.contains(dropCol)){
+				if(invariantCols != null && invariantCols.contains(featureCol)){
 					continue;
 				}
 

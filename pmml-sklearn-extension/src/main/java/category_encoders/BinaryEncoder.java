@@ -23,7 +23,7 @@ import java.util.List;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class BinaryEncoder extends CategoryEncoder {
+public class BinaryEncoder extends BaseNEncoder {
 
 	public BinaryEncoder(String module, String name){
 		super(module, name);
@@ -33,10 +33,21 @@ public class BinaryEncoder extends CategoryEncoder {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		BaseNEncoder baseNEncoder = getBaseNEncoder();
 
-		return baseNEncoder.encodeFeatures(features, encoder);
+		if(baseNEncoder != this){
+			return baseNEncoder.encodeFeatures(features, encoder);
+		}
+
+		return super.encodeFeatures(features, encoder);
 	}
 
 	public BaseNEncoder getBaseNEncoder(){
-		return get("base_n_encoder", BaseNEncoder.class);
+
+		// CategoryEncoders 2.3
+		if(containsKey("base_n_encoder")){
+			return get("base_n_encoder", BaseNEncoder.class);
+		}
+
+		// CategoryEncoders 2.5+
+		return this;
 	}
 }
