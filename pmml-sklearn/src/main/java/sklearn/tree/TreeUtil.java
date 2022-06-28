@@ -85,7 +85,7 @@ public class TreeUtil {
 		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
 		Boolean nodeScore = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
 
-		boolean fixed = ((nodeExtensions != null) || (nodeId) || (nodeScore != null && nodeScore));
+		boolean fixed = ((nodeExtensions != null) || (nodeId != null && nodeId) || (nodeScore != null && nodeScore));
 
 		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
 		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
@@ -97,10 +97,10 @@ public class TreeUtil {
 				throw new IllegalArgumentException("Conflicting tree model options");
 			}
 
+			// Activate defaults
 			nodeExtensions = null;
-
-			nodeId = null;
-			nodeScore = null;
+			nodeId = winnerId;
+			nodeScore = (winnerId ? Boolean.TRUE : null);
 		} // End if
 
 		if((Boolean.TRUE).equals(winnerId)){
