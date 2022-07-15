@@ -339,6 +339,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`
+    * `sklearn2pmml.preprocessing.NumberFormatter`
     * `sklearn2pmml.preprocessing.PMMLLabelBinarizer`
     * `sklearn2pmml.preprocessing.PMMLLabelEncoder`
     * `sklearn2pmml.preprocessing.PowerFunctionTransformer`
