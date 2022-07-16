@@ -83,6 +83,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateCQRAuto() throws Exception {
+		evaluate(CQR, AUTO);
+	}
+
+	@Test
 	public void evaluateDecisionTreeAuto() throws Exception {
 		evaluate(DECISION_TREE, AUTO);
 	}

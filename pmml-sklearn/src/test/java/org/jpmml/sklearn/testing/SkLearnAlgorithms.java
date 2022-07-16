@@ -23,6 +23,7 @@ public interface SkLearnAlgorithms {
 	String ADA_BOOST = "AdaBoost";
 	String ARD = "ARD";
 	String BAYESIAN_ARD = "Bayesian" + ARD;
+	String CQR = "CQR";
 	String DECISION_TREE = "DecisionTree";
 	String TRANSFORMED_DECISION_TREE = "Transformed" + DECISION_TREE;
 	String DECISION_TREE_ENSEMBLE = DECISION_TREE + "Ensemble";
