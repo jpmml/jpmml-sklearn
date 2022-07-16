@@ -317,6 +317,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.ConcatTransformer`
     * `sklearn2pmml.preprocessing.CutTransformer`
     * `sklearn2pmml.preprocessing.DataFrameConstructor`
+    * `sklearn2pmml.preprocessing.DateTimeFormatter`
     * `sklearn2pmml.preprocessing.DaysSinceYearTransformer`
     * `sklearn2pmml.preprocessing.ExpressionTransformer`
       * Ternary conditional expression `<expression_true> if <condition> else <expression_false>`.

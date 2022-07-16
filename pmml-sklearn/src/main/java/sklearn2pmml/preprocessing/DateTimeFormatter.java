@@ -20,14 +20,14 @@ package sklearn2pmml.preprocessing;
 
 import org.dmg.pmml.PMMLFunctions;
 
-public class NumberFormatter extends Formatter {
+public class DateTimeFormatter extends Formatter {
 
-	public NumberFormatter(String module, String name){
+	public DateTimeFormatter(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public String getFunction(){
-		return PMMLFunctions.FORMATNUMBER;
+		return PMMLFunctions.FORMATDATETIME;
 	}
 }

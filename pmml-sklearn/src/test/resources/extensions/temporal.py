@@ -2,10 +2,12 @@ from common import *
 
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
+from sklearn.pipeline import FeatureUnion, Pipeline
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.decoration import DateTimeDomain
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import ExpressionTransformer, DaysSinceYearTransformer, SecondsSinceYearTransformer
+from sklearn2pmml.preprocessing import ExpressionTransformer, DateTimeFormatter, DaysSinceYearTransformer, SecondsSinceYearTransformer
 
 df = DataFrame([
 	["1968-12-21T12:51:00", None, "1968-12-27T15:51:42", True], # Apollo 8
@@ -44,3 +46,24 @@ mapper = DataFrameMapper([
 ])
 
 build_apollo(mapper, "DurationInSecondsApollo")
+
+def make_datetime_parser():
+	return FeatureUnion([
+		("day", DateTimeFormatter(pattern = "%d")),
+		("month", DateTimeFormatter(pattern = "%m")),
+		("year", DateTimeFormatter(pattern = "%y"))
+	])
+
+# make_pipeline([DateTimeDomain(), make_datetime_parser(), "passthrough"])
+def make_datetime_pipeline():
+	return Pipeline([
+		("decorator", DateTimeDomain()),
+		("parser", make_datetime_parser()),
+		("encoder", OneHotEncoder())
+	])
+
+mapper = DataFrameMapper(
+	[([col], make_datetime_pipeline()) for col in ["launch", "return"]]
+)
+
+build_apollo(mapper, "DayMonthYearApollo")
