@@ -13,7 +13,7 @@ from sklearn.feature_selection import chi2, f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.impute import MissingIndicator, SimpleImputer
 from sklearn.isotonic import IsotonicRegression
-from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, PoissonRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDRegressor, TheilSenRegressor
+from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, PoissonRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDOneClassSVM, SGDRegressor, TheilSenRegressor
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -772,6 +772,26 @@ if "Visit" in datasets:
 #
 # Outlier detection
 #
+
+def build_ocsvm_iris(iris_df, linear_model, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	mapper = DataFrameMapper([
+		(iris_X.columns.values, [ContinuousDomain(), StandardScaler()])
+	])
+	pipeline = Pipeline([
+		("mapper", mapper),
+		("estimator", linear_model)
+	])
+	pipeline.fit(iris_X)
+	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values)
+	store_pkl(pipeline, name)
+	decisionFunction = DataFrame(pipeline.decision_function(iris_X), columns = ["decisionFunction"])
+	outlier = DataFrame(pipeline.predict(iris_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
+	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name)
+
+if "Iris" in datasets:
+	build_ocsvm_iris(iris_df, SGDOneClassSVM(average = True, random_state = 13), "SGDOneClassSVMIris")
 
 def build_iforest_housing(housing_df, iforest, name, **pmml_options):
 	housing_X, housing_y = split_csv(housing_df)

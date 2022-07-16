@@ -82,5 +82,10 @@ public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest imple
 		evaluate(ONE_CLASS_SVM, HOUSING, excludeFields(OutlierDetectorTest.predictedValue));
 	}
 
+	@Test
+	public void evaluateSGDOneClassSVMIris() throws Exception {
+		evaluate(SGD_ONE_CLASS_SVM, IRIS, excludeFields(OutlierDetectorTest.predictedValue));
+	}
+
 	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "outlier");
 }

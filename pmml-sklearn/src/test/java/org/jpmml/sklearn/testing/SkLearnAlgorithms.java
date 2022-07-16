@@ -70,6 +70,7 @@ public interface SkLearnAlgorithms {
 	String RULE_SET = "RuleSet";
 	String SELECT_FIRST = "SelectFirst";
 	String SGD = "SGD";
+	String SGD_ONE_CLASS_SVM = "SGD" + ONE_CLASS_SVM;
 	String SGD_LOG = SGD + "Log";
 	String STACKING_ENSEMBLE = "StackingEnsemble";
 	String SVC = "SVC";

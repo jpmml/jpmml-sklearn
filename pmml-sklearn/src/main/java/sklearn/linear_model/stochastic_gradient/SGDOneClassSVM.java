@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Villu Ruusmann
+ * Copyright (c) 2022 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,15 +16,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.svm;
+package sklearn.linear_model.stochastic_gradient;
 
-import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
+import java.util.List;
+
+import com.google.common.collect.Iterables;
+import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.HasDecisionFunctionField;
+import sklearn.Regressor;
+import sklearn.svm.OneClassSVMUtil;
 
-public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionField {
+public class SGDOneClassSVM extends Regressor implements HasDecisionFunctionField {
 
-	public OneClassSVM(String module, String name){
+	public SGDOneClassSVM(String module, String name){
 		super(module, name);
 	}
 
@@ -34,10 +40,21 @@ public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionF
 	}
 
 	@Override
-	public SupportVectorMachineModel encodeModel(Schema schema){
-		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
+	public RegressionModel encodeModel(Schema schema){
+		List<? extends Number> coef = getCoef();
+		List<? extends Number> offset = getOffset();
+
+		RegressionModel regressionModel = RegressionModelUtil.createRegression(schema.getFeatures(), coef, -1 * (Iterables.getOnlyElement(offset).doubleValue()), null, schema)
 			.setOutput(OneClassSVMUtil.createPredictedOutput(this));
 
-		return supportVectorMachineModel;
+		return regressionModel;
+	}
+
+	public List<? extends Number> getCoef(){
+		return getNumberArray("coef_");
+	}
+
+	public List<? extends Number> getOffset(){
+		return getNumberArray("offset_");
 	}
 }
