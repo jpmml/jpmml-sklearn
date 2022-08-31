@@ -145,16 +145,16 @@
 					<!--
 					<compilerArgument>-Xlint:unchecked</compilerArgument>
 					-->
-					<source>1.8</source>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
+					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.4.0</version>
+				<version>3.4.1</version>
 				<configuration>
 					<javadocVersion>1.8</javadocVersion>
 				</configuration>
