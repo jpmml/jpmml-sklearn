@@ -56,6 +56,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
@@ -265,17 +266,19 @@ public class PMMLPipeline extends Pipeline {
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				String name = FieldNameUtil.create(Estimator.FIELD_PREDICT, label.getName());
-
 				OutputField predictField;
 
 				if(label instanceof ContinuousLabel){
-					predictField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType())
+					ContinuousLabel continuousLabel = (ContinuousLabel)label;
+
+					predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, continuousLabel.getName()), OpType.CONTINUOUS, continuousLabel.getDataType())
 						.setFinalResult(false);
 				} else
 
 				if(label instanceof CategoricalLabel){
-					predictField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType())
+					CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+
+					predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, categoricalLabel.getName()), OpType.CATEGORICAL, categoricalLabel.getDataType())
 						.setFinalResult(false);
 				} else
 
@@ -380,10 +383,12 @@ public class PMMLPipeline extends Pipeline {
 			} else
 
 			{
+				ScalarLabel scalarLabel = (ScalarLabel)label;
+
 				for(int i = 0; i < targetFields.size(); i++){
 					VerificationField verificationField = ModelUtil.createVerificationField(targetFields.get(i));
 
-					DataType dataType = label.getDataType();
+					DataType dataType = scalarLabel.getDataType();
 					switch(dataType){
 						case DOUBLE:
 						case FLOAT:

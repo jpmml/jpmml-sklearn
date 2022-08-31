@@ -54,7 +54,7 @@ public class BaggingUtil {
 		}
 
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
-			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, models));
+			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models));
 
 		return miningModel;
 	}

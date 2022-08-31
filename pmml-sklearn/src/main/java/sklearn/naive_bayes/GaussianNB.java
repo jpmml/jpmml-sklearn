@@ -83,7 +83,7 @@ public class GaussianNB extends Classifier {
 		List<Integer> classCount = getClassCount();
 
 		BayesOutput bayesOutput = new BayesOutput(null)
-			.setField(categoricalLabel.getName())
+			.setTargetField(categoricalLabel.getName())
 			.setTargetValueCounts(encodeTargetValueCounts(categoricalLabel.getValues(), classCount));
 
 		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), bayesInputs, bayesOutput)

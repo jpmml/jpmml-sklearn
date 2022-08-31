@@ -39,6 +39,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
+import org.dmg.pmml.ScoreFrequency;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.tree.ClassifierNode;
@@ -258,7 +259,7 @@ public class CHAIDUtil {
 					result.setScore(value);
 				}
 
-				ScoreDistribution scoreDistribution = new ScoreDistribution(value, count);
+				ScoreDistribution scoreDistribution = new ScoreFrequency(value, count);
 
 				scoreDistributions.add(scoreDistribution);
 			}

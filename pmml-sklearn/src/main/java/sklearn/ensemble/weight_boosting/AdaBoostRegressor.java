@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -61,7 +62,7 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 		}
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
-			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.WEIGHTED_MEDIAN, models, estimatorWeights));
+			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.WEIGHTED_MEDIAN, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models, estimatorWeights));
 
 		return miningModel;
 	}

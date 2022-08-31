@@ -31,11 +31,11 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TransformerUtil;
 import sklearn2pmml.preprocessing.ExpressionTransformer;
 
 public class BusinessDecisionTransformer extends Transformer {
@@ -110,7 +110,7 @@ public class BusinessDecisionTransformer extends Transformer {
 
 		DerivedField decisionDerivedField = encoder.createDerivedField(model, outputField, true);
 
-		return Collections.singletonList(TransformerUtil.createFeature(decisionDerivedField, encoder));
+		return Collections.singletonList(FeatureUtil.createFeature(decisionDerivedField, encoder));
 	}
 
 	public String getBusinessProblem(){

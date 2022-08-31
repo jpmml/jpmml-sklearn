@@ -54,7 +54,7 @@ public class ExpressionTransformerTest {
 		Expression expected = new FieldRef("x");
 
 		expected = ((FieldRef)expected)
-			.setMapMissingTo(String.valueOf(-1d));
+			.setMapMissingTo(-1d);
 
 		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, null, null)));
 
@@ -84,7 +84,7 @@ public class ExpressionTransformerTest {
 			.addExpressions(new FieldRef("x"), PMMLUtil.createConstant(1d, DataType.DOUBLE));
 
 		expected = ((Apply)expected)
-			.setMapMissingTo(String.valueOf(-1d))
+			.setMapMissingTo(-1d)
 			.setDefaultValue(null)
 			.setInvalidValueTreatment(InvalidValueTreatmentMethod.RETURN_INVALID);
 
@@ -92,7 +92,7 @@ public class ExpressionTransformerTest {
 
 		expected = ((Apply)expected)
 			.setMapMissingTo(null)
-			.setDefaultValue(String.valueOf(-1d))
+			.setDefaultValue(-1d)
 			.setInvalidValueTreatment(InvalidValueTreatmentMethod.AS_MISSING);
 
 		assertTrue(ReflectionUtil.equals(expected, encode(expr, Double.NaN, -1d, "as_missing")));

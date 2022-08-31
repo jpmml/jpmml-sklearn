@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
@@ -74,7 +75,7 @@ public class StackingUtil {
 			models.add(finalModel);
 		}
 
-		return MiningModelUtil.createModelChain(models);
+		return MiningModelUtil.createModelChain(models, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
 	static

@@ -28,6 +28,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PythonTypeUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -158,7 +159,7 @@ public class Transformer extends Step {
 
 							@Override
 							public DataType getDataType(){
-								return TransformerUtil.parseDataType(string);
+								return PythonTypeUtil.parseDataType(string);
 							}
 						};
 					}

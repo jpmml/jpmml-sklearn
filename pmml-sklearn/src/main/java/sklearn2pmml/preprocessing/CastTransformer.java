@@ -26,10 +26,11 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TransformerUtil;
 
 public class CastTransformer extends Transformer {
 
@@ -42,7 +43,7 @@ public class CastTransformer extends Transformer {
 		TypeInfo dtype = getDType();
 
 		DataType dataType = dtype.getDataType();
-		OpType opType = TransformerUtil.getOpType(dataType);
+		OpType opType = TypeUtil.getOpType(dataType);
 
 		List<Feature> result = new ArrayList<>();
 
@@ -54,7 +55,7 @@ public class CastTransformer extends Transformer {
 
 				DerivedField derivedField = encoder.ensureDerivedField(createFieldName(dataType, feature), opType, dataType, () -> fieldRef);
 
-				feature = TransformerUtil.createFeature(derivedField, encoder);
+				feature = FeatureUtil.createFeature(derivedField, encoder);
 			}
 
 			result.add(feature);

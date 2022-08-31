@@ -26,11 +26,11 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.SchemaUtil;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
-import sklearn.TransformerUtil;
 
 public class DataFrameConstructor extends Initializer {
 
@@ -44,7 +44,7 @@ public class DataFrameConstructor extends Initializer {
 		TypeInfo dtype = getDType();
 
 		DataType dataType = dtype.getDataType();
-		OpType opType = TransformerUtil.getOpType(dataType);
+		OpType opType = TypeUtil.getOpType(dataType);
 
 		List<Feature> result = new ArrayList<>();
 

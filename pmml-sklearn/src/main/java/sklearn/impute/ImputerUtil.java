@@ -31,12 +31,12 @@ import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TransformerUtil;
 
 public class ImputerUtil {
 
@@ -78,7 +78,7 @@ public class ImputerUtil {
 
 			DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("imputer", feature), field.requireOpType(), field.requireDataType(), expression);
 
-			return TransformerUtil.createFeature(derivedField, encoder);
+			return FeatureUtil.createFeature(derivedField, encoder);
 		} else
 
 		{

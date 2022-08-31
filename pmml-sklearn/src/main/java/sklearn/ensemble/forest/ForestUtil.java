@@ -50,7 +50,7 @@ public class ForestUtil {
 		List<TreeModel> treeModels = TreeUtil.encodeTreeModelEnsemble(estimator, miningFunction, schema);
 
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
-			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, treeModels));
+			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels));
 
 		return TreeUtil.transform(estimator, miningModel);
 	}

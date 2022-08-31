@@ -32,6 +32,7 @@ import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.DataFrameScope;
@@ -40,7 +41,6 @@ import org.jpmml.python.Scope;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.TransformerUtil;
 
 public class ExpressionTransformer extends Transformer {
 
@@ -75,13 +75,13 @@ public class ExpressionTransformer extends Transformer {
 		if(mapMissingTo != null){
 			HasMapMissingTo<?, Object> hasMapMissingTp = (HasMapMissingTo<?, Object>)expression;
 
-			hasMapMissingTp.setMapMissingTo(ValueUtil.asString(mapMissingTo));
+			hasMapMissingTp.setMapMissingTo(mapMissingTo);
 		} // End if
 
 		if(defaultValue != null){
 			HasDefaultValue<?, Object> hasDefaultValue = (HasDefaultValue<?, Object>)expression;
 
-			hasDefaultValue.setDefaultValue(ValueUtil.asString(defaultValue));
+			hasDefaultValue.setDefaultValue(defaultValue);
 		} // End if
 
 		if(invalidValueTreatment != null){
@@ -104,7 +104,7 @@ public class ExpressionTransformer extends Transformer {
 			}
 		}
 
-		OpType opType = TransformerUtil.getOpType(dataType);
+		OpType opType = TypeUtil.getOpType(dataType);
 
 		// Detect identity field reference
 		if((expression instanceof FieldRef) && (mapMissingTo == null)){
@@ -122,7 +122,7 @@ public class ExpressionTransformer extends Transformer {
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
 
-		return Collections.singletonList(TransformerUtil.createFeature(derivedField, encoder));
+		return Collections.singletonList(FeatureUtil.createFeature(derivedField, encoder));
 	}
 
 	public Object getDefaultValue(){

@@ -66,7 +66,7 @@ public class HistGradientBoostingUtil {
 		}
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
-			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
+			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))
 			.setTargets(ModelUtil.createRescaleTargets(null, baselinePrediction, continuousLabel));
 
 		return miningModel;

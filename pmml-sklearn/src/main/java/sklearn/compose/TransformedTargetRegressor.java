@@ -27,8 +27,8 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel.NormalizationMethod;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -56,7 +56,7 @@ public class TransformedTargetRegressor extends Regressor {
 			return regressor.encode(schema);
 		}
 
-		Label label = schema.getLabel();
+		ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
 
 		Transformation transformation = new AbstractTransformation(){
 
@@ -71,7 +71,7 @@ public class TransformedTargetRegressor extends Regressor {
 			}
 		};
 
-		String name = label.getName();
+		String name = scalarLabel.getName();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 

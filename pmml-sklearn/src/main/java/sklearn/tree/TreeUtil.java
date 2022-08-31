@@ -18,6 +18,7 @@
  */
 package sklearn.tree;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.google.common.primitives.Doubles;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.HasExtensions;
@@ -405,31 +407,39 @@ public class TreeUtil {
 			if(miningFunction == MiningFunction.CLASSIFICATION){
 				CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-				double[] recordCounts = getRow(values, leftChildren.length, categoricalLabel.size(), index);
+				double[] leafValues = getRow(values, leftChildren.length, categoricalLabel.size(), index);
+
+				List<Number> recordCounts = new AbstractList<Number>(){
+
+					@Override
+					public int size(){
+						return leafValues.length;
+					}
+
+					@Override
+					public Number get(int index){
+						double leafValue = leafValues[index];
+
+						return ValueUtil.narrow(leafValue);
+					}
+				};
 
 				double totalRecordCount = 0d;
 
-				Object score = null;
-
-				double scoreRecordCount = -Double.MAX_VALUE;
-
-				for(int i = 0; i < recordCounts.length; i++){
-					double recordCount = recordCounts[i];
-
-					totalRecordCount += recordCount;
-
-					if(recordCount > scoreRecordCount){
-						score = categoricalLabel.getValue(i);
-
-						scoreRecordCount = recordCount;
-					}
+				for(Number recordCount : recordCounts){
+					totalRecordCount += recordCount.doubleValue();
 				}
+
+				// XXX
+				int maxIndex = ScoreDistributionManager.indexOfMax(Doubles.asList(leafValues));
+
+				Object score = categoricalLabel.getValue(maxIndex);
 
 				result = new ClassifierNode(score, predicate)
 					.setId(id)
 					.setRecordCount(ValueUtil.narrow(totalRecordCount));
 
-				scoreDistributionManager.addScoreDistributions(result, categoricalLabel.getValues(), recordCounts);
+				scoreDistributionManager.addScoreDistributions(result, categoricalLabel.getValues(), recordCounts, null);
 			} else
 
 			if(miningFunction == MiningFunction.REGRESSION){
@@ -456,7 +466,7 @@ public class TreeUtil {
 
 			Segmentation segmentation = miningModel.requireSegmentation();
 
-			List<Segment> segments = segmentation.getSegments();
+			List<Segment> segments = segmentation.requireSegments();
 			for(Segment segment : segments){
 				TreeModel treeModel = segment.requireModel(TreeModel.class);
 

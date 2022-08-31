@@ -18,7 +18,6 @@
  */
 package sklearn.dummy;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.primitives.Doubles;
@@ -71,46 +70,44 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		int index;
+		int maxIndex;
 
-		double[] probabilities;
+		List<? extends Number> probabilities;
 
 		switch(strategy){
 			case "constant":
 				{
-					index = classes.indexOf(constant);
-					if(index < 0){
+					maxIndex = classes.indexOf(constant);
+					if(maxIndex < 0){
 						throw new IllegalArgumentException();
 					}
 
-					probabilities = new double[classes.size()];
-					probabilities[index] = 1d;
+					probabilities = createProbabilities(classes, maxIndex);
 				}
 				break;
 			case "most_frequent":
 				{
-					index = indexOfMax(classPrior);
+					maxIndex = ScoreDistributionManager.indexOfMax((List)classPrior);
 
-					probabilities = new double[classes.size()];
-					probabilities[index] = 1d;
+					probabilities = createProbabilities(classes, maxIndex);
 				}
 				break;
 			case "prior":
 				{
-					index = indexOfMax(classPrior);
+					maxIndex = ScoreDistributionManager.indexOfMax((List)classPrior);
 
-					probabilities = Doubles.toArray(classPrior);
+					probabilities = classPrior;
 				}
 				break;
 			default:
 				throw new IllegalArgumentException(strategy);
 		}
 
-		Node root = new ClassifierNode(categoricalLabel.getValue(index), True.INSTANCE);
+		Node root = new ClassifierNode(categoricalLabel.getValue(maxIndex), True.INSTANCE);
 
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		scoreDistributionManager.addScoreDistributions(root, categoricalLabel.getValues(), probabilities);
+		scoreDistributionManager.addScoreDistributions(root, categoricalLabel.getValues(), null, probabilities);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root)
 			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
@@ -131,9 +128,11 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 	}
 
 	static
-	private int indexOfMax(List<? extends Number> values){
-		Object maxValue = Collections.max((List)values);
+	private List<Double> createProbabilities(List<?> classes, int index){
+		double[] values = new double[classes.size()];
 
-		return values.indexOf(maxValue);
+		values[index] = 1d;
+
+		return Doubles.asList(values);
 	}
 }

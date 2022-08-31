@@ -38,9 +38,9 @@ import org.dmg.pmml.nearest_neighbor.TrainingInstances;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.nearest_neighbor.NearestNeighborModelUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -68,9 +68,9 @@ public class KNeighborsUtil {
 
 		InstanceFields instanceFields = new InstanceFields();
 
-		Label label = schema.getLabel();
-		if(label != null){
-			InstanceField instanceField = new InstanceField(label.getName())
+		ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
+		if(scalarLabel != null){
+			InstanceField instanceField = new InstanceField(scalarLabel.getName())
 				.setColumn("data:y");
 
 			instanceFields.addInstanceFields(instanceField);

@@ -177,7 +177,7 @@ public class GBDTUtil {
 		}
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
-			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, treeModels))
+			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))
 			.setTargets(ModelUtil.createRescaleTargets(null, intercept, continuousLabel));
 
 		encoder.transferContent(model, miningModel);

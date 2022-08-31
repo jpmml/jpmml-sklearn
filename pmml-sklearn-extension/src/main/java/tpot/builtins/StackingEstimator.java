@@ -33,14 +33,14 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.Transformer;
 
@@ -61,7 +61,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
-		Label label;
+		ScalarLabel scalarLabel;
 
 		MiningFunction miningFunction = estimator.getMiningFunction();
 		switch(miningFunction){
@@ -71,19 +71,19 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-					label = new CategoricalLabel(dataType, categories);
+					scalarLabel = new CategoricalLabel(dataType, categories);
 				}
 				break;
 			case REGRESSION:
 				{
-					label = new ContinuousLabel(DataType.DOUBLE);
+					scalarLabel = new ContinuousLabel(DataType.DOUBLE);
 				}
 				break;
 			default:
 				throw new IllegalArgumentException();
 		}
 
-		Schema schema = new Schema(encoder, label, features);
+		Schema schema = new Schema(encoder, scalarLabel, features);
 
 		Model model = estimator.encode(schema);
 
@@ -100,7 +100,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 					List<?> categories = EstimatorUtil.getClasses(estimator);
 
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, label.getDataType());
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, scalarLabel.getDataType());
 
 					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 
@@ -121,7 +121,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 				break;
 			case REGRESSION:
 				{
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, label.getDataType());
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, scalarLabel.getDataType());
 
 					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 

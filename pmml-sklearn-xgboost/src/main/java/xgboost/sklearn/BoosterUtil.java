@@ -19,26 +19,11 @@
 package xgboost.sklearn;
 
 import java.nio.ByteOrder;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
-import org.dmg.pmml.DataField;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.Field;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMMLFunctions;
-import org.dmg.pmml.Value;
 import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.PMMLEncoder;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.xgboost.ByteOrderUtil;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
@@ -84,16 +69,13 @@ public class BoosterUtil {
 		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
 
 		Map<String, Object> options = new LinkedHashMap<>();
+		options.put(HasXGBoostOptions.OPTION_MISSING, missing);
 		options.put(HasXGBoostOptions.OPTION_COMPACT, compact);
 		options.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
 		options.put(HasXGBoostOptions.OPTION_PRUNE, prune);
 		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
 		Schema xgbSchema = learner.toXGBoostSchema(numeric, schema);
-
-		if(missing != null && !ValueUtil.isNaN(missing)){
-			xgbSchema = toBoosterSchema(missing, xgbSchema);
-		}
 
 		MiningModel miningModel = learner.encodeMiningModel(options, xgbSchema);
 
@@ -108,42 +90,5 @@ public class BoosterUtil {
 		String charset = (String)estimator.getOption(HasXGBoostOptions.OPTION_CHARSET, null);
 
 		return booster.getLearner(ByteOrderUtil.forValue(byteOrder), charset);
-	}
-
-	static
-	private Schema toBoosterSchema(Number missing, Schema schema){
-		Function<Feature, Feature> function = new Function<Feature, Feature>(){
-
-			@Override
-			public Feature apply(Feature feature){
-				ContinuousFeature continuousFeature = feature.toContinuousFeature();
-
-				Field<?> field = continuousFeature.getField();
-
-				if(field instanceof DataField){
-					DataField dataField = (DataField)field;
-
-					PMMLUtil.addValues(dataField, Value.Property.MISSING, Collections.singletonList(missing));
-
-					return continuousFeature;
-				}
-
-				PMMLEncoder encoder = continuousFeature.getEncoder();
-
-				Expression expression = PMMLUtil.createApply(PMMLFunctions.IF,
-					PMMLUtil.createApply(PMMLFunctions.AND,
-						PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, continuousFeature.ref()),
-						PMMLUtil.createApply(PMMLFunctions.NOTEQUAL, continuousFeature.ref(), PMMLUtil.createConstant(missing))
-					),
-					continuousFeature.ref()
-				);
-
-				DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("booster", continuousFeature), OpType.CONTINUOUS, continuousFeature.getDataType(), expression);
-
-				return new ContinuousFeature(encoder, derivedField);
-			}
-		};
-
-		return schema.toTransformedSchema(function);
 	}
 }

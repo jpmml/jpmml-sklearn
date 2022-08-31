@@ -26,10 +26,10 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.TransformerUtil;
 
 public class FilterLookupTransformer extends LookupTransformer {
 
@@ -57,7 +57,7 @@ public class FilterLookupTransformer extends LookupTransformer {
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("filterLookup", features), OpType.CATEGORICAL, feature.getDataType(), apply);
 
-		return Collections.singletonList(TransformerUtil.createFeature(derivedField, encoder));
+		return Collections.singletonList(FeatureUtil.createFeature(derivedField, encoder));
 	}
 
 	@Override

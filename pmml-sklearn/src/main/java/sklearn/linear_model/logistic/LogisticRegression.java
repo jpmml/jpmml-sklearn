@@ -27,6 +27,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CMatrixUtil;
@@ -127,7 +128,7 @@ public class LogisticRegression extends LinearClassifier {
 				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
 				.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
 
-			return MiningModelUtil.createModelChain(Arrays.asList(firstRegressionModel, secondRegressionModel));
+			return MiningModelUtil.createModelChain(Arrays.asList(firstRegressionModel, secondRegressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 		} else
 
 		if(numberOfClasses >= 3){
