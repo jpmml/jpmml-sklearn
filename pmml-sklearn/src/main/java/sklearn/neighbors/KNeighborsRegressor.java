@@ -24,6 +24,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
+import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasTrainingData {
@@ -37,6 +38,11 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 		int[] shape = getFitXShape();
 
 		return shape[1];
+	}
+
+	@Override
+	public int getNumberOfOutputs(){
+		return EstimatorUtil.getNumberOfOutputs(getYShape());
 	}
 
 	@Override
@@ -89,5 +95,9 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	@Override
 	public List<? extends Number> getY(){
 		return getNumberArray("_y");
+	}
+
+	public int[] getYShape(){
+		return getArrayShape("_y");
 	}
 }

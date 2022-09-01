@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2022 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,12 +18,9 @@
  */
 package sklearn;
 
-public interface SkLearnFields {
+public interface HasNumberOfOutputs {
 
-	String CLASSES = "classes_";
-	String FEATURE_IMPORTANCES = "feature_importances_";
-	String N_FEATURES = "n_features_";
-	String N_FEATURES_IN = "n_features_in_";
-	String N_OUTPUTS = "n_outputs_";
-	String SKLEARN_VERSION = "_sklearn_version";
+	int getNumberOfOutputs();
+
+	public static final int UNKNOWN = -1;
 }

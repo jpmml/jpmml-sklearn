@@ -124,7 +124,7 @@ public class PMMLPipeline extends Pipeline {
 		if(estimator != null && estimator.isSupervised()){
 
 			if(targetFields == null){
-				targetFields = initTargetFields();
+				targetFields = initTargetFields(estimator);
 			}
 
 			ClassDictUtil.checkSize(1, targetFields);
@@ -584,11 +584,7 @@ public class PMMLPipeline extends Pipeline {
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(step) + ") does not specify the number of input features");
 		}
 
-		List<String> activeFields = new ArrayList<>(numberOfFeatures);
-
-		for(int i = 0, max = numberOfFeatures; i < max; i++){
-			activeFields.add("x" + String.valueOf(i + 1));
-		}
+		List<String> activeFields = makeVariables("x", numberOfFeatures, true);
 
 		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", activeFields);
 
@@ -606,12 +602,18 @@ public class PMMLPipeline extends Pipeline {
 		return probabilityFields;
 	}
 
-	private List<String> initTargetFields(){
-		String targetField = "y";
+	private List<String> initTargetFields(Estimator estimator){
+		int numberOfOutputs = estimator.getNumberOfOutputs();
 
-		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name of the target field", targetField);
+		if(numberOfOutputs == -1){
+			throw new IllegalArgumentException("The estimator object of the final step (" + ClassDictUtil.formatClass(estimator) + ") does not specify the number of outputs");
+		}
 
-		return Collections.singletonList(targetField);
+		List<String> targetFields = makeVariables("y", numberOfOutputs, false);
+
+		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name of target fields", targetFields);
+
+		return targetFields;
 	}
 
 	static
@@ -695,6 +697,28 @@ public class PMMLPipeline extends Pipeline {
 		};
 
 		return Lists.transform(values, function);
+	}
+
+	static
+	private List<String> makeVariables(String name, int count, boolean indexed){
+
+		if(count <= 0){
+			throw new IllegalArgumentException();
+		} else
+
+		if(count == 1){
+			return Collections.singletonList(name + (indexed ? "1" : ""));
+		} else
+
+		{
+			List<String> result = new ArrayList<>(count);
+
+			for(int i = 0; i < count; i++){
+				result.add(name + String.valueOf(i + 1));
+			}
+
+			return result;
+		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PMMLPipeline.class);

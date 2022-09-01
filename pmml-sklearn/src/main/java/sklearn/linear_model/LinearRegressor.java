@@ -24,6 +24,7 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 public class LinearRegressor extends Regressor {
@@ -40,6 +41,11 @@ public class LinearRegressor extends Regressor {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		return EstimatorUtil.getNumberOfOutputs(getCoefShape());
+	}
+
+	@Override
 	public RegressionModel encodeModel(Schema schema){
 		List<? extends Number> coef = getCoef();
 		List<? extends Number> intercept = getIntercept();
@@ -52,7 +58,7 @@ public class LinearRegressor extends Regressor {
 	}
 
 	public int[] getCoefShape(){
-		return getArrayShape("coef_", 1);
+		return getArrayShape("coef_");
 	}
 
 	public List<? extends Number> getIntercept(){
