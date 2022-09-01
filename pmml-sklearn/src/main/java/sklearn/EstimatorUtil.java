@@ -38,22 +38,4 @@ public class EstimatorUtil {
 
 		throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
 	}
-
-	static
-	public int getNumberOfOutputs(int[] shape){
-
-		// (n_samples)
-		if(shape.length == 1){
-			return 1;
-		} else
-
-		// (n_samples, n_outputs)
-		if(shape.length == 2){
-			return shape[1];
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
-	}
 }

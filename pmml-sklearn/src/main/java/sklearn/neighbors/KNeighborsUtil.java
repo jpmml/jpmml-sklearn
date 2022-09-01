@@ -52,6 +52,25 @@ public class KNeighborsUtil {
 	}
 
 	static
+	public <E extends Estimator & HasTrainingData> int getNumberOfOutputs(E estimator){
+		int[] shape = estimator.getYShape();
+
+		// (n_samples)
+		if(shape.length == 1){
+			return 1;
+		} else
+
+		// (n_samples, n_outputs)
+		if(shape.length == 2){
+			return shape[1];
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	static
 	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunction miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
 		String weights = estimator.getWeights();
 

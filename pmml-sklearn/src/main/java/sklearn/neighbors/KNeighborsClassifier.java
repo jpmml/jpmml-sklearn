@@ -28,7 +28,6 @@ import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 
 public class KNeighborsClassifier extends Classifier implements HasNeighbors, HasTrainingData {
 
@@ -45,7 +44,7 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 
 	@Override
 	public int getNumberOfOutputs(){
-		return EstimatorUtil.getNumberOfOutputs(getYShape());
+		return KNeighborsUtil.getNumberOfOutputs(this);
 	}
 
 	@Override
@@ -91,6 +90,7 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 		return getNumberArray("_fit_X");
 	}
 
+	@Override
 	public int[] getFitXShape(){
 		return getArrayShape("_fit_X", 2);
 	}
@@ -115,6 +115,7 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 		return Lists.transform(y, function);
 	}
 
+	@Override
 	public int[] getYShape(){
 		return getArrayShape("_y");
 	}
