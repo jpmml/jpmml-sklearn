@@ -18,13 +18,21 @@
  */
 package sklearn.linear_model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
+import org.dmg.pmml.Model;
+import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.CMatrixUtil;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import sklearn.EstimatorUtil;
+import org.jpmml.python.ClassDictUtil;
 import sklearn.Regressor;
 
 public class LinearRegressor extends Regressor {
@@ -37,20 +45,62 @@ public class LinearRegressor extends Regressor {
 	public int getNumberOfFeatures(){
 		int[] shape = getCoefShape();
 
+		if(shape.length == 2){
+			return shape[1];
+		}
+
 		return shape[0];
 	}
 
 	@Override
 	public int getNumberOfOutputs(){
-		return EstimatorUtil.getNumberOfOutputs(getCoefShape());
+		int[] shape = getCoefShape();
+
+		if(shape.length == 2){
+			return shape[0];
+		}
+
+		return 1;
 	}
 
 	@Override
-	public RegressionModel encodeModel(Schema schema){
+	public Model encodeModel(Schema schema){
 		List<? extends Number> coef = getCoef();
 		List<? extends Number> intercept = getIntercept();
 
-		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, Iterables.getOnlyElement(intercept), null, schema);
+		Label label = schema.getLabel();
+		List<? extends Feature> features = schema.getFeatures();
+
+		int numberOfOutputs = getNumberOfOutputs();
+		if(numberOfOutputs == 1){
+			return createRegression(coef, Iterables.getOnlyElement(intercept), schema);
+		} else
+
+		if(numberOfOutputs >= 2){
+			MultiLabel multiLabel = (MultiLabel)label;
+
+			ClassDictUtil.checkSize(numberOfOutputs, intercept, multiLabel.getLabels());
+
+			List<RegressionModel> regressionModels = new ArrayList<>();
+
+			for(int i = 0, max = numberOfOutputs; i < max; i++){
+				Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
+
+				RegressionModel regressionModel = createRegression(CMatrixUtil.getRow(coef, numberOfOutputs, features.size(), i), intercept.get(i), segmentSchema);
+
+				regressionModels.add(regressionModel);
+			}
+
+			return MiningModelUtil.createMultiModelChain(regressionModels, Segmentation.MissingPredictionTreatment.CONTINUE);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	protected RegressionModel createRegression(List<? extends Number> coef, Number intercept, Schema schema){
+		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, null, schema);
 	}
 
 	public List<? extends Number> getCoef(){

@@ -192,6 +192,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateMultiLinearRegressionAuto() throws Exception {
+		evaluate(MULTI_LINEAR_REGRESSION, AUTO);
+	}
+
+	@Test
 	public void evaluateTransformedLinearRegressionAuto() throws Exception {
 		evaluate(TRANSFORMED_LINEAR_REGRESSION, AUTO);
 	}

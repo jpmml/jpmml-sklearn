@@ -9,6 +9,11 @@ def split_csv(df):
 	columns = df.columns.tolist()
 	return (df[columns[: -1]], df[columns[-1]])
 
+def split_multi_csv(df, target_columns):
+	columns = df.columns.tolist()
+	feature_columns = [column for column in columns if column not in target_columns]
+	return (df[feature_columns], df[target_columns])
+
 def store_csv(df, name):
 	df.to_csv("csv/" + name + ".csv", index = False)
 

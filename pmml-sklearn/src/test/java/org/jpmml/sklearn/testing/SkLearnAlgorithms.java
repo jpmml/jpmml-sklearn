@@ -48,6 +48,7 @@ public interface SkLearnAlgorithms {
 	String LASSO_LARS = LASSO + LARS;
 	String LINEAR_DISCRIMINANT_ANALYSIS = "LinearDiscriminantAnalysis";
 	String LINEAR_REGRESSION = "LinearRegression";
+	String MULTI_LINEAR_REGRESSION = "Multi" + LINEAR_REGRESSION;
 	String TRANSFORMED_LINEAR_REGRESSION = "Transformed" + LINEAR_REGRESSION;
 	String LINEAR_REGRESSION_ENSEMBLE = LINEAR_REGRESSION + "Ensemble";
 	String LINEAR_SVC = "LinearSVC";

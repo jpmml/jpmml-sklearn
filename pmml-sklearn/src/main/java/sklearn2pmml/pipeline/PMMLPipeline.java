@@ -55,6 +55,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
@@ -127,68 +128,7 @@ public class PMMLPipeline extends Pipeline {
 				targetFields = initTargetFields(estimator);
 			}
 
-			ClassDictUtil.checkSize(1, targetFields);
-
-			String targetField = targetFields.get(0);
-
-			MiningFunction miningFunction = estimator.getMiningFunction();
-			switch(miningFunction){
-				case CLASSIFICATION:
-					{
-						List<?> categories = EstimatorUtil.getClasses(estimator);
-						Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
-
-						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
-
-						DataField dataField = encoder.createDataField(targetField, OpType.CATEGORICAL, dataType, categories);
-
-						List<Visitor> visitors = new ArrayList<>();
-
-						if(classExtensions != null){
-							Collection<? extends Map.Entry<String, Map<String, ?>>> entries = classExtensions.entrySet();
-
-							for(Map.Entry<String, Map<String, ?>> entry : entries){
-								String name = entry.getKey();
-
-								Map<String, ?> values = entry.getValue();
-
-								Visitor valueExtender = new AbstractExtender(name){
-
-									@Override
-									public VisitorAction visit(Value pmmlValue){
-										Object value = values.get(pmmlValue.requireValue());
-
-										if(value != null){
-											value = ScalarUtil.decode(value);
-
-											addExtension(pmmlValue, ValueUtil.asString(value));
-										}
-
-										return super.visit(pmmlValue);
-									}
-								};
-
-								visitors.add(valueExtender);
-							}
-						}
-
-						for(Visitor visitor : visitors){
-							visitor.applyTo(dataField);
-						}
-
-						label = new CategoricalLabel(dataField);
-					}
-					break;
-				case REGRESSION:
-					{
-						DataField dataField = encoder.createDataField(targetField, OpType.CONTINUOUS, DataType.DOUBLE);
-
-						label = new ContinuousLabel(dataField);
-					}
-					break;
-				default:
-					throw new IllegalArgumentException();
-			}
+			label = initLabel(estimator, targetFields, encoder);
 		}
 
 		List<Feature> features = new ArrayList<>();
@@ -207,7 +147,7 @@ public class PMMLPipeline extends Pipeline {
 						activeFields = initActiveFields(transformer);
 					}
 
-					features = initFeatures(activeFields, transformer.getOpType(), transformer.getDataType(), encoder);
+					features = initFeatures(transformer, activeFields, transformer.getOpType(), transformer.getDataType(), encoder);
 				}
 
 				features = super.encodeFeatures(features, encoder);
@@ -219,7 +159,7 @@ public class PMMLPipeline extends Pipeline {
 					activeFields = initActiveFields(estimator);
 				}
 
-				features = initFeatures(activeFields, estimator.getOpType(), estimator.getDataType(), encoder);
+				features = initFeatures(estimator, activeFields, estimator.getOpType(), estimator.getDataType(), encoder);
 			}
 		} catch(UnsupportedOperationException uoe){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
@@ -617,7 +557,90 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	static
-	private List<Feature> initFeatures(List<String> activeFields, OpType opType, DataType dataType, SkLearnEncoder encoder){
+	private Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
+		MiningFunction miningFunction = estimator.getMiningFunction();
+
+		switch(miningFunction){
+			case CLASSIFICATION:
+				{
+					ClassDictUtil.checkSize(1, targetFields);
+
+					return initCategoricalLabel(estimator, targetFields.get(0), encoder);
+				}
+			case REGRESSION:
+				{
+					List<ContinuousLabel> labels = new ArrayList<>();
+
+					for(String targetField : targetFields){
+						labels.add(initContinuousLabel(estimator, targetField, encoder));
+					}
+
+					if(labels.size() == 1){
+						return labels.get(0);
+					}
+
+					return new MultiLabel(labels);
+				}
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
+	static
+	private CategoricalLabel initCategoricalLabel(Estimator estimator, String targetField, SkLearnEncoder encoder){
+		List<?> categories = EstimatorUtil.getClasses(estimator);
+		Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
+
+		DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
+
+		DataField dataField = encoder.createDataField(targetField, OpType.CATEGORICAL, dataType, categories);
+
+		List<Visitor> visitors = new ArrayList<>();
+
+		if(classExtensions != null){
+			Collection<? extends Map.Entry<String, Map<String, ?>>> entries = classExtensions.entrySet();
+
+			for(Map.Entry<String, Map<String, ?>> entry : entries){
+				String name = entry.getKey();
+
+				Map<String, ?> values = entry.getValue();
+
+				Visitor valueExtender = new AbstractExtender(name){
+
+					@Override
+					public VisitorAction visit(Value pmmlValue){
+						Object value = values.get(pmmlValue.requireValue());
+
+						if(value != null){
+							value = ScalarUtil.decode(value);
+
+							addExtension(pmmlValue, ValueUtil.asString(value));
+						}
+
+						return super.visit(pmmlValue);
+					}
+				};
+
+				visitors.add(valueExtender);
+			}
+		}
+
+		for(Visitor visitor : visitors){
+			visitor.applyTo(dataField);
+		}
+
+		return new CategoricalLabel(dataField);
+	}
+
+	static
+	private ContinuousLabel initContinuousLabel(Estimator estimator, String targetField, SkLearnEncoder encoder){
+		DataField dataField = encoder.createDataField(targetField, OpType.CONTINUOUS, DataType.DOUBLE);
+
+		return new ContinuousLabel(dataField);
+	}
+
+	static
+	private List<Feature> initFeatures(Step step, List<String> activeFields, OpType opType, DataType dataType, SkLearnEncoder encoder){
 		List<Feature> result = new ArrayList<>();
 
 		for(String activeField : activeFields){

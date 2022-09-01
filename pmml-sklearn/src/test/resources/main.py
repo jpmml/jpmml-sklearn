@@ -700,6 +700,27 @@ if "Auto" in datasets:
 	
 	build_auto_na_hist(auto_na_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAutoNA")
 
+def build_multi_auto(auto_df, regressor, name):
+	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
+
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight"]] +
+		[([column], [CategoricalDomain(), LabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_X, auto_y)
+	store_pkl(pipeline, name)
+	acceleration_mpg = DataFrame(pipeline.predict(auto_X), columns = ["acceleration", "mpg"])
+	store_csv(acceleration_mpg, name)
+
+if "Auto" in datasets:
+	auto_df = load_auto("Auto")
+
+	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
+
 def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_options):
 	housing_X, housing_y = split_csv(housing_df)
 
