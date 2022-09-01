@@ -222,6 +222,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateMultiLinearSVRAuto() throws Exception {
+		evaluate(MULTI_LINEAR_SVR, AUTO);
+	}
+
+	@Test
 	public void evaluateTheilSenAuto() throws Exception {
 		evaluate(THEIL_SEN, AUTO);
 	}

@@ -53,6 +53,7 @@ public interface SkLearnAlgorithms {
 	String LINEAR_REGRESSION_ENSEMBLE = LINEAR_REGRESSION + "Ensemble";
 	String LINEAR_SVC = "LinearSVC";
 	String LINEAR_SVR = "LinearSVR";
+	String MULTI_LINEAR_SVR = "Multi" + LINEAR_SVR;
 	String LOGISTIC_REGRESSION = "LogisticRegression";
 	String MULTINOMIAL_LOGISTIC_REGRESSION = "Multinomial" + LOGISTIC_REGRESSION;
 	String OVR_LOGISTIC_REGRESSION = "OvR" + LOGISTIC_REGRESSION;
