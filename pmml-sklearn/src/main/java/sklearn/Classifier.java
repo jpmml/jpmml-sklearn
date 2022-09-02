@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.dmg.pmml.MiningFunction;
+import org.jpmml.python.HasArray;
 
 abstract
 public class Classifier extends Estimator implements HasClasses {
@@ -37,15 +38,24 @@ public class Classifier extends Estimator implements HasClasses {
 
 	@Override
 	public List<?> getClasses(){
-		List<?> values = getArray(SkLearnFields.CLASSES);
+		List<?> values = getListLike(SkLearnFields.CLASSES);
 
-		return values.stream()
-			.map(value -> (value instanceof Long) ? Math.toIntExact((Long)value) : value)
+		values = values.stream()
+			.map(value -> (value instanceof HasArray) ? canonicalizeValues(((HasArray)value).getArrayContent()) : value)
 			.collect(Collectors.toList());
+
+		return canonicalizeValues(values);
 	}
 
 	public boolean hasProbabilityDistribution(){
 		return true;
+	}
+
+	static
+	private List<?> canonicalizeValues(List<?> values){
+		return values.stream()
+			.map(value -> (value instanceof Long) ? Math.toIntExact((Long)value) : value)
+			.collect(Collectors.toList());
 	}
 
 	public static final String FIELD_PROBABILITY = "probability";

@@ -558,39 +558,55 @@ public class PMMLPipeline extends Pipeline {
 
 	static
 	private Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
-		MiningFunction miningFunction = estimator.getMiningFunction();
+		List<Label> labels = new ArrayList<>();
 
+		MiningFunction miningFunction = estimator.getMiningFunction();
 		switch(miningFunction){
 			case CLASSIFICATION:
 				{
-					ClassDictUtil.checkSize(1, targetFields);
+					List<?> classes = EstimatorUtil.getClasses(estimator);
+					Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
 
-					return initCategoricalLabel(estimator, targetFields.get(0), encoder);
+					// XXX
+					if(classExtensions != null){
+						ClassDictUtil.checkSize(1, targetFields);
+					}
+
+					for(int i = 0; i < targetFields.size(); i++){
+						String targetField = targetFields.get(i);
+
+						labels.add(initCategoricalLabel(targetField, (targetFields.size() > 1 ? (List<?>)classes.get(i) : classes), classExtensions, encoder));
+					}
 				}
+				break;
 			case REGRESSION:
 				{
-					List<ContinuousLabel> labels = new ArrayList<>();
+					for(int i = 0; i < targetFields.size(); i++){
+						String targetField = targetFields.get(i);
 
-					for(String targetField : targetFields){
-						labels.add(initContinuousLabel(estimator, targetField, encoder));
+						labels.add(initContinuousLabel(targetField, encoder));
 					}
-
-					if(labels.size() == 1){
-						return labels.get(0);
-					}
-
-					return new MultiLabel(labels);
 				}
+				break;
 			default:
 				throw new IllegalArgumentException();
+		}
+
+		if(labels.size() == 1){
+			return labels.get(0);
+		} else
+
+		if(labels.size() >= 2){
+			return new MultiLabel(labels);
+		} else
+
+		{
+			throw new IllegalArgumentException();
 		}
 	}
 
 	static
-	private CategoricalLabel initCategoricalLabel(Estimator estimator, String targetField, SkLearnEncoder encoder){
-		List<?> categories = EstimatorUtil.getClasses(estimator);
-		Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
-
+	private CategoricalLabel initCategoricalLabel(String targetField, List<?> categories, Map<String, Map<String, ?>> classExtensions, SkLearnEncoder encoder){
 		DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
 		DataField dataField = encoder.createDataField(targetField, OpType.CATEGORICAL, dataType, categories);
@@ -633,7 +649,7 @@ public class PMMLPipeline extends Pipeline {
 	}
 
 	static
-	private ContinuousLabel initContinuousLabel(Estimator estimator, String targetField, SkLearnEncoder encoder){
+	private ContinuousLabel initContinuousLabel(String targetField, SkLearnEncoder encoder){
 		DataField dataField = encoder.createDataField(targetField, OpType.CONTINUOUS, DataType.DOUBLE);
 
 		return new ContinuousLabel(dataField);

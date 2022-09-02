@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.FieldNamePrefixes;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.testing.Datasets;
@@ -166,6 +167,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateLinearSVCAudit() throws Exception {
 		evaluate(LINEAR_SVC, AUDIT);
+	}
+
+	@Test
+	public void evaluateMultiLogisticRegression() throws Exception {
+		evaluate(MULTI_LOGISTIC_REGRESSION, AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
 	}
 
 	@Test

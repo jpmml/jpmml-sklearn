@@ -16,7 +16,7 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, PoissonRegressor, QuantileRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDOneClassSVM, SGDRegressor, TheilSenRegressor
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.multioutput import MultiOutputRegressor
+from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -284,6 +284,28 @@ def build_audit_na_hist(audit_na_df, classifier, name):
 
 if "Audit" in datasets:
 	build_audit_na_hist(audit_na_df, HistGradientBoostingClassifier(max_iter = 71, categorical_features = [3, 4, 5, 6, 7], random_state = 13), "HistGradientBoostingAuditNA")
+
+def build_multi_audit(audit_df, classifier, name):
+	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
+
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
+		[([column], [CategoricalDomain(), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_X, audit_y)
+	store_pkl(pipeline, name)
+	gender_adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Gender", "Adjusted"])
+	store_csv(gender_adjusted, name)
+
+if "Audit" in datasets:
+	audit_df = load_audit("Audit")
+	audit_df["Adjusted"] = audit_df["Adjusted"].astype(str)
+
+	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
 
 def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_options):
 	versicolor_X, versicolor_y = split_csv(versicolor_df)

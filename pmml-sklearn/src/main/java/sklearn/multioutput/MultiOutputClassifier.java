@@ -22,29 +22,29 @@ import java.util.List;
 
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import sklearn.Classifier;
 
-public class MultiOutputRegressor extends Regressor {
+public class MultiOutputClassifier extends Classifier {
 
-	public MultiOutputRegressor(String module, String name){
+	public MultiOutputClassifier(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public int getNumberOfOutputs(){
-		List<? extends Regressor> estimators = getEstimators();
+		List<? extends Classifier> estimators = getEstimators();
 
 		return estimators.size();
 	}
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Regressor> estimators = getEstimators();
+		List<? extends Classifier> estimators = getEstimators();
 
 		return MultiOutputUtil.encodeEstimators(estimators, schema);
 	}
 
-	public List<? extends Regressor> getEstimators(){
-		return getList("estimators_", Regressor.class);
+	public List<? extends Classifier> getEstimators(){
+		return getList("estimators_", Classifier.class);
 	}
 }
