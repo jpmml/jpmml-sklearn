@@ -43,6 +43,7 @@ public interface SkLearnAlgorithms {
 	String K_MEANS = "KMeans";
 	String MINIBATCH_K_MEANS = "MiniBatch" + K_MEANS;
 	String KNN = "KNN";
+	String MULTI_KNN = "Multi" + KNN;
 	String LARS = "Lars";
 	String LASSO = "Lasso";
 	String LASSO_LARS = LASSO + LARS;

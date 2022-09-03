@@ -20,13 +20,10 @@ package sklearn.neighbors;
 
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
 import sklearn.Classifier;
 
 public class KNeighborsClassifier extends Classifier implements HasNeighbors, HasTrainingData {
@@ -96,23 +93,8 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 	}
 
 	@Override
-	public List<?> getY(){
-		List<? extends Number> y = getNumberArray("_y");
-
-		Function<Number, Object> function = new Function<Number, Object>(){
-
-			private List<?> classes = getClasses();
-
-
-			@Override
-			public Object apply(Number number){
-				int index = ValueUtil.asInt(number);
-
-				return this.classes.get(index);
-			}
-		};
-
-		return Lists.transform(y, function);
+	public List<? extends Number> getY(){
+		return getNumberArray("_y");
 	}
 
 	@Override

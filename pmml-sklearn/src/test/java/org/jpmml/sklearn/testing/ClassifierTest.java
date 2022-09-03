@@ -160,6 +160,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateMultiKNNAudit() throws Exception {
+		evaluate(MULTI_KNN, AUDIT);
+	}
+
+	@Test
 	public void evaluateLinearDiscriminantAnalysisAudit() throws Exception {
 		evaluate(LINEAR_DISCRIMINANT_ANALYSIS, AUDIT);
 	}

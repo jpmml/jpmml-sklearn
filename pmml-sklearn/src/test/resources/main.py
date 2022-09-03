@@ -303,8 +303,10 @@ def build_multi_audit(audit_df, classifier, name):
 
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
+	audit_df["Gender"] = audit_df["Gender"].astype(str)
 	audit_df["Adjusted"] = audit_df["Adjusted"].astype(str)
 
+	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit")
 	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
 
 def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_options):
@@ -743,6 +745,7 @@ if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
+	build_multi_auto(auto_df, KNeighborsRegressor(), "MultiKNNAuto")
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
 
 def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_options):

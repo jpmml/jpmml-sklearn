@@ -160,6 +160,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateMultiKNNAuto() throws Exception {
+		evaluate(MULTI_KNN, AUTO);
+	}
+
+	@Test
 	public void evaluateLarsAuto() throws Exception {
 		evaluate(LARS, AUTO);
 	}

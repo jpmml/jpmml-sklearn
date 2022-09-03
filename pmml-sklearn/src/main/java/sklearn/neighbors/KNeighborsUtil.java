@@ -22,9 +22,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.CityBlock;
 import org.dmg.pmml.CompareFunction;
 import org.dmg.pmml.ComparisonMeasure;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Euclidean;
 import org.dmg.pmml.Measure;
 import org.dmg.pmml.MiningFunction;
@@ -36,12 +39,17 @@ import org.dmg.pmml.nearest_neighbor.KNNInputs;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.dmg.pmml.nearest_neighbor.TrainingInstances;
 import org.jpmml.converter.CMatrixUtil;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.nearest_neighbor.NearestNeighborModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
@@ -72,38 +80,65 @@ public class KNeighborsUtil {
 
 	static
 	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunction miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
-		String weights = estimator.getWeights();
+		int numberOfNeighbors = estimator.getNumberOfNeighbors();
+		int numberOfOutputs = estimator.getNumberOfOutputs();
 
-		if(!(weights).equals("uniform")){
-			throw new IllegalArgumentException(weights);
-		}
-
-		List<?> y = estimator.getY();
 		List<? extends Number> fitX = estimator.getFitX();
+		List<? extends Number> y = estimator.getY();
 
-		ClassDictUtil.checkSize(numberOfInstances, y);
+		ClassDictUtil.checkSize(numberOfInstances * numberOfOutputs, y);
+
+		Label label = schema.getLabel();
+		List<? extends Feature> features = schema.getFeatures();
 
 		Map<String, List<?>> data = new LinkedHashMap<>();
 
 		InstanceFields instanceFields = new InstanceFields();
 
-		ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
-		if(scalarLabel != null){
-			InstanceField instanceField = new InstanceField(scalarLabel.getName())
-				.setColumn("data:y");
+		if(numberOfOutputs == 1){
+			ScalarLabel scalarLabel = (ScalarLabel)label;
 
-			instanceFields.addInstanceFields(instanceField);
+			if(scalarLabel != null){
+				InstanceField instanceField = new InstanceField(scalarLabel.getName())
+					.setColumn("data:y");
 
-			data.put(instanceField.getColumn(), y);
+				instanceFields.addInstanceFields(instanceField);
+
+				data.put(instanceField.getColumn(), translateValues(scalarLabel, y));
+			}
+		} else
+
+		if(numberOfOutputs >= 2){
+			MultiLabel multiLabel = (MultiLabel)label;
+
+			List<? extends Label> labels = multiLabel.getLabels();
+
+			for(int i = 0; i < labels.size(); i++){
+				ScalarLabel scalarLabel = (ScalarLabel)labels.get(i);
+
+				if(scalarLabel != null){
+					InstanceField instanceField = new InstanceField(scalarLabel.getName())
+						.setColumn("data:y" + String.valueOf(i + 1));
+
+					instanceFields.addInstanceFields(instanceField);
+
+					data.put(instanceField.getColumn(), translateValues(scalarLabel, CMatrixUtil.getColumn(y, numberOfInstances, numberOfOutputs, i)));
+				}
+			}
+		} else
+
+		{
+			throw new IllegalArgumentException();
 		}
+
+		DataType dataType = estimator.getDataType();
 
 		KNNInputs knnInputs = new KNNInputs();
 
-		List<? extends Feature> features = schema.getFeatures();
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			ContinuousFeature continuousFeature = feature.toContinuousFeature(estimator.getDataType());
+			ContinuousFeature continuousFeature = feature.toContinuousFeature(dataType);
 
 			String name = continuousFeature.getName();
 
@@ -122,53 +157,84 @@ public class KNeighborsUtil {
 		TrainingInstances trainingInstances = new TrainingInstances(instanceFields, PMMLUtil.createInlineTable(data))
 			.setTransformed(true);
 
-		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator.getMetric(), estimator.getP());
+		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator);
 
-		int numberOfNeighbors = estimator.getNumberOfNeighbors();
+		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(miningFunction, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs);
 
-		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(MiningFunction.REGRESSION, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs)
-			.setOutput(NearestNeighborModelUtil.createOutput(numberOfNeighbors));
+		if(numberOfOutputs == 1){
+			nearestNeighborModel.setOutput(NearestNeighborModelUtil.createOutput(numberOfNeighbors));
+		}
 
 		return nearestNeighborModel;
 	}
 
 	static
-	private ComparisonMeasure encodeComparisonMeasure(String metric, int p){
-		Measure measure;
+	private <E extends Estimator & HasNeighbors> ComparisonMeasure encodeComparisonMeasure(E estimator){
+		String weights = estimator.getWeights();
 
-		switch(metric){
-			case "euclidean":
-				{
-					measure = new Euclidean();
-				}
-				break;
-			case "manhattan":
-				{
-					measure = new CityBlock();
-				}
-				break;
-			case "minkowski":
-				{
-					switch(p){
-						case 1:
-							measure = new CityBlock();
-							break;
-						case 2:
-							measure = new Euclidean();
-							break;
-						default:
-							measure = new Minkowski(p);
-							break;
-					}
-				}
-				break;
-			default:
-				throw new IllegalArgumentException(metric);
+		if(!("uniform").equals(weights)){
+			throw new IllegalArgumentException(weights);
 		}
+
+		Measure measure = encodeMeasure(estimator);
 
 		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, measure)
 			.setCompareFunction(CompareFunction.ABS_DIFF);
 
 		return comparisonMeasure;
+	}
+
+	static
+	private <E extends Estimator & HasNeighbors> Measure encodeMeasure(E estimator){
+		String metric = estimator.getMetric();
+		int p = estimator.getP();
+
+		switch(metric){
+			case "euclidean":
+				return new Euclidean();
+			case "manhattan":
+				return new CityBlock();
+			case "minkowski":
+				switch(p){
+					case 1:
+						return new CityBlock();
+					case 2:
+						return new Euclidean();
+					default:
+						return new Minkowski(p);
+				}
+			default:
+				throw new IllegalArgumentException(metric);
+		}
+	}
+
+	static
+	private List<?> translateValues(ScalarLabel scalarLabel, List<? extends Number> y){
+
+		if(scalarLabel instanceof ContinuousLabel){
+			ContinuousLabel continuousLabel = (ContinuousLabel)scalarLabel;
+
+			return y;
+		} else
+
+		if(scalarLabel instanceof CategoricalLabel){
+			CategoricalLabel categoricalLabel = (CategoricalLabel)scalarLabel;
+
+			Function<Number, ?> function = new Function<Number, Object>(){
+
+				@Override
+				public Object apply(Number number){
+					int index = ValueUtil.asInt(number);
+
+					return categoricalLabel.getValue(index);
+				}
+			};
+
+			return Lists.transform(y, function);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 }
