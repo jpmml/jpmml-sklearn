@@ -192,6 +192,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateLinearRegressionChain() throws Exception {
+		evaluate(LINEAR_REGRESSION_CHAIN, AUTO, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "acceleration")));
+	}
+
+	@Test
 	public void evaluateLinearRegressionEnsembleAuto() throws Exception {
 		evaluate(LINEAR_REGRESSION_ENSEMBLE, AUTO);
 	}

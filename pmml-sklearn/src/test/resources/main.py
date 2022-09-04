@@ -16,7 +16,7 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, PoissonRegressor, QuantileRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDOneClassSVM, SGDRegressor, TheilSenRegressor
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
+from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor, RegressorChain
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -748,6 +748,7 @@ if "Auto" in datasets:
 	build_multi_auto(auto_df, KNeighborsRegressor(), "MultiKNNAuto")
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
+	build_multi_auto(auto_df, RegressorChain(LinearRegression()), "LinearRegressionChainAuto")
 
 def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_options):
 	housing_X, housing_y = split_csv(housing_df)
