@@ -207,6 +207,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateMultiMLPAuto() throws Exception {
+		evaluate(MULTI_MLP, AUTO);
+	}
+
+	@Test
 	public void evaluateOMPAuto() throws Exception {
 		evaluate(OMP, AUTO);
 	}

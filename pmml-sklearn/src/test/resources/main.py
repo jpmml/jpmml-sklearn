@@ -746,6 +746,7 @@ if "Auto" in datasets:
 
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
 	build_multi_auto(auto_df, KNeighborsRegressor(), "MultiKNNAuto")
+	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
 
 def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_options):

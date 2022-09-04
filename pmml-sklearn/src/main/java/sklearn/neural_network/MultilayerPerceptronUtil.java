@@ -19,15 +19,21 @@
 package sklearn.neural_network;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.neural_network.NeuralEntity;
 import org.dmg.pmml.neural_network.NeuralInputs;
 import org.dmg.pmml.neural_network.NeuralLayer;
 import org.dmg.pmml.neural_network.NeuralNetwork;
+import org.dmg.pmml.neural_network.NeuralOutput;
 import org.dmg.pmml.neural_network.NeuralOutputs;
 import org.dmg.pmml.neural_network.Neuron;
 import org.jpmml.converter.CMatrixUtil;
@@ -36,6 +42,7 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.neural_network.NeuralNetworkUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -133,9 +140,7 @@ public class MultilayerPerceptronUtil {
 		switch(miningFunction){
 			case REGRESSION:
 				{
-					ContinuousLabel continuousLabel = (ContinuousLabel)label;
-
-					return NeuralNetworkUtil.createRegressionNeuralOutputs(entities, continuousLabel);
+					return encodeRegressionNeuralOutputs(entities, label);
 				}
 			case CLASSIFICATION:
 				{
@@ -183,5 +188,49 @@ public class MultilayerPerceptronUtil {
 			default:
 				throw new IllegalArgumentException(activation);
 		}
+	}
+
+	static
+	private NeuralOutputs encodeRegressionNeuralOutputs(List<? extends NeuralEntity> entities, Label label){
+		List<ContinuousLabel> continuousLabels;
+
+		if(entities.size() == 1){
+			ContinuousLabel continuousLabel = (ContinuousLabel)label;
+
+			continuousLabels = Collections.singletonList(continuousLabel);
+		} else
+
+		if(entities.size() >= 2){
+			MultiLabel multiLabel = (MultiLabel)label;
+
+			List<? extends Label> labels = multiLabel.getLabels();
+
+			continuousLabels = labels.stream()
+				.map(ContinuousLabel.class::cast)
+				.collect(Collectors.toList());
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+
+		ClassDictUtil.checkSize(entities, continuousLabels);
+
+		NeuralOutputs neuralOutputs = new NeuralOutputs();
+
+		for(int i = 0; i < entities.size(); i++){
+			NeuralEntity entity = entities.get(i);
+			ContinuousLabel continuousLabel = continuousLabels.get(i);
+
+			DerivedField derivedField = new DerivedField(null, OpType.CONTINUOUS, continuousLabel.getDataType(), new FieldRef(continuousLabel.getName()));
+
+			NeuralOutput neuralOutput = new NeuralOutput()
+				.setOutputNeuron(entity.requireId())
+				.setDerivedField(derivedField);
+
+			neuralOutputs.addNeuralOutputs(neuralOutput);
+		}
+
+		return neuralOutputs;
 	}
 }

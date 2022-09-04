@@ -61,6 +61,7 @@ public interface SkLearnAlgorithms {
 	String OVR_LOGISTIC_REGRESSION = "OvR" + LOGISTIC_REGRESSION;
 	String LOGISTIC_REGRESSION_ENSEMBLE = LOGISTIC_REGRESSION + "Ensemble";
 	String MLP = "MLP";
+	String MULTI_MLP = "Multi" + MLP;
 	String NAIVE_BAYES = "NaiveBayes";
 	String NU_SVC = "NuSVC";
 	String NU_SVR = "NuSVR";
