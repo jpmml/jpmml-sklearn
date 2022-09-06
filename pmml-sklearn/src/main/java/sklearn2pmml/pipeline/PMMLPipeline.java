@@ -73,6 +73,7 @@ import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClassifierOptions;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
 import sklearn.Step;
@@ -585,6 +586,21 @@ public class PMMLPipeline extends Pipeline {
 						String targetField = targetFields.get(i);
 
 						labels.add(initContinuousLabel(targetField, encoder));
+					}
+				}
+				break;
+			case MIXED:
+				{
+					HasEstimatorEnsemble<?> hasEstimatorEnsemble = (HasEstimatorEnsemble<?>)estimator;
+
+					List<? extends Estimator> estimators = hasEstimatorEnsemble.getEstimators();
+
+					ClassDictUtil.checkSize(targetFields, estimators);
+
+					for(int i = 0; i < targetFields.size(); i++){
+						String targetField = targetFields.get(i);
+
+						labels.add((ScalarLabel)initLabel(estimators.get(i), Collections.singletonList(targetField), encoder));
 					}
 				}
 				break;

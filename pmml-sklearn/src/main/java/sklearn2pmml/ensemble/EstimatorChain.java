@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Villu Ruusmann
+ * Copyright (c) 2022 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,8 +18,12 @@
  */
 package sklearn2pmml.ensemble;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
@@ -28,7 +32,7 @@ import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
@@ -36,24 +40,38 @@ import org.jpmml.python.PredicateTranslator;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
+import sklearn.HasEstimatorEnsemble;
 
-public class SelectFirstUtil {
+public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Estimator> {
 
-	private SelectFirstUtil(){
+	public EstimatorChain(String module, String name){
+		super(module, name);
 	}
 
-	static
-	public MiningModel encodeRegressor(List<Object[]> steps, Schema schema){
-		return encodeModel(MiningFunction.REGRESSION, steps, schema);
+	@Override
+	public MiningFunction getMiningFunction(){
+		List<? extends Estimator> estimators = getEstimators();
+
+		Set<MiningFunction> miningFunctions = estimators.stream()
+			.map(estimator -> estimator.getMiningFunction())
+			.collect(Collectors.toSet());
+
+		if(miningFunctions.size() == 1){
+			return Iterables.getOnlyElement(miningFunctions);
+		}
+
+		return MiningFunction.MIXED;
 	}
 
-	static
-	public MiningModel encodeClassifier(List<Object[]> steps, Schema schema){
-		return encodeModel(MiningFunction.CLASSIFICATION, steps, schema);
+	@Override
+	public boolean isSupervised(){
+		return true;
 	}
 
-	static
-	private MiningModel encodeModel(MiningFunction miningFunction, List<Object[]> steps, Schema schema){
+	@Override
+	public Model encodeModel(Schema schema){
+		MiningFunction miningFunction = getMiningFunction();
+		List<Object[]> steps = getSteps();
 
 		if(steps.isEmpty()){
 			throw new IllegalArgumentException();
@@ -62,7 +80,11 @@ public class SelectFirstUtil {
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.SELECT_FIRST, null);
+		MultiLabel multiLabel = (MultiLabel)label;
+
+		List<Model> models = new ArrayList<>();
+
+		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.MULTI_MODEL_CHAIN, null);
 
 		Scope scope = new DataFrameScope("X", features);
 
@@ -73,13 +95,13 @@ public class SelectFirstUtil {
 			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
 			String predicate = TupleUtil.extractElement(step, 2, String.class);
 
-			if(estimator.getMiningFunction() != miningFunction){
-				throw new IllegalArgumentException();
-			}
+			Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
 
 			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, scope);
 
-			Model model = estimator.encode(schema);
+			Model model = estimator.encode(segmentSchema);
+
+			models.add(model);
 
 			Segment segment = new Segment(pmmlPredicate, model)
 				.setId(name);
@@ -87,11 +109,24 @@ public class SelectFirstUtil {
 			segmentation.addSegments(segment);
 		}
 
-		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(label))
+		MiningModel miningModel = new MiningModel(miningFunction, MiningModelUtil.createMiningSchema(models))
 			.setSegmentation(segmentation);
 
-		MiningModelUtil.optimizeOutputFields(miningModel);
-
 		return miningModel;
+	}
+
+	@Override
+	public List<? extends Estimator> getEstimators(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.isEmpty()){
+			throw new IllegalArgumentException();
+		}
+
+		return TupleUtil.extractElementList(steps, 1, Estimator.class);
+	}
+
+	public List<Object[]> getSteps(){
+		return getTupleList("steps");
 	}
 }
