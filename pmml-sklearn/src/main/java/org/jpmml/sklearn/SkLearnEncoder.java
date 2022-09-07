@@ -30,6 +30,7 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
@@ -38,6 +39,7 @@ import org.jpmml.converter.ScalarLabel;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
+import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.ScalarLabelUtil;
 import sklearn.ensemble.hist_gradient_boosting.TreePredictor;
@@ -67,6 +69,19 @@ public class SkLearnEncoder extends PythonEncoder {
 		DerivedOutputField derivedOutputField = createDerivedField(model, outputField, false);
 
 		return ScalarLabelUtil.toFeature(scalarLabel, derivedOutputField, this);
+	}
+
+	public Feature exportProbability(Model model, Object value){
+		return exportProbability(model, FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value), value);
+	}
+
+	public Feature exportProbability(Model model, String name, Object value){
+		OutputField probabilityOutputField = ModelUtil.createProbabilityField(name, DataType.DOUBLE, value)
+			.setFinalResult(false);
+
+		DerivedOutputField probabilityField = createDerivedField(model, probabilityOutputField, false);
+
+		return new ContinuousFeature(this, probabilityField);
 	}
 
 	public DataField createDataField(String name){

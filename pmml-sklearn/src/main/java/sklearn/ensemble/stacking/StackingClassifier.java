@@ -22,19 +22,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNamePrefixes;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -101,11 +97,9 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 				List<Feature> result = new ArrayList<>();
 
 				for(Object value : values){
-					OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldNameUtil.create(stackMethod, index, value), DataType.DOUBLE, value);
+					Feature feature = encoder.exportProbability(model, FieldNameUtil.create(stackMethod, index, value), value);
 
-					DerivedOutputField predictedField = encoder.createDerivedField(model, probabilityOutputField, false);
-
-					result.add(new ContinuousFeature(encoder, predictedField));
+					result.add(feature);
 				}
 
 				return result;

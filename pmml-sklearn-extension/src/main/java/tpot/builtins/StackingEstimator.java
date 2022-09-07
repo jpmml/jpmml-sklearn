@@ -24,14 +24,10 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OutputField;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
@@ -113,12 +109,9 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 						List<?> categories = EstimatorUtil.getClasses(estimator);
 
 						for(Object category : categories){
-							OutputField probabilityOutputField = ModelUtil.createProbabilityField(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, name, category), DataType.DOUBLE, category)
-								.setFinalResult(false);
+							Feature feature = encoder.exportProbability(model, FieldNameUtil.create(Classifier.FIELD_PROBABILITY, name, category), category);
 
-							DerivedOutputField probabilityField = encoder.createDerivedField(model, probabilityOutputField, false);
-
-							result.add(new ContinuousFeature(encoder, probabilityField));
+							result.add(feature);
 						}
 					}
 				}
