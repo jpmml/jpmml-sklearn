@@ -97,14 +97,14 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 				throw new UnsupportedElementException(parentNode);
 			} // End if
 
+			if(this.miningFunction == MiningFunction.CLASSIFICATION){
+				initScoreDistribution(parentNode, node);
+			} else
+
 			if(this.miningFunction == MiningFunction.REGRESSION){
 				parentNode.setScore(null);
 
 				initScore(parentNode, node);
-			} else
-
-			if(this.miningFunction == MiningFunction.CLASSIFICATION){
-				initScoreDistribution(parentNode, node);
 			}
 		}
 	}
@@ -117,8 +117,8 @@ public class TreeModelFlattener extends AbstractTreeModelTransformer {
 
 		MiningFunction miningFunction = treeModel.requireMiningFunction();
 		switch(miningFunction){
-			case REGRESSION:
 			case CLASSIFICATION:
+			case REGRESSION:
 				break;
 			default:
 				throw new UnsupportedAttributeException(treeModel, miningFunction);

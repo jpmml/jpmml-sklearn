@@ -100,19 +100,19 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 				return;
 			} // End if
 
-			if(this.miningFunction == MiningFunction.REGRESSION){
-				parentNode.setScore(null);
-
-				initScore(parentNode, node);
-				replaceChildWithGrandchildren(parentNode, node);
-			} else
-
 			if(this.miningFunction == MiningFunction.CLASSIFICATION){
 
 				// Replace intermediate nodes, but not terminal nodes
 				if(node.hasNodes()){
 					replaceChildWithGrandchildren(parentNode, node);
 				}
+			} else
+
+			if(this.miningFunction == MiningFunction.REGRESSION){
+				parentNode.setScore(null);
+
+				initScore(parentNode, node);
+				replaceChildWithGrandchildren(parentNode, node);
 			}
 		}
 	}
@@ -142,10 +142,10 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 
 		MiningFunction miningFunction = treeModel.requireMiningFunction();
 		switch(miningFunction){
+			case CLASSIFICATION:
+				break;
 			case REGRESSION:
 				treeModel.setNoTrueChildStrategy(TreeModel.NoTrueChildStrategy.RETURN_LAST_PREDICTION);
-				break;
-			case CLASSIFICATION:
 				break;
 			default:
 				throw new UnsupportedAttributeException(treeModel, miningFunction);

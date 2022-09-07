@@ -43,13 +43,13 @@ public class SelectFirstUtil {
 	}
 
 	static
-	public MiningModel encodeRegressor(List<Object[]> steps, Schema schema){
-		return encodeModel(MiningFunction.REGRESSION, steps, schema);
+	public MiningModel encodeClassifier(List<Object[]> steps, Schema schema){
+		return encodeModel(MiningFunction.CLASSIFICATION, steps, schema);
 	}
 
 	static
-	public MiningModel encodeClassifier(List<Object[]> steps, Schema schema){
-		return encodeModel(MiningFunction.CLASSIFICATION, steps, schema);
+	public MiningModel encodeRegressor(List<Object[]> steps, Schema schema){
+		return encodeModel(MiningFunction.REGRESSION, steps, schema);
 	}
 
 	static

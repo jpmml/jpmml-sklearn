@@ -138,10 +138,6 @@ public class MultilayerPerceptronUtil {
 		List<? extends NeuralEntity> entities = neuralLayer.getNeurons();
 
 		switch(miningFunction){
-			case REGRESSION:
-				{
-					return encodeRegressionNeuralOutputs(entities, label);
-				}
 			case CLASSIFICATION:
 				{
 					CategoricalLabel categoricalLabel = (CategoricalLabel)label;
@@ -167,6 +163,10 @@ public class MultilayerPerceptronUtil {
 					}
 
 					return NeuralNetworkUtil.createClassificationNeuralOutputs(entities, categoricalLabel);
+				}
+			case REGRESSION:
+				{
+					return encodeRegressionNeuralOutputs(entities, label);
 				}
 			default:
 				throw new IllegalArgumentException();

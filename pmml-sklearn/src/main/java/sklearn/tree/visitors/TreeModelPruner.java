@@ -79,8 +79,8 @@ public class TreeModelPruner extends AbstractTreeModelTransformer {
 
 		MiningFunction miningFunction = treeModel.requireMiningFunction();
 		switch(miningFunction){
-			case REGRESSION:
 			case CLASSIFICATION:
+			case REGRESSION:
 				break;
 			default:
 				throw new UnsupportedAttributeException(treeModel, miningFunction);

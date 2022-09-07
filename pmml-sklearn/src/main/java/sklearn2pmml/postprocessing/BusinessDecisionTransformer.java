@@ -69,11 +69,11 @@ public class BusinessDecisionTransformer extends Transformer {
 		OpType opType = derivedField.getOpType();
 
 		switch(opType){
-			case CONTINUOUS:
-				opType = OpType.CATEGORICAL;
-				break;
 			case CATEGORICAL:
 			case ORDINAL:
+				break;
+			case CONTINUOUS:
+				opType = OpType.CATEGORICAL;
 				break;
 			default:
 				break;
