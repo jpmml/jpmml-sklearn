@@ -22,22 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
-import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.MultiLabel;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
-import sklearn.ScalarLabelUtil;
 
 public class ChainUtil {
 
@@ -48,7 +43,7 @@ public class ChainUtil {
 	public <E extends Estimator> MiningModel encodeChain(List<E> estimators, List<Integer> order, Schema schema){
 		ClassDictUtil.checkSize(estimators, order);
 
-		PMMLEncoder encoder = schema.getEncoder();
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
@@ -73,12 +68,7 @@ public class ChainUtil {
 
 			models.add(model);
 
-			OutputField predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
-				.setFinalResult(false);
-
-			DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-			Feature feature = ScalarLabelUtil.toFeature(scalarLabel, predictedField, encoder);
+			Feature feature = encoder.exportPrediction(model, scalarLabel);
 
 			augmentedFeatures.add(feature);
 		}

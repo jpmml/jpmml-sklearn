@@ -22,15 +22,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
@@ -65,11 +60,9 @@ public class StackingRegressor extends Regressor implements HasEstimatorEnsemble
 						throw new IllegalArgumentException(stackMethod);
 				}
 
-				OutputField predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, index), OpType.CONTINUOUS, continuousLabel.getDataType());
+				Feature feature = encoder.exportPrediction(model, FieldNameUtil.create(Estimator.FIELD_PREDICT, index), continuousLabel);
 
-				DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-				return Collections.singletonList(new ContinuousFeature(encoder, predictedField));
+				return Collections.singletonList(feature);
 			}
 		};
 

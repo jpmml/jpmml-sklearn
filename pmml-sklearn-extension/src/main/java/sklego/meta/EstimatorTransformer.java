@@ -40,7 +40,6 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
@@ -52,7 +51,6 @@ import sklearn.HasDecisionFunctionField;
 import sklearn.HasEstimator;
 import sklearn.HasMultiApplyField;
 import sklearn.HasPredictField;
-import sklearn.ScalarLabelUtil;
 import sklearn.SkLearnMethods;
 import sklearn.Transformer;
 import sklearn.tree.HasTreeOptions;
@@ -177,12 +175,9 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 					case CLASSIFICATION:
 					case REGRESSION:
 						{
-							OutputField predictedOutputField = ModelUtil.createPredictedField(createFieldName(Estimator.FIELD_PREDICT), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
-								.setFinalResult(false);
+							Feature feature = encoder.exportPrediction(model, scalarLabel);
 
-							DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-							return Collections.singletonList(ScalarLabelUtil.toFeature(scalarLabel, predictedField, encoder));
+							return Collections.singletonList(feature);
 						}
 					default:
 						throw new IllegalArgumentException();

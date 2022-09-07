@@ -40,7 +40,6 @@ import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
-import sklearn.ScalarLabelUtil;
 import sklearn.Transformer;
 
 public class StackingEstimator extends Transformer implements HasEstimator<Estimator> {
@@ -96,12 +95,9 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 			case CLASSIFICATION:
 			case REGRESSION:
 				{
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
-						.setFinalResult(false);
+					Feature feature = encoder.exportPrediction(model, name, scalarLabel);
 
-					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-					result.add(ScalarLabelUtil.toFeature(scalarLabel, predictedField, encoder));
+					result.add(feature);
 				}
 				break;
 			default:
