@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression, LogisticRegression, PoissonRe
 from sklearn.pipeline import _name_estimators
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.svm import OneClassSVM
+from sklearn.svm import LinearSVC, OneClassSVM
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -111,16 +111,15 @@ def build_estimatortransformer_iris(outlier_detector_estimator, final_estimator,
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
 		("outlier_detector", make_enhancer(make_estimator_transformer(outlier_detector_estimator, "outlierDetector", predict_func = "decision_function"))),
+		("proba_estimator", make_enhancer(make_debug_pipeline(make_estimator_transformer(DecisionTreeClassifier(max_depth = 2, random_state = 13), "probaClassifier", predict_func = "predict_proba"), Reshaper(newshape = (150, 3))))),
 		("estimator", final_estimator)
 	])
 	pipeline.fit(iris_X, iris_y)
 	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
-	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
-	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
 
-build_estimatortransformer_iris(IsolationForest(n_estimators = 3, max_features = 2, contamination = 0.03, random_state = 13), LogisticRegression(random_state = 13), "EstimatorTransformerIris")
+build_estimatortransformer_iris(IsolationForest(n_estimators = 3, max_features = 2, contamination = 0.03, random_state = 13), LinearSVC(random_state = 13), "EstimatorTransformerIris")
 
 def build_estimatortransformer_auto(name):
 	auto_df = load_auto("Auto")

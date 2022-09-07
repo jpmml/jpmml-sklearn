@@ -551,7 +551,7 @@ public class PMMLPipeline extends Pipeline {
 		switch(miningFunction){
 			case CLASSIFICATION:
 				{
-					List<?> classes = EstimatorUtil.getClasses(estimator);
+					List<?> categories = EstimatorUtil.getClasses(estimator);
 					Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
 
 					// XXX
@@ -562,7 +562,7 @@ public class PMMLPipeline extends Pipeline {
 					for(int i = 0; i < targetFields.size(); i++){
 						String targetField = targetFields.get(i);
 
-						labels.add(initCategoricalLabel(targetField, (targetFields.size() > 1 ? (List<?>)classes.get(i) : classes), classExtensions, encoder));
+						labels.add(initCategoricalLabel(targetField, (targetFields.size() > 1 ? (List<?>)categories.get(i) : categories), classExtensions, encoder));
 					}
 				}
 				break;
