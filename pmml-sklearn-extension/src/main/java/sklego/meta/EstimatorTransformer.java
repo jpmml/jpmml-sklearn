@@ -41,16 +41,18 @@ import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.EstimatorUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasApplyField;
 import sklearn.HasDecisionFunctionField;
 import sklearn.HasEstimator;
 import sklearn.HasMultiApplyField;
 import sklearn.HasPredictField;
+import sklearn.ScalarLabelUtil;
 import sklearn.SkLearnMethods;
 import sklearn.Transformer;
 import sklearn.tree.HasTreeOptions;
@@ -168,33 +170,18 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 					throw new IllegalArgumentException();
 				}
 
-				Label label = schema.getLabel();
-
-				String name = createFieldName(Estimator.FIELD_PREDICT);
+				ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
 
 				MiningFunction miningFunction = estimator.getMiningFunction();
 				switch(miningFunction){
 					case CLASSIFICATION:
-						{
-							CategoricalLabel categoricalLabel = (CategoricalLabel)label;
-
-							List<?> categories = categoricalLabel.getValues();
-
-							OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CATEGORICAL, categoricalLabel.getDataType());
-
-							DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
-
-							return Collections.singletonList(new CategoricalFeature(encoder, predictedField, categories));
-						}
 					case REGRESSION:
 						{
-							ContinuousLabel continuousLabel = (ContinuousLabel)label;
-
-							OutputField predictedOutputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, continuousLabel.getDataType());
+							OutputField predictedOutputField = ModelUtil.createPredictedField(createFieldName(Estimator.FIELD_PREDICT), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType());
 
 							DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 
-							return Collections.singletonList(new ContinuousFeature(encoder, predictedField));
+							return Collections.singletonList(ScalarLabelUtil.toFeature(scalarLabel, predictedField, encoder));
 						}
 					default:
 						throw new IllegalArgumentException();

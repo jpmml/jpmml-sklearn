@@ -76,6 +76,7 @@ import sklearn.HasClassifierOptions;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
+import sklearn.ScalarLabelUtil;
 import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.pipeline.FeatureUnion;
@@ -206,26 +207,11 @@ public class PMMLPipeline extends Pipeline {
 
 			Output output = ModelUtil.ensureOutput(finalModel);
 
+			ScalarLabel scalarLabel = (ScalarLabel)label;
+
 			if(predictTransformer != null){
-				OutputField predictField;
-
-				if(label instanceof ContinuousLabel){
-					ContinuousLabel continuousLabel = (ContinuousLabel)label;
-
-					predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, continuousLabel.getName()), OpType.CONTINUOUS, continuousLabel.getDataType())
-						.setFinalResult(false);
-				} else
-
-				if(label instanceof CategoricalLabel){
-					CategoricalLabel categoricalLabel = (CategoricalLabel)label;
-
-					predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, categoricalLabel.getName()), OpType.CATEGORICAL, categoricalLabel.getDataType())
-						.setFinalResult(false);
-				} else
-
-				{
-					throw new IllegalArgumentException();
-				}
+				OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
+					.setFinalResult(false);
 
 				output.addOutputFields(predictField);
 

@@ -22,14 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
-import org.jpmml.converter.CategoricalFeature;
-import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
@@ -42,6 +37,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.ScalarLabelUtil;
 
 public class ChainUtil {
 
@@ -77,43 +73,14 @@ public class ChainUtil {
 
 			models.add(model);
 
-			OutputField predictedOutputField;
-
-			if(scalarLabel instanceof ContinuousLabel){
-				ContinuousLabel continuousLabel = (ContinuousLabel)scalarLabel;
-
-				predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, continuousLabel.getName()), OpType.CONTINUOUS, continuousLabel.getDataType())
-					.setFinalResult(false);
-			} else
-
-			if(scalarLabel instanceof CategoricalLabel){
-				CategoricalLabel categoricalLabel = (CategoricalLabel)scalarLabel;
-
-				predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, categoricalLabel.getName()), OpType.CATEGORICAL, categoricalLabel.getDataType())
-					.setFinalResult(false);
-			} else
-
-			{
-				throw new IllegalArgumentException();
-			}
+			OutputField predictedOutputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
+				.setFinalResult(false);
 
 			DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 
-			if(scalarLabel instanceof ContinuousLabel){
-				ContinuousLabel continuousLabel = (ContinuousLabel)scalarLabel;
+			Feature feature = ScalarLabelUtil.toFeature(scalarLabel, predictedField, encoder);
 
-				augmentedFeatures.add(new ContinuousFeature(encoder, predictedField));
-			} else
-
-			if(scalarLabel instanceof CategoricalLabel){
-				CategoricalLabel categoricalLabel = (CategoricalLabel)scalarLabel;
-
-				augmentedFeatures.add(new CategoricalFeature(encoder, predictedField, categoricalLabel.getValues()));
-			} else
-
-			{
-				throw new IllegalArgumentException();
-			}
+			augmentedFeatures.add(feature);
 		}
 
 		return MiningModelUtil.createMultiModelChain(models, Segmentation.MissingPredictionTreatment.CONTINUE);
