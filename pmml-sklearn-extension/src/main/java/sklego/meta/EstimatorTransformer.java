@@ -177,7 +177,8 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 					case CLASSIFICATION:
 					case REGRESSION:
 						{
-							OutputField predictedOutputField = ModelUtil.createPredictedField(createFieldName(Estimator.FIELD_PREDICT), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType());
+							OutputField predictedOutputField = ModelUtil.createPredictedField(createFieldName(Estimator.FIELD_PREDICT), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
+								.setFinalResult(false);
 
 							DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 

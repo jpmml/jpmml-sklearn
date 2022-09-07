@@ -96,7 +96,8 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 			case CLASSIFICATION:
 			case REGRESSION:
 				{
-					OutputField predictedOutputField = ModelUtil.createPredictedField(name, ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType());
+					OutputField predictedOutputField = ModelUtil.createPredictedField(name, ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
+						.setFinalResult(false);
 
 					DerivedOutputField predictedField = encoder.createDerivedField(model, predictedOutputField, false);
 
