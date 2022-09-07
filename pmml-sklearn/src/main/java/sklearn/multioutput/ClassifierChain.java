@@ -20,33 +20,33 @@ package sklearn.multioutput;
 
 import java.util.List;
 
-import org.dmg.pmml.Model;
+import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import sklearn.Classifier;
 
-public class RegressorChain extends Regressor {
+public class ClassifierChain extends Classifier {
 
-	public RegressorChain(String module, String name){
+	public ClassifierChain(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public int getNumberOfOutputs(){
-		List<? extends Regressor> estimators = getEstimators();
+		List<? extends Classifier> estimators = getEstimators();
 
 		return estimators.size();
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
-		List<? extends Regressor> estimators = getEstimators();
+	public MiningModel encodeModel(Schema schema){
+		List<? extends Classifier> estimators = getEstimators();
 		List<Integer> order = getOrder();
 
 		return ChainUtil.encodeChain(estimators, order, schema);
 	}
 
-	public List<? extends Regressor> getEstimators(){
-		return getList("estimators_", Regressor.class);
+	public List<? extends Classifier> getEstimators(){
+		return getList("estimators_", Classifier.class);
 	}
 
 	public List<Integer> getOrder(){

@@ -32,6 +32,7 @@ import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
+import sklearn.Estimator;
 
 public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
 
@@ -199,6 +200,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 		String[] transformFields = {FieldNameUtil.create("eval", AUDIT_PROBABILITY_TRUE)};
 
 		evaluate(LOGISTIC_REGRESSION, AUDIT_NA, excludeFields(transformFields));
+	}
+
+	@Test
+	public void evaluateLogisticRegressionChainAudit() throws Exception {
+		evaluate(LOGISTIC_REGRESSION_CHAIN, AUDIT, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "Gender"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, -2), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, 2), AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
 	}
 
 	@Test

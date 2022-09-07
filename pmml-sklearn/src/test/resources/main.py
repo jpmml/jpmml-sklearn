@@ -16,7 +16,7 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, PoissonRegressor, QuantileRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDOneClassSVM, SGDRegressor, TheilSenRegressor
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor, RegressorChain
+from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOutputRegressor, RegressorChain
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -308,6 +308,13 @@ if "Audit" in datasets:
 
 	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit")
 	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
+
+	# Translate labels from string to numeric
+	# Use unique labels (-2/2 vs 0/1) between individual classifiers
+	audit_df["Gender"] = audit_df["Gender"].replace("Male", -2).replace("Female", 2).astype(int)
+	audit_df["Adjusted"] = audit_df["Adjusted"].astype(int)
+
+	build_multi_audit(audit_df, ClassifierChain(LogisticRegression()), "LogisticRegressionChainAudit")
 
 def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_options):
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
