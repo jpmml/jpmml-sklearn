@@ -125,6 +125,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateMultiEstimatorChainAuto() throws Exception {
+		evaluate(MULTI_ESTIMATOR_CHAIN, AUTO, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "acceleration"), "nodeId"));
+	}
+
+	@Test
 	public void evaluateGBDTLMAuto() throws Exception {
 		evaluate(GBDT_LM, AUTO);
 	}

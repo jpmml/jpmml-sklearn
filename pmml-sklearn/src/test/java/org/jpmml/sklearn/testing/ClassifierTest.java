@@ -141,6 +141,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateMultiEstimatorChainAudit() throws Exception {
+		evaluate(MULTI_ESTIMATOR_CHAIN, AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), "nodeId", AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+	}
+
+	@Test
 	public void evaluateGBDTLRAudit() throws Exception {
 		evaluate(GBDT_LR, AUDIT);
 	}

@@ -20,6 +20,7 @@ package sklearn;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
@@ -37,6 +38,19 @@ import org.jpmml.sklearn.SkLearnEncoder;
 public class EstimatorUtil {
 
 	private EstimatorUtil(){
+	}
+
+	static
+	public MiningFunction getMiningFunction(List<? extends Estimator> estimators){
+		Set<MiningFunction> miningFunctions = estimators.stream()
+			.map(estimator -> estimator.getMiningFunction())
+			.collect(Collectors.toSet());
+
+		if(miningFunctions.size() == 1){
+			return Iterables.getOnlyElement(miningFunctions);
+		}
+
+		return MiningFunction.MIXED;
 	}
 
 	static

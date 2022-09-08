@@ -18,12 +18,11 @@
  */
 package sklearn2pmml.ensemble;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
@@ -33,6 +32,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.MultiLabel;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
@@ -40,9 +40,11 @@ import org.jpmml.python.PredicateTranslator;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
+import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
 
-public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Estimator> {
+public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorEnsemble<Estimator> {
 
 	public EstimatorChain(String module, String name){
 		super(module, name);
@@ -52,15 +54,20 @@ public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Es
 	public MiningFunction getMiningFunction(){
 		List<? extends Estimator> estimators = getEstimators();
 
-		Set<MiningFunction> miningFunctions = estimators.stream()
-			.map(estimator -> estimator.getMiningFunction())
-			.collect(Collectors.toSet());
+		return EstimatorUtil.getMiningFunction(estimators);
+	}
 
-		if(miningFunctions.size() == 1){
-			return Iterables.getOnlyElement(miningFunctions);
+	@Override
+	public int getNumberOfOutputs(){
+		Boolean multioutput = getMultioutput();
+
+		if(multioutput){
+			List<? extends Estimator> estimators = getEstimators();
+
+			return estimators.size();
 		}
 
-		return MiningFunction.MIXED;
+		return 1;
 	}
 
 	@Override
@@ -69,8 +76,41 @@ public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Es
 	}
 
 	@Override
+	public List<?> getClasses(){
+		List<? extends Estimator> estimators = getEstimators();
+
+		if(estimators.size() == 1){
+			Estimator estimator = estimators.get(0);
+
+			return EstimatorUtil.getClasses(estimator);
+		} else
+
+		if(estimators.size() >= 2){
+			List<Object> result = new ArrayList<>();
+
+			for(Estimator estimator : estimators){
+				result.add(EstimatorUtil.getClasses(estimator));
+			}
+
+			List<Object> uniqueResults = result.stream()
+				.distinct()
+				.collect(Collectors.toList());
+
+			if(uniqueResults.size() == 1){
+				return (List<?>)uniqueResults.get(0);
+			}
+
+			return result;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
-		MiningFunction miningFunction = getMiningFunction();
+		Boolean multioutput = getMultioutput();
 		List<Object[]> steps = getSteps();
 
 		if(steps.isEmpty()){
@@ -80,11 +120,40 @@ public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Es
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		MultiLabel multiLabel = (MultiLabel)label;
+		MultiLabel multiLabel;
+
+		if(label instanceof ScalarLabel){
+			ScalarLabel scalarLabel = (ScalarLabel)label;
+
+			List<Label> labels = new AbstractList(){
+
+				@Override
+				public int size(){
+					return steps.size();
+				}
+
+				@Override
+				public ScalarLabel get(int index){
+					return scalarLabel;
+				}
+			};
+
+			multiLabel = new MultiLabel(labels);
+		} else
+
+		if(label instanceof MultiLabel){
+			multiLabel = (MultiLabel)label;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+
+		List<Estimator> estimators = new ArrayList<>();
 
 		List<Model> models = new ArrayList<>();
 
-		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.MULTI_MODEL_CHAIN, null);
+		Segmentation segmentation = new Segmentation(multioutput ? Segmentation.MultipleModelMethod.MULTI_MODEL_CHAIN : Segmentation.MultipleModelMethod.MODEL_CHAIN, null);
 
 		Scope scope = new DataFrameScope("X", features);
 
@@ -95,6 +164,8 @@ public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Es
 			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
 			String predicate = TupleUtil.extractElement(step, 2, String.class);
 
+			estimators.add(estimator);
+
 			Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
 
 			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, scope);
@@ -103,11 +174,19 @@ public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Es
 
 			models.add(model);
 
+			if(estimator instanceof Link){
+				Link link = (Link)estimator;
+
+				schema = link.augmentSchema(model, segmentSchema);
+			}
+
 			Segment segment = new Segment(pmmlPredicate, model)
 				.setId(name);
 
 			segmentation.addSegments(segment);
 		}
+
+		MiningFunction miningFunction = EstimatorUtil.getMiningFunction(estimators);
 
 		MiningModel miningModel = new MiningModel(miningFunction, MiningModelUtil.createMiningSchema(models))
 			.setSegmentation(segmentation);
@@ -124,6 +203,10 @@ public class EstimatorChain extends Estimator implements HasEstimatorEnsemble<Es
 		}
 
 		return TupleUtil.extractElementList(steps, 1, Estimator.class);
+	}
+
+	public Boolean getMultioutput(){
+		return getBoolean("multioutput");
 	}
 
 	public List<Object[]> getSteps(){

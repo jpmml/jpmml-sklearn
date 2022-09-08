@@ -30,6 +30,8 @@ public interface SkLearnAlgorithms {
 	String DUMMY = "Dummy";
 	String ELASTIC_NET = "ElasticNet";
 	String EXTRA_TREES = "ExtraTrees";
+	String ESTIMATOR_CHAIN = "EstimatorChain";
+	String MULTI_ESTIMATOR_CHAIN = "Multi" + ESTIMATOR_CHAIN;
 	String GAMMA_REGRESSION = "GammaRegression";
 	String GBDT_LM = "GBDTLM";
 	String GBDT_LR = "GBDTLR";
