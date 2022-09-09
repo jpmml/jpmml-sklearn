@@ -18,9 +18,21 @@
  */
 package sklearn;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Iterables;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 public class EstimatorUtil {
 
@@ -37,5 +49,109 @@ public class EstimatorUtil {
 		}
 
 		throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
+	}
+
+	static
+	public List<Feature> export(Estimator estimator, String predictFunc, Schema schema, Model model, SkLearnEncoder encoder){
+
+		switch(predictFunc){
+			case SkLearnMethods.APPLY:
+				{
+					if(estimator instanceof HasApplyField){
+						HasApplyField hasApplyField = (HasApplyField)estimator;
+
+						return encoder.export(model, hasApplyField.getApplyField());
+					} else
+
+					if(estimator instanceof HasMultiApplyField){
+						HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)estimator;
+
+						return encoder.export(model, hasMultiApplyField.getApplyFields());
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
+				}
+			case SkLearnMethods.DECISION_FUNCTION:
+				{
+					if(estimator instanceof HasDecisionFunctionField){
+						HasDecisionFunctionField hasDecisionFunctionField = (HasDecisionFunctionField)estimator;
+
+						return encoder.export(model, hasDecisionFunctionField.getDecisionFunctionField());
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
+				}
+			case SkLearnMethods.PREDICT:
+				{
+					if(estimator instanceof HasPredictField){
+						HasPredictField hasPredictField = (HasPredictField)estimator;
+
+						return encoder.export(model, hasPredictField.getPredictField());
+					} // End if
+
+					if(estimator.isSupervised()){
+						ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
+
+						MiningFunction miningFunction = estimator.getMiningFunction();
+						switch(miningFunction){
+							case CLASSIFICATION:
+							case REGRESSION:
+								{
+									Feature feature = encoder.exportPrediction(model, scalarLabel);
+
+									return Collections.singletonList(feature);
+								}
+							default:
+								throw new IllegalArgumentException();
+						}
+					} else
+
+					{
+						Output output = model.getOutput();
+
+						if(output != null && output.hasOutputFields()){
+							List<OutputField> outputFields = output.getOutputFields();
+
+							List<OutputField> predictionOutputFields = outputFields.stream()
+								.filter(outputField -> SkLearnEncoder.isPrediction(outputField))
+								.collect(Collectors.toList());
+
+							if(predictionOutputFields.isEmpty()){
+								throw new IllegalArgumentException();
+							}
+
+							OutputField outputField = Iterables.getLast(predictionOutputFields);
+
+							return encoder.export(model, outputField.getName());
+						} else
+
+						{
+							throw new IllegalArgumentException();
+						}
+					}
+				}
+			case SkLearnMethods.PREDICT_PROBA:
+				{
+					if(estimator instanceof HasClasses){
+						List<?> categories = EstimatorUtil.getClasses(estimator);
+
+						List<String> names = categories.stream()
+							.map(category -> FieldNameUtil.create(Classifier.FIELD_PROBABILITY, category))
+							.collect(Collectors.toList());
+
+						return encoder.export(model, names);
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
+				}
+			default:
+				throw new IllegalArgumentException(predictFunc);
+		}
 	}
 }

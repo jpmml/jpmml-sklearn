@@ -19,8 +19,12 @@
 package org.jpmml.sklearn;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import numpy.DType;
 import org.dmg.pmml.DataField;
@@ -29,7 +33,10 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.ResultFeature;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
@@ -56,6 +63,47 @@ public class SkLearnEncoder extends PythonEncoder {
 
 
 	public SkLearnEncoder(){
+	}
+
+	public List<Feature> export(Model model, String name){
+		return export(model, Collections.singletonList(name));
+	}
+
+	public List<Feature> export(Model model, List<String> names){
+		Output output = model.getOutput();
+
+		List<OutputField> outputFields = output.getOutputFields();
+
+		List<Feature> result = new ArrayList<>();
+
+		for(String name : names){
+			DerivedOutputField derivedOutputField = null;
+
+			List<OutputField> nameOutputFields = selectOutputFields(name, outputFields);
+			for(OutputField nameOutputField : nameOutputFields){
+				derivedOutputField = createDerivedField(model, nameOutputField, true);
+			}
+
+			Feature feature;
+
+			OpType opType = derivedOutputField.getOpType();
+			switch(opType){
+				case CATEGORICAL:
+					feature = new CategoricalFeature(this, derivedOutputField);
+					break;
+				case CONTINUOUS:
+					feature = new ContinuousFeature(this, derivedOutputField);
+					break;
+				default:
+					throw new IllegalArgumentException();
+			}
+
+			result.add(feature);
+
+			outputFields.removeAll(nameOutputFields);
+		}
+
+		return result;
 	}
 
 	public Feature exportPrediction(Model model, ScalarLabel scalarLabel){
@@ -157,6 +205,47 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	public void setModel(Model model){
 		this.model = model;
+	}
+
+	static
+	public boolean isPrediction(OutputField outputField){
+		ResultFeature resultFeature = outputField.getResultFeature();
+
+		switch(resultFeature){
+			case PREDICTED_VALUE:
+			case TRANSFORMED_VALUE:
+			case DECISION:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	static
+	private List<OutputField> selectOutputFields(String name, List<OutputField> outputFields){
+		List<OutputField> result = new ArrayList<>();
+
+		for(OutputField outputField : outputFields){
+			boolean prediction = isPrediction(outputField);
+
+			if(prediction){
+				result.add(outputField);
+			} // End if
+
+			if(!Objects.equals(name, outputField.requireName())){
+				continue;
+			} // End if
+
+			if(prediction){
+				return result;
+			} else
+
+			{
+				return Collections.singletonList(outputField);
+			}
+		}
+
+		throw new IllegalArgumentException(name);
 	}
 
 	static {
