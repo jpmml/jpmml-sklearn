@@ -22,6 +22,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.FieldNames;
 import sklearn.HasApplyField;
 import sklearn.Regressor;
 
@@ -38,7 +39,7 @@ public class TreeRegressor extends Regressor implements HasApplyField, HasTree, 
 
 	@Override
 	public String getApplyField(){
-		return "nodeId";
+		return FieldNames.NODE_ID;
 	}
 
 	@Override

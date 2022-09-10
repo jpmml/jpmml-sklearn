@@ -68,6 +68,7 @@ import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.FieldNames;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.visitors.TreeModelCompactor;
@@ -504,7 +505,7 @@ public class TreeUtil {
 		};
 		nodeIdCollector.applyTo(treeModel);
 
-		OutputField nodeIdField = ModelUtil.createEntityIdField("nodeId", DataType.INTEGER, values);
+		OutputField nodeIdField = ModelUtil.createEntityIdField(FieldNames.NODE_ID, DataType.INTEGER, values);
 
 		if(segmentId != null){
 			nodeIdField

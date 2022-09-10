@@ -24,6 +24,7 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.FieldNames;
 import sklearn.Classifier;
 import sklearn.HasApplyField;
 
@@ -40,7 +41,7 @@ public class TreeClassifier extends Classifier implements HasApplyField, HasTree
 
 	@Override
 	public String getApplyField(){
-		return "nodeId";
+		return FieldNames.NODE_ID;
 	}
 
 	@Override

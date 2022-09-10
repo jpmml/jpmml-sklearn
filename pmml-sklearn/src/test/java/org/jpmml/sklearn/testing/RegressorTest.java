@@ -26,6 +26,7 @@ import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.model.visitors.VisitorBattery;
+import org.jpmml.sklearn.FieldNames;
 import org.junit.Test;
 import sklearn.Estimator;
 
@@ -94,7 +95,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 	@Test
 	public void evaluateDecisionTreeAutoNA() throws Exception {
-		String[] transformFields = {FieldNameUtil.create("eval", "nodeId")};
+		String[] transformFields = {FieldNameUtil.create("eval", FieldNames.NODE_ID)};
 
 		evaluate(DECISION_TREE, AUTO_NA, excludeFields(transformFields));
 	}
@@ -126,7 +127,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 	@Test
 	public void evaluateMultiEstimatorChainAuto() throws Exception {
-		evaluate(MULTI_ESTIMATOR_CHAIN, AUTO, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "acceleration"), "nodeId"));
+		evaluate(MULTI_ESTIMATOR_CHAIN, AUTO, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "acceleration"), FieldNames.NODE_ID));
 	}
 
 	@Test

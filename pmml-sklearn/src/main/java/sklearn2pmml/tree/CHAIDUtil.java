@@ -54,6 +54,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.FieldNames;
 import treelib.Node;
 import treelib.Tree;
 
@@ -67,7 +68,7 @@ public class CHAIDUtil {
 		org.dmg.pmml.tree.Node root = encodeNode(True.INSTANCE, tree.selectRoot(), tree, new PredicateManager(), schema);
 
 		Output output = new Output()
-			.addOutputFields(ModelUtil.createEntityIdField("nodeId", DataType.INTEGER));
+			.addOutputFields(ModelUtil.createEntityIdField(FieldNames.NODE_ID, DataType.INTEGER));
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setOutput(output);

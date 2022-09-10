@@ -31,6 +31,7 @@ import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
+import org.jpmml.sklearn.FieldNames;
 import org.junit.Test;
 import sklearn.Estimator;
 
@@ -120,7 +121,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateDecisionTreeAuditNA() throws Exception {
-		String[] transformFields = {FieldNameUtil.create("eval", "nodeId")};
+		String[] transformFields = {FieldNameUtil.create("eval", FieldNames.NODE_ID)};
 
 		evaluate(DECISION_TREE, AUDIT_NA, excludeFields(transformFields));
 	}
@@ -142,7 +143,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateMultiEstimatorChainAudit() throws Exception {
-		evaluate(MULTI_ESTIMATOR_CHAIN, AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), "nodeId", AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+		evaluate(MULTI_ESTIMATOR_CHAIN, AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), FieldNames.NODE_ID, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
 	}
 
 	@Test

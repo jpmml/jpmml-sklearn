@@ -26,6 +26,7 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.FieldNames;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiApplyField;
 import sklearn.Regressor;
@@ -50,7 +51,7 @@ public class ForestRegressor extends Regressor implements HasEstimatorEnsemble<T
 
 	@Override
 	public String getApplyField(int index){
-		return FieldNameUtil.create("nodeId", index + 1);
+		return FieldNameUtil.create(FieldNames.NODE_ID, index + 1);
 	}
 
 	@Override
