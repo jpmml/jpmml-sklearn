@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -208,15 +209,41 @@ public class PMMLPipeline extends Pipeline {
 
 			Output output = ModelUtil.ensureOutput(finalModel);
 
-			ScalarLabel scalarLabel = (ScalarLabel)label;
-
 			if(predictTransformer != null){
-				OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
-					.setFinalResult(false);
+				List<ScalarLabel> scalarLabels;
 
-				output.addOutputFields(predictField);
+				if(label instanceof ScalarLabel){
+					ScalarLabel scalarLabel = (ScalarLabel)label;
 
-				encodeOutput(output, Collections.singletonList(predictField), predictTransformer, encoder);
+					scalarLabels = Collections.singletonList(scalarLabel);
+				} else
+
+				if(label instanceof MultiLabel){
+					MultiLabel multiLabel = (MultiLabel)label;
+
+					List<? extends Label> labels = multiLabel.getLabels();
+
+					scalarLabels = labels.stream()
+						.map(ScalarLabel.class::cast)
+						.collect(Collectors.toList());
+				} else
+
+				{
+					throw new IllegalArgumentException();
+				}
+
+				List<OutputField> predictFields = new ArrayList<>();
+
+				for(ScalarLabel scalarLabel : scalarLabels){
+					OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
+						.setFinalResult(false);
+
+					output.addOutputFields(predictField);
+
+					predictFields.add(predictField);
+				}
+
+				encodeOutput(output, predictFields, predictTransformer, encoder);
 			} // End if
 
 			if(predictProbaTransformer != null){
