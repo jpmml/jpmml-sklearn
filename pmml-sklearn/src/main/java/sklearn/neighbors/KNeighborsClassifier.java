@@ -93,6 +93,16 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 	}
 
 	@Override
+	public List<?> getId(){
+
+		if(!containsKey("_id")){
+			return null;
+		}
+
+		return getArray("_id");
+	}
+
+	@Override
 	public List<? extends Number> getY(){
 		return getNumberArray("_y");
 	}

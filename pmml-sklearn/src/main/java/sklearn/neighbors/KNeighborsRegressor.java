@@ -93,6 +93,16 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	}
 
 	@Override
+	public List<?> getId(){
+
+		if(!containsKey("_id")){
+			return null;
+		}
+
+		return getArray("_id");
+	}
+
+	@Override
 	public List<? extends Number> getY(){
 		return getNumberArray("_y");
 	}

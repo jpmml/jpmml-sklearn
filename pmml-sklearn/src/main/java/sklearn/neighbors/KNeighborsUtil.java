@@ -84,7 +84,12 @@ public class KNeighborsUtil {
 		int numberOfOutputs = estimator.getNumberOfOutputs();
 
 		List<? extends Number> fitX = estimator.getFitX();
+		List<?> id = estimator.getId();
 		List<? extends Number> y = estimator.getY();
+
+		if(id != null){
+			ClassDictUtil.checkSize(numberOfInstances, id);
+		}
 
 		ClassDictUtil.checkSize(numberOfInstances * numberOfOutputs, y);
 
@@ -94,6 +99,15 @@ public class KNeighborsUtil {
 		Map<String, List<?>> data = new LinkedHashMap<>();
 
 		InstanceFields instanceFields = new InstanceFields();
+
+		if(id != null){
+			InstanceField instanceField = new InstanceField(KNeighborsUtil.VARIABLE_ID)
+				.setColumn("data:id");
+
+			instanceFields.addInstanceFields(instanceField);
+
+			data.put(instanceField.getColumn(), id);
+		} // End if
 
 		if(numberOfOutputs == 1){
 			ScalarLabel scalarLabel = (ScalarLabel)label;
@@ -160,6 +174,10 @@ public class KNeighborsUtil {
 		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator);
 
 		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(miningFunction, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs);
+
+		if(id != null){
+			nearestNeighborModel.setInstanceIdVariable(VARIABLE_ID);
+		} // End if
 
 		if(numberOfOutputs == 1){
 			nearestNeighborModel.setOutput(NearestNeighborModelUtil.createOutput(numberOfNeighbors));
@@ -237,4 +255,6 @@ public class KNeighborsUtil {
 			throw new IllegalArgumentException();
 		}
 	}
+
+	private static final String VARIABLE_ID = "id";
 }

@@ -26,6 +26,8 @@ public interface HasTrainingData {
 
 	int[] getFitXShape();
 
+	List<?> getId();
+
 	List<? extends Number> getY();
 
 	int[] getYShape();
