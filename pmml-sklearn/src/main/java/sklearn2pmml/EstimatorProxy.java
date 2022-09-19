@@ -30,8 +30,8 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
-import sklearn.EstimatorUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimator;
 
@@ -78,6 +78,13 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		Estimator estimator = getEstimator();
 
 		return estimator.isSupervised();
+	}
+
+	@Override
+	public String getAlgorithmName(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getAlgorithmName();
 	}
 
 	@Override

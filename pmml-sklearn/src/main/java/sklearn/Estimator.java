@@ -107,6 +107,10 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		}
 	}
 
+	public String getAlgorithmName(){
+		return getClassName();
+	}
+
 	public Model encode(Schema schema){
 		checkLabel(schema.getLabel());
 		checkFeatures(schema.getFeatures());
@@ -124,7 +128,7 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 
 		String algorithmName = model.getAlgorithmName();
 		if(algorithmName == null){
-			String pyClassName = getClassName();
+			String pyClassName = getAlgorithmName();
 
 			model.setAlgorithmName(pyClassName);
 		}

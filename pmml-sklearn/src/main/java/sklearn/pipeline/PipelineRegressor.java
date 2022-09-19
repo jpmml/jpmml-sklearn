@@ -64,6 +64,13 @@ public class PipelineRegressor extends Regressor {
 	}
 
 	@Override
+	public String getAlgorithmName(){
+		Regressor regressor = getFinalRegressor();
+
+		return regressor.getAlgorithmName();
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
 		Pipeline pipeline = getPipeline();
 

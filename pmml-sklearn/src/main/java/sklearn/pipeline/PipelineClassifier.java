@@ -66,6 +66,13 @@ public class PipelineClassifier extends Classifier {
 	}
 
 	@Override
+	public String getAlgorithmName(){
+		Classifier classifier = getFinalClassifier();
+
+		return classifier.getAlgorithmName();
+	}
+
+	@Override
 	public List<?> getClasses(){
 		Classifier classifier = getFinalClassifier();
 

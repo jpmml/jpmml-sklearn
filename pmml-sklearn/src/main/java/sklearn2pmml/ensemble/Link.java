@@ -48,6 +48,13 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 	}
 
 	@Override
+	public String getAlgorithmName(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getAlgorithmName();
+	}
+
+	@Override
 	public List<?> getClasses(){
 		Estimator estimator = getEstimator();
 
