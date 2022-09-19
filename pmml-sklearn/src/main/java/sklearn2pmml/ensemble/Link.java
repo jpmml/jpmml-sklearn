@@ -30,10 +30,11 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
+import sklearn.HasEstimator;
 import sklearn.SkLearnMethods;
 import sklearn.tree.HasTreeOptions;
 
-public class Link extends Estimator implements HasClasses {
+public class Link extends Estimator implements HasClasses, HasEstimator<Estimator> {
 
 	public Link(String module, String name){
 		super(module, name);
@@ -104,6 +105,7 @@ public class Link extends Estimator implements HasClasses {
 		return getList("augment_funcs", String.class);
 	}
 
+	@Override
 	public Estimator getEstimator(){
 		return get("estimator_", Estimator.class);
 	}
