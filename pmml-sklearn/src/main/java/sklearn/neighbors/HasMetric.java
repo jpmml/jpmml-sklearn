@@ -18,11 +18,9 @@
  */
 package sklearn.neighbors;
 
-public interface HasNeighbors {
+public interface HasMetric {
 
 	String getMetric();
-
-	int getNumberOfNeighbors();
 
 	int getP();
 

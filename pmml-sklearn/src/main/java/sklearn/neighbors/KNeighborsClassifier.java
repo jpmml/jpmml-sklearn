@@ -26,7 +26,7 @@ import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 
-public class KNeighborsClassifier extends Classifier implements HasNeighbors, HasTrainingData {
+public class KNeighborsClassifier extends Classifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
 
 	public KNeighborsClassifier(String module, String name){
 		super(module, name);
@@ -50,6 +50,11 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 	}
 
 	@Override
+	public boolean hasProbabilityDistribution(){
+		return false;
+	}
+
+	@Override
 	public NearestNeighborModel encodeModel(Schema schema){
 		int[] shape = getFitXShape();
 
@@ -68,11 +73,6 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 	}
 
 	@Override
-	public int getNumberOfNeighbors(){
-		return getInteger("n_neighbors");
-	}
-
-	@Override
 	public int getP(){
 		return getInteger("p");
 	}
@@ -80,6 +80,11 @@ public class KNeighborsClassifier extends Classifier implements HasNeighbors, Ha
 	@Override
 	public String getWeights(){
 		return getString("weights");
+	}
+
+	@Override
+	public int getNumberOfNeighbors(){
+		return getInteger("n_neighbors");
 	}
 
 	@Override

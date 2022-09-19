@@ -221,6 +221,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateNearestCentroidAuditDict() throws Exception {
+		evaluate(NEAREST_CENTROID, AUDIT + "Dict");
+	}
+
+	@Test
 	public void evaluateOneVsRestAudit() throws Exception {
 		evaluate(ONE_VS_REST, AUDIT);
 	}

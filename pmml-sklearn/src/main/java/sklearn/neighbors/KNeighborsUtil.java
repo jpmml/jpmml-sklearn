@@ -18,6 +18,7 @@
  */
 package sklearn.neighbors;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,17 @@ public class KNeighborsUtil {
 	}
 
 	static
+	public List<Integer> createRange(int start, int stop){
+		List<Integer> result = new ArrayList<>();
+
+		for(int i = start; i < stop; i++){
+			result.add(i);
+		}
+
+		return result;
+	}
+
+	static
 	public <E extends Estimator & HasTrainingData> int getNumberOfOutputs(E estimator){
 		int[] shape = estimator.getYShape();
 
@@ -80,7 +92,7 @@ public class KNeighborsUtil {
 	}
 
 	static
-	public <E extends Estimator & HasNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunction miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
+	public <E extends Estimator & HasMetric & HasNumberOfNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunction miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
 		int numberOfNeighbors = estimator.getNumberOfNeighbors();
 		int numberOfOutputs = estimator.getNumberOfOutputs();
 
@@ -210,7 +222,7 @@ public class KNeighborsUtil {
 	}
 
 	static
-	private <E extends Estimator & HasNeighbors> ComparisonMeasure encodeComparisonMeasure(E estimator){
+	private <E extends Estimator & HasMetric> ComparisonMeasure encodeComparisonMeasure(E estimator){
 		String weights = estimator.getWeights();
 
 		if(!("uniform").equals(weights)){
@@ -226,7 +238,7 @@ public class KNeighborsUtil {
 	}
 
 	static
-	private <E extends Estimator & HasNeighbors> Measure encodeMeasure(E estimator){
+	private <E extends Estimator & HasMetric> Measure encodeMeasure(E estimator){
 		String metric = estimator.getMetric();
 		int p = estimator.getP();
 
@@ -251,6 +263,11 @@ public class KNeighborsUtil {
 
 	static
 	private Output createOutput(int numberOfNeighbors, ScalarLabel scalarLabel){
+
+		if(numberOfNeighbors == 1){
+			return null;
+		}
+
 		List<OutputField> outputFields = ModelUtil.createNeighborFields(numberOfNeighbors);
 
 		if(scalarLabel != null){

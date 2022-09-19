@@ -26,7 +26,7 @@ import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
-public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasTrainingData {
+public class KNeighborsRegressor extends Regressor implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
 
 	public KNeighborsRegressor(String module, String name){
 		super(module, name);
@@ -68,11 +68,6 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	}
 
 	@Override
-	public int getNumberOfNeighbors(){
-		return getInteger("n_neighbors");
-	}
-
-	@Override
 	public int getP(){
 		return getInteger("p");
 	}
@@ -80,6 +75,11 @@ public class KNeighborsRegressor extends Regressor implements HasNeighbors, HasT
 	@Override
 	public String getWeights(){
 		return getString("weights");
+	}
+
+	@Override
+	public int getNumberOfNeighbors(){
+		return getInteger("n_neighbors");
 	}
 
 	@Override

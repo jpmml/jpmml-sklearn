@@ -18,7 +18,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOutputRegressor, RegressorChain
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, NearestCentroid, NearestNeighbors
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -222,8 +222,11 @@ def build_audit_dict(audit_df, classifier, name, with_proba = True):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
+	audit_df = load_audit("Audit", stringify = False)
+	
 	build_audit_dict(audit_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditDict")
 	build_audit_dict(audit_df, LogisticRegression(), "LogisticRegressionAuditDict")
+	build_audit_dict(audit_df, NearestCentroid(), "NearestCentroidAuditDict", with_proba = False)
 
 def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
 	audit_na_X, audit_na_y = split_csv(audit_na_df)

@@ -22,26 +22,27 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
-import sklearn.Clusterer;
+import sklearn.Classifier;
 
-public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class NearestCentroid extends Classifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
 
-	public NearestNeighbors(String module, String name){
+	public NearestCentroid(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public int getNumberOfFeatures(){
-		int[] shape = getFitXShape();
+		int[] shape = getCentroidsShape();
 
 		return shape[1];
 	}
 
 	@Override
 	public int getNumberOfOutputs(){
-		return 0;
+		return 1;
 	}
 
 	@Override
@@ -50,13 +51,29 @@ public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberO
 	}
 
 	@Override
-	public NearestNeighborModel encodeModel(Schema schema){
-		int[] shape = getFitXShape();
+	public boolean hasProbabilityDistribution(){
+		return false;
+	}
+
+	@Override
+	public Model encodeModel(Schema schema){
+		int[] shape = getCentroidsShape();
 
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
-		return KNeighborsUtil.encodeNeighbors(this, MiningFunction.CLUSTERING, numberOfInstances, numberOfFeatures, schema);
+		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunction.CLASSIFICATION, numberOfInstances, numberOfFeatures, schema)
+			.setCategoricalScoringMethod(NearestNeighborModel.CategoricalScoringMethod.MAJORITY_VOTE);
+
+		return nearestNeighborModel;
+	}
+
+	public List<? extends Number> getCentroids(){
+		return getNumberArray("centroids_");
+	}
+
+	public int[] getCentroidsShape(){
+		return getArrayShape("centroids_", 2);
 	}
 
 	@Override
@@ -66,6 +83,12 @@ public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberO
 
 	@Override
 	public int getP(){
+
+		// XXX
+		if(!containsKey("p")){
+			return -1;
+		}
+
 		return getInteger("p");
 	}
 
@@ -77,39 +100,35 @@ public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberO
 
 	@Override
 	public int getNumberOfNeighbors(){
-		return getInteger("n_neighbors");
+		return 1;
 	}
 
 	@Override
 	public List<? extends Number> getFitX(){
-		return getNumberArray("_fit_X");
+		return getCentroids();
 	}
 
 	@Override
 	public int[] getFitXShape(){
-		return getArrayShape("_fit_X", 2);
+		return getCentroidsShape();
 	}
 
 	@Override
 	public List<?> getId(){
-
-		// XXX
-		if(!containsKey("_id")){
-			int[] shape = getFitXShape();
-
-			return KNeighborsUtil.createRange(0, shape[0]);
-		}
-
-		return getArray("_id");
-	}
-
-	@Override
-	public List<? extends Number> getY(){
 		return null;
 	}
 
 	@Override
+	public List<? extends Number> getY(){
+		List<?> classes = getClasses();
+
+		return KNeighborsUtil.createRange(0, classes.size());
+	}
+
+	@Override
 	public int[] getYShape(){
-		throw new UnsupportedOperationException();
+		List<?> classes = getClasses();
+
+		return new int[]{classes.size()};
 	}
 }
