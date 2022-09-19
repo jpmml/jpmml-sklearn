@@ -18,9 +18,12 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
+import org.dmg.pmml.OutputField;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.python.testing.PythonEncoderBatchTest;
@@ -47,5 +50,14 @@ public class SkLearnEncoderBatchTest extends PythonEncoderBatchTest {
 		};
 
 		return result;
+	}
+
+	static
+	protected String[] createNeighborFields(int count){
+		List<OutputField> neighborFields = ModelUtil.createNeighborFields(count);
+
+		return neighborFields.stream()
+			.map(OutputField::requireName)
+			.toArray(String[]::new);
 	}
 }

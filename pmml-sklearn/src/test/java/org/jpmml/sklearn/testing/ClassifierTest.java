@@ -18,14 +18,11 @@
  */
 package org.jpmml.sklearn.testing;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import org.dmg.pmml.OutputField;
 import org.jpmml.converter.FieldNamePrefixes;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
@@ -446,14 +443,5 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateNuSVCVersicolor() throws Exception {
 		evaluate(NU_SVC, VERSICOLOR);
-	}
-
-	static
-	private String[] createNeighborFields(int count){
-		List<OutputField> neighborFields = ModelUtil.createNeighborFields(count);
-
-		return neighborFields.stream()
-			.map(OutputField::requireName)
-			.toArray(String[]::new);
 	}
 }

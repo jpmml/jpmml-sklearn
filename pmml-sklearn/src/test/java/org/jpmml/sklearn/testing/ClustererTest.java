@@ -59,4 +59,9 @@ public class ClustererTest extends ValidatingSkLearnEncoderBatchTest implements 
 	public void evaluateMiniBatchKMeansWheat() throws Exception {
 		evaluate(MINIBATCH_K_MEANS, WHEAT);
 	}
+
+	@Test
+	public void evaluateNearestNeighborsIris() throws Exception {
+		evaluate(NEAREST_NEIGHBORS, WHEAT);
+	}
 }

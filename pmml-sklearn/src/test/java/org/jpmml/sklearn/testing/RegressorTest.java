@@ -167,7 +167,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 	@Test
 	public void evaluateMultiKNNAuto() throws Exception {
-		evaluate(MULTI_KNN, AUTO);
+		evaluate(MULTI_KNN, AUTO, excludeFields(createNeighborFields(5)));
 	}
 
 	@Test

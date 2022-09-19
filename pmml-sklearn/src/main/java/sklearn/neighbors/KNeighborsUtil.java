@@ -32,6 +32,8 @@ import org.dmg.pmml.Euclidean;
 import org.dmg.pmml.Measure;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Minkowski;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.nearest_neighbor.InstanceField;
 import org.dmg.pmml.nearest_neighbor.InstanceFields;
 import org.dmg.pmml.nearest_neighbor.KNNInput;
@@ -50,7 +52,6 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.converter.nearest_neighbor.NearestNeighborModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 
@@ -89,9 +90,11 @@ public class KNeighborsUtil {
 
 		if(id != null){
 			ClassDictUtil.checkSize(numberOfInstances, id);
-		}
+		} // End if
 
-		ClassDictUtil.checkSize(numberOfInstances * numberOfOutputs, y);
+		if(y != null){
+			ClassDictUtil.checkSize(numberOfInstances * numberOfOutputs, y);
+		}
 
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
@@ -108,6 +111,13 @@ public class KNeighborsUtil {
 
 			data.put(instanceField.getColumn(), id);
 		} // End if
+
+		if(numberOfOutputs == 0){
+
+			if(label != null){
+				throw new IllegalArgumentException();
+			}
+		} else
 
 		if(numberOfOutputs == 1){
 			ScalarLabel scalarLabel = (ScalarLabel)label;
@@ -173,14 +183,27 @@ public class KNeighborsUtil {
 
 		ComparisonMeasure comparisonMeasure = encodeComparisonMeasure(estimator);
 
-		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(miningFunction, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs);
+		Output output;
+
+		if(numberOfOutputs == 0 || numberOfOutputs == 1){
+			output = createOutput(numberOfNeighbors, null);
+		} else
+
+		if(numberOfOutputs >= 2){
+			MultiLabel multiLabel = (MultiLabel)label;
+
+			output = createOutput(numberOfNeighbors, (ScalarLabel)multiLabel.getLabel(0));
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+
+		NearestNeighborModel nearestNeighborModel = new NearestNeighborModel(miningFunction, numberOfNeighbors, ModelUtil.createMiningSchema(schema.getLabel()), trainingInstances, comparisonMeasure, knnInputs)
+			.setOutput(output);
 
 		if(id != null){
 			nearestNeighborModel.setInstanceIdVariable(VARIABLE_ID);
-		} // End if
-
-		if(numberOfOutputs == 1){
-			nearestNeighborModel.setOutput(NearestNeighborModelUtil.createOutput(numberOfNeighbors));
 		}
 
 		return nearestNeighborModel;
@@ -224,6 +247,24 @@ public class KNeighborsUtil {
 			default:
 				throw new IllegalArgumentException(metric);
 		}
+	}
+
+	static
+	private Output createOutput(int numberOfNeighbors, ScalarLabel scalarLabel){
+		List<OutputField> outputFields = ModelUtil.createNeighborFields(numberOfNeighbors);
+
+		if(scalarLabel != null){
+
+			for(OutputField outputField : outputFields){
+				outputField.setTargetField(scalarLabel.getName());
+			}
+		}
+
+		Output output = new Output();
+
+		(output.getOutputFields()).addAll(outputFields);
+
+		return output;
 	}
 
 	static

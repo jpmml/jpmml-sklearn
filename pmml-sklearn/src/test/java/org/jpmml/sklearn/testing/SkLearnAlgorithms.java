@@ -67,6 +67,7 @@ public interface SkLearnAlgorithms {
 	String MLP = "MLP";
 	String MULTI_MLP = "Multi" + MLP;
 	String NAIVE_BAYES = "NaiveBayes";
+	String NEAREST_NEIGHBORS = "NearestNeighbors";
 	String NU_SVC = "NuSVC";
 	String NU_SVR = "NuSVR";
 	String OMP = "OMP";

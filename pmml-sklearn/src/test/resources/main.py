@@ -18,7 +18,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOutputRegressor, RegressorChain
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -54,6 +54,9 @@ def make_interaction(left, right):
 	])
 	return pipeline
 
+def make_kneighbor_cols(estimator):
+	return ["neighbor(" + str(x + 1) + ")" for x in range(estimator.n_neighbors)]
+
 datasets = []
 
 if __name__ == "__main__":
@@ -66,10 +69,16 @@ if __name__ == "__main__":
 # Clustering
 #
 
+def kmeans_affinity(kmeans, X):
+	affinity_0 = kmeans_distance(kmeans, 0, X)
+	affinity_1 = kmeans_distance(kmeans, 1, X)
+	affinity_2 = kmeans_distance(kmeans, 2, X)
+	return DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity(0)", "affinity(1)", "affinity(2)"])
+
 def kmeans_distance(kmeans, center, X):
 	return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - X, 2), axis = 1)
 
-def build_wheat(wheat_df, kmeans, name, with_affinity = True, **pmml_options):
+def build_wheat(wheat_df, clusterer, name, with_affinity = False, with_kneighbors = False, **pmml_options):
 	wheat_X, wheat_y = split_csv(wheat_df)
 
 	mapper = DataFrameMapper([
@@ -81,27 +90,31 @@ def build_wheat(wheat_df, kmeans, name, with_affinity = True, **pmml_options):
 	pipeline = Pipeline([
 		("mapper", mapper),
 		("scaler", scaler),
-		("clusterer", kmeans)
+		("clusterer", clusterer)
 	])
 	pipeline.fit(wheat_X)
 	pipeline = make_pmml_pipeline(pipeline, wheat_X.columns.values)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
-	cluster = DataFrame(pipeline.predict(wheat_X), columns = ["cluster"])
-	if with_affinity == True:
+	if hasattr(clusterer, "predict"):
+		cluster = DataFrame(pipeline.predict(wheat_X), columns = ["cluster"])
+	if with_affinity:
 		Xt = pipeline_transform(pipeline, wheat_X)
-		affinity_0 = kmeans_distance(kmeans, 0, Xt)
-		affinity_1 = kmeans_distance(kmeans, 1, Xt)
-		affinity_2 = kmeans_distance(kmeans, 2, Xt)
-		cluster_affinity = DataFrame(numpy.transpose([affinity_0, affinity_1, affinity_2]), columns = ["affinity(0)", "affinity(1)", "affinity(2)"])
-		cluster = pandas.concat((cluster, cluster_affinity), axis = 1)
+		cluster_affinities = kmeans_affinity(clusterer, Xt)
+		cluster = pandas.concat((cluster, cluster_affinities), axis = 1)
+	if with_kneighbors:
+		Xt = pipeline_transform(pipeline, wheat_X)
+		kneighbors = clusterer.kneighbors(Xt)
+		cluster_ids = DataFrame(kneighbors[1], columns = make_kneighbor_cols(clusterer))
+		cluster = cluster_ids
 	store_csv(cluster, name)
 
 if "Wheat" in datasets:
 	wheat_df = load_wheat("Wheat")
 
-	build_wheat(wheat_df, KMeans(n_clusters = 3, random_state = 13), "KMeansWheat")
-	build_wheat(wheat_df, MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state = 13), "MiniBatchKMeansWheat")
+	build_wheat(wheat_df, KMeans(n_clusters = 3, random_state = 13), "KMeansWheat", with_affinity = True)
+	build_wheat(wheat_df, MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state = 13), "MiniBatchKMeansWheat", with_affinity = True)
+	build_wheat(wheat_df, NearestNeighbors(n_neighbors = 3), "NearestNeighborsWheat", with_kneighbors = True)
 
 #
 # Binary classification
@@ -158,7 +171,7 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_X, **predict_params), columns = ["Adjusted"])
-	if with_proba == True:
+	if with_proba:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X, **predict_proba_params), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
@@ -203,7 +216,7 @@ def build_audit_dict(audit_df, classifier, name, with_proba = True):
 	pipeline.fit(audit_dict_X, audit_y)
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_dict_X), columns = ["Adjusted"])
-	if with_proba == True:
+	if with_proba:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_dict_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
@@ -246,7 +259,7 @@ def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params 
 	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X, **predict_params), columns = ["Adjusted"])
-	if with_proba == True:
+	if with_proba:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X, **predict_proba_params), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	if isinstance(classifier, DecisionTreeClassifier):
@@ -285,7 +298,7 @@ def build_audit_na_hist(audit_na_df, classifier, name):
 if "Audit" in datasets:
 	build_audit_na_hist(audit_na_df, HistGradientBoostingClassifier(max_iter = 71, categorical_features = [3, 4, 5, 6, 7], random_state = 13), "HistGradientBoostingAuditNA")
 
-def build_multi_audit(audit_df, classifier, name):
+def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
 
 	mapper = DataFrameMapper(
@@ -299,6 +312,11 @@ def build_multi_audit(audit_df, classifier, name):
 	pipeline.fit(audit_X, audit_y)
 	store_pkl(pipeline, name)
 	gender_adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Gender", "Adjusted"])
+	if with_kneighbors:
+		Xt = pipeline_transform(pipeline, audit_X)
+		kneighbors = classifier.kneighbors(Xt)
+		gender_adjusted_ids = DataFrame(kneighbors[1] + 1, columns = make_kneighbor_cols(classifier))
+		gender_adjusted = pandas.concat((gender_adjusted, gender_adjusted_ids), axis = 1)
 	store_csv(gender_adjusted, name)
 
 if "Audit" in datasets:
@@ -307,7 +325,7 @@ if "Audit" in datasets:
 	audit_df["Adjusted"] = audit_df["Adjusted"].astype(str)
 
 	build_multi_audit(audit_df, EstimatorChain([("gender", Link(DecisionTreeClassifier(max_depth = 5, random_state = 13), augment_funcs = ["predict_proba", "apply"]), str(True)), ("adjusted", LogisticRegression(), str(True))]), "MultiEstimatorChainAudit")
-	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit")
+	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit", with_kneighbors = True)
 	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
 
 	# Translate labels from string to numeric
@@ -340,7 +358,7 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
 	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
-	if with_proba == True:
+	if with_proba:
 		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
@@ -373,7 +391,7 @@ def build_versicolor_direct(versicolor_df, classifier, name, with_proba = True, 
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
 	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
-	if with_proba == True:
+	if with_proba:
 		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
@@ -414,7 +432,7 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
 	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(iris_X, **predict_params), columns = ["Species"])
-	if with_proba == True:
+	if with_proba:
 		species_proba = DataFrame(pipeline.predict_proba(iris_X, **predict_proba_params), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
 		species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
@@ -529,7 +547,7 @@ def build_sentiment(sentiment_df, classifier, tokenizer, name, with_proba = True
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
-	if with_proba == True:
+	if with_proba:
 		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability(0)", "probability(1)"])
 		score = pandas.concat((score, score_proba), axis = 1)
 	store_csv(score, name)
@@ -733,7 +751,7 @@ if "Auto" in datasets:
 	
 	build_auto_na_hist(auto_na_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAutoNA")
 
-def build_multi_auto(auto_df, regressor, name):
+def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
 
 	mapper = DataFrameMapper(
@@ -747,6 +765,11 @@ def build_multi_auto(auto_df, regressor, name):
 	pipeline.fit(auto_X, auto_y)
 	store_pkl(pipeline, name)
 	acceleration_mpg = DataFrame(pipeline.predict(auto_X), columns = ["acceleration", "mpg"])
+	if with_kneighbors:
+		Xt = pipeline_transform(pipeline, auto_X)
+		kneighbors = regressor.kneighbors(Xt)
+		acceleration_mpg_ids = DataFrame(kneighbors[1] + 1, columns = make_kneighbor_cols(regressor))
+		acceleration_mpg = pandas.concat((acceleration_mpg, acceleration_mpg_ids), axis = 1)
 	store_csv(acceleration_mpg, name)
 
 if "Auto" in datasets:
@@ -754,7 +777,7 @@ if "Auto" in datasets:
 
 	build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
-	build_multi_auto(auto_df, KNeighborsRegressor(), "MultiKNNAuto")
+	build_multi_auto(auto_df, KNeighborsRegressor(), "MultiKNNAuto", with_kneighbors = True)
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
 	build_multi_auto(auto_df, RegressorChain(LinearRegression()), "LinearRegressionChainAuto")
@@ -782,10 +805,10 @@ def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_o
 	pipeline.verify(housing_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	medv = DataFrame(pipeline.predict(housing_X), columns = ["MEDV"])
-	if with_kneighbors == True:
+	if with_kneighbors:
 		Xt = pipeline_transform(pipeline, housing_X)
 		kneighbors = regressor.kneighbors(Xt)
-		medv_ids = DataFrame(kneighbors[1] + 1, columns = ["neighbor(" + str(x + 1) + ")" for x in range(regressor.n_neighbors)])
+		medv_ids = DataFrame(kneighbors[1] + 1, columns = make_kneighbor_cols(regressor))
 		medv = pandas.concat((medv, medv_ids), axis = 1)
 	store_csv(medv, name)
 
