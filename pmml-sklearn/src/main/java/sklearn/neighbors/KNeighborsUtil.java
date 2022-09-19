@@ -223,12 +223,6 @@ public class KNeighborsUtil {
 
 	static
 	private <E extends Estimator & HasMetric> ComparisonMeasure encodeComparisonMeasure(E estimator){
-		String weights = estimator.getWeights();
-
-		if(!("uniform").equals(weights)){
-			throw new IllegalArgumentException(weights);
-		}
-
 		Measure measure = encodeMeasure(estimator);
 
 		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, measure)

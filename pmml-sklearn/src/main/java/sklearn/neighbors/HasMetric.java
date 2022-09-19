@@ -23,6 +23,4 @@ public interface HasMetric {
 	String getMetric();
 
 	int getP();
-
-	String getWeights();
 }

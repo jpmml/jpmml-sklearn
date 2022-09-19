@@ -93,12 +93,6 @@ public class NearestCentroid extends Classifier implements HasMetric, HasNumberO
 	}
 
 	@Override
-	public String getWeights(){
-		// XXX
-		return "uniform";
-	}
-
-	@Override
 	public int getNumberOfNeighbors(){
 		return 1;
 	}

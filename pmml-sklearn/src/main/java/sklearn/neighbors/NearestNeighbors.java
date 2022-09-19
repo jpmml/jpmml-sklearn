@@ -70,12 +70,6 @@ public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberO
 	}
 
 	@Override
-	public String getWeights(){
-		// XXX
-		return "uniform";
-	}
-
-	@Override
 	public int getNumberOfNeighbors(){
 		return getInteger("n_neighbors");
 	}

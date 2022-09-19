@@ -57,12 +57,27 @@ public class KNeighborsClassifier extends Classifier implements HasMetric, HasNu
 	@Override
 	public NearestNeighborModel encodeModel(Schema schema){
 		int[] shape = getFitXShape();
+		String weights = getWeights();
 
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
+		boolean weighted;
+
+		switch(weights){
+			case "distance":
+				weighted = true;
+				break;
+			case "uniform":
+				weighted = false;
+				break;
+			default:
+				throw new IllegalArgumentException(weights);
+		}
+
 		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunction.CLASSIFICATION, numberOfInstances, numberOfFeatures, schema)
-			.setCategoricalScoringMethod(NearestNeighborModel.CategoricalScoringMethod.MAJORITY_VOTE);
+			.setCategoricalScoringMethod(weighted ? NearestNeighborModel.CategoricalScoringMethod.WEIGHTED_MAJORITY_VOTE : NearestNeighborModel.CategoricalScoringMethod.MAJORITY_VOTE)
+			.setThreshold(weighted ? 0d : null);
 
 		return nearestNeighborModel;
 	}
@@ -75,11 +90,6 @@ public class KNeighborsClassifier extends Classifier implements HasMetric, HasNu
 	@Override
 	public int getP(){
 		return getInteger("p");
-	}
-
-	@Override
-	public String getWeights(){
-		return getString("weights");
 	}
 
 	@Override
@@ -115,5 +125,9 @@ public class KNeighborsClassifier extends Classifier implements HasMetric, HasNu
 	@Override
 	public int[] getYShape(){
 		return getArrayShape("_y");
+	}
+
+	public String getWeights(){
+		return getString("weights");
 	}
 }

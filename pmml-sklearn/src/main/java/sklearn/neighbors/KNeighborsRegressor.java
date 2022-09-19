@@ -52,12 +52,27 @@ public class KNeighborsRegressor extends Regressor implements HasMetric, HasNumb
 	@Override
 	public NearestNeighborModel encodeModel(Schema schema){
 		int[] shape = getFitXShape();
+		String weights = getWeights();
 
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
+		boolean weighted;
+
+		switch(weights){
+			case "distance":
+				weighted = true;
+				break;
+			case "uniform":
+				weighted = false;
+				break;
+			default:
+				throw new IllegalArgumentException(weights);
+		}
+
 		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunction.REGRESSION, numberOfInstances, numberOfFeatures, schema)
-			.setContinuousScoringMethod(NearestNeighborModel.ContinuousScoringMethod.AVERAGE);
+			.setContinuousScoringMethod(weighted ? NearestNeighborModel.ContinuousScoringMethod.WEIGHTED_AVERAGE : NearestNeighborModel.ContinuousScoringMethod.AVERAGE)
+			.setThreshold(weighted ? 0d : null);
 
 		return nearestNeighborModel;
 	}
@@ -70,11 +85,6 @@ public class KNeighborsRegressor extends Regressor implements HasMetric, HasNumb
 	@Override
 	public int getP(){
 		return getInteger("p");
-	}
-
-	@Override
-	public String getWeights(){
-		return getString("weights");
 	}
 
 	@Override
@@ -110,5 +120,9 @@ public class KNeighborsRegressor extends Regressor implements HasMetric, HasNumb
 	@Override
 	public int[] getYShape(){
 		return getArrayShape("_y");
+	}
+
+	public String getWeights(){
+		return getString("weights");
 	}
 }
