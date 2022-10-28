@@ -766,6 +766,7 @@ def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, auto_y)
+	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	acceleration_mpg = DataFrame(pipeline.predict(auto_X), columns = ["acceleration", "mpg"])
 	if with_kneighbors:

@@ -210,27 +210,7 @@ public class PMMLPipeline extends Pipeline {
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				List<ScalarLabel> scalarLabels;
-
-				if(label instanceof ScalarLabel){
-					ScalarLabel scalarLabel = (ScalarLabel)label;
-
-					scalarLabels = Collections.singletonList(scalarLabel);
-				} else
-
-				if(label instanceof MultiLabel){
-					MultiLabel multiLabel = (MultiLabel)label;
-
-					List<? extends Label> labels = multiLabel.getLabels();
-
-					scalarLabels = labels.stream()
-						.map(ScalarLabel.class::cast)
-						.collect(Collectors.toList());
-				} else
-
-				{
-					throw new IllegalArgumentException();
-				}
+				List<ScalarLabel> scalarLabels = toScalarLabels(label);
 
 				List<OutputField> predictFields = new ArrayList<>();
 
@@ -338,9 +318,13 @@ public class PMMLPipeline extends Pipeline {
 			} else
 
 			{
-				ScalarLabel scalarLabel = (ScalarLabel)label;
+				List<ScalarLabel> scalarLabels = toScalarLabels(label);
+
+				ClassDictUtil.checkSize(targetFields, scalarLabels);
 
 				for(int i = 0; i < targetFields.size(); i++){
+					ScalarLabel scalarLabel = scalarLabels.get(i);
+
 					VerificationField verificationField = ModelUtil.createVerificationField(targetFields.get(i));
 
 					DataType dataType = scalarLabel.getDataType();
@@ -789,6 +773,30 @@ public class PMMLPipeline extends Pipeline {
 			}
 
 			return result;
+		}
+	}
+
+	static
+	private List<ScalarLabel> toScalarLabels(Label label){
+
+		if(label instanceof ScalarLabel){
+			ScalarLabel scalarLabel = (ScalarLabel)label;
+
+			return Collections.singletonList(scalarLabel);
+		} else
+
+		if(label instanceof MultiLabel){
+			MultiLabel multiLabel = (MultiLabel)label;
+
+			List<? extends Label> labels = multiLabel.getLabels();
+
+			return labels.stream()
+				.map(ScalarLabel.class::cast)
+				.collect(Collectors.toList());
+		} else
+
+		{
+			throw new IllegalArgumentException();
 		}
 	}
 
