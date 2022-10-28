@@ -410,10 +410,10 @@ Java library and command-line application for converting [Scikit-Learn](https://
 Validating Python installation:
 
 ```python
-import sklearn, sklearn.externals.joblib, sklearn_pandas, sklearn2pmml
+import joblib, sklearn, sklearn_pandas, sklearn2pmml
 
+print(joblib.__version__)
 print(sklearn.__version__)
-print(sklearn.externals.joblib.__version__)
 print(sklearn_pandas.__version__)
 print(sklearn2pmml.__version__)
 ```
@@ -516,7 +516,7 @@ pipeline.verify(iris_X.sample(n = 15))
 Storing the fitted `PMMLPipeline` object in `pickle` data format:
 
 ```python
-from sklearn.externals import joblib
+import joblib
 
 joblib.dump(pipeline, "pipeline.pkl.z", compress = 9)
 ```
