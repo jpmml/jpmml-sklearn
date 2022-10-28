@@ -561,7 +561,9 @@ public class PMMLPipeline extends Pipeline {
 		int numberOfOutputs = estimator.getNumberOfOutputs();
 
 		if(numberOfOutputs == -1){
-			throw new IllegalArgumentException("The estimator object of the final step (" + ClassDictUtil.formatClass(estimator) + ") does not specify the number of outputs");
+			logger.warn("The estimator object of the final step (" + ClassDictUtil.formatClass(estimator) + ") does not specify the number of outputs. Assuming a single output");
+
+			numberOfOutputs = 1;
 		}
 
 		List<String> targetFields = makeVariables("y", numberOfOutputs, false);
