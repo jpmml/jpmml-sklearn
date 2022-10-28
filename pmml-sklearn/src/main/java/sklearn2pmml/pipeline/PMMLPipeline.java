@@ -252,44 +252,10 @@ public class PMMLPipeline extends Pipeline {
 				break verification;
 			}
 
-			int[] activeValuesShape = verification.getActiveValuesShape();
-			int[] targetValuesShape = verification.getTargetValuesShape();
-
-			ClassDictUtil.checkShapes(0, activeValuesShape, targetValuesShape);
-			ClassDictUtil.checkShapes(1, activeFields.size(), activeValuesShape);
-
 			List<?> activeValues = verification.getActiveValues();
-			List<?> targetValues = verification.getTargetValues();
+			int[] activeValuesShape = verification.getActiveValuesShape();
 
-			int[] probabilityValuesShape = null;
-
-			List<? extends Number> probabilityValues = null;
-
-			boolean hasProbabilityValues = verification.hasProbabilityValues();
-
-			if(estimator instanceof Classifier){
-				Classifier classifier = (Classifier)estimator;
-
-				hasProbabilityValues &= classifier.hasProbabilityDistribution();
-			} else
-
-			{
-				hasProbabilityValues = false;
-			} // End if
-
-			if(hasProbabilityValues){
-				probabilityFields = initProbabilityFields((CategoricalLabel)label);
-
-				probabilityValuesShape = verification.getProbabilityValuesShape();
-
-				ClassDictUtil.checkShapes(0, activeValuesShape, probabilityValuesShape);
-				ClassDictUtil.checkShapes(1, probabilityFields.size(), probabilityValuesShape);
-
-				probabilityValues = verification.getProbabilityValues();
-			}
-
-			Number precision = verification.getPrecision();
-			Number zeroThreshold = verification.getZeroThreshold();
+			ClassDictUtil.checkShapes(1, activeFields.size(), activeValuesShape);
 
 			int rows = activeValuesShape[0];
 
@@ -304,9 +270,39 @@ public class PMMLPipeline extends Pipeline {
 
 					data.put(verificationField, CMatrixUtil.getColumn(cleanValues(domain, activeValues), rows, activeFields.size(), i));
 				}
+			}
+
+			Number precision = verification.getPrecision();
+			Number zeroThreshold = verification.getZeroThreshold();
+
+			List<ScalarLabel> scalarLabels = toScalarLabels(label);
+
+			boolean hasProbabilityValues = verification.hasProbabilityValues();
+
+			if(estimator instanceof Classifier){
+				Classifier classifier = (Classifier)estimator;
+
+				hasProbabilityValues &= classifier.hasProbabilityDistribution();
+			} else
+
+			{
+				hasProbabilityValues = false;
 			} // End if
 
-			if(probabilityFields != null){
+			if(hasProbabilityValues){
+				List<? extends Number> probabilityValues = verification.getProbabilityValues();
+				int[] probabilityValuesShape = verification.getProbabilityValuesShape();
+
+				ClassDictUtil.checkShapes(0, activeValuesShape, probabilityValuesShape);
+
+				// XXX
+				ClassDictUtil.checkSize(1, scalarLabels);
+
+				ScalarLabel scalarLabel = scalarLabels.get(0);
+
+				probabilityFields = initProbabilityFields((CategoricalLabel)scalarLabel);
+
+				ClassDictUtil.checkShapes(1, probabilityFields.size(), probabilityValuesShape);
 
 				for(int i = 0; i < probabilityFields.size(); i++){
 					VerificationField verificationField = ModelUtil.createVerificationField(probabilityFields.get(i))
@@ -318,14 +314,17 @@ public class PMMLPipeline extends Pipeline {
 			} else
 
 			{
-				List<ScalarLabel> scalarLabels = toScalarLabels(label);
+				List<?> targetValues = verification.getTargetValues();
+				int[] targetValuesShape = verification.getTargetValuesShape();
+
+				ClassDictUtil.checkShapes(0, activeValuesShape, targetValuesShape);
 
 				ClassDictUtil.checkSize(targetFields, scalarLabels);
 
 				for(int i = 0; i < targetFields.size(); i++){
-					ScalarLabel scalarLabel = scalarLabels.get(i);
-
 					VerificationField verificationField = ModelUtil.createVerificationField(targetFields.get(i));
+
+					ScalarLabel scalarLabel = scalarLabels.get(i);
 
 					DataType dataType = scalarLabel.getDataType();
 					switch(dataType){
