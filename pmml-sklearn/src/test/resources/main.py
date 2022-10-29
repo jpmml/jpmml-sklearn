@@ -114,7 +114,7 @@ if "Wheat" in datasets:
 
 	build_wheat(wheat_df, KMeans(n_clusters = 3, random_state = 13), "KMeansWheat", with_affinity = True)
 	build_wheat(wheat_df, MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state = 13), "MiniBatchKMeansWheat", with_affinity = True)
-	build_wheat(wheat_df, NearestNeighbors(n_neighbors = 3), "NearestNeighborsWheat", with_kneighbors = True)
+	build_wheat(wheat_df, NearestNeighbors(n_neighbors = 3, algorithm = "ball_tree"), "NearestNeighborsWheat", with_kneighbors = True)
 
 #
 # Binary classification
@@ -629,7 +629,7 @@ if "Auto" in datasets:
 	build_auto(auto_df, RidgeCV(), "RidgeAuto")
 	build_auto(auto_df, StackingRegressor([("ridge", Ridge(random_state = 13)), ("lasso", Lasso(random_state = 13))], final_estimator = GradientBoostingRegressor(n_estimators = 7, random_state = 13)), "StackingEnsembleAuto")
 	build_auto(auto_df, TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
-	build_auto(auto_df, VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor()), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
+	build_auto(auto_df, VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor(algorithm = "kd_tree")), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
 
 if "Auto" in datasets:
 	build_auto(auto_df, TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
@@ -781,7 +781,7 @@ if "Auto" in datasets:
 
 	build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
-	build_multi_auto(auto_df, KNeighborsRegressor(), "MultiKNNAuto", with_kneighbors = True)
+	build_multi_auto(auto_df, KNeighborsRegressor(algorithm = "brute"), "MultiKNNAuto", with_kneighbors = True)
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
 	build_multi_auto(auto_df, RegressorChain(LinearRegression()), "LinearRegressionChainAuto")
