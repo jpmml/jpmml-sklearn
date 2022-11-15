@@ -38,12 +38,12 @@ import org.jpmml.h2o.MojoModelUtil;
 import sklearn.Estimator;
 import sklearn.HasClasses;
 
-public class BaseEstimator extends Estimator implements HasClasses {
+public class H2OEstimator extends Estimator implements HasClasses {
 
 	private MojoModel mojoModel = null;
 
 
-	public BaseEstimator(String module, String name){
+	public H2OEstimator(String module, String name){
 		super(module, name);
 	}
 
@@ -147,7 +147,7 @@ public class BaseEstimator extends Estimator implements HasClasses {
 		return getString("_mojo_path");
 	}
 
-	public BaseEstimator setMojoPath(String mojoPath){
+	public H2OEstimator setMojoPath(String mojoPath){
 		put("_mojo_path", mojoPath);
 
 		return this;

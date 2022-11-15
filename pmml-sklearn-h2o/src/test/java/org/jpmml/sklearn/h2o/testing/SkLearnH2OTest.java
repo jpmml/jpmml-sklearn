@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import com.google.common.io.ByteStreams;
-import h2o.estimators.BaseEstimator;
+import h2o.estimators.H2OEstimator;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
@@ -52,27 +52,27 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 			protected void activate(PMMLPipeline pipeline) throws Exception {
 				super.activate(pipeline);
 
-				BaseEstimator baseEstimator = (BaseEstimator)pipeline.getFinalEstimator();
+				H2OEstimator h2oEstimator = (H2OEstimator)pipeline.getFinalEstimator();
 
 				File tmpFile = File.createTempFile(getAlgorithm() + getDataset(), ".mojo.zip");
 
-				try(InputStream is = open("/" + baseEstimator.getMojoPath())){
+				try(InputStream is = open("/" + h2oEstimator.getMojoPath())){
 
 					try(OutputStream os = new FileOutputStream(tmpFile)){
 						ByteStreams.copy(is, os);
 					}
 				}
 
-				baseEstimator.setMojoPath(tmpFile.getAbsolutePath());
+				h2oEstimator.setMojoPath(tmpFile.getAbsolutePath());
 			}
 
 			@Override
 			protected void deactivate(PMMLPipeline pipeline) throws Exception {
 				super.deactivate(pipeline);
 
-				BaseEstimator baseEstimator = (BaseEstimator)pipeline.getFinalEstimator();
+				H2OEstimator h2oEstimator = (H2OEstimator)pipeline.getFinalEstimator();
 
-				File tmpFile = new File(baseEstimator.getMojoPath());
+				File tmpFile = new File(h2oEstimator.getMojoPath());
 
 				if(tmpFile.isFile()){
 					tmpFile.delete();
