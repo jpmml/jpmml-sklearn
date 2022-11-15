@@ -292,6 +292,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * Helpers:
     * `sklearn2pmml.EstimatorProxy`
     * `sklearn2pmml.SelectorProxy`
+    * `sklearn2pmml.h2o.H2OEstimatorProxy`
   * Feature specification and decoration:
     * `sklearn2pmml.decoration.Alias`
     * `sklearn2pmml.decoration.CategoricalDomain`
