@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
@@ -167,6 +168,17 @@ public class PMMLPipeline extends Pipeline {
 			}
 		} catch(UnsupportedOperationException uoe){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
+		}
+
+		// XXX
+		if(label instanceof CategoricalLabel){
+			CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+
+			DataField dataField = encoder.getDataField(categoricalLabel.getName());
+
+			if(!Objects.equals(categoricalLabel.getValues(), PMMLUtil.getValues(dataField, Value.Property.VALID))){
+				label = new CategoricalLabel(dataField);
+			}
 		}
 
 		if(estimator == null){

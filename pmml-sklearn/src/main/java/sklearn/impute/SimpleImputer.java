@@ -19,6 +19,7 @@
 package sklearn.impute;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -131,10 +132,20 @@ public class SimpleImputer extends Transformer {
 	}
 
 	public List<?> getStatistics(){
+
+		if(!containsKey("statistics_")){
+			return Collections.emptyList();
+		}
+
 		return getArray("statistics_");
 	}
 
 	public int[] getStatisticsShape(){
+
+		if(!containsKey("statistics_")){
+			return new int[]{0};
+		}
+
 		return getArrayShape("statistics_", 1);
 	}
 

@@ -57,6 +57,7 @@ public class OneHotEncoder extends CategoryEncoder {
 
 		switch(handleUnknown){
 			case "error":
+			case "value":
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
