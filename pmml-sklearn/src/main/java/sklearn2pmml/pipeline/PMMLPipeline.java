@@ -82,11 +82,8 @@ import sklearn.Initializer;
 import sklearn.ScalarLabelUtil;
 import sklearn.Step;
 import sklearn.Transformer;
-import sklearn.pipeline.FeatureUnion;
 import sklearn.pipeline.Pipeline;
-import sklearn.pipeline.PipelineClassifier;
-import sklearn.pipeline.PipelineRegressor;
-import sklearn.pipeline.PipelineTransformer;
+import sklearn.pipeline.PipelineUtil;
 import sklearn2pmml.decoration.Domain;
 
 public class PMMLPipeline extends Pipeline {
@@ -141,7 +138,7 @@ public class PMMLPipeline extends Pipeline {
 		PythonObject featureInitializer = estimator;
 
 		try {
-			Transformer transformer = getHead(transformers, estimator);
+			Transformer transformer = PipelineUtil.getHead(transformers, estimator);
 
 			if(transformer != null){
 				featureInitializer = transformer;
@@ -693,57 +690,6 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		return result;
-	}
-
-	static
-	private Transformer getHead(List<? extends Transformer> transformers, Estimator estimator){
-
-		if(!transformers.isEmpty()){
-			Transformer transformer = transformers.get(0);
-
-			if(transformer instanceof FeatureUnion){
-				FeatureUnion featureUnion = (FeatureUnion)transformer;
-
-				return getHead(featureUnion.getTransformers(), null);
-			} else
-
-			if(transformer instanceof PipelineTransformer){
-				PipelineTransformer pipelineTransformer = (PipelineTransformer)transformer;
-
-				Pipeline pipeline = pipelineTransformer.getPipeline();
-
-				return getHead(pipeline.getTransformers(), null);
-			} else
-
-			{
-				return transformer;
-			}
-		} // End if
-
-		if(estimator != null){
-
-			if(estimator instanceof PipelineClassifier){
-				PipelineClassifier pipelineClassifier = (PipelineClassifier)estimator;
-
-				Pipeline pipeline = pipelineClassifier.getPipeline();
-
-				return getHead(pipeline.getTransformers(), pipeline.getFinalEstimator());
-			} else
-
-			if(estimator instanceof PipelineRegressor){
-				PipelineRegressor pipelineRegressor = (PipelineRegressor)estimator;
-
-				Pipeline pipeline = pipelineRegressor.getPipeline();
-
-				return getHead(pipeline.getTransformers(), pipeline.getFinalEstimator());
-			} else
-
-			{
-				return null;
-			}
-		}
-
-		return null;
 	}
 
 	static

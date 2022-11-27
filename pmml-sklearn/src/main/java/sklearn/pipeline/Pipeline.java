@@ -29,12 +29,13 @@ import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
 import sklearn.Composite;
 import sklearn.Estimator;
+import sklearn.HasHead;
 import sklearn.None;
 import sklearn.PassThrough;
 import sklearn.Regressor;
 import sklearn.Transformer;
 
-public class Pipeline extends Composite implements Castable {
+public class Pipeline extends Composite implements Castable, HasHead {
 
 	public Pipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -174,6 +175,18 @@ public class Pipeline extends Composite implements Castable {
 		}
 
 		return this;
+	}
+
+	@Override
+	public Transformer getHead(){
+		List<? extends Transformer> transformers = getTransformers();
+		Estimator estimator = null;
+
+		if(hasFinalEstimator()){
+			estimator = getFinalEstimator();
+		}
+
+		return PipelineUtil.getHead(transformers, estimator);
 	}
 
 	public Transformer toTransformer(){

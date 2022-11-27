@@ -22,9 +22,11 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
+import sklearn.HasHead;
 import sklearn.Regressor;
+import sklearn.Transformer;
 
-public class PipelineRegressor extends Regressor {
+public class PipelineRegressor extends Regressor implements HasHead {
 
 	private Pipeline pipeline = null;
 
@@ -75,6 +77,13 @@ public class PipelineRegressor extends Regressor {
 		Pipeline pipeline = getPipeline();
 
 		return pipeline.encodeModel(schema);
+	}
+
+	@Override
+	public Transformer getHead(){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.getHead();
 	}
 
 	public Regressor getFinalRegressor(){

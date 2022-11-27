@@ -24,10 +24,11 @@ import java.util.List;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasHead;
 import sklearn.MultiTransformer;
 import sklearn.Transformer;
 
-public class FeatureUnion extends MultiTransformer {
+public class FeatureUnion extends MultiTransformer implements HasHead {
 
 	public FeatureUnion(String module, String name){
 		super(module, name);
@@ -48,6 +49,25 @@ public class FeatureUnion extends MultiTransformer {
 		}
 
 		return result;
+	}
+
+	@Override
+	public Transformer getHead(){
+		List<? extends Transformer> transformers = getTransformers();
+
+		if(!transformers.isEmpty()){
+			Transformer transformer = transformers.get(0);
+
+			if(transformer instanceof HasHead){
+				HasHead hasHead = (HasHead)transformer;
+
+				return hasHead.getHead();
+			}
+
+			return transformer;
+		}
+
+		return null;
 	}
 
 	public List<? extends Transformer> getTransformers(){

@@ -25,8 +25,10 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.HasHead;
+import sklearn.Transformer;
 
-public class PipelineClassifier extends Classifier {
+public class PipelineClassifier extends Classifier implements HasHead {
 
 	private Pipeline pipeline = null;
 
@@ -91,6 +93,13 @@ public class PipelineClassifier extends Classifier {
 		Pipeline pipeline = getPipeline();
 
 		return pipeline.encodeModel(schema);
+	}
+
+	@Override
+	public Transformer getHead(){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.getHead();
 	}
 
 	public Classifier getFinalClassifier(){

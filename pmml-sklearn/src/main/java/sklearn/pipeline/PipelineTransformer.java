@@ -24,9 +24,10 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasHead;
 import sklearn.Transformer;
 
-public class PipelineTransformer extends Transformer {
+public class PipelineTransformer extends Transformer implements HasHead {
 
 	private Pipeline pipeline = null;
 
@@ -63,6 +64,13 @@ public class PipelineTransformer extends Transformer {
 		Pipeline pipeline = getPipeline();
 
 		return pipeline.encodeFeatures(features, encoder);
+	}
+
+	@Override
+	public Transformer getHead(){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.getHead();
 	}
 
 	public Pipeline getPipeline(){
