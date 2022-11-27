@@ -18,6 +18,14 @@ sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 
 from common import *
 
+datasets = []
+
+if __name__ == "__main__":
+	if len(sys.argv) > 1:
+		datasets = (sys.argv[1]).split(",")
+	else:
+		datasets = ["Audit"]
+
 def load_filter_audit(name, filter = False):
 	if name.endswith("Audit"):
 		audit_df = load_audit("Audit")
@@ -76,7 +84,7 @@ def build_audit(cat_encoder, cont_encoder, classifier, name, **pmml_options):
 	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
-if __name__ == "__main__":
+if "Audit" in datasets:
 	classifier = LogisticRegression()
 
 	build_audit(OneHotEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "OneHotEncoderAudit")
