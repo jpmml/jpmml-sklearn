@@ -66,6 +66,7 @@ public class BaseNEncoder extends CategoryEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "return_nan":
 				break;
 			case "value":
 				missingCategory = CategoryEncoder.CATEGORY_NAN;

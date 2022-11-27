@@ -67,6 +67,7 @@ public class CountEncoder extends MapEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "return_nan":
 				break;
 			case "count":
 			case "value":

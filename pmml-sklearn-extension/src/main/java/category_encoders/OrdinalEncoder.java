@@ -54,6 +54,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "return_nan":
 			case "value":
 				break;
 			default:

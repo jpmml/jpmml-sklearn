@@ -47,6 +47,7 @@ public class OneHotEncoder extends CategoryEncoder {
 
 		switch(handleMissing){
 			case "error":
+			case "return_nan":
 			case "value":
 			case "indicator":
 				break;
@@ -77,7 +78,15 @@ public class OneHotEncoder extends CategoryEncoder {
 					Object category = categories.get(j);
 
 					if(ValueUtil.isNaN(category)){
-						result.add(new MissingValueFeature(encoder, categoricalFeature));
+
+						switch(handleMissing){
+							case "value":
+							case "indicator":
+								result.add(new MissingValueFeature(encoder, categoricalFeature));
+								break;
+							default:
+								break;
+						}
 					} else
 
 					{
