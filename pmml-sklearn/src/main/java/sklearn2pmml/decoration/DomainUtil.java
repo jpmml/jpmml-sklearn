@@ -18,9 +18,15 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.dmg.pmml.Field;
+import org.dmg.pmml.HasDiscreteDomain;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.dmg.pmml.OutlierTreatmentMethod;
+import org.dmg.pmml.Value;
 
 public class DomainUtil {
 
@@ -89,6 +95,22 @@ public class DomainUtil {
 				return OutlierTreatmentMethod.AS_EXTREME_VALUES;
 			default:
 				throw new IllegalArgumentException(outlierTreatment);
+		}
+	}
+
+	static
+	public <E extends Field<E> & HasDiscreteDomain<E>> void clearValues(E field, Value.Property property){
+
+		if(field.hasValues()){
+			List<Value> pmmlValues = field.getValues();
+
+			for(Iterator<Value> it = pmmlValues.iterator(); it.hasNext(); ){
+				Value pmmlValue = it.next();
+
+				if(pmmlValue.getProperty() == property){
+					it.remove();
+				}
+			}
 		}
 	}
 }

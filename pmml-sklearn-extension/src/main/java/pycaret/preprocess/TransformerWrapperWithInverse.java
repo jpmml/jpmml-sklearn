@@ -20,7 +20,6 @@ package pycaret.preprocess;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
@@ -31,6 +30,7 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.InitializerUtil;
 import sklearn.preprocessing.LabelEncoder;
+import sklearn2pmml.decoration.DomainUtil;
 
 public class TransformerWrapperWithInverse extends TransformerWrapper {
 
@@ -59,24 +59,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 			DataField dataField = wildcardFeature.getField();
 
-			if(dataField.hasValues()){
-				List<Value> pmmlValues = dataField.getValues();
-
-				for(Iterator<Value> it = pmmlValues.iterator(); it.hasNext(); ){
-					Value pmmlValue = it.next();
-
-					Value.Property property = pmmlValue.getProperty();
-					switch(property){
-						case VALID:
-							it.remove();
-						case INVALID:
-						case MISSING:
-							break;
-						default:
-							break;
-					}
-				}
-			}
+			DomainUtil.clearValues(dataField, Value.Property.VALID);
 
 			Feature transformedLabelFeature = Iterables.getOnlyElement(transformer.encode(Collections.singletonList(labelFeature), encoder));
 

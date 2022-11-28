@@ -18,9 +18,6 @@
  */
 package sklearn2pmml.decoration;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.dmg.pmml.Field;
 import org.dmg.pmml.HasDiscreteDomain;
 import org.dmg.pmml.Value;
@@ -35,27 +32,7 @@ public class DiscreteDomainEraser extends DomainEraser {
 	public void clear(Field<?> field){
 
 		if(field instanceof HasDiscreteDomain){
-			HasDiscreteDomain<?> hasDiscreteDomain = (HasDiscreteDomain<?>)field;
-
-			if(hasDiscreteDomain.hasValues()){
-				List<Value> values = hasDiscreteDomain.getValues();
-
-				for(Iterator<Value> it = values.iterator(); it.hasNext(); ){
-					Value value = it.next();
-
-					Value.Property property = value.getProperty();
-					switch(property){
-						case VALID:
-							it.remove();
-							break;
-						case INVALID:
-						case MISSING:
-							break;
-						default:
-							break;
-					}
-				}
-			}
+			DomainUtil.clearValues((Field & HasDiscreteDomain)field, Value.Property.VALID);
 		}
 	}
 }
