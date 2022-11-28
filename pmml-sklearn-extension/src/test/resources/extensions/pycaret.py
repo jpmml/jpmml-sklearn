@@ -14,6 +14,14 @@ sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 
 from common import *
 
+datasets = []
+
+if __name__ == "__main__":
+	if len(sys.argv) > 1:
+		datasets = (sys.argv[1]).split(",")
+	else:
+		datasets = ["Audit", "Auto", "Iris", "Wheat"]
+
 def make_classification(df, estimator, name):
 	X, y = split_csv(df)
 
@@ -67,23 +75,35 @@ def make_regression(df, estimator, name):
 	yt.name = y.name
 	store_csv(yt, name)
 
-audit_df = load_audit("Audit")
+if "Audit" in datasets:
+	audit_df = load_audit("Audit")
 
-make_classification(audit_df, "lr", "PyCaretAudit")
+	make_classification(audit_df, "dt", "PyCaretAudit")
 
-iris_df = load_iris("Iris")
+	audit_df = load_audit("AuditNA")
 
-make_classification(iris_df, "lr", "PyCaretIris")
+	make_classification(audit_df, "lr", "PyCaretAuditNA")
 
-wheat_df = load_wheat("Wheat")
+if "Iris" in datasets:
+	iris_df = load_iris("Iris")
 
-make_clustering(wheat_df, "kmeans", "PyCaretWheat")
+	make_classification(iris_df, "dt", "PyCaretIris")
 
-auto_df = load_auto("Auto")
+if "Wheat" in datasets:
+	wheat_df = load_wheat("Wheat")
 
-# XXX
-auto_df["cylinders"] = auto_df["cylinders"].astype(str)
-auto_df["model_year"] = auto_df["model_year"].astype(str)
-auto_df["origin"] = auto_df["origin"].astype(str)
+	make_clustering(wheat_df, "kmeans", "PyCaretWheat")
 
-make_regression(auto_df, "lr", "PyCaretAuto")
+if "Auto" in datasets:
+	auto_df = load_auto("Auto")
+
+	# XXX
+	auto_df["cylinders"] = auto_df["cylinders"].astype(str)
+	auto_df["model_year"] = auto_df["model_year"].astype(str)
+	auto_df["origin"] = auto_df["origin"].astype(str)
+
+	make_regression(auto_df, "dt", "PyCaretAuto")
+
+	auto_df = load_auto("AutoNA")
+
+	make_regression(auto_df, "lr", "PyCaretAutoNA")

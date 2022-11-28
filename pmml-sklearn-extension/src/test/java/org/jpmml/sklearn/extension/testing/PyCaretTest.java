@@ -37,8 +37,18 @@ public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluatePyCaretAuditNA() throws Exception {
+		evaluate("PyCaret", AUDIT_NA, new FloatEquivalence(1));
+	}
+
+	@Test
 	public void evaluatePyCaretAuto() throws Exception {
-		evaluate("PyCaret", AUTO, new FloatEquivalence(1));
+		evaluate("PyCaret", AUTO);
+	}
+
+	@Test
+	public void evaluatePyCaretAutoNA() throws Exception {
+		evaluate("PyCaret", AUTO_NA, new FloatEquivalence(8));
 	}
 
 	@Test
