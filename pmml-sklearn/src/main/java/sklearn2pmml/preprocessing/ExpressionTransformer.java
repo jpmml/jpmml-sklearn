@@ -70,7 +70,9 @@ public class ExpressionTransformer extends Transformer {
 
 		Scope scope = new DataFrameScope("X", features);
 
-		Expression expression = ExpressionTranslator.translate(expr, scope);
+		ExpressionTranslator expressionTranslator = new ExpressionTranslator(scope);
+
+		Expression expression = expressionTranslator.translateExpression(expr);
 
 		if(mapMissingTo != null){
 			HasMapMissingTo<?, Object> hasMapMissingTp = (HasMapMissingTo<?, Object>)expression;

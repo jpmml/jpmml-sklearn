@@ -37,7 +37,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.PredicateTranslator;
-import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -155,7 +154,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 		Segmentation segmentation = new Segmentation(multioutput ? Segmentation.MultipleModelMethod.MULTI_MODEL_CHAIN : Segmentation.MultipleModelMethod.MODEL_CHAIN, null);
 
-		Scope scope = new DataFrameScope("X", features);
+		PredicateTranslator predicateTranslator = new PredicateTranslator(new DataFrameScope("X", features));
 
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
@@ -168,7 +167,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 			Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
 
-			Predicate pmmlPredicate = PredicateTranslator.translate(predicate, scope);
+			Predicate pmmlPredicate = predicateTranslator.translatePredicate(predicate);
 
 			Model model = estimator.encode(segmentSchema);
 
