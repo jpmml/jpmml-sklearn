@@ -2,9 +2,10 @@ from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelBinarizer
-from sklearn2pmml import make_tpot_pmml_config, make_pmml_pipeline
+from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.preprocessing import ConcatTransformer, ExpressionTransformer
+from sklearn2pmml.tpot import make_pmml_config
 from tpot import TPOTClassifier, TPOTRegressor
 from tpot.config import classifier_config_dict, regressor_config_dict
 
@@ -28,7 +29,7 @@ def build_classifier(df, feature_pipeline, generations, population_size, name):
 	Xt = feature_pipeline.fit_transform(X)
 	Xt = Xt.astype(float)
 	categories = pandas.unique(y)
-	config = make_tpot_pmml_config(classifier_config_dict)
+	config = make_pmml_config(classifier_config_dict)
 	config = filter_config(config)
 	del config["sklearn.decomposition.PCA"]
 	del config["sklearn.naive_bayes.GaussianNB"] # Does not support nesting - see http://mantis.dmg.org/view.php?id=208
@@ -84,7 +85,7 @@ def build_regressor(df, feature_pipeline, generations, population_size, name):
 	X, y = split_csv(df)
 	Xt = feature_pipeline.fit_transform(X)
 	Xt = Xt.astype(float)
-	config = make_tpot_pmml_config(regressor_config_dict)
+	config = make_pmml_config(regressor_config_dict)
 	config = filter_config(config)
 	del config["sklearn.neighbors.KNeighborsRegressor"]
 	regressor = TPOTRegressor(generations = generations, population_size = population_size, random_state = 13, config_dict = config, verbosity = 2)
