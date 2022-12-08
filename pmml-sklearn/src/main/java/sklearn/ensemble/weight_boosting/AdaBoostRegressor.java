@@ -29,6 +29,7 @@ import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Regressor;
 import sklearn.StepUtil;
 import sklearn.ensemble.EnsembleRegressor;
@@ -41,6 +42,12 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 
 	@Override
 	public int getNumberOfFeatures(){
+		int numberOfFeatures = super.getNumberOfFeatures();
+
+		if(numberOfFeatures != HasNumberOfFeatures.UNKNOWN){
+			return numberOfFeatures;
+		}
+
 		List<? extends Regressor> estimators = getEstimators();
 
 		return StepUtil.getNumberOfFeatures(estimators);
