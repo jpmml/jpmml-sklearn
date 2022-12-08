@@ -30,11 +30,19 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
+import sklearn.StepUtil;
 
 public class VotingRegressor extends Regressor implements HasEstimatorEnsemble<Regressor> {
 
 	public VotingRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		List<? extends Regressor> estimators = getEstimators();
+
+		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
