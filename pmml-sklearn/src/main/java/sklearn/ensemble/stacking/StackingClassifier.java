@@ -37,11 +37,19 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.SkLearnMethods;
+import sklearn.StepUtil;
 
 public class StackingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
 
 	public StackingClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		List<? extends Classifier> estimators = getEstimators();
+
+		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
