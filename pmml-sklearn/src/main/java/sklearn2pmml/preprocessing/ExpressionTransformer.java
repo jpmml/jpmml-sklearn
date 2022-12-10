@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
@@ -68,11 +69,44 @@ public class ExpressionTransformer extends Transformer {
 			mapMissingTo = null;
 		}
 
-		Scope scope = new DataFrameScope("X", features);
+		Scope scope = new DataFrameScope("X", features, encoder){
+
+			@Override
+			public Feature resolveFeature(String name){
+
+				// XXX
+				try {
+					return super.resolveFeature(name);
+				} catch(IllegalArgumentException iae){
+					DataField dataField = encoder.getDataField(name);
+					DerivedField derivedField = encoder.getDerivedField(name);
+
+					if((dataField == null) && (derivedField == null)){
+						return null;
+					}
+
+					throw iae;
+				}
+			}
+		};
 
 		ExpressionTranslator expressionTranslator = new ExpressionTranslator(scope);
 
-		Expression expression = expressionTranslator.translateExpression(expr);
+		DerivedField derivedField;
+
+		Expression expression;
+
+		if(expr.indexOf('\n') > -1){
+			derivedField = expressionTranslator.translateDef(expr);
+
+			expression = derivedField.getExpression();
+		} else
+
+		{
+			derivedField = null;
+
+			expression = expressionTranslator.translateExpression(expr);
+		} // End if
 
 		if(mapMissingTo != null){
 			HasMapMissingTo<?, Object> hasMapMissingTp = (HasMapMissingTo<?, Object>)expression;
@@ -120,9 +154,17 @@ public class ExpressionTransformer extends Transformer {
 					return Collections.singletonList(feature);
 				}
 			}
-		}
+		} // End if
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
+		if(derivedField != null){
+			derivedField
+				.setOpType(opType)
+				.setDataType(dataType);
+		} else
+
+		{
+			derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
+		}
 
 		return Collections.singletonList(FeatureUtil.createFeature(derivedField, encoder));
 	}
