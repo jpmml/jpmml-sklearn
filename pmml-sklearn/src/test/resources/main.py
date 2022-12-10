@@ -374,7 +374,7 @@ if "Versicolor" in datasets:
 	build_versicolor(versicolor_df, KNeighborsClassifier(metric = "euclidean"), "KNNVersicolor", with_proba = False)
 	build_versicolor(versicolor_df, MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPVersicolor")
 	build_versicolor(versicolor_df, SGDClassifier(max_iter = 100, random_state = 13), "SGDVersicolor", with_proba = False)
-	build_versicolor(versicolor_df, SGDClassifier(loss = "log", max_iter = 100, random_state = 13), "SGDLogVersicolor")
+	build_versicolor(versicolor_df, SGDClassifier(loss = "log_loss", max_iter = 100, random_state = 13), "SGDLogVersicolor")
 	build_versicolor(versicolor_df, GridSearchCV(SVC(gamma = "auto"), {"C" : [1, 3, 5]}), "SVCVersicolor", with_proba = False)
 	build_versicolor(versicolor_df, RandomizedSearchCV(NuSVC(gamma = "auto"), {"nu" : [0.3, 0.4, 0.5, 0.6]}), "NuSVCVersicolor", with_proba = False)
 
@@ -462,7 +462,7 @@ if "Iris" in datasets:
 	build_iris(iris_df, RidgeClassifierCV(), "RidgeIris", with_proba = False)
 	build_iris(iris_df, BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleIris")
 	build_iris(iris_df, SGDClassifier(max_iter = 100, random_state = 13), "SGDIris", with_proba = False)
-	build_iris(iris_df, SGDClassifier(loss = "log", max_iter = 100, random_state = 13), "SGDLogIris")
+	build_iris(iris_df, SGDClassifier(loss = "log_loss", max_iter = 100, random_state = 13), "SGDLogIris")
 	build_iris(iris_df, StackingClassifier([("lda", LinearDiscriminantAnalysis()), ("lr", LogisticRegression(multi_class = "multinomial", solver = "lbfgs"))], final_estimator = GradientBoostingClassifier(n_estimators = 5, random_state = 13), passthrough = True), "StackingEnsembleIris")
 	build_iris(iris_df, SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(iris_df, NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
@@ -581,7 +581,7 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 		(["cylinders"], [CategoricalDomain(), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0", dtype = numpy.int8), name = "odd(cylinders)", prefit = True)]),
 		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), OneHotEncoder()]),
 		(["model_year"], [CategoricalDomain(), CastTransformer(str), ExpressionTransformer("'19' + X[0] + '-01-01'"), CastTransformer("datetime64[D]"), DaysSinceYearTransformer(1977), Binarizer(threshold = 0)], {"alias" : "bin(model_year, 1977)"}),
-		(["model_year", "origin"], [ConcatTransformer("/"), OneHotEncoder(sparse = False), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
+		(["model_year", "origin"], [ConcatTransformer("/"), OneHotEncoder(sparse_output = False), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
 		(["weight", "displacement"], [ContinuousDomain(), ExpressionTransformer("(X[0] / X[1]) + 0.5", dtype = numpy.float64)], {"alias" : "weight / displacement + 0.5"}),
 		(["displacement", "horsepower", "weight", "acceleration"], [MultiDomain([None, ContinuousDomain(), None, ContinuousDomain()]), StandardScaler()])
 	])
