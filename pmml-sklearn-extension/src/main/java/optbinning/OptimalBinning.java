@@ -22,21 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PythonObject;
 
-public class OptimalBinning extends Binning {
+public class OptimalBinning extends PythonObject {
 
 	public OptimalBinning(String module, String name){
 		super(module, name);
 	}
 
-	@Override
 	public List<Double> getCategories(){
 		List<Integer> numberOfEvents = getNumberOfEvents();
 		List<Integer> numberOfNonEvents = getNumberOfNonEvents();
 
 		ClassDictUtil.checkSize(numberOfEvents, numberOfNonEvents);
 
-		double constant = Math.log((double)sum(numberOfEvents) / (double)sum(numberOfNonEvents));
+		double constant = Math.log((double)OptimalBinningUtil.sumExact(numberOfEvents) / (double)OptimalBinningUtil.sumExact(numberOfNonEvents));
 
 		List<Double> result = new ArrayList<>();
 
@@ -51,11 +51,19 @@ public class OptimalBinning extends Binning {
 		return result;
 	}
 
+	public String getDType(){
+		return getString("dtype");
+	}
+
 	public List<Integer> getNumberOfEvents(){
 		return getIntegerArray("_n_event");
 	}
 
 	public List<Integer> getNumberOfNonEvents(){
 		return getIntegerArray("_n_nonevent");
+	}
+
+	public List<Number> getSplitsOptimal(){
+		return getNumberArray("_splits_optimal");
 	}
 }

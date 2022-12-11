@@ -18,12 +18,13 @@
  */
 package optbinning;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class BinningUtil {
+public class OptimalBinningUtil {
 
-	private BinningUtil(){
+	private OptimalBinningUtil(){
 	}
 
 	static
@@ -41,5 +42,16 @@ public class BinningUtil {
 
 			prevBin = bin;
 		}
+	}
+
+	static
+	public int sumExact(Collection<Integer> values){
+		int result = 0;
+
+		for(Integer value : values){
+			result = Math.addExact(result, value);
+		}
+
+		return result;
 	}
 }

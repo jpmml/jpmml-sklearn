@@ -57,7 +57,7 @@ public class BinningProcess extends Initializer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Boolean> support = getSupport();
 
-		Map<String, Binning> binnedVariables = getBinnedVariables();
+		Map<String, OptimalBinning> binnedVariables = getBinnedVariables();
 
 		List<String> variableNames = getVariableNames();
 		Map<String, String> variableDTypes = getVariableDTypes();
@@ -76,9 +76,9 @@ public class BinningProcess extends Initializer {
 
 			String variableName = variableNames.get(i);
 
-			Binning binning = binnedVariables.get(variableName);
+			OptimalBinning optimalBinning = binnedVariables.get(variableName);
 
-			String dtype = binning.getDType();
+			String dtype = optimalBinning.getDType();
 			switch(dtype){
 				case "numerical":
 					break;
@@ -86,15 +86,15 @@ public class BinningProcess extends Initializer {
 					throw new IllegalArgumentException(dtype);
 			}
 
-			List<Number> splits = binning.getSplitsOptimal();
-			List<? extends Number> categories = binning.getCategories();
+			List<Number> splits = optimalBinning.getSplitsOptimal();
+			List<? extends Number> categories = optimalBinning.getCategories();
 
 			Feature feature = InitializerUtil.selectFeature(variableName, features, encoder);
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 			if(!splits.isEmpty()){
-				BinningUtil.checkIncreasingOrder(splits);
+				OptimalBinningUtil.checkIncreasingOrder(splits);
 
 				Discretize discretize = new Discretize(continuousFeature.getName())
 					.setMapMissingTo(0d);
@@ -148,14 +148,14 @@ public class BinningProcess extends Initializer {
 		return result;
 	}
 
-	public Map<String, Binning> getBinnedVariables(){
+	public Map<String, OptimalBinning> getBinnedVariables(){
 		Map<String, ?> binnedVariables = getDict("_binned_variables");
 
-		CastFunction<Binning> castFunction = new CastFunction<Binning>(Binning.class){
+		CastFunction<OptimalBinning> castFunction = new CastFunction<OptimalBinning>(OptimalBinning.class){
 
 			@Override
 			protected String formatMessage(Object object){
-				return "The binning object (" + ClassDictUtil.formatClass(object) + ") is not a supported Binning";
+				return "The binning object (" + ClassDictUtil.formatClass(object) + ") is not a supported";
 			}
 		};
 

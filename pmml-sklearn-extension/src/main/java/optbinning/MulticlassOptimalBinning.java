@@ -24,7 +24,7 @@ import java.util.List;
 import com.google.common.math.DoubleMath;
 import org.jpmml.converter.CMatrixUtil;
 
-public class MulticlassOptimalBinning extends Binning {
+public class MulticlassOptimalBinning extends OptimalBinning {
 
 	public MulticlassOptimalBinning(String module, String name){
 		super(module, name);
@@ -51,7 +51,7 @@ public class MulticlassOptimalBinning extends Binning {
 		for(int row = 0; row < rows; row++){
 			List<Integer> eventCounts = CMatrixUtil.getRow(numberOfEvents, rows, cols, row);
 
-			numberOfRecords.add(sum(eventCounts));
+			numberOfRecords.add(OptimalBinningUtil.sumExact(eventCounts));
 		}
 
 		List<List<Integer>> nonEventCountsByColumn = new ArrayList<>();
@@ -75,7 +75,7 @@ public class MulticlassOptimalBinning extends Binning {
 			List<Integer> eventCounts = eventCountsByColumn.get(col);
 			List<Integer> nonEventCounts = nonEventCountsByColumn.get(col);
 
-			double constant = ((double)sum(eventCounts)  / (double)sum(nonEventCounts));
+			double constant = ((double)OptimalBinningUtil.sumExact(eventCounts)  / (double)OptimalBinningUtil.sumExact(nonEventCounts));
 
 			for(int row = 0; row < rows; row++){
 				double eventRate = (double)eventCounts.get(row) / (double)numberOfRecords.get(row);
@@ -113,6 +113,7 @@ public class MulticlassOptimalBinning extends Binning {
 		return getInteger("_n_classes");
 	}
 
+	@Override
 	public List<Integer> getNumberOfEvents(){
 		return getIntegerArray("_n_event");
 	}

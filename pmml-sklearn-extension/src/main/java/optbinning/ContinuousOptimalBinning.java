@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.jpmml.python.ClassDictUtil;
 
-public class ContinuousOptimalBinning extends Binning {
+public class ContinuousOptimalBinning extends OptimalBinning {
 
 	public ContinuousOptimalBinning(String module, String name){
 		super(module, name);
