@@ -23,19 +23,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Discretize;
-import org.dmg.pmml.DiscretizeBin;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.Interval;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMMLFunctions;
-import org.jpmml.converter.CategoricalFeature;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -76,71 +66,11 @@ public class BinningProcess extends Initializer {
 
 			String variableName = variableNames.get(i);
 
-			OptimalBinning optimalBinning = binnedVariables.get(variableName);
-
-			String dtype = optimalBinning.getDType();
-			switch(dtype){
-				case "numerical":
-					break;
-				default:
-					throw new IllegalArgumentException(dtype);
-			}
-
-			List<Number> splits = optimalBinning.getSplitsOptimal();
-			List<? extends Number> categories = optimalBinning.getCategories();
-
 			Feature feature = InitializerUtil.selectFeature(variableName, features, encoder);
 
-			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+			OptimalBinning optimalBinning = binnedVariables.get(variableName);
 
-			if(!splits.isEmpty()){
-				OptimalBinningUtil.checkIncreasingOrder(splits);
-
-				Discretize discretize = new Discretize(continuousFeature.getName())
-					.setMapMissingTo(0d);
-
-				for(int j = 0; j <= splits.size(); j++){
-					Number leftMargin = null;
-					Number rightMargin = null;
-
-					if(j == 0){
-						rightMargin = splits.get(j);
-					} else
-
-					if(j == splits.size()){
-						leftMargin = splits.get(j - 1);
-					} else
-
-					{
-						leftMargin = splits.get(j - 1);
-						rightMargin = splits.get(j);
-					}
-
-					Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
-						.setLeftMargin(leftMargin)
-						.setRightMargin(rightMargin);
-
-					DiscretizeBin discretizeBin = new DiscretizeBin(categories.get(j), interval);
-
-					discretize.addDiscretizeBins(discretizeBin);
-				}
-
-				DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", continuousFeature), OpType.CATEGORICAL, DataType.DOUBLE, discretize);
-
-				feature = new CategoricalFeature(encoder, derivedField, categories.subList(0, splits.size() + 2));
-			} else
-
-			{
-				Expression expression = PMMLUtil.createApply(PMMLFunctions.IF,
-					PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, continuousFeature.ref()),
-					PMMLUtil.createConstant(categories.get(0), null),
-					PMMLUtil.createConstant(0d)
-				);
-
-				DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", continuousFeature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
-
-				feature = new CategoricalFeature(encoder, derivedField, categories.subList(0, 1));
-			}
+			feature = Iterables.getOnlyElement(optimalBinning.encodeFeatures(Collections.singletonList(feature), encoder));
 
 			result.add(feature);
 		}

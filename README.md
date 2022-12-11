@@ -271,6 +271,9 @@ Java library and command-line application for converting [Scikit-Learn](https://
   Examples: [extensions/optbinning.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/optbinning.py)
 
   * [`optbinning.BinningProcess`](https://gnpalencia.org/optbinning/binning_process.html#optbinning.BinningProcess)
+  * [`optbinning.ContinuousOptimalBinning`](https://gnpalencia.org/optbinning/binning_continuous.html#optbinning.ContinuousOptimalBinning)
+  * [`optbinning.MulticlassOptimalBinning`](https://gnpalencia.org/optbinning/binning_multiclass.html#optbinning.MulticlassOptimalBinning)
+  * [`optbinning.OptimalBinning`](https://gnpalencia.org/optbinning/binning_binary.html#optbinning.OptimalBinning)
 </details>
 
 <details>
