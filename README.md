@@ -375,6 +375,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.SubstringTransformer`
     * `sklearn2pmml.preprocessing.WordCountTransformer`
     * `sklearn2pmml.preprocessing.h2o.H2OFrameConstructor`
+    * `sklearn2pmml.preprocessing.optbinning.OptimalBinningWrapper`
     * `sklearn2pmml.util.Reshaper`
   * Rule sets:
     * `sklearn2pmml.ruleset.RuleSetClassifier`
