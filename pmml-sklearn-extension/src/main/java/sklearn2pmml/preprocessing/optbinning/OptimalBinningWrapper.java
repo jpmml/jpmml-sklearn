@@ -33,9 +33,18 @@ public class OptimalBinningWrapper extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		String metric = getMetric();
 		OptimalBinning optimalBinning = getOptimalBinning();
 
+		if(!optimalBinning.containsKey("metric")){
+			optimalBinning.setMetric(metric);
+		}
+
 		return optimalBinning.encodeFeatures(features, encoder);
+	}
+
+	public String getMetric(){
+		return getString("metric");
 	}
 
 	public OptimalBinning getOptimalBinning(){

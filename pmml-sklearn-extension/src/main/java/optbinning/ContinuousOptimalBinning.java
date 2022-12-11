@@ -31,8 +31,16 @@ public class ContinuousOptimalBinning extends OptimalBinning {
 
 	@Override
 	public List<Double> getCategories(){
+		String metric = getMetric();
 		List<Integer> numberOfRecords = getNumberOfRecords();
 		List<Number> sums = getSums();
+
+		switch(metric){
+			case "mean":
+				break;
+			default:
+				throw new IllegalArgumentException();
+		}
 
 		ClassDictUtil.checkSize(numberOfRecords, sums);
 
@@ -45,6 +53,11 @@ public class ContinuousOptimalBinning extends OptimalBinning {
 		}
 
 		return result;
+	}
+
+	@Override
+	public String getDefaultMetric(){
+		return "mean";
 	}
 
 	public List<Integer> getNumberOfRecords(){

@@ -36,6 +36,16 @@ public class OptBinningTest extends SkLearnEncoderBatchTest implements Datasets,
 	}
 
 	@Test
+	public void evaluateOptimalBinningAudit() throws Exception {
+		evaluate("OptimalBinning", AUDIT);
+	}
+
+	@Test
+	public void evaluateOptimalBinningAuditNA() throws Exception {
+		evaluate("OptimalBinning", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateBinningProcessAuto() throws Exception {
 		evaluate("BinningProcess", AUTO);
 	}

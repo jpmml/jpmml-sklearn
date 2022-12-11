@@ -118,8 +118,17 @@ public class OptimalBinning extends Transformer {
 	}
 
 	public List<Double> getCategories(){
+		String metric = getMetric();
 		List<Integer> numberOfEvents = getNumberOfEvents();
 		List<Integer> numberOfNonEvents = getNumberOfNonEvents();
+
+		switch(metric){
+			case "event_rate":
+			case "woe":
+				break;
+			default:
+				throw new IllegalArgumentException();
+		}
 
 		ClassDictUtil.checkSize(numberOfEvents, numberOfNonEvents);
 
@@ -130,9 +139,22 @@ public class OptimalBinning extends Transformer {
 		for(int i = 0; i < numberOfEvents.size(); i++){
 			double eventRate = (double)numberOfEvents.get(i) / (double)Math.addExact(numberOfEvents.get(i), numberOfNonEvents.get(i));
 
-			double woe = Math.log((1d / eventRate) - 1d) + constant;
+			switch(metric){
+				case "event_rate":
+					{
+						result.add(eventRate);
+					}
+					break;
+				case "woe":
+					{
+						double woe = Math.log((1d / eventRate) - 1d) + constant;
 
-			result.add(woe);
+						result.add(woe);
+					}
+					break;
+				default:
+					throw new IllegalArgumentException();
+			}
 		}
 
 		return result;
@@ -140,6 +162,25 @@ public class OptimalBinning extends Transformer {
 
 	public String getDType(){
 		return getString("dtype");
+	}
+
+	public String getDefaultMetric(){
+		return "woe";
+	}
+
+	public String getMetric(){
+
+		if(!containsKey("metric")){
+			return getDefaultMetric();
+		}
+
+		return getString("metric");
+	}
+
+	public OptimalBinning setMetric(String metric){
+		put("metric", metric);
+
+		return this;
 	}
 
 	public List<Integer> getNumberOfEvents(){

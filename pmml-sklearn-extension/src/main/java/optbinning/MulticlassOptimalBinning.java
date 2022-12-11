@@ -32,8 +32,16 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 
 	@Override
 	public List<Double> getCategories(){
+		String metric = getMetric();
 		Integer numberOfClasses = getNumberOfClasses();
 		List<Integer> numberOfEvents = getNumberOfEvents();
+
+		switch(metric){
+			case "mean_woe":
+				break;
+			default:
+				throw new IllegalArgumentException();
+		}
 
 		int cols = numberOfClasses;
 		int rows = numberOfEvents.size() / numberOfClasses;
@@ -107,6 +115,11 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 		}
 
 		return result;
+	}
+
+	@Override
+	public String getDefaultMetric(){
+		return "mean_woe";
 	}
 
 	public Integer getNumberOfClasses(){
