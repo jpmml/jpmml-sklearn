@@ -50,7 +50,7 @@ def build_audit_ob(audit_df, classifier, name):
 	audit_X, audit_y = split_csv(audit_df)
 
 	mapper = DataFrameMapper([
-		(["Age"], [Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else (-999 if (X[0] < 21 or X[0] > 65) else X[0])", dtype = int), name = "clean(Age)"), BinningProcess(variable_names = ["clean(Age)"], special_codes = [-999])]),
+		(["Age"], [Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else (-999 if (X[0] < 21 or X[0] > 65) else X[0])", dtype = int), name = "clean(Age)"), BinningProcess(variable_names = ["clean(Age)"], special_codes = [-999], binning_transform_params = {"clean(Age)" : {"metric" : "event_rate"}})]),
 		(["Hours"], make_optimal_binning(metric = "event_rate")),
 		(["Income"], make_optimal_binning(metric = "woe"))
 	])

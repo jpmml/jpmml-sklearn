@@ -19,6 +19,7 @@
 package optbinning;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,9 @@ public class BinningProcess extends Initializer {
 
 		Map<String, OptimalBinning> binnedVariables = getBinnedVariables();
 
+		Map<String, Map<String, ?>> binningFitParams = getBinningFitParams();
+		Map<String, Map<String, ?>> binningTransformParams = getBinningTransformParams();
+
 		List<String> variableNames = getVariableNames();
 		Map<String, String> variableDTypes = getVariableDTypes();
 		Map<String, Map<String, ?>> variableStats = getVariableStats();
@@ -70,6 +74,22 @@ public class BinningProcess extends Initializer {
 
 			OptimalBinning optimalBinning = binnedVariables.get(variableName);
 
+			Map<String, ?> fitParams = binningFitParams.get(variableName);
+			Map<String, ?> transformParams = binningTransformParams.get(variableName);
+
+			if(transformParams != null && !transformParams.isEmpty()){
+				Collection<? extends Map.Entry<String, ?>> entries = transformParams.entrySet();
+
+				for(Map.Entry<String, ?> entry : entries){
+					String key = entry.getKey();
+					Object value = entry.getValue();
+
+					if(!optimalBinning.containsKey(key)){
+						optimalBinning.put(key, value);
+					}
+				}
+			}
+
 			feature = Iterables.getOnlyElement(optimalBinning.encodeFeatures(Collections.singletonList(feature), encoder));
 
 			result.add(feature);
@@ -90,6 +110,24 @@ public class BinningProcess extends Initializer {
 		};
 
 		return Maps.transformValues(binnedVariables, castFunction);
+	}
+
+	public Map<String, Map<String, ?>> getBinningFitParams(){
+		return getBinningParams("binning_fit_params");
+	}
+
+	public Map<String, Map<String, ?>> getBinningTransformParams(){
+		return getBinningParams("binning_transform_params");
+	}
+
+	private Map<String, Map<String, ?>> getBinningParams(String name){
+		Object binningParams = get(name);
+
+		if(binningParams == null){
+			return Collections.emptyMap();
+		}
+
+		return (Map)getDict(name);
 	}
 
 	public List<Boolean> getSupport(){
