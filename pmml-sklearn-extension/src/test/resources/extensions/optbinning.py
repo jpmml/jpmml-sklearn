@@ -7,7 +7,6 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import Alias
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer
-from sklearn2pmml.preprocessing.optbinning import OptimalBinningWrapper
 
 import os
 import sys
@@ -20,9 +19,6 @@ datasets = ["Audit", "Auto", "Iris"]
 
 def make_binning_process(cont_cols, cat_cols):
 	return BinningProcess(variable_names = (cont_cols + cat_cols), categorical_variables = cat_cols)
-
-def make_optimal_binning(metric):
-	return OptimalBinningWrapper(OptimalBinning(dtype = "numerical"), metric = metric)
 
 def build_audit(audit_df, classifier, name):
 	audit_X, audit_y = split_csv(audit_df)
@@ -51,8 +47,8 @@ def build_audit_ob(audit_df, classifier, name):
 
 	mapper = DataFrameMapper([
 		(["Age"], [Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else (-999 if (X[0] < 21 or X[0] > 65) else X[0])", dtype = int), name = "clean(Age)"), BinningProcess(variable_names = ["clean(Age)"], special_codes = [-999], binning_transform_params = {"clean(Age)" : {"metric" : "event_rate"}})]),
-		(["Hours"], make_optimal_binning(metric = "event_rate")),
-		(["Income"], make_optimal_binning(metric = "woe"))
+		(["Hours"], BinningProcess(variable_names = ["Hours"], binning_transform_params = {"Hours" : {"metric" : "event_rate"}})),
+		(["Income"], BinningProcess(variable_names = ["Income"], binning_transform_params = {"Income" : {"metric" : "woe"}}))
 	])
 
 	pipeline = PMMLPipeline([
