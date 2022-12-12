@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Discretize;
 import org.dmg.pmml.DiscretizeBin;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
@@ -48,6 +50,7 @@ public class OptimalBinning extends Transformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String dtype = getDType();
+		List<Number> specialCodes = getSpecialCodes();
 		List<Number> splits = getSplitsOptimal();
 
 		switch(dtype){
@@ -57,13 +60,15 @@ public class OptimalBinning extends Transformer {
 				throw new IllegalArgumentException(dtype);
 		}
 
-		List<? extends Number> categories = getCategories();
+		List<Number> categories = (List)getCategories();
 
 		SchemaUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
 
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+		Expression expression;
 
 		if(!splits.isEmpty()){
 			OptimalBinningUtil.checkIncreasingOrder(splits);
@@ -97,22 +102,54 @@ public class OptimalBinning extends Transformer {
 				discretize.addDiscretizeBins(discretizeBin);
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", continuousFeature), OpType.CATEGORICAL, DataType.DOUBLE, discretize);
+			categories = categories.subList(0, splits.size() + 2);
 
-			feature = new CategoricalFeature(encoder, derivedField, categories.subList(0, splits.size() + 2));
+			expression = discretize;
 		} else
 
 		{
-			Expression expression = PMMLUtil.createApply(PMMLFunctions.IF,
+			Expression apply = PMMLUtil.createApply(PMMLFunctions.IF,
 				PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, continuousFeature.ref()),
 				PMMLUtil.createConstant(categories.get(0), null),
 				PMMLUtil.createConstant(0d)
 			);
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", continuousFeature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
+			categories = categories.subList(0, 1);
 
-			feature = new CategoricalFeature(encoder, derivedField, categories.subList(0, 1));
+			expression = apply;
+		} // End if
+
+		if(!specialCodes.isEmpty()){
+			// XXX
+			Double categorySpecial = 0d;
+
+			Apply valueApply = PMMLUtil.createApply((specialCodes.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), continuousFeature.ref());
+
+			for(Number specialCode : specialCodes){
+				valueApply.addExpressions(PMMLUtil.createConstant(specialCode));
+			}
+
+			if(expression instanceof HasMapMissingTo){
+				HasMapMissingTo<?, ?> hasMapMissingTo = (HasMapMissingTo<?, ?>)expression;
+
+				valueApply.setMapMissingTo(hasMapMissingTo.getMapMissingTo());
+			}
+
+			Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF,
+				valueApply,
+				PMMLUtil.createConstant(categorySpecial),
+				expression
+			);
+
+			categories = new ArrayList<>(categories);
+			categories.add(categorySpecial);
+
+			expression = ifApply;
 		}
+
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", continuousFeature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
+
+		feature = new CategoricalFeature(encoder, derivedField, categories);
 
 		return Collections.singletonList(feature);
 	}
@@ -189,6 +226,16 @@ public class OptimalBinning extends Transformer {
 
 	public List<Integer> getNumberOfNonEvents(){
 		return getIntegerArray("_n_nonevent");
+	}
+
+	public List<Number> getSpecialCodes(){
+		Object specialCodes = get("special_codes");
+
+		if(specialCodes == null){
+			return Collections.emptyList();
+		}
+
+		return getListLike("special_codes", Number.class);
 	}
 
 	public List<Number> getSplitsOptimal(){
