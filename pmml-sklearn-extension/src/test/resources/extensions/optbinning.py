@@ -28,10 +28,10 @@ def build_audit(audit_df, classifier, name):
 
 	audit_X = audit_X[cont_cols + cat_cols]
 
-	processor = make_binning_process(cont_cols, cat_cols)
+	binning_process = make_binning_process(cont_cols, cat_cols)
 
 	pipeline = PMMLPipeline([
-		("processor", processor),
+		("binning_process", binning_process),
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, audit_y)
@@ -78,10 +78,10 @@ def build_iris(iris_df, classifier, name):
 	cont_cols = list(iris_X.columns.values)
 	cat_cols = []
 
-	processor = make_binning_process(cont_cols, cat_cols)
+	binning_process = make_binning_process(cont_cols, cat_cols)
 
 	pipeline = PMMLPipeline([
-		("processor", processor),
+		("binning_process", binning_process),
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)
@@ -104,10 +104,10 @@ def build_auto(auto_df, regressor, name):
 
 	auto_X = auto_X[cont_cols + cat_cols]
 
-	processor = make_binning_process(cont_cols, cat_cols)
+	binning_process = make_binning_process(cont_cols, cat_cols)
 
 	pipeline = PMMLPipeline([
-		("processor", processor),
+		("binning_process", binning_process),
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, auto_y)
