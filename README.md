@@ -274,6 +274,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * [`optbinning.ContinuousOptimalBinning`](https://gnpalencia.org/optbinning/binning_continuous.html#optbinning.ContinuousOptimalBinning)
   * [`optbinning.MulticlassOptimalBinning`](https://gnpalencia.org/optbinning/binning_multiclass.html#optbinning.MulticlassOptimalBinning)
   * [`optbinning.OptimalBinning`](https://gnpalencia.org/optbinning/binning_binary.html#optbinning.OptimalBinning)
+  * [`optbinning.scorecard.Scorecard`](http://gnpalencia.org/optbinning/scorecard.html#optbinning.scorecard.Scorecard)
 </details>
 
 <details>

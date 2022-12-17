@@ -1,7 +1,7 @@
-from optbinning import BinningProcess, OptimalBinning
+from optbinning import BinningProcess, OptimalBinning, Scorecard
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import HuberRegressor, LinearRegression, LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import Alias
@@ -61,11 +61,35 @@ def build_audit_ob(audit_df, classifier, name):
 	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
+def build_audit_scorecard(audit_df, name, **scorecard_params):
+	audit_X, audit_y = split_csv(audit_df)
+
+	cont_cols = ["Age", "Hours", "Income"]
+	cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
+
+	audit_X = audit_X[cont_cols + cat_cols]
+
+	binning_process = make_binning_process(cont_cols, cat_cols)
+	estimator = LogisticRegression()
+
+	scorecard = Scorecard(binning_process = binning_process, estimator = estimator, **scorecard_params)
+
+	pipeline = PMMLPipeline([
+		("scorecard", scorecard)
+	])
+	pipeline.fit(audit_X, audit_y)
+	store_pkl(pipeline, name)
+	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
 	build_audit(audit_df, DecisionTreeClassifier(random_state = 13), "BinningProcessAudit")
 	build_audit_ob(audit_df, DecisionTreeClassifier(random_state = 13), "OptimalBinningAudit")
+	build_audit_scorecard(audit_df, "ScorecardAudit")
 
 	audit_df = load_audit("AuditNA")
 
@@ -115,10 +139,32 @@ def build_auto(auto_df, regressor, name):
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name)
 
+def build_auto_scorecard(auto_df, name, **scorecard_params):
+	auto_X, auto_y = split_csv(auto_df)
+
+	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
+	cat_cols = ["cylinders", "model_year", "origin"]
+
+	auto_X = auto_X[cont_cols + cat_cols]
+
+	binning_process = make_binning_process(cont_cols, cat_cols)
+	estimator = HuberRegressor()
+
+	scorecard = Scorecard(binning_process = binning_process, estimator = estimator, **scorecard_params)
+
+	pipeline = PMMLPipeline([
+		("scorecard", scorecard)
+	])
+	pipeline.fit(auto_X, auto_y)
+	store_pkl(pipeline, name)
+	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
+	store_csv(mpg, name)
+
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_auto(auto_df, DecisionTreeRegressor(random_state = 13), "BinningProcessAuto")
+	build_auto_scorecard(auto_df, "ScorecardAuto")
 
 	auto_df = load_auto("AutoNA")
 
