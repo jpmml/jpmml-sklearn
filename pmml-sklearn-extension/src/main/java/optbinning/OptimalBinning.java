@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Discretize;
@@ -30,6 +31,7 @@ import org.dmg.pmml.DiscretizeBin;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.Interval;
+import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CategoricalFeature;
@@ -37,6 +39,8 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.SchemaUtil;
+import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
@@ -55,75 +59,75 @@ public class OptimalBinning extends Transformer {
 
 		switch(dtype){
 			case "numerical":
+			case "categorical":
 				break;
 			default:
 				throw new IllegalArgumentException(dtype);
 		}
 
-		List<Number> categories = (List)getCategories();
+		List<Double> categoriesOut = getCategoriesOut();
 
 		SchemaUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
 
-		ContinuousFeature continuousFeature = feature.toContinuousFeature();
-
 		Expression expression;
+
+		List<Double> categories;
 
 		if(!splits.isEmpty()){
 			OptimalBinningUtil.checkIncreasingOrder(splits);
 
-			Discretize discretize = new Discretize(continuousFeature.getName())
-				.setMapMissingTo(0d);
+			switch(dtype){
+				case "numerical":
+					{
+						expression = encodeNumericalBinning(feature, splits, categoriesOut);
+					}
+					break;
+				case "categorical":
+					{
+						List<?> categoriesIn = getCategoriesIn();
 
-			for(int j = 0; j <= splits.size(); j++){
-				Number leftMargin = null;
-				Number rightMargin = null;
+						if(feature instanceof WildcardFeature){
+							WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				if(j == 0){
-					rightMargin = splits.get(j);
-				} else
+							DataType dataType = TypeUtil.getDataType(categoriesIn, DataType.STRING);
 
-				if(j == splits.size()){
-					leftMargin = splits.get(j - 1);
-				} else
+							DataField dataField = wildcardFeature.getField();
+							if(dataField.requireDataType() != dataType){
+								dataField.setDataType(dataType);
+							}
 
-				{
-					leftMargin = splits.get(j - 1);
-					rightMargin = splits.get(j);
-				}
+							feature = wildcardFeature.toCategoricalFeature(categoriesIn);
+						}
 
-				Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
-					.setLeftMargin(leftMargin)
-					.setRightMargin(rightMargin);
-
-				DiscretizeBin discretizeBin = new DiscretizeBin(categories.get(j), interval);
-
-				discretize.addDiscretizeBins(discretizeBin);
+						expression = encodeCategoricalBinning(feature, splits, categoriesIn, categoriesOut);
+					}
+					break;
+				default:
+					throw new IllegalArgumentException(dtype);
 			}
 
-			categories = categories.subList(0, splits.size() + 2);
-
-			expression = discretize;
+			categories = categoriesOut.subList(0, splits.size() + 2);
 		} else
 
 		{
 			Expression apply = PMMLUtil.createApply(PMMLFunctions.IF,
-				PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, continuousFeature.ref()),
-				PMMLUtil.createConstant(categories.get(0), null),
+				PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
+				PMMLUtil.createConstant(categoriesOut.get(0), null),
 				PMMLUtil.createConstant(0d)
 			);
 
-			categories = categories.subList(0, 1);
-
 			expression = apply;
+
+			categories = categoriesOut.subList(0, 1);
 		} // End if
 
 		if(!specialCodes.isEmpty()){
 			// XXX
 			Double categorySpecial = 0d;
 
-			Apply valueApply = PMMLUtil.createApply((specialCodes.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), continuousFeature.ref());
+			Apply valueApply = PMMLUtil.createApply((specialCodes.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), feature.ref());
 
 			for(Number specialCode : specialCodes){
 				valueApply.addExpressions(PMMLUtil.createConstant(specialCode));
@@ -141,20 +145,96 @@ public class OptimalBinning extends Transformer {
 				expression
 			);
 
+			expression = ifApply;
+
 			categories = new ArrayList<>(categories);
 			categories.add(categorySpecial);
-
-			expression = ifApply;
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", continuousFeature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", feature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
 
 		feature = new CategoricalFeature(encoder, derivedField, categories);
 
 		return Collections.singletonList(feature);
 	}
 
-	public List<Double> getCategories(){
+	private Discretize encodeNumericalBinning(Feature feature, List<Number> splits, List<Double> categoriesOut){
+		ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+		Discretize discretize = new Discretize(continuousFeature.getName())
+			.setMapMissingTo(0d);
+
+		for(int i = 0; i <= splits.size(); i++){
+			Number leftMargin = null;
+			Number rightMargin = null;
+
+			if(i == 0){
+				rightMargin = splits.get(i);
+			} else
+
+			if(i == splits.size()){
+				leftMargin = splits.get(i - 1);
+			} else
+
+			{
+				leftMargin = splits.get(i - 1);
+				rightMargin = splits.get(i);
+			}
+
+			Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
+				.setLeftMargin(leftMargin)
+				.setRightMargin(rightMargin);
+
+			DiscretizeBin discretizeBin = new DiscretizeBin(categoriesOut.get(i), interval);
+
+			discretize.addDiscretizeBins(discretizeBin);
+		}
+
+		return discretize;
+	}
+
+	private MapValues encodeCategoricalBinning(Feature feature, List<Number> splits, List<?> categoriesIn, List<Double> categoriesOut){
+		List<Object> inputValues = new ArrayList<>();
+		List<Double> outputValues = new ArrayList<>();
+
+		int begin = 0;
+
+		for(int i = 0; i <= splits.size(); i++){
+			Double splitCategoryOut = categoriesOut.get(i);
+
+			int end;
+
+			if(i < splits.size()){
+				Number split = splits.get(i);
+
+				end = (int)Math.ceil(split.doubleValue());
+			} else
+
+			{
+				end = categoriesIn.size();
+			}
+
+			List<?> splitCategoriesIn = categoriesIn.subList(begin, end);
+
+			for(Object splitCategoryIn : splitCategoriesIn){
+				inputValues.add(splitCategoryIn);
+				outputValues.add(splitCategoryOut);
+			}
+
+			begin = end;
+		}
+
+		MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), inputValues, outputValues)
+			.setMapMissingTo(0.0d);
+
+		return mapValues;
+	}
+
+	public List<?> getCategoriesIn(){
+		return getArray("_categories");
+	}
+
+	public List<Double> getCategoriesOut(){
 		String metric = getMetric();
 		List<Integer> numberOfEvents = getNumberOfEvents();
 		List<Integer> numberOfNonEvents = getNumberOfNonEvents();

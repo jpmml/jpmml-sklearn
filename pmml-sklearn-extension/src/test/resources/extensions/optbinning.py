@@ -24,8 +24,7 @@ def build_audit(audit_df, classifier, name):
 	audit_X, audit_y = split_csv(audit_df)
 
 	cont_cols = ["Age", "Hours", "Income"]
-	#cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
-	cat_cols = []
+	cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
 
 	audit_X = audit_X[cont_cols + cat_cols]
 
@@ -101,8 +100,7 @@ def build_auto(auto_df, regressor, name):
 	auto_X, auto_y = split_csv(auto_df)
 
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
-	#cat_cols = ["cylinders", "model_year", "origin"]
-	cat_cols = []
+	cat_cols = ["cylinders", "model_year", "origin"]
 
 	auto_X = auto_X[cont_cols + cat_cols]
 

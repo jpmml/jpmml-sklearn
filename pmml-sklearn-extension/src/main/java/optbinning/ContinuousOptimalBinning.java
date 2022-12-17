@@ -30,7 +30,7 @@ public class ContinuousOptimalBinning extends OptimalBinning {
 	}
 
 	@Override
-	public List<Double> getCategories(){
+	public List<Double> getCategoriesOut(){
 		String metric = getMetric();
 		List<Integer> numberOfRecords = getNumberOfRecords();
 		List<Number> sums = getSums();

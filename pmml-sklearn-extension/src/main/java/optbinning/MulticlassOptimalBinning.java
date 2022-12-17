@@ -31,7 +31,7 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 	}
 
 	@Override
-	public List<Double> getCategories(){
+	public List<Double> getCategoriesOut(){
 		String metric = getMetric();
 		Integer numberOfClasses = getNumberOfClasses();
 		List<Integer> numberOfEvents = getNumberOfEvents();
