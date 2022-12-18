@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.CompoundPredicate;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -35,10 +36,12 @@ import org.dmg.pmml.Interval;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
-import org.jpmml.converter.CategoricalFeature;
+import org.dmg.pmml.Predicate;
+import org.dmg.pmml.SimplePredicate;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -79,13 +82,17 @@ public class OptimalBinning extends Transformer {
 
 		Expression expression;
 
+		PredicateManager predicateManager = new PredicateManager();
+
+		List<Predicate> predicates = new ArrayList<>();
+
 		if(!splits.isEmpty()){
 			OptimalBinningUtil.checkIncreasingOrder(splits);
 
 			switch(dtype){
 				case "numerical":
 					{
-						expression = encodeNumericalBinning(feature, splits, categoriesOut);
+						expression = encodeNumericalBinning(feature, splits, categoriesOut, predicateManager, predicates);
 					}
 					break;
 				case "categorical":
@@ -105,7 +112,7 @@ public class OptimalBinning extends Transformer {
 							feature = wildcardFeature.toCategoricalFeature(categoriesIn);
 						}
 
-						expression = encodeCategoricalBinning(feature, splits, categoriesIn, categoriesOut);
+						expression = encodeCategoricalBinning(feature, splits, categoriesIn, categoriesOut, predicateManager, predicates);
 					}
 					break;
 				default:
@@ -149,22 +156,34 @@ public class OptimalBinning extends Transformer {
 
 			expression = ifApply;
 
+			Predicate specialPredicate = predicateManager.createPredicate(feature, specialCodes);
+
+			predicates.add(specialPredicate);
+
 			categories = OptimalBinningUtil.ensureCategory(categories, OptimalBinning.CATEGORY_SPECIAL);
+		} else
+
+		{
+			predicates.add(null);
 		}
 
 		// Missing
 		{
+			Predicate missingPredicate = predicateManager.createSimplePredicate(feature, SimplePredicate.Operator.IS_MISSING, null);
+
+			predicates.add(missingPredicate);
+
 			categories = OptimalBinningUtil.ensureCategory(categories, OptimalBinning.CATEGORY_MISSING);
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", feature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
 
-		feature = new CategoricalFeature(encoder, derivedField, categories);
+		feature = new BinnedFeature(encoder, derivedField, categories, predicates);
 
 		return Collections.singletonList(feature);
 	}
 
-	private Discretize encodeNumericalBinning(Feature feature, List<Number> splits, List<Double> categoriesOut){
+	private Discretize encodeNumericalBinning(Feature feature, List<Number> splits, List<Double> categoriesOut, PredicateManager predicateManager, List<Predicate> predicates){
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 		Discretize discretize = new Discretize(continuousFeature.getName())
@@ -194,12 +213,35 @@ public class OptimalBinning extends Transformer {
 			DiscretizeBin discretizeBin = new DiscretizeBin(categoriesOut.get(i), interval);
 
 			discretize.addDiscretizeBins(discretizeBin);
+
+			Predicate leftPredicate = null;
+			Predicate rightPredicate = null;
+
+			if(leftMargin != null){
+				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_OR_EQUAL, leftMargin);
+			} // End if
+
+			if(rightMargin != null){
+				rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_THAN, rightMargin);
+			}
+
+			Predicate predicate;
+
+			if(leftPredicate != null && rightPredicate != null){
+				predicate = predicateManager.createCompoundPredicate(CompoundPredicate.BooleanOperator.AND, leftPredicate, rightPredicate);
+			} else
+
+			{
+				predicate = (leftPredicate != null ? leftPredicate : rightPredicate);
+			}
+
+			predicates.add(predicate);
 		}
 
 		return discretize;
 	}
 
-	private MapValues encodeCategoricalBinning(Feature feature, List<Number> splits, List<?> categoriesIn, List<Double> categoriesOut){
+	private MapValues encodeCategoricalBinning(Feature feature, List<Number> splits, List<?> categoriesIn, List<Double> categoriesOut, PredicateManager predicateManager, List<Predicate> predicates){
 		List<Object> inputValues = new ArrayList<>();
 		List<Double> outputValues = new ArrayList<>();
 
@@ -228,6 +270,10 @@ public class OptimalBinning extends Transformer {
 			}
 
 			begin = end;
+
+			Predicate predicate = predicateManager.createPredicate(feature, splitCategoriesIn);
+
+			predicates.add(predicate);
 		}
 
 		MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), inputValues, outputValues)
