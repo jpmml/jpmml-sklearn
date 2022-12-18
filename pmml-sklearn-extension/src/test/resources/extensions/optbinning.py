@@ -176,7 +176,7 @@ if "Auto" in datasets:
 
 	build_auto(auto_df, DecisionTreeRegressor(random_state = 13), "BinningProcessAuto")
 	build_auto_scorecard(auto_df, "ScorecardAuto")
-	build_auto_scorecard(auto_df, "ScaledScorecardAuto", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100})
+	build_auto_scorecard(auto_df, "ScaledScorecardAuto", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100}, intercept_based = True, reverse_scorecard = True)
 
 	auto_df = load_auto("AutoNA")
 
