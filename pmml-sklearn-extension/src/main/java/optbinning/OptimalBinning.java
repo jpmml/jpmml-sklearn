@@ -21,6 +21,7 @@ package optbinning;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataField;
@@ -67,13 +68,16 @@ public class OptimalBinning extends Transformer {
 
 		List<Double> categoriesOut = getCategoriesOut();
 
+		ClassDictUtil.checkSize(splits.size() + 3, categoriesOut);
+
+		// Drop the last two elements, which correspond to "special" and "missing" categories
+		categoriesOut = categoriesOut.subList(0, categoriesOut.size() - 2);
+
 		SchemaUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
 
 		Expression expression;
-
-		List<Double> categories;
 
 		if(!splits.isEmpty()){
 			OptimalBinningUtil.checkIncreasingOrder(splits);
@@ -107,26 +111,24 @@ public class OptimalBinning extends Transformer {
 				default:
 					throw new IllegalArgumentException(dtype);
 			}
-
-			categories = categoriesOut.subList(0, splits.size() + 2);
 		} else
 
 		{
 			Expression apply = PMMLUtil.createApply(PMMLFunctions.IF,
 				PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
 				PMMLUtil.createConstant(categoriesOut.get(0), null),
-				PMMLUtil.createConstant(0d)
+				PMMLUtil.createConstant(OptimalBinning.CATEGORY_MISSING)
 			);
 
 			expression = apply;
+		}
 
-			categories = categoriesOut.subList(0, 1);
-		} // End if
+		List<Double> categories = categoriesOut.stream()
+			.distinct()
+			.collect(Collectors.toList());
 
+		// Special
 		if(!specialCodes.isEmpty()){
-			// XXX
-			Double categorySpecial = 0d;
-
 			Apply valueApply = PMMLUtil.createApply((specialCodes.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), feature.ref());
 
 			for(Number specialCode : specialCodes){
@@ -141,14 +143,18 @@ public class OptimalBinning extends Transformer {
 
 			Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF,
 				valueApply,
-				PMMLUtil.createConstant(categorySpecial),
+				PMMLUtil.createConstant(OptimalBinning.CATEGORY_SPECIAL),
 				expression
 			);
 
 			expression = ifApply;
 
-			categories = new ArrayList<>(categories);
-			categories.add(categorySpecial);
+			categories = OptimalBinningUtil.ensureCategory(categories, OptimalBinning.CATEGORY_SPECIAL);
+		}
+
+		// Missing
+		{
+			categories = OptimalBinningUtil.ensureCategory(categories, OptimalBinning.CATEGORY_MISSING);
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", feature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
@@ -162,7 +168,7 @@ public class OptimalBinning extends Transformer {
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 		Discretize discretize = new Discretize(continuousFeature.getName())
-			.setMapMissingTo(0d);
+			.setMapMissingTo(OptimalBinning.CATEGORY_MISSING);
 
 		for(int i = 0; i <= splits.size(); i++){
 			Number leftMargin = null;
@@ -225,7 +231,7 @@ public class OptimalBinning extends Transformer {
 		}
 
 		MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), inputValues, outputValues)
-			.setMapMissingTo(0.0d);
+			.setMapMissingTo(OptimalBinning.CATEGORY_MISSING);
 
 		return mapValues;
 	}
@@ -321,4 +327,7 @@ public class OptimalBinning extends Transformer {
 	public List<Number> getSplitsOptimal(){
 		return getNumberArray("_splits_optimal");
 	}
+
+	public static final Double CATEGORY_MISSING = 0d;
+	public static final Double CATEGORY_SPECIAL = 0d;
 }

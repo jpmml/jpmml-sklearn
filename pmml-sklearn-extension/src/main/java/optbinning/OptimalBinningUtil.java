@@ -18,6 +18,7 @@
  */
 package optbinning;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +26,17 @@ import java.util.List;
 public class OptimalBinningUtil {
 
 	private OptimalBinningUtil(){
+	}
+
+	static
+	public <E> List<E> ensureCategory(List<E> categories, E category){
+
+		if(!categories.contains(category)){
+			categories = new ArrayList<>(categories);
+			categories.add(category);
+		}
+
+		return categories;
 	}
 
 	static
