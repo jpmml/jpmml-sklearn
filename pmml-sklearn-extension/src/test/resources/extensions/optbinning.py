@@ -15,7 +15,13 @@ sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 
 from common import *
 
-datasets = ["Audit", "Auto", "Iris"]
+datasets = []
+
+if __name__ == "__main__":
+	if len(sys.argv) > 1:
+		datasets = (sys.argv[1]).split(",")
+	else:
+		datasets = ["Audit", "Auto", "Iris"]
 
 def make_binning_process(cont_cols, cat_cols):
 	return BinningProcess(variable_names = (cont_cols + cat_cols), categorical_variables = cat_cols)
@@ -157,15 +163,23 @@ def build_auto_scorecard(auto_df, name, **scorecard_params):
 	])
 	pipeline.fit(auto_X, auto_y)
 	store_pkl(pipeline, name)
-	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
-	store_csv(mpg, name)
+
+	if scorecard.scaling_method is not None:
+		mpg = DataFrame(scorecard.score(auto_X), columns = ["mpg"])
+		store_csv(mpg, name)
+	else:
+		mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
+		store_csv(mpg, name)
 
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_auto(auto_df, DecisionTreeRegressor(random_state = 13), "BinningProcessAuto")
 	build_auto_scorecard(auto_df, "ScorecardAuto")
+	build_auto_scorecard(auto_df, "ScaledScorecardAuto", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100})
 
 	auto_df = load_auto("AutoNA")
 
 	build_auto(auto_df, LinearRegression(), "BinningProcessAutoNA")
+	build_auto_scorecard(auto_df, "ScorecardAutoNA")
+	build_auto_scorecard(auto_df, "ScaledScorecardAutoNA", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100})

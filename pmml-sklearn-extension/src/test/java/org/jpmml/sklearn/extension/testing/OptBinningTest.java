@@ -66,6 +66,21 @@ public class OptBinningTest extends SkLearnEncoderBatchTest implements Datasets,
 	}
 
 	@Test
+	public void evaluateScorecardAutoNA() throws Exception {
+		evaluate("Scorecard", AUTO_NA);
+	}
+
+	@Test
+	public void evaluateScaledScorecardAuto() throws Exception {
+		evaluate("ScaledScorecard", AUTO);
+	}
+
+	@Test
+	public void evaluateScaledScorecardAutoNA() throws Exception {
+		evaluate("ScaledScorecard", AUTO_NA);
+	}
+
+	@Test
 	public void evaluateBinningProcessIris() throws Exception {
 		evaluate("BinningProcess", IRIS);
 	}
