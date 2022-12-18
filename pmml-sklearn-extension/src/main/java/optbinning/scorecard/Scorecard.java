@@ -19,9 +19,13 @@
 package optbinning.scorecard;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import numpy.DType;
+import numpy.core.TypeDescriptor;
 import optbinning.BinnedFeature;
 import optbinning.BinningProcess;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
@@ -105,17 +109,25 @@ public class Scorecard extends Estimator implements HasClasses {
 			throw new IllegalArgumentException();
 		}
 
-		List<HasArray> blockValues = data.getBlockValues();
+		Index rowAxis = axesArray.get(1);
+		List<?> rowValues = rowAxis.getArrayContent();
 
-		// XXX
-		HasArray pointsBlockValue = blockValues.get(blockValues.size() - 1);
+		Index columnAxis = axesArray.get(0);
+		List<?> columnValues = columnAxis.getArrayContent();
+
+		List<HasArray> blockValues = data.getBlockValues();
 
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		Characteristics characteristics = new Characteristics();
 
-		List<?> pointValues = pointsBlockValue.getArrayContent();
+		HasArray pointBlockValues = getPoints(blockValues);
+
+		List<?> pointValues = pointBlockValues.getArrayContent();
+		if(pointValues.size() > rowValues.size()){
+			pointValues = pointValues.subList(pointValues.size() - rowValues.size(), pointValues.size());
+		}
 
 		int index = 0;
 
@@ -170,5 +182,38 @@ public class Scorecard extends Estimator implements HasClasses {
 
 	public String getScalingMethod(){
 		return getOptionalString("scaling_method");
+	}
+
+	static
+	private HasArray getPoints(List<HasArray> blockValues){
+		blockValues = blockValues.stream()
+			.filter(blockValue -> {
+				Object descr = blockValue.getArrayType();
+
+				DataType dataType;
+
+				if(descr instanceof String){
+					String string = (String)descr;
+
+					TypeDescriptor typeDescriptor = new TypeDescriptor(string);
+
+					dataType = typeDescriptor.getDataType();
+				} else
+
+				if(descr instanceof DType){
+					DType dtype = (DType)descr;
+
+					dataType = dtype.getDataType();
+				} else
+
+				{
+					throw new IllegalArgumentException();
+				}
+
+				return (dataType == DataType.DOUBLE);
+			})
+			.collect(Collectors.toList());
+
+		return blockValues.get(blockValues.size() - 1);
 	}
 }
