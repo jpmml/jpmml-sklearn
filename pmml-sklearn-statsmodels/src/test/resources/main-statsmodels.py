@@ -2,8 +2,8 @@ from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import OneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.statsmodels import StatsModelsRegressor
-from statsmodels.api import OLS, Poisson, WLS
+from sklearn2pmml.statsmodels import StatsModelsClassifier, StatsModelsRegressor
+from statsmodels.api import Logit, MNLogit, OLS, Poisson, WLS
 
 import sys
 
@@ -12,10 +12,60 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 from common import *
 
 def make_mapper(cont_cols, cat_cols):
-	return DataFrameMapper([
-		(cont_cols, None),
-		(cat_cols, OneHotEncoder())
+	features = []
+
+	if len(cont_cols) > 0:
+		features.append((cont_cols, None))
+	if len(cat_cols) > 0:
+		features.append((cat_cols, OneHotEncoder()))
+
+	return DataFrameMapper(features)
+
+def build_audit(audit_df, classifier, name):
+	audit_X, audit_y = split_csv(audit_df)
+
+	cont_cols = ["Age", "Hours", "Income"]
+	cat_cols = ["Deductions", "Education", "Employment", "Gender", "Marital", "Occupation"]
+
+	mapper = make_mapper(cont_cols, cat_cols)
+
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
 	])
+	pipeline.fit(audit_X, audit_y)
+	store_pkl(pipeline, name)
+	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
+audit_df = load_csv("Audit")
+
+build_audit(audit_df, StatsModelsClassifier(Logit), "LogitAudit")
+
+def build_iris(iris_df, classifier, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	cont_cols = ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"]
+	cat_cols = []
+
+	mapper = make_mapper(cont_cols, cat_cols)
+
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(iris_X, iris_y, classifier__method = "bfgs")
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
+iris_df = load_iris("Iris")
+
+build_iris(iris_df, StatsModelsClassifier(MNLogit), "MNLogitIris")
 
 def build_auto(auto_df, regressor, name):
 	auto_X, auto_y = split_csv(auto_df)

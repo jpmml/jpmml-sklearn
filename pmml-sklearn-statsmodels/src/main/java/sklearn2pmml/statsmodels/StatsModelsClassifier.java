@@ -20,13 +20,13 @@ package sklearn2pmml.statsmodels;
 
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import sklearn.Classifier;
 import statsmodels.regression.RegressionResults;
 import statsmodels.regression.RegressionResultsWrapper;
 
-public class StatsModelsRegressor extends Regressor {
+public class StatsModelsClassifier extends Classifier {
 
-	public StatsModelsRegressor(String module, String name){
+	public StatsModelsClassifier(String module, String name){
 		super(module, name);
 	}
 

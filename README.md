@@ -330,6 +330,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * Feature selection:
     * `sklearn2pmml.feature_selection.SelectUnique`
   * Linear models:
+    * `sklearn2pmml.statsmodels.StatsModelsClassifier`
     * `sklearn2pmml.statsmodels.StatsModelsRegressor`
   * Neural networks:
     * `sklearn2pmml.neural_network.MLPTransformer`
@@ -400,6 +401,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
   Examples: [main-statsmodels.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-statsmodels/src/test/resources/main-statsmodels.py)
 
+  * [`statsmodels.api.Logit`](https://www.statsmodels.org/dev/generated/statsmodels.discrete.discrete_model.Logit.html)
+  * [`statsmodels.api.MNLogit`](https://www.statsmodels.org/dev/generated/statsmodels.discrete.discrete_model.MNLogit.html)
   * [`statsmodels.api.OLS`](https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLS.html)
   * [`statsmodels.api.Poisson`](https://www.statsmodels.org/dev/generated/statsmodels.discrete.discrete_model.Poisson.html)
   * [`statsmodels.api.WLS`](https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.WLS.html)

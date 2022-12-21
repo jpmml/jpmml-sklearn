@@ -25,6 +25,11 @@ import org.junit.Test;
 public class SkLearnStatsModelsTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
+	public void evaluateLogitAudit() throws Exception {
+		evaluate("Logit", AUDIT);
+	}
+
+	@Test
 	public void evaluateOLSAuto() throws Exception {
 		evaluate("OLS", AUTO);
 	}
@@ -32,6 +37,11 @@ public class SkLearnStatsModelsTest extends SkLearnEncoderBatchTest implements D
 	@Test
 	public void evaluateWLSAuto() throws Exception {
 		evaluate("WLS", AUTO);
+	}
+
+	@Test
+	public void evaluateMNLogitIris() throws Exception {
+		evaluate("MNLogit", IRIS);
 	}
 
 	@Test
