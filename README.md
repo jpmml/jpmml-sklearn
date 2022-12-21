@@ -394,6 +394,12 @@ Java library and command-line application for converting [Scikit-Learn](https://
 </details>
 
 <details>
+  <summary>StatsModels</summary>
+
+  Examples: [main-statsmodels.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-statsmodels/src/test/resources/main-statsmodels.py)
+</details>
+
+<details>
   <summary>TPOT</summary>
 
   Examples: [extensions/tpot.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/tpot.py)
