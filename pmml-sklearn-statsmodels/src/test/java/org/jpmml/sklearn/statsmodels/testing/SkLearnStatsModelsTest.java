@@ -18,7 +18,24 @@
  */
 package org.jpmml.sklearn.statsmodels.testing;
 
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
+import org.junit.Test;
 
-public class SkLearnStatsModelsTest extends SkLearnEncoderBatchTest {
+public class SkLearnStatsModelsTest extends SkLearnEncoderBatchTest implements Datasets {
+
+	@Test
+	public void evaluateOLSAuto() throws Exception {
+		evaluate("OLS", AUTO);
+	}
+
+	@Test
+	public void evaluateWLSAuto() throws Exception {
+		evaluate("WLS", AUTO);
+	}
+
+	@Test
+	public void evaluatePoissonVisit() throws Exception {
+		evaluate("Poisson", VISIT);
+	}
 }
