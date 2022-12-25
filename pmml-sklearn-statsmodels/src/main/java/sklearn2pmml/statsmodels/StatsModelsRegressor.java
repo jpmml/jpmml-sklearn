@@ -21,7 +21,6 @@ package sklearn2pmml.statsmodels;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
-import statsmodels.regression.RegressionResults;
 import statsmodels.regression.RegressionResultsWrapper;
 
 public class StatsModelsRegressor extends Regressor {
@@ -33,7 +32,7 @@ public class StatsModelsRegressor extends Regressor {
 	@Override
 	public Model encodeModel(Schema schema){
 		Boolean fitIntercept = getFitIntercept();
-		RegressionResults results = getResults();
+		RegressionResultsWrapper results = getResults();
 
 		if(fitIntercept){
 			schema = StatsModelsUtil.addConstant(schema);
@@ -46,10 +45,8 @@ public class StatsModelsRegressor extends Regressor {
 		return getBoolean("fit_intercept");
 	}
 
-	public RegressionResults getResults(){
-		RegressionResultsWrapper resultsWrapper = get("results_", RegressionResultsWrapper.class);
-
-		return resultsWrapper.getResults();
+	public RegressionResultsWrapper getResults(){
+		return get("results_", RegressionResultsWrapper.class);
 	}
 
 	static {
