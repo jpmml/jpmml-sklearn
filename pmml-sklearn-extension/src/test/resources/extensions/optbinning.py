@@ -85,9 +85,13 @@ def build_audit_scorecard(audit_df, name, **scorecard_params):
 	])
 	pipeline.fit(audit_X, audit_y)
 	store_pkl(pipeline, name)
-	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
-	adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
-	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+
+	if scorecard.scaling_method is not None:
+		adjusted = DataFrame(scorecard.score(audit_X), columns = ["Adjusted"])
+	else:
+		adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
+		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
+		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
@@ -96,6 +100,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, DecisionTreeClassifier(random_state = 13), "BinningProcessAudit")
 	build_audit_ob(audit_df, DecisionTreeClassifier(random_state = 13), "OptimalBinningAudit")
 	build_audit_scorecard(audit_df, "ScorecardAudit")
+	build_audit_scorecard(audit_df, "ScaledScorecardAudit", scaling_method = "pdo_odds", scaling_method_params = {"pdo" : 20, "odds" : 50, "scorecard_points" : 600})
 
 	audit_df = load_audit("AuditNA")
 
@@ -166,10 +171,9 @@ def build_auto_scorecard(auto_df, name, **scorecard_params):
 
 	if scorecard.scaling_method is not None:
 		mpg = DataFrame(scorecard.score(auto_X), columns = ["mpg"])
-		store_csv(mpg, name)
 	else:
 		mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
-		store_csv(mpg, name)
+	store_csv(mpg, name)
 
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")

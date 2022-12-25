@@ -43,7 +43,6 @@ import pandas.core.DataFrame;
 import pandas.core.Index;
 import sklearn.Estimator;
 import sklearn.HasClasses;
-import sklearn.Regressor;
 
 public class Scorecard extends Estimator implements HasClasses {
 
@@ -54,6 +53,11 @@ public class Scorecard extends Estimator implements HasClasses {
 	@Override
 	public MiningFunction getMiningFunction(){
 		Estimator estimator = getEstimator();
+		String scalingMethod = getScalingMethod();
+
+		if(scalingMethod != null){
+			return MiningFunction.REGRESSION;
+		}
 
 		return estimator.getMiningFunction();
 	}
@@ -87,11 +91,6 @@ public class Scorecard extends Estimator implements HasClasses {
 		schema = new Schema(encoder, label, features);
 
 		if(scalingMethod != null){
-
-			if(!(estimator instanceof Regressor)){
-				throw new IllegalArgumentException();
-			}
-
 			return encodeScorecard(schema);
 		}
 

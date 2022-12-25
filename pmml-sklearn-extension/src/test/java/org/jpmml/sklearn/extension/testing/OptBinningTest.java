@@ -51,6 +51,11 @@ public class OptBinningTest extends SkLearnEncoderBatchTest implements Datasets,
 	}
 
 	@Test
+	public void evaluateScaledScorecardAudit() throws Exception {
+		evaluate("ScaledScorecard", AUDIT);
+	}
+
+	@Test
 	public void evaluateBinningProcessAuto() throws Exception {
 		evaluate("BinningProcess", AUTO);
 	}
