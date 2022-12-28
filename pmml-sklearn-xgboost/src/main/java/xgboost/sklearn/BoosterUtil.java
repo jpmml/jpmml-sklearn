@@ -25,6 +25,7 @@ import java.util.Map;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.ByteOrderUtil;
+import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.ObjFunction;
@@ -57,13 +58,15 @@ public class BoosterUtil {
 
 		Learner learner = getLearner(estimator);
 
+		GBTree gbtree = learner.gbtree();
+
 		if(bestNTreeLimit == null){
 			bestNTreeLimit = (Integer)estimator.getOptionalScalar("best_ntree_limit");
 		}
 
 		Number missing = (Number)estimator.getOptionalScalar("missing");
 
-		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
+		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());
 		Boolean numeric = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
 		Boolean prune = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
 		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
