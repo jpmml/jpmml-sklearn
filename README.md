@@ -38,7 +38,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 * Extensibility:
   * Rich Java APIs for developing custom converters.
   * Automatic discovery and registration of custom converters based on `META-INF/sklearn2pmml.properties` resource files.
-  * Direct interfacing with other JPMML conversion libraries such as [JPMML-H2O](https://github.com/jpmml/jpmml-h2o), [JPMML-LightGBM](https://github.com/jpmml/jpmml-lightgbm) and [JPMML-XGBoost](https://github.com/jpmml/jpmml-xgboost).
+  * Direct interfacing with other JPMML conversion libraries such as [JPMML-H2O](https://github.com/jpmml/jpmml-h2o), [JPMML-LightGBM](https://github.com/jpmml/jpmml-lightgbm), [JPMML-StatsModels](https://github.com/jpmml/jpmml-statsmodels) and [JPMML-XGBoost](https://github.com/jpmml/jpmml-xgboost).
 * Production quality:
   * Complete test coverage.
   * Fully compliant with the [JPMML-Evaluator](https://github.com/jpmml/jpmml-evaluator) library.
