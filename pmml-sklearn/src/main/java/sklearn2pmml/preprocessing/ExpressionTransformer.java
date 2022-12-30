@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
@@ -69,26 +68,7 @@ public class ExpressionTransformer extends Transformer {
 			mapMissingTo = null;
 		}
 
-		Scope scope = new DataFrameScope("X", features, encoder){
-
-			@Override
-			public Feature resolveFeature(String name){
-
-				// XXX
-				try {
-					return super.resolveFeature(name);
-				} catch(IllegalArgumentException iae){
-					DataField dataField = encoder.getDataField(name);
-					DerivedField derivedField = encoder.getDerivedField(name);
-
-					if((dataField == null) && (derivedField == null)){
-						return null;
-					}
-
-					throw iae;
-				}
-			}
-		};
+		Scope scope = new DataFrameScope("X", features, encoder);
 
 		ExpressionTranslator expressionTranslator = new ExpressionTranslator(scope);
 

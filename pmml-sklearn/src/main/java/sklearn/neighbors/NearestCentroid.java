@@ -25,6 +25,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.SliceUtil;
 import sklearn.Classifier;
 
 public class NearestCentroid extends Classifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
@@ -116,7 +117,7 @@ public class NearestCentroid extends Classifier implements HasMetric, HasNumberO
 	public List<? extends Number> getY(){
 		List<?> classes = getClasses();
 
-		return KNeighborsUtil.createRange(0, classes.size());
+		return SliceUtil.indices(0, classes.size());
 	}
 
 	@Override

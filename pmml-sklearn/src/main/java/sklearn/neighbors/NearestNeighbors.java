@@ -24,6 +24,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.SliceUtil;
 import sklearn.Clusterer;
 
 public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
@@ -91,7 +92,7 @@ public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberO
 		if(!containsKey("_id")){
 			int[] shape = getFitXShape();
 
-			return KNeighborsUtil.createRange(0, shape[0]);
+			return SliceUtil.indices(0, shape[0]);
 		}
 
 		return getArray("_id");

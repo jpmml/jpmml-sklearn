@@ -21,8 +21,7 @@ package optbinning.scorecard;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import numpy.DType;
-import numpy.core.TypeDescriptor;
+import numpy.DTypeUtil;
 import optbinning.BinnedFeature;
 import optbinning.BinningProcess;
 import org.dmg.pmml.DataType;
@@ -189,25 +188,7 @@ public class Scorecard extends Estimator implements HasClasses {
 			.filter(blockValue -> {
 				Object descr = blockValue.getArrayType();
 
-				DataType dataType;
-
-				if(descr instanceof String){
-					String string = (String)descr;
-
-					TypeDescriptor typeDescriptor = new TypeDescriptor(string);
-
-					dataType = typeDescriptor.getDataType();
-				} else
-
-				if(descr instanceof DType){
-					DType dtype = (DType)descr;
-
-					dataType = dtype.getDataType();
-				} else
-
-				{
-					throw new IllegalArgumentException();
-				}
+				DataType dataType = DTypeUtil.getDataType(descr);
 
 				return (dataType == DataType.DOUBLE);
 			})

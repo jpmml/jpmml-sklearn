@@ -18,7 +18,6 @@
  */
 package sklearn.neighbors;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,17 +58,6 @@ import sklearn.Estimator;
 public class KNeighborsUtil {
 
 	private KNeighborsUtil(){
-	}
-
-	static
-	public List<Integer> createRange(int start, int stop){
-		List<Integer> result = new ArrayList<>();
-
-		for(int i = start; i < stop; i++){
-			result.add(i);
-		}
-
-		return result;
 	}
 
 	static
