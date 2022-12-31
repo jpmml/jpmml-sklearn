@@ -26,7 +26,7 @@ from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretiz
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import EstimatorProxy, SelectorProxy
-from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, ContinuousDomainEraser, DiscreteDomainEraser, MultiDomain
+from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, ContinuousDomainEraser, DiscreteDomainEraser, MultiAlias, MultiDomain
 from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, SelectFirstClassifier
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
@@ -82,14 +82,10 @@ def build_wheat(wheat_df, clusterer, name, with_affinity = False, with_kneighbor
 	wheat_X, wheat_y = split_csv(wheat_df)
 
 	mapper = DataFrameMapper([
-		(wheat_X.columns.values, [ContinuousDomain(dtype = float), PowerTransformer(method = "box-cox")])
+		(wheat_X.columns.values, [ContinuousDomain(dtype = float), PowerTransformer(method = "box-cox", standardize = True)])
 	])
-	scaler = ColumnTransformer([
-		("robust", RobustScaler(), [0, 5])
-	], remainder = MinMaxScaler())
 	pipeline = Pipeline([
 		("mapper", mapper),
-		("scaler", scaler),
 		("clusterer", clusterer)
 	])
 	pipeline.fit(wheat_X)
@@ -341,10 +337,14 @@ if "Audit" in datasets:
 def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_options):
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
 
+	scaler = ColumnTransformer([
+		("robust", RobustScaler(), [0, 2])
+	], remainder = MinMaxScaler())
+
 	transformer = ColumnTransformer([
 		("continuous_columns", Pipeline([
 			("domain", ContinuousDomain()),
-			("scaler", RobustScaler())
+			("scaler", MultiAlias(scaler, names = ["scaler(" + col + ")" for col in versicolor_X.columns.values]))
 		]), versicolor_X.columns.values)
 	])
 	pipeline = Pipeline([

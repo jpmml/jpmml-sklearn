@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2022 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,41 +18,32 @@
  */
 package sklearn2pmml.decoration;
 
-import java.util.List;
-
-import org.jpmml.converter.Feature;
-import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import sklearn.Transformer;
 
-public class Alias extends TransformerWrapper {
+abstract
+public class TransformerWrapper extends Transformer {
 
-	public Alias(String module, String name){
+	public TransformerWrapper(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public DataType getDataType(){
 		Transformer transformer = getTransformer();
-		String name = getName();
 
-		List<Feature> result = transformer.encodeFeatures(features, encoder);
-
-		ClassDictUtil.checkSize(1, result);
-
-		Feature feature = result.get(0);
-
-		encoder.renameFeature(feature, name);
-
-		return result;
+		return transformer.getDataType();
 	}
 
-	public String getName(){
-		return getString("name");
+	@Override
+	public OpType getOpType(){
+		Transformer transformer = getTransformer();
+
+		return transformer.getOpType();
 	}
 
-	static
-	public String formatAliasExample(){
-		return (Alias.class).getSimpleName() + "(transformer = ..., name = ...)";
+	public Transformer getTransformer(){
+		return get("transformer_", Transformer.class);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2022 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -25,34 +25,32 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
-public class Alias extends TransformerWrapper {
+public class MultiAlias extends TransformerWrapper {
 
-	public Alias(String module, String name){
+	public MultiAlias(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Transformer transformer = getTransformer();
-		String name = getName();
+		List<String> names = getNames();
 
 		List<Feature> result = transformer.encodeFeatures(features, encoder);
 
-		ClassDictUtil.checkSize(1, result);
+		ClassDictUtil.checkSize(names.size(), result);
 
-		Feature feature = result.get(0);
+		for(int i = 0; i < result.size(); i++){
+			Feature feature = result.get(i);
+			String name = names.get(i);
 
-		encoder.renameFeature(feature, name);
+			encoder.renameFeature(feature, name);
+		}
 
 		return result;
 	}
 
-	public String getName(){
-		return getString("name");
-	}
-
-	static
-	public String formatAliasExample(){
-		return (Alias.class).getSimpleName() + "(transformer = ..., name = ...)";
+	public List<String> getNames(){
+		return getList("names", String.class);
 	}
 }
