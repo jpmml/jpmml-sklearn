@@ -33,6 +33,7 @@ from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
 from sklearn2pmml.ruleset import RuleSetClassifier
+from sklearn2pmml.util import Slicer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
 
@@ -386,6 +387,7 @@ def build_versicolor_direct(versicolor_df, classifier, name, with_proba = True, 
 	], remainder = "drop")
 	pipeline = PMMLPipeline([
 		("transformer", transformer),
+		("passthrough-transformer", Slicer(start = None, stop = None)),
 		("svd", TruncatedSVD(n_components = 2)),
 		("classifier", classifier)
 	])

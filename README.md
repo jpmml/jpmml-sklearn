@@ -381,6 +381,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.WordCountTransformer`
     * `sklearn2pmml.preprocessing.h2o.H2OFrameConstructor`
     * `sklearn2pmml.util.Reshaper`
+    * `sklearn2pmml.util.Slicer`
   * Rule sets:
     * `sklearn2pmml.ruleset.RuleSetClassifier`
   * Decision trees:
