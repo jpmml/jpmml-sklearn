@@ -403,6 +403,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
   Examples: [main-statsmodels.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-statsmodels/src/test/resources/main-statsmodels.py)
 
+  * [`statsmodels.api.GLM`](https://www.statsmodels.org/stable/generated/statsmodels.genmod.generalized_linear_model.GLM.html)
   * [`statsmodels.api.Logit`](https://www.statsmodels.org/dev/generated/statsmodels.discrete.discrete_model.Logit.html)
   * [`statsmodels.api.MNLogit`](https://www.statsmodels.org/dev/generated/statsmodels.discrete.discrete_model.MNLogit.html)
   * [`statsmodels.api.OLS`](https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLS.html)

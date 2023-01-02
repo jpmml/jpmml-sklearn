@@ -3,7 +3,9 @@ from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import OneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.statsmodels import StatsModelsClassifier, StatsModelsRegressor
-from statsmodels.api import Logit, MNLogit, OLS, Poisson, WLS
+from statsmodels.api import GLM, Logit, MNLogit, OLS, Poisson, WLS
+
+import statsmodels.genmod.families as families
 
 import sys
 
@@ -43,6 +45,7 @@ def build_audit(audit_df, classifier, name):
 
 audit_df = load_csv("Audit")
 
+build_audit(audit_df, StatsModelsClassifier(GLM, family = families.Binomial()), "GLMAudit")
 build_audit(audit_df, StatsModelsClassifier(Logit), "LogitAudit")
 
 def build_iris(iris_df, classifier, name):
@@ -89,6 +92,7 @@ def build_auto(auto_df, regressor, name):
 
 auto_df = load_auto("Auto")
 
+build_auto(auto_df, StatsModelsRegressor(GLM, family = families.Gaussian()), "GLMAuto")
 build_auto(auto_df, StatsModelsRegressor(OLS), "OLSAuto")
 build_auto(auto_df, StatsModelsRegressor(WLS), "WLSAuto")
 
@@ -113,4 +117,5 @@ def build_visit(visit_df, regressor, name):
 
 visit_df = load_visit("Visit")
 
+build_visit(visit_df, StatsModelsRegressor(GLM, family = families.Poisson()), "GLMVisit")
 build_visit(visit_df, StatsModelsRegressor(Poisson), "PoissonVisit")
