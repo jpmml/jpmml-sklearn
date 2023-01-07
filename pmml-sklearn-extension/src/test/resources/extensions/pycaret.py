@@ -30,7 +30,10 @@ def make_classification(df, estimator, name):
 	exp = ClassificationExperiment()
 	exp.setup(data = df, target = y.name, session_id = 13)
 
-	model = exp.create_model(estimator)
+	if estimator == "dt" or estimator == "rf":
+		model = exp.create_model(estimator, min_samples_leaf = 10)
+	else:
+		model = exp.create_model(estimator)
 
 	final_model = exp.finalize_model(model)
 
@@ -64,7 +67,10 @@ def make_regression(df, estimator, name):
 	exp = RegressionExperiment()
 	exp.setup(data = df, target = y.name, session_id = 13)
 
-	model = exp.create_model(estimator)
+	if estimator == "dt" or estimator == "rf":
+		model = exp.create_model(estimator, min_samples_leaf = 10)
+	else:
+		model = exp.create_model(estimator)
 
 	final_model = exp.finalize_model(model)
 
@@ -78,7 +84,7 @@ def make_regression(df, estimator, name):
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
-	make_classification(audit_df, "dt", "PyCaretAudit")
+	make_classification(audit_df, "rf", "PyCaretAudit")
 
 	audit_df = load_audit("AuditNA")
 
@@ -87,7 +93,7 @@ if "Audit" in datasets:
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
-	make_classification(iris_df, "dt", "PyCaretIris")
+	make_classification(iris_df, "rf", "PyCaretIris")
 
 if "Wheat" in datasets:
 	wheat_df = load_wheat("Wheat")
@@ -102,7 +108,7 @@ if "Auto" in datasets:
 	auto_df["model_year"] = auto_df["model_year"].astype(str)
 	auto_df["origin"] = auto_df["origin"].astype(str)
 
-	make_regression(auto_df, "dt", "PyCaretAuto")
+	make_regression(auto_df, "rf", "PyCaretAuto")
 
 	auto_df = load_auto("AutoNA")
 
