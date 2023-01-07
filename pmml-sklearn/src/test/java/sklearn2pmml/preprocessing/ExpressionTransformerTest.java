@@ -114,7 +114,7 @@ public class ExpressionTransformerTest {
 			.setDefaultValue(defaultValue)
 			.setInvalidValueTreatment(invalidValueTreatment);
 
-		List<Feature> outputFeatures = expressionTransformer.encodeFeatures(Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = expressionTransformer.encode(Collections.singletonList(inputFeature), encoder);
 
 		Feature outputFeature = Iterables.getOnlyElement(outputFeatures);
 

@@ -90,7 +90,7 @@ public class BinningProcess extends Initializer {
 				}
 			}
 
-			feature = Iterables.getOnlyElement(optimalBinning.encodeFeatures(Collections.singletonList(feature), encoder));
+			feature = Iterables.getOnlyElement(optimalBinning.encode(Collections.singletonList(feature), encoder));
 
 			result.add(feature);
 		}

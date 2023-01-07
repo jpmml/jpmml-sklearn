@@ -18,12 +18,11 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.jpmml.converter.Feature;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
 public class Alias extends TransformerWrapper {
 
@@ -33,16 +32,11 @@ public class Alias extends TransformerWrapper {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Transformer transformer = getTransformer();
 		String name = getName();
 
-		List<Feature> result = transformer.encodeFeatures(features, encoder);
+		List<Feature> result = super.encodeFeatures(features, encoder);
 
-		ClassDictUtil.checkSize(1, result);
-
-		Feature feature = result.get(0);
-
-		encoder.renameFeature(feature, name);
+		encoder.renameFeatures(result, Collections.singletonList(name));
 
 		return result;
 	}

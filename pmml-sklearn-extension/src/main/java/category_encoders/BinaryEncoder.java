@@ -30,14 +30,14 @@ public class BinaryEncoder extends BaseNEncoder {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 		BaseNEncoder baseNEncoder = getBaseNEncoder();
 
 		if(baseNEncoder != this){
-			return baseNEncoder.encodeFeatures(features, encoder);
+			return baseNEncoder.encode(features, encoder);
 		}
 
-		return super.encodeFeatures(features, encoder);
+		return super.encode(features, encoder);
 	}
 
 	public BaseNEncoder getBaseNEncoder(){

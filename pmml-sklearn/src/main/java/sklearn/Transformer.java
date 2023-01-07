@@ -97,11 +97,13 @@ public class Transformer extends Step {
 				DataField dataField = encoder.getDataField(name);
 				if(dataField == null){
 					throw new IllegalArgumentException("Field " + name + " is undefined");
+				} // End if
+
+				if((dataField.requireOpType() != opType) || (dataField.requireDataType() != dataType)){
+					dataField = updateDataField(dataField, opType, dataType, encoder);
+
+					feature = new WildcardFeature(encoder, dataField);
 				}
-
-				dataField = updateDataField(dataField, opType, dataType, encoder);
-
-				feature = new WildcardFeature(encoder, dataField);
 			}
 
 			result.add(feature);

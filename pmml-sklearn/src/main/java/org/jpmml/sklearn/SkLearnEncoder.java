@@ -44,6 +44,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.model.ReflectionUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
 import sklearn.Classifier;
@@ -178,6 +179,17 @@ public class SkLearnEncoder extends PythonEncoder {
 		derivedField.setName(renamedName);
 
 		addDerivedField(derivedField);
+	}
+
+	public void renameFeatures(List<Feature> features, List<String> renamedNames){
+		ClassDictUtil.checkSize(renamedNames.size(), features);
+
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+			String renamedName = renamedNames.get(i);
+
+			renameFeature(feature, renamedName);
+		}
 	}
 
 	public boolean isFrozen(String name){

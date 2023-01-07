@@ -18,8 +18,12 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.List;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.Feature;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
 abstract
@@ -27,6 +31,13 @@ public class TransformerWrapper extends Transformer {
 
 	public TransformerWrapper(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		Transformer transformer = getTransformer();
+
+		return transformer.getNumberOfFeatures();
 	}
 
 	@Override
@@ -41,6 +52,13 @@ public class TransformerWrapper extends Transformer {
 		Transformer transformer = getTransformer();
 
 		return transformer.getOpType();
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Transformer transformer = getTransformer();
+
+		return transformer.encode(features, encoder);
 	}
 
 	public Transformer getTransformer(){

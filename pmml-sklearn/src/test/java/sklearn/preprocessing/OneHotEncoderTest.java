@@ -49,7 +49,7 @@ public class OneHotEncoderTest {
 		OneHotEncoder oneHotEncoder = new OneHotEncoder("sklearn.preprocessing.data", "OneHotEncoder");
 		oneHotEncoder.put("n_values_", 3);
 
-		List<Feature> outputFeatures = oneHotEncoder.encodeFeatures(Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = oneHotEncoder.encode(Collections.singletonList(inputFeature), encoder);
 		for(int i = 0; i < 3; i++){
 			BinaryFeature outputFeature = (BinaryFeature)outputFeatures.get(i);
 

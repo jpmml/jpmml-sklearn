@@ -53,7 +53,7 @@ public class LabelBinarizerTest {
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 
-		List<Feature> outputFeatures = binarizer.encodeFeatures(Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = binarizer.encode(Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof CategoricalFeature);
 		}
@@ -62,7 +62,7 @@ public class LabelBinarizerTest {
 
 		binarizer.put("neg_label", 0d);
 
-		outputFeatures = binarizer.encodeFeatures(Collections.singletonList(inputFeature), encoder);
+		outputFeatures = binarizer.encode(Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof BinaryFeature);
 		}

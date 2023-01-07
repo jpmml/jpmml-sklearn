@@ -56,7 +56,7 @@ public class BusinessDecisionTransformer extends Transformer {
 		} // End if
 
 		if(transformer != null){
-			features = transformer.encodeFeatures(features, encoder);
+			features = transformer.encode(features, encoder);
 		}
 
 		SchemaUtil.checkSize(1, features);
@@ -110,7 +110,9 @@ public class BusinessDecisionTransformer extends Transformer {
 
 		DerivedField decisionDerivedField = encoder.createDerivedField(model, outputField, true);
 
-		return Collections.singletonList(FeatureUtil.createFeature(decisionDerivedField, encoder));
+		feature = FeatureUtil.createFeature(decisionDerivedField, encoder);
+
+		return Collections.singletonList(feature);
 	}
 
 	public String getBusinessProblem(){
