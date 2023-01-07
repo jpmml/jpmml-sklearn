@@ -22,13 +22,13 @@ if __name__ == "__main__":
 	else:
 		datasets = ["Audit", "Auto", "Iris", "Wheat"]
 
-def make_classification(df, estimator, name):
+def make_classification(df, estimator, name, **setup_params):
 	X, y = split_csv(df)
 
 	categories = numpy.unique(y)
 
 	exp = ClassificationExperiment()
-	exp.setup(data = df, target = y.name, session_id = 13)
+	exp.setup(data = df, target = y.name, session_id = 13, **setup_params)
 
 	if estimator == "dt" or estimator == "rf":
 		model = exp.create_model(estimator, min_samples_leaf = 10)
@@ -45,11 +45,11 @@ def make_classification(df, estimator, name):
 	yt_proba = DataFrame(final_model.predict_proba(X), columns = ["probability(" + str(category) + ")" for category in categories])
 	store_csv(pandas.concat((yt, yt_proba), axis = 1), name)
 
-def make_clustering(df, estimator, name):
+def make_clustering(df, estimator, name, **setup_params):
 	X, y = split_csv(df)
 
 	exp = ClusteringExperiment()
-	exp.setup(data = X, session_id = 13)
+	exp.setup(data = X, session_id = 13, **setup_params)
 
 	model = exp.create_model(estimator)
 
@@ -61,11 +61,11 @@ def make_clustering(df, estimator, name):
 	yt = yt.apply(lambda x: x.replace("Cluster ", ""))
 	store_csv(yt, name)
 
-def make_regression(df, estimator, name):
+def make_regression(df, estimator, name, **setup_params):
 	X, y = split_csv(df)
 
 	exp = RegressionExperiment()
-	exp.setup(data = df, target = y.name, session_id = 13)
+	exp.setup(data = df, target = y.name, session_id = 13, **setup_params)
 
 	if estimator == "dt" or estimator == "rf":
 		model = exp.create_model(estimator, min_samples_leaf = 10)
@@ -84,7 +84,7 @@ def make_regression(df, estimator, name):
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
-	make_classification(audit_df, "rf", "PyCaretAudit")
+	make_classification(audit_df, "rf", "PyCaretAudit", rare_to_value = 0.03, rare_value = "Other")
 
 	audit_df = load_audit("AuditNA")
 
