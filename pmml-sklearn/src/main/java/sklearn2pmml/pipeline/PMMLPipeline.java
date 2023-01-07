@@ -168,15 +168,29 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		// XXX
-		if(label instanceof CategoricalLabel){
-			CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+		if(label instanceof ScalarLabel){
+			ScalarLabel scalarLabel = (ScalarLabel)label;
 
-			DataField dataField = encoder.getDataField(categoricalLabel.getName());
+			Feature labelFeature = findFeature(features, scalarLabel.getName());
+			if(labelFeature != null){
+				DataField dataField = (DataField)labelFeature.getField();
 
-			if(!Objects.equals(categoricalLabel.getValues(), PMMLUtil.getValues(dataField, Value.Property.VALID))){
-				label = new CategoricalLabel(dataField);
+				OpType opType = dataField.getOpType();
+				switch(opType){
+					case CONTINUOUS:
+						label = new ContinuousLabel(dataField);
+						break;
+					case CATEGORICAL:
+						label = new CategoricalLabel(dataField);
+						break;
+					default:
+						break;
+				}
+
+				features = new ArrayList<>(features);
+				features.remove(labelFeature);
 			}
-		}
+		} // End if
 
 		if(estimator == null){
 			return encodePMML(header, null, repr, encoder);
@@ -690,6 +704,19 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		return result;
+	}
+
+	static
+	private Feature findFeature(List<Feature> features, String name){
+
+		for(Feature feature : features){
+
+			if(Objects.equals(feature.getName(), name)){
+				return feature;
+			}
+		}
+
+		return null;
 	}
 
 	static
