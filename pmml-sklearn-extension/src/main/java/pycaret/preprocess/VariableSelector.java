@@ -18,36 +18,12 @@
  */
 package pycaret.preprocess;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import sklearn.MultiTransformer;
 
-import org.dmg.pmml.OpType;
-import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.SkLearnEncoder;
+abstract
+public class VariableSelector extends MultiTransformer {
 
-public class RemoveMulticollinearity extends VariableSelector {
-
-	public RemoveMulticollinearity(String module, String name){
+	public VariableSelector(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.CONTINUOUS;
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<String> drop = getDrop();
-
-		List<Feature> result = features.stream()
-			.filter(feature -> !drop.contains(feature.getName()))
-			.collect(Collectors.toList());
-
-		return result;
-	}
-
-	public List<String> getDrop(){
-		return getList("_drop", String.class);
 	}
 }

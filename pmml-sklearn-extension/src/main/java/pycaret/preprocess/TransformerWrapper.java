@@ -84,8 +84,8 @@ public class TransformerWrapper extends Initializer {
 			return transformedIncludeFeatures;
 		} else
 
-		if(transformer instanceof RemoveMulticollinearity){
-			RemoveMulticollinearity removeMulticollinearity = (RemoveMulticollinearity)transformer;
+		if(transformer instanceof VariableSelector){
+			VariableSelector variableSelector = (VariableSelector)transformer;
 
 			return transformedIncludeFeatures;
 		} else

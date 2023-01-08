@@ -87,8 +87,9 @@ if "Audit" in datasets:
 	make_classification(audit_df, "rf", "PyCaretAudit", rare_to_value = 0.03, rare_value = "Other")
 
 	audit_df = load_audit("AuditNA")
+	audit_df = audit_df.drop("Deductions", axis = 1)
 
-	make_classification(audit_df, "lr", "PyCaretAuditNA")
+	make_classification(audit_df, "lr", "PyCaretAuditNA", fix_imbalance = True)
 
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
