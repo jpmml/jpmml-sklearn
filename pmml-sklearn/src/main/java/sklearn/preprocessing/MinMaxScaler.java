@@ -30,9 +30,8 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
-public class MinMaxScaler extends Transformer {
+public class MinMaxScaler extends Scaler {
 
 	public MinMaxScaler(String module, String name){
 		super(module, name);
