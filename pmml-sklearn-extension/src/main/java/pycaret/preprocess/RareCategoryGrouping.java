@@ -40,6 +40,11 @@ public class RareCategoryGrouping extends MultiTransformer {
 	}
 
 	@Override
+	public OpType getOpType(){
+		return OpType.CATEGORICAL;
+	}
+
+	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Map<String, ?> toOther = getToOther();
 		Object value = getValue();

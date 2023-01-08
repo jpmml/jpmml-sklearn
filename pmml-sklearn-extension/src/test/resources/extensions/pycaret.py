@@ -108,7 +108,7 @@ if "Auto" in datasets:
 	auto_df["model_year"] = auto_df["model_year"].astype(str)
 	auto_df["origin"] = auto_df["origin"].astype(str)
 
-	make_regression(auto_df, "rf", "PyCaretAuto")
+	make_regression(auto_df, "rf", "PyCaretAuto", remove_multicollinearity = True, multicollinearity_threshold = 0.75)
 
 	auto_df = load_auto("AutoNA")
 

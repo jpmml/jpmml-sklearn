@@ -84,6 +84,12 @@ public class TransformerWrapper extends Initializer {
 			return transformedIncludeFeatures;
 		} else
 
+		if(transformer instanceof RemoveMulticollinearity){
+			RemoveMulticollinearity removeMulticollinearity = (RemoveMulticollinearity)transformer;
+
+			return transformedIncludeFeatures;
+		} else
+
 		{
 			List<List<Feature>> transformedIncludeFeatureGroups = groupByField(transformedIncludeFeatures);
 
