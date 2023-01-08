@@ -1,4 +1,4 @@
-from pandas import DataFrame
+from pandas import DataFrame, Int64Dtype
 from pycaret.classification import ClassificationExperiment
 from pycaret.clustering import ClusteringExperiment
 from pycaret.regression import RegressionExperiment
@@ -89,7 +89,7 @@ if "Audit" in datasets:
 	audit_df = load_audit("AuditNA")
 	audit_df = audit_df.drop("Deductions", axis = 1)
 
-	make_classification(audit_df, "lr", "PyCaretAuditNA", fix_imbalance = True)
+	make_classification(audit_df, "lr", "PyCaretAuditNA", normalize = True, normalize_method = "robust", fix_imbalance = True)
 
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
@@ -102,15 +102,18 @@ if "Wheat" in datasets:
 	make_clustering(wheat_df, "kmeans", "PyCaretWheat")
 
 if "Auto" in datasets:
+	cat_cols = ["cylinders", "model_year", "origin"]
+	
 	auto_df = load_auto("Auto")
 
-	# XXX
-	auto_df["cylinders"] = auto_df["cylinders"].astype(str)
-	auto_df["model_year"] = auto_df["model_year"].astype(str)
-	auto_df["origin"] = auto_df["origin"].astype(str)
+	for cat_col in cat_cols:
+		auto_df[cat_col] = auto_df[cat_col].astype(str)
 
 	make_regression(auto_df, "rf", "PyCaretAuto", remove_multicollinearity = True, multicollinearity_threshold = 0.75)
 
 	auto_df = load_auto("AutoNA")
 
-	make_regression(auto_df, "lr", "PyCaretAutoNA")
+	for cat_col in cat_cols:
+		auto_df[cat_col] = auto_df[cat_col].astype(Int64Dtype())
+
+	make_regression(auto_df, "lr", "PyCaretAutoNA", feature_selection = True, feature_selection_method = "classic", n_features_to_select = 0.85)

@@ -33,6 +33,7 @@ import sklearn.Initializer;
 import sklearn.InitializerUtil;
 import sklearn.Selector;
 import sklearn.Transformer;
+import sklearn.preprocessing.Scaler;
 
 public class TransformerWrapper extends Initializer {
 
@@ -86,6 +87,12 @@ public class TransformerWrapper extends Initializer {
 
 		if(transformer instanceof VariableSelector){
 			VariableSelector variableSelector = (VariableSelector)transformer;
+
+			return transformedIncludeFeatures;
+		} else
+
+		if(transformer instanceof Scaler){
+			Scaler scaler = (Scaler)transformer;
 
 			return transformedIncludeFeatures;
 		} else
