@@ -24,8 +24,9 @@ import java.util.stream.Collectors;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.MultiTransformer;
 
-public class RemoveMulticollinearity extends VariableSelector {
+public class RemoveMulticollinearity extends MultiTransformer {
 
 	public RemoveMulticollinearity(String module, String name){
 		super(module, name);

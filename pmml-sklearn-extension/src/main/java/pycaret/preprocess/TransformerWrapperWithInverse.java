@@ -26,9 +26,12 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.InitializerUtil;
+import sklearn.ScalarLabelUtil;
 import sklearn.preprocessing.LabelEncoder;
 import sklearn2pmml.decoration.DomainUtil;
 
@@ -44,15 +47,25 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 		LabelEncoder transformer = getTransformer();
 
+		Label label = encoder.getLabel();
+		if(label == null){
+			throw new IllegalArgumentException();
+		} // End if
+
 		if(!features.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 
 		List<Feature> result = InitializerUtil.selectFeatures(featureNamesIn, Collections.emptyList(), encoder);
 
-		int labelIndex = (result.size() - 1);
+		ScalarLabel scalarLabel = (ScalarLabel)label;
 
-		Feature labelFeature = result.get(labelIndex);
+		Feature labelFeature = ScalarLabelUtil.findLabelFeature(scalarLabel, result);
+		if(labelFeature == null){
+			throw new IllegalArgumentException();
+		}
+
+		int labelFeatureIndex = result.indexOf(labelFeature);
 
 		if(labelFeature instanceof WildcardFeature){
 			WildcardFeature wildcardFeature = (WildcardFeature)labelFeature;
@@ -64,7 +77,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 			Feature transformedLabelFeature = Iterables.getOnlyElement(transformer.encode(Collections.singletonList(labelFeature), encoder));
 
 			result = new ArrayList<>(result);
-			result.set(labelIndex, transformedLabelFeature);
+			result.set(labelFeatureIndex, transformedLabelFeature);
 		} else
 
 		{

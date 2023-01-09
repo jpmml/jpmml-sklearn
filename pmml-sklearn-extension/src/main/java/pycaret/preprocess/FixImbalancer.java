@@ -22,8 +22,9 @@ import java.util.List;
 
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.MultiTransformer;
 
-public class FixImbalancer extends VariableSelector {
+public class FixImbalancer extends MultiTransformer {
 
 	public FixImbalancer(String module, String name){
 		super(module, name);

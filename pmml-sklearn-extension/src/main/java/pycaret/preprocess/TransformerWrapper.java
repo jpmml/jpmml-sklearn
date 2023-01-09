@@ -25,20 +25,38 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import category_encoders.CategoryEncoder;
 import org.dmg.pmml.Field;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
-import sklearn.Selector;
+import sklearn.ScalarLabelUtil;
 import sklearn.Transformer;
-import sklearn.preprocessing.Scaler;
+import sklearn.impute.SimpleImputer;
 
 public class TransformerWrapper extends Initializer {
 
 	public TransformerWrapper(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		List<String> featureNamesIn = getFeatureNamesIn();
+
+		return featureNamesIn.size();
+	}
+
+	@Override
+	public void checkFeatures(List<? extends Feature> features){
+
+		if(!features.isEmpty()){
+			super.checkFeatures(features);
+		}
 	}
 
 	@Override
@@ -77,27 +95,35 @@ public class TransformerWrapper extends Initializer {
 			includeFeatures.add(includeFeature);
 		}
 
+		if(transformer instanceof FixImbalancer){
+			FixImbalancer fixImbalancer = (FixImbalancer)transformer;
+
+			return features;
+		}
+
 		List<Feature> transformedIncludeFeatures = transformer.encode(includeFeatures, encoder);
 
-		if(transformer instanceof Selector){
-			Selector selector = (Selector)transformer;
+		boolean replaceFeatures = false;
 
-			return transformedIncludeFeatures;
+		if(transformer instanceof SimpleImputer){
+			SimpleImputer simpleImputer = (SimpleImputer)transformer;
+
+			replaceFeatures = true;
 		} else
 
-		if(transformer instanceof VariableSelector){
-			VariableSelector variableSelector = (VariableSelector)transformer;
+		if(transformer instanceof RareCategoryGrouping){
+			RareCategoryGrouping rareCategoryGrouping = (RareCategoryGrouping)transformer;
 
-			return transformedIncludeFeatures;
+			replaceFeatures = true;
 		} else
 
-		if(transformer instanceof Scaler){
-			Scaler scaler = (Scaler)transformer;
+		if(transformer instanceof CategoryEncoder){
+			CategoryEncoder categoryEncoder = (CategoryEncoder)transformer;
 
-			return transformedIncludeFeatures;
-		} else
+			replaceFeatures = true;
+		} // End if
 
-		{
+		if(replaceFeatures){
 			List<List<Feature>> transformedIncludeFeatureGroups = groupByField(transformedIncludeFeatures);
 
 			ClassDictUtil.checkSize(includeFeatures, transformedIncludeFeatureGroups);
@@ -130,6 +156,23 @@ public class TransformerWrapper extends Initializer {
 					}
 				})
 				.collect(Collectors.toList());
+		} else
+
+		{
+			Label label = encoder.getLabel();
+
+			List<Feature> result = new ArrayList<>(transformedIncludeFeatures);
+
+			if(label != null){
+				ScalarLabel scalarLabel = (ScalarLabel)label;
+
+				Feature labelFeature = ScalarLabelUtil.findLabelFeature(scalarLabel, features);
+				if(labelFeature != null){
+					result.add(labelFeature);
+				}
+			}
+
+			return result;
 		}
 	}
 
