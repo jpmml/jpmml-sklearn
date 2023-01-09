@@ -94,7 +94,7 @@ if "Audit" in datasets:
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
-	make_classification(iris_df, "rf", "PyCaretIris")
+	make_classification(iris_df, "lr", "PyCaretIris", polynomial_features = True, polynomial_degree = 2, low_variance_threshold = 0.5)
 
 if "Wheat" in datasets:
 	wheat_df = load_wheat("Wheat")
