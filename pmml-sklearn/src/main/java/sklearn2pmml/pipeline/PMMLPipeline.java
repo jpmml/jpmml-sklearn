@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
@@ -122,23 +121,23 @@ public class PMMLPipeline extends Pipeline {
 		String repr = getRepr();
 		Verification verification = getVerification();
 
-		Label label = null;
-
 		if(estimator != null && estimator.isSupervised()){
 
 			if(targetFields == null){
 				targetFields = initTargetFields(estimator);
 			}
 
-			label = initLabel(estimator, targetFields, encoder);
-		}
+			Label label = initLabel(estimator, targetFields, encoder);
 
-		List<Feature> features = new ArrayList<>();
+			encoder.setLabel(label);
+		}
 
 		PythonObject featureInitializer = estimator;
 
 		try {
 			Transformer transformer = PipelineUtil.getHead(transformers, estimator);
+
+			List<Feature> features = new ArrayList<>();
 
 			if(transformer != null){
 				featureInitializer = transformer;
@@ -163,40 +162,17 @@ public class PMMLPipeline extends Pipeline {
 
 				features = initFeatures(estimator, activeFields, estimator.getOpType(), estimator.getDataType(), encoder);
 			}
+
+			encoder.setFeatures(features);
 		} catch(UnsupportedOperationException uoe){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
 		}
-
-		// XXX
-		if(label instanceof ScalarLabel){
-			ScalarLabel scalarLabel = (ScalarLabel)label;
-
-			Feature labelFeature = findFeature(features, scalarLabel.getName());
-			if(labelFeature != null){
-				DataField dataField = (DataField)labelFeature.getField();
-
-				OpType opType = dataField.getOpType();
-				switch(opType){
-					case CONTINUOUS:
-						label = new ContinuousLabel(dataField);
-						break;
-					case CATEGORICAL:
-						label = new CategoricalLabel(dataField);
-						break;
-					default:
-						break;
-				}
-
-				features = new ArrayList<>(features);
-				features.remove(labelFeature);
-			}
-		} // End if
 
 		if(estimator == null){
 			return encodePMML(header, null, repr, encoder);
 		}
 
-		Schema schema = new Schema(encoder, label, features);
+		Schema schema = encoder.createSchema();
 
 		Model model = estimator.encode(schema);
 
@@ -229,6 +205,8 @@ public class PMMLPipeline extends Pipeline {
 
 			// XXX
 			encoder.setModel(finalModel);
+
+			Label label = schema.getLabel();
 
 			Output output = ModelUtil.ensureOutput(finalModel);
 
@@ -274,6 +252,8 @@ public class PMMLPipeline extends Pipeline {
 
 				break verification;
 			}
+
+			Label label = schema.getLabel();
 
 			List<?> activeValues = verification.getActiveValues();
 			int[] activeValuesShape = verification.getActiveValuesShape();
@@ -704,19 +684,6 @@ public class PMMLPipeline extends Pipeline {
 		}
 
 		return result;
-	}
-
-	static
-	private Feature findFeature(List<Feature> features, String name){
-
-		for(Feature feature : features){
-
-			if(Objects.equals(feature.getName(), name)){
-				return feature;
-			}
-		}
-
-		return null;
 	}
 
 	static

@@ -18,6 +18,9 @@
  */
 package sklearn;
 
+import java.util.List;
+import java.util.Objects;
+
 import org.dmg.pmml.Field;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalFeature;
@@ -78,5 +81,19 @@ public class ScalarLabelUtil {
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	static
+	public Feature findLabelFeature(ScalarLabel scalarLabel, List<? extends Feature> features){
+		String name = scalarLabel.getName();
+
+		for(Feature feature : features){
+
+			if(Objects.equals(feature.getName(), name)){
+				return feature;
+			}
+		}
+
+		return null;
 	}
 }

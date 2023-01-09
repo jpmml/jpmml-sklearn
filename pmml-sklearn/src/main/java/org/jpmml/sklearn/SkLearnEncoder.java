@@ -37,12 +37,16 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
 import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.Schema;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PickleUtil;
@@ -59,6 +63,10 @@ import sklearn2pmml.decoration.Domain;
 public class SkLearnEncoder extends PythonEncoder {
 
 	private Map<String, Domain> domains = new LinkedHashMap<>();
+
+	private Label label = null;
+
+	private List<? extends Feature> features = Collections.emptyList();
 
 	private Model model = null;
 
@@ -192,6 +200,42 @@ public class SkLearnEncoder extends PythonEncoder {
 		}
 	}
 
+	public Schema createSchema(){
+		Label label = getLabel();
+		List<? extends Feature> features = getFeatures();
+
+		// XXX
+		if(label instanceof ScalarLabel){
+			ScalarLabel scalarLabel = (ScalarLabel)label;
+
+			Feature labelFeature = ScalarLabelUtil.findLabelFeature(scalarLabel, features);
+			if(labelFeature != null){
+				DataField dataField = (DataField)labelFeature.getField();
+
+				OpType opType = dataField.getOpType();
+				switch(opType){
+					case CONTINUOUS:
+						label = new ContinuousLabel(dataField);
+						break;
+					case CATEGORICAL:
+						label = new CategoricalLabel(dataField);
+						break;
+					default:
+						break;
+				}
+
+				setLabel(label);
+
+				features = new ArrayList<>(features);
+				features.remove(labelFeature);
+			}
+
+			setFeatures(features);
+		}
+
+		return new Schema(this, label, features);
+	}
+
 	public boolean isFrozen(String name){
 		return this.domains.containsKey(name);
 	}
@@ -209,6 +253,22 @@ public class SkLearnEncoder extends PythonEncoder {
 		{
 			this.domains.remove(name);
 		}
+	}
+
+	public Label getLabel(){
+		return this.label;
+	}
+
+	public void setLabel(Label label){
+		this.label = label;
+	}
+
+	public List<? extends Feature> getFeatures(){
+		return this.features;
+	}
+
+	public void setFeatures(List<? extends Feature> features){
+		this.features = Objects.requireNonNull(features);
 	}
 
 	public Model getModel(){
