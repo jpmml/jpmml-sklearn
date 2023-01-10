@@ -1,4 +1,4 @@
-from pandas import DataFrame, Int64Dtype
+from pandas import DataFrame, Int64Dtype, Series
 from pycaret.classification import ClassificationExperiment
 from pycaret.clustering import ClusteringExperiment
 from pycaret.regression import RegressionExperiment
@@ -35,14 +35,13 @@ def make_classification(df, estimator, name, **setup_params):
 	else:
 		model = exp.create_model(estimator)
 
-	final_model = exp.finalize_model(model)
+	pipeline = exp.finalize_model(model)
 
-	pipeline = make_pmml_pipeline(final_model, target_fields = [y.name], escape_func = _escape)
-	store_pkl(pipeline, name)
+	pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
+	store_pkl(pmml_pipeline, name)
 
-	yt = exp.predict_model(final_model, data = X)["prediction_label"]
-	yt.name = y.name
-	yt_proba = DataFrame(final_model.predict_proba(X), columns = ["probability(" + str(category) + ")" for category in categories])
+	yt = Series(pipeline.predict(X), name = y.name)
+	yt_proba = DataFrame(pipeline.predict_proba(X), columns = ["probability(" + str(category) + ")" for category in categories])
 	store_csv(pandas.concat((yt, yt_proba), axis = 1), name)
 
 def make_clustering(df, estimator, name, **setup_params):
@@ -53,11 +52,10 @@ def make_clustering(df, estimator, name, **setup_params):
 
 	model = exp.create_model(estimator)
 
-	pipeline = make_pmml_pipeline(model, active_fields = X.columns.values, escape_func = _escape)
-	store_pkl(pipeline, name)
+	pmml_pipeline = make_pmml_pipeline(model, active_fields = X.columns.values, escape_func = _escape)
+	store_pkl(pmml_pipeline, name)
 
-	yt = exp.predict_model(model, data = X)["Cluster"]
-	yt.name = "cluster"
+	yt = Series(model.predict(X), name = "cluster")
 	yt = yt.apply(lambda x: x.replace("Cluster ", ""))
 	store_csv(yt, name)
 
@@ -72,13 +70,12 @@ def make_regression(df, estimator, name, **setup_params):
 	else:
 		model = exp.create_model(estimator)
 
-	final_model = exp.finalize_model(model)
+	pipeline = exp.finalize_model(model)
 
-	pipeline = make_pmml_pipeline(final_model, target_fields = [y.name], escape_func = _escape)
-	store_pkl(pipeline, name)
+	pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
+	store_pkl(pmml_pipeline, name)
 
-	yt = exp.predict_model(final_model, data = X)["prediction_label"]
-	yt.name = y.name
+	yt = Series(pipeline.predict(X), name = y.name)
 	store_csv(yt, name)
 
 if "Audit" in datasets:
