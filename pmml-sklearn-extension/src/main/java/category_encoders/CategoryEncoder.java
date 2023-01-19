@@ -60,6 +60,17 @@ public class CategoryEncoder extends Transformer {
 		return getBoolean("drop_invariant");
 	}
 
+	public List<String> getFeatureNamesOut(){
+
+		// CategoryEncoders 2.5.1post0
+		if(containsKey("feature_names")){
+			return getList("feature_names", String.class);
+		}
+
+		// CategoryEncoders 2.6+
+		return getList("feature_names_out_", String.class);
+	}
+
 	public String getHandleMissing(){
 		return getString("handle_missing");
 	}

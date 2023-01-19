@@ -49,7 +49,7 @@ public class BaseNEncoder extends CategoryEncoder {
 		List<?> cols = getCols();
 		List<String> invariantCols = null;
 		Boolean dropInvariant = getDropInvariant();
-		List<String> featureNames = getFeatureNames();
+		List<String> featureNamesOut = getFeatureNamesOut();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
@@ -112,7 +112,7 @@ public class BaseNEncoder extends CategoryEncoder {
 			}
 		}
 
-		boolean pre23Mode = (numberOfBaseNFeatures == featureNames.size());
+		boolean pre23Mode = (numberOfBaseNFeatures == featureNamesOut.size());
 
 		List<Feature> result = new ArrayList<>();
 
@@ -179,10 +179,6 @@ public class BaseNEncoder extends CategoryEncoder {
 
 	public OrdinalEncoder getOrdinalEncoder(){
 		return get("ordinal_encoder", OrdinalEncoder.class);
-	}
-
-	public List<String> getFeatureNames(){
-		return getList("feature_names", String.class);
 	}
 
 	static
