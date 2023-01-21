@@ -21,6 +21,7 @@ package sklearn.isotonic;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.LinearNorm;
@@ -30,12 +31,15 @@ import org.dmg.pmml.OutlierTreatmentMethod;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Regressor;
+import sklearn.Transformer;
 
 public class IsotonicRegression extends Regressor {
 
@@ -45,14 +49,27 @@ public class IsotonicRegression extends Regressor {
 
 	@Override
 	public RegressionModel encodeModel(Schema schema){
+		PMMLEncoder encoder = schema.getEncoder();
+
+		Label label = schema.getLabel();
+		List<? extends Feature> features = schema.getFeatures();
+
+		features = encodeFeatures((List)features, (SkLearnEncoder)encoder);
+
+		Feature feature = Iterables.getOnlyElement(features);
+
+		return RegressionModelUtil.createRegression(Collections.singletonList(feature), Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+	}
+
+	/**
+	 * @see Transformer#encodeFeatures(List, SkLearnEncoder)
+	 */
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> xThresholds = getXThresholds();
 		List<? extends Number> yThresholds = getYThresholds();
 		String outOfBounds = getOutOfBounds();
 
 		ClassDictUtil.checkSize(xThresholds, yThresholds);
-
-		PMMLEncoder encoder = schema.getEncoder();
-		List<? extends Feature> features = schema.getFeatures();
 
 		SchemaUtil.checkSize(1, features);
 
@@ -72,9 +89,7 @@ public class IsotonicRegression extends Regressor {
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("isotonicRegression", feature), OpType.CONTINUOUS, DataType.DOUBLE, normContinuous);
 
-		feature = new ContinuousFeature(encoder, derivedField);
-
-		return RegressionModelUtil.createRegression(Collections.singletonList(feature), Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
 	}
 
 	public Boolean getIncreasing(){

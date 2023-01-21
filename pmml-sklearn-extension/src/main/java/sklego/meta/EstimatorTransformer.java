@@ -20,15 +20,20 @@ package sklego.meta;
 
 import java.util.List;
 
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.ResultFeature;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -37,6 +42,7 @@ import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnMethods;
 import sklearn.Transformer;
+import sklearn.isotonic.IsotonicRegression;
 import sklearn.tree.HasTreeOptions;
 
 public class EstimatorTransformer extends Transformer implements HasEstimator<Estimator> {
@@ -47,6 +53,17 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+
+		if(!encoder.hasModel()){
+			return encodePreProcessor(features, encoder);
+		} else
+
+		{
+			return encodePostProcessor(features, encoder);
+		}
+	}
+
+	private List<Feature> encodePreProcessor(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 		String predictFunc = getPredictFunc();
 
@@ -93,9 +110,47 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		return result;
 	}
 
+	private List<Feature> encodePostProcessor(List<Feature> features, SkLearnEncoder encoder){
+		IsotonicRegression estimator = getEstimator(IsotonicRegression.class);
+		String predictFunc = getPredictFunc();
+
+		switch(predictFunc){
+			case SkLearnMethods.PREDICT:
+				break;
+			default:
+				throw new IllegalArgumentException(predictFunc);
+		}
+
+		Model model = encoder.getModel();
+
+		features = estimator.encodeFeatures(features, encoder);
+
+		ContinuousFeature continuousFeature = (ContinuousFeature)Iterables.getOnlyElement(features);
+
+		DerivedField derivedField = (DerivedField)continuousFeature.getField();
+
+		String name = derivedField.requireName();
+
+		encoder.removeDerivedField(name);
+
+		OutputField outputField = new OutputField(name, derivedField.requireOpType(), derivedField.requireDataType())
+			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+			.setExpression(derivedField.requireExpression());
+
+		Output output = ModelUtil.ensureOutput(model);
+
+		output.addOutputFields(outputField);
+
+		return encoder.export(model, name);
+	}
+
 	@Override
 	public Estimator getEstimator(){
-		return get("estimator_", Estimator.class);
+		return getEstimator(Estimator.class);
+	}
+
+	public <E extends Estimator> E getEstimator(Class<? extends E> clazz){
+		return get("estimator_", clazz);
 	}
 
 	public String getPredictFunc(){
