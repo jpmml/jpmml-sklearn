@@ -34,20 +34,27 @@ public class EnsembleRegressor extends Regressor implements HasEstimatorEnsemble
 
 	@Override
 	public OpType getOpType(){
-		Regressor baseEstimator = getBaseEstimator();
+		Regressor estimator = getEstimator();
 
-		return baseEstimator.getOpType();
+		return estimator.getOpType();
 	}
 
 	@Override
 	public DataType getDataType(){
-		Regressor baseEstimator = getBaseEstimator();
+		Regressor estimator = getEstimator();
 
-		return baseEstimator.getDataType();
+		return estimator.getDataType();
 	}
 
-	public Regressor getBaseEstimator(){
-		return get("base_estimator_", Regressor.class);
+	public Regressor getEstimator(){
+
+		// SkLearn 1.1
+		if(containsKey("base_estimator_")){
+			return get("base_estimator_", Regressor.class);
+		}
+
+		// SkLearn 1.2+
+		return get("_estimator", Regressor.class);
 	}
 
 	@Override

@@ -34,20 +34,27 @@ public class EnsembleClassifier extends Classifier implements HasEstimatorEnsemb
 
 	@Override
 	public OpType getOpType(){
-		Classifier baseEstimator = getBaseEstimator();
+		Classifier estimator = getEstimator();
 
-		return baseEstimator.getOpType();
+		return estimator.getOpType();
 	}
 
 	@Override
 	public DataType getDataType(){
-		Classifier baseEstimator = getBaseEstimator();
+		Classifier estimator = getEstimator();
 
-		return baseEstimator.getDataType();
+		return estimator.getDataType();
 	}
 
-	public Classifier getBaseEstimator(){
-		return get("base_estimator_", Classifier.class);
+	public Classifier getEstimator(){
+
+		// SkLearn 1.1
+		if(containsKey("base_estimator_")){
+			return get("base_estimator_", Classifier.class);
+		}
+
+		// SkLearn 1.2+
+		return get("_estimator", Classifier.class);
 	}
 
 	@Override
