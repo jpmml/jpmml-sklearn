@@ -74,6 +74,16 @@ public class SkLearnEncoder extends PythonEncoder {
 	public SkLearnEncoder(){
 	}
 
+	@Override
+	public void addTransformer(Model transformer){
+
+		if(hasModel()){
+			throw new IllegalStateException("Model is already defined");
+		}
+
+		super.addTransformer(transformer);
+	}
+
 	public List<Feature> export(Model model, String name){
 		return export(model, Collections.singletonList(name));
 	}
@@ -269,6 +279,12 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	public void setFeatures(List<? extends Feature> features){
 		this.features = Objects.requireNonNull(features);
+	}
+
+	public boolean hasModel(){
+		Model model = getModel();
+
+		return (model != null);
 	}
 
 	public Model getModel(){

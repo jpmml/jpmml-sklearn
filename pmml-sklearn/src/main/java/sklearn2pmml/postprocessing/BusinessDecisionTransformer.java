@@ -50,10 +50,11 @@ public class BusinessDecisionTransformer extends Transformer {
 		String businessProblem = getBusinessProblem();
 		List<Object[]> decisions = getDecisions();
 
+		if(!encoder.hasModel()){
+			throw new IllegalStateException("Model is undefined");
+		}
+
 		Model model = encoder.getModel();
-		if(model == null){
-			throw new IllegalArgumentException("Model is undefined");
-		} // End if
 
 		if(transformer != null){
 			features = transformer.encode(features, encoder);
