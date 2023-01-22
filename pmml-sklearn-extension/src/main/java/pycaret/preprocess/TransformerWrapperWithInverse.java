@@ -50,13 +50,17 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 		Label label = encoder.getLabel();
 		if(label == null){
 			throw new IllegalArgumentException();
-		} // End if
-
-		if(!features.isEmpty()){
-			throw new IllegalArgumentException();
 		}
 
-		List<Feature> result = InitializerUtil.selectFeatures(featureNamesIn, Collections.emptyList(), encoder);
+		List<Feature> result;
+
+		if(features.isEmpty()){
+			result = InitializerUtil.selectFeatures(featureNamesIn, Collections.emptyList(), encoder);
+		} else
+
+		{
+			result = features;
+		}
 
 		ScalarLabel scalarLabel = (ScalarLabel)label;
 
