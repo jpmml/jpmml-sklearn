@@ -283,6 +283,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   Examples: [extensions/pycaret.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/pycaret.py)
 
   * `pycaret.internal.pipeline.Pipeline`
+  * `pycaret.internal.preprocess.transformers.CleanColumnNames`
   * `pycaret.internal.preprocess.transformers.FixImbalancer`
   * `pycaret.internal.preprocess.transformers.RareCategoryGrouping`
   * `pycaret.internal.preprocess.transformers.RemoveMulticollinearity`
