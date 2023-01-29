@@ -576,6 +576,7 @@ java -jar pmml-sklearn-example/target/pmml-sklearn-example-executable-1.7-SNAPSH
 
 Up-to-date:
 
+* [Training Python-based XGBoost accelerated failure time (AFT) models](https://openscoring.io/blog/2023/01/28/python_xgboost_aft_pmml/)
 * [Converting Scikit-Learn based PyCaret 3 pipelines to PMML documents](https://openscoring.io/blog/2023/01/12/converting_sklearn_pycaret3_pipeline_pmml/)
 * [Training Scikit-Learn based H2O.ai pipelines](https://openscoring.io/blog/2022/11/11/sklearn_h2o_pipeline/)
 * [Measuring the memory consumption of Scikit-Learn models](https://openscoring.io/blog/2022/11/09/measuring_memory_sklearn/)
