@@ -10,7 +10,7 @@
 
 	<groupId>org.jpmml</groupId>
 	<artifactId>jpmml-sklearn</artifactId>
-	<version>1.7-SNAPSHOT</version>
+	<version>1.7.24</version>
 	<packaging>pom</packaging>
 
 	<name>JPMML-SkLearn</name>
@@ -46,7 +46,7 @@
 		<connection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</connection>
 		<developerConnection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</developerConnection>
 		<url>git://github.com/jpmml/jpmml-sklearn.git</url>
-		<tag>HEAD</tag>
+		<tag>1.7.24</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
@@ -58,37 +58,37 @@
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7.24</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-example</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7.24</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-extension</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7.24</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-h2o</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7.24</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-lightgbm</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7.24</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-statsmodels</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7.24</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-xgboost</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7.24</version>
 			</dependency>
 
 			<dependency>
