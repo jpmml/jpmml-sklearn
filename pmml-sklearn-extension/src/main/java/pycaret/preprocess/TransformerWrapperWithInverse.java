@@ -21,6 +21,7 @@ package pycaret.preprocess;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataField;
@@ -66,7 +67,11 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 		Feature labelFeature = ScalarLabelUtil.findLabelFeature(scalarLabel, result);
 		if(labelFeature == null){
-			throw new IllegalArgumentException();
+			List<String> names = result.stream()
+				.map(feature -> feature.getName())
+				.collect(Collectors.toList());
+
+			throw new IllegalArgumentException("Column \'" + scalarLabel.getName() + "\' not found in " + (names));
 		}
 
 		int labelFeatureIndex = result.indexOf(labelFeature);
