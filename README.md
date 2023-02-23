@@ -361,6 +361,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Identity comparison operators `is None` and `is not None`.
       * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.
+      * Math constant `math.nan`.
+      * Math functions (too numerous to list).
       * Numpy constant `numpy.NaN`.
       * Numpy function `numpy.where`.
       * Numpy universal functions (too numerous to list).
@@ -368,7 +370,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Pandas functions `pandas.isna`, `pandas.isnull`, `pandas.notna` and `pandas.notnull`.
       * Scipy functions `scipy.special.expit` and `scipy.special.logit`.
       * String functions `startswith(<prefix>)`, `endswith(<suffix>)`, `lower`, `upper` and `strip`.
-      * String length function `len(<str>)`
+      * String length function `len(<str>)`.
+      * User-defined functions.
     * `sklearn2pmml.preprocessing.FilterLookupTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
