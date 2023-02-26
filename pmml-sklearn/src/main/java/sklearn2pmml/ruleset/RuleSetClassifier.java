@@ -35,9 +35,10 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.DataFrameScope;
-import org.jpmml.python.PredicateTranslator;
+import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
+import sklearn2pmml.util.EvaluatableUtil;
 
 public class RuleSetClassifier extends Classifier {
 
@@ -93,13 +94,13 @@ public class RuleSetClassifier extends Classifier {
 				.setDefaultScore(defaultScore);
 		}
 
-		PredicateTranslator predicateTranslator = new PredicateTranslator(new DataFrameScope("X", features));
+		Scope scope = new DataFrameScope("X", features);
 
 		for(Object[] rule : rules){
 			String predicate = TupleUtil.extractElement(rule, 0, String.class);
 			String score = TupleUtil.extractElement(rule, 1, String.class);
 
-			Predicate pmmlPredicate = predicateTranslator.translatePredicate(predicate);
+			Predicate pmmlPredicate = EvaluatableUtil.translatePredicate(predicate, Collections.emptyList(), scope);
 
 			SimpleRule simpleRule = new SimpleRule(score, pmmlPredicate);
 

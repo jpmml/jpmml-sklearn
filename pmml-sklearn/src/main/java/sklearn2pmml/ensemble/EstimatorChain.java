@@ -20,6 +20,7 @@ package sklearn2pmml.ensemble;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,12 +37,13 @@ import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
-import org.jpmml.python.PredicateTranslator;
+import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
+import sklearn2pmml.util.EvaluatableUtil;
 
 public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorEnsemble<Estimator> {
 
@@ -154,7 +156,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 		Segmentation segmentation = new Segmentation(multioutput ? Segmentation.MultipleModelMethod.MULTI_MODEL_CHAIN : Segmentation.MultipleModelMethod.MODEL_CHAIN, null);
 
-		PredicateTranslator predicateTranslator = new PredicateTranslator(new DataFrameScope("X", features));
+		Scope scope = new DataFrameScope("X", features);
 
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
@@ -167,7 +169,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 			Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
 
-			Predicate pmmlPredicate = predicateTranslator.translatePredicate(predicate);
+			Predicate pmmlPredicate = EvaluatableUtil.translatePredicate(predicate, Collections.emptyList(), scope);
 
 			Model model = estimator.encode(segmentSchema);
 

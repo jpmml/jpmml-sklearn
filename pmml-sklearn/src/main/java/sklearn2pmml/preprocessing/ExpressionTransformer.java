@@ -36,11 +36,11 @@ import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.DataFrameScope;
-import org.jpmml.python.ExpressionTranslator;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
+import sklearn2pmml.util.EvaluatableUtil;
 
 public class ExpressionTransformer extends Transformer {
 
@@ -70,22 +70,18 @@ public class ExpressionTransformer extends Transformer {
 
 		Scope scope = new DataFrameScope("X", features, encoder);
 
-		ExpressionTranslator expressionTranslator = new ExpressionTranslator(scope);
+		Expression expression = EvaluatableUtil.translateExpression(expr, Collections.emptyList(), scope);
 
-		DerivedField derivedField;
+		DerivedField derivedField = null;
 
-		Expression expression;
+		if(expression instanceof FieldRef){
+			FieldRef fieldRef = (FieldRef)expression;
 
-		if(expr.indexOf('\n') > -1){
-			derivedField = expressionTranslator.translateDef(expr);
+			derivedField = encoder.getDerivedField(fieldRef.requireField());
 
-			expression = derivedField.getExpression();
-		} else
-
-		{
-			derivedField = null;
-
-			expression = expressionTranslator.translateExpression(expr);
+			if(derivedField != null){
+				expression = derivedField.getExpression();
+			}
 		} // End if
 
 		if(mapMissingTo != null){
@@ -126,7 +122,7 @@ public class ExpressionTransformer extends Transformer {
 		if((expression instanceof FieldRef) && (mapMissingTo == null)){
 			FieldRef fieldRef = (FieldRef)expression;
 
-			Feature feature = scope.resolveFeature(fieldRef.getField());
+			Feature feature = scope.resolveFeature(fieldRef.requireField());
 			if(feature != null){
 				Field<?> field = feature.getField();
 

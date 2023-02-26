@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.ensemble;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
@@ -32,9 +33,10 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
-import org.jpmml.python.PredicateTranslator;
+import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
+import sklearn2pmml.util.EvaluatableUtil;
 
 public class SelectFirstUtil {
 
@@ -63,7 +65,7 @@ public class SelectFirstUtil {
 
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.SELECT_FIRST, null);
 
-		PredicateTranslator predicateTranslator = new PredicateTranslator(new DataFrameScope("X", features));
+		Scope scope = new DataFrameScope("X", features);
 
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
@@ -76,7 +78,7 @@ public class SelectFirstUtil {
 				throw new IllegalArgumentException();
 			}
 
-			Predicate pmmlPredicate = predicateTranslator.translatePredicate(predicate);
+			Predicate pmmlPredicate = EvaluatableUtil.translatePredicate(predicate, Collections.emptyList(), scope);
 
 			Model model = estimator.encode(schema);
 
