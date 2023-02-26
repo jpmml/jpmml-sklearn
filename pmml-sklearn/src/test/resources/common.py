@@ -1,6 +1,5 @@
 import joblib
 import pandas
-#import pickle
 
 def load_csv(name):
 	return pandas.read_csv("csv/" + name + ".csv", na_values = ["N/A", "NA"])
@@ -24,16 +23,6 @@ def store_mojo(estimator, name):
 # Joblib dump
 def store_pkl(obj, name):
 	joblib.dump(obj, "pkl/" + name + ".pkl", compress = 9)
-
-# Pickle dump
-#def store_pkl(obj, name):
-#	con = open("pkl/" + name, "wb")
-#	pickle.dump(obj, con, protocol = -1)
-#	con.close()
-
-def dump(obj):
-	for attr in dir(obj):
-		print("obj.%s = %s" % (attr, getattr(obj, attr)))
 
 def load_audit(name, stringify = True):
 	df = load_csv(name)

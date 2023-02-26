@@ -1,3 +1,6 @@
+import os
+import sys
+
 from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
 from sklearn.cluster import KMeans
@@ -10,16 +13,12 @@ from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.svm import LinearSVC, OneClassSVM
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
+from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import ExpressionTransformer
 from sklearn2pmml.util import Reshaper
 from sklego.meta import EstimatorTransformer
 from sklego.pipeline import DebugPipeline
 from sklego.preprocessing import IdentityTransformer
-
-import os
-import sys
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 

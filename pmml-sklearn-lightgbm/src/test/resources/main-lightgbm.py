@@ -1,6 +1,6 @@
-from lightgbm import LGBMClassifier, LGBMRegressor
-
 import sys
+
+from lightgbm import LGBMClassifier, LGBMRegressor
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
@@ -43,7 +43,7 @@ def build_audit_cat(audit_df, classifier, name, with_proba = True, fit_params = 
 	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
-	if with_proba == True:
+	if with_proba:
 		adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
 		adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)

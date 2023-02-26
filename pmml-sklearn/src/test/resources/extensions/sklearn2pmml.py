@@ -1,4 +1,4 @@
-from common import *
+import sys
 
 from pandas import DataFrame, Series
 from sklearn_pandas import DataFrameMapper
@@ -19,7 +19,8 @@ from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
 from sklearn2pmml.util import Predicate
 
 import numpy
-import sys
+
+from common import *
 
 sys.path.append("../")
 

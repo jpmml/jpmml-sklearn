@@ -1,5 +1,3 @@
-from common import *
-
 from pandas import DataFrame
 from scipy.interpolate import make_interp_spline
 from scipy.stats import norm
@@ -8,6 +6,8 @@ from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import BSplineTransformer
 
 import numpy
+
+from common import *
 
 # See https://ndsplines.readthedocs.io/en/latest/auto_examples/1d-interp.html
 

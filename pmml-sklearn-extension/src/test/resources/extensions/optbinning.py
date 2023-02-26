@@ -1,15 +1,14 @@
-from optbinning import BinningProcess, OptimalBinning, Scorecard
+import os
+import sys
+
+from optbinning import BinningProcess, Scorecard
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.linear_model import HuberRegressor, LinearRegression, LogisticRegression
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import Alias
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer
-
-import os
-import sys
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 

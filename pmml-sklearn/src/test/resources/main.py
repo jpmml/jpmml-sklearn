@@ -9,7 +9,7 @@ from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingClassifier, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_selection import chi2, f_classif, f_regression
+from sklearn.feature_selection import f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.impute import MissingIndicator, SimpleImputer
 from sklearn.isotonic import IsotonicRegression
@@ -24,7 +24,7 @@ from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretizer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, PowerTransformer, RobustScaler, StandardScaler
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
-from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
+from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, ContinuousDomainEraser, DiscreteDomainEraser, MultiAlias, MultiDomain
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
@@ -33,7 +33,7 @@ from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
 from sklearn2pmml.util import Slicer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
-from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
+from xgboost.sklearn import XGBClassifier, XGBRegressor
 
 import numpy
 import pandas
@@ -477,6 +477,7 @@ def build_iris_opt(iris_df, classifier, name, fit_params = {}, **pmml_options):
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X[iris_train_mask], iris_y[iris_train_mask], **fit_params)
+	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
@@ -636,6 +637,7 @@ def build_auto_opt(auto_df, regressor, name, fit_params = {}, **pmml_options):
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X[auto_train_mask], auto_y[auto_train_mask], **fit_params)
+	pipeline.configure(**pmml_options)
 	if isinstance(regressor, XGBRegressor):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:

@@ -1,3 +1,5 @@
+import sys
+
 from h2o import H2OFrame
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.estimators.glm import H2OGeneralizedLinearEstimator
@@ -10,7 +12,6 @@ from sklearn2pmml.preprocessing.h2o import H2OFrameConstructor
 from sklearn_pandas import DataFrameMapper
 
 import h2o
-import sys
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 

@@ -1,6 +1,6 @@
-from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
-
 import sys
+
+from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 

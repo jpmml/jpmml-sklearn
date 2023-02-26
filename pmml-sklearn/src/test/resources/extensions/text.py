@@ -1,6 +1,6 @@
-from common import *
-
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
+
+from common import *
 
 stop_words = ["a", "and", "are", "d", "i", "is", "it", "ll", "m", "s", "the", "ve", "we", "you"]
 

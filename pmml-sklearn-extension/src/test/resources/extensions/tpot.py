@@ -1,3 +1,6 @@
+import os
+import sys
+
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.pipeline import Pipeline
@@ -10,8 +13,6 @@ from tpot import TPOTClassifier, TPOTRegressor
 from tpot.config import classifier_config_dict, regressor_config_dict
 
 import pandas
-import os
-import sys
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 

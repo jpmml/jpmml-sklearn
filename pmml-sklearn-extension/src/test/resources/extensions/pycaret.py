@@ -1,3 +1,6 @@
+import os
+import sys
+
 from pandas import DataFrame, Int64Dtype, Series
 from pycaret.classification import ClassificationExperiment
 from pycaret.clustering import ClusteringExperiment
@@ -6,9 +9,6 @@ from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml.pycaret import _escape
 
 import numpy
-import os
-import pycaret
-import sys
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 

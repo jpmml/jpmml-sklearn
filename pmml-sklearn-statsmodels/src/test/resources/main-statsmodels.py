@@ -1,13 +1,12 @@
+import sys
+
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import OneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.statsmodels import StatsModelsClassifier, StatsModelsRegressor
 from statsmodels.api import GLM, Logit, MNLogit, OLS, Poisson, WLS
-
-import statsmodels.genmod.families as families
-
-import sys
+from statsmodels.genmod import families
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
