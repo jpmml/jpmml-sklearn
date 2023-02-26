@@ -97,12 +97,12 @@ public class RuleSetClassifier extends Classifier {
 		Scope scope = new DataFrameScope("X", features);
 
 		for(Object[] rule : rules){
-			String predicate = TupleUtil.extractElement(rule, 0, String.class);
+			Object expr = TupleUtil.extractElement(rule, 0, Object.class);
 			String score = TupleUtil.extractElement(rule, 1, String.class);
 
-			Predicate pmmlPredicate = EvaluatableUtil.translatePredicate(predicate, Collections.emptyList(), scope);
+			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 
-			SimpleRule simpleRule = new SimpleRule(score, pmmlPredicate);
+			SimpleRule simpleRule = new SimpleRule(score, predicate);
 
 			ruleSet.addRules(simpleRule);
 		}

@@ -18,7 +18,6 @@
  */
 package sklearn2pmml.ensemble;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
@@ -72,17 +71,17 @@ public class SelectFirstUtil {
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
 			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
-			String predicate = TupleUtil.extractElement(step, 2, String.class);
+			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
 			if(estimator.getMiningFunction() != miningFunction){
 				throw new IllegalArgumentException();
 			}
 
-			Predicate pmmlPredicate = EvaluatableUtil.translatePredicate(predicate, Collections.emptyList(), scope);
+			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 
 			Model model = estimator.encode(schema);
 
-			Segment segment = new Segment(pmmlPredicate, model)
+			Segment segment = new Segment(predicate, model)
 				.setId(name);
 
 			segmentation.addSegments(segment);

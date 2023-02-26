@@ -74,6 +74,18 @@ public class EvaluatableUtil {
 	}
 
 	static
+	public org.dmg.pmml.Predicate translatePredicate(Object expr, Scope scope){
+
+		if(expr instanceof Predicate){
+			Predicate predicate = (Predicate)expr;
+
+			return predicate.translate(scope);
+		}
+
+		return translatePredicate((String)expr, Collections.emptyList(), scope);
+	}
+
+	static
 	public org.dmg.pmml.Predicate translatePredicate(String expr, List<String> functionDefs, Scope scope){
 		PredicateTranslator predicateTranslator = new PredicateTranslator(scope);
 

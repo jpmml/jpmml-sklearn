@@ -20,7 +20,6 @@ package sklearn2pmml.ensemble;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -163,13 +162,13 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
 			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
-			String predicate = TupleUtil.extractElement(step, 2, String.class);
+			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
 			estimators.add(estimator);
 
 			Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
 
-			Predicate pmmlPredicate = EvaluatableUtil.translatePredicate(predicate, Collections.emptyList(), scope);
+			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 
 			Model model = estimator.encode(segmentSchema);
 
@@ -181,7 +180,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 				schema = link.augmentSchema(model, segmentSchema);
 			}
 
-			Segment segment = new Segment(pmmlPredicate, model)
+			Segment segment = new Segment(predicate, model)
 				.setId(name);
 
 			segmentation.addSegments(segment);

@@ -16,6 +16,7 @@ from sklearn2pmml.postprocessing import BusinessDecisionTransformer
 from sklearn2pmml.preprocessing import CutTransformer
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
+from sklearn2pmml.util import Predicate
 
 import numpy
 import sys
@@ -122,7 +123,7 @@ def build_ruleset_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
 
 	classifier = RuleSetClassifier([
-		("X['Petal.Length'] >= 2.45 and X['Petal.Width'] < 1.75", "versicolor"),
+		(Predicate("X['Petal.Length'] >= 2.45 and X['Petal.Width'] < 1.75"), "versicolor"),
 		("X['Petal.Length'] >= 2.45", "virginica")
 	], default_score = "setosa")
 	pipeline = PMMLPipeline([
