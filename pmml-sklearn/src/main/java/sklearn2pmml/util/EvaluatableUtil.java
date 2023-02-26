@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.util;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DerivedField;
@@ -29,6 +30,30 @@ import org.jpmml.python.Scope;
 public class EvaluatableUtil {
 
 	private EvaluatableUtil(){
+	}
+
+	static
+	public String toString(Object expr){
+
+		if(expr instanceof Evaluatable){
+			Evaluatable<?> evaluatable = (Evaluatable<?>)expr;
+
+			return evaluatable.getExpr();
+		}
+
+		return (String)expr;
+	}
+
+	static
+	public org.dmg.pmml.Expression translateExpression(Object expr, Scope scope){
+
+		if(expr instanceof Expression){
+			Expression expression = (Expression)expr;
+
+			return expression.translate(scope);
+		}
+
+		return translateExpression((String)expr, Collections.emptyList(), scope);
 	}
 
 	static

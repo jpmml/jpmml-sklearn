@@ -54,7 +54,7 @@ public class ExpressionTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		String expr = getExpr();
+		Object expr = getExpr();
 		Object mapMissingTo = getMapMissingTo();
 		Object defaultValue = getDefaultValue();
 		InvalidValueTreatmentMethod invalidValueTreatment = parseInvalidValueTreatment(getInvalidValueTreatment());
@@ -70,7 +70,7 @@ public class ExpressionTransformer extends Transformer {
 
 		Scope scope = new DataFrameScope("X", features, encoder);
 
-		Expression expression = EvaluatableUtil.translateExpression(expr, Collections.emptyList(), scope);
+		Expression expression = EvaluatableUtil.translateExpression(expr, scope);
 
 		DerivedField derivedField = null;
 
@@ -139,7 +139,7 @@ public class ExpressionTransformer extends Transformer {
 		} else
 
 		{
-			derivedField = encoder.createDerivedField(createFieldName("eval", expr), opType, dataType, expression);
+			derivedField = encoder.createDerivedField(createFieldName("eval", EvaluatableUtil.toString(expr)), opType, dataType, expression);
 		}
 
 		return Collections.singletonList(FeatureUtil.createFeature(derivedField, encoder));
@@ -165,7 +165,7 @@ public class ExpressionTransformer extends Transformer {
 		return this;
 	}
 
-	public String getExpr(){
+	public Object getExpr(){
 
 		// SkLearn2PMML 0.31.0
 		if(containsKey("expr_")){
@@ -174,7 +174,7 @@ public class ExpressionTransformer extends Transformer {
 
 		// SkLearn2PMML 0.31.1+
 		{
-			return getString("expr");
+			return getObject("expr");
 		}
 	}
 
