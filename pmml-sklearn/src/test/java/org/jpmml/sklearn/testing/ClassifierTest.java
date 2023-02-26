@@ -139,16 +139,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluateMultiEstimatorChainAudit() throws Exception {
-		evaluate(MULTI_ESTIMATOR_CHAIN, AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), FieldNames.NODE_ID, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
-	}
-
-	@Test
-	public void evaluateGBDTLRAudit() throws Exception {
-		evaluate(GBDT_LR, AUDIT);
-	}
-
-	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {
 		evaluate(GRADIENT_BOOSTING, AUDIT);
 	}
@@ -351,16 +341,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluateRuleSetIris() throws Exception {
-		evaluate(RULE_SET, IRIS);
-	}
-
-	@Test
-	public void evaluateSelectFirstIris() throws Exception {
-		evaluate(SELECT_FIRST, IRIS, excludeFields(IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA));
-	}
-
-	@Test
 	public void evaluateSGDIris() throws Exception {
 		evaluate(SGD, IRIS);
 	}
@@ -413,11 +393,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateDummyVersicolor() throws Exception {
 		evaluate(DUMMY, VERSICOLOR);
-	}
-
-	@Test
-	public void evaluateGBDTLRVersicolor() throws Exception {
-		evaluate(GBDT_LR, VERSICOLOR);
 	}
 
 	@Test

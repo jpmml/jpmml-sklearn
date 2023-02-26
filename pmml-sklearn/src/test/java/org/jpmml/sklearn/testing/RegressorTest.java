@@ -126,16 +126,6 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
-	public void evaluateMultiEstimatorChainAuto() throws Exception {
-		evaluate(MULTI_ESTIMATOR_CHAIN, AUTO, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "acceleration"), FieldNames.NODE_ID));
-	}
-
-	@Test
-	public void evaluateGBDTLMAuto() throws Exception {
-		evaluate(GBDT_LM, AUTO);
-	}
-
-	@Test
 	public void evaluateGradientBoostingAuto() throws Exception {
 		evaluate(GRADIENT_BOOSTING, AUTO);
 	}
@@ -265,11 +255,6 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluateBayesianRidgeHousing() throws Exception {
 		evaluate(BAYESIAN_RIDGE, HOUSING);
-	}
-
-	@Test
-	public void evaluateGBDTLMHousing() throws Exception {
-		evaluate(GBDT_LM, HOUSING);
 	}
 
 	@Test

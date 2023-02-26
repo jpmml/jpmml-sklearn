@@ -2,17 +2,27 @@ from common import *
 
 from pandas import DataFrame, Series
 from sklearn_pandas import DataFrameMapper
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPRegressor
-from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
+from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
+from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, SelectFirstClassifier
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
 from sklearn2pmml.preprocessing import CutTransformer
+from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
 
 import numpy
+import sys
+
+sys.path.append("../")
+
+from main import *
 
 def make_bins(X, cols):
 	result = dict()
@@ -55,13 +65,23 @@ def build_chaid_audit(audit_df, name):
 	node_id = Series(pipeline._final_estimator.apply(audit_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
 
+audit_df = load_audit("Audit", stringify = False)
+
+build_audit(audit_df, GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "GBDTLRAudit")
+
 audit_df = load_audit("Audit")
+
+build_multi_audit(audit_df, EstimatorChain([("gender", Link(DecisionTreeClassifier(max_depth = 5, random_state = 13), augment_funcs = ["predict_proba", "apply"]), str(True)), ("adjusted", LogisticRegression(), str(True))]), "MultiEstimatorChainAudit")
 
 build_chaid_audit(audit_df, "CHAIDAudit")
 
 audit_df = load_audit("AuditNA")
 
 build_chaid_audit(audit_df, "CHAIDAuditNA")
+
+versicolor_df = load_versicolor("Versicolor")
+
+build_versicolor(versicolor_df, GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRVersicolor")
 
 def build_chaid_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
@@ -98,6 +118,47 @@ def build_mlp_iris(iris_df, name, transformer, predict_proba_transformer = None)
 	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
 
+def build_ruleset_iris(iris_df, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	classifier = RuleSetClassifier([
+		("X['Petal.Length'] >= 2.45 and X['Petal.Width'] < 1.75", "versicolor"),
+		("X['Petal.Length'] >= 2.45", "virginica")
+	], default_score = "setosa")
+	pipeline = PMMLPipeline([
+		("domain", ContinuousDomain(display_name = ["Sepal length (cm)", "Sepal width (cm)", "Petal length (cm)", "Petal width (cm)"])),
+		("classifier", classifier)
+	])
+	pipeline.fit(iris_X, iris_y)
+	pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
+	store_pkl(pipeline, "RuleSetIris")
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	store_csv(species, "RuleSetIris")
+
+def build_selectfirst_iris(iris_df, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	pipeline = PMMLPipeline([
+		("mapper", DataFrameMapper([
+			(iris_X.columns.values, ContinuousDomain())
+		])),
+		("classifier", SelectFirstClassifier([
+			("select", Pipeline([
+				("classifier", DecisionTreeClassifier(random_state = 13))
+			]), "X[1] <= 3"),
+			("default", Pipeline([
+				("scaler", StandardScaler()),
+				("classifier", LogisticRegression(multi_class = "ovr", solver = "liblinear"))
+			]), str(True))
+		]))
+	])
+	pipeline.fit(iris_X, iris_y)
+	store_pkl(pipeline, "SelectFirstIris")
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, "SelectFirstIris")
+
 iris_df = load_iris("Iris")
 
 build_chaid_iris(iris_df, "CHAIDIris")
@@ -106,6 +167,10 @@ mlp = MLPRegressor(hidden_layer_sizes = (11, ), solver = "lbfgs", random_state =
 
 build_mlp_iris(iris_df, "MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")], prefit = True), "decision", prefit = True))
 build_mlp_iris(iris_df, "MLPTransformerIris", MLPTransformer(mlp, transformer_output_layer = 1))
+
+build_ruleset_iris(iris_df, "RuleSetIris")
+
+build_selectfirst_iris(iris_df, "SelectFirstIris")
 
 def build_chaid_auto(auto_df, name):
 	auto_X, auto_y = split_csv(auto_df)
@@ -127,8 +192,23 @@ def build_chaid_auto(auto_df, name):
 
 auto_df = load_auto("Auto")
 
+# XXX
+auto_df["cylinders"] = auto_df["cylinders"].astype(int)
+auto_df["model_year"] = auto_df["model_year"].astype(int)
+auto_df["origin"] = auto_df["origin"].astype(int)
+
+build_auto(auto_df, GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
+
+auto_df = load_auto("Auto")
+
 build_chaid_auto(auto_df, "CHAIDAuto")
+
+build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
 
 auto_df = load_auto("AutoNA")
 
 build_chaid_auto(auto_df, "CHAIDAutoNA")
+
+housing_df = load_housing("Housing")
+
+build_housing(housing_df, GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")

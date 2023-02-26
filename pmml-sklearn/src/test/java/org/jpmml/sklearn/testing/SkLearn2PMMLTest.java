@@ -18,15 +18,29 @@
  */
 package org.jpmml.sklearn.testing;
 
+import org.jpmml.converter.FieldNamePrefixes;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.sklearn.FieldNames;
 import org.junit.Test;
+import sklearn.Estimator;
 
 public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
 	@Test
 	public void evaluateCHAIDAudit() throws Exception {
 		evaluate("CHAID", AUDIT, excludeFields(AUDIT_ADJUSTED, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+	}
+
+	@Test
+	public void evaluateGBDTLRAudit() throws Exception {
+		evaluate("GBDTLR", AUDIT);
+	}
+
+	@Test
+	public void evaluateMultiEstimatorChainAudit() throws Exception {
+		evaluate("MultiEstimatorChain", AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), FieldNames.NODE_ID, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
 	}
 
 	@Test
@@ -40,8 +54,23 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	}
 
 	@Test
+	public void evaluateGBDTLMAuto() throws Exception {
+		evaluate("GBDTLM", AUTO);
+	}
+
+	@Test
+	public void evaluateMultiEstimatorChainAuto() throws Exception {
+		evaluate("MultiEstimatorChain", AUTO, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "acceleration"), FieldNames.NODE_ID));
+	}
+
+	@Test
 	public void evaluateCHAIDAutoNA() throws Exception {
 		evaluate("CHAID", AUTO_NA, excludeFields(AUTO_MPG));
+	}
+
+	@Test
+	public void evaluateGBDTLMHousing() throws Exception {
+		evaluate("GBDTLM", HOUSING);
 	}
 
 	@Test
@@ -57,5 +86,20 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	@Test
 	public void evaluateMLPTransformerIris() throws Exception {
 		evaluate("MLPTransformer", IRIS);
+	}
+
+	@Test
+	public void evaluateRuleSetIris() throws Exception {
+		evaluate("RuleSet", IRIS);
+	}
+
+	@Test
+	public void evaluateSelectFirstIris() throws Exception {
+		evaluate("SelectFirst", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA));
+	}
+
+	@Test
+	public void evaluateGBDTLRVersicolor() throws Exception {
+		evaluate("GBDTLR", VERSICOLOR);
 	}
 }

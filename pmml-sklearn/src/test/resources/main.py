@@ -27,12 +27,10 @@ from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SV
 from sklearn2pmml import make_pmml_pipeline, sklearn2pmml
 from sklearn2pmml import EstimatorProxy, SelectorProxy
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, ContinuousDomainEraser, DiscreteDomainEraser, MultiAlias, MultiDomain
-from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, SelectFirstClassifier
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
-from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn2pmml.util import Slicer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
@@ -180,7 +178,6 @@ if "Audit" in datasets:
 	build_audit(audit_df, BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
 	build_audit(audit_df, DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 	build_audit(audit_df, EstimatorProxy(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13)), "ExtraTreesAudit")
-	build_audit(audit_df, GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "GBDTLRAudit")
 	build_audit(audit_df, EstimatorProxy(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13)), "GradientBoostingAudit")
 	build_audit(audit_df, HistGradientBoostingClassifier(max_iter = 71, random_state = 13), "HistGradientBoostingAudit")
 	build_audit(audit_df, LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
@@ -301,6 +298,9 @@ if "Audit" in datasets:
 def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
 
+	audit_y["Gender"] = audit_y["Gender"].astype(str)
+	audit_y["Adjusted"] = audit_y["Adjusted"].astype(str)
+
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
 		[([column], [CategoricalDomain(), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation"]]
@@ -321,10 +321,7 @@ def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
-	audit_df["Gender"] = audit_df["Gender"].astype(str)
-	audit_df["Adjusted"] = audit_df["Adjusted"].astype(str)
 
-	build_multi_audit(audit_df, EstimatorChain([("gender", Link(DecisionTreeClassifier(max_depth = 5, random_state = 13), augment_funcs = ["predict_proba", "apply"]), str(True)), ("adjusted", LogisticRegression(), str(True))]), "MultiEstimatorChainAudit")
 	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit", with_kneighbors = True)
 	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
 
@@ -371,7 +368,6 @@ if "Versicolor" in datasets:
 	versicolor_df = load_versicolor("Versicolor")
 
 	build_versicolor(versicolor_df, DummyClassifier(strategy = "prior"), "DummyVersicolor")
-	build_versicolor(versicolor_df, GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRVersicolor")
 	build_versicolor(versicolor_df, KNeighborsClassifier(metric = "euclidean"), "KNNVersicolor", with_proba = False)
 	build_versicolor(versicolor_df, MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPVersicolor")
 	build_versicolor(versicolor_df, SGDClassifier(max_iter = 100, random_state = 13), "SGDVersicolor", with_proba = False)
@@ -491,47 +487,6 @@ def build_iris_opt(iris_df, classifier, name, fit_params = {}, **pmml_options):
 	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
 
-if "Iris" in datasets:
-	iris_X, iris_y = split_csv(iris_df)
-
-	pipeline = PMMLPipeline([
-		("mapper", DataFrameMapper([
-			(iris_X.columns.values, ContinuousDomain())
-		])),
-		("classifier", SelectFirstClassifier([
-			("select", Pipeline([
-				("classifier", DecisionTreeClassifier(random_state = 13))
-			]), "X[1] <= 3"),
-			("default", Pipeline([
-				("scaler", StandardScaler()),
-				("classifier", LogisticRegression(multi_class = "ovr", solver = "liblinear"))
-			]), str(True))
-		]))
-	])
-	pipeline.fit(iris_X, iris_y)
-	store_pkl(pipeline, "SelectFirstIris")
-	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
-	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
-	species = pandas.concat((species, species_proba), axis = 1)
-	store_csv(species, "SelectFirstIris")
-
-if "Iris" in datasets:
-	iris_X, iris_y = split_csv(iris_df)
-
-	classifier = RuleSetClassifier([
-		("X['Petal.Length'] >= 2.45 and X['Petal.Width'] < 1.75", "versicolor"),
-		("X['Petal.Length'] >= 2.45", "virginica")
-	], default_score = "setosa")
-	pipeline = PMMLPipeline([
-		("domain", ContinuousDomain(display_name = ["Sepal length (cm)", "Sepal width (cm)", "Petal length (cm)", "Petal width (cm)"])),
-		("classifier", classifier)
-	])
-	pipeline.fit(iris_X, iris_y)
-	pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
-	store_pkl(pipeline, "RuleSetIris")
-	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
-	store_csv(species, "RuleSetIris")
-
 #
 # Text classification
 #
@@ -617,7 +572,6 @@ if "Auto" in datasets:
 	build_auto(auto_df, DummyRegressor(strategy = "median"), "DummyAuto")
 	build_auto(auto_df, ElasticNetCV(cv = 3, random_state = 13), "ElasticNetAuto")
 	build_auto(auto_df, ExtraTreesRegressor(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesAuto")
-	build_auto(auto_df, GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
 	build_auto(auto_df, GradientBoostingRegressor(init = None, random_state = 13), "GradientBoostingAuto")
 	build_auto(auto_df, HuberRegressor(), "HuberAuto")
 	build_auto(auto_df, LarsCV(cv = 3), "LarsAuto")
@@ -781,7 +735,6 @@ def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
-	build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
 	build_multi_auto(auto_df, KNeighborsRegressor(algorithm = "brute"), "MultiKNNAuto", with_kneighbors = True)
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")
@@ -823,7 +776,6 @@ if "Housing" in datasets:
 
 	build_housing(housing_df, AdaBoostRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), n_estimators = 17, random_state = 13), "AdaBoostHousing")
 	build_housing(housing_df, BayesianRidge(), "BayesianRidgeHousing")
-	build_housing(housing_df, GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
 	build_housing(housing_df, HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingHousing")
 	build_housing(housing_df, KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 	build_housing(housing_df, MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", tol = 0.001, max_iter = 1000, random_state = 13), "MLPHousing")

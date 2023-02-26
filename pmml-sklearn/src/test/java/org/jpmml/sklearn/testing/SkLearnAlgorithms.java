@@ -30,11 +30,7 @@ public interface SkLearnAlgorithms {
 	String DUMMY = "Dummy";
 	String ELASTIC_NET = "ElasticNet";
 	String EXTRA_TREES = "ExtraTrees";
-	String ESTIMATOR_CHAIN = "EstimatorChain";
-	String MULTI_ESTIMATOR_CHAIN = "Multi" + ESTIMATOR_CHAIN;
 	String GAMMA_REGRESSION = "GammaRegression";
-	String GBDT_LM = "GBDTLM";
-	String GBDT_LR = "GBDTLR";
 	String GRADIENT_BOOSTING = "GradientBoosting";
 	String HIST_GRADIENT_BOOSTING = "HistGradientBoosting";
 	String HUBER = "Huber";
@@ -79,8 +75,6 @@ public interface SkLearnAlgorithms {
 	String RIDGE = "Ridge";
 	String BAYESIAN_RIDGE = "Bayesian" + RIDGE;
 	String RIDGE_ENSEMBLE = RIDGE + "Ensemble";
-	String RULE_SET = "RuleSet";
-	String SELECT_FIRST = "SelectFirst";
 	String SGD = "SGD";
 	String SGD_ONE_CLASS_SVM = "SGD" + ONE_CLASS_SVM;
 	String SGD_LOG = SGD + "Log";
