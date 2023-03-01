@@ -361,9 +361,9 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Identity comparison operators `is None` and `is not None`.
       * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.
-      * Math constant `math.nan`.
+      * Math constants `math.e`, `math.nan` and `math.pi`.
       * Math functions (too numerous to list).
-      * Numpy constant `numpy.NaN`.
+      * Numpy constants `numpy.e`, `numpy.NaN`. `numpy.NZERO`, `numpy.pi` and `numpy.PZERO`.
       * Numpy function `numpy.where`.
       * Numpy universal functions (too numerous to list).
       * Pandas constants `pandas.NA` and `pandas.NaT`.
