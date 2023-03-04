@@ -26,6 +26,14 @@ sys.path.append("../")
 
 from main import *
 
+datasets = []
+
+if __name__ == "__main__":
+	if len(sys.argv) > 1:
+		datasets = (sys.argv[1]).split(",")
+	else:
+		datasets = ["Audit", "Auto", "Housing", "Iris", "Versicolor"]
+
 def make_bins(X, cols):
 	result = dict()
 	for col in cols:
@@ -67,23 +75,25 @@ def build_chaid_audit(audit_df, name):
 	node_id = Series(pipeline._final_estimator.apply(audit_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
 
-audit_df = load_audit("Audit", stringify = False)
+if "Audit" in datasets:
+	audit_df = load_audit("Audit", stringify = False)
 
-build_audit(audit_df, GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "GBDTLRAudit")
+	build_audit(audit_df, GBDTLRClassifier(RandomForestClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "GBDTLRAudit")
 
-audit_df = load_audit("Audit")
+	audit_df = load_audit("Audit")
 
-build_multi_audit(audit_df, EstimatorChain([("gender", Link(DecisionTreeClassifier(max_depth = 5, random_state = 13), augment_funcs = ["predict_proba", "apply"]), str(True)), ("adjusted", LogisticRegression(), str(True))]), "MultiEstimatorChainAudit")
+	build_multi_audit(audit_df, EstimatorChain([("gender", Link(DecisionTreeClassifier(max_depth = 5, random_state = 13), augment_funcs = ["predict_proba", "apply"]), str(True)), ("adjusted", LogisticRegression(), str(True))]), "MultiEstimatorChainAudit")
 
-build_chaid_audit(audit_df, "CHAIDAudit")
+	build_chaid_audit(audit_df, "CHAIDAudit")
 
-audit_df = load_audit("AuditNA")
+	audit_df = load_audit("AuditNA")
 
-build_chaid_audit(audit_df, "CHAIDAuditNA")
+	build_chaid_audit(audit_df, "CHAIDAuditNA")
 
-versicolor_df = load_versicolor("Versicolor")
+if "Versicolor" in datasets:
+	versicolor_df = load_versicolor("Versicolor")
 
-build_versicolor(versicolor_df, GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRVersicolor")
+	build_versicolor(versicolor_df, GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRVersicolor")
 
 def build_chaid_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
@@ -161,18 +171,19 @@ def build_selectfirst_iris(iris_df, name):
 	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, "SelectFirstIris")
 
-iris_df = load_iris("Iris")
+if "Iris" in datasets:
+	iris_df = load_iris("Iris")
 
-build_chaid_iris(iris_df, "CHAIDIris")
+	build_chaid_iris(iris_df, "CHAIDIris")
 
-mlp = MLPRegressor(hidden_layer_sizes = (11, ), solver = "lbfgs", random_state = 13)
+	mlp = MLPRegressor(hidden_layer_sizes = (11, ), solver = "lbfgs", random_state = 13)
 
-build_mlp_iris(iris_df, "MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")], prefit = True), "decision", prefit = True))
-build_mlp_iris(iris_df, "MLPTransformerIris", MLPTransformer(mlp, transformer_output_layer = 1))
+	build_mlp_iris(iris_df, "MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")], prefit = True), "decision", prefit = True))
+	build_mlp_iris(iris_df, "MLPTransformerIris", MLPTransformer(mlp, transformer_output_layer = 1))
 
-build_ruleset_iris(iris_df, "RuleSetIris")
+	build_ruleset_iris(iris_df, "RuleSetIris")
 
-build_selectfirst_iris(iris_df, "SelectFirstIris")
+	build_selectfirst_iris(iris_df, "SelectFirstIris")
 
 def build_chaid_auto(auto_df, name):
 	auto_X, auto_y = split_csv(auto_df)
@@ -192,25 +203,27 @@ def build_chaid_auto(auto_df, name):
 	node_id = Series(pipeline._final_estimator.apply(auto_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
 
-auto_df = load_auto("Auto")
+if "Auto" in datasets:
+	auto_df = load_auto("Auto")
 
-# XXX
-auto_df["cylinders"] = auto_df["cylinders"].astype(int)
-auto_df["model_year"] = auto_df["model_year"].astype(int)
-auto_df["origin"] = auto_df["origin"].astype(int)
+	# XXX
+	auto_df["cylinders"] = auto_df["cylinders"].astype(int)
+	auto_df["model_year"] = auto_df["model_year"].astype(int)
+	auto_df["origin"] = auto_df["origin"].astype(int)
 
-build_auto(auto_df, GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
+	build_auto(auto_df, GBDTLMRegressor(RandomForestRegressor(n_estimators = 7, max_depth = 6, random_state = 13), LinearRegression()), "GBDTLMAuto")
 
-auto_df = load_auto("Auto")
+	auto_df = load_auto("Auto")
 
-build_chaid_auto(auto_df, "CHAIDAuto")
+	build_chaid_auto(auto_df, "CHAIDAuto")
 
-build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
+	build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
 
-auto_df = load_auto("AutoNA")
+	auto_df = load_auto("AutoNA")
 
-build_chaid_auto(auto_df, "CHAIDAutoNA")
+	build_chaid_auto(auto_df, "CHAIDAutoNA")
 
-housing_df = load_housing("Housing")
+if "Housing" in datasets:
+	housing_df = load_housing("Housing")
 
-build_housing(housing_df, GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
+	build_housing(housing_df, GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
