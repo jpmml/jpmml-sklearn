@@ -27,6 +27,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
@@ -56,7 +57,7 @@ public class ExpressionRegressor extends Regressor {
 
 		org.dmg.pmml.Expression pmmlExpression = EvaluatableUtil.translateExpression(expr, scope);
 
-		DerivedField derivedField = encoder.createDerivedField("expression", OpType.CONTINUOUS, DataType.DOUBLE, pmmlExpression);
+		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("expression"), OpType.CONTINUOUS, DataType.DOUBLE, pmmlExpression);
 
 		return RegressionModelUtil.createRegression(Collections.singletonList(new ContinuousFeature(encoder, derivedField)), Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
 	}

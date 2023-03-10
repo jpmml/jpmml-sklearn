@@ -333,6 +333,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.ensemble.SelectFirstClassifier`
     * `sklearn2pmml.ensemble.SelectFirstRegressor`
   * UDF models:
+    * `sklearn2pmml.expression.ExpressionClassifier`
     * `sklearn2pmml.expression.ExpressionRegressor`
   * Feature selection:
     * `sklearn2pmml.feature_selection.SelectUnique`

@@ -84,6 +84,11 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	}
 
 	@Test
+	public void evaluateExpressionIris() throws Exception {
+		evaluate("Expression", IRIS);
+	}
+
+	@Test
 	public void evaluateMLPAutoencoderIris() throws Exception {
 		evaluate("MLPAutoencoder", IRIS);
 	}
@@ -101,6 +106,11 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	@Test
 	public void evaluateSelectFirstIris() throws Exception {
 		evaluate("SelectFirst", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA));
+	}
+
+	@Test
+	public void evaluateExpressionVersicolor() throws Exception {
+		evaluate("Expression", VERSICOLOR);
 	}
 
 	@Test

@@ -10,7 +10,7 @@ from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, SelectFirstClassifier
-from sklearn2pmml.expression import ExpressionRegressor
+from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
@@ -91,10 +91,38 @@ if "Audit" in datasets:
 
 	build_chaid_audit(audit_df, "CHAIDAuditNA")
 
+def _versicolor_func(petal_length, petal_width):
+	if petal_length > 2.45:
+		if petal_width <= 1.75:
+			return 2.2824 # logit(49. / 54.)
+		else:
+			return -3.8067 # logit(1. / 46.)
+	else:
+		return -9.2102 # logit(0.0001)
+
+def build_expr_versicolor(versicolor_df, name):
+	versicolor_X, versicolor_y = split_csv(versicolor_df)
+
+	class_exprs = {
+		1: Expression("_versicolor_func(X['Petal.Length'], X['Petal.Width'])", function_defs = [_versicolor_func])
+	}
+
+	pipeline = PMMLPipeline([
+		("classifier", ExpressionClassifier(class_exprs, normalization_method = "logit"))
+	])
+	pipeline.fit(versicolor_X, versicolor_y)
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
 if "Versicolor" in datasets:
 	versicolor_df = load_versicolor("Versicolor")
 
 	build_versicolor(versicolor_df, GBDTLRClassifier(GradientBoostingClassifier(n_estimators = 11, random_state = 13), LogisticRegression(solver = "liblinear")), "GBDTLRVersicolor")
+
+	build_expr_versicolor(versicolor_df, "ExpressionVersicolor")
 
 def build_chaid_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
@@ -111,6 +139,49 @@ def build_chaid_iris(iris_df, name):
 	store_pkl(pipeline, name)
 	node_id = Series(pipeline._final_estimator.apply(iris_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
+
+def _iris_setosa_func(petal_length):
+	if petal_length <= 2.45:
+		return 1
+	else:
+		return 0
+
+def _iris_versicolor_func(petal_length, petal_width):
+	if petal_length > 2.45:
+		if petal_width <= 1.75:
+			return 0.90741
+		else:
+			return 0.02174
+	else:
+		return 0
+
+def _iris_virginica_func(petal_length, petal_width):
+	if petal_length > 2.45:
+		if petal_width <= 1.75:
+			return 0.09259
+		else:
+			return 0.97826
+	else:
+		return 0
+
+def build_expr_iris(iris_df, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	class_exprs = {
+		"setosa" : Expression("_iris_setosa_func(X['Petal.Length'])", function_defs = [_iris_setosa_func]),
+		"versicolor" : Expression("_iris_versicolor_func(X['Petal.Length'], X['Petal.Width'])", function_defs = [_iris_versicolor_func]),
+		"virginica" : Expression("_iris_virginica_func(X['Petal.Length'], X['Petal.Width'])", function_defs = [_iris_virginica_func])
+	}
+
+	pipeline = PMMLPipeline([
+		("classifier", ExpressionClassifier(class_exprs, normalization_method = "simplemax"))
+	])
+	pipeline.fit(iris_X, iris_y)
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
 
 def build_mlp_iris(iris_df, name, transformer, predict_proba_transformer = None):
 	iris_X, iris_y = split_csv(iris_df)
@@ -144,9 +215,9 @@ def build_ruleset_iris(iris_df, name):
 	])
 	pipeline.fit(iris_X, iris_y)
 	pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
-	store_pkl(pipeline, "RuleSetIris")
+	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
-	store_csv(species, "RuleSetIris")
+	store_csv(species, name)
 
 def build_selectfirst_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
@@ -166,16 +237,17 @@ def build_selectfirst_iris(iris_df, name):
 		]))
 	])
 	pipeline.fit(iris_X, iris_y)
-	store_pkl(pipeline, "SelectFirstIris")
+	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
 	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
 	species = pandas.concat((species, species_proba), axis = 1)
-	store_csv(species, "SelectFirstIris")
+	store_csv(species, name)
 
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
 	build_chaid_iris(iris_df, "CHAIDIris")
+	build_expr_iris(iris_df, "ExpressionIris")
 
 	mlp = MLPRegressor(hidden_layer_sizes = (11, ), solver = "lbfgs", random_state = 13)
 
@@ -210,7 +282,7 @@ def _scale_displacement(displacement):
 def _scale_weight(weight):
 	return (weight - 2977.58) / 848.32
 
-def build_expr_auto(df, name):
+def build_expr_auto(auto_df, name):
 	auto_X, auto_y = split_csv(auto_df)
 
 	expr = Expression("-1.724 * _scale_displacement(X['displacement']) + 4.879 * _scale_weight(X['weight']) + 23.45", function_defs = [_scale_displacement, _scale_weight])
