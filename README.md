@@ -332,6 +332,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * The LR side: A Scikit-Learn binary linear classifier (eg. `LinearSVC`, `LogisticRegression`, `SGDClassifier`).
     * `sklearn2pmml.ensemble.SelectFirstClassifier`
     * `sklearn2pmml.ensemble.SelectFirstRegressor`
+  * UDF models:
+    * `sklearn2pmml.expression.ExpressionRegressor`
   * Feature selection:
     * `sklearn2pmml.feature_selection.SelectUnique`
   * Linear models:

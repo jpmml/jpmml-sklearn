@@ -10,13 +10,14 @@ from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, SelectFirstClassifier
+from sklearn2pmml.expression import ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
 from sklearn2pmml.preprocessing import CutTransformer
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
-from sklearn2pmml.util import Predicate
+from sklearn2pmml.util import Expression, Predicate
 
 import numpy
 
@@ -203,6 +204,25 @@ def build_chaid_auto(auto_df, name):
 	node_id = Series(pipeline._final_estimator.apply(auto_X), dtype = int, name = "nodeId")
 	store_csv(node_id, name)
 
+def _scale_displacement(displacement):
+	return (displacement - 194.41) / 104.51
+
+def _scale_weight(weight):
+	return (weight - 2977.58) / 848.32
+
+def build_expr_auto(df, name):
+	auto_X, auto_y = split_csv(auto_df)
+
+	expr = Expression("-1.724 * _scale_displacement(X['displacement']) + 4.879 * _scale_weight(X['weight']) + 23.45", function_defs = [_scale_displacement, _scale_weight])
+
+	pipeline = PMMLPipeline([
+		("regressor", ExpressionRegressor(expr))
+	])
+	pipeline.fit(auto_X, auto_y)
+	store_pkl(pipeline, name)
+	mpg = Series(pipeline.predict(auto_X), name = "mpg")
+	store_csv(mpg, name)
+
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
@@ -216,6 +236,7 @@ if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_chaid_auto(auto_df, "CHAIDAuto")
+	build_expr_auto(auto_df, "ExpressionAuto")
 
 	build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
 

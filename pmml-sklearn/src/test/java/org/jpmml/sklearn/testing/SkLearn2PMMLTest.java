@@ -54,6 +54,11 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	}
 
 	@Test
+	public void evaluateExpressionAuto() throws Exception {
+		evaluate("Expression", AUTO);
+	}
+
+	@Test
 	public void evaluateGBDTLMAuto() throws Exception {
 		evaluate("GBDTLM", AUTO);
 	}
