@@ -21,14 +21,13 @@ package sklearn2pmml.expression;
 import java.util.Collections;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.OpType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
-import org.jpmml.converter.ContinuousFeature;
+import org.dmg.pmml.regression.RegressionTable;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
@@ -50,16 +49,22 @@ public class ExpressionRegressor extends Regressor {
 
 		PMMLEncoder encoder = schema.getEncoder();
 
-		Label label = schema.getLabel();
+		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		Scope scope = new DataFrameScope("X", features, encoder);
 
 		org.dmg.pmml.Expression pmmlExpression = EvaluatableUtil.translateExpression(expr, scope);
 
-		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("expression"), OpType.CONTINUOUS, DataType.DOUBLE, pmmlExpression);
+		Feature exprFeature = ExpressionUtil.toFeature(FieldNameUtil.create("expression"), pmmlExpression, encoder);
 
-		return RegressionModelUtil.createRegression(Collections.singletonList(new ContinuousFeature(encoder, derivedField)), Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+		RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(exprFeature), Collections.singletonList(1d), 0d);
+
+		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel), null)
+			.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE)
+			.addRegressionTables(regressionTable);
+
+		return regressionModel;
 	}
 
 	public Expression getExpr(){

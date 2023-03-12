@@ -28,13 +28,10 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
@@ -74,9 +71,9 @@ public class ExpressionClassifier extends Classifier {
 
 			org.dmg.pmml.Expression pmmlExpression = EvaluatableUtil.translateExpression(expr, scope);
 
-			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("expression", category), OpType.CONTINUOUS, DataType.DOUBLE, pmmlExpression);
+			Feature exprFeature = ExpressionUtil.toFeature(FieldNameUtil.create("expression", category), pmmlExpression, encoder);
 
-			RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(new ContinuousFeature(encoder, derivedField)), Collections.singletonList(1d), 0d);
+			RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(exprFeature), Collections.singletonList(1d), 0d);
 
 			categoryRegressionTables.put(category, regressionTable);
 		}
