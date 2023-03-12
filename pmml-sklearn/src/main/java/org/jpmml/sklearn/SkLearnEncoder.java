@@ -222,7 +222,7 @@ public class SkLearnEncoder extends PythonEncoder {
 			if(labelFeature != null){
 				DataField dataField = (DataField)labelFeature.getField();
 
-				OpType opType = dataField.getOpType();
+				OpType opType = dataField.requireOpType();
 				switch(opType){
 					case CONTINUOUS:
 						label = new ContinuousLabel(dataField);

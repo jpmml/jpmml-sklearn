@@ -66,8 +66,8 @@ public class BusinessDecisionTransformer extends Transformer {
 
 		DerivedField derivedField = (DerivedField)feature.getField();
 
-		DataType dataType = derivedField.getDataType();
-		OpType opType = derivedField.getOpType();
+		DataType dataType = derivedField.requireDataType();
+		OpType opType = derivedField.requireOpType();
 
 		switch(opType){
 			case CATEGORICAL:

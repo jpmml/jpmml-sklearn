@@ -126,7 +126,7 @@ public class ExpressionTransformer extends Transformer {
 			if(feature != null){
 				Field<?> field = feature.getField();
 
-				if((field.getOpType() == opType) && (field.getDataType() == dataType)){
+				if((field.requireOpType() == opType) && (field.requireDataType() == dataType)){
 					return Collections.singletonList(feature);
 				}
 			}

@@ -41,8 +41,8 @@ public class ExpressionUtil {
 			derivedField = encoder.getDerivedField(fieldRef.requireField());
 
 			if(derivedField != null){
-				DataType dataType = derivedField.getDataType();
-				OpType opType = derivedField.getOpType();
+				DataType dataType = derivedField.requireDataType();
+				OpType opType = derivedField.requireOpType();
 
 				switch(dataType){
 					case INTEGER:
