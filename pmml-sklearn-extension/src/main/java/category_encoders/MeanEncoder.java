@@ -141,21 +141,24 @@ public class MeanEncoder extends MapEncoder {
 
 	static
 	private Series toMeanSeries(DataFrame dataFrame, MeanFunction function){
-		BlockManager blockManager = dataFrame.getData();
+		BlockManager data = dataFrame.getData();
 
-		List<Index> axes = blockManager.getAxesArray();
+		List<Index> axes = data.getAxesArray();
 		if(axes.size() != 2){
 			throw new IllegalArgumentException();
 		}
 
-		List<?> firstDim = (axes.get(0)).getValues();
-		List<?> secondDim = (axes.get(1)).getValues();
+		Index columnAxis = axes.get(0);
+		List<?> columnValues = columnAxis.getArrayContent();
 
-		if(!(Arrays.asList("sum", "count")).equals(firstDim)){
+		Index rowAxis = axes.get(1);
+		List<?> rowValues = rowAxis.getArrayContent();
+
+		if(!(Arrays.asList("sum", "count")).equals(columnValues)){
 			throw new IllegalArgumentException();
 		}
 
-		List<HasArray> blockValues = blockManager.getBlockValues();
+		List<HasArray> blockValues = data.getBlockValues();
 
 		List<?> sumValues;
 		List<?> countValues;
