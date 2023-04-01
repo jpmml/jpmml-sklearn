@@ -19,7 +19,6 @@
 package sklearn.calibration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,9 +27,12 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
@@ -49,6 +51,7 @@ import sklearn.Estimator;
 import sklearn.HasEstimator;
 import sklearn.Regressor;
 import sklearn.isotonic.IsotonicRegression;
+import sklearn.linear_model.LinearClassifier;
 
 public class CalibratedClassifier extends Classifier implements HasEstimator<Classifier> {
 
@@ -78,62 +81,136 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 		Model model = estimator.encodeModel(schema);
 
-		// XXX
-		if(model instanceof RegressionModel){
-			throw new IllegalArgumentException();
-		}
+		List<Model> models = new ArrayList<>();
 
-		Output output = model.getOutput();
-		if(output == null){
-			throw new IllegalArgumentException();
-		}
+		List<Feature> decisionFunctionFeatures = new ArrayList<>();
 
-		List<Feature> probabilityFeatures = new ArrayList<>();
+		if(estimator instanceof LinearClassifier){
 
-		List<OutputField> outputFields = output.getOutputFields();
-		for(OutputField outputField : outputFields){
-			ResultFeature resultFeature = outputField.getResultFeature();
+			if(model instanceof MiningModel){
+				MiningModel miningModel = (MiningModel)model;
 
-			switch(resultFeature){
-				case PROBABILITY:
-					{
-						// XXX
-						outputField.setName(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, outputField.getValue()));
+				Segmentation segmentation = miningModel.requireSegmentation();
 
-						probabilityFeatures.add(new ContinuousFeature(encoder, outputField));
+				List<Segment> segments = segmentation.requireSegments();
+				for(Segment segment : segments){
+					RegressionModel decisionFunctionModel = (RegressionModel)segment.requireModel();
+
+					if(decisionFunctionModel.requireMiningFunction() != MiningFunction.REGRESSION){
+						continue;
 					}
-					break;
-				default:
-					break;
+
+					Output output = decisionFunctionModel.getOutput();
+					if(output == null){
+						throw new IllegalArgumentException();
+					}
+
+					OutputField outputField = Iterables.getOnlyElement(output.getOutputFields());
+
+					decisionFunctionModel.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE);
+
+					models.add(decisionFunctionModel);
+
+					decisionFunctionFeatures.add(new ContinuousFeature(encoder, outputField));
+				}
+			} else
+
+			if(model instanceof RegressionModel){
+				RegressionModel regressionModel = (RegressionModel)model;
+
+				List<RegressionTable> regressionTables = regressionModel.getRegressionTables();
+
+				// XXX
+				if(categoricalLabel.size() == 2){
+					regressionTables = regressionTables.subList(0, 1);
+				}
+
+				for(RegressionTable regressionTable : regressionTables){
+					OutputField outputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, regressionTable.requireTargetCategory()), OpType.CONTINUOUS, DataType.DOUBLE)
+						.setFinalResult(false);
+
+					Output output = new Output()
+						.addOutputFields(outputField);
+
+					regressionTable.setTargetCategory(null);
+
+					Model decisionFunctionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(null), null)
+						.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE)
+						.addRegressionTables(regressionTable)
+						.setOutput(output);
+
+					models.add(decisionFunctionModel);
+
+					decisionFunctionFeatures.add(new ContinuousFeature(encoder, outputField));
+				}
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
+		} else
+
+		{
+			Output output = model.getOutput();
+			if(output == null){
+				throw new IllegalArgumentException();
+			}
+
+			List<OutputField> outputFields = output.getOutputFields();
+			for(OutputField outputField : outputFields){
+				ResultFeature resultFeature = outputField.getResultFeature();
+
+				switch(resultFeature){
+					case PROBABILITY:
+						{
+							// XXX
+							outputField.setName(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, outputField.getValue()));
+
+							decisionFunctionFeatures.add(new ContinuousFeature(encoder, outputField));
+						}
+						break;
+					default:
+						break;
+				}
+			}
+
+			models.add(model);
+
+			// XXX
+			if(categoricalLabel.size() == 2){
+				SchemaUtil.checkSize(2, decisionFunctionFeatures);
+
+				decisionFunctionFeatures = decisionFunctionFeatures.subList(1, 2);
 			}
 		}
+
+		SchemaUtil.checkSize(calibrators.size(), decisionFunctionFeatures);
 
 		RegressionModel calibratorModel;
 
 		if(calibrators.size() == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
-			SchemaUtil.checkSize(2, probabilityFeatures);
 
 			Regressor calibrator = calibrators.get(0);
+			Model featureModel = models.get(0);
+			Feature feature = decisionFunctionFeatures.get(0);
 
-			Feature feature = Iterables.getOnlyElement(probabilityFeatures.subList(1, 2));
-
-			Feature calibratedFeature = calibrate(calibrator, model, feature, encoder);
+			Feature calibratedFeature = calibrate(calibrator, featureModel, feature, encoder);
 
 			calibratorModel = RegressionModelUtil.createBinaryLogisticClassification(Collections.singletonList(calibratedFeature), Collections.singletonList(1d), null, RegressionModel.NormalizationMethod.NONE, true, schema);
 		} else
 
 		if(calibrators.size() >= 3){
 			SchemaUtil.checkSize(calibrators.size(), categoricalLabel);
-			SchemaUtil.checkSize(calibrators.size(), probabilityFeatures);
 
 			List<RegressionTable> regressionTables = new ArrayList<>();
 
 			for(int i = 0; i < calibrators.size(); i++){
 				Regressor calibrator = calibrators.get(i);
-				Feature feature = probabilityFeatures.get(i);
+				Model featureModel = models.size() == 1 ? models.get(0) : models.get(i);
+				Feature feature = decisionFunctionFeatures.get(i);
 
-				Feature calibratedFeature = calibrate(calibrator, model, feature, encoder);
+				Feature calibratedFeature = calibrate(calibrator, featureModel, feature, encoder);
 
 				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(calibratedFeature), Collections.singletonList(1d), null)
 					.setTargetCategory(categoricalLabel.getValue(i));
@@ -150,7 +227,9 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 			throw new IllegalArgumentException();
 		}
 
-		return MiningModelUtil.createModelChain(Arrays.asList(model, calibratorModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
+		models.add(calibratorModel);
+
+		return MiningModelUtil.createModelChain(models, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
 	@Override
@@ -173,7 +252,6 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 	static
 	private Feature calibrate(Regressor calibrator, Model model, Feature feature, SkLearnEncoder encoder){
-		// XXX
 		encoder.export(model, feature.getName());
 
 		Feature calibratedFeature;
@@ -203,7 +281,6 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 		derivedField = encoder.createDerivedField(model, outputField, true);
 
-		// XXX
 		return new ContinuousFeature(encoder, derivedField);
 	}
 }

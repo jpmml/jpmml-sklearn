@@ -174,6 +174,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateLinearSVCIsotonicAudit() throws Exception {
+		evaluate(LINEAR_SVC + "Isotonic", AUDIT, new PMMLEquivalence(1e-12, 1e-12));
+	}
+
+	@Test
 	public void evaluateMultiLogisticRegression() throws Exception {
 		evaluate(MULTI_LOGISTIC_REGRESSION, AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
 	}
@@ -246,6 +251,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateRidgeSigmoidAudit() throws Exception {
+		evaluate(RIDGE + "Sigmoid", AUDIT);
+	}
+
+	@Test
 	public void evaluateStackingEnsembleAudit() throws Exception {
 		evaluate(STACKING_ENSEMBLE, AUDIT);
 	}
@@ -311,6 +321,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateLinearSVCIsotonicIris() throws Exception {
+		evaluate(LINEAR_SVC + "Isotonic", IRIS);
+	}
+
+	@Test
 	public void evaluateMultinomialLogisticRegressionIris() throws Exception {
 		evaluate(MULTINOMIAL_LOGISTIC_REGRESSION, IRIS);
 	}
@@ -356,6 +371,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateRidgeSigmoidIris() throws Exception {
+		evaluate(RIDGE + "Sigmoid", IRIS);
+	}
+
+	@Test
 	public void evaluateSGDIris() throws Exception {
 		evaluate(SGD, IRIS);
 	}
@@ -363,6 +383,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateSGDLogIris() throws Exception {
 		evaluate(SGD_LOG, IRIS);
+	}
+
+	@Test
+	public void evaluateSGDSigmoidIris() throws Exception {
+		evaluate(SGD + "Sigmoid", IRIS);
 	}
 
 	@Test
