@@ -129,6 +129,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateDecisionTreeIsotonicAudit() throws Exception {
+		evaluate(DECISION_TREE + "Isotonic", AUDIT);
+	}
+
+	@Test
 	public void evaluateDummyAudit() throws Exception {
 		evaluate(DUMMY, AUDIT);
 	}
@@ -226,6 +231,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateRandomForestIsotonicAudit() throws Exception {
+		evaluate(RANDOM_FOREST + "Isotonic", AUDIT);
+	}
+
+	@Test
 	public void evaluateRidgeAudit() throws Exception {
 		evaluate(RIDGE, AUDIT);
 	}
@@ -258,6 +268,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateDecisionTreeEnsembleIris() throws Exception {
 		evaluate(DECISION_TREE_ENSEMBLE, IRIS);
+	}
+
+	@Test
+	public void evaluateDecisionTreeIsotonicIris() throws Exception {
+		evaluate(DECISION_TREE + "Isotonic", IRIS);
 	}
 
 	@Test

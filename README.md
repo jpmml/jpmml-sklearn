@@ -50,6 +50,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
   Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/main.py)
 
+  * Probability Calibration:
+    * [`calibration.CalibratedClassifierCV`](https://scikit-learn.org/stable/modules/generated/sklearn.calibration.CalibratedClassifierCV.html)
   * Clustering:
     * [`cluster.KMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
     * [`cluster.MiniBatchKMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html)

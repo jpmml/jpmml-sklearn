@@ -1,6 +1,7 @@
 from common import *
 
 from pandas import DataFrame
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA, PCA, TruncatedSVD
@@ -175,7 +176,8 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit", stringify = False)
 
 	build_audit(audit_df, EstimatorProxy(DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13)), "DecisionTreeAudit", compact = False)
-	build_audit(audit_df, BaggingClassifier(DecisionTreeClassifier(random_state = 13, min_samples_leaf = 5), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
+	build_audit(audit_df, BaggingClassifier(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
+	build_audit(audit_df, CalibratedClassifierCV(DecisionTreeClassifier(min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "DecisionTreeIsotonicAudit")
 	build_audit(audit_df, DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 	build_audit(audit_df, EstimatorProxy(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13)), "ExtraTreesAudit")
 	build_audit(audit_df, EstimatorProxy(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13)), "GradientBoostingAudit")
@@ -188,6 +190,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, GaussianNB(), "NaiveBayesAudit")
 	build_audit(audit_df, OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
 	build_audit(audit_df, EstimatorProxy(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)), "RandomForestAudit", flat = True)
+	build_audit(audit_df, CalibratedClassifierCV(RandomForestClassifier(n_estimators = 3, min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "RandomForestIsotonicAudit")
 	build_audit(audit_df, RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 	build_audit(audit_df, BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
 	build_audit(audit_df, StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression())], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")
@@ -443,6 +446,7 @@ if "Iris" in datasets:
 
 	build_iris(iris_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeIris", compact = False)
 	build_iris(iris_df, BaggingClassifier(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleIris")
+	build_iris(iris_df, CalibratedClassifierCV(DecisionTreeClassifier(min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "DecisionTreeIsotonicIris")
 	build_iris(iris_df, DummyClassifier(strategy = "constant", constant = "versicolor"), "DummyIris")
 	build_iris(iris_df, ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesIris")
 	build_iris(iris_df, GradientBoostingClassifier(init = None, n_estimators = 17, random_state = 13), "GradientBoostingIris")
