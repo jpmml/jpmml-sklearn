@@ -190,7 +190,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, GaussianNB(), "NaiveBayesAudit")
 	build_audit(audit_df, OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
 	build_audit(audit_df, EstimatorProxy(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)), "RandomForestAudit", flat = True)
-	build_audit(audit_df, CalibratedClassifierCV(RandomForestClassifier(n_estimators = 3, min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "RandomForestIsotonicAudit")
+	build_audit(audit_df, CalibratedClassifierCV(RandomForestClassifier(n_estimators = 3, min_samples_leaf = 15, random_state = 13), ensemble = False, method = "sigmoid"), "RandomForestSigmoidAudit")
 	build_audit(audit_df, RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 	build_audit(audit_df, BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
 	build_audit(audit_df, StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression())], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")

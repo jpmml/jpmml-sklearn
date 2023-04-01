@@ -231,8 +231,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluateRandomForestIsotonicAudit() throws Exception {
-		evaluate(RANDOM_FOREST + "Isotonic", AUDIT);
+	public void evaluateRandomForestSigmoidAudit() throws Exception {
+		evaluate(RANDOM_FOREST + "Sigmoid", AUDIT);
 	}
 
 	@Test

@@ -65,6 +65,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 		switch(method){
 			case "isotonic":
+			case "sigmoid":
 				break;
 			default:
 				throw new IllegalArgumentException(method);
@@ -172,12 +173,26 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 	static
 	private Feature calibrate(Regressor calibrator, Model model, Feature feature, SkLearnEncoder encoder){
-		IsotonicRegression isotonicRegression = (IsotonicRegression)calibrator;
-
 		// XXX
 		encoder.export(model, feature.getName());
 
-		Feature calibratedFeature = Iterables.getOnlyElement(isotonicRegression.encodeFeatures(Collections.singletonList(feature), encoder));
+		Feature calibratedFeature;
+
+		if(calibrator instanceof IsotonicRegression){
+			IsotonicRegression isotonicRegression = (IsotonicRegression)calibrator;
+
+			calibratedFeature = Iterables.getOnlyElement(isotonicRegression.encodeFeatures(Collections.singletonList(feature), encoder));
+		} else
+
+		if(calibrator instanceof SigmoidCalibration){
+			SigmoidCalibration sigmoidCalibration = (SigmoidCalibration)calibrator;
+
+			calibratedFeature = Iterables.getOnlyElement(sigmoidCalibration.encodeFeatures(Collections.singletonList(feature), encoder));
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 
 		DerivedField derivedField = encoder.removeDerivedField(calibratedFeature.getName());
 
