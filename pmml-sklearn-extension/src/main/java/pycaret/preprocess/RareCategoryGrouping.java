@@ -86,7 +86,14 @@ public class RareCategoryGrouping extends MultiTransformer {
 	}
 
 	public Map<String, ?> getToOther(){
-		return getDict("_to_other");
+
+		// PyCaret 3.0.0-RC
+		if(containsKey("_to_other")){
+			return getDict("_to_other");
+		}
+
+		// PyCaret 3.0.0+
+		return getDict("to_other_");
 	}
 
 	public Object getValue(){
