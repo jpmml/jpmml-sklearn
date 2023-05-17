@@ -46,11 +46,10 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Calibrator;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
-import sklearn.Regressor;
-import sklearn.isotonic.IsotonicRegression;
 import sklearn.linear_model.LinearClassifier;
 
 public class CalibratedClassifier extends Classifier implements HasEstimator<Classifier> {
@@ -61,7 +60,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Regressor> calibrators = getCalibrators();
+		List<? extends Calibrator> calibrators = getCalibrators();
 		List<?> classes = getClasses();
 		Classifier estimator = getEstimator();
 		String method = getMethod();
@@ -191,7 +190,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 		if(calibrators.size() == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			Regressor calibrator = calibrators.get(0);
+			Calibrator calibrator = calibrators.get(0);
 			Model featureModel = models.get(0);
 			Feature feature = decisionFunctionFeatures.get(0);
 
@@ -206,7 +205,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 			List<RegressionTable> regressionTables = new ArrayList<>();
 
 			for(int i = 0; i < calibrators.size(); i++){
-				Regressor calibrator = calibrators.get(i);
+				Calibrator calibrator = calibrators.get(i);
 				Model featureModel = models.size() == 1 ? models.get(0) : models.get(i);
 				Feature feature = decisionFunctionFeatures.get(i);
 
@@ -237,8 +236,8 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 		return getListLike("classes");
 	}
 
-	public List<? extends Regressor> getCalibrators(){
-		return getList("calibrators", Regressor.class);
+	public List<? extends Calibrator> getCalibrators(){
+		return getList("calibrators", Calibrator.class);
 	}
 
 	@Override
@@ -251,26 +250,10 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 	}
 
 	static
-	private Feature calibrate(Regressor calibrator, Model model, Feature feature, SkLearnEncoder encoder){
+	private Feature calibrate(Calibrator calibrator, Model model, Feature feature, SkLearnEncoder encoder){
 		encoder.export(model, feature.getName());
 
-		Feature calibratedFeature;
-
-		if(calibrator instanceof IsotonicRegression){
-			IsotonicRegression isotonicRegression = (IsotonicRegression)calibrator;
-
-			calibratedFeature = Iterables.getOnlyElement(isotonicRegression.encodeFeatures(Collections.singletonList(feature), encoder));
-		} else
-
-		if(calibrator instanceof SigmoidCalibration){
-			SigmoidCalibration sigmoidCalibration = (SigmoidCalibration)calibrator;
-
-			calibratedFeature = Iterables.getOnlyElement(sigmoidCalibration.encodeFeatures(Collections.singletonList(feature), encoder));
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
+		Feature calibratedFeature = Iterables.getOnlyElement(calibrator.encodeFeatures(Collections.singletonList(feature), encoder));
 
 		DerivedField derivedField = encoder.removeDerivedField(calibratedFeature.getName());
 

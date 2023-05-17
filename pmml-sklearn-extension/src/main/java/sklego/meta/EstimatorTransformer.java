@@ -37,12 +37,12 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Calibrator;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnMethods;
 import sklearn.Transformer;
-import sklearn.isotonic.IsotonicRegression;
 import sklearn.tree.HasTreeOptions;
 
 public class EstimatorTransformer extends Transformer implements HasEstimator<Estimator> {
@@ -111,7 +111,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 	}
 
 	private List<Feature> encodePostProcessor(List<Feature> features, SkLearnEncoder encoder){
-		IsotonicRegression estimator = getEstimator(IsotonicRegression.class);
+		Calibrator estimator = getEstimator(Calibrator.class);
 		String predictFunc = getPredictFunc();
 
 		switch(predictFunc){

@@ -24,33 +24,23 @@ import java.util.List;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.FunctionUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Regressor;
-import sklearn.Transformer;
+import sklearn.Calibrator;
 
-public class SigmoidCalibration extends Regressor {
+public class SigmoidCalibration extends Calibrator {
 
 	public SigmoidCalibration(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @see Transformer#encodeFeatures(List, SkLearnEncoder)
-	 */
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Number a = getA();
 		Number b = getB();

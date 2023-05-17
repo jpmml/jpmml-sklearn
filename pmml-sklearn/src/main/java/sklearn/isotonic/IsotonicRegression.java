@@ -21,49 +21,26 @@ package sklearn.isotonic;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.LinearNorm;
 import org.dmg.pmml.NormContinuous;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutlierTreatmentMethod;
-import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
-import org.jpmml.converter.PMMLEncoder;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
-import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Regressor;
-import sklearn.Transformer;
+import sklearn.Calibrator;
 
-public class IsotonicRegression extends Regressor {
+public class IsotonicRegression extends Calibrator {
 
 	public IsotonicRegression(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public RegressionModel encodeModel(Schema schema){
-		PMMLEncoder encoder = schema.getEncoder();
-
-		Label label = schema.getLabel();
-		List<? extends Feature> features = schema.getFeatures();
-
-		features = encodeFeatures((List)features, (SkLearnEncoder)encoder);
-
-		Feature feature = Iterables.getOnlyElement(features);
-
-		return RegressionModelUtil.createRegression(Collections.singletonList(feature), Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
-	}
-
-	/**
-	 * @see Transformer#encodeFeatures(List, SkLearnEncoder)
-	 */
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends Number> xThresholds = getXThresholds();
 		List<? extends Number> yThresholds = getYThresholds();
