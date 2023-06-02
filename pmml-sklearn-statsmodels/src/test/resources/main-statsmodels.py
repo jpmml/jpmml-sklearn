@@ -1,12 +1,15 @@
 import sys
 
-from pandas import DataFrame
+from pandas import CategoricalDtype, DataFrame, Series
 from sklearn_pandas import DataFrameMapper
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, KBinsDiscretizer
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.statsmodels import StatsModelsClassifier, StatsModelsRegressor
+from sklearn2pmml.statsmodels import StatsModelsClassifier, StatsModelsOrdinalClassifier, StatsModelsRegressor
 from statsmodels.api import GLM, Logit, MNLogit, OLS, Poisson, WLS
 from statsmodels.genmod import families
+from statsmodels.miscmodels.ordinal_model import OrderedModel
+
+import numpy
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
@@ -89,11 +92,41 @@ def build_auto(auto_df, regressor, name):
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name)
 
+def build_auto_ordinal(auto_df, classifier, name):
+	auto_X, auto_y = split_csv(auto_df)
+
+	categories = ["bad", "poor", "fair", "good", "excellent"]
+
+	binner = KBinsDiscretizer(n_bins = len(categories), encode = "ordinal", strategy = "kmeans")
+	auto_y = binner.fit_transform(auto_y.values.reshape((-1, 1))).astype(int)
+
+	category_mapping = {idx : category for idx, category in enumerate(categories)}
+	auto_y = Series(numpy.vectorize(lambda x: category_mapping[x])(auto_y.ravel()), dtype = CategoricalDtype(categories = categories, ordered = True), name = "bin(mpg)")
+
+	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
+	cat_cols = ["cylinders", "model_year", "origin"]
+
+	mapper = make_mapper(cont_cols = cont_cols + cat_cols, cat_cols = [])
+
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(auto_X, auto_y)
+	classifier.remove_data()
+	store_pkl(pipeline, name)
+	mpg_bin = DataFrame(pipeline.predict(auto_X), columns = ["bin(mpg)"])
+	mpg_bin_proba = DataFrame(pipeline.predict_proba(auto_X), columns = ["probability({})".format(category) for category in categories])
+	mpg_bin = pandas.concat((mpg_bin, mpg_bin_proba), axis = 1)
+	store_csv(mpg_bin, name)
+
 auto_df = load_auto("Auto")
 
 build_auto(auto_df, StatsModelsRegressor(GLM, family = families.Gaussian()), "GLMAuto")
 build_auto(auto_df, StatsModelsRegressor(OLS), "OLSAuto")
 build_auto(auto_df, StatsModelsRegressor(WLS), "WLSAuto")
+
+build_auto_ordinal(auto_df, StatsModelsOrdinalClassifier(OrderedModel, distr = "logit"), "OrderedLogitAuto")
 
 def build_visit(visit_df, regressor, name):
 	visit_X, visit_y = split_csv(visit_df)

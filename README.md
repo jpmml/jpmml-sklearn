@@ -341,6 +341,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.feature_selection.SelectUnique`
   * Linear models:
     * `sklearn2pmml.statsmodels.StatsModelsClassifier`
+    * `sklearn2pmml.statsmodels.StatsModelsOrdinalClassifier`
     * `sklearn2pmml.statsmodels.StatsModelsRegressor`
   * Neural networks:
     * `sklearn2pmml.neural_network.MLPTransformer`

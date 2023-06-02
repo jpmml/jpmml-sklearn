@@ -45,6 +45,11 @@ public class SkLearnStatsModelsTest extends SkLearnEncoderBatchTest implements D
 	}
 
 	@Test
+	public void evaluateOrderedLogitAuto() throws Exception {
+		evaluate("OrderedLogit", AUTO);
+	}
+
+	@Test
 	public void evaluateWLSAuto() throws Exception {
 		evaluate("WLS", AUTO);
 	}
