@@ -52,11 +52,13 @@ def make_clustering(df, estimator, name, **setup_params):
 
 	model = exp.create_model(estimator)
 
+	# XXX
+	model.cluster_centers_ = model.cluster_centers_.astype(float)
+
 	pmml_pipeline = make_pmml_pipeline(model, active_fields = X.columns.values, escape_func = _escape)
 	store_pkl(pmml_pipeline, name)
 
-	yt = Series(model.predict(X), name = "cluster")
-	yt = yt.apply(lambda x: x.replace("Cluster ", ""))
+	yt = Series(pmml_pipeline.predict(X), name = "cluster")
 	store_csv(yt, name)
 
 def make_regression(df, estimator, name, **setup_params):
