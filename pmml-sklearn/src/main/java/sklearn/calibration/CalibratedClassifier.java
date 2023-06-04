@@ -196,7 +196,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 			Feature calibratedFeature = calibrate(calibrator, featureModel, feature, encoder);
 
-			calibratorModel = RegressionModelUtil.createBinaryLogisticClassification(Collections.singletonList(calibratedFeature), Collections.singletonList(1d), null, RegressionModel.NormalizationMethod.NONE, true, schema);
+			calibratorModel = RegressionModelUtil.createBinaryLogisticClassification(Collections.singletonList(calibratedFeature), Collections.singletonList(1d), null, RegressionModel.NormalizationMethod.NONE, false, schema);
 		} else
 
 		if(calibrators.size() >= 3){
@@ -218,13 +218,14 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 			}
 
 			calibratorModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
-				.setNormalizationMethod(RegressionModel.NormalizationMethod.SIMPLEMAX)
-				.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+				.setNormalizationMethod(RegressionModel.NormalizationMethod.SIMPLEMAX);
 		} else
 
 		{
 			throw new IllegalArgumentException();
 		}
+
+		encodePredictProbaOutput(calibratorModel, DataType.DOUBLE, categoricalLabel);
 
 		models.add(calibratorModel);
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
@@ -60,6 +61,8 @@ public class HistGradientBoostingClassifier extends Classifier {
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
+		MiningModel miningModel;
+
 		if(numberOfTreesPerIteration == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
@@ -67,10 +70,10 @@ public class HistGradientBoostingClassifier extends Classifier {
 				throw new IllegalArgumentException();
 			}
 
-			MiningModel miningModel = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
+			Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
-			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, true, schema);
+			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, false, schema);
 		} else
 
 		if(numberOfTreesPerIteration >= 3){
@@ -80,21 +83,25 @@ public class HistGradientBoostingClassifier extends Classifier {
 				throw new IllegalArgumentException();
 			}
 
-			List<MiningModel> miningModels = new ArrayList<>();
+			List<Model> models = new ArrayList<>();
 
 			for(int i = 0, columns = categoricalLabel.size(); i < columns; i++){
-				MiningModel miningModel = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, i, segmentSchema)
+				Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, i, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
 
-				miningModels.add(miningModel);
+				models.add(model);
 			}
 
-			return MiningModelUtil.createClassification(miningModels, RegressionModel.NormalizationMethod.SOFTMAX, true, schema);
+			miningModel = MiningModelUtil.createClassification(models, RegressionModel.NormalizationMethod.SOFTMAX, false, schema);
 		} else
 
 		{
 			throw new IllegalArgumentException();
 		}
+
+		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+
+		return miningModel;
 	}
 
 	public List<? extends Number> getBaselinePrediction(){

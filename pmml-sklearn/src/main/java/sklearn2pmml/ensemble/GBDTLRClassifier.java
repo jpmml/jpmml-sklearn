@@ -57,7 +57,7 @@ public class GBDTLRClassifier extends Classifier {
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
+	public MiningModel encodeModel(Schema schema){
 		Classifier gbdt = getGBDT();
 		MultiOneHotEncoder ohe = getOHE();
 		LinearClassifier lr = getLR();
@@ -71,10 +71,16 @@ public class GBDTLRClassifier extends Classifier {
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		MiningModel miningModel = GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), segmentSchema)
+		Model model = GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), segmentSchema)
 			.setOutput(ModelUtil.createPredictedOutput(Estimator.FIELD_DECISION_FUNCTION, OpType.CONTINUOUS, DataType.DOUBLE));
 
-		return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, lr.hasProbabilityDistribution(), schema);
+		MiningModel miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, false, schema);
+
+		if(lr.hasProbabilityDistribution()){
+			encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+		}
+
+		return miningModel;
 	}
 
 	public Classifier getGBDT(){

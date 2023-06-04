@@ -86,8 +86,9 @@ public class GaussianNB extends Classifier {
 			.setTargetField(categoricalLabel.getName())
 			.setTargetValueCounts(encodeTargetValueCounts(categoricalLabel.getValues(), classCount));
 
-		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), bayesInputs, bayesOutput)
-			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), bayesInputs, bayesOutput);
+
+		encodePredictProbaOutput(naiveBayesModel, DataType.DOUBLE, categoricalLabel);
 
 		return naiveBayesModel;
 	}

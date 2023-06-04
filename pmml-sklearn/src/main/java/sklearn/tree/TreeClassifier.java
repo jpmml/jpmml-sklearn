@@ -22,7 +22,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
 import sklearn.Classifier;
@@ -46,8 +45,11 @@ public class TreeClassifier extends Classifier implements HasApplyField, HasTree
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, schema)
-			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, schema);
+
+		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
 
 		return TreeUtil.transform(this, treeModel);
 	}

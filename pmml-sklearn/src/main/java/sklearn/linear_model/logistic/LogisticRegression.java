@@ -27,6 +27,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
@@ -109,7 +110,7 @@ public class LogisticRegression extends LinearClassifier {
 
 			Schema segmentSchema = schema.toRelabeledSchema(null);
 
-			RegressionModel firstRegressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), null, segmentSchema)
+			Model firstModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), null, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(Estimator.FIELD_DECISION_FUNCTION, OpType.CONTINUOUS, DataType.DOUBLE));
 
 			Feature feature = new ContinuousFeature(encoder, Estimator.FIELD_DECISION_FUNCTION, DataType.DOUBLE);
@@ -124,11 +125,14 @@ public class LogisticRegression extends LinearClassifier {
 			regressionTables.add(passiveRegressionTable);
 			regressionTables.add(activeRegressionTable);
 
-			RegressionModel secondRegressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
-				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
-				.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+			Model secondModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
+				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX);
 
-			return MiningModelUtil.createModelChain(Arrays.asList(firstRegressionModel, secondRegressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
+			MiningModel miningModel = MiningModelUtil.createModelChain(Arrays.asList(firstModel, secondModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
+
+			encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+
+			return miningModel;
 		} else
 
 		if(numberOfClasses >= 3){
@@ -144,8 +148,9 @@ public class LogisticRegression extends LinearClassifier {
 			}
 
 			RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
-				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
-				.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX);
+
+			encodePredictProbaOutput(regressionModel, DataType.DOUBLE, categoricalLabel);
 
 			return regressionModel;
 		} else

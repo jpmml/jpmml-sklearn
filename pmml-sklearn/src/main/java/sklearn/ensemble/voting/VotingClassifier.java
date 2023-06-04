@@ -48,7 +48,7 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
+	public MiningModel encodeModel(Schema schema){
 		List<? extends Classifier> estimators = getEstimators();
 		List<? extends Number> weights = getWeights();
 
@@ -67,8 +67,9 @@ public class VotingClassifier extends Classifier implements HasEstimatorEnsemble
 		Segmentation.MultipleModelMethod multipleModelMethod = parseVoting(voting, (weights != null && !weights.isEmpty()));
 
 		MiningModel miningModel = new MiningModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel))
-			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models, weights))
-			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models, weights));
+
+		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 
 		return miningModel;
 	}

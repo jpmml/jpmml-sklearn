@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
@@ -89,16 +90,20 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 
 			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();
 
-			List<RegressionModel> regressionModels = new ArrayList<>();
+			List<Model> models = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.NONE, segmentSchema)
+				Model model = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.NONE, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
 
-				regressionModels.add(regressionModel);
+				models.add(model);
 			}
 
-			return MiningModelUtil.createClassification(regressionModels, RegressionModel.NormalizationMethod.SOFTMAX, true, schema);
+			MiningModel miningModel = MiningModelUtil.createClassification(models, RegressionModel.NormalizationMethod.SOFTMAX, false, schema);
+
+			encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+
+			return miningModel;
 		} else
 
 		{

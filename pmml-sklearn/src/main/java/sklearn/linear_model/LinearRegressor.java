@@ -81,17 +81,17 @@ public class LinearRegressor extends Regressor {
 
 			ClassDictUtil.checkSize(numberOfOutputs, intercept, multiLabel.getLabels());
 
-			List<RegressionModel> regressionModels = new ArrayList<>();
+			List<Model> models = new ArrayList<>();
 
 			for(int i = 0, max = numberOfOutputs; i < max; i++){
 				Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
 
-				RegressionModel regressionModel = createRegression(CMatrixUtil.getRow(coef, numberOfOutputs, features.size(), i), intercept.get(i), segmentSchema);
+				Model model = createRegression(CMatrixUtil.getRow(coef, numberOfOutputs, features.size(), i), intercept.get(i), segmentSchema);
 
-				regressionModels.add(regressionModel);
+				models.add(model);
 			}
 
-			return MiningModelUtil.createMultiModelChain(regressionModels, Segmentation.MissingPredictionTreatment.CONTINUE);
+			return MiningModelUtil.createMultiModelChain(models, Segmentation.MissingPredictionTreatment.CONTINUE);
 		} else
 
 		{

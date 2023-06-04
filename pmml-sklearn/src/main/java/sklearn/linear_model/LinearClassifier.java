@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
@@ -68,7 +69,13 @@ public class LinearClassifier extends Classifier {
 		if(numberOfClasses == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			return RegressionModelUtil.createBinaryLogisticClassification(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0), intercept.get(0), RegressionModel.NormalizationMethod.LOGIT, hasProbabilityDistribution, schema);
+			RegressionModel regressionModel = RegressionModelUtil.createBinaryLogisticClassification(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0), intercept.get(0), RegressionModel.NormalizationMethod.LOGIT, false, schema);
+
+			if(hasProbabilityDistribution){
+				encodePredictProbaOutput(regressionModel, DataType.DOUBLE, categoricalLabel);
+			}
+
+			return regressionModel;
 		} else
 
 		if(numberOfClasses >= 3){
@@ -76,16 +83,22 @@ public class LinearClassifier extends Classifier {
 
 			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();
 
-			List<RegressionModel> regressionModels = new ArrayList<>();
+			List<Model> models = new ArrayList<>();
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
-				RegressionModel regressionModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
+				Model model = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
 
-				regressionModels.add(regressionModel);
+				models.add(model);
 			}
 
-			return MiningModelUtil.createClassification(regressionModels, RegressionModel.NormalizationMethod.SIMPLEMAX, hasProbabilityDistribution, schema);
+			MiningModel miningModel = MiningModelUtil.createClassification(models, RegressionModel.NormalizationMethod.SIMPLEMAX, false, schema);
+
+			if(hasProbabilityDistribution){
+				encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+			}
+
+			return miningModel;
 		} else
 
 		{

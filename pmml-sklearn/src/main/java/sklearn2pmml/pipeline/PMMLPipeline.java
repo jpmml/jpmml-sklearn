@@ -230,7 +230,7 @@ public class PMMLPipeline extends Pipeline {
 			if(predictProbaTransformer != null){
 				CategoricalLabel categoricalLabel = (CategoricalLabel)label;
 
-				List<OutputField> predictProbaFields = ModelUtil.createProbabilityFields(DataType.DOUBLE, categoricalLabel.getValues());
+				List<OutputField> predictProbaFields = estimator.createPredictProbaFields(DataType.DOUBLE, categoricalLabel);
 
 				encodeOutput(output, predictProbaFields, predictProbaTransformer, encoder);
 			} // End if

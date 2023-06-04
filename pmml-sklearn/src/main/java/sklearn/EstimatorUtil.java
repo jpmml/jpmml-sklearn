@@ -24,12 +24,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
@@ -151,10 +152,14 @@ public class EstimatorUtil {
 			case SkLearnMethods.PREDICT_PROBA:
 				{
 					if(estimator instanceof HasClasses){
-						List<?> categories = EstimatorUtil.getClasses(estimator);
+						HasClasses hasClasses = (HasClasses)estimator;
 
-						List<String> names = categories.stream()
-							.map(category -> FieldNameUtil.create(Classifier.FIELD_PROBABILITY, category))
+						CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+						List<OutputField> probabilityOutputFields = estimator.createPredictProbaFields(DataType.DOUBLE, categoricalLabel);
+
+						List<String> names = probabilityOutputFields.stream()
+							.map(outputField -> outputField.requireName())
 							.collect(Collectors.toList());
 
 						return encoder.export(model, names);

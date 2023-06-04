@@ -21,7 +21,15 @@ package sklearn;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
+import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.HasArray;
 
 abstract
@@ -49,6 +57,22 @@ public class Classifier extends Estimator implements HasClasses {
 
 	public boolean hasProbabilityDistribution(){
 		return true;
+	}
+
+	public List<OutputField> encodePredictProbaOutput(Model model, DataType dataType, CategoricalLabel categoricalLabel){
+		List<OutputField> predictProbaFields = createPredictProbaFields(dataType, categoricalLabel);
+
+		if(model instanceof MiningModel){
+			MiningModel miningModel = (MiningModel)model;
+
+			model = MiningModelUtil.getFinalModel(miningModel);
+		}
+
+		Output output = ModelUtil.ensureOutput(model);
+
+		(output.getOutputFields()).addAll(predictProbaFields);
+
+		return predictProbaFields;
 	}
 
 	static

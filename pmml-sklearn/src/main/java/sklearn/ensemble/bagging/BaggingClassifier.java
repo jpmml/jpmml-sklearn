@@ -25,7 +25,6 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.HasArray;
 import sklearn.Classifier;
@@ -43,6 +42,8 @@ public class BaggingClassifier extends EnsembleClassifier {
 		List<? extends Classifier> estimators = getEstimators();
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
 		Segmentation.MultipleModelMethod multipleModelMethod = Segmentation.MultipleModelMethod.AVERAGE;
 
 		for(Classifier estimator : estimators){
@@ -54,8 +55,9 @@ public class BaggingClassifier extends EnsembleClassifier {
 			}
 		}
 
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, multipleModelMethod, MiningFunction.CLASSIFICATION, schema)
-			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
+		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, multipleModelMethod, MiningFunction.CLASSIFICATION, schema);
+
+		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 
 		return miningModel;
 	}

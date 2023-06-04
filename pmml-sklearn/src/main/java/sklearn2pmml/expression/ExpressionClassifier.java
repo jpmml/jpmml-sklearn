@@ -134,8 +134,9 @@ public class ExpressionClassifier extends Classifier {
 		}
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
-			.setNormalizationMethod(normalizationMethod)
-			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+			.setNormalizationMethod(normalizationMethod);
+
+		encodePredictProbaOutput(regressionModel, DataType.DOUBLE, categoricalLabel);
 
 		return regressionModel;
 	}

@@ -22,15 +22,20 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.OutputField;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import org.slf4j.Logger;
@@ -260,6 +265,16 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 
 	public String getSkLearnVersion(){
 		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
+	}
+
+	public List<OutputField> createPredictProbaFields(DataType dataType, CategoricalLabel categoricalLabel){
+		HasClasses hasClasses = (HasClasses)this;
+
+		List<?> values = categoricalLabel.getValues();
+
+		return values.stream()
+			.map(value -> ModelUtil.createProbabilityField(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value), dataType, value))
+			.collect(Collectors.toList());
 	}
 
 	public static final String FIELD_APPLY = "apply";

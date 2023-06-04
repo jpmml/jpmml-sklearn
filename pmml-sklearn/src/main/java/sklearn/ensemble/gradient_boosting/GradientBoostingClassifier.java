@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.function.IntFunction;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
@@ -88,13 +89,15 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
+		MiningModel miningModel;
+
 		if(numberOfClasses == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
+			Model model = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
-			return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.NONE, true, schema);
+			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.NONE, false, schema);
 		} else
 
 		if(numberOfClasses >= 3){
@@ -102,7 +105,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 			List<? extends TreeRegressor> estimators = getEstimators();
 
-			List<MiningModel> miningModels = new ArrayList<>();
+			List<Model> models = new ArrayList<>();
 
 			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
 				List<? extends TreeRegressor> columnEstimators = CMatrixUtil.getColumn(estimators, rows, columns, i);
@@ -115,18 +118,22 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 					}
 				};
 
-				MiningModel miningModel = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initialPredictions.apply(i), learningRate, segmentSchema)
+				Model model = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initialPredictions.apply(i), learningRate, segmentSchema)
 					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
-				miningModels.add(miningModel);
+				models.add(model);
 			}
 
-			return MiningModelUtil.createClassification(miningModels, RegressionModel.NormalizationMethod.SIMPLEMAX, true, schema);
+			miningModel = MiningModelUtil.createClassification(models, RegressionModel.NormalizationMethod.SIMPLEMAX, false, schema);
 		} else
 
 		{
 			throw new IllegalArgumentException();
 		}
+
+		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+
+		return miningModel;
 	}
 
 	public LossFunction getLoss(){

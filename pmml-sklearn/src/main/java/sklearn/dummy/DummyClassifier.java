@@ -109,8 +109,9 @@ public class DummyClassifier extends Classifier implements HasPriorProbability {
 
 		scoreDistributionManager.addScoreDistributions(root, categoricalLabel.getValues(), null, probabilities);
 
-		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root)
-			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root);
+
+		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
 
 		return treeModel;
 	}

@@ -24,7 +24,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.HasArray;
 import sklearn.Classifier;
@@ -49,8 +48,11 @@ public class MLPClassifier extends Classifier {
 		List<? extends HasArray> coefs = getCoefs();
 		List<? extends HasArray> intercepts = getIntercepts();
 
-		NeuralNetwork neuralNetwork = MultilayerPerceptronUtil.encodeNeuralNetwork(MiningFunction.CLASSIFICATION, activation, coefs, intercepts, schema)
-			.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, (CategoricalLabel)schema.getLabel()));
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+		NeuralNetwork neuralNetwork = MultilayerPerceptronUtil.encodeNeuralNetwork(MiningFunction.CLASSIFICATION, activation, coefs, intercepts, schema);
+
+		encodePredictProbaOutput(neuralNetwork, DataType.DOUBLE, categoricalLabel);
 
 		return neuralNetwork;
 	}
