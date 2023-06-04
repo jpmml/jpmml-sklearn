@@ -28,7 +28,6 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.Output;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
@@ -222,11 +221,9 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 
 		Transformation sklearnOutlier = new SkLearnOutlierTransformation();
 
-		Output output = ModelUtil.createPredictedOutput("rawAnomalyScore", OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier, sklearnOutlier);
-
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))
-			.setOutput(output);
+			.setOutput(ModelUtil.createPredictedOutput("rawAnomalyScore", OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier, sklearnOutlier));
 
 		return TreeUtil.transform(this, miningModel);
 	}
