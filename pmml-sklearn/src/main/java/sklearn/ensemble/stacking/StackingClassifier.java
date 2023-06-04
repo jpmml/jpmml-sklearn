@@ -93,8 +93,8 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 						.forEach(outputField -> {
 							String name = outputField.requireName();
 
-							if(name.startsWith(PREFIX_PROBABILITY)){
-								name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, index, name.substring(PREFIX_PROBABILITY.length()));
+							if(name.startsWith(PREFIX_PROBABILITY) && name.endsWith(")")){
+								name = (PREFIX_PROBABILITY + (index + ", ") + name.substring(PREFIX_PROBABILITY.length(), name.length() - ")".length()) + ")");
 
 								outputField.setName(name);
 							}
