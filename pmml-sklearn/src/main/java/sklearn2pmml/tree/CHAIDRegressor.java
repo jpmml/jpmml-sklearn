@@ -21,13 +21,20 @@ package sklearn2pmml.tree;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.FieldNames;
+import sklearn.HasApplyField;
 import sklearn.Regressor;
 import treelib.Tree;
 
-public class CHAIDRegressor extends Regressor {
+public class CHAIDRegressor extends Regressor implements HasApplyField {
 
 	public CHAIDRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public String getApplyField(){
+		return FieldNames.NODE_ID;
 	}
 
 	@Override

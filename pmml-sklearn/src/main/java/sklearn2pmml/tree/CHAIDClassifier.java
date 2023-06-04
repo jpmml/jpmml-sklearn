@@ -23,13 +23,20 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.FieldNames;
 import sklearn.Classifier;
+import sklearn.HasApplyField;
 import treelib.Tree;
 
-public class CHAIDClassifier extends Classifier {
+public class CHAIDClassifier extends Classifier implements HasApplyField {
 
 	public CHAIDClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public String getApplyField(){
+		return FieldNames.NODE_ID;
 	}
 
 	@Override
