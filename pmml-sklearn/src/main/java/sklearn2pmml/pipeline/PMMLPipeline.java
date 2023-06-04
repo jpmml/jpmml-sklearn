@@ -67,7 +67,6 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
-import org.jpmml.sklearn.FieldNames;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,9 +235,9 @@ public class PMMLPipeline extends Pipeline {
 			} // End if
 
 			if(applyTransformer != null){
-				OutputField nodeIdField = ModelUtil.createEntityIdField(FieldNames.NODE_ID, DataType.INTEGER);
+				OutputField applyField = estimator.createApplyField(DataType.INTEGER);
 
-				encodeOutput(output, Collections.singletonList(nodeIdField), applyTransformer, encoder);
+				encodeOutput(output, Collections.singletonList(applyField), applyTransformer, encoder);
 			}
 
 			encoder.setModel(model);

@@ -18,6 +18,8 @@
  */
 package sklearn2pmml.tree;
 
+import java.util.Collections;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.tree.TreeModel;
@@ -48,6 +50,7 @@ public class CHAIDClassifier extends Classifier implements HasApplyField {
 		TreeModel treeModel = CHAIDUtil.encodeModel(MiningFunction.CLASSIFICATION, tree, schema);
 
 		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
+		encodeApplyOutput(treeModel, DataType.INTEGER, Collections.emptyList());
 
 		return treeModel;
 	}

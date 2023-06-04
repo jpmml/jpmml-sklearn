@@ -29,6 +29,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
@@ -36,8 +37,10 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.FieldNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -268,13 +271,57 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 	}
 
 	public List<OutputField> createPredictProbaFields(DataType dataType, CategoricalLabel categoricalLabel){
-		HasClasses hasClasses = (HasClasses)this;
+
+		if(this instanceof HasClasses){
+			HasClasses hasClasses = (HasClasses)this;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 
 		List<?> values = categoricalLabel.getValues();
 
 		return values.stream()
 			.map(value -> ModelUtil.createProbabilityField(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value), dataType, value))
 			.collect(Collectors.toList());
+	}
+
+	public OutputField createApplyField(DataType dataType){
+		String name;
+
+		if(this instanceof HasApplyField){
+			HasApplyField hasApplyField = (HasApplyField)this;
+
+			name = hasApplyField.getApplyField();
+		} else
+
+		if(this instanceof HasMultiApplyField){
+			HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)this;
+
+			// XXX
+			name = FieldNames.NODE_ID;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+
+		return ModelUtil.createEntityIdField(name, dataType);
+	}
+
+	public OutputField encodeApplyOutput(Model model, DataType dataType, List<?> values){
+		OutputField applyField = createApplyField(dataType);
+
+		if(values != null && !values.isEmpty()){
+			PMMLUtil.addValues(applyField, values);
+		}
+
+		Output output = ModelUtil.ensureOutput(model);
+
+		(output.getOutputFields()).add(applyField);
+
+		return applyField;
 	}
 
 	public static final String FIELD_APPLY = "apply";

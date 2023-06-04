@@ -33,7 +33,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.HasExtensions;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
@@ -107,7 +106,7 @@ public class TreeUtil {
 		} // End if
 
 		if((Boolean.TRUE).equals(winnerId)){
-			encodeNodeId(model);
+			encodeNodeId(estimator, model);
 		}
 
 		List<Visitor> visitors = new ArrayList<>();
@@ -459,8 +458,7 @@ public class TreeUtil {
 	}
 
 	static
-	private void encodeNodeId(Model model){
-		Output output = ModelUtil.ensureOutput(model);
+	private void encodeNodeId(Estimator estimator, Model model){
 
 		if(model instanceof MiningModel){
 			MiningModel miningModel = (MiningModel)model;
@@ -476,20 +474,33 @@ public class TreeUtil {
 					throw new UnsupportedElementException(segment);
 				}
 
-				encodeNodeId(output, treeModel, segmentId);
+				List<Integer> nodeIds = collectNodeIds(treeModel);
+
+				OutputField applyField = estimator.encodeApplyOutput(miningModel, DataType.INTEGER, nodeIds);
+
+				// XXX
+				applyField
+					.setName(FieldNameUtil.create(FieldNames.NODE_ID, segmentId))
+					.setSegmentId(segmentId);
 			}
 		} else
 
-		{
+		if(model instanceof TreeModel){
 			TreeModel treeModel = (TreeModel)model;
 
-			encodeNodeId(output, treeModel, null);
+			List<Integer> nodeIds = collectNodeIds(treeModel);
+
+			estimator.encodeApplyOutput(treeModel, DataType.INTEGER, nodeIds);
+		} else
+
+		{
+			throw new IllegalArgumentException();
 		}
 	}
 
 	static
-	private void encodeNodeId(Output output, TreeModel treeModel, String segmentId){
-		List<Integer> values = new ArrayList<>();
+	private List<Integer> collectNodeIds(TreeModel treeModel){
+		List<Integer> result = new ArrayList<>();
 
 		Visitor nodeIdCollector = new AbstractVisitor(){
 
@@ -497,7 +508,7 @@ public class TreeUtil {
 			public VisitorAction visit(Node node){
 
 				if(!node.hasNodes()){
-					values.add((Integer)node.getId());
+					result.add((Integer)node.getId());
 				}
 
 				return super.visit(node);
@@ -505,15 +516,7 @@ public class TreeUtil {
 		};
 		nodeIdCollector.applyTo(treeModel);
 
-		OutputField nodeIdField = ModelUtil.createEntityIdField(FieldNames.NODE_ID, DataType.INTEGER, values);
-
-		if(segmentId != null){
-			nodeIdField
-				.setName(FieldNameUtil.create(nodeIdField.requireName(), segmentId))
-				.setSegmentId(segmentId);
-		}
-
-		output.addOutputFields(nodeIdField);
+		return result;
 	}
 
 	static

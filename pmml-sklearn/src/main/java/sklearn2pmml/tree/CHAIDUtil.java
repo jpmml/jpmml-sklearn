@@ -33,10 +33,8 @@ import java.util.stream.Collectors;
 import chaid.Column;
 import com.google.common.math.DoubleMath;
 import org.dmg.pmml.CompoundPredicate;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.False;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Output;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.ScoreFrequency;
@@ -54,7 +52,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.FieldNames;
 import treelib.Node;
 import treelib.Tree;
 
@@ -67,13 +64,7 @@ public class CHAIDUtil {
 	public TreeModel encodeModel(MiningFunction miningFunction, Tree tree, Schema schema){
 		org.dmg.pmml.tree.Node root = encodeNode(True.INSTANCE, tree.selectRoot(), tree, new PredicateManager(), schema);
 
-		Output output = new Output()
-			.addOutputFields(ModelUtil.createEntityIdField(FieldNames.NODE_ID, DataType.INTEGER));
-
-		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
-			.setOutput(output);
-
-		return treeModel;
+		return new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root);
 	}
 
 	static

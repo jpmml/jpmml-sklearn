@@ -90,6 +90,9 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	public List<Feature> export(Model model, List<String> names){
 		Output output = model.getOutput();
+		if(output == null){
+			throw new IllegalArgumentException();
+		}
 
 		List<OutputField> outputFields = output.getOutputFields();
 

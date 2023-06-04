@@ -18,8 +18,11 @@
  */
 package sklearn2pmml.tree;
 
+import java.util.Collections;
+
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Model;
+import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
 import sklearn.HasApplyField;
@@ -38,10 +41,14 @@ public class CHAIDRegressor extends Regressor implements HasApplyField {
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
+	public TreeModel encodeModel(Schema schema){
 		Tree tree = getTree();
 
-		return CHAIDUtil.encodeModel(MiningFunction.REGRESSION, tree, schema);
+		TreeModel treeModel = CHAIDUtil.encodeModel(MiningFunction.REGRESSION, tree, schema);
+
+		encodeApplyOutput(treeModel, DataType.INTEGER, Collections.emptyList());
+
+		return treeModel;
 	}
 
 	public Tree getTree(){
