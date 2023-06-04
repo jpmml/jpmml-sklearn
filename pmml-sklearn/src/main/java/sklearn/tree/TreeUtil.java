@@ -55,7 +55,6 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
@@ -67,9 +66,9 @@ import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.FieldNames;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.HasMultiApplyField;
 import sklearn.tree.visitors.TreeModelCompactor;
 import sklearn.tree.visitors.TreeModelFlattener;
 import sklearn.tree.visitors.TreeModelPruner;
@@ -463,6 +462,8 @@ public class TreeUtil {
 		if(model instanceof MiningModel){
 			MiningModel miningModel = (MiningModel)model;
 
+			HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)estimator;
+
 			Segmentation segmentation = miningModel.requireSegmentation();
 
 			List<Segment> segments = segmentation.requireSegments();
@@ -480,7 +481,7 @@ public class TreeUtil {
 
 				// XXX
 				applyField
-					.setName(FieldNameUtil.create(FieldNames.NODE_ID, segmentId))
+					.setName(hasMultiApplyField.getApplyField(segmentId))
 					.setSegmentId(segmentId);
 			}
 		} else

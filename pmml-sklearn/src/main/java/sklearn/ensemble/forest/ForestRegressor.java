@@ -24,7 +24,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
 import sklearn.HasEstimatorEnsemble;
@@ -50,8 +49,8 @@ public class ForestRegressor extends Regressor implements HasEstimatorEnsemble<T
 	}
 
 	@Override
-	public String getApplyField(int index){
-		return FieldNameUtil.create(FieldNames.NODE_ID, index + 1);
+	public String getApplyField(){
+		return FieldNames.NODE_ID;
 	}
 
 	@Override

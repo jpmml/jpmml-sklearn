@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.jpmml.converter.FieldNameUtil;
 
-public interface HasMultiApplyField {
+public interface HasMultiApplyField extends HasApplyField {
 
 	int getNumberOfApplyFields();
 
@@ -32,7 +32,7 @@ public interface HasMultiApplyField {
 		List<String> result = new ArrayList<>();
 
 		for(int i = 0, max = getNumberOfApplyFields(); i < max; i++){
-			String name = getApplyField(i);
+			String name = getApplyField(i + 1);
 
 			result.add(name);
 		}
@@ -41,7 +41,7 @@ public interface HasMultiApplyField {
 	}
 
 	default
-	String getApplyField(int index){
-		return FieldNameUtil.create(Estimator.FIELD_APPLY, index);
+	String getApplyField(Object segmentId){
+		return FieldNameUtil.create(getApplyField(), segmentId);
 	}
 }

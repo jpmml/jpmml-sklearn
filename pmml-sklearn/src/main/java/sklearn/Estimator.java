@@ -40,7 +40,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.FieldNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -294,13 +293,6 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 			HasApplyField hasApplyField = (HasApplyField)this;
 
 			name = hasApplyField.getApplyField();
-		} else
-
-		if(this instanceof HasMultiApplyField){
-			HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)this;
-
-			// XXX
-			name = FieldNames.NODE_ID;
 		} else
 
 		{
