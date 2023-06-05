@@ -53,7 +53,15 @@ public class StackingUtil {
 			E estimator = estimators.get(i);
 			String stackMethod = stackMethods.get(i);
 
-			Model model = estimator.encode(schema);
+			Model model;
+
+			estimator.setPMMLSegmentId((i + 1));
+
+			try {
+				model = estimator.encode(schema);
+			} finally {
+				estimator.setPMMLSegmentId(null);
+			}
 
 			List<Feature> predictFeatures = predictFunction.apply(i, model, stackMethod, encoder);
 			if(predictFeatures != null && !predictFeatures.isEmpty()){

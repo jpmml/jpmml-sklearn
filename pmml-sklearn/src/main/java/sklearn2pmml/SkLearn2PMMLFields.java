@@ -23,4 +23,5 @@ public interface SkLearn2PMMLFields {
 	String PMML_FEATURE_IMPORTANCES = "pmml_feature_importances_";
 	String PMML_NAME = "pmml_name_";
 	String PMML_OPTIONS = "pmml_options_";
+	String PMML_SEGMENT_ID = "pmml_segment_id_";
 }

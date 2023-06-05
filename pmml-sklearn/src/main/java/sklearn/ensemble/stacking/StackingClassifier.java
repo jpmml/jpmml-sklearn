@@ -23,15 +23,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.Model;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
-import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
@@ -82,25 +78,6 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 						throw new IllegalArgumentException(stackMethod);
 				}
 
-				Model finalModel = MiningModelUtil.getFinalModel(model);
-
-				Output output = finalModel.getOutput();
-				if(output != null && output.hasOutputFields()){
-					List<OutputField> outputFields = output.getOutputFields();
-
-					outputFields.stream()
-						.filter(outputField -> (outputField.getResultFeature() == ResultFeature.PROBABILITY))
-						.forEach(outputField -> {
-							String name = outputField.requireName();
-
-							if(name.startsWith(PREFIX_PROBABILITY) && name.endsWith(")")){
-								name = (PREFIX_PROBABILITY + (index + ", ") + name.substring(PREFIX_PROBABILITY.length(), name.length() - ")".length()) + ")");
-
-								outputField.setName(name);
-							}
-						});
-				}
-
 				List<Feature> result = new ArrayList<>();
 
 				for(Object value : values){
@@ -111,8 +88,6 @@ public class StackingClassifier extends Classifier implements HasEstimatorEnsemb
 
 				return result;
 			}
-
-			private static final String PREFIX_PROBABILITY = Classifier.FIELD_PROBABILITY + "(";
 		};
 
 		return StackingUtil.encodeStacking(estimators, stackMethod, predictFunction, finalEstimator, passthrough, schema);

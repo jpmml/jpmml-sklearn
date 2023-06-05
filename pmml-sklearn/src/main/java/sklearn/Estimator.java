@@ -265,11 +265,29 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		return this;
 	}
 
+	public Object getPMMLSegmentId(){
+		return getOptionalScalar(SkLearn2PMMLFields.PMML_SEGMENT_ID);
+	}
+
+	public Estimator setPMMLSegmentId(Object segmentId){
+
+		if(segmentId != null){
+			put(SkLearn2PMMLFields.PMML_SEGMENT_ID, segmentId);
+		} else
+
+		{
+			remove(SkLearn2PMMLFields.PMML_SEGMENT_ID);
+		}
+
+		return this;
+	}
+
 	public String getSkLearnVersion(){
 		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
 	}
 
 	public List<OutputField> createPredictProbaFields(DataType dataType, CategoricalLabel categoricalLabel){
+		Object pmmlSegmentId = getPMMLSegmentId();
 
 		if(this instanceof HasClasses){
 			HasClasses hasClasses = (HasClasses)this;
@@ -282,11 +300,25 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		List<?> values = categoricalLabel.getValues();
 
 		return values.stream()
-			.map(value -> ModelUtil.createProbabilityField(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value), dataType, value))
+			.map(value -> {
+				String name;
+
+				if(pmmlSegmentId != null){
+					name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, pmmlSegmentId, value);
+				} else
+
+				{
+					name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value);
+				}
+
+				return ModelUtil.createProbabilityField(name, dataType, value);
+			})
 			.collect(Collectors.toList());
 	}
 
 	public OutputField createApplyField(DataType dataType){
+		Object pmmlSegmentId = getPMMLSegmentId();
+
 		String name;
 
 		if(this instanceof HasApplyField){
@@ -297,6 +329,10 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 
 		{
 			throw new IllegalArgumentException();
+		}
+
+		if(pmmlSegmentId != null){
+			name = FieldNameUtil.create(name, pmmlSegmentId);
 		}
 
 		return ModelUtil.createEntityIdField(name, dataType);
