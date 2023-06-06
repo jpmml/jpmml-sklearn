@@ -25,10 +25,11 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.HasDecisionFunctionField;
+import sklearn.OutlierDetector;
+import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
-import sklearn.svm.OneClassSVMUtil;
 
-public class SGDOneClassSVM extends Regressor implements HasDecisionFunctionField {
+public class SGDOneClassSVM extends Regressor implements HasDecisionFunctionField, OutlierDetector {
 
 	public SGDOneClassSVM(String module, String name){
 		super(module, name);
@@ -45,7 +46,7 @@ public class SGDOneClassSVM extends Regressor implements HasDecisionFunctionFiel
 		List<? extends Number> offset = getOffset();
 
 		RegressionModel regressionModel = RegressionModelUtil.createRegression(schema.getFeatures(), coef, -1 * (Iterables.getOnlyElement(offset).doubleValue()), null, schema)
-			.setOutput(OneClassSVMUtil.createPredictedOutput(this));
+			.setOutput(OutlierDetectorUtil.createPredictedOutput(this));
 
 		return regressionModel;
 	}

@@ -23,11 +23,9 @@ import java.util.Deque;
 import java.util.List;
 
 import com.google.common.primitives.Ints;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
@@ -46,13 +44,13 @@ import org.jpmml.converter.Transformation;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.transformations.AbstractTransformation;
-import org.jpmml.converter.transformations.OutlierTransformation;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import sklearn.HasDecisionFunctionField;
+import sklearn.OutlierDetector;
+import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
-import sklearn.SkLearnOutlierTransformation;
 import sklearn.SkLearnUtil;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.ensemble.EnsembleUtil;
@@ -61,7 +59,7 @@ import sklearn.tree.Tree;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class IsolationForest extends EnsembleRegressor implements HasDecisionFunctionField, HasTreeOptions {
+public class IsolationForest extends EnsembleRegressor implements HasDecisionFunctionField, HasTreeOptions, OutlierDetector {
 
 	public IsolationForest(String module, String name){
 		super(module, name);
@@ -182,50 +180,40 @@ public class IsolationForest extends EnsembleRegressor implements HasDecisionFun
 			}
 		};
 
-		Transformation outlier = new OutlierTransformation(){
-
-			@Override
-			public String getName(String name){
-				return createFieldName("outlier");
-			}
-
-			@Override
-			public Expression createExpression(FieldRef fieldRef){
-				String behaviour = getBehaviour();
-
-				Number threshold;
-
-				// SkLearn 0.19 or SkLearn 0.24+
-				if(behaviour == null){
-					threshold = getThreshold();
-				} else
-
-				// SkLearn 0.20 through 0.23
-				{
-					if(("old").equals(behaviour)){
-						threshold = getThreshold();
-					} else
-
-					if(("new").equals(behaviour) || ("deprecated").equals(behaviour)){
-						threshold = 0d;
-					} else
-
-					{
-						throw new IllegalArgumentException(behaviour);
-					}
-				}
-
-				return PMMLUtil.createApply(PMMLFunctions.LESSOREQUAL, fieldRef, PMMLUtil.createConstant(threshold));
-			}
-		};
-
-		Transformation sklearnOutlier = new SkLearnOutlierTransformation();
-
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))
-			.setOutput(ModelUtil.createPredictedOutput("rawAnomalyScore", OpType.CONTINUOUS, DataType.DOUBLE, normalizedAnomalyScore, decisionFunction, outlier, sklearnOutlier));
+			.setOutput(OutlierDetectorUtil.createPredictedOutput(this, "rawAnomalyScore", normalizedAnomalyScore, decisionFunction));
 
 		return TreeUtil.transform(this, miningModel);
+	}
+
+	@Override
+	public Number getDecisionFunctionThreshold(){
+		String behaviour = getBehaviour();
+
+		Number threshold;
+
+		// SkLearn 0.19 or SkLearn 0.24+
+		if(behaviour == null){
+			threshold = getThreshold();
+		} else
+
+		// SkLearn 0.20 through 0.23
+		{
+			if(("old").equals(behaviour)){
+				threshold = getThreshold();
+			} else
+
+			if(("new").equals(behaviour) || ("deprecated").equals(behaviour)){
+				threshold = 0d;
+			} else
+
+			{
+				throw new IllegalArgumentException(behaviour);
+			}
+		}
+
+		return threshold;
 	}
 
 	public List<List<Integer>> getEstimatorsFeatures(){

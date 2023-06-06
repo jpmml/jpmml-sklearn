@@ -21,8 +21,10 @@ package sklearn.svm;
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.Schema;
 import sklearn.HasDecisionFunctionField;
+import sklearn.OutlierDetector;
+import sklearn.OutlierDetectorUtil;
 
-public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionField {
+public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionField, OutlierDetector {
 
 	public OneClassSVM(String module, String name){
 		super(module, name);
@@ -36,7 +38,7 @@ public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionF
 	@Override
 	public SupportVectorMachineModel encodeModel(Schema schema){
 		SupportVectorMachineModel supportVectorMachineModel = super.encodeModel(schema)
-			.setOutput(OneClassSVMUtil.createPredictedOutput(this));
+			.setOutput(OutlierDetectorUtil.createPredictedOutput(this));
 
 		return supportVectorMachineModel;
 	}
