@@ -112,18 +112,18 @@
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-python</artifactId>
-				<version>1.1.14</version>
+				<version>1.1.15</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-python-testing</artifactId>
-				<version>1.1.14</version>
+				<version>1.1.15</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-statsmodels</artifactId>
-				<version>1.0.3</version>
+				<version>1.0.4</version>
 			</dependency>
 
 			<dependency>

@@ -40,7 +40,6 @@ import pandas.core.DataFrame;
 import pandas.core.Index;
 import pandas.core.Series;
 import pandas.core.SeriesUtil;
-import pandas.core.SingleBlockManager;
 import sklearn.preprocessing.EncoderUtil;
 
 abstract
@@ -143,18 +142,10 @@ public class MeanEncoder extends MapEncoder {
 	private Series toMeanSeries(DataFrame dataFrame, MeanFunction function){
 		BlockManager data = dataFrame.getData();
 
-		List<Index> axes = data.getAxesArray();
-		if(axes.size() != 2){
-			throw new IllegalArgumentException();
-		}
+		Index columnAxis = data.getColumnAxis();
+		Index rowAxis = data.getRowAxis();
 
-		Index columnAxis = axes.get(0);
-		List<?> columnValues = columnAxis.getArrayContent();
-
-		Index rowAxis = axes.get(1);
-		List<?> rowValues = rowAxis.getArrayContent();
-
-		if(!(Arrays.asList("sum", "count")).equals(columnValues)){
+		if(!(Arrays.asList("sum", "count")).equals(columnAxis.getValues())){
 			throw new IllegalArgumentException();
 		}
 
@@ -191,32 +182,7 @@ public class MeanEncoder extends MapEncoder {
 			meanValues.add(mean);
 		}
 
-		HasArray hasArray = new HasArray(){
-
-			@Override
-			public List<?> getArrayContent(){
-				return meanValues;
-			}
-
-			@Override
-			public int[] getArrayShape(){
-				return new int[]{meanValues.size()};
-			}
-
-			@Override
-			public Object getArrayType(){
-				throw new UnsupportedOperationException();
-			}
-		};
-
-		SingleBlockManager singleBlockManager = new SingleBlockManager();
-		singleBlockManager.setOnlyBlockItem(axes.get(1));
-		singleBlockManager.setOnlyBlockValue(hasArray);
-
-		Series result = new Series();
-		result.setBlockManager(singleBlockManager);
-
-		return result;
+		return SeriesUtil.createSeries(rowAxis, meanValues);
 	}
 
 	public interface MeanFunction extends BiFunction<Double, Integer, Double> {

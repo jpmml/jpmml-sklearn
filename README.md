@@ -367,7 +367,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Identity comparison operators `is None` and `is not None`.
       * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.
-      * Math constants `math.e`, `math.nan` and `math.pi`.
+      * Math constants `math.e`, `math.nan`, `math.pi` and `math.tau`.
       * Math functions (too numerous to list).
       * Numpy constants `numpy.e`, `numpy.NaN`. `numpy.NZERO`, `numpy.pi` and `numpy.PZERO`.
       * Numpy function `numpy.where`.
@@ -377,6 +377,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Scipy functions `scipy.special.expit` and `scipy.special.logit`.
       * String functions `startswith(<prefix>)`, `endswith(<suffix>)`, `lower`, `upper` and `strip`.
       * String length function `len(<str>)`.
+      * Perl Compatible Regular Expression (PCRE) functions `pcre.search` and `pcre.sub`.
+      * Regular Expression (RE) functions `re.search`, and `re.sub`.
       * User-defined functions.
     * `sklearn2pmml.preprocessing.FilterLookupTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`

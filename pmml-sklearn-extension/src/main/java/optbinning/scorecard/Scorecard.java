@@ -102,15 +102,7 @@ public class Scorecard extends Estimator implements HasClasses {
 
 		BlockManager data = dfScorecard.getData();
 
-		List<Index> axes = data.getAxesArray();
-		if(axes.size() != 2){
-			throw new IllegalArgumentException();
-		}
-
-		Index columnAxis = axes.get(0);
-		List<?> columnValues = columnAxis.getArrayContent();
-
-		Index rowAxis = axes.get(1);
+		Index rowAxis = data.getRowAxis();
 		List<?> rowValues = rowAxis.getArrayContent();
 
 		List<HasArray> blockValues = data.getBlockValues();
