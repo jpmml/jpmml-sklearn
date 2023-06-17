@@ -58,14 +58,14 @@ public class GBDTUtil {
 		if(gbdt instanceof HasNativeConfiguration){
 			HasNativeConfiguration hasNativeConfiguration = (HasNativeConfiguration)gbdt;
 
-			Map<String, ?> pmmlOptions = gbdt.getPMMLOptions();
+			Map<String, ?> prevPmmlOptions = gbdt.getPMMLOptions();
 
 			try {
 				gbdt.setPMMLOptions(hasNativeConfiguration.getNativeConfiguration());
 
 				model = gbdt.encode(schema);
 			} finally {
-				gbdt.setPMMLOptions(pmmlOptions);
+				gbdt.setPMMLOptions(prevPmmlOptions);
 			}
 		} else
 

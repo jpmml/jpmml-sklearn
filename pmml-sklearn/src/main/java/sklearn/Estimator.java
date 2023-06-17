@@ -145,6 +145,18 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		return model;
 	}
 
+	public Model encode(Object segmentId, Schema schema){
+		Object prevSegmentId = getPMMLSegmentId();
+
+		try {
+			setPMMLSegmentId(segmentId);
+
+			return encode(schema);
+		} finally {
+			setPMMLSegmentId(prevSegmentId);
+		}
+	}
+
 	public void checkLabel(Label label){
 		boolean supervised = isSupervised();
 
