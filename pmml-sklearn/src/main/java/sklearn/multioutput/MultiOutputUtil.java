@@ -39,7 +39,7 @@ public class MultiOutputUtil {
 		if(estimators.size() == 1){
 			Estimator estimator = estimators.get(0);
 
-			return estimator.encodeModel(schema);
+			return estimator.encode(schema);
 		} else
 
 		if(estimators.size() >= 2){
@@ -52,7 +52,7 @@ public class MultiOutputUtil {
 
 				Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
 
-				Model model = estimator.encodeModel(segmentSchema);
+				Model model = estimator.encode(segmentSchema);
 
 				models.add(model);
 			}

@@ -78,7 +78,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		Model model = estimator.encodeModel(schema);
+		Model model = estimator.encode(schema);
 
 		List<Model> models = new ArrayList<>();
 
