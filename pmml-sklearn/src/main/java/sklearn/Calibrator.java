@@ -24,6 +24,7 @@ import java.util.List;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
@@ -55,5 +56,18 @@ public class Calibrator extends Regressor {
 		Feature feature = Iterables.getOnlyElement(features);
 
 		return RegressionModelUtil.createRegression(Collections.singletonList(feature), Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+	}
+
+	/**
+	 * @see Transformer#createFieldName(String, Object...)
+	 */
+	public String createFieldName(String function, Feature feature){
+		String pmmlName = getPMMLName();
+
+		if(pmmlName != null){
+			return pmmlName;
+		}
+
+		return FieldNameUtil.create(function, Collections.singletonList(feature));
 	}
 }

@@ -19,12 +19,14 @@
 package sklearn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
@@ -177,5 +179,19 @@ public class Transformer extends Step {
 		};
 
 		return castFunction.apply(dtype);
+	}
+
+	public String createFieldName(String function, Object... args){
+		return createFieldName(function, Arrays.asList(args));
+	}
+
+	public String createFieldName(String function, List<?> args){
+		String pmmlName = getPMMLName();
+
+		if(pmmlName != null){
+			return pmmlName;
+		}
+
+		return FieldNameUtil.create(function, args);
 	}
 }

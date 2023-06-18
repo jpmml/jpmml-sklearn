@@ -18,11 +18,6 @@
  */
 package sklearn;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.dmg.pmml.DataType;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.python.PythonObject;
 import sklearn2pmml.SkLearn2PMMLFields;
 
@@ -31,24 +26,6 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public Step(String module, String name){
 		super(module, name);
-	}
-
-	public String createFieldName(DataType dataType, Object... args){
-		return createFieldName((dataType.name()).toLowerCase(), args);
-	}
-
-	public String createFieldName(String function, Object... args){
-		return createFieldName(function, Arrays.asList(args));
-	}
-
-	public String createFieldName(String function, List<?> args){
-		String pmmlName = getPMMLName();
-
-		if(pmmlName != null){
-			return pmmlName;
-		}
-
-		return FieldNameUtil.create(function, args);
 	}
 
 	public String getPMMLName(){
