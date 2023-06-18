@@ -35,7 +35,9 @@ def make_classification(df, estimator, name, **setup_params):
 	else:
 		model = exp.create_model(estimator)
 
-	pipeline = exp.finalize_model(model)
+	calibrated_model = exp.calibrate_model(model)
+
+	pipeline = exp.finalize_model(calibrated_model)
 
 	pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
 	store_pkl(pmml_pipeline, name)
