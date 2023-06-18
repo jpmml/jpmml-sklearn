@@ -60,7 +60,7 @@ public class OutlierDetectorUtil {
 
 			@Override
 			public String getName(String name){
-				return estimator.createFieldName("outlier");
+				return estimator.getOutlierField();
 			}
 
 			@Override

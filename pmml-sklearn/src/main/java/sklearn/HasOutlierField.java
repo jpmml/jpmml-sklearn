@@ -18,12 +18,10 @@
  */
 package sklearn;
 
-public interface OutlierDetector extends HasOutlierField {
+public interface HasOutlierField {
 
 	default
-	Number getDecisionFunctionThreshold(){
-		return 0d;
+	String getOutlierField(){
+		return OutlierDetector.FIELD_OUTLIER;
 	}
-
-	String FIELD_OUTLIER = "outlier";
 }
