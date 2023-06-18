@@ -364,6 +364,16 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		return applyField;
 	}
 
+	static
+	protected String extractArguments(String function, String name){
+
+		if(name.startsWith(function + "(") && name.endsWith(")")){
+			return name.substring((function + "(").length(), name.length() - ")".length());
+		}
+
+		return name;
+	}
+
 	public static final String FIELD_APPLY = "apply";
 	public static final String FIELD_DECISION_FUNCTION = "decisionFunction";
 	public static final String FIELD_PREDICT = "predict";

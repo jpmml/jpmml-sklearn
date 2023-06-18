@@ -19,6 +19,7 @@
 package sklearn.calibration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -106,6 +107,9 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 					OutputField outputField = Iterables.getOnlyElement(output.getOutputFields());
 
+					// XXX
+					outputField.setName(getDecisionFunctionField(outputField.getName()));
+
 					decisionFunctionModel.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE);
 
 					models.add(decisionFunctionModel);
@@ -125,7 +129,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 				}
 
 				for(RegressionTable regressionTable : regressionTables){
-					OutputField outputField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, regressionTable.requireTargetCategory()), OpType.CONTINUOUS, DataType.DOUBLE)
+					OutputField outputField = ModelUtil.createPredictedField(getDecisionFunctionField(regressionTable.requireTargetCategory()), OpType.CONTINUOUS, DataType.DOUBLE)
 						.setFinalResult(false);
 
 					Output output = new Output()
@@ -162,8 +166,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 				switch(resultFeature){
 					case PROBABILITY:
 						{
-							// XXX
-							outputField.setName(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, outputField.getValue()));
+							outputField.setName(getDecisionFunctionField(outputField.getValue()));
 
 							decisionFunctionFeatures.add(new ContinuousFeature(encoder, outputField));
 						}
@@ -248,6 +251,29 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 	public String getMethod(){
 		return getString("method");
+	}
+
+	private String getDecisionFunctionField(Object value){
+		Object segmentId = getPMMLSegmentId();
+
+		if(value instanceof String){
+			String name = (String)value;
+
+			// XXX
+			value = extractArguments(Estimator.FIELD_DECISION_FUNCTION, name);
+		}
+
+		List<?> args;
+
+		if(segmentId != null){
+			args = Arrays.asList(segmentId, value);
+		} else
+
+		{
+			args = Arrays.asList(value);
+		}
+
+		return FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, args);
 	}
 
 	static

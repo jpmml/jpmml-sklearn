@@ -18,10 +18,18 @@
  */
 package sklearn.calibration;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation;
+import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
 
 public class CalibratedClassifierCV extends Classifier {
@@ -34,6 +42,8 @@ public class CalibratedClassifierCV extends Classifier {
 	public Model encodeModel(Schema schema){
 		List<CalibratedClassifier> calibratedClassifiers = getCalibratedClassifiers();
 
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
 		if(calibratedClassifiers.size() == 1){
 			CalibratedClassifier calibratedClassifier = calibratedClassifiers.get(0);
 
@@ -41,7 +51,24 @@ public class CalibratedClassifierCV extends Classifier {
 		} else
 
 		if(calibratedClassifiers.size() >= 2){
-			throw new IllegalArgumentException();
+			Schema segmentSchema = schema.toAnonymousSchema();
+
+			List<Model> models = new ArrayList<>();
+
+			for(int i = 0; i < calibratedClassifiers.size(); i++){
+				CalibratedClassifier calibratedClassifier = calibratedClassifiers.get(i);
+
+				Model model = calibratedClassifier.encode((i + 1), segmentSchema);
+
+				models.add(model);
+			}
+
+			MiningModel miningModel = new MiningModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel))
+				.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.AVERAGE, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models));
+
+			encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+
+			return miningModel;
 		} else
 
 		{
