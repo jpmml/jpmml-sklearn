@@ -26,13 +26,13 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
+import sklearn.ScalarLabelUtil;
 
 public class ChainUtil {
 
@@ -41,26 +41,25 @@ public class ChainUtil {
 
 	static
 	public <E extends Estimator> MiningModel encodeChain(List<E> estimators, List<Integer> order, Schema schema){
-		ClassDictUtil.checkSize(estimators, order);
-
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		List<Model> models = new ArrayList<>();
+		List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
 
-		MultiLabel multiLabel = (MultiLabel)label;
+		ClassDictUtil.checkSize(estimators, order, scalarLabels);
+
+		List<Model> models = new ArrayList<>();
 
 		List<Feature> augmentedFeatures = new ArrayList<>(features);
 
 		for(int i = 0; i < estimators.size(); i++){
 			E estimator = estimators.get(i);
+			ScalarLabel scalarLabel = scalarLabels.get(i);
 
 			if(order.get(i) != i){
 				throw new IllegalArgumentException();
 			}
-
-			ScalarLabel scalarLabel = (ScalarLabel)multiLabel.getLabel(i);
 
 			Schema segmentSchema = new Schema(encoder, scalarLabel, augmentedFeatures);
 

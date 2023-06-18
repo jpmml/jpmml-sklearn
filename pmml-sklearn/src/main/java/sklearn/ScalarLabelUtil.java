@@ -18,8 +18,10 @@
  */
 package sklearn;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.Field;
 import org.dmg.pmml.OpType;
@@ -28,6 +30,8 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabel;
 
@@ -49,6 +53,35 @@ public class ScalarLabelUtil {
 			ContinuousLabel continuousLabel = (ContinuousLabel)scalarLabel;
 
 			return OpType.CONTINUOUS;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	static
+	public List<ScalarLabel> toScalarLabels(Label label){
+		return toScalarLabels(ScalarLabel.class, label);
+	}
+
+	static
+	public <E extends ScalarLabel> List<E> toScalarLabels(Class<? extends E> clazz, Label label){
+
+		if(label instanceof ScalarLabel){
+			ScalarLabel scalarLabel = (ScalarLabel)label;
+
+			return Collections.singletonList(clazz.cast(scalarLabel));
+		} else
+
+		if(label instanceof MultiLabel){
+			MultiLabel multiLabel = (MultiLabel)label;
+
+			List<? extends Label> labels = multiLabel.getLabels();
+
+			return labels.stream()
+				.map(clazz::cast)
+				.collect(Collectors.toList());
 		} else
 
 		{

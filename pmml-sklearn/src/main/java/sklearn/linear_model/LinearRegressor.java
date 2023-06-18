@@ -28,12 +28,13 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.MultiLabel;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Regressor;
+import sklearn.ScalarLabelUtil;
 
 public class LinearRegressor extends Regressor {
 
@@ -77,14 +78,14 @@ public class LinearRegressor extends Regressor {
 		} else
 
 		if(numberOfOutputs >= 2){
-			MultiLabel multiLabel = (MultiLabel)label;
+			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
 
-			ClassDictUtil.checkSize(numberOfOutputs, intercept, multiLabel.getLabels());
+			ClassDictUtil.checkSize(numberOfOutputs, intercept, scalarLabels);
 
 			List<Model> models = new ArrayList<>();
 
 			for(int i = 0, max = numberOfOutputs; i < max; i++){
-				Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
+				Schema segmentSchema = schema.toRelabeledSchema(scalarLabels.get(i));
 
 				Model model = createRegression(CMatrixUtil.getRow(coef, numberOfOutputs, features.size(), i), intercept.get(i), segmentSchema);
 

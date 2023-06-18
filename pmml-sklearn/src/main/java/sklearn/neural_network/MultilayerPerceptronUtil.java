@@ -19,9 +19,7 @@
 package sklearn.neural_network;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
@@ -42,11 +40,11 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.neural_network.NeuralNetworkUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
+import sklearn.ScalarLabelUtil;
 
 public class MultilayerPerceptronUtil {
 
@@ -192,27 +190,7 @@ public class MultilayerPerceptronUtil {
 
 	static
 	private NeuralOutputs encodeRegressionNeuralOutputs(List<? extends NeuralEntity> entities, Label label){
-		List<ContinuousLabel> continuousLabels;
-
-		if(entities.size() == 1){
-			ContinuousLabel continuousLabel = (ContinuousLabel)label;
-
-			continuousLabels = Collections.singletonList(continuousLabel);
-		} else
-
-		if(entities.size() >= 2){
-			MultiLabel multiLabel = (MultiLabel)label;
-
-			List<? extends Label> labels = multiLabel.getLabels();
-
-			continuousLabels = labels.stream()
-				.map(ContinuousLabel.class::cast)
-				.collect(Collectors.toList());
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
+		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
 
 		ClassDictUtil.checkSize(entities, continuousLabels);
 

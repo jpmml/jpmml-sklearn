@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -210,7 +209,7 @@ public class PMMLPipeline extends Pipeline {
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				List<ScalarLabel> scalarLabels = toScalarLabels(label);
+				List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
 
 				List<OutputField> predictFields = new ArrayList<>();
 
@@ -277,7 +276,7 @@ public class PMMLPipeline extends Pipeline {
 			Number precision = verification.getPrecision();
 			Number zeroThreshold = verification.getZeroThreshold();
 
-			List<ScalarLabel> scalarLabels = toScalarLabels(label);
+			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
 
 			boolean hasProbabilityValues = verification.hasProbabilityValues();
 
@@ -723,30 +722,6 @@ public class PMMLPipeline extends Pipeline {
 			}
 
 			return result;
-		}
-	}
-
-	static
-	private List<ScalarLabel> toScalarLabels(Label label){
-
-		if(label instanceof ScalarLabel){
-			ScalarLabel scalarLabel = (ScalarLabel)label;
-
-			return Collections.singletonList(scalarLabel);
-		} else
-
-		if(label instanceof MultiLabel){
-			MultiLabel multiLabel = (MultiLabel)label;
-
-			List<? extends Label> labels = multiLabel.getLabels();
-
-			return labels.stream()
-				.map(ScalarLabel.class::cast)
-				.collect(Collectors.toList());
-		} else
-
-		{
-			throw new IllegalArgumentException();
 		}
 	}
 

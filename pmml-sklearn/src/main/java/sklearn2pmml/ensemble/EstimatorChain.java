@@ -18,7 +18,6 @@
  */
 package sklearn2pmml.ensemble;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,10 +30,10 @@ import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
@@ -42,6 +41,7 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.ScalarLabelUtil;
 import sklearn2pmml.util.EvaluatableUtil;
 
 public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorEnsemble<Estimator> {
@@ -120,33 +120,10 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		MultiLabel multiLabel;
+		List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
 
-		if(label instanceof ScalarLabel){
-			ScalarLabel scalarLabel = (ScalarLabel)label;
-
-			List<Label> labels = new AbstractList(){
-
-				@Override
-				public int size(){
-					return steps.size();
-				}
-
-				@Override
-				public ScalarLabel get(int index){
-					return scalarLabel;
-				}
-			};
-
-			multiLabel = new MultiLabel(labels);
-		} else
-
-		if(label instanceof MultiLabel){
-			multiLabel = (MultiLabel)label;
-		} else
-
-		{
-			throw new IllegalArgumentException();
+		if(multioutput){
+			ClassDictUtil.checkSize(steps, scalarLabels);
 		}
 
 		List<Estimator> estimators = new ArrayList<>();
@@ -166,7 +143,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 			estimators.add(estimator);
 
-			Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
+			Schema segmentSchema = schema.toRelabeledSchema(multioutput ? scalarLabels.get(i) : scalarLabels.get(0));
 
 			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 

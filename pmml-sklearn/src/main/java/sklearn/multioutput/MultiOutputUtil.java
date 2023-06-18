@@ -23,10 +23,12 @@ import java.util.List;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.Segmentation;
-import org.jpmml.converter.MultiLabel;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.ScalarLabelUtil;
 
 public class MultiOutputUtil {
 
@@ -43,14 +45,17 @@ public class MultiOutputUtil {
 		} else
 
 		if(estimators.size() >= 2){
-			MultiLabel multiLabel = (MultiLabel)schema.getLabel();
+			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(schema.getLabel());
+
+			ClassDictUtil.checkSize(estimators, scalarLabels);
 
 			List<Model> models = new ArrayList<>();
 
 			for(int i = 0; i < estimators.size(); i++){
 				E estimator = estimators.get(i);
+				ScalarLabel scalarLabel = scalarLabels.get(i);
 
-				Schema segmentSchema = schema.toRelabeledSchema(multiLabel.getLabel(i));
+				Schema segmentSchema = schema.toRelabeledSchema(scalarLabel);
 
 				Model model = estimator.encode(segmentSchema);
 

@@ -18,6 +18,7 @@
  */
 package sklearn.neighbors;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +48,13 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.ScalarLabelUtil;
 
 public class KNeighborsUtil {
 
@@ -110,17 +111,18 @@ public class KNeighborsUtil {
 			instanceFields.addInstanceFields(instanceField);
 
 			data.put(instanceField.getColumn(), id);
-		} // End if
+		}
+
+		List<ScalarLabel> scalarLabels = (label != null ? ScalarLabelUtil.toScalarLabels(label) : Collections.emptyList());
+
+		ClassDictUtil.checkSize(numberOfOutputs, scalarLabels);
 
 		if(numberOfOutputs == 0){
-
-			if(label != null){
-				throw new IllegalArgumentException();
-			}
+			// Ignored
 		} else
 
 		if(numberOfOutputs == 1){
-			ScalarLabel scalarLabel = (ScalarLabel)label;
+			ScalarLabel scalarLabel = scalarLabels.get(0);
 
 			if(scalarLabel != null){
 				InstanceField instanceField = new InstanceField(scalarLabel.getName())
@@ -133,12 +135,9 @@ public class KNeighborsUtil {
 		} else
 
 		if(numberOfOutputs >= 2){
-			MultiLabel multiLabel = (MultiLabel)label;
 
-			List<? extends Label> labels = multiLabel.getLabels();
-
-			for(int i = 0; i < labels.size(); i++){
-				ScalarLabel scalarLabel = (ScalarLabel)labels.get(i);
+			for(int i = 0; i < scalarLabels.size(); i++){
+				ScalarLabel scalarLabel = scalarLabels.get(i);
 
 				if(scalarLabel != null){
 					InstanceField instanceField = new InstanceField(scalarLabel.getName())
@@ -189,10 +188,9 @@ public class KNeighborsUtil {
 			output = createOutput(numberOfNeighbors, null);
 		} else
 
+		// XXX
 		if(numberOfOutputs >= 2){
-			MultiLabel multiLabel = (MultiLabel)label;
-
-			output = createOutput(numberOfNeighbors, (ScalarLabel)multiLabel.getLabel(0));
+			output = createOutput(numberOfNeighbors, scalarLabels.get(0));
 		} else
 
 		{
