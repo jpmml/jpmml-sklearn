@@ -136,6 +136,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
+			ScalarLabel scalarLabel = (multioutput ? scalarLabels.get(i) : scalarLabels.get(0));
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
 			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
@@ -143,11 +144,19 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 			estimators.add(estimator);
 
-			Schema segmentSchema = schema.toRelabeledSchema(multioutput ? scalarLabels.get(i) : scalarLabels.get(0));
+			Schema segmentSchema = schema.toRelabeledSchema(scalarLabel);
 
 			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 
-			Model model = estimator.encode(segmentSchema);
+			Model model;
+
+			if(multioutput){
+				model = estimator.encode(scalarLabel.getName(), segmentSchema);
+			} else
+
+			{
+				model = estimator.encode(segmentSchema);
+			}
 
 			models.add(model);
 

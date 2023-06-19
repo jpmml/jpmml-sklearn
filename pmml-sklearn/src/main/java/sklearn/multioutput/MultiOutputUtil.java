@@ -57,7 +57,7 @@ public class MultiOutputUtil {
 
 				Schema segmentSchema = schema.toRelabeledSchema(scalarLabel);
 
-				Model model = estimator.encode(segmentSchema);
+				Model model = estimator.encode(scalarLabel.getName(), segmentSchema);
 
 				models.add(model);
 			}

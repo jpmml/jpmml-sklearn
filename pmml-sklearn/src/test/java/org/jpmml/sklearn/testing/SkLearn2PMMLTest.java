@@ -40,7 +40,13 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 
 	@Test
 	public void evaluateMultiEstimatorChainAudit() throws Exception {
-		evaluate("MultiEstimatorChain", AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), FieldNames.NODE_ID, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+		String[] resultFields = {
+			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"),
+			FieldNames.NODE_ID,
+			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 1)
+		};
+
+		evaluate("MultiEstimatorChain", AUDIT, excludeFields(resultFields));
 	}
 
 	@Test

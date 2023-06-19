@@ -63,7 +63,7 @@ public class ChainUtil {
 
 			Schema segmentSchema = new Schema(encoder, scalarLabel, augmentedFeatures);
 
-			Model model = estimator.encode(segmentSchema);
+			Model model = estimator.encode(scalarLabel.getName(), segmentSchema);
 
 			models.add(model);
 

@@ -180,7 +180,12 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateMultiLogisticRegression() throws Exception {
-		evaluate(MULTI_LOGISTIC_REGRESSION, AUDIT, excludeFields(FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"), AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+		String[] resultFields = {
+			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", "Female"),
+			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 1)
+		};
+
+		evaluate(MULTI_LOGISTIC_REGRESSION, AUDIT, excludeFields(resultFields));
 	}
 
 	@Test
@@ -207,7 +212,12 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateLogisticRegressionChainAudit() throws Exception {
-		evaluate(LOGISTIC_REGRESSION_CHAIN, AUDIT, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "Gender"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, -2), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, 2), AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
+		String[] resultFields = {
+			FieldNameUtil.create(Estimator.FIELD_PREDICT, "Gender"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", -2), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", 2),
+			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 1)
+		};
+
+		evaluate(LOGISTIC_REGRESSION_CHAIN, AUDIT, excludeFields(resultFields));
 	}
 
 	@Test
