@@ -105,7 +105,7 @@ public class BinningProcess extends Initializer {
 
 			@Override
 			protected String formatMessage(Object object){
-				return "The binning object (" + ClassDictUtil.formatClass(object) + ") is not a supported";
+				return "The binning object (" + ClassDictUtil.formatClass(object) + ") is not supported";
 			}
 		};
 

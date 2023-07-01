@@ -64,6 +64,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractExtender;
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -576,7 +577,29 @@ public class PMMLPipeline extends Pipeline {
 					for(int i = 0; i < targetFields.size(); i++){
 						String targetField = targetFields.get(i);
 
-						labels.add(initCategoricalLabel(targetField, (targetFields.size() > 1 ? (List<?>)categories.get(i) : categories), classExtensions, encoder));
+						List<?> targetCategories;
+
+						if(targetFields.size() == 1){
+							targetCategories = categories;
+						} else
+
+						if(targetFields.size() >= 2){
+							CastFunction<List<?>> castFunction = new CastFunction<List<?>>((Class)List.class){
+
+								@Override
+								public String formatMessage(Object object){
+									return "The categories object of the \'" + targetField + "\' target field (" + ClassDictUtil.formatClass(object) + ") is not supported";
+								}
+							};
+
+							targetCategories = castFunction.apply(categories.get(i));
+						} else
+
+						{
+							throw new IllegalArgumentException();
+						}
+
+						labels.add(initCategoricalLabel(targetField, targetCategories, classExtensions, encoder));
 					}
 				}
 				break;
