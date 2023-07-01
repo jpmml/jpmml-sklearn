@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
@@ -88,7 +89,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
-			Object col = cols.get(i);
+			Object col = ScalarUtil.decode(cols.get(i));
 			OrdinalEncoder.Mapping ordinalMapping = ordinalMappings.get(i);
 
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
@@ -102,6 +103,9 @@ public class OrdinalMapEncoder extends MapEncoder {
 			}
 
 			Series series = mapping.get(col);
+			if(series == null){
+				throw new IllegalArgumentException(String.valueOf(col));
+			}
 
 			Map<Integer, Double> valueMappings = SeriesUtil.toMap(series, key -> ValueUtil.asInteger((Number)key), ValueUtil::asDouble);
 
