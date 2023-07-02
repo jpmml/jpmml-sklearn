@@ -254,7 +254,7 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 	}
 
 	private String getDecisionFunctionField(Object value){
-		Object segmentId = getPMMLSegmentId();
+		Object pmmlSegmentId = getPMMLSegmentId();
 
 		if(value instanceof String){
 			String name = (String)value;
@@ -265,8 +265,8 @@ public class CalibratedClassifier extends Classifier implements HasEstimator<Cla
 
 		List<?> args;
 
-		if(segmentId != null){
-			args = Arrays.asList(segmentId, value);
+		if(pmmlSegmentId != null){
+			args = Arrays.asList(pmmlSegmentId, value);
 		} else
 
 		{
