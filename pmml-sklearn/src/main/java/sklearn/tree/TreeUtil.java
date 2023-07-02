@@ -56,6 +56,7 @@ import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
@@ -68,7 +69,6 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
-import sklearn.HasMultiApplyField;
 import sklearn.tree.visitors.TreeModelCompactor;
 import sklearn.tree.visitors.TreeModelFlattener;
 import sklearn.tree.visitors.TreeModelPruner;
@@ -459,14 +459,26 @@ public class TreeUtil {
 	static
 	private void encodeNodeId(Estimator estimator, Model model){
 
+		if(model instanceof TreeModel){
+			TreeModel treeModel = (TreeModel)model;
+
+			OutputField outputField = estimator.encodeApplyOutput(treeModel, DataType.INTEGER);
+
+			List<Integer> nodeIds = collectNodeIds(treeModel);
+			if(nodeIds != null && nodeIds.isEmpty()){
+				PMMLUtil.addValues(outputField, nodeIds);
+			}
+		} else
+
 		if(model instanceof MiningModel){
 			MiningModel miningModel = (MiningModel)model;
-
-			HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)estimator;
 
 			Segmentation segmentation = miningModel.requireSegmentation();
 
 			List<Segment> segments = segmentation.requireSegments();
+
+			List<String> segmentIds = new ArrayList<>();
+
 			for(Segment segment : segments){
 				TreeModel treeModel = segment.requireModel(TreeModel.class);
 
@@ -475,23 +487,10 @@ public class TreeUtil {
 					throw new UnsupportedElementException(segment);
 				}
 
-				List<Integer> nodeIds = collectNodeIds(treeModel);
-
-				OutputField applyField = estimator.encodeApplyOutput(miningModel, DataType.INTEGER, nodeIds);
-
-				// XXX
-				applyField
-					.setName(hasMultiApplyField.getApplyField(segmentId))
-					.setSegmentId(segmentId);
+				segmentIds.add(segmentId);
 			}
-		} else
 
-		if(model instanceof TreeModel){
-			TreeModel treeModel = (TreeModel)model;
-
-			List<Integer> nodeIds = collectNodeIds(treeModel);
-
-			estimator.encodeApplyOutput(treeModel, DataType.INTEGER, nodeIds);
+			estimator.encodeMultiApplyOutput(miningModel, DataType.INTEGER, segmentIds);
 		} else
 
 		{

@@ -72,16 +72,16 @@ public class EstimatorUtil {
 		switch(predictFunc){
 			case SkLearnMethods.APPLY:
 				{
-					if(estimator instanceof HasMultiApplyField){
-						HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)estimator;
-
-						return encoder.export(model, hasMultiApplyField.getApplyFields());
-					} else
-
 					if(estimator instanceof HasApplyField){
 						HasApplyField hasApplyField = (HasApplyField)estimator;
 
 						return encoder.export(model, hasApplyField.getApplyField());
+					} else
+
+					if(estimator instanceof HasMultiApplyField){
+						HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)estimator;
+
+						return encoder.export(model, hasMultiApplyField.getMultiApplyFields());
 					} else
 
 					{

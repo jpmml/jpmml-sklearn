@@ -18,6 +18,7 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,7 +38,6 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import org.slf4j.Logger;
@@ -341,7 +341,7 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 
 		{
 			throw new IllegalArgumentException();
-		}
+		} // End if
 
 		if(pmmlSegmentId != null){
 			name = FieldNameUtil.create(name, pmmlSegmentId);
@@ -350,18 +350,56 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		return ModelUtil.createEntityIdField(name, dataType);
 	}
 
-	public OutputField encodeApplyOutput(Model model, DataType dataType, List<?> values){
+	public OutputField encodeApplyOutput(Model model, DataType dataType){
 		OutputField applyField = createApplyField(dataType);
-
-		if(values != null && !values.isEmpty()){
-			PMMLUtil.addValues(applyField, values);
-		}
 
 		Output output = ModelUtil.ensureOutput(model);
 
 		(output.getOutputFields()).add(applyField);
 
 		return applyField;
+	}
+
+	public OutputField createMultiApplyField(DataType dataType, String segmentId){
+		Object pmmlSegmentId = getPMMLSegmentId();
+
+		String name;
+
+		if(this instanceof HasMultiApplyField){
+			HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)this;
+
+			name = hasMultiApplyField.getMultiApplyField(segmentId);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		} // End if
+
+		if(pmmlSegmentId != null){
+			name = FieldNameUtil.create(name, pmmlSegmentId);
+		}
+
+		OutputField result = ModelUtil.createEntityIdField(name, dataType);
+
+		result.setSegmentId(segmentId);
+
+		return result;
+	}
+
+	public List<OutputField> encodeMultiApplyOutput(Model model, DataType dataType, List<String> segmentIds){
+		List<OutputField> applyFields = new ArrayList<>();
+
+		for(String segmentId : segmentIds){
+			OutputField applyField = createMultiApplyField(dataType, segmentId);
+
+			applyFields.add(applyField);
+		}
+
+		Output output = ModelUtil.ensureOutput(model);
+
+		(output.getOutputFields()).addAll(applyFields);
+
+		return applyFields;
 	}
 
 	static

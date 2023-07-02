@@ -25,6 +25,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
 import sklearn.Classifier;
@@ -50,8 +51,8 @@ public class ForestClassifier extends Classifier implements HasEstimatorEnsemble
 	}
 
 	@Override
-	public String getApplyField(){
-		return FieldNames.NODE_ID;
+	public String getMultiApplyField(Object segmentId){
+		return FieldNameUtil.create(FieldNames.NODE_ID, segmentId);
 	}
 
 	@Override
