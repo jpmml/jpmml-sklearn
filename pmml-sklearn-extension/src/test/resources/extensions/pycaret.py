@@ -110,7 +110,7 @@ if "Auto" in datasets:
 	for cat_col in cat_cols:
 		auto_df[cat_col] = auto_df[cat_col].astype(str)
 
-	make_regression(auto_df, "rf", "PyCaretAuto", remove_multicollinearity = True, multicollinearity_threshold = 0.75)
+	make_regression(auto_df, "rf", "PyCaretAuto", remove_outliers = True, remove_multicollinearity = True, multicollinearity_threshold = 0.75)
 
 	auto_df = load_auto("AutoNA")
 

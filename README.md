@@ -289,6 +289,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * `pycaret.internal.preprocess.transformers.FixImbalancer`
   * `pycaret.internal.preprocess.transformers.RareCategoryGrouping`
   * `pycaret.internal.preprocess.transformers.RemoveMulticollinearity`
+  * `pycaret.internal.preprocess.transformers.RemoveOutliers`
   * `pycaret.internal.preprocess.transformers.TransformerWrapper`
   * `pycaret.internal.preprocess.transformers.TransformerWrapperWithInverse`
 </details>
