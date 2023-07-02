@@ -45,6 +45,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.model.ReflectionUtil;
@@ -111,7 +113,26 @@ public class SkLearnEncoder extends PythonEncoder {
 			OpType opType = derivedOutputField.getOpType();
 			switch(opType){
 				case CATEGORICAL:
-					feature = new CategoricalFeature(this, derivedOutputField);
+					if(derivedOutputField.hasValues()){
+						feature = new CategoricalFeature(this, derivedOutputField);
+					} else
+
+					{
+						feature = new ObjectFeature(this, derivedOutputField){
+
+							/**
+							 * @see CategoricalFeature#toContinuousFeature()
+							 */
+							@Override
+							public ContinuousFeature toContinuousFeature(){
+								PMMLEncoder encoder = getEncoder();
+
+								org.dmg.pmml.Field<?> field = encoder.toContinuous(getName());
+
+								return new ContinuousFeature(encoder, field);
+							}
+						};
+					}
 					break;
 				case CONTINUOUS:
 					feature = new ContinuousFeature(this, derivedOutputField);

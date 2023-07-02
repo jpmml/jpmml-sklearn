@@ -33,7 +33,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.HasExtensions;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
@@ -56,7 +55,6 @@ import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
@@ -462,12 +460,7 @@ public class TreeUtil {
 		if(model instanceof TreeModel){
 			TreeModel treeModel = (TreeModel)model;
 
-			OutputField outputField = estimator.encodeApplyOutput(treeModel, DataType.INTEGER);
-
-			List<Integer> nodeIds = collectNodeIds(treeModel);
-			if(nodeIds != null && nodeIds.isEmpty()){
-				PMMLUtil.addValues(outputField, nodeIds);
-			}
+			estimator.encodeApplyOutput(treeModel, DataType.INTEGER);
 		} else
 
 		if(model instanceof MiningModel){
@@ -496,27 +489,6 @@ public class TreeUtil {
 		{
 			throw new IllegalArgumentException();
 		}
-	}
-
-	static
-	private List<Integer> collectNodeIds(TreeModel treeModel){
-		List<Integer> result = new ArrayList<>();
-
-		Visitor nodeIdCollector = new AbstractVisitor(){
-
-			@Override
-			public VisitorAction visit(Node node){
-
-				if(!node.hasNodes()){
-					result.add((Integer)node.getId());
-				}
-
-				return super.visit(node);
-			}
-		};
-		nodeIdCollector.applyTo(treeModel);
-
-		return result;
 	}
 
 	static
