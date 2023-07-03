@@ -18,11 +18,57 @@
  */
 package pycaret.preprocess;
 
-import sklearn.IdentityTransformer;
+import java.util.Arrays;
+import java.util.List;
 
-public class RemoveOutliers extends IdentityTransformer {
+import org.dmg.pmml.Model;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.Schema;
+import org.jpmml.python.CastFunction;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Estimator;
+import sklearn.HasEstimator;
+import sklearn.IdentityTransformer;
+import sklearn.OutlierDetector;
+
+public class RemoveOutliers extends IdentityTransformer implements HasEstimator<Estimator> {
 
 	public RemoveOutliers(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Estimator estimator = getEstimator();
+
+		CastFunction<OutlierDetector> castFunction = new CastFunction<OutlierDetector>(OutlierDetector.class){
+
+			@Override
+			public String formatMessage(Object object){
+				return "The outlier detector object (" + ClassDictUtil.formatClass(object) + ") is not supported";
+			}
+		};
+
+		OutlierDetector outlierDetector = castFunction.apply(estimator);
+
+		if(estimator.isSupervised()){
+			throw new IllegalArgumentException();
+		}
+
+		Schema schema = new Schema(encoder, null, features);
+
+		Model model = estimator.encode(schema);
+
+		encoder.addTransformer(model);
+
+		encoder.export(model, Arrays.asList(outlierDetector.getDecisionFunctionField(), outlierDetector.getOutlierField()));
+
+		return super.encodeFeatures(features, encoder);
+	}
+
+	@Override
+	public Estimator getEstimator(){
+		return get("_estimator", Estimator.class);
 	}
 }
