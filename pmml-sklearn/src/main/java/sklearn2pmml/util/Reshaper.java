@@ -18,14 +18,10 @@
  */
 package sklearn2pmml.util;
 
-import java.util.List;
-
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
+import sklearn.IdentityTransformer;
 
-public class Reshaper extends MultiTransformer {
+public class Reshaper extends IdentityTransformer {
 
 	public Reshaper(String module, String name){
 		super(module, name);
@@ -40,11 +36,6 @@ public class Reshaper extends MultiTransformer {
 		}
 
 		return super.getNumberOfFeatures();
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		return features;
 	}
 
 	public Object[] getNewshape(){

@@ -18,20 +18,10 @@
  */
 package sklearn;
 
-import java.util.List;
-
-import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.SkLearnEncoder;
-
-public class PassThrough extends MultiTransformer {
+public class PassThrough extends IdentityTransformer {
 
 	private PassThrough(){
 		super(null, "_passthrough");
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		return features;
 	}
 
 	public static final PassThrough INSTANCE = new PassThrough();

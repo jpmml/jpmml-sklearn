@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2023 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -23,16 +23,14 @@ import java.util.List;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class None extends MultiTransformer {
+public class IdentityTransformer extends MultiTransformer {
 
-	private None(){
-		super(null, "None");
+	public IdentityTransformer(String module, String name){
+		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		return features;
 	}
-
-	public static final None INSTANCE = new None();
 }

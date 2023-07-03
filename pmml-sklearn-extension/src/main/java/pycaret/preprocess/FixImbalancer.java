@@ -18,20 +18,11 @@
  */
 package pycaret.preprocess;
 
-import java.util.List;
+import sklearn.IdentityTransformer;
 
-import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
-
-public class FixImbalancer extends MultiTransformer {
+public class FixImbalancer extends IdentityTransformer {
 
 	public FixImbalancer(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		return features;
 	}
 }
