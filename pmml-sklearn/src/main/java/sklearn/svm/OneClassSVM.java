@@ -20,11 +20,10 @@ package sklearn.svm;
 
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.Schema;
-import sklearn.HasDecisionFunctionField;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 
-public class OneClassSVM extends LibSVMRegressor implements HasDecisionFunctionField, OutlierDetector {
+public class OneClassSVM extends LibSVMRegressor implements OutlierDetector {
 
 	public OneClassSVM(String module, String name){
 		super(module, name);

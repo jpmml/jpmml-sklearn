@@ -47,7 +47,6 @@ import org.jpmml.converter.transformations.AbstractTransformation;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
-import sklearn.HasDecisionFunctionField;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
@@ -59,7 +58,7 @@ import sklearn.tree.Tree;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class IsolationForest extends EnsembleRegressor implements HasDecisionFunctionField, HasTreeOptions, OutlierDetector {
+public class IsolationForest extends EnsembleRegressor implements HasTreeOptions, OutlierDetector {
 
 	public IsolationForest(String module, String name){
 		super(module, name);

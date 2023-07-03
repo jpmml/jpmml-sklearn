@@ -24,12 +24,11 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import sklearn.HasDecisionFunctionField;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
 
-public class SGDOneClassSVM extends Regressor implements HasDecisionFunctionField, OutlierDetector {
+public class SGDOneClassSVM extends Regressor implements OutlierDetector {
 
 	public SGDOneClassSVM(String module, String name){
 		super(module, name);

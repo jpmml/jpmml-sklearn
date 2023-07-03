@@ -18,7 +18,7 @@
  */
 package sklearn;
 
-public interface OutlierDetector extends HasOutlierField {
+public interface OutlierDetector extends HasDecisionFunctionField, HasOutlierField {
 
 	default
 	Number getDecisionFunctionThreshold(){

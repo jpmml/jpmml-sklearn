@@ -40,7 +40,7 @@ public class OutlierDetectorUtil {
 	}
 
 	static
-	public <E extends Estimator & OutlierDetector & HasDecisionFunctionField> Output createPredictedOutput(E estimator){
+	public <E extends Estimator & OutlierDetector> Output createPredictedOutput(E estimator){
 		Output output = createPredictedOutput(estimator, estimator.getDecisionFunctionField());
 
 		List<OutputField> outputFields = output.getOutputFields();
