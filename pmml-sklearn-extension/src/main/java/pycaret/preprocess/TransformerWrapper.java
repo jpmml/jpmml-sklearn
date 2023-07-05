@@ -68,8 +68,12 @@ public class TransformerWrapper extends Initializer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<String> featureNamesIn = getFeatureNamesIn();
 		List<String> include = getInclude();
-
+		Boolean trainOnly = getTrainOnly();
 		Transformer transformer = getTransformer();
+
+		if(trainOnly){
+			return features;
+		} // End if
 
 		if(features.isEmpty()){
 			features = InitializerUtil.selectFeatures(featureNamesIn, features, encoder);
@@ -186,6 +190,10 @@ public class TransformerWrapper extends Initializer {
 
 	public List<String> getInclude(){
 		return getList("_include", String.class);
+	}
+
+	public Boolean getTrainOnly(){
+		return getOptionalBoolean("_train_only", Boolean.FALSE);
 	}
 
 	public Transformer getTransformer(){
