@@ -14,7 +14,7 @@ def split_multi_csv(df, target_columns):
 	return (df[feature_columns], df[target_columns])
 
 def store_csv(df, name):
-	df.to_csv("csv/" + name + ".csv", index = False)
+	df.to_csv("csv/" + name + ".csv", index = False, na_rep = "N/A")
 
 def store_mojo(estimator, name):
 	estimator.download_mojo("mojo/" + name + ".zip")

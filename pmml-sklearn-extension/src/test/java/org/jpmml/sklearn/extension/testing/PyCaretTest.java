@@ -18,18 +18,50 @@
  */
 package org.jpmml.sklearn.extension.testing;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
 
+import com.google.common.base.Equivalence;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OutputField;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.FloatEquivalence;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 
 public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
+
+	@Override
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public PyCaretTest getArchiveBatchTest(){
+				return PyCaretTest.this;
+			}
+
+			@Override
+			public List<? extends Map<String, ?>> getOutput() throws IOException {
+				List<? extends Map<String, ?>> records = super.getOutput();
+
+				for(Map<String, ?> record : records){
+					(record.values()).removeIf(Objects::isNull);
+				}
+
+				return records;
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluatePyCaretAudit() throws Exception {
@@ -47,6 +79,11 @@ public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluatePyCaretMaskedAuto() throws Exception {
+		evaluate("PyCaretMasked", AUTO, excludeFields(IFOREST_FIELDS));
+	}
+
+	@Test
 	public void evaluatePyCaretAutoNA() throws Exception {
 		evaluate("PyCaret", AUTO_NA, new FloatEquivalence(8));
 	}
@@ -54,6 +91,11 @@ public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluatePyCaretIris() throws Exception {
 		evaluate("PyCaret", IRIS);
+	}
+
+	@Test
+	public void evaluatePyCaretMaskedIris() throws Exception {
+		evaluate("PyCaretMasked", IRIS, excludeFields(IFOREST_FIELDS));
 	}
 
 	@Test
@@ -73,4 +115,6 @@ public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
 			.map(OutputField::requireName)
 			.toArray(String[]::new);
 	}
+
+	private static List<String> IFOREST_FIELDS = Arrays.asList("rawAnomalyScore", "normalizedAnomalyScore", "decisionFunction", "outlier", "predict(outlier)");
 }

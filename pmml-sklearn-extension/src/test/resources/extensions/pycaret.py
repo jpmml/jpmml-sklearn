@@ -4,6 +4,7 @@ import sys
 from pandas import DataFrame, Int64Dtype, Series
 from pycaret.classification import ClassificationExperiment
 from pycaret.clustering import ClusteringExperiment
+from pycaret.internal.pipeline import Pipeline
 from pycaret.regression import RegressionExperiment
 from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml.pycaret import _escape
@@ -21,6 +22,29 @@ if __name__ == "__main__":
 		datasets = (sys.argv[1]).split(",")
 	else:
 		datasets = ["Audit", "Auto", "Iris", "Wheat"]
+
+def extract_preproc_pipeline(pipeline):
+	preproc_steps = []
+	for step in pipeline.steps:
+		if step[0] == "remove_outliers":
+			return Pipeline(steps = preproc_steps)
+		preproc_steps.append(step)
+	raise ValueError()
+
+def predict_outlier_mask(pipeline, X):
+	remove_outliers = pipeline["remove_outliers"]
+	remove_outliers._train_only = False
+	remove_outliers.transformer._train_only = False
+
+	preproc_pipeline = extract_preproc_pipeline(pipeline)
+
+	X_preproc = preproc_pipeline.transform(X)
+
+	# XXX
+	if remove_outliers.transformer._estimator is None:
+		remove_outliers.transformer.transform(X_preproc)
+
+	return remove_outliers.transformer._estimator.predict(X_preproc)
 
 def make_classification(df, estimator, name, **setup_params):
 	X, y = split_csv(df)
@@ -45,6 +69,18 @@ def make_classification(df, estimator, name, **setup_params):
 	yt = Series(pipeline.predict(X), name = y.name)
 	yt_proba = DataFrame(pipeline.predict_proba(X), columns = ["probability(" + str(category) + ")" for category in categories])
 	store_csv(pandas.concat((yt, yt_proba), axis = 1), name)
+
+	if setup_params.get("remove_outliers", False):
+		name = name.replace("PyCaret", "PyCaretMasked")
+
+		mask = predict_outlier_mask(pipeline, X)
+
+		yt[mask == -1] = None
+		yt_proba.loc[mask == -1, :] = numpy.NaN
+
+		store_pkl(pmml_pipeline, name)
+
+		store_csv(pandas.concat((yt, yt_proba), axis = 1), name)
 
 def make_clustering(df, estimator, name, **setup_params):
 	X, y = split_csv(df)
@@ -82,6 +118,17 @@ def make_regression(df, estimator, name, **setup_params):
 	yt = Series(pipeline.predict(X), name = y.name)
 	store_csv(yt, name)
 
+	if setup_params.get("remove_outliers", False):
+		name = name.replace("PyCaret", "PyCaretMasked")
+
+		mask = predict_outlier_mask(pipeline, X)
+
+		yt[mask == -1] = numpy.NaN
+
+		store_pkl(pmml_pipeline, name)
+
+		store_csv(yt, name)
+
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
@@ -95,7 +142,7 @@ if "Audit" in datasets:
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
-	make_classification(iris_df, "lr", "PyCaretIris", polynomial_features = True, polynomial_degree = 2, low_variance_threshold = 0.5)
+	make_classification(iris_df, "lr", "PyCaretIris", remove_outliers = True, polynomial_features = True, polynomial_degree = 2, low_variance_threshold = 0.5)
 
 if "Wheat" in datasets:
 	wheat_df = load_wheat("Wheat")

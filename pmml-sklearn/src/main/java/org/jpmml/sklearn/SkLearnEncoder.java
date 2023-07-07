@@ -25,17 +25,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import numpy.DType;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.PMML;
+import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ResultFeature;
+import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segment;
+import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
@@ -50,6 +58,7 @@ import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.model.ReflectionUtil;
+import org.jpmml.model.UnsupportedAttributeException;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
@@ -70,6 +79,8 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	private List<? extends Feature> features = Collections.emptyList();
 
+	private Predicate predicate = null;
+
 	private Model model = null;
 
 
@@ -84,6 +95,66 @@ public class SkLearnEncoder extends PythonEncoder {
 		}
 
 		super.addTransformer(transformer);
+	}
+
+	@Override
+	public PMML encodePMML(){
+		PMML pmml = super.encodePMML();
+
+		Predicate predicate = getPredicate();
+		if(predicate == null){
+			return pmml;
+		}
+
+		// XXX
+		PMML result = new PMML(){
+
+			{
+				ReflectionUtil.copyState(pmml, this);
+			}
+
+			@Override
+			public PMML addModels(Model... models){
+
+				if(models.length != 1){
+					throw new IllegalArgumentException();
+				}
+
+				MiningModel miningModel = (MiningModel)models[0];
+
+				Segmentation segmentation = miningModel.requireSegmentation();
+
+				Segmentation.MultipleModelMethod multipleModelMethod = segmentation.requireMultipleModelMethod();
+				switch(multipleModelMethod){
+					case MODEL_CHAIN:
+						break;
+					default:
+						throw new UnsupportedAttributeException(segmentation, multipleModelMethod);
+				}
+
+				List<Segment> segments = segmentation.requireSegments();
+
+				Segment finalSegment = segments.get(segments.size() - 1);
+
+				finalSegment.setPredicate(predicate);
+
+				Set<MiningFunction> miningFunctions = segments.stream()
+					.map(segment -> {
+						Model model = segment.requireModel();
+
+						return model.requireMiningFunction();
+					})
+					.collect(Collectors.toSet());
+
+				if(miningFunctions.size() > 1){
+					miningModel.setMiningFunction(MiningFunction.MIXED);
+				}
+
+				return super.addModels(models);
+			}
+		};
+
+		return result;
 	}
 
 	public List<Feature> export(Model model, String name){
@@ -303,6 +374,14 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	public void setFeatures(List<? extends Feature> features){
 		this.features = Objects.requireNonNull(features);
+	}
+
+	public Predicate getPredicate(){
+		return this.predicate;
+	}
+
+	public void setPredicate(Predicate predicate){
+		this.predicate = predicate;
 	}
 
 	public boolean hasModel(){

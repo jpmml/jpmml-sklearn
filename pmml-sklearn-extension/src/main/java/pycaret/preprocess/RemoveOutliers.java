@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.Model;
+import org.dmg.pmml.Predicate;
+import org.dmg.pmml.SimplePredicate;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
@@ -63,6 +65,10 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 		encoder.addTransformer(model);
 
 		encoder.export(model, Arrays.asList(outlierDetector.getDecisionFunctionField(), outlierDetector.getOutlierField()));
+
+		Predicate predicate = new SimplePredicate(outlierDetector.getOutlierField(), SimplePredicate.Operator.EQUAL, false);
+
+		encoder.setPredicate(predicate);
 
 		return super.encodeFeatures(features, encoder);
 	}
