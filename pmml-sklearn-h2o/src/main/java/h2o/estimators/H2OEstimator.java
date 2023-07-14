@@ -112,7 +112,7 @@ public class H2OEstimator extends Estimator implements HasClasses {
 
 		List<? extends Feature> h2oFeatures = h2oSchema.getFeatures();
 
-		List<Feature> sortedFeatures = new ArrayList<>();
+		List<Feature> reorderedFeatures = new ArrayList<>();
 
 		for(Feature h2oFeature : h2oFeatures){
 			String name = h2oFeature.getName();
@@ -126,15 +126,13 @@ public class H2OEstimator extends Estimator implements HasClasses {
 			} else
 
 			{
-				int index = Integer.parseInt(name.substring(1)) - 1;
-
-				feature = features.get(index);
+				feature = findByName(features, name);
 			}
 
-			sortedFeatures.add(feature);
+			reorderedFeatures.add(feature);
 		}
 
-		Schema mojoModelSchema = converter.toMojoModelSchema(new Schema(encoder, label, sortedFeatures));
+		Schema mojoModelSchema = converter.toMojoModelSchema(new Schema(encoder, label, reorderedFeatures));
 
 		return converter.encodeModel(mojoModelSchema);
 	}
@@ -174,5 +172,20 @@ public class H2OEstimator extends Estimator implements HasClasses {
 		}
 
 		return mojoModel;
+	}
+
+	static
+	private Feature findByName(List<? extends Feature> features, String name){
+
+		for(Feature feature : features){
+
+			if((feature.getName()).equals(name)){
+				return feature;
+			}
+		}
+
+		int index = Integer.parseInt(name.substring(1)) - 1;
+
+		return features.get(index);
 	}
 }
