@@ -1,3 +1,4 @@
+import dill
 import joblib
 import pandas
 
@@ -21,8 +22,15 @@ def store_mojo(estimator, name):
 	estimator._mojo_path = "mojo/" + name + ".zip"
 
 # Joblib dump
-def store_pkl(obj, name):
-	joblib.dump(obj, "pkl/" + name + ".pkl", compress = 9)
+def store_pkl(obj, name, flavour = "joblib"):
+	path = "pkl/" + name + ".pkl"
+	if flavour == "joblib":
+		joblib.dump(obj, path, compress = 9)
+	elif flavour == "dill":
+		with open(path, "wb") as dill_file:
+			dill.dump(obj, dill_file)
+	else:
+		raise ValueError(flavour)
 
 def load_audit(name, stringify = True):
 	df = load_csv(name)

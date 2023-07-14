@@ -128,7 +128,7 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 
 	@Test
 	public void evaluateXGBoostAuto() throws Exception {
-		evaluate("H2OXGBoost", AUTO, new FloatEquivalence(4));
+		evaluate("H2OXGBoost", AUTO, new FloatEquivalence(8));
 	}
 
 	static

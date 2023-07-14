@@ -40,7 +40,7 @@ def build_audit(audit_df, classifier, name):
 	#	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
 	classifier = pipeline._final_estimator
 	store_mojo(classifier, name)
-	store_pkl(pipeline, name)
+	store_pkl(pipeline, name, flavour = "dill")
 	adjusted = pipeline.predict(audit_X)
 	adjusted.set_names(["h2o(Adjusted)", "probability(0)", "probability(1)"])
 	store_csv(adjusted.as_data_frame(), name)
@@ -73,7 +73,7 @@ def build_auto(auto_df, regressor, name):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
 	regressor = pipeline._final_estimator
 	store_mojo(regressor, name)
-	store_pkl(pipeline, name)
+	store_pkl(pipeline, name, flavour = "dill")
 	mpg = pipeline.predict(auto_X)
 	mpg.set_names(["mpg"])
 	store_csv(mpg.as_data_frame(), name)
