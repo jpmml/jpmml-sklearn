@@ -21,20 +21,20 @@ package pycaret.preprocess;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.InitializerUtil;
-import sklearn.ScalarLabelUtil;
 import sklearn.preprocessing.LabelEncoder;
-import sklearn2pmml.decoration.DomainUtil;
 
 public class TransformerWrapperWithInverse extends TransformerWrapper {
 
@@ -65,13 +65,9 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 		ScalarLabel scalarLabel = (ScalarLabel)label;
 
-		Feature labelFeature = ScalarLabelUtil.findLabelFeature(scalarLabel, result);
+		Feature labelFeature = FeatureUtil.findLabelFeature(result, scalarLabel);
 		if(labelFeature == null){
-			List<String> names = result.stream()
-				.map(feature -> feature.getName())
-				.collect(Collectors.toList());
-
-			throw new IllegalArgumentException("Column \'" + scalarLabel.getName() + "\' not found in " + (names));
+			throw new IllegalArgumentException("Column \'" + scalarLabel.getName() + "\' not found in " + FeatureUtil.formatNames(result, '\''));
 		}
 
 		int labelFeatureIndex = result.indexOf(labelFeature);
@@ -81,12 +77,16 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 			DataField dataField = wildcardFeature.getField();
 
-			DomainUtil.clearValues(dataField, Value.Property.VALID);
+			PMMLUtil.clearValues(dataField, Value.Property.VALID);
 
 			Feature transformedLabelFeature = Iterables.getOnlyElement(transformer.encode(Collections.singletonList(labelFeature), encoder));
 
 			result = new ArrayList<>(result);
 			result.set(labelFeatureIndex, transformedLabelFeature);
+
+			scalarLabel = ScalarLabelUtil.createScalarLabel(dataField);
+
+			encoder.setLabel(scalarLabel);
 		} else
 
 		{

@@ -21,6 +21,7 @@ package sklearn2pmml.decoration;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.HasDiscreteDomain;
 import org.dmg.pmml.Value;
+import org.jpmml.converter.PMMLUtil;
 
 public class DiscreteDomainEraser extends DomainEraser {
 
@@ -32,7 +33,7 @@ public class DiscreteDomainEraser extends DomainEraser {
 	public void clear(Field<?> field){
 
 		if(field instanceof HasDiscreteDomain){
-			DomainUtil.clearValues((Field & HasDiscreteDomain)field, Value.Property.VALID);
+			PMMLUtil.clearValues((Field & HasDiscreteDomain)field, Value.Property.VALID);
 		}
 	}
 }

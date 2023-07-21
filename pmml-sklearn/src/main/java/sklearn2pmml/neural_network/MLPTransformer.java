@@ -37,7 +37,6 @@ import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.dmg.pmml.neural_network.NeuralOutput;
 import org.dmg.pmml.neural_network.NeuralOutputs;
 import org.dmg.pmml.neural_network.Neuron;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
@@ -128,7 +127,7 @@ public class MLPTransformer extends Transformer {
 
 			DerivedOutputField derivedOutputField = encoder.createDerivedField(neuralNetwork, outputField, false);
 
-			result.add(new ContinuousFeature(encoder, derivedOutputField));
+			result.add(derivedOutputField.toFeature(encoder));
 		}
 
 		return result;

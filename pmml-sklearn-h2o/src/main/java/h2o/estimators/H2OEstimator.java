@@ -28,6 +28,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureList;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
@@ -126,7 +127,13 @@ public class H2OEstimator extends Estimator implements HasClasses {
 			} else
 
 			{
-				feature = findByName(features, name);
+				feature = FeatureUtil.findFeature(features, name);
+
+				if(feature == null){
+					int index = Integer.parseInt(name.substring(1)) - 1;
+
+					feature = features.get(index);
+				}
 			}
 
 			reorderedFeatures.add(feature);
@@ -172,20 +179,5 @@ public class H2OEstimator extends Estimator implements HasClasses {
 		}
 
 		return mojoModel;
-	}
-
-	static
-	private Feature findByName(List<? extends Feature> features, String name){
-
-		for(Feature feature : features){
-
-			if((feature.getName()).equals(name)){
-				return feature;
-			}
-		}
-
-		int index = Integer.parseInt(name.substring(1)) - 1;
-
-		return features.get(index);
 	}
 }

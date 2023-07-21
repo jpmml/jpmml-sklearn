@@ -29,12 +29,12 @@ import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Regressor;
-import sklearn.ScalarLabelUtil;
 
 public class LinearRegressor extends Regressor {
 

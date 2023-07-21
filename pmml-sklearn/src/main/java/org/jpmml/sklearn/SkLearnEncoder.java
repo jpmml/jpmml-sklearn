@@ -38,24 +38,19 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
-import org.dmg.pmml.PMML;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
-import org.jpmml.converter.CategoricalFeature;
-import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.UnsupportedAttributeException;
@@ -64,7 +59,6 @@ import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.ScalarLabelUtil;
 import sklearn.ensemble.hist_gradient_boosting.TreePredictor;
 import sklearn.neighbors.BinaryTree;
 import sklearn.tree.Tree;
@@ -98,63 +92,46 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	@Override
-	public PMML encodePMML(){
-		PMML pmml = super.encodePMML();
-
+	public Model encodeModel(Model model){
 		Predicate predicate = getPredicate();
+
+		model = super.encodeModel(model);
+
 		if(predicate == null){
-			return pmml;
+			return model;
 		}
 
-		// XXX
-		PMML result = new PMML(){
+		MiningModel miningModel = (MiningModel)model;
 
-			{
-				ReflectionUtil.copyState(pmml, this);
-			}
+		Segmentation segmentation = miningModel.requireSegmentation();
 
-			@Override
-			public PMML addModels(Model... models){
+		Segmentation.MultipleModelMethod multipleModelMethod = segmentation.requireMultipleModelMethod();
+		switch(multipleModelMethod){
+			case MODEL_CHAIN:
+				break;
+			default:
+				throw new UnsupportedAttributeException(segmentation, multipleModelMethod);
+		}
 
-				if(models.length != 1){
-					throw new IllegalArgumentException();
-				}
+		List<Segment> segments = segmentation.requireSegments();
 
-				MiningModel miningModel = (MiningModel)models[0];
+		Segment finalSegment = segments.get(segments.size() - 1);
 
-				Segmentation segmentation = miningModel.requireSegmentation();
+		finalSegment.setPredicate(predicate);
 
-				Segmentation.MultipleModelMethod multipleModelMethod = segmentation.requireMultipleModelMethod();
-				switch(multipleModelMethod){
-					case MODEL_CHAIN:
-						break;
-					default:
-						throw new UnsupportedAttributeException(segmentation, multipleModelMethod);
-				}
+		Set<MiningFunction> miningFunctions = segments.stream()
+			.map(segment -> {
+				Model segmentModel = segment.requireModel();
 
-				List<Segment> segments = segmentation.requireSegments();
+				return segmentModel.requireMiningFunction();
+			})
+			.collect(Collectors.toSet());
 
-				Segment finalSegment = segments.get(segments.size() - 1);
+		if(miningFunctions.size() > 1){
+			miningModel.setMiningFunction(MiningFunction.MIXED);
+		}
 
-				finalSegment.setPredicate(predicate);
-
-				Set<MiningFunction> miningFunctions = segments.stream()
-					.map(segment -> {
-						Model model = segment.requireModel();
-
-						return model.requireMiningFunction();
-					})
-					.collect(Collectors.toSet());
-
-				if(miningFunctions.size() > 1){
-					miningModel.setMiningFunction(MiningFunction.MIXED);
-				}
-
-				return super.addModels(models);
-			}
-		};
-
-		return result;
+		return miningModel;
 	}
 
 	public List<Feature> export(Model model, String name){
@@ -179,38 +156,7 @@ public class SkLearnEncoder extends PythonEncoder {
 				derivedOutputField = createDerivedField(model, nameOutputField, true);
 			}
 
-			Feature feature;
-
-			OpType opType = derivedOutputField.getOpType();
-			switch(opType){
-				case CATEGORICAL:
-					if(derivedOutputField.hasValues()){
-						feature = new CategoricalFeature(this, derivedOutputField);
-					} else
-
-					{
-						feature = new ObjectFeature(this, derivedOutputField){
-
-							/**
-							 * @see CategoricalFeature#toContinuousFeature()
-							 */
-							@Override
-							public ContinuousFeature toContinuousFeature(){
-								PMMLEncoder encoder = getEncoder();
-
-								org.dmg.pmml.Field<?> field = encoder.toContinuous(getName());
-
-								return new ContinuousFeature(encoder, field);
-							}
-						};
-					}
-					break;
-				case CONTINUOUS:
-					feature = new ContinuousFeature(this, derivedOutputField);
-					break;
-				default:
-					throw new IllegalArgumentException();
-			}
+			Feature feature = derivedOutputField.toFeature(this);
 
 			result.add(feature);
 
@@ -225,12 +171,12 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public Feature exportPrediction(Model model, String name, ScalarLabel scalarLabel){
-		OutputField outputField = ModelUtil.createPredictedField(name, ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
+		OutputField outputField = ModelUtil.createPredictedField(name, scalarLabel.getOpType(), scalarLabel.getDataType())
 			.setFinalResult(false);
 
 		DerivedOutputField derivedOutputField = createDerivedField(model, outputField, false);
 
-		return ScalarLabelUtil.toFeature(scalarLabel, derivedOutputField, this);
+		return derivedOutputField.toFeature(this);
 	}
 
 	public Feature exportProbability(Model model, Object value){
@@ -243,7 +189,7 @@ public class SkLearnEncoder extends PythonEncoder {
 
 		DerivedOutputField probabilityField = createDerivedField(model, probabilityOutputField, false);
 
-		return new ContinuousFeature(this, probabilityField);
+		return probabilityField.toFeature(this);
 	}
 
 	public DataField createDataField(String name){
@@ -313,23 +259,11 @@ public class SkLearnEncoder extends PythonEncoder {
 		if(label instanceof ScalarLabel){
 			ScalarLabel scalarLabel = (ScalarLabel)label;
 
-			Feature labelFeature = ScalarLabelUtil.findLabelFeature(scalarLabel, features);
+			Feature labelFeature = FeatureUtil.findLabelFeature(features, scalarLabel);
 			if(labelFeature != null){
 				DataField dataField = (DataField)labelFeature.getField();
 
-				OpType opType = dataField.requireOpType();
-				switch(opType){
-					case CONTINUOUS:
-						label = new ContinuousLabel(dataField);
-						break;
-					case CATEGORICAL:
-						label = new CategoricalLabel(dataField);
-						break;
-					default:
-						break;
-				}
-
-				setLabel(label);
+				setLabel(ScalarLabelUtil.createScalarLabel(dataField));
 
 				features = new ArrayList<>(features);
 				features.remove(labelFeature);

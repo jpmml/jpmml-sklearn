@@ -31,6 +31,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -41,7 +42,6 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
-import sklearn.ScalarLabelUtil;
 import sklearn2pmml.util.EvaluatableUtil;
 
 public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorEnsemble<Estimator> {

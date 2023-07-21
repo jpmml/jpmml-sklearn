@@ -365,6 +365,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * String concatenation expressions.
       * String slicing expressions `<str>[<start>:<stop>]`.
       * Arithmetic operators `+`, `-`, `*`, `/` and `%`.
+      * The power operator `**`.
       * Identity comparison operators `is None` and `is not None`.
       * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.

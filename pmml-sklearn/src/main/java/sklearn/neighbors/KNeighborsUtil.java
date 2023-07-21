@@ -50,11 +50,11 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
-import sklearn.ScalarLabelUtil;
 
 public class KNeighborsUtil {
 

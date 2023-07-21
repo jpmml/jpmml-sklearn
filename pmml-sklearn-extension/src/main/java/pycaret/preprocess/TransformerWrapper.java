@@ -28,13 +28,13 @@ import java.util.stream.Stream;
 import category_encoders.CategoryEncoder;
 import org.dmg.pmml.Field;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
-import sklearn.ScalarLabelUtil;
 import sklearn.Transformer;
 import sklearn.impute.SimpleImputer;
 
@@ -170,7 +170,7 @@ public class TransformerWrapper extends Initializer {
 			if(label != null){
 				ScalarLabel scalarLabel = (ScalarLabel)label;
 
-				Feature labelFeature = ScalarLabelUtil.findLabelFeature(scalarLabel, features);
+				Feature labelFeature = FeatureUtil.findLabelFeature(features, scalarLabel);
 				if(labelFeature != null){
 					result.add(labelFeature);
 				}

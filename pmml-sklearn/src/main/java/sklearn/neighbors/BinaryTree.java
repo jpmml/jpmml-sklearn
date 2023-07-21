@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.CustomPythonObject;
 
 public class BinaryTree extends CustomPythonObject {
@@ -32,7 +33,7 @@ public class BinaryTree extends CustomPythonObject {
 
 	@Override
 	public void __init__(Object[] args){
-		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
+		super.__setstate__(ClassDictUtil.createAttributeMap(INIT_ATTRIBUTES, args));
 	}
 
 	@Override
@@ -40,12 +41,12 @@ public class BinaryTree extends CustomPythonObject {
 
 		// SkLearn 0.19
 		if(args.length == SETSTATE_ATTRIBUTES.length){
-			super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
+			super.__setstate__(ClassDictUtil.createAttributeMap(SETSTATE_ATTRIBUTES, args));
 		} else
 
 		// SkLearn 0.20+
 		{
-			super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES_WEIGHTED, args));
+			super.__setstate__(ClassDictUtil.createAttributeMap(SETSTATE_ATTRIBUTES_WEIGHTED, args));
 		}
 	}
 

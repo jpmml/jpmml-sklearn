@@ -24,11 +24,11 @@ import java.util.List;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
-import sklearn.ScalarLabelUtil;
 
 public class MultiOutputUtil {
 

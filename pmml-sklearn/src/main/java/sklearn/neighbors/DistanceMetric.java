@@ -18,6 +18,7 @@
  */
 package sklearn.neighbors;
 
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.CustomPythonObject;
 
 public class DistanceMetric extends CustomPythonObject {
@@ -28,12 +29,12 @@ public class DistanceMetric extends CustomPythonObject {
 
 	@Override
 	public void __init__(Object[] args){
-		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
+		super.__setstate__(ClassDictUtil.createAttributeMap(INIT_ATTRIBUTES, args));
 	}
 
 	@Override
 	public void __setstate__(Object[] args){
-		super.__setstate__(createAttributeMap(SETSTATE_ATTRIBUTES, args));
+		super.__setstate__(ClassDictUtil.createAttributeMap(SETSTATE_ATTRIBUTES, args));
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {

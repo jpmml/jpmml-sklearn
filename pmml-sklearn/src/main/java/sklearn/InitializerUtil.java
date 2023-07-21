@@ -20,13 +20,13 @@ package sklearn;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -54,20 +54,13 @@ public class InitializerUtil {
 					String column = (String)object;
 
 					if(!features.isEmpty()){
+						Feature feature = FeatureUtil.findFeature(features, column);
 
-						for(Feature feature : features){
-							String name = feature.getName();
-
-							if((column).equals(name)){
-								return feature;
-							}
+						if(feature != null){
+							return feature;
 						}
 
-						List<String> names = features.stream()
-							.map(feature -> feature.getName())
-							.collect(Collectors.toList());
-
-						throw new IllegalArgumentException("Column \'" + column + "\' not found in " + (names));
+						throw new IllegalArgumentException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
 					}
 
 					return createWildcardFeature(column);

@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.CustomPythonObject;
 
 public class Tree extends CustomPythonObject {
@@ -33,7 +34,7 @@ public class Tree extends CustomPythonObject {
 
 	@Override
 	public void __init__(Object[] args){
-		super.__setstate__(createAttributeMap(INIT_ATTRIBUTES, args));
+		super.__setstate__(ClassDictUtil.createAttributeMap(INIT_ATTRIBUTES, args));
 	}
 
 	public double[] getValues(){

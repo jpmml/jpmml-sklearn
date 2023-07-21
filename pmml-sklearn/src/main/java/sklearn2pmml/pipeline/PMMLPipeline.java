@@ -58,6 +58,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
@@ -77,7 +78,6 @@ import sklearn.HasClassifierOptions;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Initializer;
-import sklearn.ScalarLabelUtil;
 import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.pipeline.Pipeline;
@@ -215,7 +215,7 @@ public class PMMLPipeline extends Pipeline {
 				List<OutputField> predictFields = new ArrayList<>();
 
 				for(ScalarLabel scalarLabel : scalarLabels){
-					OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), ScalarLabelUtil.getOpType(scalarLabel), scalarLabel.getDataType())
+					OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), scalarLabel.getOpType(), scalarLabel.getDataType())
 						.setFinalResult(false);
 
 					output.addOutputFields(predictField);

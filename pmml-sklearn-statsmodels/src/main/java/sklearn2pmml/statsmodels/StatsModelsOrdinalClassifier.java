@@ -26,8 +26,8 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
+import org.jpmml.converter.OrdinalLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.statsmodels.OrdinalLabel;
 
 public class StatsModelsOrdinalClassifier extends StatsModelsClassifier {
 
