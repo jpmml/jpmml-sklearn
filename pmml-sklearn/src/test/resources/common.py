@@ -1,5 +1,6 @@
 import dill
 import joblib
+import os
 import pandas
 
 def load_csv(name):
@@ -18,8 +19,15 @@ def store_csv(df, name):
 	df.to_csv("csv/" + name + ".csv", index = False, na_rep = "N/A")
 
 def store_mojo(estimator, name):
-	estimator.download_mojo("mojo/" + name + ".zip")
-	estimator._mojo_path = "mojo/" + name + ".zip"
+	mojo_path = "mojo/" + name + ".zip"
+	estimator.download_mojo(mojo_path)
+	estimator._mojo_path = mojo_path
+
+def embed_stored_mojo(estimator, maxsize = None):
+	mojo_path = estimator._mojo_path
+	if (maxsize is None) or (os.path.getsize(mojo_path) <= maxsize):
+		with open(mojo_path, "rb") as mojo_file:
+			estimator._mojo_bytes = mojo_file.read()
 
 # Joblib dump
 def store_pkl(obj, name, flavour = "joblib"):

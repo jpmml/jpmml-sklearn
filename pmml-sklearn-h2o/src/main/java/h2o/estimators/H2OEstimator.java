@@ -18,7 +18,9 @@
  */
 package h2o.estimators;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -148,6 +150,10 @@ public class H2OEstimator extends Estimator implements HasClasses {
 		return getString("_estimator_type");
 	}
 
+	public byte[] getMojoBytes(){
+		return get("_mojo_bytes", byte[].class);
+	}
+
 	public String getMojoPath(){
 		return getString("_mojo_path");
 	}
@@ -168,12 +174,23 @@ public class H2OEstimator extends Estimator implements HasClasses {
 	}
 
 	private MojoModel loadMojoModel(){
-		String mojoPath = getMojoPath();
-
 		MojoModel mojoModel;
 
 		try {
-			mojoModel = MojoModelUtil.readFrom(new File(mojoPath), false);
+
+			if(containsKey("_mojo_bytes")){
+				byte[] mojoBytes = getMojoBytes();
+
+				try(InputStream is = new ByteArrayInputStream(mojoBytes)){
+					mojoModel = MojoModelUtil.readFrom(is);
+				}
+			} else
+
+			{
+				String mojoPath = getMojoPath();
+
+				mojoModel = MojoModelUtil.readFrom(new File(mojoPath), false);
+			}
 		} catch(Exception e){
 			throw new IllegalArgumentException(e);
 		}
