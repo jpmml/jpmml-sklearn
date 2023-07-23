@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import builtins.TypeConstructor;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -154,6 +155,12 @@ public class Transformer extends Step {
 
 			@Override
 			public TypeInfo apply(Object object){
+
+				if(object instanceof TypeConstructor){
+					TypeConstructor typeConstructor = (TypeConstructor)object;
+
+					return (TypeInfo)typeConstructor.construct();
+				} else
 
 				if(object instanceof String){
 					String string = (String)object;
