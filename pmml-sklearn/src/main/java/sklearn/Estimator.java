@@ -119,6 +119,8 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 	}
 
 	public Model encode(Schema schema){
+		checkVersion();
+
 		checkLabel(schema.getLabel());
 		checkFeatures(schema.getFeatures());
 
@@ -292,10 +294,6 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		}
 
 		return this;
-	}
-
-	public String getSkLearnVersion(){
-		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
 	}
 
 	public List<OutputField> createPredictProbaFields(DataType dataType, CategoricalLabel categoricalLabel){

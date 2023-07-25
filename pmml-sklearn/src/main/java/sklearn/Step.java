@@ -28,6 +28,17 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		super(module, name);
 	}
 
+	public void checkVersion(){
+		String sklearnVersion = getSkLearnVersion();
+
+		if(sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "1.2.2") > 0){
+			String message = "This converter version does not know about Scikit-Learn version " + sklearnVersion + " artifacts. " +
+				"Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version 1.2.2";
+
+			throw new IllegalArgumentException(message);
+		}
+	}
+
 	public String getPMMLName(){
 		return getOptionalString(SkLearn2PMMLFields.PMML_NAME);
 	}
@@ -36,5 +47,9 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		put(SkLearn2PMMLFields.PMML_NAME, name);
 
 		return this;
+	}
+
+	public String getSkLearnVersion(){
+		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
 	}
 }

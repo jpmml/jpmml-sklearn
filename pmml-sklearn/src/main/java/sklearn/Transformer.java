@@ -66,6 +66,8 @@ public class Transformer extends Step {
 	}
 
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
+		checkVersion();
+
 		checkFeatures(features);
 
 		features = updateFeatures(features, encoder);
