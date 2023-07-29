@@ -124,8 +124,8 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 		(["Income"], [ContinuousDomain(), KBinsDiscretizer(n_bins = 3, strategy = "quantile")])
 	])
 	categorical_mapper = DataFrameMapper([
-		(["Employment"], [CategoricalDomain(), SubstringTransformer(0, 3), OneHotEncoder(drop = ["Vol"]), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
-		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), OneHotEncoder(drop = "first"), SelectFromModel(RandomForestClassifier(n_estimators = 3, random_state = 13), threshold = "1.25 * mean")]),
+		(["Employment"], [CategoricalDomain(), SubstringTransformer(0, 3), OneHotEncoder(drop = ["Con"], min_frequency = 0.05), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
+		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), OneHotEncoder(drop = "first", max_categories = 10), SelectFromModel(RandomForestClassifier(n_estimators = 3, random_state = 13), threshold = "1.25 * mean")]),
 		(["Marital"], [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
 		(["Occupation"], [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
 		(["Gender"], [CategoricalDomain(), MatchesTransformer("^Male$"), CastTransformer(int)]),
@@ -548,7 +548,7 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 		(["cylinders"], [CategoricalDomain(), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0", dtype = numpy.int8), name = "odd(cylinders)", prefit = True)]),
 		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), OneHotEncoder()]),
 		(["model_year"], [CategoricalDomain(), CastTransformer(str), ExpressionTransformer("'19' + X[0] + '-01-01'"), CastTransformer("datetime64[D]"), DaysSinceYearTransformer(1977), Binarizer(threshold = 0)], {"alias" : "bin(model_year, 1977)"}),
-		(["model_year", "origin"], [ConcatTransformer("/"), OneHotEncoder(sparse_output = False), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
+		(["model_year", "origin"], [ConcatTransformer("/"), OneHotEncoder(sparse_output = False, max_categories = 15), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "0.75 * mean"))]),
 		(["weight", "displacement"], [ContinuousDomain(), ExpressionTransformer("(X[0] / X[1]) + 0.5", dtype = numpy.float64)], {"alias" : "weight / displacement + 0.5"}),
 		(["displacement", "horsepower", "weight", "acceleration"], [MultiDomain([None, ContinuousDomain(), None, ContinuousDomain()]), StandardScaler()])
 	])

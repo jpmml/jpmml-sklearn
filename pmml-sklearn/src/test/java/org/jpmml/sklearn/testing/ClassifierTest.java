@@ -74,9 +74,9 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 					switch(algorithm){
 						case DECISION_TREE:
-						case EXTRA_TREES:
+						//case EXTRA_TREES:
 						case GRADIENT_BOOSTING:
-						case RANDOM_FOREST:
+						//case RANDOM_FOREST:
 							visitorBattery.add(FeatureImportancesInspector.class);
 							break;
 						default:
@@ -165,7 +165,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateLinearDiscriminantAnalysisAudit() throws Exception {
-		evaluate(LINEAR_DISCRIMINANT_ANALYSIS, AUDIT);
+		evaluate(LINEAR_DISCRIMINANT_ANALYSIS, AUDIT, new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test

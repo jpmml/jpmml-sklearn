@@ -19,7 +19,11 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
@@ -37,6 +41,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class MultiOneHotEncoder extends BaseEncoder {
@@ -51,6 +56,8 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		Object drop = getDrop();
 		List<Integer> dropIdx = (drop != null ? getDropIdx() : null);
 		String handleUnknown = getHandleUnknown();
+		Boolean infrequentEnabled = getInfrequentEnabled();
+		List<List<Integer>> infrequentIndices = (infrequentEnabled ? getInfrequentIndices() : null);
 
 		ClassDictUtil.checkSize(categories, features);
 
@@ -59,6 +66,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			List<Object> featureCategories = new ArrayList<>(categories.get(i));
+			Set<Integer> featureInfrequentIndices = infrequentEnabled ? new LinkedHashSet<>(infrequentIndices.get(i)) : Collections.emptySet();
 
 			InvalidValueTreatmentMethod invalidValueTreatmentMethod;
 
@@ -130,6 +138,22 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 			{
 				throw new IllegalArgumentException();
+			}
+
+			Object infrequentCategory = null;
+
+			if(infrequentEnabled){
+				infrequentCategory = getInfrequentCategory(feature);
+
+				if(infrequentCategory == null || featureCategories.contains(infrequentCategory)){
+					throw new IllegalArgumentException();
+				}
+
+				List<Object> featureInfrequentCategories = selectValues(featureCategories, featureInfrequentIndices);
+
+				featureCategories.removeAll(featureInfrequentCategories);
+
+				feature = EncoderUtil.encodeRegroupFeature(this, feature, featureInfrequentCategories, infrequentCategory, encoder);
 			} // End if
 
 			if(dropIdx != null){
@@ -154,6 +178,10 @@ public class MultiOneHotEncoder extends BaseEncoder {
 					result.add(new BinaryFeature(encoder, feature, featureCategory));
 				}
 			}
+
+			if(infrequentEnabled){
+				result.add(new BinaryFeature(encoder, feature, infrequentCategory));
+			}
 		}
 
 		return result;
@@ -171,6 +199,14 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		}
 
 		return Lists.transform(dropIdx, number -> number != null ? ValueUtil.asInteger(number) : null);
+	}
+
+	public Boolean getInfrequentEnabled(){
+		return getOptionalBoolean("_infrequent_enabled", false);
+	}
+
+	public List<List<Integer>> getInfrequentIndices(){
+		return EncoderUtil.transformInfrequentIndices(getList("_infrequent_indices", HasArray.class));
 	}
 
 	static
@@ -193,5 +229,34 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		}
 
 		return categories;
+	}
+
+	static
+	private Object getInfrequentCategory(Feature feature){
+		DataType dataType = feature.getDataType();
+
+		switch(dataType){
+			case STRING:
+				return "infrequent";
+			case INTEGER:
+			case FLOAT:
+			case DOUBLE:
+				return -999;
+			default:
+				return null;
+		}
+	}
+
+	static
+	private <E> List<E> selectValues(List<E> values, Collection<Integer> indices){
+		List<E> result = new ArrayList<>();
+
+		for(Integer index : indices){
+			E value = values.get(index);
+
+			result.add(value);
+		}
+
+		return result;
 	}
 }

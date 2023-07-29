@@ -22,16 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.dmg.pmml.Apply;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.MultiTransformer;
+import sklearn.preprocessing.EncoderUtil;
 
 public class RareCategoryGrouping extends MultiTransformer {
 
@@ -60,23 +55,7 @@ public class RareCategoryGrouping extends MultiTransformer {
 			} // End if
 
 			if(!categories.isEmpty()){
-				DataType dataType = feature.getDataType();
-
-				Apply valueApply = PMMLUtil.createApply((categories.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), feature.ref());
-
-				for(Object category : categories){
-					valueApply.addExpressions(PMMLUtil.createConstant(category, dataType));
-				}
-
-				Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-					valueApply,
-					PMMLUtil.createConstant(value, dataType),
-					feature.ref()
-				);
-
-				DerivedField derivedField = encoder.createDerivedField(createFieldName("rareCategoryGrouping", feature), OpType.CATEGORICAL, dataType, apply);
-
-				feature = FeatureUtil.createFeature(derivedField, encoder);
+				feature = EncoderUtil.encodeRegroupFeature(this, feature, categories, value, encoder);
 			}
 
 			result.add(feature);
