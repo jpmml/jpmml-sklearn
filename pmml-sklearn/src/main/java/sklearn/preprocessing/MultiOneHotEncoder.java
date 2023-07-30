@@ -33,6 +33,7 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.BinaryThresholdFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Decorator;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueFeature;
@@ -68,20 +69,41 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			List<Object> featureCategories = new ArrayList<>(categories.get(i));
 			Set<Integer> featureInfrequentIndices = infrequentEnabled ? new LinkedHashSet<>(infrequentIndices.get(i)) : Collections.emptySet();
 
-			InvalidValueTreatmentMethod invalidValueTreatmentMethod;
+			Object infrequentCategory = null;
+
+			if(infrequentEnabled){
+				infrequentCategory = getInfrequentCategory(feature);
+			}
+
+			Decorator invalidValueDecorator;
 
 			switch(handleUnknown){
 				case "error":
-					invalidValueTreatmentMethod = InvalidValueTreatmentMethod.RETURN_INVALID;
+					{
+						invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.RETURN_INVALID, null);
+					}
 					break;
 				case "ignore":
-					invalidValueTreatmentMethod = InvalidValueTreatmentMethod.AS_IS;
+					{
+						invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null);
+					}
+					break;
+				case "infrequent_if_exist":
+					{
+						if(infrequentEnabled){
+							invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_VALUE, infrequentCategory);
+						} else
+
+						{
+							invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null);
+						}
+					}
 					break;
 				default:
 					throw new IllegalArgumentException(handleUnknown);
 			}
 
-			EncoderUtil.addDecorator(feature, new InvalidValueDecorator(invalidValueTreatmentMethod, null));
+			EncoderUtil.addDecorator(feature, invalidValueDecorator);
 
 			if(feature instanceof BinaryThresholdFeature){
 				BinaryThresholdFeature thresholdFeature = (BinaryThresholdFeature)feature;
@@ -138,12 +160,9 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 			{
 				throw new IllegalArgumentException();
-			}
-
-			Object infrequentCategory = null;
+			} // End if
 
 			if(infrequentEnabled){
-				infrequentCategory = getInfrequentCategory(feature);
 
 				if(infrequentCategory == null || featureCategories.contains(infrequentCategory)){
 					throw new IllegalArgumentException();

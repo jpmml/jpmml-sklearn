@@ -724,15 +724,21 @@ if "Auto" in datasets:
 def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
 
-	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight"]] +
-		[([column], [CategoricalDomain(), LabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
-	)
+	mapper = DataFrameMapper([
+		(["displacement", "horsepower", "weight"], ContinuousDomain()),
+		(["cylinders"], [CategoricalDomain(invalid_value_treatment = "as_is"), OneHotEncoder(handle_unknown = "infrequent_if_exist")]),
+		(["model_year"], [CategoricalDomain(invalid_value_treatment = "as_is"), OneHotEncoder(max_categories = 10, handle_unknown = "infrequent_if_exist")]),
+		(["origin"], [CategoricalDomain(invalid_value_treatment = "as_is"), OneHotEncoder()])
+	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("regressor", regressor)
 	])
-	pipeline.fit(auto_X, auto_y)
+	if isinstance(regressor, LinearRegression):
+		mask = numpy.logical_and(auto_X["cylinders"] != 5, auto_X["model_year"] != 80)
+		pipeline.fit(auto_X[mask], auto_y[mask])
+	else:
+		pipeline.fit(auto_X, auto_y)
 	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	acceleration_mpg = DataFrame(pipeline.predict(auto_X), columns = ["acceleration", "mpg"])
