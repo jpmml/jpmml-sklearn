@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2023 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,13 +18,9 @@
  */
 package sklearn;
 
-public interface SkLearnFields {
+import java.util.List;
 
-	String CLASSES = "classes_";
-	String FEATURE_IMPORTANCES = "feature_importances_";
-	String FEATURE_NAMES_IN = "feature_names_in_";
-	String N_FEATURES = "n_features_";
-	String N_FEATURES_IN = "n_features_in_";
-	String N_OUTPUTS = "n_outputs_";
-	String SKLEARN_VERSION = "_sklearn_version";
+public interface HasFeatureNamesIn {
+
+	List<String> getFeatureNamesIn();
 }

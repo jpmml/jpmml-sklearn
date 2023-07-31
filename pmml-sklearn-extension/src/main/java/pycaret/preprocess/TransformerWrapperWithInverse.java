@@ -44,7 +44,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<String> featureNamesIn = getFeatureNamesIn();
+		List<String> featureNames = getFeatureNames();
 
 		LabelEncoder transformer = getTransformer();
 
@@ -56,7 +56,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 		List<Feature> result;
 
 		if(features.isEmpty()){
-			result = InitializerUtil.selectFeatures(featureNamesIn, Collections.emptyList(), encoder);
+			result = InitializerUtil.selectFeatures(featureNames, Collections.emptyList(), encoder);
 		} else
 
 		{

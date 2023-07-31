@@ -46,6 +46,13 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
+	public List<String> getFeatureNamesIn(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getFeatureNamesIn();
+	}
+
+	@Override
 	public int getNumberOfFeatures(){
 		Estimator estimator = getEstimator();
 

@@ -48,6 +48,26 @@ public class Composite extends Step {
 	public Estimator getFinalEstimator();
 
 	@Override
+	public List<String> getFeatureNamesIn(){
+
+		if(hasTransformers()){
+			List<? extends Transformer> transformers = getTransformers();
+
+			for(Transformer transformer : transformers){
+				return transformer.getFeatureNamesIn();
+			}
+		} // End if
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			return estimator.getFeatureNamesIn();
+		}
+
+		return null;
+	}
+
+	@Override
 	public int getNumberOfFeatures(){
 
 		if(hasTransformers()){

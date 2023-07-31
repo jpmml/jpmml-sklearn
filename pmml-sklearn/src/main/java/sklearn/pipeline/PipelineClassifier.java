@@ -40,6 +40,13 @@ public class PipelineClassifier extends Classifier implements HasHead {
 	}
 
 	@Override
+	public List<String> getFeatureNamesIn(){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.getFeatureNamesIn();
+	}
+
+	@Override
 	public int getNumberOfFeatures(){
 		Pipeline pipeline = getPipeline();
 

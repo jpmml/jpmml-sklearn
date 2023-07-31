@@ -18,6 +18,8 @@
  */
 package sklearn.pipeline;
 
+import java.util.List;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
@@ -35,6 +37,13 @@ public class PipelineRegressor extends Regressor implements HasHead {
 		super(pipeline.getPythonModule(), pipeline.getPythonName());
 
 		setPipeline(pipeline);
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+		Pipeline pipeline = getPipeline();
+
+		return pipeline.getFeatureNamesIn();
 	}
 
 	@Override

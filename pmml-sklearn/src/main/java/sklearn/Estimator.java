@@ -58,6 +58,16 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 	public Model encodeModel(Schema schema);
 
 	@Override
+	public List<String> getFeatureNamesIn(){
+
+		if(containsKey(SkLearnFields.FEATURE_NAMES_IN)){
+			return (List<String>)getArray(SkLearnFields.FEATURE_NAMES_IN, String.class);
+		}
+
+		return null;
+	}
+
+	@Override
 	public int getNumberOfFeatures(){
 
 		// SkLearn 1.0+

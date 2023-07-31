@@ -46,9 +46,9 @@ public class TransformerWrapper extends Initializer {
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<String> featureNamesIn = getFeatureNamesIn();
+		List<String> featureNames = getFeatureNames();
 
-		return featureNamesIn.size();
+		return featureNames.size();
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class TransformerWrapper extends Initializer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<String> featureNamesIn = getFeatureNamesIn();
+		List<String> featureNames = getFeatureNames();
 		List<String> include = getInclude();
 		Boolean trainOnly = getTrainOnly();
 		Transformer transformer = getTransformer();
@@ -76,7 +76,7 @@ public class TransformerWrapper extends Initializer {
 		} // End if
 
 		if(features.isEmpty()){
-			features = InitializerUtil.selectFeatures(featureNamesIn, features, encoder);
+			features = InitializerUtil.selectFeatures(featureNames, features, encoder);
 		}
 
 		List<Feature> includeFeatures = new ArrayList<>();
@@ -87,7 +87,7 @@ public class TransformerWrapper extends Initializer {
 			Feature includeFeature;
 
 			if(!features.isEmpty()){
-				int index = featureNamesIn.indexOf(includeColumn);
+				int index = featureNames.indexOf(includeColumn);
 
 				includeFeature = features.get(index);
 			} else
@@ -137,7 +137,7 @@ public class TransformerWrapper extends Initializer {
 			for(int i = 0; i < include.size(); i++){
 				String includeColumn = include.get(i);
 
-				int index = featureNamesIn.indexOf(includeColumn);
+				int index = featureNames.indexOf(includeColumn);
 
 				List<Feature> transformedIncludeFeatureGroup = transformedIncludeFeatureGroups.get(i);
 
@@ -180,7 +180,7 @@ public class TransformerWrapper extends Initializer {
 		}
 	}
 
-	public List<String> getFeatureNamesIn(){
+	public List<String> getFeatureNames(){
 		return getList("_feature_names_in", String.class);
 	}
 

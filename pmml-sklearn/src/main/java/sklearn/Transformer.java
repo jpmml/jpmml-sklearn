@@ -46,6 +46,16 @@ public class Transformer extends Step {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder);
 
 	@Override
+	public List<String> getFeatureNamesIn(){
+
+		if(containsKey(SkLearnFields.FEATURE_NAMES_IN)){
+			return (List<String>)getArray(SkLearnFields.FEATURE_NAMES_IN, String.class);
+		}
+
+		return null;
+	}
+
+	@Override
 	public int getNumberOfFeatures(){
 
 		if(containsKey(SkLearnFields.N_FEATURES_IN)){

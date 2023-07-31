@@ -22,7 +22,7 @@ import org.jpmml.python.PythonObject;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
-public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
+public class Step extends PythonObject implements HasFeatureNamesIn, HasNumberOfFeatures, HasType {
 
 	public Step(String module, String name){
 		super(module, name);

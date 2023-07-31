@@ -91,7 +91,7 @@ public class DictVectorizer extends Initializer {
 		return result;
 	}
 
-	public List<? extends String> getFeatureNames(){
+	public List<String> getFeatureNames(){
 		return getList("feature_names_", String.class);
 	}
 
