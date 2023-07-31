@@ -21,7 +21,6 @@ package org.jpmml.sklearn.example;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,7 +30,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.metro.MetroJAXBUtil;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
@@ -39,9 +37,9 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Estimator;
-import sklearn.pipeline.Pipeline;
 import sklearn.tree.HasTreeOptions;
 import sklearn2pmml.pipeline.PMMLPipeline;
+import sklearn2pmml.pipeline.PMMLPipelineUtil;
 
 public class Main {
 
@@ -170,32 +168,8 @@ public class Main {
 			throw e;
 		}
 
-		if(!(object instanceof PMMLPipeline)){
+		PMMLPipeline pipeline = PMMLPipelineUtil.toPMMLPipeline(object);
 
-			// Create a single- or multi-step PMMLPipeline from a Pipeline
-			if(object instanceof Pipeline){
-				Pipeline pipeline = (Pipeline)object;
-
-				object = new PMMLPipeline()
-					.setSteps(pipeline.getSteps());
-			} else
-
-			// Create a single-step PMMLPipeline from an Estimator
-			if(object instanceof Estimator){
-				Estimator estimator = (Estimator)object;
-
-				object = new PMMLPipeline()
-					.setSteps(Collections.singletonList(new Object[]{"estimator", estimator}));
-			} else
-
-			{
-				throw new IllegalArgumentException("The object (" + ClassDictUtil.formatClass(object) + ") is not a PMMLPipeline");
-			}
-		}
-
-		PMMLPipeline pipeline = (PMMLPipeline)object;
-
-		options:
 		if(pipeline.hasFinalEstimator()){
 			Estimator estimator = pipeline.getFinalEstimator();
 
