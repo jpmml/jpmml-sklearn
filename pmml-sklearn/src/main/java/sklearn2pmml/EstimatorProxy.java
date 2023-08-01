@@ -60,6 +60,13 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getNumberOfOutputs();
+	}
+
+	@Override
 	public OpType getOpType(){
 		Estimator estimator = getEstimator();
 

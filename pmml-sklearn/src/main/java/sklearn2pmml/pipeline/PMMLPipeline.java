@@ -77,6 +77,7 @@ import sklearn.EstimatorUtil;
 import sklearn.HasClassifierOptions;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasNumberOfFeatures;
+import sklearn.HasNumberOfOutputs;
 import sklearn.Initializer;
 import sklearn.Step;
 import sklearn.Transformer;
@@ -545,7 +546,7 @@ public class PMMLPipeline extends Pipeline {
 	private List<String> initTargetFields(Estimator estimator){
 		int numberOfOutputs = estimator.getNumberOfOutputs();
 
-		if(numberOfOutputs == -1){
+		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
 			logger.warn("The estimator object of the final step (" + ClassDictUtil.formatClass(estimator) + ") does not specify the number of outputs. Assuming a single output");
 
 			numberOfOutputs = 1;

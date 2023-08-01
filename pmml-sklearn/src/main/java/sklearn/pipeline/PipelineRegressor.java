@@ -54,6 +54,13 @@ public class PipelineRegressor extends Regressor implements HasHead {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		Regressor regressor = getFinalRegressor();
+
+		return regressor.getNumberOfOutputs();
+	}
+
+	@Override
 	public OpType getOpType(){
 		Pipeline pipeline = getPipeline();
 

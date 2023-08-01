@@ -54,6 +54,13 @@ public class PipelineClassifier extends Classifier implements HasHead {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		Classifier classifier = getFinalClassifier();
+
+		return classifier.getNumberOfOutputs();
+	}
+
+	@Override
 	public OpType getOpType(){
 		Pipeline pipeline = getPipeline();
 
