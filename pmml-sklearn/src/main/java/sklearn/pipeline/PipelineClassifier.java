@@ -26,9 +26,10 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import sklearn.HasHead;
+import sklearn.Proxy;
 import sklearn.Transformer;
 
-public class PipelineClassifier extends Classifier implements HasHead {
+public class PipelineClassifier extends Classifier implements HasHead, Proxy {
 
 	private Pipeline pipeline = null;
 

@@ -25,10 +25,11 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import sklearn.HasHead;
+import sklearn.Proxy;
 import sklearn.Regressor;
 import sklearn.Transformer;
 
-public class PipelineRegressor extends Regressor implements HasHead {
+public class PipelineRegressor extends Regressor implements HasHead, Proxy {
 
 	private Pipeline pipeline = null;
 

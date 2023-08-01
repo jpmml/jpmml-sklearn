@@ -34,8 +34,9 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimator;
+import sklearn.Proxy;
 
-public class EstimatorProxy extends Estimator implements HasClasses, HasEstimator<Estimator> {
+public class EstimatorProxy extends Estimator implements HasClasses, HasEstimator<Estimator>, Proxy {
 
 	public EstimatorProxy(){
 		super("sklearn2pmml", "EstimatorProxy");

@@ -20,9 +20,10 @@ package sklearn2pmml;
 
 import java.util.List;
 
+import sklearn.Proxy;
 import sklearn.Selector;
 
-public class SelectorProxy extends Selector {
+public class SelectorProxy extends Selector implements Proxy {
 
 	public SelectorProxy(){
 		this("sklearn2pmml", "SelectorProxy");
