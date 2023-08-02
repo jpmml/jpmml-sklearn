@@ -51,6 +51,11 @@ public class PMMLPipelineUtil {
 		PMMLPipeline pipeline = new PMMLPipeline()
 			.setSteps(Collections.singletonList(new Object[]{"estimator", step}));
 
+		String repr = step.getOptionalString("repr_");
+		if(repr != null){
+			pipeline.setRepr(repr);
+		}
+
 		return pipeline;
 	}
 }
