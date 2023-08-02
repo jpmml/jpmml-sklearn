@@ -58,6 +58,13 @@ public class Booster extends PythonObject {
 	}
 
 	public String getHandle(){
-		return getString("handle");
+
+		// LightGBM 3.3.5
+		if(containsKey("handle")){
+			return getString("handle");
+		}
+
+		// LightGBM 4.0.0+
+		return getString("_handle");
 	}
 }

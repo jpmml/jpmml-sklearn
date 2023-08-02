@@ -1,6 +1,8 @@
 import sys
 
+from lightgbm import early_stopping
 from lightgbm import LGBMClassifier, LGBMRegressor
+from sklearn2pmml.ensemble import GBDTLRClassifier
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
@@ -34,12 +36,11 @@ def build_audit_cat(audit_df, classifier, name, with_proba = True, fit_params = 
 		[(["Occupation"], [CategoricalDomain(display_name = "Occupation"), OrdinalEncoder(dtype = numpy.float_)])] +
 		[([column], [CategoricalDomain(display_name = column), LabelEncoder()]) for column in ["Gender", "Deductions"]]
 	)
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, audit_y, **fit_params)
-	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
 	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
@@ -60,10 +61,10 @@ if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 	iris_X, iris_y = split_csv(iris_df)
 
-	build_iris_opt(iris_df, LGBMClassifier(objective = "multiclass"), "LGBMIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "multi_logloss", "classifier__early_stopping_rounds" : 3})
+	build_iris_opt(iris_df, LGBMClassifier(objective = "multiclass"), "LGBMIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "multi_logloss", "classifier__callbacks" : [early_stopping(stopping_rounds = 3)]})
 
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 	auto_X, auto_y = split_csv(auto_df)
 
-	build_auto_opt(auto_df, LGBMRegressor(objective = "regression", random_state = 13), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
+	build_auto_opt(auto_df, LGBMRegressor(objective = "regression", random_state = 13), "LGBMAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__callbacks" : [early_stopping(stopping_rounds = 3)]})
