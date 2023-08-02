@@ -30,6 +30,10 @@ import sklearn.Regressor;
 
 public class DummyRegressor extends Regressor implements HasDefaultValue {
 
+	public DummyRegressor(){
+		this("sklearn.dummy", "DummyRegressor");
+	}
+
 	public DummyRegressor(String module, String name){
 		super(module, name);
 	}

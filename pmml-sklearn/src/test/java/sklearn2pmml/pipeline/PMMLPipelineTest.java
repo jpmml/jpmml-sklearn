@@ -40,7 +40,7 @@ public class PMMLPipelineTest {
 		assertNull(pipeline.getActiveFields());
 		assertNull(pipeline.getTargetFields());
 
-		Estimator estimator = new DummyClassifier(null, null);
+		Estimator estimator = new DummyClassifier();
 
 		pipeline
 			.setSteps(Collections.singletonList(new Object[]{"estimator", estimator}))

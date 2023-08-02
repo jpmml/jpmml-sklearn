@@ -427,10 +427,9 @@ public class PMMLPipeline extends Pipeline {
 		return super.getSteps();
 	}
 
+	@Override
 	public PMMLPipeline setSteps(List<Object[]> steps){
-		put("steps", steps);
-
-		return this;
+		return (PMMLPipeline)super.setSteps(steps);
 	}
 
 	public Map<?, ?> getHeader(){

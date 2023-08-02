@@ -37,6 +37,10 @@ import sklearn.HasPriorProbability;
 
 public class DummyClassifier extends Classifier implements HasPriorProbability {
 
+	public DummyClassifier(){
+		this("sklearn.dummy", "DummyClassifier");
+	}
+
 	public DummyClassifier(String module, String name){
 		super(module, name);
 	}

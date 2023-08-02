@@ -223,4 +223,10 @@ public class Pipeline extends Composite implements Castable, HasHead {
 	public List<Object[]> getSteps(){
 		return getTupleList("steps");
 	}
+
+	protected Pipeline setSteps(List<Object[]> steps){
+		put("steps", steps);
+
+		return this;
+	}
 }
