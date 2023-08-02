@@ -27,6 +27,7 @@ import org.jpmml.python.Castable;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
+import sklearn.Clusterer;
 import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.HasHead;
@@ -207,6 +208,10 @@ public class Pipeline extends Composite implements Castable, HasHead {
 
 		if(estimator instanceof Regressor){
 			return toRegressor();
+		} else
+
+		if(estimator instanceof Clusterer){
+			return toClusterer();
 		}
 
 		throw new IllegalArgumentException();
@@ -218,6 +223,10 @@ public class Pipeline extends Composite implements Castable, HasHead {
 
 	public Regressor toRegressor(){
 		return new PipelineRegressor(this);
+	}
+
+	public Clusterer toClusterer(){
+		return new PipelineClusterer(this);
 	}
 
 	public List<Object[]> getSteps(){
