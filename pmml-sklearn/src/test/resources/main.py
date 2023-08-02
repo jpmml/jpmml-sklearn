@@ -41,8 +41,11 @@ import pandas
 import sys
 
 def pipeline_transform(pipeline, X):
-	identity_pipeline = Pipeline(pipeline.steps[: -1] + [("estimator", None)])
-	return identity_pipeline.transform(X)
+	steps = pipeline.steps
+	if len(steps) == 1:
+		return pipeline_transform(steps[0][1], X)
+	transformer_pipeline = Pipeline(steps[: -1] + [("estimator", None)])
+	return transformer_pipeline.transform(X)
 
 def make_interaction(left, right):
 	pipeline = Pipeline([
@@ -89,7 +92,7 @@ def build_wheat(wheat_df, clusterer, name, with_affinity = False, with_kneighbor
 		("clusterer", clusterer)
 	])
 	pipeline.fit(wheat_X)
-	pipeline = make_pmml_pipeline(pipeline, wheat_X.columns.values)
+	pipeline = make_pmml_pipeline(pipeline)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
 	if hasattr(clusterer, "predict"):
@@ -124,14 +127,14 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 		(["Income"], [ContinuousDomain(), KBinsDiscretizer(n_bins = 3, strategy = "quantile")])
 	])
 	categorical_mapper = DataFrameMapper([
-		(["Employment"], [CategoricalDomain(), SubstringTransformer(0, 3), OneHotEncoder(drop = ["Con"], min_frequency = 0.05), SelectFromModel(DecisionTreeClassifier(random_state = 13))]),
-		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), OneHotEncoder(drop = "first", max_categories = 10), SelectFromModel(RandomForestClassifier(n_estimators = 3, random_state = 13), threshold = "1.25 * mean")]),
+		(["Employment"], [CategoricalDomain(), SubstringTransformer(0, 3), OneHotEncoder(drop = ["Con"], min_frequency = 0.05), SelectorProxy(SelectFromModel(DecisionTreeClassifier(random_state = 13)))]),
+		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), OneHotEncoder(drop = "first", max_categories = 10), SelectorProxy(SelectFromModel(RandomForestClassifier(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
 		(["Marital"], [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
 		(["Occupation"], [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
 		(["Gender"], [CategoricalDomain(), MatchesTransformer("^Male$"), CastTransformer(int)]),
 		(["Deductions"], [CategoricalDomain()]),
 	])
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("union", FeatureUnion([
 			("continuous", continuous_mapper),
 			("categorical", Pipeline([
@@ -142,7 +145,6 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 		("classifier", classifier)
 	])
 	pipeline.fit(audit_X, audit_y, **fit_params)
-	pipeline = make_pmml_pipeline(pipeline, audit_X.columns.values, audit_y.name)
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, EstimatorProxy):
 		estimator = classifier.estimator
@@ -359,7 +361,7 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
-	pipeline = make_pmml_pipeline(pipeline, versicolor_X.columns.values, versicolor_y.name)
+	pipeline = make_pmml_pipeline(pipeline, active_fields = versicolor_X.columns.values, target_fields = [versicolor_y.name])
 	pipeline.configure(**pmml_options)
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
 	store_pkl(pipeline, name)
@@ -430,7 +432,7 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y, **fit_params)
-	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values, iris_y.name)
+	pipeline = make_pmml_pipeline(pipeline, active_fields = iris_X.columns.values, target_fields = [iris_y.name])
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
@@ -764,19 +766,18 @@ def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_o
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("transformer-pipeline", Pipeline([
 			("polynomial", PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)),
 			("scaler", StandardScaler()),
 			("passthrough-transformer", "passthrough"),
-			("selector", SelectPercentile(score_func = f_regression, percentile = 35)),
+			("selector", SelectorProxy(SelectPercentile(score_func = f_regression, percentile = 35))),
 			("passthrough-final-estimator", "passthrough")
 		])),
 		("regressor", regressor)
 	])
 	pipeline.fit(housing_X, housing_y)
-	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values, housing_y.name)
 	pipeline.configure(**pmml_options)
 	pipeline.verify(housing_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
@@ -837,12 +838,11 @@ def build_ocsvm_iris(iris_df, linear_model, name):
 	mapper = DataFrameMapper([
 		(iris_X.columns.values, [ContinuousDomain(), StandardScaler()])
 	])
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("estimator", linear_model)
 	])
 	pipeline.fit(iris_X)
-	pipeline = make_pmml_pipeline(pipeline, iris_X.columns.values)
 	store_pkl(pipeline, name)
 	decisionFunction = DataFrame(pipeline.decision_function(iris_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(iris_X) == -1, columns = ["outlier"]).replace(True, "true").replace(False, "false")
@@ -857,12 +857,11 @@ def build_iforest_housing(housing_df, iforest, name, **pmml_options):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("estimator", iforest)
 	])
 	pipeline.fit(housing_X)
-	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
@@ -878,7 +877,7 @@ def build_ocsvm_housing(housing_df, svm, name):
 	mapper = DataFrameMapper([
 		(housing_X.columns.values, ContinuousDomain())
 	])
-	pipeline = Pipeline([
+	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("transformer-pipeline", Pipeline([
 			("none-transformer", None),
@@ -888,7 +887,6 @@ def build_ocsvm_housing(housing_df, svm, name):
 		("estimator", svm)
 	])
 	pipeline.fit(housing_X)
-	pipeline = make_pmml_pipeline(pipeline, housing_X.columns.values)
 	store_pkl(pipeline, name)
 	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
 	outlier = DataFrame(pipeline.predict(housing_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")

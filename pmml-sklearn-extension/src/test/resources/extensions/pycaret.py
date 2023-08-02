@@ -93,7 +93,7 @@ def make_clustering(df, estimator, name, **setup_params):
 	# XXX
 	model.cluster_centers_ = model.cluster_centers_.astype(float)
 
-	pmml_pipeline = make_pmml_pipeline(model, active_fields = X.columns.values, escape_func = _escape)
+	pmml_pipeline = make_pmml_pipeline(model, escape_func = _escape)
 	store_pkl(pmml_pipeline, name)
 
 	yt = Series(pmml_pipeline.predict(X), name = "cluster")
