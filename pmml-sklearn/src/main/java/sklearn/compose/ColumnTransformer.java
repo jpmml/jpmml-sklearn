@@ -32,6 +32,7 @@ import sklearn.Drop;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
 import sklearn.PassThrough;
+import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 
 public class ColumnTransformer extends Initializer {
@@ -77,11 +78,11 @@ public class ColumnTransformer extends Initializer {
 			@Override
 			public Transformer apply(Object object){
 
-				if(("drop").equals(object)){
+				if((SkLearnSteps.DROP).equals(object)){
 					return Drop.INSTANCE;
 				} else
 
-				if(("passthrough").equals(object)){
+				if((SkLearnSteps.PASSTHROUGH).equals(object)){
 					return PassThrough.INSTANCE;
 				}
 

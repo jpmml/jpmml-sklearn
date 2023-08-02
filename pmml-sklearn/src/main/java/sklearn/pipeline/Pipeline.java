@@ -32,6 +32,7 @@ import sklearn.Estimator;
 import sklearn.HasHead;
 import sklearn.PassThrough;
 import sklearn.Regressor;
+import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 
 public class Pipeline extends Composite implements Castable, HasHead {
@@ -73,7 +74,7 @@ public class Pipeline extends Composite implements Castable, HasHead {
 
 		Object estimator = TupleUtil.extractElement(finalStep, 1);
 
-		if(("passthrough").equals(estimator)){
+		if((SkLearnSteps.PASSTHROUGH).equals(estimator)){
 			return true;
 		}
 
@@ -97,7 +98,7 @@ public class Pipeline extends Composite implements Castable, HasHead {
 			@Override
 			public Transformer apply(Object object){
 
-				if((object == null) || ("passthrough").equals(object)){
+				if((object == null) || (SkLearnSteps.PASSTHROUGH).equals(object)){
 					return PassThrough.INSTANCE;
 				}
 
@@ -134,7 +135,7 @@ public class Pipeline extends Composite implements Castable, HasHead {
 			@Override
 			public E apply(Object object){
 
-				if(("passthrough").equals(object)){
+				if((SkLearnSteps.PASSTHROUGH).equals(object)){
 					return null;
 				}
 
