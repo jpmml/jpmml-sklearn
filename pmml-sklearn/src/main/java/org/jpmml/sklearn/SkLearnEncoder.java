@@ -45,12 +45,10 @@ import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabel;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.UnsupportedAttributeException;
@@ -254,23 +252,6 @@ public class SkLearnEncoder extends PythonEncoder {
 	public Schema createSchema(){
 		Label label = getLabel();
 		List<? extends Feature> features = getFeatures();
-
-		// XXX
-		if(label instanceof ScalarLabel){
-			ScalarLabel scalarLabel = (ScalarLabel)label;
-
-			Feature labelFeature = FeatureUtil.findLabelFeature(features, scalarLabel);
-			if(labelFeature != null){
-				DataField dataField = (DataField)labelFeature.getField();
-
-				setLabel(ScalarLabelUtil.createScalarLabel(dataField));
-
-				features = new ArrayList<>(features);
-				features.remove(labelFeature);
-			}
-
-			setFeatures(features);
-		}
 
 		return new Schema(this, label, features);
 	}

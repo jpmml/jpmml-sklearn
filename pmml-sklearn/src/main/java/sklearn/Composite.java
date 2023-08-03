@@ -151,9 +151,11 @@ public class Composite extends Step {
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		// XXX
 		if(hasTransformers()){
 			features = encodeFeatures((List<Feature>)features, encoder);
+
+			// Refresh label in case some transformer refined the label-backing field
+			label = refreshLabel(label, encoder);
 
 			schema = new Schema(encoder, label, features);
 		} // End if
@@ -165,5 +167,9 @@ public class Composite extends Step {
 		}
 
 		throw new UnsupportedOperationException();
+	}
+
+	protected Label refreshLabel(Label label, SkLearnEncoder encoder){
+		return label;
 	}
 }
