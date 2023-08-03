@@ -26,7 +26,6 @@ import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Estimator;
 import sklearn2pmml.pipeline.PMMLPipeline;
 
 abstract
@@ -44,11 +43,17 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	public PMML getPMML() throws Exception {
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
+		Map<String, ?> options = getOptions();
+
 		PMMLPipeline pipeline = loadPickle(PMMLPipeline.class);
 
 		activate(pipeline);
 
 		try {
+			if(options != null && !options.isEmpty()){
+				pipeline.setPMMLOptions(options);
+			}
+
 			PMML pmml = pipeline.encodePMML(encoder);
 
 			validatePMML(pmml);
@@ -60,13 +65,6 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	}
 
 	protected void activate(PMMLPipeline pipeline) throws Exception {
-		Map<String, ?> options = getOptions();
-
-		Estimator estimator = pipeline.getFinalEstimator();
-
-		if(!options.isEmpty()){
-			estimator.putOptions(options);
-		}
 	}
 
 	protected void deactivate(PMMLPipeline pipeline) throws Exception {

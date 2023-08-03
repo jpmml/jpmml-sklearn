@@ -68,6 +68,7 @@ import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,7 @@ import sklearn.pipeline.Pipeline;
 import sklearn.pipeline.PipelineUtil;
 import sklearn2pmml.decoration.Domain;
 
-public class PMMLPipeline extends Pipeline {
+public class PMMLPipeline extends Pipeline implements Encodable {
 
 	public PMMLPipeline(){
 		this("sklearn2pmml", "PMMLPipeline");
@@ -102,6 +103,34 @@ public class PMMLPipeline extends Pipeline {
 		return super.encodeFeatures(features, encoder);
 	}
 
+	@Override
+	public Model encodeModel(Schema schema){
+		return super.encodeModel(schema);
+	}
+
+	@Override
+	public Map<String, ?> getPMMLOptions(){
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			return estimator.getPMMLOptions();
+		}
+
+		return null;
+	}
+
+	@Override
+	public void setPMMLOptions(Map<String, ?> pmmlOptions){
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			estimator.setPMMLOptions(pmmlOptions);
+		}
+	}
+
+	@Override
 	public PMML encodePMML(SkLearnEncoder encoder){
 		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = null;

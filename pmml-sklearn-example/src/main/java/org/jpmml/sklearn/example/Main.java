@@ -33,12 +33,11 @@ import org.jpmml.model.metro.MetroJAXBUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
+import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sklearn.Estimator;
 import sklearn.tree.HasTreeOptions;
-import sklearn2pmml.pipeline.PMMLPipeline;
 import sklearn2pmml.pipeline.PMMLPipelineUtil;
 
 public class Main {
@@ -168,27 +167,11 @@ public class Main {
 			throw e;
 		}
 
-		PMMLPipeline pipeline = PMMLPipelineUtil.toPMMLPipeline(object);
+		Encodable encodable = toEncodable(object);
 
-		if(pipeline.hasFinalEstimator()){
-			Estimator estimator = pipeline.getFinalEstimator();
-
-			Map<String, Object> options = new LinkedHashMap<>();
-
-			options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
-			options.put(HasTreeOptions.OPTION_FLAT, this.flat);
-			options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
-			options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
-			options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
-			options.put(HasTreeOptions.OPTION_PRUNE, this.prune);
-			options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);
-
-			// Ignore defaults
-			options.values().removeIf(Objects::isNull);
-
-			if(!options.isEmpty()){
-				estimator.putOptions(options);
-			}
+		Map<String, ?> options = getOptions();
+		if(!options.isEmpty()){
+			encodable.setPMMLOptions(options);
 		}
 
 		PMML pmml;
@@ -197,7 +180,7 @@ public class Main {
 			logger.info("Converting PKL to PMML..");
 
 			long begin = System.currentTimeMillis();
-			pmml = pipeline.encodePMML(encoder);
+			pmml = encodable.encodePMML(encoder);
 			long end = System.currentTimeMillis();
 
 			logger.info("Converted PKL to PMML in {} ms.", (end - begin));
@@ -222,6 +205,23 @@ public class Main {
 		}
 	}
 
+	private Map<String, ?> getOptions(){
+		Map<String, Object> options = new LinkedHashMap<>();
+
+		options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
+		options.put(HasTreeOptions.OPTION_FLAT, this.flat);
+		options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
+		options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
+		options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
+		options.put(HasTreeOptions.OPTION_PRUNE, this.prune);
+		options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);
+
+		// Ignore defaults
+		options.values().removeIf(Objects::isNull);
+
+		return options;
+	}
+
 	public File getInput(){
 		return this.input;
 	}
@@ -236,6 +236,18 @@ public class Main {
 
 	public void setOutput(File output){
 		this.output = output;
+	}
+
+	static
+	private Encodable toEncodable(Object object){
+
+		if(object instanceof Encodable){
+			Encodable encodable = (Encodable)object;
+
+			return encodable;
+		}
+
+		return PMMLPipelineUtil.toPMMLPipeline(object);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
