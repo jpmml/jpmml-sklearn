@@ -25,8 +25,10 @@ import com.google.common.base.Equivalence;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.python.testing.PythonEncoderBatch;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn2pmml.pipeline.PMMLPipeline;
+import sklearn.Step;
 
 abstract
 public class SkLearnEncoderBatch extends PythonEncoderBatch {
@@ -45,28 +47,30 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 
 		Map<String, ?> options = getOptions();
 
-		PMMLPipeline pipeline = loadPickle(PMMLPipeline.class);
+		Step step = loadPickle(Step.class);
 
-		activate(pipeline);
+		activate(step);
 
 		try {
+			Encodable encodable = EncodableUtil.toEncodable(step);
+
 			if(options != null && !options.isEmpty()){
-				pipeline.setPMMLOptions(options);
+				encodable.setPMMLOptions(options);
 			}
 
-			PMML pmml = pipeline.encodePMML(encoder);
+			PMML pmml = encodable.encodePMML(encoder);
 
 			validatePMML(pmml);
 
 			return pmml;
 		} finally {
-			deactivate(pipeline);
+			deactivate(step);
 		}
 	}
 
-	protected void activate(PMMLPipeline pipeline) throws Exception {
+	protected void activate(Object object) throws Exception {
 	}
 
-	protected void deactivate(PMMLPipeline pipeline) throws Exception {
+	protected void deactivate(Object object) throws Exception {
 	}
 }

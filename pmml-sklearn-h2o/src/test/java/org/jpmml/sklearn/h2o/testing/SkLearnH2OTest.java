@@ -35,7 +35,7 @@ import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
-import sklearn2pmml.pipeline.PMMLPipeline;
+import sklearn.pipeline.Pipeline;
 
 public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
@@ -49,10 +49,10 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 			}
 
 			@Override
-			protected void activate(PMMLPipeline pipeline) throws Exception {
-				super.activate(pipeline);
+			protected void activate(Object object) throws Exception {
+				super.activate(object);
 
-				H2OEstimator h2oEstimator = (H2OEstimator)pipeline.getFinalEstimator();
+				H2OEstimator h2oEstimator = getEstimator(object);
 
 				File tmpFile = File.createTempFile(getAlgorithm() + getDataset(), ".mojo.zip");
 
@@ -67,16 +67,27 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 			}
 
 			@Override
-			protected void deactivate(PMMLPipeline pipeline) throws Exception {
-				super.deactivate(pipeline);
+			protected void deactivate(Object object) throws Exception {
+				super.deactivate(object);
 
-				H2OEstimator h2oEstimator = (H2OEstimator)pipeline.getFinalEstimator();
+				H2OEstimator h2oEstimator = getEstimator(object);
 
 				File tmpFile = new File(h2oEstimator.getMojoPath());
 
 				if(tmpFile.isFile()){
 					tmpFile.delete();
 				}
+			}
+
+			private H2OEstimator getEstimator(Object object){
+
+				if(object instanceof Pipeline){
+					Pipeline pipeline = (Pipeline)object;
+
+					object = pipeline.getFinalEstimator();
+				}
+
+				return (H2OEstimator)object;
 			}
 		};
 
