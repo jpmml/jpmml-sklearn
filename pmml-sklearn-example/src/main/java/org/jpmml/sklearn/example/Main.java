@@ -34,11 +34,11 @@ import org.jpmml.python.PickleUtil;
 import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
 import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.tree.HasTreeOptions;
-import sklearn2pmml.pipeline.PMMLPipelineUtil;
 
 public class Main {
 
@@ -167,7 +167,7 @@ public class Main {
 			throw e;
 		}
 
-		Encodable encodable = toEncodable(object);
+		Encodable encodable = EncodableUtil.toEncodable(object);
 
 		Map<String, ?> options = getOptions();
 		if(!options.isEmpty()){
@@ -236,18 +236,6 @@ public class Main {
 
 	public void setOutput(File output){
 		this.output = output;
-	}
-
-	static
-	private Encodable toEncodable(Object object){
-
-		if(object instanceof Encodable){
-			Encodable encodable = (Encodable)object;
-
-			return encodable;
-		}
-
-		return PMMLPipelineUtil.toPMMLPipeline(object);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
