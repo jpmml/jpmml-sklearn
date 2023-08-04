@@ -28,6 +28,7 @@ import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasPMMLOptions;
 import sklearn.Step;
 
 abstract
@@ -55,7 +56,9 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 			Encodable encodable = EncodableUtil.toEncodable(step);
 
 			if(options != null && !options.isEmpty()){
-				encodable.setPMMLOptions(options);
+				HasPMMLOptions<?> hasPmmlOptions = (HasPMMLOptions<?>)encodable;
+
+				hasPmmlOptions.setPMMLOptions(options);
 			}
 
 			PMML pmml = encodable.encodePMML(encoder);

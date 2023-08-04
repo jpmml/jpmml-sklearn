@@ -38,6 +38,7 @@ import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sklearn.HasPMMLOptions;
 import sklearn.tree.HasTreeOptions;
 
 public class Main {
@@ -171,7 +172,9 @@ public class Main {
 
 		Map<String, ?> options = getOptions();
 		if(!options.isEmpty()){
-			encodable.setPMMLOptions(options);
+			HasPMMLOptions<?> hasPmmlOptions = (HasPMMLOptions<?>)encodable;
+
+			hasPmmlOptions.setPMMLOptions(options);
 		}
 
 		PMML pmml;

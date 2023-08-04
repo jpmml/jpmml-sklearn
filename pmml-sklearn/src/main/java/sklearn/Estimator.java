@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
-public class Estimator extends Step implements HasNumberOfOutputs {
+public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOptions<Estimator> {
 
 	public Estimator(String module, String name){
 		super(module, name);
@@ -273,6 +273,7 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		return this;
 	}
 
+	@Override
 	public Map<String, ?> getPMMLOptions(){
 		Object value = get(SkLearn2PMMLFields.PMML_OPTIONS);
 
@@ -283,6 +284,7 @@ public class Estimator extends Step implements HasNumberOfOutputs {
 		return getDict(SkLearn2PMMLFields.PMML_OPTIONS);
 	}
 
+	@Override
 	public Estimator setPMMLOptions(Map<String, ?> pmmlOptions){
 		put(SkLearn2PMMLFields.PMML_OPTIONS, pmmlOptions);
 

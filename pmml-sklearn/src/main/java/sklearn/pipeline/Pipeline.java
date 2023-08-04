@@ -19,6 +19,7 @@
 package sklearn.pipeline;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 import org.jpmml.python.CastFunction;
@@ -31,12 +32,13 @@ import sklearn.Clusterer;
 import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.HasHead;
+import sklearn.HasPMMLOptions;
 import sklearn.PassThrough;
 import sklearn.Regressor;
 import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 
-public class Pipeline extends Composite implements Castable, HasHead {
+public class Pipeline extends Composite implements Castable, HasHead, HasPMMLOptions<Pipeline> {
 
 	public Pipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -184,6 +186,30 @@ public class Pipeline extends Composite implements Castable, HasHead {
 		}
 
 		return PipelineUtil.getHead(transformers, estimator);
+	}
+
+	@Override
+	public Map<String, ?> getPMMLOptions(){
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			return estimator.getPMMLOptions();
+		}
+
+		return null;
+	}
+
+	@Override
+	public Pipeline setPMMLOptions(Map<String, ?> pmmlOptions){
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			estimator.setPMMLOptions(pmmlOptions);
+		}
+
+		return this;
 	}
 
 	public Transformer toTransformer(){

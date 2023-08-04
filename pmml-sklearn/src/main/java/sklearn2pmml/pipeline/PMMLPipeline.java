@@ -109,28 +109,6 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 	}
 
 	@Override
-	public Map<String, ?> getPMMLOptions(){
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getPMMLOptions();
-		}
-
-		return null;
-	}
-
-	@Override
-	public void setPMMLOptions(Map<String, ?> pmmlOptions){
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			estimator.setPMMLOptions(pmmlOptions);
-		}
-	}
-
-	@Override
 	public PMML encodePMML(SkLearnEncoder encoder){
 		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = null;
