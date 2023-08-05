@@ -19,11 +19,14 @@
 package sklearn2pmml.statsmodels;
 
 import org.dmg.pmml.Model;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import statsmodels.ResultsWrapper;
 
-public class StatsModelsClassifier extends Classifier implements HasResults {
+public class StatsModelsClassifier extends Classifier implements HasResults, Encodable {
 
 	public StatsModelsClassifier(String module, String name){
 		super(module, name);
@@ -39,6 +42,11 @@ public class StatsModelsClassifier extends Classifier implements HasResults {
 		}
 
 		return results.encodeModel(schema);
+	}
+
+	@Override
+	public PMML encodePMML(SkLearnEncoder encoder){
+		return StatsModelsUtil.encodePMML(this);
 	}
 
 	public Boolean getFitIntercept(){

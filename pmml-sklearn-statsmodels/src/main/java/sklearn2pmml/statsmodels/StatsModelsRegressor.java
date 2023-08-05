@@ -19,11 +19,14 @@
 package sklearn2pmml.statsmodels;
 
 import org.dmg.pmml.Model;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Regressor;
 import statsmodels.ResultsWrapper;
 
-public class StatsModelsRegressor extends Regressor implements HasResults {
+public class StatsModelsRegressor extends Regressor implements HasResults, Encodable {
 
 	public StatsModelsRegressor(String module, String name){
 		super(module, name);
@@ -39,6 +42,11 @@ public class StatsModelsRegressor extends Regressor implements HasResults {
 		}
 
 		return results.encodeModel(schema);
+	}
+
+	@Override
+	public PMML encodePMML(SkLearnEncoder encoder){
+		return StatsModelsUtil.encodePMML(this);
 	}
 
 	public Boolean getFitIntercept(){

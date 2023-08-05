@@ -21,16 +21,29 @@ package sklearn2pmml.statsmodels;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.statsmodels.InterceptFeature;
+import org.jpmml.statsmodels.StatsModelsEncoder;
+import sklearn.Estimator;
+import statsmodels.ResultsWrapper;
 
 public class StatsModelsUtil {
 
 	private StatsModelsUtil(){
+	}
+
+	static
+	public <E extends Estimator & HasResults> PMML encodePMML(E estimator){
+		StatsModelsEncoder encoder = new StatsModelsEncoder();
+
+		ResultsWrapper resultsWrapper = estimator.getResults();
+
+		return resultsWrapper.encodePMML(encoder);
 	}
 
 	static
