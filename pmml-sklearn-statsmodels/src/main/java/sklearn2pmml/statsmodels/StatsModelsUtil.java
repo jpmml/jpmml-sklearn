@@ -25,7 +25,6 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.PickleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.statsmodels.InterceptFeature;
 import org.jpmml.statsmodels.StatsModelsEncoder;
@@ -70,9 +69,8 @@ public class StatsModelsUtil {
 
 	static
 	private void init(){
-		ClassLoader clazzLoader = SkLearnEncoder.class.getClassLoader();
-
-		PickleUtil.init(clazzLoader, "statsmodels2pmml.properties");
+		@SuppressWarnings("unused")
+		StatsModelsEncoder encoder = new StatsModelsEncoder();
 	}
 
 	private static boolean initialized = false;

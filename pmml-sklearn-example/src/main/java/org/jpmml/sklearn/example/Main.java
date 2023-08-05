@@ -36,6 +36,7 @@ import org.jpmml.python.StorageUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.HasPMMLOptions;
@@ -150,8 +151,6 @@ public class Main {
 	}
 
 	public void run() throws Exception {
-		SkLearnEncoder encoder = new SkLearnEncoder();
-
 		Object object;
 
 		try(Storage storage = StorageUtil.createStorage(this.input)){
@@ -181,6 +180,8 @@ public class Main {
 
 		try {
 			logger.info("Converting PKL to PMML..");
+
+			SkLearnEncoder encoder = new SkLearnEncoder();
 
 			long begin = System.currentTimeMillis();
 			pmml = encodable.encodePMML(encoder);
@@ -239,6 +240,10 @@ public class Main {
 
 	public void setOutput(File output){
 		this.output = output;
+	}
+
+	static {
+		SkLearnUtil.initOnce();
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);

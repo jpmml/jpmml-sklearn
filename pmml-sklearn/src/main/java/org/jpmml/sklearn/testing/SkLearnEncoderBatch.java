@@ -28,6 +28,7 @@ import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.HasPMMLOptions;
 import sklearn.Step;
 
@@ -44,8 +45,6 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 
 	@Override
 	public PMML getPMML() throws Exception {
-		SkLearnEncoder encoder = new SkLearnEncoder();
-
 		Map<String, ?> options = getOptions();
 
 		Step step = loadPickle(Step.class);
@@ -61,6 +60,8 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 				hasPmmlOptions.setPMMLOptions(options);
 			}
 
+			SkLearnEncoder encoder = new SkLearnEncoder();
+
 			PMML pmml = encodable.encodePMML(encoder);
 
 			validatePMML(pmml);
@@ -75,5 +76,9 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	}
 
 	protected void deactivate(Object object) throws Exception {
+	}
+
+	static {
+		SkLearnUtil.initOnce();
 	}
 }
