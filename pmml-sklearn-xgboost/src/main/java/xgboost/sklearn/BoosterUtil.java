@@ -22,9 +22,11 @@ import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.ByteOrderUtil;
+import org.jpmml.xgboost.FeatureMap;
 import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
@@ -51,7 +53,7 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel encodeBooster(E estimator, Schema schema){
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel encodeModel(E estimator, Schema schema){
 		Booster booster = estimator.getBooster();
 
 		Integer bestNTreeLimit = booster.getBestNTreeLimit();
@@ -83,6 +85,18 @@ public class BoosterUtil {
 		MiningModel miningModel = learner.encodeMiningModel(options, xgbSchema);
 
 		return miningModel;
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> PMML encodePMML(E estimator){
+		Learner learner = getLearner(estimator);
+
+		FeatureMap featureMap = learner.encodeFeatureMap();
+
+		// XXX
+		Map<String, ?> options = estimator.getNativeConfiguration();
+
+		return learner.encodePMML(options, null, null, featureMap);
 	}
 
 	static

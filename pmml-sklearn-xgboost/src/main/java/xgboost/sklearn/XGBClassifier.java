@@ -19,15 +19,18 @@
 package xgboost.sklearn;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.xgboost.Classification;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
 import sklearn.LabelEncoderClassifier;
 
-public class XGBClassifier extends LabelEncoderClassifier implements HasBooster, HasXGBoostOptions {
+public class XGBClassifier extends LabelEncoderClassifier implements HasBooster, HasXGBoostOptions, Encodable {
 
 	public XGBClassifier(String module, String name){
 		super(module, name);
@@ -56,7 +59,12 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		return BoosterUtil.encodeBooster(this, schema);
+		return BoosterUtil.encodeModel(this, schema);
+	}
+
+	@Override
+	public PMML encodePMML(SkLearnEncoder encoder){
+		return BoosterUtil.encodePMML(this);
 	}
 
 	@Override
