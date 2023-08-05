@@ -28,6 +28,7 @@ import java.util.List;
 import hex.genmodel.MojoModel;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureList;
 import org.jpmml.converter.FeatureUtil;
@@ -38,10 +39,12 @@ import org.jpmml.h2o.Converter;
 import org.jpmml.h2o.ConverterFactory;
 import org.jpmml.h2o.H2OEncoder;
 import org.jpmml.h2o.MojoModelUtil;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.HasClasses;
 
-public class H2OEstimator extends Estimator implements HasClasses {
+public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 
 	private MojoModel mojoModel = null;
 
@@ -93,17 +96,7 @@ public class H2OEstimator extends Estimator implements HasClasses {
 
 	@Override
 	public Model encodeModel(Schema schema){
-		MojoModel mojoModel = getMojoModel();
-
-		Converter<?> converter;
-
-		try {
-			ConverterFactory converterFactory = ConverterFactory.newConverterFactory();
-
-			converter = converterFactory.newConverter(mojoModel);
-		} catch(Exception e){
-			throw new IllegalArgumentException(e);
-		}
+		Converter<?> converter = createConverter();
 
 		PMMLEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
@@ -146,6 +139,13 @@ public class H2OEstimator extends Estimator implements HasClasses {
 		return converter.encodeModel(mojoModelSchema);
 	}
 
+	@Override
+	public PMML encodePMML(SkLearnEncoder encoder){
+		Converter<?> converter = createConverter();
+
+		return converter.encodePMML();
+	}
+
 	public String getEstimatorType(){
 		return getString("_estimator_type");
 	}
@@ -162,6 +162,18 @@ public class H2OEstimator extends Estimator implements HasClasses {
 		put("_mojo_path", mojoPath);
 
 		return this;
+	}
+
+	private Converter<?> createConverter(){
+		MojoModel mojoModel = getMojoModel();
+
+		try {
+			ConverterFactory converterFactory = ConverterFactory.newConverterFactory();
+
+			return converterFactory.newConverter(mojoModel);
+		} catch(Exception e){
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	private MojoModel getMojoModel(){
