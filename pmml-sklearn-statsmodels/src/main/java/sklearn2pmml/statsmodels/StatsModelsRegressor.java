@@ -23,7 +23,7 @@ import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 import statsmodels.ResultsWrapper;
 
-public class StatsModelsRegressor extends Regressor {
+public class StatsModelsRegressor extends Regressor implements HasResults {
 
 	public StatsModelsRegressor(String module, String name){
 		super(module, name);
@@ -45,6 +45,7 @@ public class StatsModelsRegressor extends Regressor {
 		return getBoolean("fit_intercept");
 	}
 
+	@Override
 	public ResultsWrapper getResults(){
 		return get("results_", ResultsWrapper.class);
 	}

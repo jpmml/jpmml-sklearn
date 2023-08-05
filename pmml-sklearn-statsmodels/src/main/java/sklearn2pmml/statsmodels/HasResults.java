@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Villu Ruusmann
+ * Copyright (c) 2023 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,39 +18,9 @@
  */
 package sklearn2pmml.statsmodels;
 
-import org.dmg.pmml.Model;
-import org.jpmml.converter.Schema;
-import sklearn.Classifier;
 import statsmodels.ResultsWrapper;
 
-public class StatsModelsClassifier extends Classifier implements HasResults {
+public interface HasResults {
 
-	public StatsModelsClassifier(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		Boolean fitIntercept = getFitIntercept();
-		ResultsWrapper results = getResults();
-
-		if(fitIntercept){
-			schema = StatsModelsUtil.addConstant(schema);
-		}
-
-		return results.encodeModel(schema);
-	}
-
-	public Boolean getFitIntercept(){
-		return getBoolean("fit_intercept");
-	}
-
-	@Override
-	public ResultsWrapper getResults(){
-		return get("results_", ResultsWrapper.class);
-	}
-
-	static {
-		StatsModelsUtil.initOnce();
-	}
+	ResultsWrapper getResults();
 }
