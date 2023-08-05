@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SkLearnUtil {
+public class VersionUtil {
 
-	private SkLearnUtil(){
+	private VersionUtil(){
 	}
 
 	static

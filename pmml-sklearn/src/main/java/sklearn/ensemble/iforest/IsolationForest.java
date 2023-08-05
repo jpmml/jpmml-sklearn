@@ -50,7 +50,7 @@ import org.jpmml.python.HasArray;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
-import sklearn.SkLearnUtil;
+import sklearn.VersionUtil;
 import sklearn.ensemble.EnsembleRegressor;
 import sklearn.ensemble.EnsembleUtil;
 import sklearn.tree.HasTreeOptions;
@@ -76,10 +76,10 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/8549
-		boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.19") >= 0);
+		boolean corrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.19") >= 0);
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/11839
-		boolean nodeSampleCorrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.21") >= 0);
+		boolean nodeSampleCorrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.21") >= 0);
 
 		Boolean numeric = (Boolean)getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
 

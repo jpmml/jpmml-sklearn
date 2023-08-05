@@ -43,7 +43,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
-import sklearn.SkLearnUtil;
+import sklearn.VersionUtil;
 import sklearn.linear_model.LinearClassifier;
 
 public class LogisticRegression extends LinearClassifier {
@@ -60,7 +60,7 @@ public class LogisticRegression extends LinearClassifier {
 
 		if(("auto").equals(multiClass)){
 
-			if(sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.22") >= 0){
+			if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.22") >= 0){
 				int[] shape = getCoefShape();
 
 				multiClass = getAutoMultiClass(solver, shape);
@@ -102,7 +102,7 @@ public class LogisticRegression extends LinearClassifier {
 			SchemaUtil.checkSize(2, categoricalLabel);
 
 			// See https://github.com/scikit-learn/scikit-learn/issues/9889
-			boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.20") >= 0);
+			boolean corrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.20") >= 0);
 
 			if(!corrected){
 				return encodeOvRModel(schema);

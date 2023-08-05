@@ -36,7 +36,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Estimator;
-import sklearn.SkLearnUtil;
+import sklearn.VersionUtil;
 import sklearn.linear_model.LinearClassifier;
 
 public class LinearDiscriminantAnalysis extends LinearClassifier {
@@ -79,7 +79,7 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 		List<? extends Feature> features = schema.getFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/6848
-		boolean corrected = (sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.21") >= 0);
+		boolean corrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.21") >= 0);
 
 		if(!corrected){
 			return super.encodeModel(schema);

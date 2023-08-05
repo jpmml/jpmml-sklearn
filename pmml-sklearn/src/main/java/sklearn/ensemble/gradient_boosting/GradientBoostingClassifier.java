@@ -38,7 +38,7 @@ import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasPriorProbability;
-import sklearn.SkLearnUtil;
+import sklearn.VersionUtil;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn2pmml.EstimatorProxy;
@@ -79,7 +79,7 @@ public class GradientBoostingClassifier extends Classifier implements HasEstimat
 
 		IntFunction<Number> initialPredictions = init::getPriorProbability;
 
-		if(sklearnVersion != null && SkLearnUtil.compareVersion(sklearnVersion, "0.21") >= 0){
+		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.21") >= 0){
 			List<? extends Number> computedInitialPredictions = loss.computeInitialPredictions(init);
 
 			initialPredictions = computedInitialPredictions::get;
