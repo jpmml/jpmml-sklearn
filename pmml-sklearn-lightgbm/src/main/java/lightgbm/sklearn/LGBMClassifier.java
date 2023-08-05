@@ -18,15 +18,18 @@
  */
 package lightgbm.sklearn;
 
+import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.Classification;
 import org.jpmml.lightgbm.HasLightGBMOptions;
 import org.jpmml.lightgbm.ObjectiveFunction;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.LabelEncoderClassifier;
 
-public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster, HasLightGBMOptions {
+public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster, HasLightGBMOptions, Encodable {
 
 	public LGBMClassifier(String module, String name){
 		super(module, name);
@@ -51,6 +54,11 @@ public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		return BoosterUtil.encodeModel(this, schema);
+	}
+
+	@Override
+	public PMML encodePMML(SkLearnEncoder encoder){
+		return BoosterUtil.encodePMML(this);
 	}
 
 	@Override

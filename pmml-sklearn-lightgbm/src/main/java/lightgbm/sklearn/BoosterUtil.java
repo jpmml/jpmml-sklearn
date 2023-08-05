@@ -21,6 +21,7 @@ package lightgbm.sklearn;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
@@ -72,6 +73,16 @@ public class BoosterUtil {
 		encoder.transferFeatureImportances(null, miningModel);
 
 		return miningModel;
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasLightGBMOptions> PMML encodePMML(E estimator){
+		GBDT gbdt = getGBDT(estimator);
+
+		// XXX
+		Map<String, ?> options = estimator.getNativeConfiguration();
+
+		return gbdt.encodePMML(options, null, null);
 	}
 
 	static
