@@ -26,7 +26,6 @@ import org.jpmml.lightgbm.Classification;
 import org.jpmml.lightgbm.HasLightGBMOptions;
 import org.jpmml.lightgbm.ObjectiveFunction;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.LabelEncoderClassifier;
 
 public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster, HasLightGBMOptions, Encodable {
@@ -57,7 +56,7 @@ public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster
 	}
 
 	@Override
-	public PMML encodePMML(SkLearnEncoder encoder){
+	public PMML encodePMML(){
 		return BoosterUtil.encodePMML(this);
 	}
 

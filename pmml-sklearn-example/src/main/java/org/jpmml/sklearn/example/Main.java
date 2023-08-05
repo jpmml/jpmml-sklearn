@@ -35,7 +35,6 @@ import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,10 +180,8 @@ public class Main {
 		try {
 			logger.info("Converting PKL to PMML..");
 
-			SkLearnEncoder encoder = new SkLearnEncoder();
-
 			long begin = System.currentTimeMillis();
-			pmml = encodable.encodePMML(encoder);
+			pmml = encodable.encodePMML();
 			long end = System.currentTimeMillis();
 
 			logger.info("Converted PKL to PMML in {} ms.", (end - begin));

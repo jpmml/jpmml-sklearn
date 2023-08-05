@@ -40,7 +40,6 @@ import org.jpmml.h2o.ConverterFactory;
 import org.jpmml.h2o.H2OEncoder;
 import org.jpmml.h2o.MojoModelUtil;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.HasClasses;
 
@@ -140,7 +139,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	}
 
 	@Override
-	public PMML encodePMML(SkLearnEncoder encoder){
+	public PMML encodePMML(){
 		Converter<?> converter = createConverter();
 
 		return converter.encodePMML();

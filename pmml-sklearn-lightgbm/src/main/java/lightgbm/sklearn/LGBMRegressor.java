@@ -26,7 +26,6 @@ import org.jpmml.lightgbm.HasLightGBMOptions;
 import org.jpmml.lightgbm.ObjectiveFunction;
 import org.jpmml.lightgbm.Regression;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Regressor;
 
 public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMOptions, Encodable {
@@ -57,7 +56,7 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 	}
 
 	@Override
-	public PMML encodePMML(SkLearnEncoder encoder){
+	public PMML encodePMML(){
 		return BoosterUtil.encodePMML(this);
 	}
 

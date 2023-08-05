@@ -24,7 +24,6 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
 import org.jpmml.xgboost.Regression;
@@ -63,7 +62,7 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 	}
 
 	@Override
-	public PMML encodePMML(SkLearnEncoder encoder){
+	public PMML encodePMML(){
 		return BoosterUtil.encodePMML(this);
 	}
 

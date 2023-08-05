@@ -22,7 +22,6 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import statsmodels.ResultsWrapper;
 
@@ -45,7 +44,7 @@ public class StatsModelsClassifier extends Classifier implements HasResults, Enc
 	}
 
 	@Override
-	public PMML encodePMML(SkLearnEncoder encoder){
+	public PMML encodePMML(){
 		return StatsModelsUtil.encodePMML(this);
 	}
 

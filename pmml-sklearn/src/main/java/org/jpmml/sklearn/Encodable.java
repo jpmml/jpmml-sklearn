@@ -22,5 +22,5 @@ import org.dmg.pmml.PMML;
 
 public interface Encodable {
 
-	PMML encodePMML(SkLearnEncoder encoder);
+	PMML encodePMML();
 }

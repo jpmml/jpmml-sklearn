@@ -24,7 +24,6 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.xgboost.Classification;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
@@ -63,7 +62,7 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	}
 
 	@Override
-	public PMML encodePMML(SkLearnEncoder encoder){
+	public PMML encodePMML(){
 		return BoosterUtil.encodePMML(this);
 	}
 

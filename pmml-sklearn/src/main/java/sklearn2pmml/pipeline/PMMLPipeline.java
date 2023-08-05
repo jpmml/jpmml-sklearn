@@ -109,7 +109,9 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 	}
 
 	@Override
-	public PMML encodePMML(SkLearnEncoder encoder){
+	public PMML encodePMML(){
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
 		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = null;
 
