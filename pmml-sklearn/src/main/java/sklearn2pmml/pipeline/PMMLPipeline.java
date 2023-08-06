@@ -573,7 +573,7 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 	}
 
 	static
-	private Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
+	public Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
 		List<Label> labels = new ArrayList<>();
 
 		MiningFunction miningFunction = estimator.getMiningFunction();

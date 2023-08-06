@@ -19,21 +19,29 @@
 package pycaret.pipeline;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pycaret.preprocess.TransformerWrapper;
+import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
+import sklearn.Transformer;
 import sklearn.pipeline.Pipeline;
+import sklearn2pmml.pipeline.PMMLPipeline;
 
-public class PyCaretPipeline extends Pipeline {
+public class PyCaretPipeline extends Pipeline implements Encodable {
 
 	public PyCaretPipeline(String module, String name){
 		super(module, name);
@@ -42,6 +50,13 @@ public class PyCaretPipeline extends Pipeline {
 	@Override
 	public int getNumberOfFeatures(){
 		return HasNumberOfFeatures.UNKNOWN;
+	}
+
+	@Override
+	public List<? extends TransformerWrapper> getTransformers(){
+		List<? extends Transformer> transformers = super.getTransformers();
+
+		return Lists.transform(transformers, TransformerWrapper.class::cast);
 	}
 
 	@Override
@@ -69,6 +84,33 @@ public class PyCaretPipeline extends Pipeline {
 	@Override
 	public Model encodeModel(Schema schema){
 		return super.encodeModel(schema);
+	}
+
+	@Override
+	public PMML encodePMML(){
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
+		List<? extends TransformerWrapper> transformers = getTransformers();
+		Estimator estimator = getFinalEstimator();
+
+		TransformerWrapper transformer = transformers.get(0);
+
+		String targetName = transformer.getTargetName();
+		if(targetName != null){
+			Label label = PMMLPipeline.initLabel(estimator, Collections.singletonList(targetName), encoder);
+
+			encoder.setLabel(label);
+		}
+
+		encodeFeatures(Collections.emptyList(), encoder);
+
+		Schema schema = encoder.createSchema();
+
+		Model model = encodeModel(schema);
+
+		encoder.setModel(model);
+
+		return encoder.encodePMML(model);
 	}
 
 	@Override

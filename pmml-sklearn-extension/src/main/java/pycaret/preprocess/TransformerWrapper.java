@@ -192,6 +192,10 @@ public class TransformerWrapper extends Initializer {
 		return getList("_include", String.class);
 	}
 
+	public String getTargetName(){
+		return getString("target_name_");
+	}
+
 	public Boolean getTrainOnly(){
 		return getOptionalBoolean("_train_only", Boolean.FALSE);
 	}
