@@ -31,10 +31,11 @@ import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
+import sklearn.pipeline.Pipeline;
 
-public class Pipeline extends sklearn.pipeline.Pipeline {
+public class PyCaretPipeline extends Pipeline {
 
-	public Pipeline(String module, String name){
+	public PyCaretPipeline(String module, String name){
 		super(module, name);
 	}
 
