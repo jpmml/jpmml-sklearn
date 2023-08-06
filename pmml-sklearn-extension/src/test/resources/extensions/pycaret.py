@@ -63,7 +63,10 @@ def make_classification(df, estimator, name, **setup_params):
 
 	pipeline = exp.finalize_model(calibrated_model)
 
-	pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
+	if name.endswith("NA"):
+		pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
+	else:
+		pmml_pipeline = _escape(pipeline, escape_func = _escape)
 	store_pkl(pmml_pipeline, name)
 
 	yt = Series(pipeline.predict(X), name = y.name)
@@ -112,7 +115,10 @@ def make_regression(df, estimator, name, **setup_params):
 
 	pipeline = exp.finalize_model(model)
 
-	pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
+	if name.endswith("NA"):
+		pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
+	else:
+		pmml_pipeline = _escape(pipeline, escape_func = _escape)
 	store_pkl(pmml_pipeline, name)
 
 	yt = Series(pipeline.predict(X), name = y.name)
