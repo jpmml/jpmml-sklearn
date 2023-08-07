@@ -44,9 +44,9 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class KBinsDiscretizer extends Transformer {
+public class KBinsDiscretizer extends SkLearnTransformer {
 
 	public KBinsDiscretizer(String module, String name){
 		super(module, name);

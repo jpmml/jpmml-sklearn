@@ -28,9 +28,9 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class Binarizer extends Transformer {
+public class Binarizer extends SkLearnTransformer {
 
 	public Binarizer(String module, String name){
 		super(module, name);

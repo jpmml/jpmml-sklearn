@@ -34,9 +34,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class OneHotEncoder extends Transformer {
+public class OneHotEncoder extends SkLearnTransformer {
 
 	public OneHotEncoder(String module, String name){
 		super(module, name);

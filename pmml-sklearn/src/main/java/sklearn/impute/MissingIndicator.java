@@ -26,9 +26,9 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class MissingIndicator extends Transformer {
+public class MissingIndicator extends SkLearnTransformer {
 
 	public MissingIndicator(String module, String name){
 		super(module, name);

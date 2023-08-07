@@ -28,9 +28,9 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.SkLearnFields;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class LabelEncoder extends Transformer {
+public class LabelEncoder extends SkLearnTransformer {
 
 	public LabelEncoder(String module, String name){
 		super(module, name);

@@ -31,9 +31,9 @@ import org.jpmml.converter.Feature;
 import org.jpmml.python.FunctionUtil;
 import org.jpmml.python.Identifiable;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class FunctionTransformer extends Transformer {
+public class FunctionTransformer extends SkLearnTransformer {
 
 	public FunctionTransformer(String module, String name){
 		super(module, name);

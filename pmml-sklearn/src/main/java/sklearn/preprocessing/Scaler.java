@@ -18,10 +18,10 @@
  */
 package sklearn.preprocessing;
 
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
 abstract
-public class Scaler extends Transformer {
+public class Scaler extends SkLearnTransformer {
 
 	public Scaler(String module, String name){
 		super(module, name);

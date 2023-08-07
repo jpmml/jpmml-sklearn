@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Villu Ruusmann
+ * Copyright (c) 2023 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,31 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.decomposition;
-
-import java.util.List;
-
-import sklearn.SkLearnTransformer;
+package sklearn;
 
 abstract
-public class BasePCA extends SkLearnTransformer {
+public class SkLearnTransformer extends Transformer {
 
-	public BasePCA(String module, String name){
+	public SkLearnTransformer(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getComponentsShape();
-
-		return shape[1];
-	}
-
-	public List<? extends Number> getComponents(){
-		return getNumberArray("components_");
-	}
-
-	public int[] getComponentsShape(){
-		return getArrayShape("components_", 2);
 	}
 }

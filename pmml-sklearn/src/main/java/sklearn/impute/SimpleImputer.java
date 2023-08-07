@@ -30,9 +30,9 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class SimpleImputer extends Transformer {
+public class SimpleImputer extends SkLearnTransformer {
 
 	public SimpleImputer(String module, String name){
 		super(module, name);

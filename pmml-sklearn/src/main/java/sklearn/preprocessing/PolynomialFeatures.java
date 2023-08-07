@@ -36,9 +36,9 @@ import org.jpmml.converter.PowerFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.SkLearnFields;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class PolynomialFeatures extends Transformer {
+public class PolynomialFeatures extends SkLearnTransformer {
 
 	public PolynomialFeatures(String module, String name){
 		super(module, name);

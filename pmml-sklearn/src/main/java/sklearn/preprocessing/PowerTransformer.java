@@ -32,9 +32,9 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class PowerTransformer extends Transformer {
+public class PowerTransformer extends SkLearnTransformer {
 
 	public PowerTransformer(String module, String name){
 		super(module, name);

@@ -35,9 +35,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.SkLearnFields;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class LabelBinarizer extends Transformer {
+public class LabelBinarizer extends SkLearnTransformer {
 
 	public LabelBinarizer(String module, String name){
 		super(module, name);
