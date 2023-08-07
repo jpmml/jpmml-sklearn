@@ -26,9 +26,9 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.HasDefaultValue;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class DummyRegressor extends Regressor implements HasDefaultValue {
+public class DummyRegressor extends SkLearnRegressor implements HasDefaultValue {
 
 	public DummyRegressor(){
 		this("sklearn.dummy", "DummyRegressor");

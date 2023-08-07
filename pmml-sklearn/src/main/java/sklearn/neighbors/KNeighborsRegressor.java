@@ -24,9 +24,9 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class KNeighborsRegressor extends Regressor implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class KNeighborsRegressor extends SkLearnRegressor implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
 
 	public KNeighborsRegressor(String module, String name){
 		super(module, name);

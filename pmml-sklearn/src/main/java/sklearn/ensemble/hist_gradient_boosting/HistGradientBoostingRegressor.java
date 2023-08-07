@@ -23,9 +23,9 @@ import java.util.List;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class HistGradientBoostingRegressor extends Regressor {
+public class HistGradientBoostingRegressor extends SkLearnRegressor {
 
 	public HistGradientBoostingRegressor(String module, String name){
 		super(module, name);

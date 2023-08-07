@@ -26,9 +26,9 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class SGDOneClassSVM extends Regressor implements OutlierDetector {
+public class SGDOneClassSVM extends SkLearnRegressor implements OutlierDetector {
 
 	public SGDOneClassSVM(String module, String name){
 		super(module, name);

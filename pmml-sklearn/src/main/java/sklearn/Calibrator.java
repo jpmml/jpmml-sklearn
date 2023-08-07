@@ -32,7 +32,7 @@ import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Calibrator extends Regressor {
+public class Calibrator extends SkLearnRegressor {
 
 	public Calibrator(String module, String name){
 		super(module, name);

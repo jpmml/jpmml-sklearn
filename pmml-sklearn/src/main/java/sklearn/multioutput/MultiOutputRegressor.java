@@ -23,8 +23,9 @@ import java.util.List;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class MultiOutputRegressor extends Regressor {
+public class MultiOutputRegressor extends SkLearnRegressor {
 
 	public MultiOutputRegressor(String module, String name){
 		super(module, name);

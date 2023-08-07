@@ -36,9 +36,10 @@ import org.jpmml.converter.transformations.AbstractTransformation;
 import org.jpmml.python.FunctionUtil;
 import org.jpmml.python.Identifiable;
 import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 import sklearn.preprocessing.FunctionTransformer;
 
-public class TransformedTargetRegressor extends Regressor {
+public class TransformedTargetRegressor extends SkLearnRegressor {
 
 	public TransformedTargetRegressor(String module, String name){
 		super(module, name);

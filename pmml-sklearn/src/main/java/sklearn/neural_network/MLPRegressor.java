@@ -24,9 +24,9 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.HasArray;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class MLPRegressor extends Regressor {
+public class MLPRegressor extends SkLearnRegressor {
 
 	public MLPRegressor(String module, String name){
 		super(module, name);

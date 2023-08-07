@@ -24,9 +24,9 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
 import sklearn.HasApplyField;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class TreeRegressor extends Regressor implements HasApplyField, HasTree, HasTreeOptions {
+public class TreeRegressor extends SkLearnRegressor implements HasApplyField, HasTree, HasTreeOptions {
 
 	public TreeRegressor(String module, String name){
 		super(module, name);

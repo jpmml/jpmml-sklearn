@@ -25,11 +25,11 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.HasDefaultValue;
 import sklearn.HasEstimatorEnsemble;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 
-public class GradientBoostingRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
+public class GradientBoostingRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
 	public GradientBoostingRegressor(String module, String name){
 		super(module, name);

@@ -29,11 +29,11 @@ import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiApplyField;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 
-public class ForestRegressor extends Regressor implements HasEstimatorEnsemble<TreeRegressor>, HasMultiApplyField, HasTreeOptions {
+public class ForestRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<TreeRegressor>, HasMultiApplyField, HasTreeOptions {
 
 	public ForestRegressor(String module, String name){
 		super(module, name);

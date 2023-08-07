@@ -30,9 +30,10 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 import sklearn.StepUtil;
 
-public class VotingRegressor extends Regressor implements HasEstimatorEnsemble<Regressor> {
+public class VotingRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<Regressor> {
 
 	public VotingRegressor(String module, String name){
 		super(module, name);

@@ -23,8 +23,9 @@ import java.util.List;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class RegressorChain extends Regressor {
+public class RegressorChain extends SkLearnRegressor {
 
 	public RegressorChain(String module, String name){
 		super(module, name);

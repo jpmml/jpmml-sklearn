@@ -26,9 +26,9 @@ import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.CMatrix;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class LibSVMRegressor extends Regressor {
+public class LibSVMRegressor extends SkLearnRegressor {
 
 	public LibSVMRegressor(String module, String name){
 		super(module, name);

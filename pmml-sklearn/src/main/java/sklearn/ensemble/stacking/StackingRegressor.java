@@ -32,9 +32,10 @@ import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 import sklearn.SkLearnMethods;
+import sklearn.SkLearnRegressor;
 import sklearn.StepUtil;
 
-public class StackingRegressor extends Regressor implements HasEstimatorEnsemble<Regressor> {
+public class StackingRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<Regressor> {
 
 	public StackingRegressor(String module, String name){
 		super(module, name);

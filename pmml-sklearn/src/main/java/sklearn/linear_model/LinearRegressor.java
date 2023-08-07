@@ -34,9 +34,9 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.ClassDictUtil;
-import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
-public class LinearRegressor extends Regressor {
+public class LinearRegressor extends SkLearnRegressor {
 
 	public LinearRegressor(String module, String name){
 		super(module, name);

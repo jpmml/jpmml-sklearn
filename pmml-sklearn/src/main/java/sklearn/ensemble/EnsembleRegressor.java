@@ -24,9 +24,10 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
+import sklearn.SkLearnRegressor;
 
 abstract
-public class EnsembleRegressor extends Regressor implements HasEstimatorEnsemble<Regressor> {
+public class EnsembleRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<Regressor> {
 
 	public EnsembleRegressor(String module, String name){
 		super(module, name);
