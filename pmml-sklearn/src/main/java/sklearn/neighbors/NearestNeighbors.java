@@ -25,9 +25,9 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.SliceUtil;
-import sklearn.Clusterer;
+import sklearn.SkLearnClusterer;
 
-public class NearestNeighbors extends Clusterer implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class NearestNeighbors extends SkLearnClusterer implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
 
 	public NearestNeighbors(String module, String name){
 		super(module, name);

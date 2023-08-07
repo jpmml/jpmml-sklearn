@@ -35,9 +35,9 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.clustering.ClusteringModelUtil;
-import sklearn.Clusterer;
+import sklearn.SkLearnClusterer;
 
-public class KMeans extends Clusterer {
+public class KMeans extends SkLearnClusterer {
 
 	public KMeans(String module, String name){
 		super(module, name);
