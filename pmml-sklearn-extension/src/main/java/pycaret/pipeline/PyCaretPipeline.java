@@ -102,8 +102,6 @@ public class PyCaretPipeline extends Pipeline implements Encodable {
 			encoder.setLabel(label);
 		}
 
-		encodeFeatures(Collections.emptyList(), encoder);
-
 		Schema schema = encoder.createSchema();
 
 		Model model = encodeModel(schema);
