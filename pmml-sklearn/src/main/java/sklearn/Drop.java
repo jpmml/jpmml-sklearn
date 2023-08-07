@@ -21,13 +21,25 @@ package sklearn;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class Drop extends MultiTransformer {
+public class Drop extends Transformer {
 
 	private Drop(){
 		super(null, "_drop");
+	}
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

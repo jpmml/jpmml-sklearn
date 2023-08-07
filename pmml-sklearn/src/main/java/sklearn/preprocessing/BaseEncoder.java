@@ -27,10 +27,10 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
-import sklearn.MultiTransformer;
+import sklearn.SkLearnTransformer;
 
 abstract
-public class BaseEncoder extends MultiTransformer {
+public class BaseEncoder extends SkLearnTransformer {
 
 	public BaseEncoder(String module, String name){
 		super(module, name);

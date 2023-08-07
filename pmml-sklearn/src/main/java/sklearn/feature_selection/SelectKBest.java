@@ -24,9 +24,8 @@ import java.util.List;
 
 import com.google.common.primitives.Booleans;
 import org.jpmml.converter.ValueUtil;
-import sklearn.Selector;
 
-public class SelectKBest extends Selector {
+public class SelectKBest extends SkLearnSelector {
 
 	public SelectKBest(String module, String name){
 		super(module, name);

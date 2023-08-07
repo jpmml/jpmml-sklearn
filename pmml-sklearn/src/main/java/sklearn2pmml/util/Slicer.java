@@ -20,15 +20,27 @@ package sklearn2pmml.util;
 
 import java.util.List;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.SliceUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
+import sklearn.Transformer;
 
-public class Slicer extends MultiTransformer {
+public class Slicer extends Transformer {
 
 	public Slicer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

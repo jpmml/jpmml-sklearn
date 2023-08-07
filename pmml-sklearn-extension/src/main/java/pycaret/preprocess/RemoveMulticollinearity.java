@@ -21,12 +21,13 @@ package pycaret.preprocess;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
+import sklearn.Transformer;
 
-public class RemoveMulticollinearity extends MultiTransformer {
+public class RemoveMulticollinearity extends Transformer {
 
 	public RemoveMulticollinearity(String module, String name){
 		super(module, name);
@@ -35,6 +36,11 @@ public class RemoveMulticollinearity extends MultiTransformer {
 	@Override
 	public OpType getOpType(){
 		return OpType.CONTINUOUS;
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

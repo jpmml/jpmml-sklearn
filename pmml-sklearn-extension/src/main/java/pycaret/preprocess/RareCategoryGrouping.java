@@ -22,13 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
+import sklearn.Transformer;
 import sklearn.preprocessing.EncoderUtil;
 
-public class RareCategoryGrouping extends MultiTransformer {
+public class RareCategoryGrouping extends Transformer {
 
 	public RareCategoryGrouping(String module, String name){
 		super(module, name);
@@ -37,6 +38,11 @@ public class RareCategoryGrouping extends MultiTransformer {
 	@Override
 	public OpType getOpType(){
 		return OpType.CATEGORICAL;
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

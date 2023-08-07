@@ -20,13 +20,15 @@ package sklearn2pmml.decoration;
 
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Field;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
+import sklearn.Transformer;
 
 abstract
-public class DomainEraser extends MultiTransformer {
+public class DomainEraser extends Transformer {
 
 	public DomainEraser(String module, String name){
 		super(module, name);
@@ -34,6 +36,16 @@ public class DomainEraser extends MultiTransformer {
 
 	abstract
 	public void clear(Field<?> field);
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){

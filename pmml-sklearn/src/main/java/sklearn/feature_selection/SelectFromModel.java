@@ -24,11 +24,10 @@ import java.util.List;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
-import sklearn.Selector;
 import sklearn2pmml.EstimatorProxy;
 import sklearn2pmml.SelectorProxy;
 
-public class SelectFromModel extends Selector implements HasEstimator<Estimator> {
+public class SelectFromModel extends SkLearnSelector implements HasEstimator<Estimator> {
 
 	public SelectFromModel(String module, String name){
 		super(module, name);

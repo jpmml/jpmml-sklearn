@@ -20,15 +20,27 @@ package sklearn2pmml.preprocessing.h2o;
 
 import java.util.List;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureList;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.MultiTransformer;
+import sklearn.Transformer;
 
-public class H2OFrameConstructor extends MultiTransformer {
+public class H2OFrameConstructor extends Transformer {
 
 	public H2OFrameConstructor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

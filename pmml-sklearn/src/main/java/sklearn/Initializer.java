@@ -20,11 +20,13 @@ package sklearn;
 
 import java.util.List;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Initializer extends MultiTransformer {
+public class Initializer extends Transformer {
 
 	public Initializer(String module, String name){
 		super(module, name);
@@ -32,6 +34,16 @@ public class Initializer extends MultiTransformer {
 
 	abstract
 	public List<Feature> initializeFeatures(SkLearnEncoder encoder);
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public int getNumberOfFeatures(){

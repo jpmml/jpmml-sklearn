@@ -21,12 +21,14 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Selector extends MultiTransformer {
+public class Selector extends Transformer {
 
 	public Selector(String module, String name){
 		super(module, name);
@@ -34,6 +36,16 @@ public class Selector extends MultiTransformer {
 
 	abstract
 	public List<Boolean> getSupportMask();
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
