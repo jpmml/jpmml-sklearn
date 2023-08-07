@@ -24,9 +24,9 @@ import org.jpmml.python.ClassDictUtil;
 import sklearn.Selector;
 import sklearn2pmml.SelectorProxy;
 
-public class PySelector extends Selector {
+public class SkLearnSelector extends Selector {
 
-	public PySelector(String module, String name){
+	public SkLearnSelector(String module, String name){
 		super(module, name);
 	}
 
