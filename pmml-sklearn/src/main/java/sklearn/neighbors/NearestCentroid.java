@@ -26,9 +26,9 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.SliceUtil;
-import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class NearestCentroid extends Classifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class NearestCentroid extends SkLearnClassifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
 
 	public NearestCentroid(String module, String name){
 		super(module, name);

@@ -24,9 +24,9 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
-import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class KNeighborsClassifier extends Classifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
 
 	public KNeighborsClassifier(String module, String name){
 		super(module, name);

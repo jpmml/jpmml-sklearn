@@ -35,10 +35,10 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.SkLearnClassifier;
 
-public class LinearClassifier extends Classifier {
+public class LinearClassifier extends SkLearnClassifier {
 
 	public LinearClassifier(String module, String name){
 		super(module, name);

@@ -26,9 +26,9 @@ import org.dmg.pmml.neural_network.NeuralNetwork;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.HasArray;
-import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class MLPClassifier extends Classifier {
+public class MLPClassifier extends SkLearnClassifier {
 
 	public MLPClassifier(String module, String name){
 		super(module, name);

@@ -28,13 +28,13 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
-import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiApplyField;
+import sklearn.SkLearnClassifier;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeClassifier;
 
-public class ForestClassifier extends Classifier implements HasEstimatorEnsemble<TreeClassifier>, HasMultiApplyField, HasTreeOptions {
+public class ForestClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<TreeClassifier>, HasMultiApplyField, HasTreeOptions {
 
 	public ForestClassifier(String module, String name){
 		super(module, name);

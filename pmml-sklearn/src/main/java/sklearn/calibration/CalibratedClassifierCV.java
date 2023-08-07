@@ -30,9 +30,9 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class CalibratedClassifierCV extends Classifier {
+public class CalibratedClassifierCV extends SkLearnClassifier {
 
 	public CalibratedClassifierCV(String module, String name){
 		super(module, name);

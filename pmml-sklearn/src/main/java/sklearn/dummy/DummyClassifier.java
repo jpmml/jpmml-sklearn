@@ -32,10 +32,10 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.python.ClassDictUtil;
-import sklearn.Classifier;
 import sklearn.HasPriorProbability;
+import sklearn.SkLearnClassifier;
 
-public class DummyClassifier extends Classifier implements HasPriorProbability {
+public class DummyClassifier extends SkLearnClassifier implements HasPriorProbability {
 
 	public DummyClassifier(){
 		this("sklearn.dummy", "DummyClassifier");

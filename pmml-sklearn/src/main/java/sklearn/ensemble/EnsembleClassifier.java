@@ -24,9 +24,10 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.SkLearnClassifier;
 
 abstract
-public class EnsembleClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
+public class EnsembleClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
 
 	public EnsembleClassifier(String module, String name){
 		super(module, name);

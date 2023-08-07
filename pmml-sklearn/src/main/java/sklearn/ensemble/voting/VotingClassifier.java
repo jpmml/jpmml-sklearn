@@ -32,9 +32,10 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.SkLearnClassifier;
 import sklearn.StepUtil;
 
-public class VotingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
+public class VotingClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
 
 	public VotingClassifier(String module, String name){
 		super(module, name);

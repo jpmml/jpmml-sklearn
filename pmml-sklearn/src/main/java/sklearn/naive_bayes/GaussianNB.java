@@ -38,9 +38,9 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
-import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class GaussianNB extends Classifier {
+public class GaussianNB extends SkLearnClassifier {
 
 	public GaussianNB(String module, String name){
 		super(module, name);

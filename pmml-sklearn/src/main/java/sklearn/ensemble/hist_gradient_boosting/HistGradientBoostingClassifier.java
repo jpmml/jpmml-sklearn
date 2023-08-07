@@ -34,12 +34,12 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
-import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.SkLearnClassifier;
 import sklearn.loss.HalfBinomialLoss;
 import sklearn.loss.HalfMultinomialLoss;
 
-public class HistGradientBoostingClassifier extends Classifier {
+public class HistGradientBoostingClassifier extends SkLearnClassifier {
 
 	public HistGradientBoostingClassifier(String module, String name){
 		super(module, name);

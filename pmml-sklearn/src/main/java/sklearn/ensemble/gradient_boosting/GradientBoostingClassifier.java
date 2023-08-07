@@ -34,16 +34,16 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
-import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasPriorProbability;
+import sklearn.SkLearnClassifier;
 import sklearn.VersionUtil;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn2pmml.EstimatorProxy;
 
-public class GradientBoostingClassifier extends Classifier implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
+public class GradientBoostingClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
 	public GradientBoostingClassifier(String module, String name){
 		super(module, name);

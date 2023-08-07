@@ -26,9 +26,9 @@ import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
 import org.jpmml.converter.CMatrix;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
-import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class LibSVMClassifier extends Classifier {
+public class LibSVMClassifier extends SkLearnClassifier {
 
 	public LibSVMClassifier(String module, String name){
 		super(module, name);

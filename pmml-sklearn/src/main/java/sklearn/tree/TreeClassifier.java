@@ -24,10 +24,10 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.FieldNames;
-import sklearn.Classifier;
 import sklearn.HasApplyField;
+import sklearn.SkLearnClassifier;
 
-public class TreeClassifier extends Classifier implements HasApplyField, HasTree, HasTreeOptions {
+public class TreeClassifier extends SkLearnClassifier implements HasApplyField, HasTree, HasTreeOptions {
 
 	public TreeClassifier(String module, String name){
 		super(module, name);

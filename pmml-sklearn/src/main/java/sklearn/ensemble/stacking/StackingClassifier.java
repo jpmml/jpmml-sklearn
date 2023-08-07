@@ -31,10 +31,11 @@ import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.SkLearnClassifier;
 import sklearn.SkLearnMethods;
 import sklearn.StepUtil;
 
-public class StackingClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
+public class StackingClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
 
 	public StackingClassifier(String module, String name){
 		super(module, name);

@@ -51,9 +51,10 @@ import sklearn.Calibrator;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasEstimator;
+import sklearn.SkLearnClassifier;
 import sklearn.linear_model.LinearClassifier;
 
-public class CalibratedClassifier extends Classifier implements HasEstimator<Classifier> {
+public class CalibratedClassifier extends SkLearnClassifier implements HasEstimator<Classifier> {
 
 	public CalibratedClassifier(String module, String name){
 		super(module, name);

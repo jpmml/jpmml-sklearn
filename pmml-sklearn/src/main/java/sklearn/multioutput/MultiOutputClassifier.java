@@ -23,8 +23,9 @@ import java.util.List;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class MultiOutputClassifier extends Classifier {
+public class MultiOutputClassifier extends SkLearnClassifier {
 
 	public MultiOutputClassifier(String module, String name){
 		super(module, name);

@@ -37,9 +37,10 @@ import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasNumberOfFeatures;
+import sklearn.SkLearnClassifier;
 import sklearn.StepUtil;
 
-public class OneVsRestClassifier extends Classifier implements HasEstimatorEnsemble<Classifier> {
+public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
 
 	public OneVsRestClassifier(String module, String name){
 		super(module, name);

@@ -23,8 +23,9 @@ import java.util.List;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.SkLearnClassifier;
 
-public class ClassifierChain extends Classifier {
+public class ClassifierChain extends SkLearnClassifier {
 
 	public ClassifierChain(String module, String name){
 		super(module, name);
