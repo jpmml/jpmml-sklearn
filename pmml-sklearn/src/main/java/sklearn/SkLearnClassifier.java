@@ -18,10 +18,17 @@
  */
 package sklearn;
 
+import java.util.List;
+
 abstract
-public class SkLearnClassifier extends Classifier {
+public class SkLearnClassifier extends Classifier implements HasFeatureNamesIn {
 
 	public SkLearnClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+		return getSkLearnFeatureNamesIn();
 	}
 }

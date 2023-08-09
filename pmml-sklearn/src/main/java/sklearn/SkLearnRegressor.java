@@ -18,10 +18,17 @@
  */
 package sklearn;
 
+import java.util.List;
+
 abstract
-public class SkLearnRegressor extends Regressor {
+public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn {
 
 	public SkLearnRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+		return getSkLearnFeatureNamesIn();
 	}
 }

@@ -18,11 +18,13 @@
  */
 package sklearn;
 
+import java.util.List;
+
 import org.jpmml.python.PythonObject;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
-public class Step extends PythonObject implements HasFeatureNamesIn, HasNumberOfFeatures, HasType {
+public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public Step(String module, String name){
 		super(module, name);
@@ -47,6 +49,15 @@ public class Step extends PythonObject implements HasFeatureNamesIn, HasNumberOf
 		put(SkLearn2PMMLFields.PMML_NAME, name);
 
 		return this;
+	}
+
+	public List<String> getSkLearnFeatureNamesIn(){
+
+		if(containsKey(SkLearnFields.FEATURE_NAMES_IN)){
+			return (List<String>)getArray(SkLearnFields.FEATURE_NAMES_IN, String.class);
+		}
+
+		return null;
 	}
 
 	public String getSkLearnVersion(){

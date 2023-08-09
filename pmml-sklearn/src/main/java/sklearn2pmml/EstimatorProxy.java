@@ -34,9 +34,10 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimator;
+import sklearn.HasFeatureNamesIn;
 import sklearn.Proxy;
 
-public class EstimatorProxy extends Estimator implements HasClasses, HasEstimator<Estimator>, Proxy {
+public class EstimatorProxy extends Estimator implements HasClasses, HasEstimator<Estimator>, HasFeatureNamesIn, Proxy {
 
 	public EstimatorProxy(){
 		super("sklearn2pmml", "EstimatorProxy");
@@ -50,7 +51,7 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	public List<String> getFeatureNamesIn(){
 		Estimator estimator = getEstimator();
 
-		return estimator.getFeatureNamesIn();
+		return estimator.getSkLearnFeatureNamesIn();
 	}
 
 	@Override

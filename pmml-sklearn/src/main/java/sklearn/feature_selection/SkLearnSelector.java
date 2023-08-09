@@ -21,13 +21,19 @@ package sklearn.feature_selection;
 import java.util.List;
 
 import org.jpmml.python.ClassDictUtil;
+import sklearn.HasFeatureNamesIn;
 import sklearn.Selector;
 import sklearn2pmml.SelectorProxy;
 
-public class SkLearnSelector extends Selector {
+public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 
 	public SkLearnSelector(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+		return getSkLearnFeatureNamesIn();
 	}
 
 	@Override

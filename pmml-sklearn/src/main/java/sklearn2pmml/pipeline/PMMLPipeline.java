@@ -77,6 +77,7 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClassifierOptions;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.HasFeatureNamesIn;
 import sklearn.HasNumberOfFeatures;
 import sklearn.HasNumberOfOutputs;
 import sklearn.Initializer;
@@ -527,11 +528,15 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 	}
 
 	private List<String> initActiveFields(Step step){
-		List<String> featureNamesIn = step.getFeatureNamesIn();
 		int numberOfFeatures = step.getNumberOfFeatures();
 
-		if(featureNamesIn != null){
-			return featureNamesIn;
+		if(step instanceof HasFeatureNamesIn){
+			HasFeatureNamesIn hasFeatureNamesIn = (HasFeatureNamesIn)step;
+
+			List<String> featureNamesIn = hasFeatureNamesIn.getFeatureNamesIn();
+			if(featureNamesIn != null){
+				return featureNamesIn;
+			}
 		} // End if
 
 		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){

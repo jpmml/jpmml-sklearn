@@ -25,11 +25,12 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.HasFeatureNamesIn;
 import sklearn.HasHead;
 import sklearn.Proxy;
 import sklearn.Transformer;
 
-public class PipelineClassifier extends Classifier implements HasHead, Proxy {
+public class PipelineClassifier extends Classifier implements HasFeatureNamesIn, HasHead, Proxy {
 
 	private Pipeline pipeline = null;
 

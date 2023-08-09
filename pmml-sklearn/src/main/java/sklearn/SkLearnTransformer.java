@@ -18,10 +18,17 @@
  */
 package sklearn;
 
+import java.util.List;
+
 abstract
-public class SkLearnTransformer extends Transformer {
+public class SkLearnTransformer extends Transformer implements HasFeatureNamesIn {
 
 	public SkLearnTransformer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+		return getSkLearnFeatureNamesIn();
 	}
 }

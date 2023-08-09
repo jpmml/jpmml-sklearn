@@ -31,6 +31,7 @@ import sklearn.Classifier;
 import sklearn.Clusterer;
 import sklearn.Composite;
 import sklearn.Estimator;
+import sklearn.HasFeatureNamesIn;
 import sklearn.HasHead;
 import sklearn.HasPMMLOptions;
 import sklearn.PassThrough;
@@ -38,7 +39,7 @@ import sklearn.Regressor;
 import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 
-public class Pipeline extends Composite implements Castable, HasHead, HasPMMLOptions<Pipeline> {
+public class Pipeline extends Composite implements Castable, HasFeatureNamesIn, HasHead, HasPMMLOptions<Pipeline> {
 
 	public Pipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -174,6 +175,26 @@ public class Pipeline extends Composite implements Castable, HasHead, HasPMMLOpt
 		}
 
 		return this;
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+
+		if(hasTransformers()){
+			List<? extends Transformer> transformers = getTransformers();
+
+			for(Transformer transformer : transformers){
+				return transformer.getSkLearnFeatureNamesIn();
+			}
+		} // End if
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			return estimator.getSkLearnFeatureNamesIn();
+		}
+
+		return null;
 	}
 
 	@Override

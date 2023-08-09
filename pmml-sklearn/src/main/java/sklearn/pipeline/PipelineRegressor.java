@@ -24,12 +24,13 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
+import sklearn.HasFeatureNamesIn;
 import sklearn.HasHead;
 import sklearn.Proxy;
 import sklearn.Regressor;
 import sklearn.Transformer;
 
-public class PipelineRegressor extends Regressor implements HasHead, Proxy {
+public class PipelineRegressor extends Regressor implements HasFeatureNamesIn, HasHead, Proxy {
 
 	private Pipeline pipeline = null;
 

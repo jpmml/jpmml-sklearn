@@ -25,11 +25,12 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 import sklearn.Clusterer;
+import sklearn.HasFeatureNamesIn;
 import sklearn.HasHead;
 import sklearn.Proxy;
 import sklearn.Transformer;
 
-public class PipelineClusterer extends Clusterer implements HasHead, Proxy {
+public class PipelineClusterer extends Clusterer implements HasFeatureNamesIn, HasHead, Proxy {
 
 	private Pipeline pipeline = null;
 
