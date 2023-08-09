@@ -542,7 +542,7 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 
 		List<?> values = categoricalLabel.getValues();
 		for(Object value : values){
-			probabilityFields.add("probability(" + value + ")"); // XXX
+			probabilityFields.add(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value));
 		}
 
 		return probabilityFields;
