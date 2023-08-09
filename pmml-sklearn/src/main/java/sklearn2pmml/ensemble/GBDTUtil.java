@@ -34,7 +34,6 @@ import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
@@ -44,6 +43,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.preprocessing.MultiOneHotEncoder;
 
 public class GBDTUtil {
@@ -53,25 +53,7 @@ public class GBDTUtil {
 
 	static
 	public MiningModel encodeModel(Estimator gbdt, MultiOneHotEncoder ohe, List<? extends Number> coef, Number intercept, Schema schema){
-		Model model;
-
-		if(gbdt instanceof HasNativeConfiguration){
-			HasNativeConfiguration hasNativeConfiguration = (HasNativeConfiguration)gbdt;
-
-			Map<String, ?> prevPmmlOptions = gbdt.getPMMLOptions();
-
-			try {
-				gbdt.setPMMLOptions(hasNativeConfiguration.getNativeConfiguration());
-
-				model = gbdt.encode(schema);
-			} finally {
-				gbdt.setPMMLOptions(prevPmmlOptions);
-			}
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
+		Model model = EstimatorUtil.encodeNativeLike(gbdt, schema);
 
 		List<TreeModel> treeModels = new ArrayList<>();
 

@@ -199,7 +199,15 @@ public class EstimatorUtil {
 
 		Schema schema = encoder.createSchema();
 
-		Model model;
+		Model model = encodeNativeLike(estimator, schema);
+
+		encoder.setModel(model);
+
+		return encoder.encodePMML(model);
+	}
+
+	static
+	public Model encodeNativeLike(Estimator estimator, Schema schema){
 
 		if(estimator instanceof HasNativeConfiguration){
 			HasNativeConfiguration hasNativeConfiguration = (HasNativeConfiguration)estimator;
@@ -209,18 +217,14 @@ public class EstimatorUtil {
 			try {
 				estimator.setPMMLOptions(hasNativeConfiguration.getNativeConfiguration());
 
-				model = estimator.encode(schema);
+				return estimator.encode(schema);
 			} finally {
 				estimator.setPMMLOptions(prevPmmlOptions);
 			}
 		} else
 
 		{
-			model = estimator.encode(schema);
+			return estimator.encode(schema);
 		}
-
-		encoder.setModel(model);
-
-		return encoder.encodePMML(model);
 	}
 }
