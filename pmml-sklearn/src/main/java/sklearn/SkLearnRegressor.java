@@ -20,8 +20,12 @@ package sklearn;
 
 import java.util.List;
 
+import org.dmg.pmml.PMML;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.HasSkLearnOptions;
+
 abstract
-public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn {
+public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn, HasSkLearnOptions, Encodable {
 
 	public SkLearnRegressor(String module, String name){
 		super(module, name);
@@ -30,5 +34,10 @@ public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn {
 	@Override
 	public List<String> getFeatureNamesIn(){
 		return getSkLearnFeatureNamesIn();
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return EstimatorUtil.encodePMML(this);
 	}
 }

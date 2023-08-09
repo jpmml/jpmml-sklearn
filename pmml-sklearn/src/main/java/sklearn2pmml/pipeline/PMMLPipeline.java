@@ -565,12 +565,12 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 	}
 
 	static
-	private Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
+	public Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
 		return estimator.encodeLabel(targetFields, encoder);
 	}
 
 	static
-	private List<Feature> initFeatures(Step step, List<String> activeFields, SkLearnEncoder encoder){
+	public List<Feature> initFeatures(Step step, List<String> activeFields, SkLearnEncoder encoder){
 		List<Feature> result = new ArrayList<>();
 
 		OpType opType = step.getOpType();

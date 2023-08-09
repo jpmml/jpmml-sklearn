@@ -20,6 +20,7 @@ package sklearn;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,12 +30,17 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.HasNativeConfiguration;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class EstimatorUtil {
 
@@ -172,5 +178,49 @@ public class EstimatorUtil {
 			default:
 				throw new IllegalArgumentException(predictFunc);
 		}
+	}
+
+	static
+	public <E extends Estimator & HasFeatureNamesIn & HasSkLearnOptions> PMML encodePMML(E estimator){
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
+		if(estimator.isSupervised()){
+			Label label = PMMLPipeline.initLabel(estimator, Collections.singletonList("_label"), encoder);
+
+			if(label != null){
+				encoder.setLabel(label);
+			}
+		}
+
+		List<Feature> features = PMMLPipeline.initFeatures(estimator, estimator.getFeatureNamesIn(), encoder);
+		if(features != null){
+			encoder.setFeatures(features);
+		}
+
+		Schema schema = encoder.createSchema();
+
+		Model model;
+
+		if(estimator instanceof HasNativeConfiguration){
+			HasNativeConfiguration hasNativeConfiguration = (HasNativeConfiguration)estimator;
+
+			Map<String, ?> prevPmmlOptions = estimator.getPMMLOptions();
+
+			try {
+				estimator.setPMMLOptions(hasNativeConfiguration.getNativeConfiguration());
+
+				model = estimator.encode(schema);
+			} finally {
+				estimator.setPMMLOptions(prevPmmlOptions);
+			}
+		} else
+
+		{
+			model = estimator.encode(schema);
+		}
+
+		encoder.setModel(model);
+
+		return encoder.encodePMML(model);
 	}
 }
