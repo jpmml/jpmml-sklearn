@@ -19,6 +19,7 @@
 package sklearn2pmml.ensemble;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
@@ -38,6 +40,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
@@ -101,6 +104,39 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 			}
 
 			return result;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		List<? extends Estimator> estimators = getEstimators();
+
+		ClassDictUtil.checkSize(names, estimators);
+
+		if(names.size() == 1){
+			String name = names.get(0);
+			Estimator estimator = estimators.get(0);
+
+			return estimator.encodeLabel(Collections.singletonList(name), encoder);
+		} else
+
+		if(names.size() >= 2){
+			List<Label> labels = new ArrayList<>();
+
+			for(int i = 0; i < names.size(); i++){
+				String name = names.get(i);
+				Estimator estimator = estimators.get(i);
+
+				ScalarLabel label = (ScalarLabel)estimator.encodeLabel(Collections.singletonList(name), encoder);
+
+				labels.add(label);
+			}
+
+			return new MultiLabel(labels);
 		} else
 
 		{

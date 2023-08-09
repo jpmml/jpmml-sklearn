@@ -39,7 +39,6 @@ import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn.pipeline.Pipeline;
-import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class PyCaretPipeline extends Pipeline implements Encodable {
 
@@ -97,7 +96,7 @@ public class PyCaretPipeline extends Pipeline implements Encodable {
 
 		String targetName = transformer.getTargetName();
 		if(targetName != null){
-			Label label = PMMLPipeline.initLabel(estimator, Collections.singletonList(targetName), encoder);
+			Label label = estimator.encodeLabel(Collections.singletonList(targetName), encoder);
 
 			encoder.setLabel(label);
 		}

@@ -29,43 +29,33 @@ import java.util.Map;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
-import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Header;
 import org.dmg.pmml.MiningBuildTask;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.ResultFeature;
-import org.dmg.pmml.Value;
 import org.dmg.pmml.VerificationField;
-import org.dmg.pmml.Visitor;
-import org.dmg.pmml.VisitorAction;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.converter.visitors.AbstractExtender;
-import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.Encodable;
@@ -74,9 +64,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
-import sklearn.HasClassifierOptions;
-import sklearn.HasEstimatorEnsemble;
 import sklearn.HasFeatureNamesIn;
 import sklearn.HasNumberOfFeatures;
 import sklearn.HasNumberOfOutputs;
@@ -158,7 +145,7 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 						activeFields = initActiveFields(transformer);
 					}
 
-					features = initFeatures(transformer, activeFields, transformer.getOpType(), transformer.getDataType(), encoder);
+					features = initFeatures(transformer, activeFields, encoder);
 				}
 
 				features = super.encodeFeatures(features, encoder);
@@ -170,7 +157,7 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 					activeFields = initActiveFields(estimator);
 				}
 
-				features = initFeatures(estimator, activeFields, estimator.getOpType(), estimator.getDataType(), encoder);
+				features = initFeatures(estimator, activeFields, encoder);
 			}
 
 			encoder.setFeatures(features);
@@ -578,144 +565,16 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 	}
 
 	static
-	public Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
-		List<Label> labels = new ArrayList<>();
-
-		MiningFunction miningFunction = estimator.getMiningFunction();
-		switch(miningFunction){
-			case CLASSIFICATION:
-				{
-					List<?> categories = EstimatorUtil.getClasses(estimator);
-					Map<String, Map<String, ?>> classExtensions = (Map)estimator.getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
-
-					// XXX
-					if(classExtensions != null){
-						ClassDictUtil.checkSize(1, targetFields);
-					}
-
-					for(int i = 0; i < targetFields.size(); i++){
-						String targetField = targetFields.get(i);
-
-						List<?> targetCategories;
-
-						if(targetFields.size() == 1){
-							targetCategories = categories;
-						} else
-
-						if(targetFields.size() >= 2){
-							CastFunction<List<?>> castFunction = new CastFunction<List<?>>((Class)List.class){
-
-								@Override
-								public String formatMessage(Object object){
-									return "The categories object of the \'" + targetField + "\' target field (" + ClassDictUtil.formatClass(object) + ") is not supported";
-								}
-							};
-
-							targetCategories = castFunction.apply(categories.get(i));
-						} else
-
-						{
-							throw new IllegalArgumentException();
-						}
-
-						labels.add(initCategoricalLabel(targetField, targetCategories, classExtensions, encoder));
-					}
-				}
-				break;
-			case REGRESSION:
-				{
-					for(int i = 0; i < targetFields.size(); i++){
-						String targetField = targetFields.get(i);
-
-						labels.add(initContinuousLabel(targetField, encoder));
-					}
-				}
-				break;
-			case MIXED:
-				{
-					HasEstimatorEnsemble<?> hasEstimatorEnsemble = (HasEstimatorEnsemble<?>)estimator;
-
-					List<? extends Estimator> estimators = hasEstimatorEnsemble.getEstimators();
-
-					ClassDictUtil.checkSize(targetFields, estimators);
-
-					for(int i = 0; i < targetFields.size(); i++){
-						String targetField = targetFields.get(i);
-
-						labels.add((ScalarLabel)initLabel(estimators.get(i), Collections.singletonList(targetField), encoder));
-					}
-				}
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
-
-		if(labels.size() == 1){
-			return labels.get(0);
-		} else
-
-		if(labels.size() >= 2){
-			return new MultiLabel(labels);
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
+	private Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
+		return estimator.encodeLabel(targetFields, encoder);
 	}
 
 	static
-	private CategoricalLabel initCategoricalLabel(String targetField, List<?> categories, Map<String, Map<String, ?>> classExtensions, SkLearnEncoder encoder){
-		DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
-
-		DataField dataField = encoder.createDataField(targetField, OpType.CATEGORICAL, dataType, categories);
-
-		List<Visitor> visitors = new ArrayList<>();
-
-		if(classExtensions != null){
-			Collection<? extends Map.Entry<String, Map<String, ?>>> entries = classExtensions.entrySet();
-
-			for(Map.Entry<String, Map<String, ?>> entry : entries){
-				String name = entry.getKey();
-
-				Map<String, ?> values = entry.getValue();
-
-				Visitor valueExtender = new AbstractExtender(name){
-
-					@Override
-					public VisitorAction visit(Value pmmlValue){
-						Object value = values.get(pmmlValue.requireValue());
-
-						if(value != null){
-							value = ScalarUtil.decode(value);
-
-							addExtension(pmmlValue, ValueUtil.asString(value));
-						}
-
-						return super.visit(pmmlValue);
-					}
-				};
-
-				visitors.add(valueExtender);
-			}
-		}
-
-		for(Visitor visitor : visitors){
-			visitor.applyTo(dataField);
-		}
-
-		return new CategoricalLabel(dataField);
-	}
-
-	static
-	private ContinuousLabel initContinuousLabel(String targetField, SkLearnEncoder encoder){
-		DataField dataField = encoder.createDataField(targetField, OpType.CONTINUOUS, DataType.DOUBLE);
-
-		return new ContinuousLabel(dataField);
-	}
-
-	static
-	private List<Feature> initFeatures(Step step, List<String> activeFields, OpType opType, DataType dataType, SkLearnEncoder encoder){
+	private List<Feature> initFeatures(Step step, List<String> activeFields, SkLearnEncoder encoder){
 		List<Feature> result = new ArrayList<>();
+
+		OpType opType = step.getOpType();
+		DataType dataType = step.getDataType();
 
 		for(String activeField : activeFields){
 			DataField dataField = encoder.createDataField(activeField, opType, dataType);

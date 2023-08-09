@@ -61,25 +61,11 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 		return EstimatorUtil.getClasses(estimator);
 	}
 
-	public Schema augmentSchema(Model model, Schema schema){
-		List<String> augmentFuncs = getAugmentFuncs();
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
-		if(augmentFuncs.isEmpty()){
-			return schema;
-		}
-
-		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-		Label label = schema.getLabel();
-		List<? extends Feature> features = schema.getFeatures();
-
-		List<Feature> augmentedFeatures = new ArrayList<>(features);
-
-		for(String augmentFunc : augmentFuncs){
-			augmentedFeatures.addAll(EstimatorUtil.export(estimator, augmentFunc, schema, model, encoder));
-		}
-
-		return new Schema(encoder, label, augmentedFeatures);
+		return estimator.encodeLabel(names, encoder);
 	}
 
 	@Override
@@ -107,6 +93,28 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 
 		return estimator.encodeModel(schema);
 	}
+
+	public Schema augmentSchema(Model model, Schema schema){
+		List<String> augmentFuncs = getAugmentFuncs();
+		Estimator estimator = getEstimator();
+
+		if(augmentFuncs.isEmpty()){
+			return schema;
+		}
+
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
+		Label label = schema.getLabel();
+		List<? extends Feature> features = schema.getFeatures();
+
+		List<Feature> augmentedFeatures = new ArrayList<>(features);
+
+		for(String augmentFunc : augmentFuncs){
+			augmentedFeatures.addAll(EstimatorUtil.export(estimator, augmentFunc, schema, model, encoder));
+		}
+
+		return new Schema(encoder, label, augmentedFeatures);
+	}
+
 
 	public List<String> getAugmentFuncs(){
 		return getList("augment_funcs", String.class);

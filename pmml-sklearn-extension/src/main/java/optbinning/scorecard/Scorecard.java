@@ -24,13 +24,16 @@ import java.util.stream.Collectors;
 import numpy.DTypeUtil;
 import optbinning.BinnedFeature;
 import optbinning.BinningProcess;
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.scorecard.Attribute;
 import org.dmg.pmml.scorecard.Characteristic;
 import org.dmg.pmml.scorecard.Characteristics;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
@@ -72,6 +75,24 @@ public class Scorecard extends Estimator implements HasClasses {
 		}
 
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		Estimator estimator = getEstimator();
+		String scalingMethod = getScalingMethod();
+
+		if(names.size() != 1){
+			throw new IllegalArgumentException();
+		} // End if
+
+		if(scalingMethod != null){
+			DataField dataField = encoder.createDataField(names.get(0), OpType.CONTINUOUS, DataType.DOUBLE);
+
+			return new ContinuousLabel(dataField);
+		}
+
+		return estimator.encodeLabel(names, encoder);
 	}
 
 	@Override

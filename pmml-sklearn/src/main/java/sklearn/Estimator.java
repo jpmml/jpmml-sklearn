@@ -40,6 +40,7 @@ import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -53,6 +54,9 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 	abstract
 	public MiningFunction getMiningFunction();
+
+	abstract
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder);
 
 	abstract
 	public Model encodeModel(Schema schema);

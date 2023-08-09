@@ -18,7 +18,18 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.OpType;
+import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.Label;
+import org.jpmml.converter.MultiLabel;
+import org.jpmml.converter.ScalarLabel;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
 public class Regressor extends Estimator {
@@ -30,5 +41,35 @@ public class Regressor extends Estimator {
 	@Override
 	public MiningFunction getMiningFunction(){
 		return MiningFunction.REGRESSION;
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+
+		if(names.size() == 1){
+			return encodeLabel(names.get(0), encoder);
+		} else
+
+		if(names.size() >= 2){
+			List<Label> labels = new ArrayList<>();
+
+			for(String name : names){
+				Label label = encodeLabel(name, encoder);
+
+				labels.add(label);
+			}
+
+			return new MultiLabel(labels);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	protected ScalarLabel encodeLabel(String name, SkLearnEncoder encoder){
+		DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
+
+		return new ContinuousLabel(dataField);
 	}
 }

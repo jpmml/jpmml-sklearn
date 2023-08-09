@@ -18,7 +18,11 @@
  */
 package sklearn;
 
+import java.util.List;
+
 import org.dmg.pmml.MiningFunction;
+import org.jpmml.converter.Label;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
 public class Clusterer extends Estimator implements HasPredictField {
@@ -30,6 +34,11 @@ public class Clusterer extends Estimator implements HasPredictField {
 	@Override
 	public MiningFunction getMiningFunction(){
 		return MiningFunction.CLUSTERING;
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		return null;
 	}
 
 	@Override

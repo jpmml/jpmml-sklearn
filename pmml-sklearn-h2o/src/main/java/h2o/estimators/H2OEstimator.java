@@ -26,20 +26,26 @@ import java.util.Arrays;
 import java.util.List;
 
 import hex.genmodel.MojoModel;
+import org.dmg.pmml.DataField;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureList;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.h2o.Converter;
 import org.jpmml.h2o.ConverterFactory;
 import org.jpmml.h2o.H2OEncoder;
 import org.jpmml.h2o.MojoModelUtil;
 import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.HasClasses;
 
@@ -91,6 +97,38 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 			default:
 				throw new IllegalArgumentException(estimatorType);
 		}
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		String estimatorType = getEstimatorType();
+
+		if(names.size() != 1){
+			throw new IllegalArgumentException();
+		}
+
+		DataField dataField;
+
+		switch(estimatorType){
+			case "classifier":
+				{
+					List<?> categories = getClasses();
+
+					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
+
+					dataField = encoder.createDataField(names.get(0), OpType.CATEGORICAL, dataType, categories);
+				}
+				break;
+			case "regressor":
+				{
+					dataField = encoder.createDataField(names.get(0), OpType.CONTINUOUS, DataType.DOUBLE);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException(estimatorType);
+		}
+
+		return ScalarLabelUtil.createScalarLabel(dataField);
 	}
 
 	@Override

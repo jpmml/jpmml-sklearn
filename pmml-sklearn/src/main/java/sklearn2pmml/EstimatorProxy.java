@@ -30,6 +30,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
@@ -108,6 +109,13 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		Estimator estimator = getEstimator();
 
 		return EstimatorUtil.getClasses(estimator);
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		Estimator estimator = getEstimator();
+
+		return estimator.encodeLabel(names, encoder);
 	}
 
 	@Override
