@@ -38,6 +38,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.BlockManager;
@@ -82,9 +83,7 @@ public class Scorecard extends Estimator implements HasClasses {
 		Estimator estimator = getEstimator();
 		String scalingMethod = getScalingMethod();
 
-		if(names.size() != 1){
-			throw new IllegalArgumentException();
-		} // End if
+		ClassDictUtil.checkSize(1, names);
 
 		if(scalingMethod != null){
 			DataField dataField = encoder.createDataField(names.get(0), OpType.CONTINUOUS, DataType.DOUBLE);

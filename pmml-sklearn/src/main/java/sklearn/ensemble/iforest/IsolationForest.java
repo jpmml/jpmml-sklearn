@@ -35,6 +35,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
@@ -47,6 +48,7 @@ import org.jpmml.converter.transformations.AbstractTransformation;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
@@ -67,6 +69,11 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	@Override
 	public boolean isSupervised(){
 		return false;
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

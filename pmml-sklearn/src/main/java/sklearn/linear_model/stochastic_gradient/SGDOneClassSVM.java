@@ -22,8 +22,10 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 import sklearn.SkLearnRegressor;
@@ -37,6 +39,11 @@ public class SGDOneClassSVM extends SkLearnRegressor implements OutlierDetector 
 	@Override
 	public boolean isSupervised(){
 		return false;
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

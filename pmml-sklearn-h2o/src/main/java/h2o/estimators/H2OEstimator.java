@@ -44,6 +44,7 @@ import org.jpmml.h2o.Converter;
 import org.jpmml.h2o.ConverterFactory;
 import org.jpmml.h2o.H2OEncoder;
 import org.jpmml.h2o.MojoModelUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
@@ -103,9 +104,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		String estimatorType = getEstimatorType();
 
-		if(names.size() != 1){
-			throw new IllegalArgumentException();
-		}
+		ClassDictUtil.checkSize(1, names);
 
 		DataField dataField;
 

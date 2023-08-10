@@ -18,8 +18,12 @@
  */
 package sklearn.svm;
 
+import java.util.List;
+
 import org.dmg.pmml.support_vector_machine.SupportVectorMachineModel;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 
@@ -32,6 +36,11 @@ public class OneClassSVM extends LibSVMRegressor implements OutlierDetector {
 	@Override
 	public boolean isSupervised(){
 		return false;
+	}
+
+	@Override
+	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

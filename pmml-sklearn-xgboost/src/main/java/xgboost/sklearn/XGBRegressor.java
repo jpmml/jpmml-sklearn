@@ -18,12 +18,17 @@
  */
 package xgboost.sklearn;
 
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
 import org.jpmml.xgboost.Regression;
@@ -54,6 +59,13 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 		if((objFunction != null) && !(objFunction instanceof Regression)){
 			throw new IllegalArgumentException("Expected a regression-type objective function, got '" + objFunction.getName() + "'");
 		}
+	}
+
+	@Override
+	protected ScalarLabel encodeLabel(String name, SkLearnEncoder encoder){
+		DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.FLOAT);
+
+		return new ContinuousLabel(dataField);
 	}
 
 	@Override
