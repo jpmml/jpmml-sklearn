@@ -190,7 +190,7 @@ public class EstimatorUtil {
 		encoder.initFeatures(estimator, activeFields);
 
 		if(estimator.isSupervised()){
-			List<String> targetFields = Collections.singletonList("_label");
+			List<String> targetFields = Collections.singletonList("_target");
 
 			encoder.initLabel(estimator, targetFields);
 		}
