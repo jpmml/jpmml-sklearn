@@ -26,6 +26,8 @@ import org.junit.Test;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.PassThrough;
+import sklearn.CompositeClassifier;
+import sklearn.CompositeRegressor;
 import sklearn.Regressor;
 import sklearn.SkLearnSteps;
 import sklearn.dummy.DummyClassifier;
@@ -80,7 +82,7 @@ public class PipelineTest {
 
 		Classifier classifier = pipeline.toClassifier();
 
-		assertTrue(classifier instanceof PipelineClassifier);
+		assertTrue(classifier instanceof CompositeClassifier);
 	}
 
 	@Test
@@ -89,7 +91,7 @@ public class PipelineTest {
 
 		Regressor regressor = pipeline.toRegressor();
 
-		assertTrue(regressor instanceof PipelineRegressor);
+		assertTrue(regressor instanceof CompositeRegressor);
 	}
 
 	static

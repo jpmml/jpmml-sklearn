@@ -35,7 +35,7 @@ import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
-import sklearn.pipeline.Pipeline;
+import sklearn.Composite;
 
 public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
@@ -81,10 +81,10 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 
 			private H2OEstimator getEstimator(Object object){
 
-				if(object instanceof Pipeline){
-					Pipeline pipeline = (Pipeline)object;
+				if(object instanceof Composite){
+					Composite composite = (Composite)object;
 
-					object = pipeline.getFinalEstimator();
+					object = composite.getFinalEstimator();
 				}
 
 				return (H2OEstimator)object;

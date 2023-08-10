@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.pipeline;
+package sklearn;
 
 import java.util.List;
 
@@ -24,21 +24,16 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
-import sklearn.Clusterer;
-import sklearn.HasFeatureNamesIn;
-import sklearn.HasHead;
-import sklearn.Proxy;
-import sklearn.Transformer;
 
-public class PipelineClusterer extends Clusterer implements HasFeatureNamesIn, HasHead, Proxy {
+public class CompositeClusterer extends Clusterer implements HasFeatureNamesIn, HasHead, Proxy {
 
-	private Pipeline pipeline = null;
+	private Composite composite = null;
 
 
-	public PipelineClusterer(Pipeline pipeline){
-		super(pipeline.getPythonModule(), pipeline.getPythonName());
+	public CompositeClusterer(Composite composite){
+		super(composite.getPythonModule(), composite.getPythonName());
 
-		setPipeline(pipeline);
+		setComposite(composite);
 	}
 
 	@Override
@@ -50,16 +45,16 @@ public class PipelineClusterer extends Clusterer implements HasFeatureNamesIn, H
 
 	@Override
 	public List<String> getFeatureNamesIn(){
-		Pipeline pipeline = getPipeline();
+		Composite composite = getComposite();
 
-		return pipeline.getFeatureNamesIn();
+		return composite.getFeatureNamesIn();
 	}
 
 	@Override
 	public int getNumberOfFeatures(){
-		Pipeline pipeline = getPipeline();
+		Composite composite = getComposite();
 
-		return pipeline.getNumberOfFeatures();
+		return composite.getNumberOfFeatures();
 	}
 
 	@Override
@@ -71,16 +66,16 @@ public class PipelineClusterer extends Clusterer implements HasFeatureNamesIn, H
 
 	@Override
 	public OpType getOpType(){
-		Pipeline pipeline = getPipeline();
+		Composite composite = getComposite();
 
-		return pipeline.getOpType();
+		return composite.getOpType();
 	}
 
 	@Override
 	public DataType getDataType(){
-		Pipeline pipeline = getPipeline();
+		Composite composite = getComposite();
 
-		return pipeline.getDataType();
+		return composite.getDataType();
 	}
 
 	@Override
@@ -99,29 +94,29 @@ public class PipelineClusterer extends Clusterer implements HasFeatureNamesIn, H
 
 	@Override
 	public Model encodeModel(Schema schema){
-		Pipeline pipeline = getPipeline();
+		Composite composite = getComposite();
 
-		return pipeline.encodeModel(schema);
+		return composite.encodeModel(schema);
 	}
 
 	@Override
 	public Transformer getHead(){
-		Pipeline pipeline = getPipeline();
+		Composite composite = getComposite();
 
-		return pipeline.getHead();
+		return composite.getHead();
 	}
 
 	public Clusterer getFinalClusterer(){
-		Pipeline pipeline = getPipeline();
+		Composite composite = getComposite();
 
-		return pipeline.getFinalEstimator(Clusterer.class);
+		return composite.getFinalEstimator(Clusterer.class);
 	}
 
-	public Pipeline getPipeline(){
-		return this.pipeline;
+	public Composite getComposite(){
+		return this.composite;
 	}
 
-	private void setPipeline(Pipeline pipeline){
-		this.pipeline = pipeline;
+	private void setComposite(Composite composite){
+		this.composite = composite;
 	}
 }

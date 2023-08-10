@@ -26,10 +26,11 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.Castable;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Composite extends Step {
+public class Composite extends Step implements Castable, HasFeatureNamesIn, HasHead {
 
 	public Composite(String module, String name){
 		super(module, name);
@@ -46,6 +47,29 @@ public class Composite extends Step {
 
 	abstract
 	public Estimator getFinalEstimator();
+
+	abstract
+	public <E extends Estimator> E getFinalEstimator(Class<? extends E> clazz);
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+
+		if(hasTransformers()){
+			List<? extends Transformer> transformers = getTransformers();
+
+			for(Transformer transformer : transformers){
+				return transformer.getSkLearnFeatureNamesIn();
+			}
+		} // End if
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			return estimator.getSkLearnFeatureNamesIn();
+		}
+
+		return null;
+	}
 
 	@Override
 	public int getNumberOfFeatures(){
@@ -151,5 +175,70 @@ public class Composite extends Step {
 
 	protected Label refreshLabel(Label label, SkLearnEncoder encoder){
 		return label;
+	}
+
+	@Override
+	public Object castTo(Class<?> clazz){
+
+		if((Transformer.class).equals(clazz)){
+			return toTransformer();
+		} else
+
+		if((Estimator.class).equals(clazz)){
+			return toEstimator();
+		} else
+
+		if((Classifier.class).equals(clazz)){
+			return toClassifier();
+		} else
+
+		if((Regressor.class).equals(clazz)){
+			return toRegressor();
+		}
+
+		return this;
+	}
+
+	public Transformer toTransformer(){
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			if(estimator != null){
+				throw new IllegalArgumentException("The pipeline ends with an estimator object");
+			}
+		}
+
+		return new CompositeTransformer(this);
+	}
+
+	public Estimator toEstimator(){
+		Estimator estimator = getFinalEstimator();
+
+		if(estimator instanceof Classifier){
+			return toClassifier();
+		} else
+
+		if(estimator instanceof Regressor){
+			return toRegressor();
+		} else
+
+		if(estimator instanceof Clusterer){
+			return toClusterer();
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	public Classifier toClassifier(){
+		return new CompositeClassifier(this);
+	}
+
+	public Regressor toRegressor(){
+		return new CompositeRegressor(this);
+	}
+
+	public Clusterer toClusterer(){
+		return new CompositeClusterer(this);
 	}
 }

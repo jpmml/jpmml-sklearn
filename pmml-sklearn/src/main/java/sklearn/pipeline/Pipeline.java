@@ -24,22 +24,16 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.CastUtil;
-import org.jpmml.python.Castable;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TupleUtil;
-import sklearn.Classifier;
-import sklearn.Clusterer;
 import sklearn.Composite;
 import sklearn.Estimator;
-import sklearn.HasFeatureNamesIn;
-import sklearn.HasHead;
 import sklearn.HasPMMLOptions;
 import sklearn.PassThrough;
-import sklearn.Regressor;
 import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 
-public class Pipeline extends Composite implements Castable, HasFeatureNamesIn, HasHead, HasPMMLOptions<Pipeline> {
+public class Pipeline extends Composite implements HasPMMLOptions<Pipeline> {
 
 	public Pipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -123,6 +117,7 @@ public class Pipeline extends Composite implements Castable, HasFeatureNamesIn, 
 		return getFinalEstimator(Estimator.class);
 	}
 
+	@Override
 	public <E extends Estimator> E getFinalEstimator(Class<? extends E> clazz){
 		List<Object[]> steps = getSteps();
 
@@ -153,48 +148,6 @@ public class Pipeline extends Composite implements Castable, HasFeatureNamesIn, 
 		};
 
 		return castFunction.apply(estimator);
-	}
-
-	@Override
-	public Object castTo(Class<?> clazz){
-
-		if((Transformer.class).equals(clazz)){
-			return toTransformer();
-		} else
-
-		if((Estimator.class).equals(clazz)){
-			return toEstimator();
-		} else
-
-		if((Classifier.class).equals(clazz)){
-			return toClassifier();
-		} else
-
-		if((Regressor.class).equals(clazz)){
-			return toRegressor();
-		}
-
-		return this;
-	}
-
-	@Override
-	public List<String> getFeatureNamesIn(){
-
-		if(hasTransformers()){
-			List<? extends Transformer> transformers = getTransformers();
-
-			for(Transformer transformer : transformers){
-				return transformer.getSkLearnFeatureNamesIn();
-			}
-		} // End if
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getSkLearnFeatureNamesIn();
-		}
-
-		return null;
 	}
 
 	@Override
@@ -231,49 +184,6 @@ public class Pipeline extends Composite implements Castable, HasFeatureNamesIn, 
 		}
 
 		return this;
-	}
-
-	public Transformer toTransformer(){
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			if(estimator != null){
-				throw new IllegalArgumentException("The pipeline ends with an estimator object");
-			}
-		}
-
-		return new PipelineTransformer(this);
-	}
-
-	public Estimator toEstimator(){
-		Estimator estimator = getFinalEstimator();
-
-		if(estimator instanceof Classifier){
-			return toClassifier();
-		} else
-
-		if(estimator instanceof Regressor){
-			return toRegressor();
-		} else
-
-		if(estimator instanceof Clusterer){
-			return toClusterer();
-		}
-
-		throw new IllegalArgumentException();
-	}
-
-	public Classifier toClassifier(){
-		return new PipelineClassifier(this);
-	}
-
-	public Regressor toRegressor(){
-		return new PipelineRegressor(this);
-	}
-
-	public Clusterer toClusterer(){
-		return new PipelineClusterer(this);
 	}
 
 	public List<Object[]> getSteps(){
