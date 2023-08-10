@@ -34,13 +34,11 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.HasNativeConfiguration;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class EstimatorUtil {
 
@@ -184,17 +182,17 @@ public class EstimatorUtil {
 	public <E extends Estimator & HasFeatureNamesIn & HasSkLearnOptions> PMML encodePMML(E estimator){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		if(estimator.isSupervised()){
-			Label label = PMMLPipeline.initLabel(estimator, Collections.singletonList("_label"), encoder);
-
-			if(label != null){
-				encoder.setLabel(label);
-			}
+		List<String> activeFields = estimator.getFeatureNamesIn();
+		if(activeFields == null){
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.FEATURE_NAMES_IN) + "\' is not set");
 		}
 
-		List<Feature> features = PMMLPipeline.initFeatures(estimator, estimator.getFeatureNamesIn(), encoder);
-		if(features != null){
-			encoder.setFeatures(features);
+		encoder.initFeatures(estimator, activeFields);
+
+		if(estimator.isSupervised()){
+			List<String> targetFields = Collections.singletonList("_label");
+
+			encoder.initLabel(estimator, targetFields);
 		}
 
 		Schema schema = encoder.createSchema();

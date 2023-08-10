@@ -36,7 +36,6 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Header;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
@@ -124,17 +123,13 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 				targetFields = initTargetFields(estimator);
 			}
 
-			Label label = initLabel(estimator, targetFields, encoder);
-
-			encoder.setLabel(label);
+			encoder.initLabel(estimator, targetFields);
 		}
 
 		PythonObject featureInitializer = estimator;
 
 		try {
 			Transformer transformer = PipelineUtil.getHead(transformers, estimator);
-
-			List<Feature> features = new ArrayList<>();
 
 			if(transformer != null){
 				featureInitializer = transformer;
@@ -145,10 +140,16 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 						activeFields = initActiveFields(transformer);
 					}
 
-					features = initFeatures(transformer, activeFields, encoder);
+					encoder.initFeatures(transformer, activeFields);
 				}
 
+				// XXX
+				List<Feature> features = new ArrayList<>();
+				features.addAll(encoder.getFeatures());
+
 				features = super.encodeFeatures(features, encoder);
+
+				encoder.setFeatures(features);
 			} else
 
 			if(estimator != null){
@@ -157,10 +158,8 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 					activeFields = initActiveFields(estimator);
 				}
 
-				features = initFeatures(estimator, activeFields, encoder);
+				encoder.initFeatures(estimator, activeFields);
 			}
-
-			encoder.setFeatures(features);
 		} catch(UnsupportedOperationException uoe){
 			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
 		}
@@ -562,27 +561,6 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name of target fields", targetFields);
 
 		return targetFields;
-	}
-
-	static
-	public Label initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
-		return estimator.encodeLabel(targetFields, encoder);
-	}
-
-	static
-	public List<Feature> initFeatures(Step step, List<String> activeFields, SkLearnEncoder encoder){
-		List<Feature> result = new ArrayList<>();
-
-		OpType opType = step.getOpType();
-		DataType dataType = step.getDataType();
-
-		for(String activeField : activeFields){
-			DataField dataField = encoder.createDataField(activeField, opType, dataType);
-
-			result.add(new WildcardFeature(encoder, dataField));
-		}
-
-		return result;
 	}
 
 	static

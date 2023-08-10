@@ -96,9 +96,7 @@ public class PyCaretPipeline extends Pipeline implements Encodable {
 
 		String targetName = transformer.getTargetName();
 		if(targetName != null){
-			Label label = estimator.encodeLabel(Collections.singletonList(targetName), encoder);
-
-			encoder.setLabel(label);
+			encoder.initLabel(estimator, Collections.singletonList(targetName));
 		}
 
 		Schema schema = encoder.createSchema();

@@ -50,6 +50,7 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.UnsupportedAttributeException;
 import org.jpmml.python.ClassDictUtil;
@@ -57,6 +58,7 @@ import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.Step;
 import sklearn.ensemble.hist_gradient_boosting.TreePredictor;
 import sklearn.neighbors.BinaryTree;
 import sklearn.tree.Tree;
@@ -247,6 +249,33 @@ public class SkLearnEncoder extends PythonEncoder {
 
 			renameFeature(feature, renamedName);
 		}
+	}
+
+	public Label initLabel(Estimator estimator, List<String> names){
+		Label label = estimator.encodeLabel(names, this);
+
+		setLabel(label);
+
+		return label;
+	}
+
+	public List<Feature> initFeatures(Step step, List<String> names){
+		List<Feature> features = new ArrayList<>();
+
+		OpType opType = step.getOpType();
+		DataType dataType = step.getDataType();
+
+		for(String name : names){
+			DataField dataField = createDataField(name, opType, dataType);
+
+			Feature feature = new WildcardFeature(this, dataField);
+
+			features.add(feature);
+		}
+
+		setFeatures(features);
+
+		return features;
 	}
 
 	public Schema createSchema(){
