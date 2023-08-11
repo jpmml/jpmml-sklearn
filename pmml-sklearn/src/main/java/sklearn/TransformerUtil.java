@@ -31,6 +31,18 @@ public class TransformerUtil {
 	}
 
 	static
+	public Transformer getHead(Transformer transformer){
+
+		if(transformer instanceof HasHead){
+			HasHead hasHead = (HasHead)transformer;
+
+			return hasHead.getHead();
+		}
+
+		return transformer;
+	}
+
+	static
 	public <E extends Transformer & HasFeatureNamesIn> PMML encodePMML(E transformer){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 

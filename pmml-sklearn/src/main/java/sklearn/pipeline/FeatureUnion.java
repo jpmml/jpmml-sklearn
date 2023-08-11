@@ -29,6 +29,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasHead;
 import sklearn.SkLearnTransformer;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
@@ -70,13 +71,7 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 		if(!transformers.isEmpty()){
 			Transformer transformer = transformers.get(0);
 
-			if(transformer instanceof HasHead){
-				HasHead hasHead = (HasHead)transformer;
-
-				return hasHead.getHead();
-			}
-
-			return transformer;
+			return TransformerUtil.getHead(transformer);
 		}
 
 		return null;

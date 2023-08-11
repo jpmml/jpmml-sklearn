@@ -56,7 +56,6 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
@@ -70,7 +69,6 @@ import sklearn.Initializer;
 import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.pipeline.Pipeline;
-import sklearn.pipeline.PipelineUtil;
 import sklearn2pmml.decoration.Domain;
 
 public class PMMLPipeline extends Pipeline implements Encodable {
@@ -99,7 +97,6 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 	public PMML encodePMML(){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		List<? extends Transformer> transformers = getTransformers();
 		Estimator estimator = null;
 
 		if(hasFinalEstimator()){
@@ -126,10 +123,10 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 			encoder.initLabel(estimator, targetFields);
 		}
 
-		PythonObject featureInitializer = estimator;
+		Step featureInitializer = estimator;
 
 		try {
-			Transformer transformer = PipelineUtil.getHead(transformers, estimator);
+			Transformer transformer = getHead();
 
 			if(transformer != null){
 				featureInitializer = transformer;

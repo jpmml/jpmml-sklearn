@@ -28,10 +28,12 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TupleUtil;
 import sklearn.Composite;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasPMMLOptions;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 public class Pipeline extends Composite implements HasPMMLOptions<Pipeline> {
 
@@ -152,14 +154,22 @@ public class Pipeline extends Composite implements HasPMMLOptions<Pipeline> {
 
 	@Override
 	public Transformer getHead(){
-		List<? extends Transformer> transformers = getTransformers();
-		Estimator estimator = null;
+
+		if(hasTransformers()){
+			List<? extends Transformer> transformers = getTransformers();
+
+			Transformer transformer = transformers.get(0);
+
+			return TransformerUtil.getHead(transformer);
+		} // End if
 
 		if(hasFinalEstimator()){
-			estimator = getFinalEstimator();
+			Estimator estimator = getFinalEstimator();
+
+			return EstimatorUtil.getHead(estimator);
 		}
 
-		return PipelineUtil.getHead(transformers, estimator);
+		return null;
 	}
 
 	@Override
