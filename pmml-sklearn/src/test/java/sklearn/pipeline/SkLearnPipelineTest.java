@@ -39,11 +39,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class PipelineTest {
+public class SkLearnPipelineTest {
 
 	@Test
 	public void emptyPipeline(){
-		Pipeline pipeline = new Pipeline()
+		SkLearnPipeline pipeline = new SkLearnPipeline()
 			.setSteps(Collections.emptyList());
 
 		assertFalse(pipeline.hasTransformers());
@@ -64,7 +64,7 @@ public class PipelineTest {
 
 	@Test
 	public void passthroughPipeline(){
-		Pipeline pipeline = new Pipeline()
+		SkLearnPipeline pipeline = new SkLearnPipeline()
 			.setSteps(Collections.singletonList(new Object[]{"estimator", SkLearnSteps.PASSTHROUGH}));
 
 		assertFalse(pipeline.hasTransformers());
@@ -78,7 +78,7 @@ public class PipelineTest {
 
 	@Test
 	public void classifierPipeline(){
-		Pipeline pipeline = forEstimator(new DummyClassifier());
+		SkLearnPipeline pipeline = forEstimator(new DummyClassifier());
 
 		Classifier classifier = pipeline.toClassifier();
 
@@ -87,7 +87,7 @@ public class PipelineTest {
 
 	@Test
 	public void regressorPipeline(){
-		Pipeline pipeline = forEstimator(new DummyRegressor());
+		SkLearnPipeline pipeline = forEstimator(new DummyRegressor());
 
 		Regressor regressor = pipeline.toRegressor();
 
@@ -95,13 +95,13 @@ public class PipelineTest {
 	}
 
 	static
-	private Pipeline forEstimator(Estimator estimator){
+	private SkLearnPipeline forEstimator(Estimator estimator){
 		List<Object[]> steps = Arrays.asList(
 			new Object[]{"first", SkLearnSteps.PASSTHROUGH},
 			new Object[]{"second", estimator}
 		);
 
-		Pipeline pipeline = new Pipeline()
+		SkLearnPipeline pipeline = new SkLearnPipeline()
 			.setSteps(steps);
 
 		assertTrue(pipeline.hasTransformers());

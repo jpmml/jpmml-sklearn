@@ -38,9 +38,9 @@ import pycaret.preprocess.TransformerWrapper;
 import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
-import sklearn.pipeline.Pipeline;
+import sklearn.pipeline.SkLearnPipeline;
 
-public class PyCaretPipeline extends Pipeline implements Encodable {
+public class PyCaretPipeline extends SkLearnPipeline implements Encodable {
 
 	public PyCaretPipeline(String module, String name){
 		super(module, name);

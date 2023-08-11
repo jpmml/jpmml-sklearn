@@ -18,9 +18,9 @@
  */
 package imblearn.pipeline;
 
-import sklearn.pipeline.Pipeline;
+import sklearn.pipeline.SkLearnPipeline;
 
-public class ImbLearnPipeline extends Pipeline {
+public class ImbLearnPipeline extends SkLearnPipeline {
 
 	public ImbLearnPipeline(String module, String name){
 		super(module, name);

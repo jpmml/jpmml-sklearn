@@ -26,7 +26,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
-import sklearn.pipeline.Pipeline;
+import sklearn.pipeline.SkLearnPipeline;
 
 public class WordCountTransformer extends Transformer {
 
@@ -46,7 +46,7 @@ public class WordCountTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Pipeline pipeline = getPipeline();
+		SkLearnPipeline pipeline = getPipeline();
 
 		ClassDictUtil.checkSize(1, features);
 
@@ -55,7 +55,7 @@ public class WordCountTransformer extends Transformer {
 		return transformer.encode(features, encoder);
 	}
 
-	public Pipeline getPipeline(){
-		return get("pipeline_", Pipeline.class);
+	public SkLearnPipeline getPipeline(){
+		return get("pipeline_", SkLearnPipeline.class);
 	}
 }

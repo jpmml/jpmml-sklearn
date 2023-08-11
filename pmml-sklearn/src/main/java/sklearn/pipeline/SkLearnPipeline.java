@@ -35,13 +35,13 @@ import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
-public class Pipeline extends Composite implements HasPMMLOptions<Pipeline> {
+public class SkLearnPipeline extends Composite implements HasPMMLOptions<SkLearnPipeline> {
 
-	public Pipeline(){
+	public SkLearnPipeline(){
 		this("sklearn.pipeline", "Pipeline");
 	}
 
-	public Pipeline(String module, String name){
+	public SkLearnPipeline(String module, String name){
 		super(module, name);
 	}
 
@@ -185,7 +185,7 @@ public class Pipeline extends Composite implements HasPMMLOptions<Pipeline> {
 	}
 
 	@Override
-	public Pipeline setPMMLOptions(Map<String, ?> pmmlOptions){
+	public SkLearnPipeline setPMMLOptions(Map<String, ?> pmmlOptions){
 
 		if(hasFinalEstimator()){
 			Estimator estimator = getFinalEstimator();
@@ -200,7 +200,7 @@ public class Pipeline extends Composite implements HasPMMLOptions<Pipeline> {
 		return getTupleList("steps");
 	}
 
-	protected Pipeline setSteps(List<Object[]> steps){
+	protected SkLearnPipeline setSteps(List<Object[]> steps){
 		put("steps", steps);
 
 		return this;

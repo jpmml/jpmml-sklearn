@@ -68,10 +68,10 @@ import sklearn.HasNumberOfOutputs;
 import sklearn.Initializer;
 import sklearn.Step;
 import sklearn.Transformer;
-import sklearn.pipeline.Pipeline;
+import sklearn.pipeline.SkLearnPipeline;
 import sklearn2pmml.decoration.Domain;
 
-public class PMMLPipeline extends Pipeline implements Encodable {
+public class PMMLPipeline extends SkLearnPipeline implements Encodable {
 
 	public PMMLPipeline(){
 		this("sklearn2pmml", "PMMLPipeline");
@@ -83,7 +83,7 @@ public class PMMLPipeline extends Pipeline implements Encodable {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		logger.warn(ClassDictUtil.formatClass(this) + " should be replaced with " + ClassDictUtil.formatClass(new Pipeline()) + " in nested workflows");
+		logger.warn(ClassDictUtil.formatClass(this) + " should be replaced with " + ClassDictUtil.formatClass(new SkLearnPipeline()) + " in nested workflows");
 
 		return super.encodeFeatures(features, encoder);
 	}
