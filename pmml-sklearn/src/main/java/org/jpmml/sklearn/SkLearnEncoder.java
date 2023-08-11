@@ -252,6 +252,12 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public Label initLabel(Estimator estimator, List<String> names){
+		List<? extends Feature> features = getFeatures();
+
+		if(!features.isEmpty()){
+			throw new IllegalStateException();
+		}
+
 		Label label = estimator.encodeLabel(names, this);
 
 		setLabel(label);

@@ -194,18 +194,18 @@ public class EstimatorUtil {
 	public <E extends Estimator & HasFeatureNamesIn & HasSkLearnOptions> PMML encodePMML(E estimator){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
+		if(estimator.isSupervised()){
+			List<String> targetFields = Collections.singletonList("_target");
+
+			encoder.initLabel(estimator, targetFields);
+		}
+
 		List<String> activeFields = estimator.getFeatureNamesIn();
 		if(activeFields == null){
 			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.FEATURE_NAMES_IN) + "\' is not set");
 		}
 
 		encoder.initFeatures(estimator, activeFields);
-
-		if(estimator.isSupervised()){
-			List<String> targetFields = Collections.singletonList("_target");
-
-			encoder.initLabel(estimator, targetFields);
-		}
 
 		Schema schema = encoder.createSchema();
 
