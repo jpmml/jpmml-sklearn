@@ -21,22 +21,30 @@ package sklearn;
 import java.util.List;
 
 import org.dmg.pmml.PMML;
-import org.jpmml.sklearn.Encodable;
+import org.jpmml.converter.Feature;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 
-abstract
-public class SkLearnTransformer extends Transformer implements HasFeatureNamesIn, Encodable {
+public class TransformerUtil {
 
-	public SkLearnTransformer(String module, String name){
-		super(module, name);
+	private TransformerUtil(){
 	}
 
-	@Override
-	public List<String> getFeatureNamesIn(){
-		return getSkLearnFeatureNamesIn();
-	}
+	static
+	public <E extends Transformer & HasFeatureNamesIn> PMML encodePMML(E transformer){
+		SkLearnEncoder encoder = new SkLearnEncoder();
 
-	@Override
-	public PMML encodePMML(){
-		return TransformerUtil.encodePMML(this);
+		List<String> activeFields = transformer.getFeatureNamesIn();
+		if(activeFields == null){
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(transformer, SkLearnFields.FEATURE_NAMES_IN) + "\' is not set");
+		}
+
+		List<Feature> features = encoder.initFeatures(transformer, activeFields);
+
+		features = transformer.encodeFeatures(features, encoder);
+
+		encoder.setFeatures(features);
+
+		return encoder.encodePMML(null);
 	}
 }
