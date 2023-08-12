@@ -134,6 +134,46 @@ public class SkLearnEncoder extends PythonEncoder {
 		return miningModel;
 	}
 
+	public Label initLabel(Estimator estimator, List<String> names){
+		List<? extends Feature> features = getFeatures();
+
+		if(!features.isEmpty()){
+			throw new IllegalStateException();
+		}
+
+		Label label = estimator.encodeLabel(names, this);
+
+		setLabel(label);
+
+		return label;
+	}
+
+	public List<Feature> initFeatures(Step step, List<String> names){
+		List<Feature> features = new ArrayList<>();
+
+		OpType opType = step.getOpType();
+		DataType dataType = step.getDataType();
+
+		for(String name : names){
+			DataField dataField = createDataField(name, opType, dataType);
+
+			Feature feature = new WildcardFeature(this, dataField);
+
+			features.add(feature);
+		}
+
+		setFeatures(features);
+
+		return features;
+	}
+
+	public Schema createSchema(){
+		Label label = getLabel();
+		List<? extends Feature> features = getFeatures();
+
+		return new Schema(this, label, features);
+	}
+
 	public List<Feature> export(Model model, String name){
 		return export(model, Collections.singletonList(name));
 	}
@@ -249,46 +289,6 @@ public class SkLearnEncoder extends PythonEncoder {
 
 			renameFeature(feature, renamedName);
 		}
-	}
-
-	public Label initLabel(Estimator estimator, List<String> names){
-		List<? extends Feature> features = getFeatures();
-
-		if(!features.isEmpty()){
-			throw new IllegalStateException();
-		}
-
-		Label label = estimator.encodeLabel(names, this);
-
-		setLabel(label);
-
-		return label;
-	}
-
-	public List<Feature> initFeatures(Step step, List<String> names){
-		List<Feature> features = new ArrayList<>();
-
-		OpType opType = step.getOpType();
-		DataType dataType = step.getDataType();
-
-		for(String name : names){
-			DataField dataField = createDataField(name, opType, dataType);
-
-			Feature feature = new WildcardFeature(this, dataField);
-
-			features.add(feature);
-		}
-
-		setFeatures(features);
-
-		return features;
-	}
-
-	public Schema createSchema(){
-		Label label = getLabel();
-		List<? extends Feature> features = getFeatures();
-
-		return new Schema(this, label, features);
 	}
 
 	public boolean isFrozen(String name){
