@@ -18,24 +18,34 @@
  */
 package sklearn.pipeline;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
+import org.dmg.pmml.Model;
+import org.dmg.pmml.PMML;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.CastUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TupleUtil;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasPMMLOptions;
+import sklearn.Initializer;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
+import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
-public class SkLearnPipeline extends Composite implements HasPMMLOptions<SkLearnPipeline> {
+public class SkLearnPipeline extends Composite implements HasPMMLOptions<SkLearnPipeline>, Encodable {
 
 	public SkLearnPipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -170,6 +180,96 @@ public class SkLearnPipeline extends Composite implements HasPMMLOptions<SkLearn
 		}
 
 		return null;
+	}
+
+	@Override
+	public PMML encodePMML(){
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
+		Estimator estimator = null;
+
+		if(hasFinalEstimator()){
+			estimator = getFinalEstimator();
+		}
+
+		initLabel(estimator, null, encoder);
+		initFeatures(estimator, null, encoder);
+
+		if(estimator == null){
+			return encoder.encodePMML(null);
+		}
+
+		Schema schema = encoder.createSchema();
+
+		Model model = estimator.encode(schema);
+
+		encoder.setModel(model);
+
+		return encoder.encodePMML(model);
+	}
+
+	protected List<String> initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
+
+		if(estimator != null && estimator.isSupervised()){
+
+			if(targetFields == null){
+				targetFields = initTargetFields(estimator);
+			}
+
+			encoder.initLabel(estimator, targetFields);
+		}
+
+		return targetFields;
+	}
+
+	protected List<String> initTargetFields(Estimator estimator){
+		return EstimatorUtil.generateOutputNames(estimator);
+	}
+
+	protected List<String> initFeatures(Estimator estimator, List<String> activeFields, SkLearnEncoder encoder){
+		Step featureInitializer = estimator;
+
+		try {
+			Transformer transformer = getHead();
+
+			if(transformer != null){
+				featureInitializer = transformer;
+
+				if(!(transformer instanceof Initializer)){
+
+					if(activeFields == null){
+						activeFields = initActiveFields(transformer);
+					}
+
+					encoder.initFeatures(transformer, activeFields);
+				}
+
+				// XXX
+				List<Feature> features = new ArrayList<>();
+				features.addAll(encoder.getFeatures());
+
+				features = super.encodeFeatures(features, encoder);
+
+				encoder.setFeatures(features);
+			} else
+
+			if(estimator != null){
+
+				if(activeFields == null){
+					activeFields = initActiveFields(estimator);
+				}
+
+				encoder.initFeatures(estimator, activeFields);
+			}
+		} catch(UnsupportedOperationException uoe){
+			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
+		}
+
+		return activeFields;
+	}
+
+	protected List<String> initActiveFields(Step step){
+		return StepUtil.getOrGenerateFeatureNames(step);
 	}
 
 	@Override

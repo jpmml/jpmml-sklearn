@@ -32,7 +32,6 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pycaret.preprocess.TransformerWrapper;
 import sklearn.Estimator;
@@ -40,7 +39,7 @@ import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
 
-public class PyCaretPipeline extends SkLearnPipeline implements Encodable {
+public class PyCaretPipeline extends SkLearnPipeline {
 
 	public PyCaretPipeline(String module, String name){
 		super(module, name);

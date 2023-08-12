@@ -56,7 +56,6 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,14 +63,13 @@ import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasNumberOfOutputs;
-import sklearn.Initializer;
 import sklearn.Step;
 import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
 import sklearn2pmml.decoration.Domain;
 
-public class PMMLPipeline extends SkLearnPipeline implements Encodable {
+public class PMMLPipeline extends SkLearnPipeline {
 
 	public PMMLPipeline(){
 		this("sklearn2pmml", "PMMLPipeline");
@@ -103,63 +101,20 @@ public class PMMLPipeline extends SkLearnPipeline implements Encodable {
 			estimator = getFinalEstimator();
 		}
 
-		Map<?, ?> header = getHeader();
-		Transformer predictTransformer = getPredictTransformer();
-		Transformer predictProbaTransformer = getPredictProbaTransformer();
-		Transformer applyTransformer = getApplyTransformer();
-
 		List<String> activeFields = getActiveFields();
 		List<String> probabilityFields = null;
 		List<String> targetFields = getTargetFields();
+
+		Map<?, ?> header = getHeader();
 		String repr = getRepr();
+		Transformer predictTransformer = getPredictTransformer();
+		Transformer predictProbaTransformer = getPredictProbaTransformer();
+		Transformer applyTransformer = getApplyTransformer();
 		Verification verification = getVerification();
 
-		if(estimator != null && estimator.isSupervised()){
-
-			if(targetFields == null){
-				targetFields = initTargetFields(estimator);
-			}
-
-			encoder.initLabel(estimator, targetFields);
-		}
-
-		Step featureInitializer = estimator;
-
-		try {
-			Transformer transformer = getHead();
-
-			if(transformer != null){
-				featureInitializer = transformer;
-
-				if(!(transformer instanceof Initializer)){
-
-					if(activeFields == null){
-						activeFields = initActiveFields(transformer);
-					}
-
-					encoder.initFeatures(transformer, activeFields);
-				}
-
-				// XXX
-				List<Feature> features = new ArrayList<>();
-				features.addAll(encoder.getFeatures());
-
-				features = super.encodeFeatures(features, encoder);
-
-				encoder.setFeatures(features);
-			} else
-
-			if(estimator != null){
-
-				if(activeFields == null){
-					activeFields = initActiveFields(estimator);
-				}
-
-				encoder.initFeatures(estimator, activeFields);
-			}
-		} catch(UnsupportedOperationException uoe){
-			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
-		}
+		targetFields = initLabel(estimator, targetFields, encoder);
+		probabilityFields = null;
+		activeFields = initFeatures(estimator, activeFields, encoder);
 
 		if(estimator == null){
 			return encodePMML(header, null, repr, encoder);
@@ -510,18 +465,8 @@ public class PMMLPipeline extends SkLearnPipeline implements Encodable {
 		return this;
 	}
 
-	private List<String> initProbabilityFields(CategoricalLabel categoricalLabel){
-		List<String> probabilityFields = new ArrayList<>();
-
-		List<?> values = categoricalLabel.getValues();
-		for(Object value : values){
-			probabilityFields.add(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value));
-		}
-
-		return probabilityFields;
-	}
-
-	private List<String> initTargetFields(Estimator estimator){
+	@Override
+	protected List<String> initTargetFields(Estimator estimator){
 		List<String> result = Collections.singletonList("y");
 
 		int numberOfOutputs = estimator.getNumberOfOutputs();
@@ -534,12 +479,24 @@ public class PMMLPipeline extends SkLearnPipeline implements Encodable {
 		return result;
 	}
 
-	private List<String> initActiveFields(Step step){
+	@Override
+	protected List<String> initActiveFields(Step step){
 		List<String> result = StepUtil.getOrGenerateFeatureNames(step);
 
 		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", result);
 
 		return result;
+	}
+
+	private List<String> initProbabilityFields(CategoricalLabel categoricalLabel){
+		List<String> probabilityFields = new ArrayList<>();
+
+		List<?> values = categoricalLabel.getValues();
+		for(Object value : values){
+			probabilityFields.add(FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value));
+		}
+
+		return probabilityFields;
 	}
 
 	static
