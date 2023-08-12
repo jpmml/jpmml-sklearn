@@ -62,11 +62,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.HasFeatureNamesIn;
-import sklearn.HasNumberOfFeatures;
+import sklearn.EstimatorUtil;
 import sklearn.HasNumberOfOutputs;
 import sklearn.Initializer;
 import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
 import sklearn2pmml.decoration.Domain;
@@ -510,29 +510,6 @@ public class PMMLPipeline extends SkLearnPipeline implements Encodable {
 		return this;
 	}
 
-	private List<String> initActiveFields(Step step){
-		int numberOfFeatures = step.getNumberOfFeatures();
-
-		if(step instanceof HasFeatureNamesIn){
-			HasFeatureNamesIn hasFeatureNamesIn = (HasFeatureNamesIn)step;
-
-			List<String> featureNamesIn = hasFeatureNamesIn.getFeatureNamesIn();
-			if(featureNamesIn != null){
-				return featureNamesIn;
-			}
-		} // End if
-
-		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
-			throw new IllegalArgumentException("The transformer object of the first step (" + ClassDictUtil.formatClass(step) + ") does not specify the number of input features");
-		}
-
-		List<String> activeFields = makeVariables("x", numberOfFeatures, true);
-
-		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", activeFields);
-
-		return activeFields;
-	}
-
 	private List<String> initProbabilityFields(CategoricalLabel categoricalLabel){
 		List<String> probabilityFields = new ArrayList<>();
 
@@ -545,19 +522,24 @@ public class PMMLPipeline extends SkLearnPipeline implements Encodable {
 	}
 
 	private List<String> initTargetFields(Estimator estimator){
+		List<String> result = Collections.singletonList("y");
+
 		int numberOfOutputs = estimator.getNumberOfOutputs();
-
-		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
-			logger.warn("The estimator object of the final step (" + ClassDictUtil.formatClass(estimator) + ") does not specify the number of outputs. Assuming a single output");
-
-			numberOfOutputs = 1;
+		if(numberOfOutputs != HasNumberOfOutputs.UNKNOWN){
+			result = EstimatorUtil.generateOutputNames(estimator);
 		}
 
-		List<String> targetFields = makeVariables("y", numberOfOutputs, false);
+		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name(s) of the target field(s)", result);
 
-		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name of target fields", targetFields);
+		return result;
+	}
 
-		return targetFields;
+	private List<String> initActiveFields(Step step){
+		List<String> result = StepUtil.getOrGenerateFeatureNames(step);
+
+		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", result);
+
+		return result;
 	}
 
 	static
@@ -577,28 +559,6 @@ public class PMMLPipeline extends SkLearnPipeline implements Encodable {
 		};
 
 		return Lists.transform(values, function);
-	}
-
-	static
-	private List<String> makeVariables(String name, int count, boolean indexed){
-
-		if(count <= 0){
-			throw new IllegalArgumentException();
-		} else
-
-		if(count == 1){
-			return Collections.singletonList(name + (indexed ? "1" : ""));
-		} else
-
-		{
-			List<String> result = new ArrayList<>(count);
-
-			for(int i = 0; i < count; i++){
-				result.add(name + String.valueOf(i + 1));
-			}
-
-			return result;
-		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PMMLPipeline.class);

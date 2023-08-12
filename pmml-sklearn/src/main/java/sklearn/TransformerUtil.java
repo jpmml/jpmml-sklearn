@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class TransformerUtil {
@@ -46,10 +45,7 @@ public class TransformerUtil {
 	public <E extends Transformer & HasFeatureNamesIn> PMML encodePMML(E transformer){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		List<String> activeFields = transformer.getFeatureNamesIn();
-		if(activeFields == null){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(transformer, SkLearnFields.FEATURE_NAMES_IN) + "\' is not set");
-		}
+		List<String> activeFields = StepUtil.getOrGenerateFeatureNames(transformer);
 
 		List<Feature> features = encoder.initFeatures(transformer, activeFields);
 

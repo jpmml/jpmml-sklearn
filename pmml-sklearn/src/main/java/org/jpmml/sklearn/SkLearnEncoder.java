@@ -363,6 +363,28 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	static
+	public List<String> generateNames(String name, int count, boolean indexed){
+
+		if(count <= 0){
+			throw new IllegalArgumentException();
+		} else
+
+		if(count == 1){
+			return Collections.singletonList(name + (indexed ? "1" : ""));
+		} else
+
+		{
+			List<String> result = new ArrayList<>(count);
+
+			for(int i = 0; i < count; i++){
+				result.add(name + String.valueOf(i + 1));
+			}
+
+			return result;
+		}
+	}
+
+	static
 	private List<OutputField> selectOutputFields(String name, List<OutputField> outputFields){
 		List<OutputField> result = new ArrayList<>();
 

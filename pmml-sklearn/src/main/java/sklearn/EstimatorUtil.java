@@ -195,15 +195,12 @@ public class EstimatorUtil {
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		if(estimator.isSupervised()){
-			List<String> targetFields = Collections.singletonList("_target");
+			List<String> targetFields = generateOutputNames(estimator);
 
 			encoder.initLabel(estimator, targetFields);
 		}
 
-		List<String> activeFields = estimator.getFeatureNamesIn();
-		if(activeFields == null){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.FEATURE_NAMES_IN) + "\' is not set");
-		}
+		List<String> activeFields = StepUtil.getOrGenerateFeatureNames(estimator);
 
 		encoder.initFeatures(estimator, activeFields);
 
@@ -236,5 +233,16 @@ public class EstimatorUtil {
 		{
 			return estimator.encode(schema);
 		}
+	}
+
+	static
+	public List<String> generateOutputNames(Estimator estimator){
+		int numberOfOutputs = estimator.getNumberOfOutputs();
+
+		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.N_OUTPUTS) + "\' is not set");
+		}
+
+		return SkLearnEncoder.generateNames("y", numberOfOutputs, false);
 	}
 }
