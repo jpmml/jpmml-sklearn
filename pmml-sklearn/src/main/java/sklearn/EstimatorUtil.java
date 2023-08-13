@@ -37,6 +37,7 @@ import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -195,12 +196,12 @@ public class EstimatorUtil {
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		if(estimator.isSupervised()){
-			List<String> targetFields = generateOutputNames(estimator);
+			List<String> targetFields = EncodableUtil.generateOutputNames(estimator);
 
 			encoder.initLabel(estimator, targetFields);
 		}
 
-		List<String> activeFields = StepUtil.getOrGenerateFeatureNames(estimator);
+		List<String> activeFields = EncodableUtil.getOrGenerateFeatureNames(estimator);
 
 		encoder.initFeatures(estimator, activeFields);
 
@@ -233,16 +234,5 @@ public class EstimatorUtil {
 		{
 			return estimator.encode(schema);
 		}
-	}
-
-	static
-	public List<String> generateOutputNames(Estimator estimator){
-		int numberOfOutputs = estimator.getNumberOfOutputs();
-
-		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.N_OUTPUTS) + "\' is not set");
-		}
-
-		return SkLearnEncoder.generateNames("y", numberOfOutputs, false);
 	}
 }

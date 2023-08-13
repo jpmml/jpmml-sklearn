@@ -61,10 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
-import sklearn.HasNumberOfOutputs;
 import sklearn.Step;
-import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
 import sklearn2pmml.HasPMMLOptions;
@@ -492,25 +489,20 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 	@Override
 	protected List<String> initTargetFields(Estimator estimator){
-		List<String> result = Collections.singletonList("y");
+		List<String> targetFields = super.initTargetFields(estimator);
 
-		int numberOfOutputs = estimator.getNumberOfOutputs();
-		if(numberOfOutputs != HasNumberOfOutputs.UNKNOWN){
-			result = EstimatorUtil.generateOutputNames(estimator);
-		}
+		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name(s) of the target field(s)", targetFields);
 
-		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name(s) of the target field(s)", result);
-
-		return result;
+		return targetFields;
 	}
 
 	@Override
 	protected List<String> initActiveFields(Step step){
-		List<String> result = StepUtil.getOrGenerateFeatureNames(step);
+		List<String> activeFields = super.initActiveFields(step);
 
-		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", result);
+		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", activeFields);
 
-		return result;
+		return activeFields;
 	}
 
 	private List<String> initProbabilityFields(CategoricalLabel categoricalLabel){

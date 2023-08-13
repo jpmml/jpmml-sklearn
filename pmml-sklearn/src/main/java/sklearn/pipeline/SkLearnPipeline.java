@@ -31,6 +31,7 @@ import org.jpmml.python.CastUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Composite;
 import sklearn.Estimator;
@@ -39,7 +40,6 @@ import sklearn.Initializer;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
 import sklearn.Step;
-import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
@@ -221,7 +221,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 	}
 
 	protected List<String> initTargetFields(Estimator estimator){
-		return EstimatorUtil.generateOutputNames(estimator);
+		return EncodableUtil.generateOutputNames(estimator);
 	}
 
 	protected List<String> initFeatures(Estimator estimator, List<String> activeFields, SkLearnEncoder encoder){
@@ -267,7 +267,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 	}
 
 	protected List<String> initActiveFields(Step step){
-		return StepUtil.getOrGenerateFeatureNames(step);
+		return EncodableUtil.getOrGenerateFeatureNames(step);
 	}
 
 	public List<Object[]> getSteps(){

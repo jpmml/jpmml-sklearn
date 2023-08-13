@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
 
 public class StepUtil {
 
@@ -46,27 +45,5 @@ public class StepUtil {
 		}
 
 		return HasNumberOfFeatures.UNKNOWN;
-	}
-
-	static
-	public List<String> getOrGenerateFeatureNames(Step step){
-		List<String> result = step.getFeatureNamesIn();
-
-		if(result == null){
-			result = generateFeatureNames(step);
-		}
-
-		return result;
-	}
-
-	static
-	public List<String> generateFeatureNames(Step step){
-		int numberOfFeatures = step.getNumberOfFeatures();
-
-		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(step, SkLearnFields.N_FEATURES_IN) + "\' is not set");
-		}
-
-		return SkLearnEncoder.generateNames("x", numberOfFeatures, true);
 	}
 }

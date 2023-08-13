@@ -18,6 +18,16 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.jpmml.python.ClassDictUtil;
+import sklearn.Estimator;
+import sklearn.HasNumberOfFeatures;
+import sklearn.HasNumberOfOutputs;
+import sklearn.SkLearnFields;
+import sklearn.Step;
 import sklearn2pmml.pipeline.PMMLPipelineUtil;
 
 public class EncodableUtil {
@@ -35,5 +45,60 @@ public class EncodableUtil {
 		}
 
 		return PMMLPipelineUtil.toPMMLPipeline(object);
+	}
+
+	static
+	public List<String> getOrGenerateFeatureNames(Step step){
+		List<String> result = step.getFeatureNamesIn();
+
+		if(result == null){
+			result = generateFeatureNames(step);
+		}
+
+		return result;
+	}
+
+	static
+	public List<String> generateFeatureNames(Step step){
+		int numberOfFeatures = step.getNumberOfFeatures();
+
+		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(step, SkLearnFields.N_FEATURES_IN) + "\' is not set");
+		}
+
+		return generateNames("x", numberOfFeatures, true);
+	}
+
+	static
+	public List<String> generateOutputNames(Estimator estimator){
+		int numberOfOutputs = estimator.getNumberOfOutputs();
+
+		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
+			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.N_OUTPUTS) + "\' is not set");
+		}
+
+		return generateNames("y", numberOfOutputs, false);
+	}
+
+	static
+	private List<String> generateNames(String name, int count, boolean indexed){
+
+		if(count <= 0){
+			throw new IllegalArgumentException();
+		} else
+
+		if(count == 1){
+			return Collections.singletonList(name + (indexed ? "1" : ""));
+		} else
+
+		{
+			List<String> result = new ArrayList<>(count);
+
+			for(int i = 0; i < count; i++){
+				result.add(name + String.valueOf(i + 1));
+			}
+
+			return result;
+		}
 	}
 }
