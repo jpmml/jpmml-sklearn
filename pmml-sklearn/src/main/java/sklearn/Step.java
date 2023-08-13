@@ -49,8 +49,8 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		return getOptionalString(SkLearn2PMMLFields.PMML_NAME);
 	}
 
-	public Step setPMMLName(String name){
-		put(SkLearn2PMMLFields.PMML_NAME, name);
+	public Step setPMMLName(String pmmlName){
+		put(SkLearn2PMMLFields.PMML_NAME, pmmlName);
 
 		return this;
 	}

@@ -34,9 +34,10 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonTypeUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn2pmml.HasPMMLName;
 
 abstract
-public class Transformer extends Step {
+public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 	public Transformer(String module, String name){
 		super(module, name);
@@ -202,5 +203,10 @@ public class Transformer extends Step {
 		}
 
 		return FieldNameUtil.create(function, args);
+	}
+
+	@Override
+	public Transformer setPMMLName(String pmmlName){
+		return (Transformer)super.setPMMLName(pmmlName);
 	}
 }

@@ -30,9 +30,10 @@ import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn2pmml.HasPMMLName;
 
 abstract
-public class Calibrator extends SkLearnRegressor {
+public class Calibrator extends SkLearnRegressor implements HasPMMLName<Calibrator> {
 
 	public Calibrator(String module, String name){
 		super(module, name);
@@ -69,5 +70,10 @@ public class Calibrator extends SkLearnRegressor {
 		}
 
 		return FieldNameUtil.create(function, Collections.singletonList(feature));
+	}
+
+	@Override
+	public Calibrator setPMMLName(String pmmlName){
+		return (Calibrator)super.setPMMLName(pmmlName);
 	}
 }
