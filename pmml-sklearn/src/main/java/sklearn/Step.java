@@ -31,6 +31,10 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public void checkVersion(){
+		checkSkLearnVersion();
+	}
+
+	public void checkSkLearnVersion(){
 		String sklearnVersion = getSkLearnVersion();
 
 		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.2.2") > 0){
