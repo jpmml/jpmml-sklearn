@@ -18,8 +18,6 @@
  */
 package sklearn;
 
-import java.util.List;
-
 import org.dmg.pmml.PMML;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
@@ -29,11 +27,6 @@ public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn, Ha
 
 	public SkLearnRegressor(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public List<String> getFeatureNamesIn(){
-		return getSkLearnFeatureNamesIn();
 	}
 
 	@Override

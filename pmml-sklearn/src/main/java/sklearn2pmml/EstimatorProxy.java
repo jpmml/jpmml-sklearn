@@ -53,7 +53,7 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	public List<String> getFeatureNamesIn(){
 		Estimator estimator = getEstimator();
 
-		return estimator.getSkLearnFeatureNamesIn();
+		return estimator.getFeatureNamesIn();
 	}
 
 	@Override

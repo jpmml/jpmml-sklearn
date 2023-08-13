@@ -30,18 +30,6 @@ public class StepUtil {
 	}
 
 	static
-	public List<String> getFeatureNamesIn(Step step){
-
-		if(step instanceof HasFeatureNamesIn){
-			HasFeatureNamesIn hasFeatureNamesIn = (HasFeatureNamesIn)step;
-
-			return hasFeatureNamesIn.getFeatureNamesIn();
-		}
-
-		return null;
-	}
-
-	static
 	public void checkNumberOfFeatures(Step step, List<? extends Feature> features){
 		int numberOfFeatures = step.getNumberOfFeatures();
 
@@ -62,7 +50,7 @@ public class StepUtil {
 
 	static
 	public List<String> getOrGenerateFeatureNames(Step step){
-		List<String> result = getFeatureNamesIn(step);
+		List<String> result = step.getFeatureNamesIn();
 
 		if(result == null){
 			result = generateFeatureNames(step);

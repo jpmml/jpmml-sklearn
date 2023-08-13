@@ -18,8 +18,6 @@
  */
 package sklearn;
 
-import java.util.List;
-
 import org.dmg.pmml.PMML;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
@@ -29,11 +27,6 @@ public class SkLearnClusterer extends Clusterer implements HasFeatureNamesIn, Ha
 
 	public SkLearnClusterer(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public List<String> getFeatureNamesIn(){
-		return getSkLearnFeatureNamesIn();
 	}
 
 	@Override

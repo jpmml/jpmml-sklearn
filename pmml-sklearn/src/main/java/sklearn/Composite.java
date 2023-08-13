@@ -58,14 +58,14 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 			List<? extends Transformer> transformers = getTransformers();
 
 			for(Transformer transformer : transformers){
-				return transformer.getSkLearnFeatureNamesIn();
+				return transformer.getFeatureNamesIn();
 			}
 		} // End if
 
 		if(hasFinalEstimator()){
 			Estimator estimator = getFinalEstimator();
 
-			return estimator.getSkLearnFeatureNamesIn();
+			return estimator.getFeatureNamesIn();
 		}
 
 		return null;

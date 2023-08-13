@@ -32,11 +32,6 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 	}
 
 	@Override
-	public List<String> getFeatureNamesIn(){
-		return getSkLearnFeatureNamesIn();
-	}
-
-	@Override
 	public int getNumberOfFeatures(){
 		throw new IllegalArgumentException(formatMessage());
 	}
