@@ -44,10 +44,11 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn2pmml.HasPMMLOptions;
+import sklearn2pmml.HasPMMLSegmentId;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
-public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOptions<Estimator> {
+public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOptions<Estimator>, HasPMMLSegmentId<Estimator> {
 
 	public Estimator(String module, String name){
 		super(module, name);
@@ -286,14 +287,16 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		return this;
 	}
 
+	@Override
 	public Object getPMMLSegmentId(){
 		return getOptionalScalar(SkLearn2PMMLFields.PMML_SEGMENT_ID);
 	}
 
-	public Estimator setPMMLSegmentId(Object segmentId){
+	@Override
+	public Estimator setPMMLSegmentId(Object pmmlSegmentId){
 
-		if(segmentId != null){
-			put(SkLearn2PMMLFields.PMML_SEGMENT_ID, segmentId);
+		if(pmmlSegmentId != null){
+			put(SkLearn2PMMLFields.PMML_SEGMENT_ID, pmmlSegmentId);
 		} else
 
 		{

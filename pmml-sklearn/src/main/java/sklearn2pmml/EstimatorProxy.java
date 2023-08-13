@@ -189,6 +189,22 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		return this;
 	}
 
+	@Override
+	public Object getPMMLSegmentId(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getPMMLSegmentId();
+	}
+
+	@Override
+	public EstimatorProxy setPMMLSegmentId(Object pmmlSegmentId){
+		Estimator estimator = getEstimator();
+
+		estimator.setPMMLSegmentId(pmmlSegmentId);
+
+		return this;
+	}
+
 	static
 	public String formatProxyExample(Estimator estimator){
 		return ((EstimatorProxy.class).getSimpleName() + "(" + estimator.getPythonName() + "(...))");
