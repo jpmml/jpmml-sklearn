@@ -16,11 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn;
+package sklearn2pmml;
 
 import java.util.Map;
 
-public interface HasPMMLOptions<E> {
+import sklearn.Step;
+
+/**
+ * @see SkLearn2PMMLFields#PMML_OPTIONS
+ */
+public interface HasPMMLOptions<E extends Step> {
 
 	Map<String, ?> getPMMLOptions();
 

@@ -19,6 +19,7 @@
 package sklearn2pmml;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
@@ -170,6 +171,22 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		};
 
 		return castFunction.apply(estimator);
+	}
+
+	@Override
+	public Map<String, ?> getPMMLOptions(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getPMMLOptions();
+	}
+
+	@Override
+	public EstimatorProxy setPMMLOptions(Map<String, ?> pmmlOptions){
+		Estimator estimator = getEstimator();
+
+		estimator.setPMMLOptions(pmmlOptions);
+
+		return this;
 	}
 
 	static

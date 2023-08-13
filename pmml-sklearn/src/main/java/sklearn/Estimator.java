@@ -43,6 +43,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sklearn2pmml.HasPMMLOptions;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract

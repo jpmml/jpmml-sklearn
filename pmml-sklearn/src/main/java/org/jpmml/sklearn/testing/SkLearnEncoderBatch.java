@@ -28,8 +28,8 @@ import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUtil;
-import sklearn.HasPMMLOptions;
 import sklearn.Step;
+import sklearn2pmml.HasPMMLOptions;
 
 abstract
 public class SkLearnEncoderBatch extends PythonEncoderBatch {

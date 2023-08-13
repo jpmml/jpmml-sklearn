@@ -20,7 +20,6 @@ package sklearn.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.Lists;
 import org.dmg.pmml.Model;
@@ -36,7 +35,6 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
-import sklearn.HasPMMLOptions;
 import sklearn.Initializer;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
@@ -45,7 +43,7 @@ import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
-public class SkLearnPipeline extends Composite implements HasPMMLOptions<SkLearnPipeline>, Encodable {
+public class SkLearnPipeline extends Composite implements Encodable {
 
 	public SkLearnPipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -270,30 +268,6 @@ public class SkLearnPipeline extends Composite implements HasPMMLOptions<SkLearn
 
 	protected List<String> initActiveFields(Step step){
 		return StepUtil.getOrGenerateFeatureNames(step);
-	}
-
-	@Override
-	public Map<String, ?> getPMMLOptions(){
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getPMMLOptions();
-		}
-
-		return null;
-	}
-
-	@Override
-	public SkLearnPipeline setPMMLOptions(Map<String, ?> pmmlOptions){
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			estimator.setPMMLOptions(pmmlOptions);
-		}
-
-		return this;
 	}
 
 	public List<Object[]> getSteps(){
