@@ -44,6 +44,17 @@ public class Regressor extends Estimator {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		int numberOfOutputs = super.getNumberOfOutputs();
+
+		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
+			numberOfOutputs = 1;
+		}
+
+		return numberOfOutputs;
+	}
+
+	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 
 		if(names.size() == 1){

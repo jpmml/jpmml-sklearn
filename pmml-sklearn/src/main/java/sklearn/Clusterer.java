@@ -37,6 +37,11 @@ public class Clusterer extends Estimator implements HasPredictField {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		return 0;
+	}
+
+	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		throw new UnsupportedOperationException();
 	}

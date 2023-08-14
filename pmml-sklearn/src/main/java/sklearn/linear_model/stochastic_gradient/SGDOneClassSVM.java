@@ -37,6 +37,11 @@ public class SGDOneClassSVM extends SkLearnRegressor implements OutlierDetector 
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		return 0;
+	}
+
+	@Override
 	public boolean isSupervised(){
 		return false;
 	}

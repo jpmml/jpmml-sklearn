@@ -66,6 +66,11 @@ public class Scorecard extends Estimator implements HasClasses {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		return 1;
+	}
+
+	@Override
 	public List<?> getClasses(){
 		Estimator estimator = getEstimator();
 

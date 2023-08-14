@@ -67,6 +67,11 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		return 0;
+	}
+
+	@Override
 	public boolean isSupervised(){
 		return false;
 	}

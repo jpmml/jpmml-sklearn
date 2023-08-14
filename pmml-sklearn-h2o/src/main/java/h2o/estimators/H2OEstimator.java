@@ -74,6 +74,19 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		String estimatorType = getEstimatorType();
+
+		switch(estimatorType){
+			case "classifier":
+			case "regressor":
+				return 1;
+			default:
+				throw new IllegalArgumentException(estimatorType);
+		}
+	}
+
+	@Override
 	public List<?> getClasses(){
 		MojoModel mojoModel = getMojoModel();
 

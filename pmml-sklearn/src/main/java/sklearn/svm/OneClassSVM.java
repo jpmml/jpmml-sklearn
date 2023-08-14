@@ -34,6 +34,11 @@ public class OneClassSVM extends LibSVMRegressor implements OutlierDetector {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		return 0;
+	}
+
+	@Override
 	public boolean isSupervised(){
 		return false;
 	}

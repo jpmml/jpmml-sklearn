@@ -63,6 +63,17 @@ public class Classifier extends Estimator implements HasClasses {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		int numberOfOutputs = super.getNumberOfOutputs();
+
+		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
+			numberOfOutputs = 1;
+		}
+
+		return numberOfOutputs;
+	}
+
+	@Override
 	public List<?> getClasses(){
 		List<?> values = getListLike(SkLearnFields.CLASSES);
 
