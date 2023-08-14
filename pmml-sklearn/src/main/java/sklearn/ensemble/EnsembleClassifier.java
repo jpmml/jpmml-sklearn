@@ -55,7 +55,7 @@ public class EnsembleClassifier extends SkLearnClassifier implements HasEstimato
 		}
 
 		// SkLearn 1.2+
-		return get("_estimator", Classifier.class);
+		return get("estimator_", Classifier.class);
 	}
 
 	@Override
