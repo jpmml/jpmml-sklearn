@@ -102,7 +102,7 @@ public class Classifier extends Estimator implements HasClasses {
 
 					@Override
 					public String formatMessage(Object object){
-						return "The categories object of the \'" + name + "\' target field (" + ClassDictUtil.formatClass(object) + ") is not supported";
+						return "The categories object of the " + (name != null ? ("\'" + name + "\'" + " ") : "<un-named> ") + " target field (" + ClassDictUtil.formatClass(object) + ") is not supported";
 					}
 				};
 
@@ -124,14 +124,20 @@ public class Classifier extends Estimator implements HasClasses {
 	protected ScalarLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
 		DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-		DataField dataField = encoder.createDataField(name, OpType.CATEGORICAL, dataType, categories);
+		if(name != null){
+			DataField dataField = encoder.createDataField(name, OpType.CATEGORICAL, dataType, categories);
 
-		Map<String, Map<String, ?>> classExtensions = (Map)getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
-		if(classExtensions != null){
-			addClassExtensions(dataField, classExtensions);
+			Map<String, Map<String, ?>> classExtensions = (Map)getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
+			if(classExtensions != null){
+				addClassExtensions(dataField, classExtensions);
+			}
+
+			return new CategoricalLabel(dataField);
+		} else
+
+		{
+			return new CategoricalLabel(dataType, categories);
 		}
-
-		return new CategoricalLabel(dataField);
 	}
 
 	private void addClassExtensions(DataField dataField, Map<String, Map<String, ?>> classExtensions){

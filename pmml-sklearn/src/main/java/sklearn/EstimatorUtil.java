@@ -128,18 +128,9 @@ public class EstimatorUtil {
 					if(estimator.isSupervised()){
 						ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
 
-						MiningFunction miningFunction = estimator.getMiningFunction();
-						switch(miningFunction){
-							case CLASSIFICATION:
-							case REGRESSION:
-								{
-									Feature feature = encoder.exportPrediction(model, scalarLabel);
+						Feature feature = encoder.exportPrediction(model, scalarLabel);
 
-									return Collections.singletonList(feature);
-								}
-							default:
-								throw new IllegalArgumentException();
-						}
+						return Collections.singletonList(feature);
 					} else
 
 					{

@@ -19,18 +19,15 @@
 package tpot.builtins;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
@@ -55,27 +52,7 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
-		ScalarLabel scalarLabel;
-
-		MiningFunction miningFunction = estimator.getMiningFunction();
-		switch(miningFunction){
-			case CLASSIFICATION:
-				{
-					List<?> categories = EstimatorUtil.getClasses(estimator);
-
-					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
-
-					scalarLabel = new CategoricalLabel(dataType, categories);
-				}
-				break;
-			case REGRESSION:
-				{
-					scalarLabel = new ContinuousLabel(DataType.DOUBLE);
-				}
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
+		ScalarLabel scalarLabel = (ScalarLabel)estimator.encodeLabel(Collections.singletonList(null), encoder);
 
 		Schema schema = new Schema(encoder, scalarLabel, features);
 
@@ -87,19 +64,13 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 		List<Feature> result = new ArrayList<>();
 
-		switch(miningFunction){
-			case CLASSIFICATION:
-			case REGRESSION:
-				{
-					Feature feature = encoder.exportPrediction(model, name, scalarLabel);
+		{
+			Feature feature = encoder.exportPrediction(model, name, scalarLabel);
 
-					result.add(feature);
-				}
-				break;
-			default:
-				throw new IllegalArgumentException();
-		} // End switch
+			result.add(feature);
+		}
 
+		MiningFunction miningFunction = estimator.getMiningFunction();
 		switch(miningFunction){
 			case CLASSIFICATION:
 				{

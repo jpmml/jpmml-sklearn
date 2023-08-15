@@ -91,9 +91,17 @@ public class Scorecard extends Estimator implements HasClasses {
 		ClassDictUtil.checkSize(1, names);
 
 		if(scalingMethod != null){
-			DataField dataField = encoder.createDataField(names.get(0), OpType.CONTINUOUS, DataType.DOUBLE);
+			String name = names.get(0);
 
-			return new ContinuousLabel(dataField);
+			if(name != null){
+				DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
+
+				return new ContinuousLabel(dataField);
+			} else
+
+			{
+				return new ContinuousLabel(DataType.DOUBLE);
+			}
 		}
 
 		return estimator.encodeLabel(names, encoder);

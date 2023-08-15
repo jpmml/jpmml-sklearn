@@ -32,12 +32,13 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureList;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.h2o.Converter;
@@ -119,7 +120,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 
 		ClassDictUtil.checkSize(1, names);
 
-		DataField dataField;
+		String name = names.get(0);
 
 		switch(estimatorType){
 			case "classifier":
@@ -128,19 +129,31 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 
 					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-					dataField = encoder.createDataField(names.get(0), OpType.CATEGORICAL, dataType, categories);
+					if(name != null){
+						DataField dataField = encoder.createDataField(name, OpType.CATEGORICAL, dataType, categories);
+
+						return new CategoricalLabel(dataField);
+					} else
+
+					{
+						return new CategoricalLabel(dataType, categories);
+					}
 				}
-				break;
 			case "regressor":
 				{
-					dataField = encoder.createDataField(names.get(0), OpType.CONTINUOUS, DataType.DOUBLE);
+					if(name != null){
+						DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
+
+						return new ContinuousLabel(dataField);
+					} else
+
+					{
+						return new ContinuousLabel(DataType.DOUBLE);
+					}
 				}
-				break;
 			default:
 				throw new IllegalArgumentException(estimatorType);
 		}
-
-		return ScalarLabelUtil.createScalarLabel(dataField);
 	}
 
 	@Override

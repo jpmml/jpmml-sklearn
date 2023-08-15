@@ -79,8 +79,15 @@ public class Regressor extends Estimator {
 	}
 
 	protected ScalarLabel encodeLabel(String name, SkLearnEncoder encoder){
-		DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
 
-		return new ContinuousLabel(dataField);
+		if(name != null){
+			DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
+
+			return new ContinuousLabel(dataField);
+		} else
+
+		{
+			return new ContinuousLabel(DataType.DOUBLE);
+		}
 	}
 }

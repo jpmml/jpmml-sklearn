@@ -18,24 +18,20 @@
  */
 package sklego.meta;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.ResultFeature;
-import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.TypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Calibrator;
 import sklearn.Estimator;
@@ -77,7 +73,13 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 				throw new IllegalArgumentException(predictFunc);
 		}
 
-		Schema schema = createSchema(estimator, features, encoder);
+		ScalarLabel scalarLabel = null;
+
+		if(estimator.isSupervised()){
+			scalarLabel = (ScalarLabel)estimator.encodeLabel(Collections.singletonList(null), encoder);
+		}
+
+		Schema schema = new Schema(encoder, scalarLabel, features);
 
 		switch(predictFunc){
 			case SkLearnMethods.APPLY:
@@ -155,35 +157,5 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 	public String getPredictFunc(){
 		return getString("predict_func");
-	}
-
-	static
-	private Schema createSchema(Estimator estimator, List<Feature> features, SkLearnEncoder encoder){
-		Label label = null;
-
-		if(estimator.isSupervised()){
-			MiningFunction miningFunction = estimator.getMiningFunction();
-
-			switch(miningFunction){
-				case CLASSIFICATION:
-					{
-						List<?> categories = EstimatorUtil.getClasses(estimator);
-
-						DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
-
-						label = new CategoricalLabel(dataType, categories);
-					}
-					break;
-				case REGRESSION:
-					{
-						label = new ContinuousLabel(DataType.DOUBLE);
-					}
-					break;
-				default:
-					throw new IllegalArgumentException();
-			}
-		}
-
-		return new Schema(encoder, label, features);
 	}
 }
