@@ -50,6 +50,34 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
+	public MiningFunction getMiningFunction(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getMiningFunction();
+	}
+
+	@Override
+	public boolean isSupervised(){
+		Estimator estimator = getEstimator();
+
+		return estimator.isSupervised();
+	}
+
+	@Override
+	public OpType getOpType(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getOpType();
+	}
+
+	@Override
+	public DataType getDataType(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getDataType();
+	}
+
+	@Override
 	public List<String> getFeatureNamesIn(){
 		Estimator estimator = getEstimator();
 
@@ -71,41 +99,6 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
-	public OpType getOpType(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getOpType();
-	}
-
-	@Override
-	public DataType getDataType(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getDataType();
-	}
-
-	@Override
-	public MiningFunction getMiningFunction(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getMiningFunction();
-	}
-
-	@Override
-	public boolean isSupervised(){
-		Estimator estimator = getEstimator();
-
-		return estimator.isSupervised();
-	}
-
-	@Override
-	public String getAlgorithmName(){
-		Estimator estimator = getEstimator();
-
-		return estimator.getAlgorithmName();
-	}
-
-	@Override
 	public List<?> getClasses(){
 		Estimator estimator = getEstimator();
 
@@ -117,6 +110,13 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		Estimator estimator = getEstimator();
 
 		return EstimatorUtil.hasProbabilityDistribution(estimator);
+	}
+
+	@Override
+	public String getAlgorithmName(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getAlgorithmName();
 	}
 
 	@Override

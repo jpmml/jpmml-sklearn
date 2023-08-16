@@ -63,6 +63,11 @@ public class Classifier extends Estimator implements HasClasses {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return true;
+	}
+
+	@Override
 	public int getNumberOfOutputs(){
 		int numberOfOutputs = super.getNumberOfOutputs();
 

@@ -48,10 +48,10 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 	}
 
 	@Override
-	public String getAlgorithmName(){
+	public boolean isSupervised(){
 		Estimator estimator = getEstimator();
 
-		return estimator.getAlgorithmName();
+		return estimator.isSupervised();
 	}
 
 	@Override
@@ -66,6 +66,13 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 		Estimator estimator = getEstimator();
 
 		return EstimatorUtil.hasProbabilityDistribution(estimator);
+	}
+
+	@Override
+	public String getAlgorithmName(){
+		Estimator estimator = getEstimator();
+
+		return estimator.getAlgorithmName();
 	}
 
 	@Override

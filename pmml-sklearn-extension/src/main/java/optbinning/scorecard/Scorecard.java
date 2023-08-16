@@ -67,6 +67,11 @@ public class Scorecard extends Estimator implements HasClasses {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return true;
+	}
+
+	@Override
 	public int getNumberOfOutputs(){
 		return 1;
 	}

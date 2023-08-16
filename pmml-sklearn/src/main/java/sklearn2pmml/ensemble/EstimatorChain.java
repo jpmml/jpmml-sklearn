@@ -61,6 +61,11 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return true;
+	}
+
+	@Override
 	public int getNumberOfOutputs(){
 		Boolean multioutput = getMultioutput();
 
@@ -71,11 +76,6 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 		}
 
 		return 1;
-	}
-
-	@Override
-	public boolean isSupervised(){
-		return true;
 	}
 
 	@Override

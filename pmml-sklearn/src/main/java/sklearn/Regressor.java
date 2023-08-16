@@ -44,6 +44,11 @@ public class Regressor extends Estimator {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return true;
+	}
+
+	@Override
 	public int getNumberOfOutputs(){
 		int numberOfOutputs = super.getNumberOfOutputs();
 

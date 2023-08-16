@@ -37,6 +37,11 @@ public class Clusterer extends Estimator implements HasPredictField {
 	}
 
 	@Override
+	public boolean isSupervised(){
+		return false;
+	}
+
+	@Override
 	public int getNumberOfOutputs(){
 		return 0;
 	}

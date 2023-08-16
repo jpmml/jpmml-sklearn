@@ -58,10 +58,23 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	public MiningFunction getMiningFunction();
 
 	abstract
+	public boolean isSupervised();
+
+	abstract
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder);
 
 	abstract
 	public Model encodeModel(Schema schema);
+
+	@Override
+	public OpType getOpType(){
+		return OpType.CONTINUOUS;
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.DOUBLE;
+	}
 
 	@Override
 	public int getNumberOfFeatures(){
@@ -94,30 +107,6 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		}
 
 		return HasNumberOfOutputs.UNKNOWN;
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.CONTINUOUS;
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.DOUBLE;
-	}
-
-	public boolean isSupervised(){
-		MiningFunction miningFunction = getMiningFunction();
-
-		switch(miningFunction){
-			case CLASSIFICATION:
-			case REGRESSION:
-				return true;
-			case CLUSTERING:
-				return false;
-			default:
-				throw new IllegalArgumentException();
-		}
 	}
 
 	public String getAlgorithmName(){
