@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.HasClasses;
 import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
@@ -228,14 +229,10 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 			boolean hasProbabilityValues = verification.hasProbabilityValues();
 
-			if(estimator instanceof Classifier){
-				Classifier classifier = (Classifier)estimator;
+			if(estimator instanceof HasClasses){
+				HasClasses hasClasses = (HasClasses)estimator;
 
-				hasProbabilityValues &= classifier.hasProbabilityDistribution();
-			} else
-
-			{
-				hasProbabilityValues = false;
+				hasProbabilityValues &= hasClasses.hasProbabilityDistribution();
 			} // End if
 
 			if(hasProbabilityValues){

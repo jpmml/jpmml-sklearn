@@ -23,4 +23,6 @@ import java.util.List;
 public interface HasClasses {
 
 	List<?> getClasses();
+
+	boolean hasProbabilityDistribution();
 }

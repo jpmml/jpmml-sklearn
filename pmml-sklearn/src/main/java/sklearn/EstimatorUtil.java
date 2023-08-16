@@ -72,6 +72,18 @@ public class EstimatorUtil {
 	}
 
 	static
+	public boolean hasProbabilityDistribution(Estimator estimator){
+
+		if(estimator instanceof HasClasses){
+			HasClasses hasClasses = (HasClasses)estimator;
+
+			return hasClasses.hasProbabilityDistribution();
+		}
+
+		throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
+	}
+
+	static
 	public Transformer getHead(Estimator estimator){
 
 		if(estimator instanceof HasHead){

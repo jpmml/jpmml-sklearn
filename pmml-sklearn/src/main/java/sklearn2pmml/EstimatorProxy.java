@@ -113,6 +113,13 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
+	public boolean hasProbabilityDistribution(){
+		Estimator estimator = getEstimator();
+
+		return EstimatorUtil.hasProbabilityDistribution(estimator);
+	}
+
+	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 

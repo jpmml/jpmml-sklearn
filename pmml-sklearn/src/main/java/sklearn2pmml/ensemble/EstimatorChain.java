@@ -112,6 +112,19 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
+	public boolean hasProbabilityDistribution(){
+		List<? extends Estimator> estimators = getEstimators();
+
+		boolean result = true;
+
+		for(Estimator estimator : estimators){
+			result &= EstimatorUtil.hasProbabilityDistribution(estimator);
+		}
+
+		return result;
+	}
+
+	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		List<? extends Estimator> estimators = getEstimators();
 

@@ -85,6 +85,11 @@ public class Classifier extends Estimator implements HasClasses {
 	}
 
 	@Override
+	public boolean hasProbabilityDistribution(){
+		return true;
+	}
+
+	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
@@ -174,10 +179,6 @@ public class Classifier extends Estimator implements HasClasses {
 		for(Visitor visitor : visitors){
 			visitor.applyTo(dataField);
 		}
-	}
-
-	public boolean hasProbabilityDistribution(){
-		return true;
 	}
 
 	public List<OutputField> encodePredictProbaOutput(Model model, DataType dataType, CategoricalLabel categoricalLabel){

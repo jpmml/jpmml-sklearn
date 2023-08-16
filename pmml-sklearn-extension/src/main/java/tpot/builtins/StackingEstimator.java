@@ -31,7 +31,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.EstimatorUtil;
+import sklearn.HasClasses;
 import sklearn.HasEstimator;
 import sklearn.Transformer;
 
@@ -74,10 +74,10 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 		switch(miningFunction){
 			case CLASSIFICATION:
 				{
-					Classifier classifier = (Classifier)estimator;
+					HasClasses hasClasses = (HasClasses)estimator;
 
-					if(classifier.hasProbabilityDistribution()){
-						List<?> categories = EstimatorUtil.getClasses(estimator);
+					if(hasClasses.hasProbabilityDistribution()){
+						List<?> categories = hasClasses.getClasses();
 
 						for(Object category : categories){
 							Feature feature = encoder.exportProbability(model, FieldNameUtil.create(Classifier.FIELD_PROBABILITY, name, category), category);

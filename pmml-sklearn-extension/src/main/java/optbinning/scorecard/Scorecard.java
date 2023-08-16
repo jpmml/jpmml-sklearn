@@ -45,6 +45,7 @@ import pandas.core.BlockManager;
 import pandas.core.DataFrame;
 import pandas.core.Index;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 
 public class Scorecard extends Estimator implements HasClasses {
@@ -74,13 +75,14 @@ public class Scorecard extends Estimator implements HasClasses {
 	public List<?> getClasses(){
 		Estimator estimator = getEstimator();
 
-		if(estimator instanceof HasClasses){
-			HasClasses hasClasses = (HasClasses)estimator;
+		return EstimatorUtil.getClasses(estimator);
+	}
 
-			return hasClasses.getClasses();
-		}
+	@Override
+	public boolean hasProbabilityDistribution(){
+		Estimator estimator = getEstimator();
 
-		throw new UnsupportedOperationException();
+		return EstimatorUtil.hasProbabilityDistribution(estimator);
 	}
 
 	@Override

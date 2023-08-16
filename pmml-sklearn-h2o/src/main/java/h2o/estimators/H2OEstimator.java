@@ -101,6 +101,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 		return Arrays.asList(responseValues);
 	}
 
+	@Override
 	public boolean hasProbabilityDistribution(){
 		String estimatorType = getEstimatorType();
 
