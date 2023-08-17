@@ -21,6 +21,7 @@ package sklearn;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
@@ -215,19 +216,17 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	public Estimator toEstimator(){
 		Estimator estimator = getFinalEstimator();
 
-		if(estimator instanceof Classifier){
-			return toClassifier();
-		} else
-
-		if(estimator instanceof Regressor){
-			return toRegressor();
-		} else
-
-		if(estimator instanceof Clusterer){
-			return toClusterer();
+		MiningFunction miningFunction = estimator.getMiningFunction();
+		switch(miningFunction){
+			case CLASSIFICATION:
+				return toClassifier();
+			case REGRESSION:
+				return toRegressor();
+			case CLUSTERING:
+				return toClusterer();
+			default:
+				throw new IllegalArgumentException();
 		}
-
-		throw new IllegalArgumentException();
 	}
 
 	public Classifier toClassifier(){
