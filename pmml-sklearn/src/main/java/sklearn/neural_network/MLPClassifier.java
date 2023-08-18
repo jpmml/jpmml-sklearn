@@ -42,6 +42,11 @@ public class MLPClassifier extends SkLearnClassifier {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		return 1;
+	}
+
+	@Override
 	public NeuralNetwork encodeModel(Schema schema){
 		String activation = getActivation();
 
