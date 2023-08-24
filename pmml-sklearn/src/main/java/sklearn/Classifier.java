@@ -37,10 +37,11 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.MultiLabel;
-import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.OrdinalLabel;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -131,22 +132,40 @@ public class Classifier extends Estimator implements HasClasses {
 		}
 	}
 
-	protected ScalarLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
+	protected DiscreteLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
+		return encodeLabel(name, OpType.CATEGORICAL, categories, encoder);
+	}
+
+	protected DiscreteLabel encodeLabel(String name, OpType opType, List<?> categories, SkLearnEncoder encoder){
 		DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
 		if(name != null){
-			DataField dataField = encoder.createDataField(name, OpType.CATEGORICAL, dataType, categories);
+			DataField dataField = encoder.createDataField(name, opType, dataType, categories);
 
 			Map<String, Map<String, ?>> classExtensions = (Map)getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
 			if(classExtensions != null){
 				addClassExtensions(dataField, classExtensions);
 			}
 
-			return new CategoricalLabel(dataField);
+			switch(opType){
+				case CATEGORICAL:
+					return new CategoricalLabel(dataField);
+				case ORDINAL:
+					return new OrdinalLabel(dataField);
+				default:
+					throw new IllegalArgumentException();
+			}
 		} else
 
 		{
-			return new CategoricalLabel(dataType, categories);
+			switch(opType){
+				case CATEGORICAL:
+					return new CategoricalLabel(dataType, categories);
+				case ORDINAL:
+					return new OrdinalLabel(dataType, categories);
+				default:
+					throw new IllegalArgumentException();
+			}
 		}
 	}
 
@@ -186,8 +205,8 @@ public class Classifier extends Estimator implements HasClasses {
 		}
 	}
 
-	public List<OutputField> encodePredictProbaOutput(Model model, DataType dataType, CategoricalLabel categoricalLabel){
-		List<OutputField> predictProbaFields = createPredictProbaFields(dataType, categoricalLabel);
+	public List<OutputField> encodePredictProbaOutput(Model model, DataType dataType, DiscreteLabel discreteLabel){
+		List<OutputField> predictProbaFields = createPredictProbaFields(dataType, discreteLabel);
 
 		if(model instanceof MiningModel){
 			MiningModel miningModel = (MiningModel)model;

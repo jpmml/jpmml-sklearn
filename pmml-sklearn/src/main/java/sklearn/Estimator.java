@@ -32,7 +32,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
-import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
@@ -295,7 +295,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		return this;
 	}
 
-	public List<OutputField> createPredictProbaFields(DataType dataType, CategoricalLabel categoricalLabel){
+	public List<OutputField> createPredictProbaFields(DataType dataType, DiscreteLabel discreteLabel){
 		Object pmmlSegmentId = getPMMLSegmentId();
 
 		if(this instanceof HasClasses){
@@ -306,7 +306,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			throw new IllegalArgumentException();
 		}
 
-		List<?> values = categoricalLabel.getValues();
+		List<?> values = discreteLabel.getValues();
 
 		return values.stream()
 			.map(value -> {

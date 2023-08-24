@@ -20,11 +20,8 @@ package sklearn2pmml.statsmodels;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.OrdinalLabel;
-import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class StatsModelsOrdinalClassifier extends StatsModelsClassifier {
@@ -34,15 +31,7 @@ public class StatsModelsOrdinalClassifier extends StatsModelsClassifier {
 	}
 
 	@Override
-	protected ScalarLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
-		CategoricalLabel categoricalLabel = (CategoricalLabel)super.encodeLabel(name, categories, encoder);
-
-		if(!categoricalLabel.isAnonymous()){
-			DataField dataField = encoder.getDataField(categoricalLabel.getName());
-
-			dataField.setOpType(OpType.ORDINAL);
-		}
-
-		return new OrdinalLabel(categoricalLabel.getName(), categoricalLabel.getDataType(), categoricalLabel.getValues());
+	protected DiscreteLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
+		return encodeLabel(name, OpType.ORDINAL, categories, encoder);
 	}
 }
