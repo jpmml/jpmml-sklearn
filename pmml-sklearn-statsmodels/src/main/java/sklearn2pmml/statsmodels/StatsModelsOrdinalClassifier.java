@@ -21,13 +21,11 @@ package sklearn2pmml.statsmodels;
 import java.util.List;
 
 import org.dmg.pmml.DataField;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.Feature;
-import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.OrdinalLabel;
-import org.jpmml.converter.Schema;
+import org.jpmml.converter.ScalarLabel;
+import org.jpmml.sklearn.SkLearnEncoder;
 
 public class StatsModelsOrdinalClassifier extends StatsModelsClassifier {
 
@@ -36,11 +34,8 @@ public class StatsModelsOrdinalClassifier extends StatsModelsClassifier {
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
-		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
-
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-		List<? extends Feature> features = schema.getFeatures();
+	protected ScalarLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
+		CategoricalLabel categoricalLabel = (CategoricalLabel)super.encodeLabel(name, categories, encoder);
 
 		if(!categoricalLabel.isAnonymous()){
 			DataField dataField = encoder.getDataField(categoricalLabel.getName());
@@ -48,10 +43,6 @@ public class StatsModelsOrdinalClassifier extends StatsModelsClassifier {
 			dataField.setOpType(OpType.ORDINAL);
 		}
 
-		OrdinalLabel ordinalLabel = new OrdinalLabel(categoricalLabel.getName(), categoricalLabel.getDataType(), categoricalLabel.getValues());
-
-		schema = schema.toRelabeledSchema(ordinalLabel);
-
-		return super.encodeModel(schema);
+		return new OrdinalLabel(categoricalLabel.getName(), categoricalLabel.getDataType(), categoricalLabel.getValues());
 	}
 }
