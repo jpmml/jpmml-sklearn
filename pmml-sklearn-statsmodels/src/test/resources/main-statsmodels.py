@@ -1,15 +1,13 @@
 import sys
 
-from pandas import CategoricalDtype, DataFrame, Series
+from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
-from sklearn.preprocessing import OneHotEncoder, KBinsDiscretizer
+from sklearn.preprocessing import OneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.statsmodels import StatsModelsClassifier, StatsModelsOrdinalClassifier, StatsModelsRegressor
 from statsmodels.api import GLM, Logit, MNLogit, OLS, Poisson, WLS
 from statsmodels.genmod import families
 from statsmodels.miscmodels.ordinal_model import OrderedModel
-
-import numpy
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
@@ -97,11 +95,7 @@ def build_auto_ordinal(auto_df, classifier, name):
 
 	categories = ["bad", "poor", "fair", "good", "excellent"]
 
-	binner = KBinsDiscretizer(n_bins = len(categories), encode = "ordinal", strategy = "kmeans")
-	auto_y = binner.fit_transform(auto_y.values.reshape((-1, 1))).astype(int)
-
-	category_mapping = {idx : category for idx, category in enumerate(categories)}
-	auto_y = Series(numpy.vectorize(lambda x: category_mapping[x])(auto_y.ravel()), dtype = CategoricalDtype(categories = categories, ordered = True), name = "bin(mpg)")
+	auto_y = to_ordinal_label(auto_y, categories, "bin(mpg)")
 
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
 	cat_cols = ["cylinders", "model_year", "origin"]
