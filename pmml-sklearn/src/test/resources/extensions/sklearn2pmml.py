@@ -296,28 +296,7 @@ def build_expr_auto(auto_df, name):
 	store_csv(mpg, name)
 
 def build_ordinal_auto(auto_df, name):
-	auto_X, auto_y = split_csv(auto_df)
-
-	categories = ["bad", "poor", "fair", "good", "excellent"]
-
-	auto_y = to_ordinal_label(auto_y, categories, "bin(mpg)")
-
-	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
-	cat_cols = ["cylinders", "model_year", "origin"]
-
-	pipeline = PMMLPipeline([
-		("mapper", DataFrameMapper(
-			[([cont_col], ContinuousDomain()) for cont_col in cont_cols] +
-			[([cat_col], [CategoricalDomain(), OneHotEncoder()]) for cat_col in cat_cols]
-		)),
-		("classifier", OrdinalClassifier(LogisticRegression()))
-	])
-	pipeline.fit(auto_X, auto_y)
-	store_pkl(pipeline, name)
-	mpg_bin = DataFrame(pipeline.predict(auto_X), columns = ["bin(mpg)"])
-	mpg_bin_proba = DataFrame(pipeline.predict_proba(auto_X), columns = ["probability({})".format(category) for category in categories])
-	mpg_bin = pandas.concat((mpg_bin, mpg_bin_proba), axis = 1)
-	store_csv(mpg_bin, name)
+	build_auto_ordinal(auto_df, OrdinalClassifier(LogisticRegression()), name)
 
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")

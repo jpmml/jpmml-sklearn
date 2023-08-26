@@ -1,9 +1,5 @@
-from pandas import CategoricalDtype, DataFrame, Series
-from sklearn.preprocessing import KBinsDiscretizer
-
 import dill
 import joblib
-import numpy
 import os
 import pandas
 
@@ -96,12 +92,3 @@ def load_wheat(name):
 	df = load_csv(name)
 	print(df.dtypes)
 	return df
-
-def to_ordinal_label(y, categories, name):
-	binner = KBinsDiscretizer(n_bins = len(categories), encode = "ordinal", strategy = "kmeans")
-	y_bin = binner.fit_transform(y.values.reshape((-1, 1))).astype(int)
-
-	category_mapping = {idx : category for idx, category in enumerate(categories)}
-	y_bin = Series(numpy.vectorize(lambda x: category_mapping[x])(y_bin.ravel()), dtype = CategoricalDtype(categories = categories, ordered = True), name = name)
-
-	return y_bin

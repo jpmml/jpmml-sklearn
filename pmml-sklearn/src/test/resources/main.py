@@ -1,6 +1,6 @@
 from common import *
 
-from pandas import DataFrame
+from pandas import CategoricalDtype, DataFrame, Series
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
@@ -532,6 +532,36 @@ if "Sentiment" in datasets:
 	build_sentiment(sentiment_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), Matcher(), "RandomForestSentiment", compact = False)
 
 #
+# Ordinal classification
+#
+
+def build_auto_ordinal(auto_df, classifier, name):
+	auto_X, auto_y = split_csv(auto_df)
+
+	categories = ["bad", "poor", "fair", "good", "excellent"]
+
+	binner = KBinsDiscretizer(n_bins = len(categories), encode = "ordinal", strategy = "kmeans")
+	auto_y = binner.fit_transform(auto_y.values.reshape((-1, 1))).astype(int)
+
+	category_mapping = {idx : category for idx, category in enumerate(categories)}
+	auto_y = Series(numpy.vectorize(lambda x: category_mapping[x])(auto_y.ravel()), dtype = CategoricalDtype(categories = categories, ordered = True), name = "bin(mpg)")
+
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
+		[([column], [CategoricalDomain(), OneHotEncoder(drop = "first")]) for column in ["cylinders", "model_year", "origin"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(auto_X, auto_y)
+	store_pkl(pipeline, name)
+	mpg_bin = DataFrame(pipeline.predict(auto_X), columns = ["bin(mpg)"])
+	mpg_bin_proba = DataFrame(pipeline.predict_proba(auto_X), columns = ["probability({})".format(category) for category in categories])
+	mpg_bin = pandas.concat((mpg_bin, mpg_bin_proba), axis = 1)
+	store_csv(mpg_bin, name)
+
+#
 # Regression
 #
 
@@ -621,7 +651,7 @@ def build_auto_hist(auto_df, regressor, name):
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
-	build_auto_hist(auto_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAuto")
+	build_auto_hist(auto_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAuto")	
 
 def build_auto_isotonic(auto_isotonic_X, auto_y, regressor, name):
 	pipeline = PMMLPipeline([

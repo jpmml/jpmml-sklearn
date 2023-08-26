@@ -12,6 +12,7 @@ from statsmodels.miscmodels.ordinal_model import OrderedModel
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
+from main import *
 
 def make_mapper(cont_cols, cat_cols):
 	features = []
@@ -89,30 +90,6 @@ def build_auto(auto_df, regressor, name):
 	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name)
-
-def build_auto_ordinal(auto_df, classifier, name):
-	auto_X, auto_y = split_csv(auto_df)
-
-	categories = ["bad", "poor", "fair", "good", "excellent"]
-
-	auto_y = to_ordinal_label(auto_y, categories, "bin(mpg)")
-
-	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
-	cat_cols = ["cylinders", "model_year", "origin"]
-
-	mapper = make_mapper(cont_cols = cont_cols + cat_cols, cat_cols = [])
-
-	pipeline = PMMLPipeline([
-		("mapper", mapper),
-		("classifier", classifier)
-	])
-	pipeline.fit(auto_X, auto_y)
-	classifier.remove_data()
-	store_pkl(pipeline, name)
-	mpg_bin = DataFrame(pipeline.predict(auto_X), columns = ["bin(mpg)"])
-	mpg_bin_proba = DataFrame(pipeline.predict_proba(auto_X), columns = ["probability({})".format(category) for category in categories])
-	mpg_bin = pandas.concat((mpg_bin, mpg_bin_proba), axis = 1)
-	store_csv(mpg_bin, name)
 
 auto_df = load_auto("Auto")
 
