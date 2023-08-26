@@ -46,7 +46,7 @@ def build_audit(audit_df, classifier, name):
 	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
-def build_audit_ob(audit_df, classifier, name):
+def build_ob_audit(audit_df, classifier, name):
 	audit_X, audit_y = split_csv(audit_df)
 
 	mapper = DataFrameMapper([
@@ -66,7 +66,7 @@ def build_audit_ob(audit_df, classifier, name):
 	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
 	store_csv(adjusted, name)
 
-def build_audit_scorecard(audit_df, name, **scorecard_params):
+def build_scorecard_audit(audit_df, name, **scorecard_params):
 	audit_X, audit_y = split_csv(audit_df)
 
 	cont_cols = ["Age", "Hours", "Income"]
@@ -97,9 +97,9 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
 	build_audit(audit_df, DecisionTreeClassifier(random_state = 13), "BinningProcessAudit")
-	build_audit_ob(audit_df, DecisionTreeClassifier(random_state = 13), "OptimalBinningAudit")
-	build_audit_scorecard(audit_df, "ScorecardAudit")
-	build_audit_scorecard(audit_df, "ScaledScorecardAudit", scaling_method = "pdo_odds", scaling_method_params = {"pdo" : 20, "odds" : 50, "scorecard_points" : 600})
+	build_ob_audit(audit_df, DecisionTreeClassifier(random_state = 13), "OptimalBinningAudit")
+	build_scorecard_audit(audit_df, "ScorecardAudit")
+	build_scorecard_audit(audit_df, "ScaledScorecardAudit", scaling_method = "pdo_odds", scaling_method_params = {"pdo" : 20, "odds" : 50, "scorecard_points" : 600})
 
 	audit_df = load_audit("AuditNA")
 
@@ -149,7 +149,7 @@ def build_auto(auto_df, regressor, name):
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name)
 
-def build_auto_scorecard(auto_df, name, **scorecard_params):
+def build_scorecard_auto(auto_df, name, **scorecard_params):
 	auto_X, auto_y = split_csv(auto_df)
 
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
@@ -178,11 +178,11 @@ if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_auto(auto_df, DecisionTreeRegressor(random_state = 13), "BinningProcessAuto")
-	build_auto_scorecard(auto_df, "ScorecardAuto")
-	build_auto_scorecard(auto_df, "ScaledScorecardAuto", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100}, intercept_based = True, reverse_scorecard = True)
+	build_scorecard_auto(auto_df, "ScorecardAuto")
+	build_scorecard_auto(auto_df, "ScaledScorecardAuto", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100}, intercept_based = True, reverse_scorecard = True)
 
 	auto_df = load_auto("AutoNA")
 
 	build_auto(auto_df, LinearRegression(), "BinningProcessAutoNA")
-	build_auto_scorecard(auto_df, "ScorecardAutoNA")
-	build_auto_scorecard(auto_df, "ScaledScorecardAutoNA", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100})
+	build_scorecard_auto(auto_df, "ScorecardAutoNA")
+	build_scorecard_auto(auto_df, "ScaledScorecardAutoNA", scaling_method = "min_max", scaling_method_params = {"min" : 0, "max" : 100})

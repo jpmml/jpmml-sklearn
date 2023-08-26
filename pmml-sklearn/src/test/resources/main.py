@@ -278,7 +278,7 @@ if "Audit" in datasets:
 	build_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(audit_na_df, LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 
-def build_audit_na_hist(audit_na_df, classifier, name):
+def build_hist_audit_na(audit_na_df, classifier, name):
 	audit_na_X, audit_na_y = split_csv(audit_na_df)
 
 	mapper = DataFrameMapper(
@@ -300,7 +300,7 @@ def build_audit_na_hist(audit_na_df, classifier, name):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_audit_na_hist(audit_na_df, HistGradientBoostingClassifier(max_iter = 71, categorical_features = [3, 4, 5, 6, 7], random_state = 13), "HistGradientBoostingAuditNA")
+	build_hist_audit_na(audit_na_df, HistGradientBoostingClassifier(max_iter = 71, categorical_features = [3, 4, 5, 6, 7], random_state = 13), "HistGradientBoostingAuditNA")
 
 def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
@@ -633,7 +633,7 @@ if "Auto" in datasets:
 	build_auto(auto_df, TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
 	build_auto(auto_df, TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedLinearRegressionAuto")
 
-def build_auto_hist(auto_df, regressor, name):
+def build_hist_auto(auto_df, regressor, name):
 	auto_X, auto_y = split_csv(auto_df)
 
 	mapper = DataFrameMapper(
@@ -651,9 +651,9 @@ def build_auto_hist(auto_df, regressor, name):
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
-	build_auto_hist(auto_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAuto")	
+	build_hist_auto(auto_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAuto")	
 
-def build_auto_isotonic(auto_isotonic_X, auto_y, regressor, name):
+def build_isotonic_auto(auto_isotonic_X, auto_y, regressor, name):
 	pipeline = PMMLPipeline([
 		("regressor", regressor)
 	])
@@ -664,8 +664,8 @@ def build_auto_isotonic(auto_isotonic_X, auto_y, regressor, name):
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
-	build_auto_isotonic(auto_df["acceleration"], auto_df["mpg"], IsotonicRegression(increasing = True, out_of_bounds = "nan"), "IsotonicRegressionIncrAuto")
-	build_auto_isotonic(auto_df["weight"], auto_df["mpg"], IsotonicRegression(increasing = False, y_min = 12, y_max = 36, out_of_bounds = "clip"), "IsotonicRegressionDecrAuto")
+	build_isotonic_auto(auto_df["acceleration"], auto_df["mpg"], IsotonicRegression(increasing = True, out_of_bounds = "nan"), "IsotonicRegressionIncrAuto")
+	build_isotonic_auto(auto_df["weight"], auto_df["mpg"], IsotonicRegression(increasing = False, y_min = 12, y_max = 36, out_of_bounds = "clip"), "IsotonicRegressionDecrAuto")
 
 # XXX
 auto_train_mask = numpy.random.choice([False, True], size = (392,), p = [0.8, 0.2])
@@ -727,7 +727,7 @@ if "Auto" in datasets:
 	build_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_auto_na(auto_na_df, LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
 
-def build_auto_na_hist(auto_na_df, regressor, name):
+def build_hist_auto_na(auto_na_df, regressor, name):
 	auto_na_X, auto_na_y = split_csv(auto_na_df)
 
 	mapper = DataFrameMapper(
@@ -751,7 +751,7 @@ if "Auto" in datasets:
 	auto_na_df["model_year"] = auto_na_df["model_year"].astype("Int64")
 	auto_na_df["origin"] = auto_na_df["origin"].astype("Int64")
 	
-	build_auto_na_hist(auto_na_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAutoNA")
+	build_hist_auto_na(auto_na_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAutoNA")
 
 def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
