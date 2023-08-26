@@ -79,18 +79,6 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		logger.warn(ClassDictUtil.formatClass(this) + " should be replaced with " + ClassDictUtil.formatClass(new SkLearnPipeline()) + " in nested workflows");
-
-		return super.encodeFeatures(features, encoder);
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		return super.encodeModel(schema);
-	}
-
-	@Override
 	public PMML encodePMML(){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 

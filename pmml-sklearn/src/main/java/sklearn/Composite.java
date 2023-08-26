@@ -18,6 +18,7 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -28,6 +29,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.Castable;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -135,13 +138,12 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	 */
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 
-		if(!hasTransformers()){
-			return features;
-		}
+		if(hasTransformers()){
+			List<? extends Transformer> transformers = getTransformers();
 
-		List<? extends Transformer> transformers = getTransformers();
-		for(Transformer transformer : transformers){
-			features = transformer.encode(features, encoder);
+			for(Transformer transformer : transformers){
+				features = transformer.encode(features, encoder);
+			}
 		}
 
 		return features;
@@ -179,6 +181,26 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	}
 
 	@Override
+	public Transformer getHead(){
+
+		if(hasTransformers()){
+			List<? extends Transformer> transformers = getTransformers();
+
+			Transformer transformer = transformers.get(0);
+
+			return TransformerUtil.getHead(transformer);
+		} // End if
+
+		if(hasFinalEstimator()){
+			Estimator estimator = getFinalEstimator();
+
+			return EstimatorUtil.getHead(estimator);
+		}
+
+		return null;
+	}
+
+	@Override
 	public Object castTo(Class<?> clazz){
 
 		if((Transformer.class).equals(clazz)){
@@ -195,6 +217,10 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 		if((Regressor.class).equals(clazz)){
 			return toRegressor();
+		} else
+
+		if((Clusterer.class).equals(clazz)){
+			return toClusterer();
 		}
 
 		return this;
@@ -239,5 +265,69 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 	public Clusterer toClusterer(){
 		return new CompositeClusterer(this);
+	}
+
+	protected List<String> initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
+
+		if(estimator != null && estimator.isSupervised()){
+
+			if(targetFields == null){
+				targetFields = initTargetFields(estimator);
+			}
+
+			encoder.initLabel(estimator, targetFields);
+		}
+
+		return targetFields;
+	}
+
+	protected List<String> initTargetFields(Estimator estimator){
+		return EncodableUtil.generateOutputNames(estimator);
+	}
+
+	protected List<String> initFeatures(Estimator estimator, List<String> activeFields, SkLearnEncoder encoder){
+		Step featureInitializer = estimator;
+
+		try {
+			Transformer transformer = getHead();
+
+			if(transformer != null){
+				featureInitializer = transformer;
+
+				if(!(transformer instanceof Initializer)){
+
+					if(activeFields == null){
+						activeFields = initActiveFields(transformer);
+					}
+
+					encoder.initFeatures(transformer, activeFields);
+				}
+
+				// XXX
+				List<Feature> features = new ArrayList<>();
+				features.addAll(encoder.getFeatures());
+
+				features = encodeFeatures(features, encoder);
+
+				encoder.setFeatures(features);
+			} else
+
+			if(estimator != null){
+
+				if(activeFields == null){
+					activeFields = initActiveFields(estimator);
+				}
+
+				encoder.initFeatures(estimator, activeFields);
+			}
+		} catch(UnsupportedOperationException uoe){
+			throw new IllegalArgumentException("The feature initializer object (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
+		}
+
+		return activeFields;
+	}
+
+	protected List<String> initActiveFields(Step step){
+		return EncodableUtil.getOrGenerateFeatureNames(step);
 	}
 }
