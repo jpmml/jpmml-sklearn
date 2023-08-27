@@ -215,6 +215,14 @@ Java library and command-line application for converting [Scikit-Learn](https://
 </details>
 
 <details>
+  <summary>Hyperopt-sklearn</summary>
+
+  Examples: [extensions/hpsklearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/hpsklearn.py)
+
+  * `hpsklearn.HyperoptEstimator`
+</details>
+
+<details>
   <summary>Imbalanced-Learn</summary>
 
   Examples: [extensions/imblearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/imblearn.py)
