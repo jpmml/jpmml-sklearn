@@ -29,13 +29,14 @@ import org.jpmml.python.HasArray;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Drop;
+import sklearn.HasFeatureNamesIn;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 
-public class ColumnTransformer extends Initializer {
+public class ColumnTransformer extends Initializer implements HasFeatureNamesIn {
 
 	public ColumnTransformer(String module, String name){
 		super(module, name);
@@ -43,7 +44,20 @@ public class ColumnTransformer extends Initializer {
 
 	@Override
 	public List<Feature> initializeFeatures(SkLearnEncoder encoder){
-		return encodeFeatures(Collections.emptyList(), encoder);
+		List<Feature> features = Collections.emptyList();
+
+		List<String> names = getFeatureNamesIn();
+		if(names != null){
+			features = new ArrayList<>();
+
+			for(String featureNameIn : names){
+				Feature feature = InitializerUtil.createWildcardFeature(featureNameIn, encoder);
+
+				features.add(feature);
+			}
+		}
+
+		return encodeFeatures(features, encoder);
 	}
 
 	@Override

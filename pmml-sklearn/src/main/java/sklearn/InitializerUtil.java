@@ -63,7 +63,7 @@ public class InitializerUtil {
 						throw new IllegalArgumentException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
 					}
 
-					return createWildcardFeature(column);
+					return createWildcardFeature(column, encoder);
 				} else
 
 				if(object instanceof Integer){
@@ -75,24 +75,25 @@ public class InitializerUtil {
 						return feature;
 					}
 
-					return createWildcardFeature(("x" + (index.intValue() + 1)));
+					return createWildcardFeature(("x" + (index.intValue() + 1)), encoder);
 				} else
 
 				{
 					throw new IllegalArgumentException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string or integer");
 				}
 			}
-
-			private Feature createWildcardFeature(String name){
-				DataField dataField = encoder.getDataField(name);
-				if(dataField == null){
-					dataField = encoder.createDataField(name);
-				}
-
-				return new WildcardFeature(encoder, dataField);
-			}
 		};
 
 		return Lists.transform(columns, castFunction);
+	}
+
+	static
+	public Feature createWildcardFeature(String name, SkLearnEncoder encoder){
+		DataField dataField = encoder.getDataField(name);
+		if(dataField == null){
+			dataField = encoder.createDataField(name);
+		}
+
+		return new WildcardFeature(encoder, dataField);
 	}
 }

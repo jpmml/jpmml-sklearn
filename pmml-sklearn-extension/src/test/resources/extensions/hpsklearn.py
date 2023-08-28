@@ -37,6 +37,7 @@ def build_audit(audit_df, name):
 
 	estimator = HyperoptEstimator(classifier = hist_gradient_boosting_classifier("hist", categorical_features = [0, 1, 2, 3, 4]), preprocessing = [mapper])
 	estimator.fit(audit_X, audit_y)
+	mapper.feature_names_in_ = audit_X.columns.values
 	store_pkl(estimator, name)
 
 	pipeline = to_pipeline(estimator)
@@ -79,6 +80,7 @@ def build_auto(auto_df, name):
 
 	estimator = HyperoptEstimator(regressor = linear_regression("lm"), preprocessing = [mapper])
 	estimator.fit(auto_X, auto_y)
+	mapper.feature_names_in_ = auto_X.columns.values
 	store_pkl(estimator, name)
 
 	mpg = DataFrame(estimator.predict(auto_X), columns = ["y"])

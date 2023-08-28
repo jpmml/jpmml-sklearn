@@ -49,13 +49,13 @@ public class EncodableUtil {
 
 	static
 	public List<String> getOrGenerateFeatureNames(Step step){
-		List<String> result = step.getFeatureNamesIn();
+		List<String> names = step.getFeatureNamesIn();
 
-		if(result == null){
-			result = generateFeatureNames(step);
+		if(names == null){
+			return generateFeatureNames(step);
 		}
 
-		return result;
+		return names;
 	}
 
 	static
