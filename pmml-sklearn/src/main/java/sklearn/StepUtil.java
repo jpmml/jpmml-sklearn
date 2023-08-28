@@ -29,6 +29,18 @@ public class StepUtil {
 	}
 
 	static
+	public Step getHead(Step step){
+
+		if(step instanceof HasHead){
+			HasHead hasHead = (HasHead)step;
+
+			return hasHead.getHead();
+		}
+
+		return step;
+	}
+
+	static
 	public void checkNumberOfFeatures(Step step, List<? extends Feature> features){
 		int numberOfFeatures = step.getNumberOfFeatures();
 

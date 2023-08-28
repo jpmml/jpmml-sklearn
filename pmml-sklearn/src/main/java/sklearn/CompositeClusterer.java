@@ -100,7 +100,7 @@ public class CompositeClusterer extends Clusterer implements HasFeatureNamesIn, 
 	}
 
 	@Override
-	public Transformer getHead(){
+	public Step getHead(){
 		Composite composite = getComposite();
 
 		return composite.getHead();

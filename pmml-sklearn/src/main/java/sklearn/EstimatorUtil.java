@@ -84,18 +84,6 @@ public class EstimatorUtil {
 	}
 
 	static
-	public Transformer getHead(Estimator estimator){
-
-		if(estimator instanceof HasHead){
-			HasHead hasHead = (HasHead)estimator;
-
-			return hasHead.getHead();
-		}
-
-		return null;
-	}
-
-	static
 	public List<Feature> export(Estimator estimator, String predictFunc, Schema schema, Model model, SkLearnEncoder encoder){
 
 		switch(predictFunc){

@@ -20,5 +20,5 @@ package sklearn;
 
 public interface HasHead {
 
-	Transformer getHead();
+	Step getHead();
 }

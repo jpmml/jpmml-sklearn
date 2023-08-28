@@ -93,7 +93,7 @@ public class CompositeRegressor extends Regressor implements HasFeatureNamesIn, 
 	}
 
 	@Override
-	public Transformer getHead(){
+	public Step getHead(){
 		Composite composite = getComposite();
 
 		return composite.getHead();

@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.junit.Test;
 import sklearn.Classifier;
-import sklearn.Estimator;
-import sklearn.PassThrough;
 import sklearn.CompositeClassifier;
 import sklearn.CompositeRegressor;
+import sklearn.Estimator;
+import sklearn.PassThrough;
 import sklearn.Regressor;
 import sklearn.SkLearnSteps;
 import sklearn.dummy.DummyClassifier;
@@ -49,7 +49,13 @@ public class SkLearnPipelineTest {
 		assertFalse(pipeline.hasTransformers());
 		assertEquals(Collections.emptyList(), pipeline.getTransformers());
 
-		assertNull(pipeline.getHead());
+		try {
+			pipeline.getHead();
+
+			fail();
+		} catch(IllegalArgumentException iae){
+			// Ignored
+		}
 
 		assertFalse(pipeline.hasFinalEstimator());
 

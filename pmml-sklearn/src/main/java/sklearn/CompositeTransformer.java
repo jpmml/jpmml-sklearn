@@ -65,7 +65,7 @@ public class CompositeTransformer extends Transformer implements HasHead {
 	}
 
 	@Override
-	public Transformer getHead(){
+	public Step getHead(){
 		Composite composite = getComposite();
 
 		return composite.getHead();

@@ -31,6 +31,8 @@ import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Composite;
 import sklearn.Estimator;
+import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.Transformer;
 
 public class HyperoptEstimator extends Composite implements Encodable {
@@ -78,6 +80,21 @@ public class HyperoptEstimator extends Composite implements Encodable {
 		E bestLearner = getBestLearner(clazz);
 
 		return bestLearner;
+	}
+
+	@Override
+	public Step getHead(){
+		List<? extends Transformer> transformers = getTransformers();
+
+		if(!transformers.isEmpty()){
+			Transformer transformer = transformers.get(0);
+
+			return StepUtil.getHead(transformer);
+		}
+
+		Estimator estimator = getFinalEstimator();
+
+		return StepUtil.getHead(estimator);
 	}
 
 	@Override

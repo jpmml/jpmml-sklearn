@@ -57,19 +57,10 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 	@Override
 	public List<String> getFeatureNamesIn(){
+		Step head = getHead();
 
-		if(hasTransformers()){
-			List<? extends Transformer> transformers = getTransformers();
-
-			for(Transformer transformer : transformers){
-				return transformer.getFeatureNamesIn();
-			}
-		} // End if
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getFeatureNamesIn();
+		if(head != null){
+			return head.getFeatureNamesIn();
 		}
 
 		return null;
@@ -77,17 +68,10 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 	@Override
 	public int getNumberOfFeatures(){
+		Step head = getHead();
 
-		if(hasTransformers()){
-			List<? extends Transformer> transformers = getTransformers();
-
-			return StepUtil.getNumberOfFeatures(transformers);
-		} // End if
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getNumberOfFeatures();
+		if(head != null){
+			return head.getNumberOfFeatures();
 		}
 
 		return HasNumberOfFeatures.UNKNOWN;
@@ -95,19 +79,10 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 	@Override
 	public OpType getOpType(){
+		Step head = getHead();
 
-		if(hasTransformers()){
-			List<? extends Transformer> transformers = getTransformers();
-
-			for(Transformer transformer : transformers){
-				return transformer.getOpType();
-			}
-		} // End if
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getOpType();
+		if(head != null){
+			return head.getOpType();
 		}
 
 		throw new UnsupportedOperationException();
@@ -115,19 +90,10 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 	@Override
 	public DataType getDataType(){
+		Step head = getHead();
 
-		if(hasTransformers()){
-			List<? extends Transformer> transformers = getTransformers();
-
-			for(Transformer transformer : transformers){
-				return transformer.getDataType();
-			}
-		} // End if
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getDataType();
+		if(head != null){
+			return head.getDataType();
 		}
 
 		throw new UnsupportedOperationException();
@@ -178,26 +144,6 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 	protected Label refreshLabel(Label label, SkLearnEncoder encoder){
 		return label;
-	}
-
-	@Override
-	public Transformer getHead(){
-
-		if(hasTransformers()){
-			List<? extends Transformer> transformers = getTransformers();
-
-			Transformer transformer = transformers.get(0);
-
-			return TransformerUtil.getHead(transformer);
-		} // End if
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return EstimatorUtil.getHead(estimator);
-		}
-
-		return null;
 	}
 
 	@Override
@@ -286,21 +232,18 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	}
 
 	protected List<String> initFeatures(Estimator estimator, List<String> activeFields, SkLearnEncoder encoder){
-		Step featureInitializer = estimator;
+		Step head = getHead();
 
 		try {
-			Transformer transformer = getHead();
+			if(head instanceof Transformer){
 
-			if(transformer != null){
-				featureInitializer = transformer;
-
-				if(!(transformer instanceof Initializer)){
+				if(!(head instanceof Initializer)){
 
 					if(activeFields == null){
-						activeFields = initActiveFields(transformer);
+						activeFields = initActiveFields(head);
 					}
 
-					encoder.initFeatures(transformer, activeFields);
+					encoder.initFeatures(head, activeFields);
 				}
 
 				// XXX
@@ -312,16 +255,20 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 				encoder.setFeatures(features);
 			} else
 
-			if(estimator != null){
+			if(head instanceof Estimator){
 
 				if(activeFields == null){
-					activeFields = initActiveFields(estimator);
+					activeFields = initActiveFields(head);
 				}
 
-				encoder.initFeatures(estimator, activeFields);
+				encoder.initFeatures(head, activeFields);
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
 		} catch(UnsupportedOperationException uoe){
-			throw new IllegalArgumentException("The feature initializer object (" + ClassDictUtil.formatClass(featureInitializer) + ") does not specify feature type information", uoe);
+			throw new IllegalArgumentException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information", uoe);
 		}
 
 		return activeFields;

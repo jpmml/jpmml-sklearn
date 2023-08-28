@@ -107,7 +107,7 @@ public class CompositeClassifier extends Classifier implements HasFeatureNamesIn
 	}
 
 	@Override
-	public Transformer getHead(){
+	public Step getHead(){
 		Composite composite = getComposite();
 
 		return composite.getHead();

@@ -34,6 +34,8 @@ import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
+import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.Transformer;
 
 public class SkLearnPipeline extends Composite implements Encodable {
@@ -151,6 +153,41 @@ public class SkLearnPipeline extends Composite implements Encodable {
 		};
 
 		return castFunction.apply(estimator);
+	}
+
+	@Override
+	public Step getHead(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.isEmpty()){
+			throw new IllegalArgumentException("Expected one or more steps, got zero steps");
+		}
+
+		Object[] headStep = steps.get(0);
+
+		Object step = TupleUtil.extractElement(headStep, 1);
+
+		CastFunction<Step> castFunction = new CastFunction<Step>(Step.class){
+
+			@Override
+			public Step apply(Object object){
+
+				if((SkLearnSteps.PASSTHROUGH).equals(object)){
+					return null;
+				}
+
+				return super.apply(object);
+			}
+
+			@Override
+			public String formatMessage(Object object){
+				return "The transformer object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
+			}
+		};
+
+		step = castFunction.apply(step);
+
+		return StepUtil.getHead((Step)step);
 	}
 
 	@Override

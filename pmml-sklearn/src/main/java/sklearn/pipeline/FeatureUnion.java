@@ -28,8 +28,9 @@ import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasHead;
 import sklearn.SkLearnTransformer;
+import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.Transformer;
-import sklearn.TransformerUtil;
 
 public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
@@ -65,16 +66,16 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 	}
 
 	@Override
-	public Transformer getHead(){
+	public Step getHead(){
 		List<? extends Transformer> transformers = getTransformers();
 
 		if(!transformers.isEmpty()){
 			Transformer transformer = transformers.get(0);
 
-			return TransformerUtil.getHead(transformer);
+			return StepUtil.getHead(transformer);
 		}
 
-		return null;
+		throw new IllegalArgumentException();
 	}
 
 	public List<? extends Transformer> getTransformers(){
