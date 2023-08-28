@@ -51,12 +51,14 @@ public class Initializer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 
-		if(!features.isEmpty()){
-			throw new IllegalArgumentException("Transformer \'" + getClassName() + "\' must be the first step of the pipeline");
+		if(features.isEmpty()){
+			checkVersion();
+
+			return initializeFeatures(encoder);
 		}
 
-		return initializeFeatures(encoder);
+		return super.encode(features, encoder);
 	}
 }

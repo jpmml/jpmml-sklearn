@@ -42,6 +42,11 @@ public class DictVectorizer extends Initializer {
 
 	@Override
 	public List<Feature> initializeFeatures(SkLearnEncoder encoder){
+		return encodeFeatures(Collections.emptyList(), encoder);
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<? extends String> featureNames = getFeatureNames();
 		String separator = getSeparator();
 		Map<String, Integer> vocabulary = getVocabulary();
