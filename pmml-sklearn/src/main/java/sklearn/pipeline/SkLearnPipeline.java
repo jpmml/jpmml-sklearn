@@ -110,7 +110,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 			@Override
 			public String formatMessage(Object object){
-				return "The transformer object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
+				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
 			}
 		};
 
@@ -148,7 +148,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 			@Override
 			public String formatMessage(Object object){
-				return "The transformer object of the final step (" + ClassDictUtil.formatClass(object) + ") is not a supported Estimator";
+				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Estimator";
 			}
 		};
 
@@ -181,7 +181,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 			@Override
 			public String formatMessage(Object object){
-				return "The transformer object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
+				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
 			}
 		};
 
