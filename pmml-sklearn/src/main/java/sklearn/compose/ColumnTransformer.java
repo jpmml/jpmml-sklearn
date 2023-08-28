@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TupleUtil;
+import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Drop;
 import sklearn.HasFeatureNamesIn;
@@ -35,8 +37,9 @@ import sklearn.InitializerUtil;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
-public class ColumnTransformer extends Initializer implements HasFeatureNamesIn {
+public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, Encodable {
 
 	public ColumnTransformer(String module, String name){
 		super(module, name);
@@ -77,6 +80,11 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn 
 		}
 
 		return result;
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return TransformerUtil.encodePMML(this);
 	}
 
 	public List<Object[]> getFittedTransformers(){
