@@ -103,8 +103,8 @@ public class HyperoptEstimator extends Composite implements Encodable {
 
 		Estimator estimator = getFinalEstimator();
 
-		initLabel(estimator, null, encoder);
-		initFeatures(estimator, null, encoder);
+		initLabel(null, encoder);
+		initFeatures(null, encoder);
 
 		Schema schema = encoder.createSchema();
 

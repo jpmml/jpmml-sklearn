@@ -82,12 +82,6 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	public PMML encodePMML(){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		Estimator estimator = null;
-
-		if(hasFinalEstimator()){
-			estimator = getFinalEstimator();
-		}
-
 		List<String> activeFields = getActiveFields();
 		List<String> probabilityFields = null;
 		List<String> targetFields = getTargetFields();
@@ -99,9 +93,15 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		Transformer applyTransformer = getApplyTransformer();
 		Verification verification = getVerification();
 
-		targetFields = initLabel(estimator, targetFields, encoder);
-		probabilityFields = null;
-		activeFields = initFeatures(estimator, activeFields, encoder);
+		Estimator estimator = null;
+
+		if(hasFinalEstimator()){
+			estimator = getFinalEstimator();
+
+			targetFields = initLabel(targetFields, encoder);
+		}
+
+		activeFields = initFeatures(activeFields, encoder);
 
 		if(estimator == null){
 			return encodePMML(header, null, repr, encoder);

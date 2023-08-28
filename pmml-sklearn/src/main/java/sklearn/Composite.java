@@ -213,7 +213,8 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 		return new CompositeClusterer(this);
 	}
 
-	protected List<String> initLabel(Estimator estimator, List<String> targetFields, SkLearnEncoder encoder){
+	protected List<String> initLabel(List<String> targetFields, SkLearnEncoder encoder){
+		Estimator estimator = getFinalEstimator();
 
 		if(estimator != null && estimator.isSupervised()){
 
@@ -231,7 +232,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 		return EncodableUtil.generateOutputNames(estimator);
 	}
 
-	protected List<String> initFeatures(Estimator estimator, List<String> activeFields, SkLearnEncoder encoder){
+	protected List<String> initFeatures(List<String> activeFields, SkLearnEncoder encoder){
 		Step head = getHead();
 
 		try {

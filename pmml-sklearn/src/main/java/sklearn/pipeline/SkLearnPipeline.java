@@ -198,10 +198,11 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		if(hasFinalEstimator()){
 			estimator = getFinalEstimator();
+
+			initLabel(null, encoder);
 		}
 
-		initLabel(estimator, null, encoder);
-		initFeatures(estimator, null, encoder);
+		initFeatures(null, encoder);
 
 		if(estimator == null){
 			return encoder.encodePMML(null);
