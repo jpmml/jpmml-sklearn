@@ -34,6 +34,11 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 	}
 
 	@Test
+	public void evaluateXGBLRAudit() throws Exception {
+		evaluate("XGBLR", AUDIT);
+	}
+
+	@Test
 	public void evaluateXGBAuditNA() throws Exception {
 		String[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create(Estimator.FIELD_PREDICT, AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
 
@@ -51,13 +56,18 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 	}
 
 	@Test
-	public void evaluateXGBLRAudit() throws Exception {
-		evaluate("XGBLR", AUDIT);
+	public void evaluateXGBSigmoidVersicolor() throws Exception {
+		evaluate("XGB" + "Sigmoid", VERSICOLOR, new FloatEquivalence(12));
 	}
 
 	@Test
 	public void evaluateXGBRFAudit() throws Exception {
 		evaluate("XGBRF", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(4));
+	}
+
+	@Test
+	public void evaluateXGBRFLRAudit() throws Exception {
+		evaluate("XGBRFLR", AUDIT);
 	}
 
 	@Test
@@ -68,11 +78,6 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 	@Test
 	public void evaluateXGBRFLMAuto() throws Exception {
 		evaluate("XGBRFLM", AUTO);
-	}
-
-	@Test
-	public void evaluateXGBRFLRAudit() throws Exception {
-		evaluate("XGBRFLR", AUDIT);
 	}
 
 	@Test

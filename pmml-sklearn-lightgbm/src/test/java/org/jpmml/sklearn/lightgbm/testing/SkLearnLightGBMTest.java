@@ -76,4 +76,14 @@ public class SkLearnLightGBMTest extends SkLearnEncoderBatchTest implements Data
 	public void evaluateLGBMIris() throws Exception {
 		evaluate("LGBM", IRIS, new RealNumberEquivalence(1));
 	}
+
+	@Test
+	public void evaluateLGBMIsotonicIris() throws Exception {
+		evaluate("LGBM" + "Isotonic", IRIS);
+	}
+
+	@Test
+	public void evaluateLGBMSigmoidVersicolor() throws Exception {
+		evaluate("LGBM" + "Sigmoid", VERSICOLOR);
+	}
 }

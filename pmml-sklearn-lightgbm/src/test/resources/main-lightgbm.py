@@ -14,7 +14,7 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Audit", "Auto", "Iris"]
+		datasets = ["Audit", "Auto", "Iris", "Versicolor"]
 
 if "Audit" in datasets:
 	audit_df = load_audit("Audit", stringify = False)
@@ -57,9 +57,16 @@ if "Audit" in datasets:
 	build_audit_cat(audit_df, GBDTLRClassifier(LGBMClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "LGBMLRAuditCat", fit_params = {"classifier__gbdt__categorical_feature" : cat_indices})
 	build_audit_cat(audit_df, LGBMClassifier(objective = "binary", n_estimators = 101), "LGBMAuditCat", fit_params = {"classifier__categorical_feature" : cat_indices})
 
+if "Versicolor" in datasets:
+	versicolor_df = load_versicolor("Versicolor")
+
+	build_versicolor(versicolor_df, CalibratedClassifierCV(LGBMClassifier(n_estimators = 7), ensemble = False, method = "sigmoid"), "LGBMSigmoidVersicolor")
+
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 	iris_X, iris_y = split_csv(iris_df)
+
+	build_iris(iris_df, CalibratedClassifierCV(LGBMClassifier(m_estimators = 7, objective = "multiclass"), ensemble = False, method = "isotonic"), "LGBMIsotonicIris")
 
 	build_iris_opt(iris_df, LGBMClassifier(objective = "multiclass"), "LGBMIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "multi_logloss", "classifier__callbacks" : [early_stopping(stopping_rounds = 3)]})
 

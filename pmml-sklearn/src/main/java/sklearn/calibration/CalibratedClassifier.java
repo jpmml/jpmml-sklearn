@@ -155,7 +155,20 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		} else
 
 		{
-			Output output = model.getOutput();
+			Output output;
+
+			if(model instanceof MiningModel){
+				MiningModel miningModel = (MiningModel)model;
+
+				Model finalModel = MiningModelUtil.getFinalModel(miningModel);
+
+				output = finalModel.getOutput();
+			} else
+
+			{
+				output = model.getOutput();
+			} // End if
+
 			if(output == null){
 				throw new IllegalArgumentException();
 			}

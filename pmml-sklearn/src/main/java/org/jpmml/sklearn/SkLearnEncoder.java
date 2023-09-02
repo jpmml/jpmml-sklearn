@@ -51,6 +51,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.UnsupportedAttributeException;
 import org.jpmml.python.ClassDictUtil;
@@ -179,7 +180,20 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public List<Feature> export(Model model, List<String> names){
-		Output output = model.getOutput();
+		Output output;
+
+		if(model instanceof MiningModel){
+			MiningModel miningModel = (MiningModel)model;
+
+			Model finalModel = MiningModelUtil.getFinalModel(miningModel);
+
+			output = finalModel.getOutput();
+		} else
+
+		{
+			output = model.getOutput();
+		} // End if
+
 		if(output == null){
 			throw new IllegalArgumentException();
 		}
