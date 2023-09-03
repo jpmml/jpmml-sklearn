@@ -36,6 +36,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.HasSkLearnOptions;
@@ -225,5 +226,12 @@ public class EstimatorUtil {
 		{
 			return estimator.encode(schema);
 		}
+	}
+
+	static
+	public Output getFinalOutput(Model model){
+		model = MiningModelUtil.getFinalModel(model);
+
+		return model.getOutput();
 	}
 }

@@ -35,7 +35,6 @@ import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Value;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.converter.Label;
@@ -208,11 +207,7 @@ public class Classifier extends Estimator implements HasClasses {
 	public List<OutputField> encodePredictProbaOutput(Model model, DataType dataType, DiscreteLabel discreteLabel){
 		List<OutputField> predictProbaFields = createPredictProbaFields(dataType, discreteLabel);
 
-		if(model instanceof MiningModel){
-			MiningModel miningModel = (MiningModel)model;
-
-			model = MiningModelUtil.getFinalModel(miningModel);
-		}
+		model = MiningModelUtil.getFinalModel(model);
 
 		Output output = ModelUtil.ensureOutput(model);
 

@@ -50,6 +50,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Calibrator;
 import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
 import sklearn.linear_model.LinearClassifier;
@@ -155,20 +156,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		} else
 
 		{
-			Output output;
-
-			if(model instanceof MiningModel){
-				MiningModel miningModel = (MiningModel)model;
-
-				Model finalModel = MiningModelUtil.getFinalModel(miningModel);
-
-				output = finalModel.getOutput();
-			} else
-
-			{
-				output = model.getOutput();
-			} // End if
-
+			Output output = EstimatorUtil.getFinalOutput(model);
 			if(output == null){
 				throw new IllegalArgumentException();
 			}
