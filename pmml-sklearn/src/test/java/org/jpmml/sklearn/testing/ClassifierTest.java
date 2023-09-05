@@ -144,8 +144,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluateGradientBoostingAudit() throws Exception {
-		evaluate(GRADIENT_BOOSTING, AUDIT);
+	public void evaluateGradientBoostingSigmoidAudit() throws Exception {
+		evaluate(GRADIENT_BOOSTING + "Sigmoid", AUDIT);
 	}
 
 	@Test

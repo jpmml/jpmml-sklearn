@@ -53,6 +53,7 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
+import sklearn.ensemble.gradient_boosting.GradientBoostingClassifier;
 import sklearn.linear_model.LinearClassifier;
 
 public class CalibratedClassifier extends SkLearnClassifier implements HasEstimator<Classifier> {
@@ -87,7 +88,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 
 		List<Feature> decisionFunctionFeatures = new ArrayList<>();
 
-		if(estimator instanceof LinearClassifier){
+		if((estimator instanceof GradientBoostingClassifier) || (estimator instanceof LinearClassifier)){
 
 			if(model instanceof MiningModel){
 				MiningModel miningModel = (MiningModel)model;
@@ -95,28 +96,63 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 				Segmentation segmentation = miningModel.requireSegmentation();
 
 				List<Segment> segments = segmentation.requireSegments();
-				for(Segment segment : segments){
-					RegressionModel decisionFunctionModel = (RegressionModel)segment.requireModel();
+
+				List<Segment> regressorSegments = segments.subList(0, segments.size() - 1);
+				for(Segment regressorSegment : regressorSegments){
+					Model decisionFunctionModel = regressorSegment.requireModel();
 
 					if(decisionFunctionModel.requireMiningFunction() != MiningFunction.REGRESSION){
-						continue;
-					}
-
-					Output output = decisionFunctionModel.getOutput();
-					if(output == null){
 						throw new IllegalArgumentException();
 					}
 
-					OutputField outputField = Iterables.getOnlyElement(output.getOutputFields());
+					Output output = decisionFunctionModel.getOutput();
+					if(output == null || !output.hasOutputFields()){
+						throw new IllegalArgumentException();
+					}
+
+					List<OutputField> outputFields = output.getOutputFields();
+
+					OutputField outputField;
+
+					if(estimator instanceof LinearClassifier){
+						RegressionModel regressionModel = (RegressionModel)decisionFunctionModel;
+
+						regressionModel.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE);
+
+						outputField = Iterables.getOnlyElement(outputFields);
+					} else
+
+					if(estimator instanceof GradientBoostingClassifier){
+
+						if(outputFields.size() != 2){
+							throw new IllegalArgumentException();
+						}
+
+						// XXX
+						outputFields.remove(1);
+
+						outputField = Iterables.getOnlyElement(outputFields);
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
 
 					// XXX
 					outputField.setName(getDecisionFunctionField(outputField.getName()));
 
-					decisionFunctionModel.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE);
-
 					models.add(decisionFunctionModel);
 
 					decisionFunctionFeatures.add(new ContinuousFeature(encoder, outputField));
+				}
+
+				List<Segment> classifierSegments = Collections.singletonList(segments.get(segments.size() - 1));
+				for(Segment classifierSegment : classifierSegments){
+					RegressionModel normalizerModel = (RegressionModel)classifierSegment.requireModel();
+
+					if(normalizerModel.requireMiningFunction() != MiningFunction.CLASSIFICATION){
+						throw new IllegalArgumentException();
+					}
 				}
 			} else
 
