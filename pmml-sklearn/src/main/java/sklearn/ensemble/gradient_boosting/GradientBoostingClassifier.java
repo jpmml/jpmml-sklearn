@@ -29,13 +29,13 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.HasMultiDecisionFunctionField;
 import sklearn.HasPriorProbability;
 import sklearn.SkLearnClassifier;
 import sklearn.VersionUtil;
@@ -43,7 +43,7 @@ import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn2pmml.EstimatorProxy;
 
-public class GradientBoostingClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
+public class GradientBoostingClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<TreeRegressor>, HasMultiDecisionFunctionField, HasTreeOptions {
 
 	public GradientBoostingClassifier(String module, String name){
 		super(module, name);
@@ -95,7 +95,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 			SchemaUtil.checkSize(2, categoricalLabel);
 
 			Model model = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.NONE, false, schema);
 		} else
@@ -119,7 +119,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 				};
 
 				Model model = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initialPredictions.apply(i), learningRate, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+					.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
 
 				models.add(model);
 			}

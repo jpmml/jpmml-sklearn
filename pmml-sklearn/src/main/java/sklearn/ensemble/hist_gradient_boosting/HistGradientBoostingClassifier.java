@@ -27,19 +27,18 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
-import sklearn.Estimator;
+import sklearn.HasMultiDecisionFunctionField;
 import sklearn.SkLearnClassifier;
 import sklearn.loss.HalfBinomialLoss;
 import sklearn.loss.HalfMultinomialLoss;
 
-public class HistGradientBoostingClassifier extends SkLearnClassifier {
+public class HistGradientBoostingClassifier extends SkLearnClassifier implements HasMultiDecisionFunctionField {
 
 	public HistGradientBoostingClassifier(String module, String name){
 		super(module, name);
@@ -71,7 +70,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier {
 			}
 
 			Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
+				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, false, schema);
 		} else
@@ -87,7 +86,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier {
 
 			for(int i = 0, columns = categoricalLabel.size(); i < columns; i++){
 				Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, i, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
+					.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 				models.add(model);
 			}

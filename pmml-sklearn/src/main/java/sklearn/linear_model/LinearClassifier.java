@@ -29,16 +29,15 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import sklearn.Estimator;
+import sklearn.HasMultiDecisionFunctionField;
 import sklearn.SkLearnClassifier;
 
-public class LinearClassifier extends SkLearnClassifier {
+public class LinearClassifier extends SkLearnClassifier implements HasMultiDecisionFunctionField {
 
 	public LinearClassifier(String module, String name){
 		super(module, name);
@@ -87,7 +86,7 @@ public class LinearClassifier extends SkLearnClassifier {
 
 			for(int i = 0, rows = categoricalLabel.size(); i < rows; i++){
 				Model model = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, i), intercept.get(i), RegressionModel.NormalizationMethod.LOGIT, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
+					.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 				models.add(model);
 			}

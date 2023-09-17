@@ -27,20 +27,19 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
-import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.HasMultiDecisionFunctionField;
 import sklearn.HasNumberOfFeatures;
 import sklearn.SkLearnClassifier;
 import sklearn.StepUtil;
 
-public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
+public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier>, HasMultiDecisionFunctionField {
 
 	public OneVsRestClassifier(String module, String name){
 		super(module, name);
@@ -95,7 +94,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 				}
 
 				Output output = new Output()
-					.addOutputFields(ModelUtil.createProbabilityField(FieldNameUtil.create(Estimator.FIELD_DECISION_FUNCTION, categoricalLabel.getValue(i)), DataType.DOUBLE, categoricalLabel.getValue(i)));
+					.addOutputFields(ModelUtil.createProbabilityField(getMultiDecisionFunctionField(categoricalLabel.getValue(i)), DataType.DOUBLE, categoricalLabel.getValue(i)));
 
 				CategoricalLabel segmentCategoricalLabel = new CategoricalLabel(DataType.STRING, Arrays.asList("(other)", ValueUtil.asString(categoricalLabel.getValue(i))));
 

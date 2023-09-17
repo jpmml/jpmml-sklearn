@@ -32,11 +32,11 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
-import sklearn.Estimator;
+import sklearn.HasMultiDecisionFunctionField;
 import sklearn.linear_model.LinearClassifier;
 import sklearn.preprocessing.MultiOneHotEncoder;
 
-public class GBDTLRClassifier extends Classifier {
+public class GBDTLRClassifier extends Classifier implements HasMultiDecisionFunctionField {
 
 	public GBDTLRClassifier(String module, String name){
 		super(module, name);
@@ -72,7 +72,7 @@ public class GBDTLRClassifier extends Classifier {
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		Model model = GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), segmentSchema)
-			.setOutput(ModelUtil.createPredictedOutput(Estimator.FIELD_DECISION_FUNCTION, OpType.CONTINUOUS, DataType.DOUBLE));
+			.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 		MiningModel miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, false, schema);
 
