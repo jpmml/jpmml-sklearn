@@ -32,6 +32,7 @@ import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 import sklearn.Estimator;
+import sklearn.OutlierDetector;
 import sklearn.tree.HasTreeOptions;
 
 public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets {
@@ -87,5 +88,5 @@ public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest imple
 		evaluate(SGD_ONE_CLASS_SVM, IRIS, excludeFields(OutlierDetectorTest.predictedValue));
 	}
 
-	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "outlier");
+	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, OutlierDetector.FIELD_OUTLIER);
 }

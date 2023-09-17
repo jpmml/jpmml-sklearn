@@ -29,6 +29,7 @@ import java.util.function.Predicate;
 import com.google.common.base.Equivalence;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.ResultField;
@@ -36,6 +37,8 @@ import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
+import sklearn.Estimator;
+import sklearn.OutlierDetector;
 
 public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
 
@@ -116,5 +119,5 @@ public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
 			.toArray(String[]::new);
 	}
 
-	private static List<String> IFOREST_FIELDS = Arrays.asList("rawAnomalyScore", "normalizedAnomalyScore", "decisionFunction", "outlier", "predict(outlier)");
+	private static List<String> IFOREST_FIELDS = Arrays.asList("rawAnomalyScore", "normalizedAnomalyScore", Estimator.FIELD_DECISION_FUNCTION, OutlierDetector.FIELD_OUTLIER, FieldNameUtil.create(Estimator.FIELD_PREDICT, OutlierDetector.FIELD_OUTLIER));
 }
