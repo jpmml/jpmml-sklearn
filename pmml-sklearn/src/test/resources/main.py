@@ -182,7 +182,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, CalibratedClassifierCV(DecisionTreeClassifier(min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "DecisionTreeIsotonicAudit")
 	build_audit(audit_df, DummyClassifier(strategy = "most_frequent"), "DummyAudit")
 	build_audit(audit_df, EstimatorProxy(ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13)), "ExtraTreesAudit")
-	build_audit(audit_df, CalibratedClassifierCV(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13), ensemble = False), "GradientBoostingSigmoidAudit")
+	build_audit(audit_df, CalibratedClassifierCV(GradientBoostingClassifier(loss = "exponential", init = None, random_state = 13), ensemble = True), "GradientBoostingSigmoidAudit")
 	build_audit(audit_df, HistGradientBoostingClassifier(max_iter = 71, random_state = 13), "HistGradientBoostingAudit")
 	build_audit(audit_df, LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 	build_audit(audit_df, LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
