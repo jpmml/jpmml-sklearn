@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from sklearn.base import ClassifierMixin, ClusterMixin, RegressorMixin, TransformerMixin
+from sklearn.base import ClassifierMixin, ClusterMixin, OutlierMixin, RegressorMixin, TransformerMixin
 from sklearn2pmml import load_class_mapping
 from sklearn2pmml.util import fqn
 
@@ -50,7 +50,7 @@ def store_table(name, table):
 	table.to_csv("attributes/" + name + ".tsv", sep = "\t", index = False)
 
 def _is_estimator(pyClass):
-	return issubclass(pyClass, (ClassifierMixin, ClusterMixin, RegressorMixin))
+	return issubclass(pyClass, (ClassifierMixin, ClusterMixin, OutlierMixin, RegressorMixin))
 
 pyEstimatorClasses = [pyClass for pyClass in pyClasses if _is_estimator(pyClass)]
 # XXX: ["n_features_", "n_features_in_", "n_outputs_"]

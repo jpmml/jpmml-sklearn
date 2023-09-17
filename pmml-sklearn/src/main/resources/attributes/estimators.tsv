@@ -17,6 +17,7 @@ sklearn.ensemble._gb.GradientBoostingClassifier	+	+	+	+
 sklearn.ensemble._gb.GradientBoostingRegressor	+	-	+	-
 sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier	-	+	+	+
 sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingRegressor	-	-	+	-
+sklearn.ensemble._iforest.IsolationForest	-	+	+	-
 sklearn.ensemble._stacking.StackingClassifier	-	+	+	+
 sklearn.ensemble._stacking.StackingRegressor	-	-	+	-
 sklearn.ensemble._voting.VotingClassifier	-	-	+	+
@@ -47,6 +48,7 @@ sklearn.linear_model._ridge.RidgeClassifierCV	-	+	+	-
 sklearn.linear_model._ridge.Ridge	-	-	+	-
 sklearn.linear_model._ridge.RidgeCV	-	-	+	-
 sklearn.linear_model._stochastic_gradient.SGDClassifier	-	+	+	+
+sklearn.linear_model._stochastic_gradient.SGDOneClassSVM	-	+	+	-
 sklearn.linear_model._stochastic_gradient.SGDRegressor	-	-	+	-
 sklearn.linear_model._theil_sen.TheilSenRegressor	-	-	+	-
 sklearn.multiclass.OneVsRestClassifier	-	+	+	+
@@ -64,6 +66,7 @@ sklearn.svm._classes.LinearSVC	-	+	+	-
 sklearn.svm._classes.LinearSVR	-	-	+	-
 sklearn.svm._classes.NuSVC	-	+	+	+
 sklearn.svm._classes.NuSVR	-	-	+	-
+sklearn.svm._classes.OneClassSVM	-	+	+	-
 sklearn.svm._classes.SVC	-	+	+	+
 sklearn.svm._classes.SVR	-	-	+	-
 sklearn.tree._classes.DecisionTreeClassifier	+	-	+	+
