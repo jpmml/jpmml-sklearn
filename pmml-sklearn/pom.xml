@@ -59,6 +59,7 @@
 						</manifestEntries>
 					</archive>
 					<excludes>
+						<exclude>attributes/</exclude>
 						<exclude>*.py</exclude>
 					</excludes>
 				</configuration>
