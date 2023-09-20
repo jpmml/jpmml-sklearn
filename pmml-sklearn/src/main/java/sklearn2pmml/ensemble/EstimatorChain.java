@@ -47,7 +47,7 @@ import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
 import sklearn2pmml.util.EvaluatableUtil;
 
-public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorEnsemble<Estimator> {
+public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorEnsemble<Estimator>, HasEstimatorSteps {
 
 	public EstimatorChain(String module, String name){
 		super(module, name);
@@ -244,6 +244,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 		return getBoolean("multioutput");
 	}
 
+	@Override
 	public List<Object[]> getSteps(){
 		return getTupleList("steps");
 	}

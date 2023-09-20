@@ -34,7 +34,9 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
+import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.Regressor;
 import sklearn2pmml.util.EvaluatableUtil;
 
 public class SelectFirstUtil {
@@ -43,17 +45,18 @@ public class SelectFirstUtil {
 	}
 
 	static
-	public MiningModel encodeClassifier(List<Object[]> steps, Schema schema){
-		return encodeModel(MiningFunction.CLASSIFICATION, steps, schema);
+	public <E extends Classifier & HasEstimatorSteps> MiningModel encodeClassifier(E estimator, Schema schema){
+		return encodeModel(estimator, MiningFunction.CLASSIFICATION, schema);
 	}
 
 	static
-	public MiningModel encodeRegressor(List<Object[]> steps, Schema schema){
-		return encodeModel(MiningFunction.REGRESSION, steps, schema);
+	public <E extends Regressor & HasEstimatorSteps> MiningModel encodeRegressor(E estimator, Schema schema){
+		return encodeModel(estimator, MiningFunction.REGRESSION, schema);
 	}
 
 	static
-	private MiningModel encodeModel(MiningFunction miningFunction, List<Object[]> steps, Schema schema){
+	private <E extends Estimator & HasEstimatorSteps> MiningModel encodeModel(E estimator, MiningFunction miningFunction, Schema schema){
+		List<Object[]> steps = estimator.getSteps();
 
 		if(steps.isEmpty()){
 			throw new IllegalArgumentException();
@@ -70,16 +73,16 @@ public class SelectFirstUtil {
 			Object[] step = steps.get(i);
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
-			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
+			Estimator stepEstimator = TupleUtil.extractElement(step, 1, Estimator.class);
 			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
-			if(estimator.getMiningFunction() != miningFunction){
+			if(stepEstimator.getMiningFunction() != miningFunction){
 				throw new IllegalArgumentException();
 			}
 
 			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 
-			Model model = estimator.encode(schema);
+			Model model = stepEstimator.encode(schema);
 
 			Segment segment = new Segment(predicate, model)
 				.setId(name);

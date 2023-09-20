@@ -26,7 +26,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
 
-public class SelectFirstClassifier extends Classifier {
+public class SelectFirstClassifier extends Classifier implements HasEstimatorSteps {
 
 	public SelectFirstClassifier(String module, String name){
 		super(module, name);
@@ -69,9 +69,7 @@ public class SelectFirstClassifier extends Classifier {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<Object[]> steps = getSteps();
-
-		return SelectFirstUtil.encodeClassifier(steps, schema);
+		return SelectFirstUtil.encodeClassifier(this, schema);
 	}
 
 	public List<? extends Classifier> getClassifiers(){
@@ -84,6 +82,7 @@ public class SelectFirstClassifier extends Classifier {
 		return TupleUtil.extractElementList(steps, 1, Classifier.class);
 	}
 
+	@Override
 	public List<Object[]> getSteps(){
 		return getTupleList("steps");
 	}

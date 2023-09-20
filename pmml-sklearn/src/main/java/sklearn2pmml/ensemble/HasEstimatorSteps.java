@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Villu Ruusmann
+ * Copyright (c) 2023 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -20,23 +20,7 @@ package sklearn2pmml.ensemble;
 
 import java.util.List;
 
-import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+public interface HasEstimatorSteps {
 
-public class SelectFirstRegressor extends Regressor implements HasEstimatorSteps {
-
-	public SelectFirstRegressor(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		return SelectFirstUtil.encodeRegressor(this, schema);
-	}
-
-	@Override
-	public List<Object[]> getSteps(){
-		return getTupleList("steps");
-	}
+	List<Object[]> getSteps();
 }
