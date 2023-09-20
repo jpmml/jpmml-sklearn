@@ -395,6 +395,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
       * Regular Expression (RE) functions `re.search`, and `re.sub`.
       * User-defined functions.
     * `sklearn2pmml.preprocessing.FilterLookupTransformer`
+    * `sklearn2pmml.preprocessing.IdentityTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`
