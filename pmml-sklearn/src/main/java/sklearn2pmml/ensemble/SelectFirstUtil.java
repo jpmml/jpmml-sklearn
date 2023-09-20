@@ -34,7 +34,9 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
+import sklearn.Transformer;
 import sklearn2pmml.util.EvaluatableUtil;
 
 public class SelectFirstUtil {
@@ -44,17 +46,24 @@ public class SelectFirstUtil {
 
 	static
 	public <E extends Estimator & HasEstimatorSteps> MiningModel encodeSelectFirstEstimator(E ensembleEstimator, Schema schema){
-		MiningFunction miningFunction = ensembleEstimator.getMiningFunction();
+		Transformer controller = ensembleEstimator.getController();
 		List<Object[]> steps = ensembleEstimator.getSteps();
 
 		if(steps.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
+		MiningFunction miningFunction = ensembleEstimator.getMiningFunction();
+
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.SELECT_FIRST, null);
+
+		if(controller != null){
+			features = controller.encode((List)features, encoder);
+		}
 
 		Scope scope = new DataFrameScope("X", features);
 
