@@ -23,8 +23,9 @@ import java.util.Objects;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.TupleUtil;
 import sklearn.Classifier;
+import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 
 public class SelectFirstClassifier extends Classifier implements HasEstimatorSteps {
 
@@ -34,18 +35,18 @@ public class SelectFirstClassifier extends Classifier implements HasEstimatorSte
 
 	@Override
 	public List<?> getClasses(){
-		List<? extends Classifier> classifiers = getClassifiers();
+		List<? extends Estimator> estimators = getEstimators();
 
 		List<?> result = null;
 
-		for(Classifier classifier : classifiers){
+		for(Estimator estimator : estimators){
 
 			if(result == null){
-				result = classifier.getClasses();
+				result = EstimatorUtil.getClasses(estimator);
 			} else
 
 			{
-				if(!Objects.equals(result, classifier.getClasses())){
+				if(!Objects.equals(result, EstimatorUtil.getClasses(estimator))){
 					throw new IllegalArgumentException();
 				}
 			}
@@ -56,12 +57,12 @@ public class SelectFirstClassifier extends Classifier implements HasEstimatorSte
 
 	@Override
 	public boolean hasProbabilityDistribution(){
-		List<? extends Classifier> classifiers = getClassifiers();
+		List<? extends Estimator> estimators = getEstimators();
 
 		boolean result = true;
 
-		for(Classifier classifier : classifiers){
-			result &= classifier.hasProbabilityDistribution();
+		for(Estimator estimator : estimators){
+			result &= EstimatorUtil.hasProbabilityDistribution(estimator);
 		}
 
 		return result;
@@ -70,16 +71,6 @@ public class SelectFirstClassifier extends Classifier implements HasEstimatorSte
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		return SelectFirstUtil.encodeSelectFirstEstimator(this, schema);
-	}
-
-	public List<? extends Classifier> getClassifiers(){
-		List<Object[]> steps = getSteps();
-
-		if(steps.isEmpty()){
-			throw new IllegalArgumentException();
-		}
-
-		return TupleUtil.extractElementList(steps, 1, Classifier.class);
 	}
 
 	@Override

@@ -20,7 +20,21 @@ package sklearn2pmml.ensemble;
 
 import java.util.List;
 
+import org.jpmml.python.TupleUtil;
+import sklearn.Estimator;
+
 public interface HasEstimatorSteps {
+
+	default
+	List<? extends Estimator> getEstimators(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.isEmpty()){
+			throw new IllegalArgumentException();
+		}
+
+		return TupleUtil.extractElementList(steps, 1, Estimator.class);
+	}
 
 	List<Object[]> getSteps();
 }

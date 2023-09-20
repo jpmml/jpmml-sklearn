@@ -228,16 +228,6 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 		return miningModel;
 	}
 
-	public List<? extends Estimator> getEstimators(){
-		List<Object[]> steps = getSteps();
-
-		if(steps.isEmpty()){
-			throw new IllegalArgumentException();
-		}
-
-		return TupleUtil.extractElementList(steps, 1, Estimator.class);
-	}
-
 	public Boolean getMultioutput(){
 		return getBoolean("multioutput");
 	}
