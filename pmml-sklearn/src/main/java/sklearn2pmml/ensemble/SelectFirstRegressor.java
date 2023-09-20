@@ -32,7 +32,7 @@ public class SelectFirstRegressor extends Regressor implements HasEstimatorSteps
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		return SelectFirstUtil.encodeRegressor(this, schema);
+		return SelectFirstUtil.encodeSelectFirstEstimator(this, schema);
 	}
 
 	@Override

@@ -69,7 +69,7 @@ public class SelectFirstClassifier extends Classifier implements HasEstimatorSte
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		return SelectFirstUtil.encodeClassifier(this, schema);
+		return SelectFirstUtil.encodeSelectFirstEstimator(this, schema);
 	}
 
 	public List<? extends Classifier> getClassifiers(){

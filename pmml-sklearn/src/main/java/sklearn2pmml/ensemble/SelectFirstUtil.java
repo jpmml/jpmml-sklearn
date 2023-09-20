@@ -34,9 +34,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
-import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.Regressor;
 import sklearn2pmml.util.EvaluatableUtil;
 
 public class SelectFirstUtil {
@@ -45,18 +43,9 @@ public class SelectFirstUtil {
 	}
 
 	static
-	public <E extends Classifier & HasEstimatorSteps> MiningModel encodeClassifier(E estimator, Schema schema){
-		return encodeModel(estimator, MiningFunction.CLASSIFICATION, schema);
-	}
-
-	static
-	public <E extends Regressor & HasEstimatorSteps> MiningModel encodeRegressor(E estimator, Schema schema){
-		return encodeModel(estimator, MiningFunction.REGRESSION, schema);
-	}
-
-	static
-	private <E extends Estimator & HasEstimatorSteps> MiningModel encodeModel(E estimator, MiningFunction miningFunction, Schema schema){
-		List<Object[]> steps = estimator.getSteps();
+	public <E extends Estimator & HasEstimatorSteps> MiningModel encodeSelectFirstEstimator(E ensembleEstimator, Schema schema){
+		MiningFunction miningFunction = ensembleEstimator.getMiningFunction();
+		List<Object[]> steps = ensembleEstimator.getSteps();
 
 		if(steps.isEmpty()){
 			throw new IllegalArgumentException();
@@ -73,16 +62,16 @@ public class SelectFirstUtil {
 			Object[] step = steps.get(i);
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
-			Estimator stepEstimator = TupleUtil.extractElement(step, 1, Estimator.class);
+			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
 			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
-			if(stepEstimator.getMiningFunction() != miningFunction){
+			if(estimator.getMiningFunction() != miningFunction){
 				throw new IllegalArgumentException();
 			}
 
 			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 
-			Model model = stepEstimator.encode(schema);
+			Model model = estimator.encode(schema);
 
 			Segment segment = new Segment(predicate, model)
 				.setId(name);
