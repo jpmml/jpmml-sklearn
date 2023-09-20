@@ -126,9 +126,12 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
+		Boolean multioutput = getMultioutput();
 		List<? extends Estimator> estimators = getEstimators();
 
-		ClassDictUtil.checkSize(names, estimators);
+		if(multioutput){
+			ClassDictUtil.checkSize(names, estimators);
+		} // End if
 
 		if(names.size() == 1){
 			String name = names.get(0);
@@ -159,6 +162,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 	@Override
 	public Model encodeModel(Schema schema){
+		Transformer controller = getController();
 		Boolean multioutput = getMultioutput();
 		List<Object[]> steps = getSteps();
 
@@ -166,6 +170,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 			throw new IllegalArgumentException();
 		}
 
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
@@ -180,6 +185,10 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 		List<Model> models = new ArrayList<>();
 
 		Segmentation segmentation = new Segmentation(multioutput ? Segmentation.MultipleModelMethod.MULTI_MODEL_CHAIN : Segmentation.MultipleModelMethod.MODEL_CHAIN, null);
+
+		if(controller != null){
+			features = controller.encode((List)features, encoder);
+		}
 
 		Scope scope = new DataFrameScope("X", features);
 
