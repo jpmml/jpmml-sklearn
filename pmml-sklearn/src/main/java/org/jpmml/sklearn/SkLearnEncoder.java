@@ -74,6 +74,8 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	private List<? extends Feature> features = Collections.emptyList();
 
+	private Map<String, Feature> memory = new LinkedHashMap<>();
+
 	private Predicate predicate = null;
 
 	private Model model = null;
@@ -325,6 +327,14 @@ public class SkLearnEncoder extends PythonEncoder {
 
 	public void setFeatures(List<? extends Feature> features){
 		this.features = Objects.requireNonNull(features);
+	}
+
+	public void memorize(String name, Feature feature){
+		this.memory.put(name, feature);
+	}
+
+	public Feature recall(String name){
+		return this.memory.get(name);
 	}
 
 	public Predicate getPredicate(){
