@@ -44,6 +44,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
+import sklearn.Transformer;
 import sklearn2pmml.util.EvaluatableUtil;
 
 public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorSteps {
@@ -226,6 +227,11 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 			.setSegmentation(segmentation);
 
 		return miningModel;
+	}
+
+	@Override
+	public Transformer getController(){
+		return getOptional("controller", Transformer.class);
 	}
 
 	public Boolean getMultioutput(){

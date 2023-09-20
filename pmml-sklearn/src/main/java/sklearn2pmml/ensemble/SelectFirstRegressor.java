@@ -23,6 +23,7 @@ import java.util.List;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
+import sklearn.Transformer;
 
 public class SelectFirstRegressor extends Regressor implements HasEstimatorSteps {
 
@@ -33,6 +34,11 @@ public class SelectFirstRegressor extends Regressor implements HasEstimatorSteps
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		return SelectFirstUtil.encodeSelectFirstEstimator(this, schema);
+	}
+
+	@Override
+	public Transformer getController(){
+		return getOptional("controller", Transformer.class);
 	}
 
 	@Override

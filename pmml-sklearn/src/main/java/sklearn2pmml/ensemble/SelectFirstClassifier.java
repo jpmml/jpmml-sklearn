@@ -26,6 +26,7 @@ import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.Transformer;
 
 public class SelectFirstClassifier extends Classifier implements HasEstimatorSteps {
 
@@ -71,6 +72,11 @@ public class SelectFirstClassifier extends Classifier implements HasEstimatorSte
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		return SelectFirstUtil.encodeSelectFirstEstimator(this, schema);
+	}
+
+	@Override
+	public Transformer getController(){
+		return getOptional("controller", Transformer.class);
 	}
 
 	@Override
