@@ -44,10 +44,9 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
-import sklearn.HasEstimatorEnsemble;
 import sklearn2pmml.util.EvaluatableUtil;
 
-public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorEnsemble<Estimator>, HasEstimatorSteps {
+public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorSteps {
 
 	public EstimatorChain(String module, String name){
 		super(module, name);
@@ -229,7 +228,6 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 		return miningModel;
 	}
 
-	@Override
 	public List<? extends Estimator> getEstimators(){
 		List<Object[]> steps = getSteps();
 
