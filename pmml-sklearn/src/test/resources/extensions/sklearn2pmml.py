@@ -8,8 +8,9 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
+from sklearn2pmml.cross_reference import Memorizer, Recaller
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
-from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, OrdinalClassifier, SelectFirstClassifier
+from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, OrdinalClassifier, SelectFirstClassifier, SelectFirstRegressor
 from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Audit", "Auto", "Housing", "Iris", "Versicolor"]
+		datasets = ["Audit", "Auto", "Housing", "Iris", "Versicolor", "Wine"]
 
 def make_bins(X, cols):
 	result = dict()
@@ -324,3 +325,44 @@ if "Housing" in datasets:
 	housing_df = load_housing("Housing")
 
 	build_housing(housing_df, GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
+
+def build_wine(wine_df, regressor, name):
+	wine_X, wine_y = split_csv(wine_df)
+
+	cols = wine_X.columns.values.tolist()
+
+	memory = dict()
+
+	memorizer = Memorizer(memory, ["subset"])
+	recaller = Recaller(memory, ["subset"])
+
+	regressor.controller = recaller
+
+	pipeline = PMMLPipeline([
+		("transformer", ColumnTransformer([
+			("cont", ContinuousDomain(), cols[0:-1]),
+			("cat", Pipeline([("domain", CategoricalDomain()), ("memorizer", memorizer)]), cols[-1:])
+		])),
+		("regressor", regressor)
+	])
+	# XXX
+	memory["subset"] = wine_X["color"].values.copy()
+	pipeline.fit(wine_X, wine_y)
+	memory.clear()
+	store_pkl(pipeline, name)
+	# XXX
+	memory["subset"] = wine_X["color"].values.copy()
+	quality = Series(pipeline.predict(wine_X), name = "quality")
+	store_csv(quality, name)
+
+if "Wine" in datasets:
+	wine_df = load_wine("Wine")
+
+	def make_steps():
+		return [
+			("red", LinearRegression(), "X[0] == 'red'"),
+			("white", LinearRegression(), "X[0] == 'white'")
+		]
+
+	build_wine(wine_df, EstimatorChain(make_steps(), multioutput = False), "EstimatorChainWine")
+	build_wine(wine_df, SelectFirstRegressor(make_steps()), "SelectFirstWine")

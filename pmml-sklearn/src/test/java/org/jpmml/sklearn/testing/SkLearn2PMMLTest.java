@@ -129,4 +129,14 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	public void evaluateGBDTLRVersicolor() throws Exception {
 		evaluate("GBDTLR", VERSICOLOR);
 	}
+
+	@Test
+	public void evaluateEstimatorChainWine() throws Exception {
+		evaluate("EstimatorChain", "Wine");
+	}
+
+	@Test
+	public void evaluateSelectFirstWine() throws Exception {
+		evaluate("SelectFirst", "Wine");
+	}
 }

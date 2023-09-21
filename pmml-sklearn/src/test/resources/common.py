@@ -92,3 +92,8 @@ def load_wheat(name):
 	df = load_csv(name)
 	print(df.dtypes)
 	return df
+
+def load_wine(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	return df
