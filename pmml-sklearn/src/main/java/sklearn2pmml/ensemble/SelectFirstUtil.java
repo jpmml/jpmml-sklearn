@@ -61,11 +61,13 @@ public class SelectFirstUtil {
 
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.SELECT_FIRST, null);
 
+		List<Feature> controlFeatures = (List)features;
+
 		if(controller != null){
-			features = controller.encode((List)features, encoder);
+			controlFeatures = controller.encode(controlFeatures, encoder);
 		}
 
-		Scope scope = new DataFrameScope("X", features);
+		Scope scope = new DataFrameScope("X", controlFeatures);
 
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);

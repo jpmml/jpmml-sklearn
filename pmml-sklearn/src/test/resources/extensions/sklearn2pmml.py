@@ -15,7 +15,7 @@ from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
-from sklearn2pmml.preprocessing import CutTransformer
+from sklearn2pmml.preprocessing import CutTransformer, SelectFirstTransformer
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
 from sklearn2pmml.util import Expression, Predicate
@@ -338,11 +338,23 @@ def build_wine(wine_df, regressor, name):
 
 	regressor.controller = recaller
 
+	def make_scaler(name):
+		red_scaler = Alias(StandardScaler(), name = "standardScaler({}, red)".format(name))
+		white_scaler = Alias(StandardScaler(), name = "standardScaler({}, white)".format(name))
+
+		return SelectFirstTransformer([
+			("red", red_scaler, "X[0] == 'red'"),
+			("white", white_scaler, "X[0] == 'white'")
+		], controller = recaller)
+
 	pipeline = PMMLPipeline([
-		("transformer", ColumnTransformer([
-			("cont", ContinuousDomain(), cols[0:-1]),
+		("mapper", ColumnTransformer([
+			("cont", Pipeline([("domain", ContinuousDomain())]), cols[0:-1]),
 			("cat", Pipeline([("domain", CategoricalDomain()), ("memorizer", memorizer)]), cols[-1:])
 		])),
+		("scaler", ColumnTransformer(
+			[(cols[idx], make_scaler(cols[idx]), [idx]) for idx in range(0, len(cols) - 1)]
+		)),
 		("regressor", regressor)
 	])
 	pipeline.fit(wine_X, wine_y)

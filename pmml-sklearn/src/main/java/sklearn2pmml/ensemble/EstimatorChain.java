@@ -186,11 +186,13 @@ public class EstimatorChain extends Estimator implements HasClasses, HasEstimato
 
 		Segmentation segmentation = new Segmentation(multioutput ? Segmentation.MultipleModelMethod.MULTI_MODEL_CHAIN : Segmentation.MultipleModelMethod.MODEL_CHAIN, null);
 
+		List<Feature> controlFeatures = (List)features;
+
 		if(controller != null){
-			features = controller.encode((List)features, encoder);
+			controlFeatures = controller.encode(controlFeatures, encoder);
 		}
 
-		Scope scope = new DataFrameScope("X", features);
+		Scope scope = new DataFrameScope("X", controlFeatures);
 
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
