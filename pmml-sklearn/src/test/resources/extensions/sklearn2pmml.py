@@ -8,7 +8,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
-from sklearn2pmml.cross_reference import Memorizer, Recaller
+from sklearn2pmml.cross_reference import Memory, Memorizer, Recaller
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, OrdinalClassifier, SelectFirstClassifier, SelectFirstRegressor
 from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
@@ -331,7 +331,7 @@ def build_wine(wine_df, regressor, name):
 
 	cols = wine_X.columns.values.tolist()
 
-	memory = dict()
+	memory = Memory()
 
 	memorizer = Memorizer(memory, ["subset"])
 	recaller = Recaller(memory, ["subset"])
@@ -345,13 +345,8 @@ def build_wine(wine_df, regressor, name):
 		])),
 		("regressor", regressor)
 	])
-	# XXX
-	memory["subset"] = wine_X["color"].values.copy()
 	pipeline.fit(wine_X, wine_y)
-	memory.clear()
 	store_pkl(pipeline, name)
-	# XXX
-	memory["subset"] = wine_X["color"].values.copy()
 	quality = Series(pipeline.predict(wine_X), name = "quality")
 	store_csv(quality, name)
 
