@@ -186,6 +186,12 @@ Java library and command-line application for converting [Scikit-Learn](https://
 </details>
 
 <details>
+  <summary>BorutaPy</summary>
+
+  * `boruta.BorutaPy`
+</details>
+
+<details>
   <summary>Category Encoders</summary>
 
   Examples: [extensions/category_encoders.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/category_encoders.py) and [extensions/category_encoders-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/extensions/category_encoders-xgboost.py)
