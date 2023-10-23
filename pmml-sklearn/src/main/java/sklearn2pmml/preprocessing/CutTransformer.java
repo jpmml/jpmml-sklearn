@@ -22,16 +22,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Discretize;
 import org.dmg.pmml.DiscretizeBin;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -102,6 +106,27 @@ public class CutTransformer extends Transformer {
 			DiscretizeBin discretizeBin = new DiscretizeBin(label, interval);
 
 			discretize.addDiscretizeBins(discretizeBin);
+		}
+
+		List<DiscretizeBin> discretizeBins = discretize.getDiscretizeBins();
+		if(discretizeBins.size() == 1){
+			DiscretizeBin discretizeBin = discretizeBins.get(0);
+
+			Interval interval = discretizeBin.requireInterval();
+			Object binValue = discretizeBin.requireBinValue();
+
+			if(interval.getLeftMargin() == null && interval.getRightMargin() == null){
+				Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
+					PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, continuousFeature.ref()),
+					PMMLUtil.createConstant(binValue, null)
+				);
+
+				DerivedField derivedField = encoder.createDerivedField(createFieldName("cut", continuousFeature), OpType.CATEGORICAL, dataType, apply);
+
+				Feature result = FeatureUtil.createFeature(derivedField, encoder);
+
+				return Collections.singletonList(result);
+			}
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("cut", continuousFeature), OpType.CATEGORICAL, dataType, discretize);
