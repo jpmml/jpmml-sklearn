@@ -295,22 +295,31 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public boolean isFrozen(String name){
-		return this.domains.containsKey(name);
+		Map<String, Domain> domains = getDomains();
+
+		return domains.containsKey(name);
 	}
 
 	public Domain getDomain(String name){
-		return this.domains.get(name);
+		Map<String, Domain> domains = getDomains();
+
+		return domains.get(name);
 	}
 
 	public void setDomain(String name, Domain domain){
+		Map<String, Domain> domains = getDomains();
 
 		if(domain != null){
-			this.domains.put(name, domain);
+			domains.put(name, domain);
 		} else
 
 		{
-			this.domains.remove(name);
+			domains.remove(name);
 		}
+	}
+
+	public Map<String, Domain> getDomains(){
+		return this.domains;
 	}
 
 	public Label getLabel(){
@@ -330,11 +339,19 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public void memorize(String name, Feature feature){
-		this.memory.put(name, feature);
+		Map<String, Feature> memory = getMemory();
+
+		memory.put(name, feature);
 	}
 
 	public Feature recall(String name){
-		return this.memory.get(name);
+		Map<String, Feature> memory = getMemory();
+
+		return memory.get(name);
+	}
+
+	public Map<String, Feature> getMemory(){
+		return this.memory;
 	}
 
 	public Predicate getPredicate(){
