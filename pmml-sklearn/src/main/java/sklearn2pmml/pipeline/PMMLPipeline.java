@@ -21,12 +21,11 @@ package sklearn2pmml.pipeline;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -35,6 +34,7 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.Header;
 import org.dmg.pmml.MiningBuildTask;
 import org.dmg.pmml.Model;
@@ -346,12 +346,26 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 		List<Feature> outputFeatures = transformer.encode(features, outputEncoder);
 
-		Set<String> finalResultNames = new LinkedHashSet<>();
+		Map<String, Integer> finalResults = new LinkedHashMap<>();
 
 		for(Feature outputFeature : outputFeatures){
 			String name = outputFeature.getName();
 
-			finalResultNames.add(name);
+			Field<?> field = outputFeature.getField();
+
+			// XXX
+			try {
+				outputEncoder.getField(field.requireName());
+			} catch(IllegalArgumentException iae){
+				OutputField outputField = new OutputField(FieldNameUtil.create("xref", outputFeature), field.requireOpType(), field.requireDataType())
+					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+					.setFinalResult(true)
+					.setExpression(outputFeature.ref());
+
+				output.addOutputFields(outputField);
+			}
+
+			finalResults.put(name, finalResults.size());
 		}
 
 		Collection<DerivedField> derivedFields = (outputEncoder.getDerivedFields()).values();
@@ -372,12 +386,25 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 				outputField = new OutputField(name, derivedField.requireOpType(), derivedField.requireDataType())
 					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-					.setFinalResult(finalResultNames.contains(name))
+					.setFinalResult(finalResults.containsKey(name))
 					.setExpression(derivedField.requireExpression());
 			}
 
 			output.addOutputFields(outputField);
 		}
+
+		Comparator<OutputField> comparator = new Comparator<OutputField>(){
+
+			@Override
+			public int compare(OutputField left, OutputField right){
+				int leftIndex = finalResults.getOrDefault(left.requireName(), -1);
+				int rightIndex = finalResults.getOrDefault(right.requireName(), -1);
+
+				return Integer.compare(leftIndex, rightIndex);
+			}
+		};
+
+		Collections.sort(output.getOutputFields(), comparator);
 
 		Map<String, DefineFunction> defineFunctions = outputEncoder.getDefineFunctions();
 

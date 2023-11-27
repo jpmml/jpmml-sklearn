@@ -212,13 +212,19 @@ def build_pca_iris(iris_df, name):
 
 	memory = Memory()
 
+	pca_union = FeatureUnion([
+		("first", ExpressionTransformer("X[0]")),
+		("second", ExpressionTransformer("X[1]")),
+		("ratio", Alias(ExpressionTransformer("X[0] / X[1]"), name = "pca_ratio", prefit = True))
+	])
+
 	pipeline = PMMLPipeline([
 		("pca", make_pipeline(MultiAlias(PCA(n_components = len(pca_names)), names = pca_names), make_memorizer_union(memory = memory, names = pca_names))),
 		("classifier", LogisticRegression())
-	], predict_transformer = make_pipeline(make_recaller_union(memory = memory, names = pca_names), Alias(ExpressionTransformer("X[0] / X[1]"), name = "pca_ratio", prefit = True)))
+	], predict_transformer = make_pipeline(make_recaller_union(memory = memory, names = pca_names), pca_union))
 	pipeline.fit(iris_X, iris_y)
 	store_pkl(pipeline, name)
-	species = DataFrame(pipeline.predict_transform(iris_X), columns = ["Species", "pca_ratio"])
+	species = DataFrame(pipeline.predict_transform(iris_X), columns = ["Species", "xref({})".format(pca_names[0]), "xref({})".format(pca_names[1]), "pca_ratio"])
 	store_csv(species, name)
 
 def build_ruleset_iris(iris_df, name):
