@@ -23,8 +23,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -342,7 +344,15 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			features.add(new WildcardFeature(outputEncoder, dataField));
 		}
 
-		transformer.encode(features, outputEncoder);
+		List<Feature> outputFeatures = transformer.encode(features, outputEncoder);
+
+		Set<String> finalResultNames = new LinkedHashSet<>();
+
+		for(Feature outputFeature : outputFeatures){
+			String name = outputFeature.getName();
+
+			finalResultNames.add(name);
+		}
 
 		Collection<DerivedField> derivedFields = (outputEncoder.getDerivedFields()).values();
 
@@ -358,9 +368,11 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			} else
 
 			{
-				outputField = new OutputField(derivedField.requireName(), derivedField.requireOpType(), derivedField.requireDataType())
+				String name = derivedField.requireName();
+
+				outputField = new OutputField(name, derivedField.requireOpType(), derivedField.requireDataType())
 					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-					.setFinalResult(!it.hasNext())
+					.setFinalResult(finalResultNames.contains(name))
 					.setExpression(derivedField.requireExpression());
 			}
 
