@@ -306,7 +306,28 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	private void encodeOutput(Output output, List<OutputField> outputFields, Transformer transformer, SkLearnEncoder encoder){
-		SkLearnEncoder outputEncoder = new SkLearnEncoder();
+		SkLearnEncoder outputEncoder = new SkLearnEncoder(){
+
+			@Override
+			public void addTransformer(Model transformer){
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public boolean isFrozen(String name){
+				return true;
+			}
+
+			@Override
+			public Map<String, Domain> getDomains(){
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public Map<String, Feature> getMemory(){
+				return encoder.getMemory();
+			}
+		};
 
 		Model model = encoder.getModel();
 		if(model != null){

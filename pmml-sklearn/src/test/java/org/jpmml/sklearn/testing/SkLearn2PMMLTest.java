@@ -26,6 +26,7 @@ import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.FieldNames;
 import org.junit.Test;
 import sklearn.Estimator;
+import sklearn.SkLearnMethods;
 
 public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
@@ -108,6 +109,11 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	@Test
 	public void evaluateMLPTransformerIris() throws Exception {
 		evaluate("MLPTransformer", IRIS);
+	}
+
+	@Test
+	public void evaluatePCAIris() throws Exception {
+		evaluate("PCA", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA, IRIS_PROBABILITY_VERSICOLOR, IRIS_PROBABILITY_VIRGINICA, FieldNameUtil.create(SkLearnMethods.PREDICT, IRIS_SPECIES)));
 	}
 
 	@Test

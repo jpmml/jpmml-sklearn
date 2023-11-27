@@ -5,11 +5,13 @@ from sklearn_pandas import DataFrameMapper
 from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPRegressor
+from sklearn.pipeline import make_pipeline
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
+from sklearn2pmml.cross_reference import make_memorizer_union, make_recaller_union
 from sklearn2pmml.cross_reference import Memory, Memorizer, Recaller
-from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
+from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiAlias
 from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, OrdinalClassifier, SelectFirstClassifier, SelectFirstRegressor
 from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
@@ -203,6 +205,22 @@ def build_mlp_iris(iris_df, name, transformer, predict_proba_transformer = None)
 	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
 
+def build_pca_iris(iris_df, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	pca_names = ["pca_1", "pca_2"]
+
+	memory = Memory()
+
+	pipeline = PMMLPipeline([
+		("pca", make_pipeline(MultiAlias(PCA(n_components = len(pca_names)), names = pca_names), make_memorizer_union(memory = memory, names = pca_names))),
+		("classifier", LogisticRegression())
+	], predict_transformer = make_pipeline(make_recaller_union(memory = memory, names = pca_names), Alias(ExpressionTransformer("X[0] / X[1]"), name = "pca_ratio", prefit = True)))
+	pipeline.fit(iris_X, iris_y)
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict_transform(iris_X), columns = ["Species", "pca_ratio"])
+	store_csv(species, name)
+
 def build_ruleset_iris(iris_df, name):
 	iris_X, iris_y = split_csv(iris_df)
 
@@ -254,6 +272,8 @@ if "Iris" in datasets:
 
 	build_mlp_iris(iris_df, "MLPAutoencoderIris", MLPTransformer(mlp), predict_proba_transformer = Alias(BusinessDecisionTransformer("'yes' if X[1] >= 0.95 else 'no'", "Is the predicted species definitely versicolor?", [("yes", "Is versicolor"), ("no", "Is not versicolor")], prefit = True), "decision", prefit = True))
 	build_mlp_iris(iris_df, "MLPTransformerIris", MLPTransformer(mlp, transformer_output_layer = 1))
+
+	build_pca_iris(iris_df, "PCAIris")
 
 	build_ruleset_iris(iris_df, "RuleSetIris")
 
