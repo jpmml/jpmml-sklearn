@@ -27,16 +27,16 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
+import org.jpmml.sklearn.IfElseBuilder;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn2pmml.util.EvaluatableUtil;
@@ -68,9 +68,7 @@ public class SelectFirstTransformer extends Transformer {
 
 		Scope scope = new DataFrameScope("X", controlFeatures);
 
-		Apply apply = null;
-
-		Apply prevIfApply = null;
+		IfElseBuilder applyBuilder = new IfElseBuilder();
 
 		Set<DataType> dataTypes = EnumSet.noneOf(DataType.class);
 
@@ -81,7 +79,7 @@ public class SelectFirstTransformer extends Transformer {
 			Transformer transformer = TupleUtil.extractElement(step, 1, Transformer.class);
 			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
-			Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF, EvaluatableUtil.translateExpression(expr, scope));
+			Expression expression = EvaluatableUtil.translateExpression(expr, scope);
 
 			List<Feature> stepFeatures = transformer.encode(Collections.singletonList(feature), encoder);
 
@@ -89,23 +87,15 @@ public class SelectFirstTransformer extends Transformer {
 
 			Feature stepFeature = Iterables.getOnlyElement(stepFeatures);
 
-			ifApply.addExpressions(stepFeature.ref());
+			applyBuilder.add(expression, stepFeature.ref());
 
 			dataTypes.add(stepFeature.getDataType());
-
-			if(apply == null){
-				apply = ifApply;
-			} // End if
-
-			if(prevIfApply != null){
-				prevIfApply.addExpressions(ifApply);
-			}
-
-			prevIfApply = ifApply;
 		}
 
 		DataType dataType = Iterables.getOnlyElement(dataTypes);
 		OpType opType = TypeUtil.getOpType(dataType);
+
+		Apply apply = applyBuilder.build();
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("selectFirst", feature), opType, dataType, apply);
 

@@ -43,6 +43,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.ToStringHelper;
+import org.jpmml.sklearn.IfElseBuilder;
 
 public class BaseNFeature extends BinaryThresholdFeature {
 
@@ -114,9 +115,7 @@ public class BaseNFeature extends BinaryThresholdFeature {
 
 			Integer missingBaseValue = 0;
 
-			Apply apply = null;
-
-			Apply prevIfApply = null;
+			IfElseBuilder applyBuilder = new IfElseBuilder();
 
 			Collection<? extends Map.Entry<Integer, ? extends Collection<?>>> entries = valueMap.entrySet();
 
@@ -155,28 +154,17 @@ public class BaseNFeature extends BinaryThresholdFeature {
 					valueApply.addExpressions(PMMLUtil.createConstant(category, dataType));
 				}
 
-				Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF,
-					valueApply,
-					PMMLUtil.createConstant(baseValue)
-				);
-
-				if(apply == null){
-					apply = ifApply;
-				} // End if
-
-				if(prevIfApply != null){
-					prevIfApply.addExpressions(ifApply);
-				}
-
-				prevIfApply = ifApply;
+				applyBuilder.add(valueApply, PMMLUtil.createConstant(baseValue));
 			}
 
-			if(apply == null){
+			if(applyBuilder.isEmpty()){
 				return PMMLUtil.createConstant(0);
 			} else
 
 			{
-				prevIfApply.addExpressions(PMMLUtil.createConstant(0));
+				applyBuilder.terminate(PMMLUtil.createConstant(0));
+
+				Apply apply = applyBuilder.build();
 
 				if(missingValueAware){
 					apply = PMMLUtil.createApply(PMMLFunctions.IF,
