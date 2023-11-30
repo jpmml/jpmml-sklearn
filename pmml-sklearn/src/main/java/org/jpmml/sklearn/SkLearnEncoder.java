@@ -210,7 +210,17 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public Feature exportPrediction(Model model, ScalarLabel scalarLabel){
-		return exportPrediction(model, FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), scalarLabel);
+		String name;
+
+		if(scalarLabel.isAnonymous()){
+			name = Estimator.FIELD_PREDICT;
+		} else
+
+		{
+			name = FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName());
+		}
+
+		return exportPrediction(model, name, scalarLabel);
 	}
 
 	public Feature exportPrediction(Model model, String name, ScalarLabel scalarLabel){
