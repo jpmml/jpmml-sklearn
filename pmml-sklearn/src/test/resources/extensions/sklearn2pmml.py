@@ -352,7 +352,7 @@ if "Housing" in datasets:
 
 	build_housing(housing_df, GBDTLMRegressor(GradientBoostingRegressor(n_estimators = 31, random_state = 13), LinearRegression()), "GBDTLMHousing")
 
-def build_wine(wine_df, regressor, name):
+def build_wine(wine_df, regressor, name, eval_rows = True):
 	wine_X, wine_y = split_csv(wine_df)
 
 	cols = wine_X.columns.values.tolist()
@@ -369,9 +369,9 @@ def build_wine(wine_df, regressor, name):
 		white_scaler = Alias(StandardScaler(), name = "standardScaler({}, white)".format(name))
 
 		return SelectFirstTransformer([
-			("red", red_scaler, "X[0] == 'red'"),
-			("white", white_scaler, "X[0] == 'white'")
-		], controller = recaller)
+			("red", red_scaler, "X[0] == 'red'" if eval_rows else "X[:, 0] == 'red'"),
+			("white", white_scaler, "X[0] == 'white'" if eval_rows else "X[:, 0] == 'white'")
+		], controller = recaller, eval_rows = eval_rows)
 
 	pipeline = PMMLPipeline([
 		("mapper", ColumnTransformer([
@@ -391,11 +391,11 @@ def build_wine(wine_df, regressor, name):
 if "Wine" in datasets:
 	wine_df = load_wine("Wine")
 
-	def make_steps():
+	def make_steps(eval_rows):
 		return [
-			("red", LinearRegression(), "X[0] == 'red'"),
-			("white", LinearRegression(), "X[0] == 'white'")
+			("red", LinearRegression(), "X[0] == 'red'" if eval_rows else "X[:, 0] == 'red'"),
+			("white", LinearRegression(), "X[0] == 'white'" if eval_rows else "X[:, 0] == 'white'")
 		]
 
-	build_wine(wine_df, EstimatorChain(make_steps(), multioutput = False), "EstimatorChainWine")
-	build_wine(wine_df, SelectFirstRegressor(make_steps()), "SelectFirstWine")
+	build_wine(wine_df, EstimatorChain(make_steps(eval_rows = True), multioutput = False), "EstimatorChainWine")
+	build_wine(wine_df, SelectFirstRegressor(make_steps(eval_rows = False), eval_rows = False), "SelectFirstWine", eval_rows = False)
