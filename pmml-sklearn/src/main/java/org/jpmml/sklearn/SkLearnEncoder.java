@@ -433,7 +433,8 @@ public class SkLearnEncoder extends PythonEncoder {
 		PickleUtil.init(clazzLoader, "sklearn2pmml.properties");
 
 		DType.addDefinition(BinaryTree.DTYPE_NODEDATA);
-		DType.addDefinition(Tree.DTYPE_TREE);
+		DType.addDefinition(Tree.DTYPE_TREE_OLD);
+		DType.addDefinition(Tree.DTYPE_TREE_NEW);
 		DType.addDefinition(TreePredictor.DTYPE_PREDICTOR_OLD);
 		DType.addDefinition(TreePredictor.DTYPE_PREDICTOR_NEW);
 	}

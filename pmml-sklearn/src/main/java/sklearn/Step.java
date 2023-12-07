@@ -37,9 +37,9 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	public void checkSkLearnVersion(){
 		String sklearnVersion = getSkLearnVersion();
 
-		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.2.2") > 0){
+		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.3.0") > 0){
 			String message = "This converter version does not know about Scikit-Learn version " + sklearnVersion + " artifacts. " +
-				"Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version 1.2.2";
+				"Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version 1.3.0";
 
 			throw new IllegalArgumentException(message);
 		}

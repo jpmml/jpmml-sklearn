@@ -65,7 +65,8 @@ public class Tree extends CustomPythonObject {
 		return (List)getArray("nodes", key);
 	}
 
-	public static final List<String> DTYPE_TREE = Arrays.asList("left_child", "right_child", "feature", "threshold", "impurity", "n_node_samples", "weighted_n_node_samples");
+	public static final List<String> DTYPE_TREE_OLD = Arrays.asList("left_child", "right_child", "feature", "threshold", "impurity", "n_node_samples", "weighted_n_node_samples");
+	public static final List<String> DTYPE_TREE_NEW = Arrays.asList("left_child", "right_child", "feature", "threshold", "impurity", "n_node_samples", "weighted_n_node_samples", "missing_go_to_left");
 
 	private static final String[] INIT_ATTRIBUTES = {
 		"n_features",
