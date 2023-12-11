@@ -92,6 +92,9 @@ public class BoosterUtil {
 		Learner learner = getLearner(estimator);
 
 		FeatureMap featureMap = learner.encodeFeatureMap();
+		if(featureMap == null){
+			throw new IllegalArgumentException();
+		}
 
 		// XXX
 		Map<String, ?> options = estimator.getNativeConfiguration();
