@@ -106,7 +106,7 @@
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-lightgbm</artifactId>
-				<version>1.4.7</version>
+				<version>1.5.0</version>
 			</dependency>
 
 			<dependency>
