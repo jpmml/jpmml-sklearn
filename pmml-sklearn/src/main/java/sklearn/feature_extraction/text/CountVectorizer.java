@@ -55,10 +55,11 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasSparseOutput;
 import sklearn.SkLearnTransformer;
 import sklearn2pmml.feature_extraction.text.Matcher;
 
-public class CountVectorizer extends SkLearnTransformer {
+public class CountVectorizer extends SkLearnTransformer implements HasSparseOutput {
 
 	public CountVectorizer(String module, String name){
 		super(module, name);
@@ -233,6 +234,11 @@ public class CountVectorizer extends SkLearnTransformer {
 
 	public Object getPreprocessor(){
 		return getOptionalObject("preprocessor");
+	}
+
+	@Override
+	public Boolean getSparseOutput(){
+		return Boolean.TRUE;
 	}
 
 	public List<String> getStopWords(){
