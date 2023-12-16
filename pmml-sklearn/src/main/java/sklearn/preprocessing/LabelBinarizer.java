@@ -124,12 +124,12 @@ public class LabelBinarizer extends SkLearnTransformer implements HasSparseOutpu
 		return getArray(SkLearnFields.CLASSES);
 	}
 
-	public Number getPosLabel(){
-		return getNumber("pos_label");
-	}
-
 	public Number getNegLabel(){
 		return getNumber("neg_label");
+	}
+
+	public Number getPosLabel(){
+		return getNumber("pos_label");
 	}
 
 	@Override
