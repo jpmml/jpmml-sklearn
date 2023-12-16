@@ -32,6 +32,7 @@ import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Drop;
 import sklearn.HasFeatureNamesIn;
+import sklearn.HasSparseOutput;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
 import sklearn.PassThrough;
@@ -39,7 +40,7 @@ import sklearn.SkLearnSteps;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
-public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, Encodable {
+public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, HasSparseOutput, Encodable {
 
 	public ColumnTransformer(String module, String name){
 		super(module, name);
@@ -89,6 +90,11 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 
 	public List<Object[]> getFittedTransformers(){
 		return getTupleList("transformers_");
+	}
+
+	@Override
+	public Boolean getSparseOutput(){
+		return getBoolean("sparse_output_");
 	}
 
 	static

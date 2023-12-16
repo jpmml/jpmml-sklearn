@@ -34,9 +34,10 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasSparseOutput;
 import sklearn.SkLearnTransformer;
 
-public class OneHotEncoder extends SkLearnTransformer {
+public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput {
 
 	public OneHotEncoder(String module, String name){
 		super(module, name);
@@ -124,5 +125,15 @@ public class OneHotEncoder extends SkLearnTransformer {
 
 	public List<Integer> getFeatureSizes(){
 		return getIntegerArray("n_values_");
+	}
+
+	@Override
+	public Boolean getSparseOutput(){
+
+		if(containsKey("sparse")){
+			return getBoolean("sparse");
+		}
+
+		return getBoolean("sparse_output");
 	}
 }

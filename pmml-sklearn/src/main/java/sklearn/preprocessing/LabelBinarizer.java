@@ -34,10 +34,11 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasSparseOutput;
 import sklearn.SkLearnFields;
 import sklearn.SkLearnTransformer;
 
-public class LabelBinarizer extends SkLearnTransformer {
+public class LabelBinarizer extends SkLearnTransformer implements HasSparseOutput {
 
 	public LabelBinarizer(String module, String name){
 		super(module, name);
@@ -129,5 +130,10 @@ public class LabelBinarizer extends SkLearnTransformer {
 
 	public Number getNegLabel(){
 		return getNumber("neg_label");
+	}
+
+	@Override
+	public Boolean getSparseOutput(){
+		return getBoolean("sparse_output");
 	}
 }

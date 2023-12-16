@@ -35,10 +35,11 @@ import org.jpmml.converter.InteractionFeature;
 import org.jpmml.converter.PowerFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasSparseOutput;
 import sklearn.SkLearnFields;
 import sklearn.SkLearnTransformer;
 
-public class PolynomialFeatures extends SkLearnTransformer {
+public class PolynomialFeatures extends SkLearnTransformer implements HasSparseOutput {
 
 	public PolynomialFeatures(String module, String name){
 		super(module, name);
@@ -178,6 +179,11 @@ public class PolynomialFeatures extends SkLearnTransformer {
 
 	public int getNumberOfOutputFeatures(){
 		return getInteger("n_output_features_");
+	}
+
+	@Override
+	public Boolean getSparseOutput(){
+		return getOptionalBoolean("sparse_output", Boolean.FALSE);
 	}
 
 	/**

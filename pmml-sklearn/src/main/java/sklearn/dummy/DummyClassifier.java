@@ -33,9 +33,10 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.HasPriorProbability;
+import sklearn.HasSparseOutput;
 import sklearn.SkLearnClassifier;
 
-public class DummyClassifier extends SkLearnClassifier implements HasPriorProbability {
+public class DummyClassifier extends SkLearnClassifier implements HasPriorProbability, HasSparseOutput {
 
 	public DummyClassifier(){
 		this("sklearn.dummy", "DummyClassifier");
@@ -126,6 +127,11 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 
 	public Object getConstant(){
 		return getOptionalScalar("constant");
+	}
+
+	@Override
+	public Boolean getSparseOutput(){
+		return getBoolean("sparse_output_");
 	}
 
 	public String getStrategy(){
