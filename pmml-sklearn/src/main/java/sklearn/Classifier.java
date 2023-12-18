@@ -49,6 +49,7 @@ import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
 public class Classifier extends Estimator implements HasClasses {
@@ -80,7 +81,15 @@ public class Classifier extends Estimator implements HasClasses {
 
 	@Override
 	public List<?> getClasses(){
-		List<?> values = getListLike(SkLearnFields.CLASSES);
+		List<?> values;
+
+		if(containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
+			values = getListLike(SkLearn2PMMLFields.PMML_CLASSES);
+		} else
+
+		{
+			values = getListLike(SkLearnFields.CLASSES);
+		}
 
 		values = values.stream()
 			.map(value -> (value instanceof HasArray) ? canonicalizeValues(((HasArray)value).getArrayContent()) : value)
