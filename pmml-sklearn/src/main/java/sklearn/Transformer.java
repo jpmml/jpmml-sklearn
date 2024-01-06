@@ -98,24 +98,30 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				String name = wildcardFeature.getName();
-
-				DataField dataField = encoder.getDataField(name);
-				if(dataField == null){
-					throw new IllegalArgumentException("Field " + name + " is undefined");
-				} // End if
-
-				if((dataField.requireOpType() != opType) || (dataField.requireDataType() != dataType)){
-					dataField = updateDataField(dataField, opType, dataType, encoder);
-
-					feature = new WildcardFeature(encoder, dataField);
-				}
+				feature = refineWildcardFeature(wildcardFeature, opType, dataType, encoder);
 			}
 
 			result.add(feature);
 		}
 
 		return result;
+	}
+
+	public WildcardFeature refineWildcardFeature(WildcardFeature wildcardFeature, OpType opType, DataType dataType, SkLearnEncoder encoder){
+		String name = wildcardFeature.getName();
+
+		DataField dataField = encoder.getDataField(name);
+		if(dataField == null){
+			throw new IllegalArgumentException("Field " + name + " is undefined");
+		} // End if
+
+		if((dataField.requireOpType() != opType) || (dataField.requireDataType() != dataType)){
+			dataField = updateDataField(dataField, opType, dataType, encoder);
+
+			wildcardFeature = new WildcardFeature(encoder, dataField);
+		}
+
+		return wildcardFeature;
 	}
 
 	public DataField updateDataField(DataField dataField, OpType opType, DataType dataType, SkLearnEncoder encoder){

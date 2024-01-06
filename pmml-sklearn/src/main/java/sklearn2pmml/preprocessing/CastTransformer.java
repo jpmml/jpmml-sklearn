@@ -28,8 +28,10 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pandas.core.CategoricalDtype;
 import sklearn.Transformer;
 
 public class CastTransformer extends Transformer {
@@ -50,12 +52,39 @@ public class CastTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			if(feature.getDataType() != dataType){
-				FieldRef fieldRef = feature.ref();
+			if(feature instanceof WildcardFeature){
+				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				DerivedField derivedField = encoder.ensureDerivedField(createFieldName((dataType.name()).toLowerCase(), feature), opType, dataType, () -> fieldRef);
+				wildcardFeature = refineWildcardFeature(wildcardFeature, opType, dataType, encoder);
 
-				feature = FeatureUtil.createFeature(derivedField, encoder);
+				if(dtype instanceof CategoricalDtype){
+					CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+					Boolean ordered = categoricalDtype.getOrdered();
+					List<?> values = categoricalDtype.getValues();
+
+					if(ordered){
+						feature = wildcardFeature.toOrdinalFeature(values);
+					} else
+
+					{
+						feature = wildcardFeature.toCategoricalFeature(values);
+					}
+				} else
+
+				{
+					feature = wildcardFeature;
+				}
+			} else
+
+			{
+				if(feature.getDataType() != dataType){
+					FieldRef fieldRef = feature.ref();
+
+					DerivedField derivedField = encoder.ensureDerivedField(createFieldName((dataType.name()).toLowerCase(), feature), opType, dataType, () -> fieldRef);
+
+					feature = FeatureUtil.createFeature(derivedField, encoder);
+				}
 			}
 
 			result.add(feature);
