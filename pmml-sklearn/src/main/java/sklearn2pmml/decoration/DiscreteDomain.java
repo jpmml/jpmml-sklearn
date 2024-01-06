@@ -59,9 +59,9 @@ public class DiscreteDomain extends Domain {
 		} // End if
 
 		if(withData){
-			List<?> data = getData();
+			List<?> dataValues = getDataValues();
 
-			return TypeUtil.getDataType(data, DataType.STRING);
+			return TypeUtil.getDataType(dataValues, DataType.STRING);
 		}
 
 		return DataType.STRING;
@@ -81,9 +81,9 @@ public class DiscreteDomain extends Domain {
 		WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
 		if(withData){
-			List<?> data = getData();
+			List<?> dataValues = getDataValues();
 
-			feature = encodeFeature(wildcardFeature, data);
+			feature = encodeFeature(wildcardFeature, dataValues);
 		} else
 
 		{
@@ -105,8 +105,17 @@ public class DiscreteDomain extends Domain {
 		return Collections.singletonList(feature);
 	}
 
-	public List<?> getData(){
-		return getArray("data_");
+	public List<?> getDataValues(){
+
+		// SkLearn2PMML 0.101.0+
+		if(containsKey("data_values_")){
+			return getArray("data_values_");
+		} else
+
+		// SkLearn2PMML 0.100.2
+		{
+			return getArray("data_");
+		}
 	}
 
 	public Object[] getDiscrStats(){
