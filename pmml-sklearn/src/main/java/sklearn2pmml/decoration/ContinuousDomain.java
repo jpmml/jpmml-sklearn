@@ -116,6 +116,14 @@ public class ContinuousDomain extends Domain {
 			ClassDictUtil.checkSize(features, dataMin, dataMax);
 		}
 
+		Map<String, ?> counts = null;
+		Map<String, ?> numericInfo = null;
+
+		if(withStatistics){
+			counts = getCounts();
+			numericInfo = getNumericInfo();
+		}
+
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
@@ -140,13 +148,10 @@ public class ContinuousDomain extends Domain {
 			} // End if
 
 			if(withStatistics){
-				Map<String, ?> counts = extractMap(getCounts(), i);
-				Map<String, ?> numericInfo = extractMap(getNumericInfo(), i);
-
 				UnivariateStats univariateStats = new UnivariateStats()
 					.setField(dataField)
-					.setCounts(createCounts(counts))
-					.setNumericInfo(createNumericInfo(wildcardFeature.getDataType(), numericInfo));
+					.setCounts(createCounts(extractMap(counts, i)))
+					.setNumericInfo(createNumericInfo(wildcardFeature.getDataType(), extractMap(numericInfo, i)));
 
 				encoder.addUnivariateStats(univariateStats);
 			}

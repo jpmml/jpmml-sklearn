@@ -18,10 +18,13 @@
  */
 package sklearn2pmml.decoration;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.UnivariateStats;
@@ -31,6 +34,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -45,11 +49,6 @@ public class DiscreteDomain extends Domain {
 	public Feature encodeFeature(WildcardFeature wildcardFeature, List<?> values);
 
 	@Override
-	public int getNumberOfFeatures(){
-		return 1;
-	}
-
-	@Override
 	public DataType getDataType(){
 		TypeInfo dtype = getDType();
 		Boolean withData = getWithData();
@@ -59,9 +58,9 @@ public class DiscreteDomain extends Domain {
 		} // End if
 
 		if(withData){
-			List<?> dataValues = getDataValues();
+			List<? extends List<?>> dataValues = getDataValues();
 
-			return TypeUtil.getDataType(dataValues, DataType.STRING);
+			return TypeUtil.getDataType(dataValues.get(0), DataType.STRING);
 		}
 
 		return DataType.STRING;
@@ -74,52 +73,91 @@ public class DiscreteDomain extends Domain {
 		Boolean withData = getWithData();
 		Boolean withStatistics = getWithStatistics();
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
-
-		WildcardFeature wildcardFeature = asWildcardFeature(feature);
+		List<? extends List<?>> dataValues = null;
 
 		if(withData){
-			List<?> dataValues = getDataValues();
+			dataValues = getDataValues();
 
-			feature = encodeFeature(wildcardFeature, dataValues);
-		} else
-
-		{
-			feature = encodeFeature(wildcardFeature, Collections.emptyList());
-		} // End if
-
-		if(withStatistics){
-			Map<String, ?> counts = extractMap(getCounts(), 0);
-			Object[] discrStats = getDiscrStats();
-
-			UnivariateStats univariateStats = new UnivariateStats()
-				.setField(wildcardFeature.getName())
-				.setCounts(createCounts(counts))
-				.setDiscrStats(createDiscrStats(wildcardFeature.getDataType(), discrStats));
-
-			encoder.addUnivariateStats(univariateStats);
+			ClassDictUtil.checkSize(features.size(), dataValues);
 		}
 
-		return Collections.singletonList(feature);
+		Map<String, ?> counts = null;
+		List<Object[]> discrStats = null;
+
+		if(withStatistics){
+			counts = getCounts();
+			discrStats = getDiscrStats();
+
+			ClassDictUtil.checkSize(features.size(), discrStats);
+		}
+
+		List<Feature> result = new ArrayList<>();
+
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+
+			WildcardFeature wildcardFeature = asWildcardFeature(feature);
+
+			if(withData){
+				feature = encodeFeature(wildcardFeature, dataValues.get(i));
+			} else
+
+			{
+				feature = encodeFeature(wildcardFeature, Collections.emptyList());
+			} // End if
+
+			if(withStatistics){
+				UnivariateStats univariateStats = new UnivariateStats()
+					.setField(wildcardFeature.getName())
+					.setCounts(createCounts(extractMap(counts, i)))
+					.setDiscrStats(createDiscrStats(wildcardFeature.getDataType(), discrStats.get(i)));
+
+				encoder.addUnivariateStats(univariateStats);
+			}
+
+			result.add(feature);
+		}
+
+		return result;
 	}
 
-	public List<?> getDataValues(){
+	public List<? extends List<?>> getDataValues(){
 
 		// SkLearn2PMML 0.101.0+
 		if(containsKey("data_values_")){
-			return getArray("data_values_");
+			Object dataValues = get("data_values_");
+
+			if(dataValues instanceof List){
+				List<? extends HasArray> arrays = getList("data_values_", HasArray.class);
+
+				Function<HasArray, List<?>> function = new Function<HasArray, List<?>>(){
+
+					@Override
+					public List<?> apply(HasArray hasArray){
+						return (List)hasArray.getArrayContent();
+					}
+				};
+
+				return Lists.transform(arrays, function);
+			}
+
+			return Collections.singletonList(getArray("data_values_"));
 		} else
 
 		// SkLearn2PMML 0.100.2
 		{
-			return getArray("data_");
+			return Collections.singletonList(getArray("data_"));
 		}
 	}
 
-	public Object[] getDiscrStats(){
-		return getTuple("discr_stats_");
+	public List<Object[]> getDiscrStats(){
+		Object discrStats = get("discr_stats_");
+
+		if(discrStats instanceof List){
+			return getTupleList("discr_stats_");
+		}
+
+		return Collections.singletonList(getTuple("discr_stats_"));
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
