@@ -62,8 +62,18 @@ public class BoosterUtil {
 
 		GBTree gbtree = learner.gbtree();
 
+		// XGBoost 1.7
 		if(bestNTreeLimit == null){
 			bestNTreeLimit = (Integer)estimator.getOptionalScalar("best_ntree_limit");
+		} // End if
+
+		// XGBoost 2.0+
+		if(bestNTreeLimit == null){
+			Integer bestIteration = learner.getBestIteration();
+
+			if(bestIteration != null){
+				bestNTreeLimit = bestIteration + 1;
+			}
 		}
 
 		Number missing = (Number)estimator.getOptionalScalar("missing");
