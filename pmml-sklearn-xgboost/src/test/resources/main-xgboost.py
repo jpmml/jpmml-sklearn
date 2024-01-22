@@ -1,6 +1,6 @@
 import sys
 
-from sklearn2pmml.ensemble import GBDTLRClassifier
+from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
@@ -19,8 +19,8 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit", stringify = False)
 
 	build_audit(audit_df, GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "XGBLRAudit")
-	build_audit(audit_df, GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
-	build_audit(audit_df, XGBClassifier(objective = "binary:logistic", importance_type = "weight", random_state = 13), "XGBAudit", predict_params = {"ntree_limit" : 71}, predict_proba_params = {"ntree_limit" : 71}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
+	build_audit(audit_df, GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log_loss", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
+	build_audit(audit_df, XGBClassifier(objective = "binary:logistic", importance_type = "weight", random_state = 13), "XGBAudit", predict_params = {"iteration_range" : (0, 71)}, predict_proba_params = {"iteration_range" : (0, 71)}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
 	build_audit(audit_df, XGBRFClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 5, random_state = 13), "XGBRFAudit")
 
 def build_audit_na_direct(audit_na_df, classifier, name):
@@ -30,7 +30,7 @@ def build_audit_na_direct(audit_na_df, classifier, name):
 		(["Age", "Hours", "Income"], None),
 		(["Education", "Employment"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OrdinalEncoder(), OneHotEncoder()]),
 		(["Gender"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OrdinalEncoder(handle_unknown = "use_encoded_value", unknown_value = 11), OneHotEncoder()]),
-		(["Marital", "Occupation"], OneHotEncoder())
+		(["Marital", "Occupation"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OneHotEncoder()])
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -38,6 +38,7 @@ def build_audit_na_direct(audit_na_df, classifier, name):
 	])
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	classifier.pmml_classes_ = classifier.classes_
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
 	adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
@@ -60,7 +61,18 @@ if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 	iris_X, iris_y = split_csv(iris_df)
 
-	build_iris_opt(iris_df, XGBClassifier(objective = "multi:softprob"), "XGBIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "mlogloss", "classifier__early_stopping_rounds" : 3})
+	le = LabelEncoder()
+	iris_y = le.fit_transform(iris_y)
+
+	iris_df = pandas.concat((iris_X, Series(iris_y, name = "Species")), axis = 1)
+
+	classifier = XGBClassifier(objective = "multi:softprob", eval_metric = "mlogloss", early_stopping_rounds = 3, random_state = 13)
+	classifier._le = le
+
+	build_iris_opt(iris_df, classifier, "XGBIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])]})
+
+	assert hasattr(classifier, "best_iteration")
+	assert hasattr(classifier, "best_score")
 
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
@@ -75,7 +87,12 @@ if "Auto" in datasets:
 if "Auto" in datasets:
 	auto_X, auto_y = split_csv(auto_df)
 
-	build_auto_opt(auto_df, XGBRegressor(objective = "reg:squarederror", missing = 1, random_state = 13), "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])], "regressor__eval_metric" : "rmse", "regressor__early_stopping_rounds" : 3})
+	regressor = XGBRegressor(objective = "reg:squarederror", missing = 1, eval_metric = "rmse", early_stopping_rounds = 3, random_state = 13)
+
+	build_auto_opt(auto_df, regressor, "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])]})
+
+	assert hasattr(regressor, "best_iteration")
+	assert hasattr(regressor, "best_score")
 
 if "Housing" in datasets:
 	housing_df = load_housing("Housing")

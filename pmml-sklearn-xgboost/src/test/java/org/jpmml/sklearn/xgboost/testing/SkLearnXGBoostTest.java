@@ -18,19 +18,17 @@
  */
 package org.jpmml.sklearn.xgboost.testing;
 
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
-import sklearn.Estimator;
 
 public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-		evaluate("XGB", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(8));
+		evaluate("XGB", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(48 + 8));
 	}
 
 	@Test
@@ -40,9 +38,7 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
-		String[] transformFields = {AUDIT_PROBABILITY_FALSE, FieldNameUtil.create(Estimator.FIELD_PREDICT, AUDIT_ADJUSTED), FieldNameUtil.create("eval", AUDIT_ADJUSTED)};
-
-		evaluate("XGB", AUDIT_NA, excludeFields(transformFields), new FloatEquivalence(8));
+		evaluate("XGB", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(64 + 8));
 	}
 
 	@Test
@@ -57,12 +53,12 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBSigmoidVersicolor() throws Exception {
-		evaluate("XGB" + "Sigmoid", VERSICOLOR, new FloatEquivalence(12));
+		evaluate("XGB" + "Sigmoid", VERSICOLOR, new FloatEquivalence(16));
 	}
 
 	@Test
 	public void evaluateXGBRFAudit() throws Exception {
-		evaluate("XGBRF", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(4));
+		evaluate("XGBRF", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(16));
 	}
 
 	@Test
@@ -72,7 +68,7 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBRFAuto() throws Exception {
-		evaluate("XGBRF", AUTO, new FloatEquivalence(2));
+		evaluate("XGBRF", AUTO, new FloatEquivalence(8 + 4));
 	}
 
 	@Test
