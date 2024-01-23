@@ -47,6 +47,11 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 	}
 
 	@Test
+	public void evaluateMultiXGBAuto() throws Exception {
+		evaluate("MultiXGB", AUTO, new FloatEquivalence(8));
+	}
+
+	@Test
 	public void evaluateXGBIris() throws Exception {
 		evaluate("XGB", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA), new FloatEquivalence(16));
 	}
@@ -69,6 +74,11 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 	@Test
 	public void evaluateXGBRFAuto() throws Exception {
 		evaluate("XGBRF", AUTO, new FloatEquivalence(8 + 4));
+	}
+
+	@Test
+	public void evaluateMultiXGBRFAuto() throws Exception {
+		evaluate("MultiXGBRF", AUTO, new FloatEquivalence(8 + 4));
 	}
 
 	@Test
