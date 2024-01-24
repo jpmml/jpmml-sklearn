@@ -79,11 +79,27 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		if((SkLearnSteps.PASSTHROUGH).equals(estimator)){
 			return true;
+		} // End if
+
+		if(estimator instanceof Composite){
+			Composite composite = (Composite)estimator;
+
+			return composite.hasFinalEstimator();
+		} else
+
+		if(estimator instanceof Estimator){
+			return true;
+		} else
+
+		if(estimator instanceof Transformer){
+			return false;
+		} else
+
+		{
+			estimator = CastUtil.deepCastTo(estimator, Estimator.class);
+
+			return (Estimator.class).isInstance(estimator);
 		}
-
-		estimator = CastUtil.deepCastTo(estimator, Estimator.class);
-
-		return (Estimator.class).isInstance(estimator);
 	}
 
 	@Override
