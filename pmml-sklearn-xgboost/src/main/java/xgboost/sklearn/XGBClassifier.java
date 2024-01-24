@@ -24,8 +24,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.LabelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.xgboost.Classification;
 import org.jpmml.xgboost.HasXGBoostOptions;
@@ -53,14 +53,15 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	@Override
 	public List<?> getClasses(){
 
-		try {
+		// XGBoost 0.4 through 1.7
+		if(containsKey("_le") || containsKey(SkLearnFields.CLASSES) || containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
 			return super.getClasses();
-		} catch(IllegalArgumentException iae){
-			String message = "The classifier object does not have a persistent \'" + SkLearnFields.CLASSES + "\' attribute. " +
-				"Please set the \'" + ClassDictUtil.formatMember(this, SkLearn2PMMLFields.PMML_CLASSES) + "\' attribute";
-
-			throw new IllegalArgumentException(message, iae);
 		}
+
+		// XGBoost 2.0+
+		int numClasses = getNumberOfClasses();
+
+		return LabelUtil.createTargetCategories(numClasses);
 	}
 
 	@Override
@@ -87,5 +88,9 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	@Override
 	public Booster getBooster(){
 		return get("_Booster", Booster.class);
+	}
+
+	public int getNumberOfClasses(){
+		return getInteger(SkLearnFields.N_CLASSES);
 	}
 }

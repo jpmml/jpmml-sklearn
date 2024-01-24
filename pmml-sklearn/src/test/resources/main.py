@@ -159,11 +159,7 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 				if hasattr(child_estimator, "feature_importances_"):
 					child_estimator.pmml_feature_importances_ = child_estimator.feature_importances_
 	elif isinstance(classifier, (XGBClassifier, XGBRFClassifier)):
-		classifier.pmml_classes_ = classifier.classes_
 		classifier.pmml_feature_importances_ = classifier.feature_importances_
-	elif isinstance(classifier, GBDTLRClassifier):
-		if isinstance(classifier.gbdt_, (XGBClassifier, XGBRFClassifier)):
-			classifier.gbdt_.pmml_classes_ = classifier.gbdt_.classes_
 	else:
 		pass
 	if isinstance(classifier, GaussianNB):
@@ -367,11 +363,6 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 		("classifier", classifier)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
-	if isinstance(classifier, GBDTLRClassifier):
-		if isinstance(classifier.gbdt_, XGBRFClassifier):
-			classifier.gbdt_.pmml_classes_ = classifier.gbdt_.classes_
-	else:
-		pass
 	pipeline = make_pmml_pipeline(pipeline, active_fields = versicolor_X.columns.values, target_fields = [versicolor_y.name])
 	pipeline.configure(**pmml_options)
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
@@ -446,7 +437,6 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 	pipeline = make_pmml_pipeline(pipeline, active_fields = iris_X.columns.values, target_fields = [iris_y.name])
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
-		classifier.pmml_classes_ = classifier.classes_
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
@@ -502,7 +492,6 @@ def build_iris_opt(iris_df, classifier, name, fit_params = {}, **pmml_options):
 	pipeline.fit(iris_X[iris_train_mask], iris_y[iris_train_mask], **fit_params)
 	pipeline.configure(**pmml_options)
 	if isinstance(classifier, XGBClassifier):
-		classifier.pmml_classes_ = classifier.classes_
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))

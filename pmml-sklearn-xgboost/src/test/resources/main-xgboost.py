@@ -38,7 +38,6 @@ def build_audit_na_direct(audit_na_df, classifier, name):
 	])
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
-	classifier.pmml_classes_ = classifier.classes_
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
 	adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])

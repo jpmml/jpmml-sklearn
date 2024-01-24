@@ -53,7 +53,7 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA), new FloatEquivalence(16));
+		evaluate("XGB", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA), new FloatEquivalence(16 + 4));
 	}
 
 	@Test

@@ -23,6 +23,7 @@ public interface SkLearnFields {
 	String CLASSES = "classes_";
 	String FEATURE_IMPORTANCES = "feature_importances_";
 	String FEATURE_NAMES_IN = "feature_names_in_";
+	String N_CLASSES = "n_classes_";
 	String N_FEATURES = "n_features_";
 	String N_FEATURES_IN = "n_features_in_";
 	String N_OUTPUTS = "n_outputs_";
