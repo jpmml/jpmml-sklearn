@@ -94,32 +94,11 @@ if "Auto" in datasets:
 	assert hasattr(regressor, "best_iteration")
 	assert hasattr(regressor, "best_score")
 
-def build_multi_auto(auto_df, regressor, name):
-	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
-
-	cat_cols = ["cylinders", "model_year", "origin"]
-	cont_cols = []
-
-	transformer = ColumnTransformer(
-		[("cat_" + cat_col, CastTransformer("category"), [cat_col]) for cat_col in cat_cols] +
-		[("cont", "passthrough", cont_cols)]
-	)
-	pipeline = PMMLPipeline([
-		("transformer", transformer),
-		("regressor", regressor)
-	])
-	pipeline.set_output(transform = "pandas")
-	pipeline.fit(auto_X, auto_y)
-	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
-	store_pkl(pipeline, name)
-	acceleration_mpg = DataFrame(pipeline.predict(auto_X), columns = ["acceleration", "mpg"])
-	store_csv(acceleration_mpg, name)
-
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
-	build_multi_auto(auto_df, XGBRegressor(n_estimators = 31, max_depth = 6, objective = "reg:squarederror", enable_categorical = True, random_state = 13), "MultiXGBAuto")
-	build_multi_auto(auto_df, XGBRFRegressor(n_estimators = 31, max_depth = 6, enable_categorical = True, random_state = 13), "MultiXGBRFAuto")
+	build_multi_auto(auto_df, XGBRegressor(n_estimators = 31, max_depth = 6, objective = "reg:squarederror", random_state = 13), "MultiXGBAuto")
+	build_multi_auto(auto_df, XGBRFRegressor(n_estimators = 31, max_depth = 6, random_state = 13), "MultiXGBRFAuto")
 
 if "Housing" in datasets:
 	housing_df = load_housing("Housing")
