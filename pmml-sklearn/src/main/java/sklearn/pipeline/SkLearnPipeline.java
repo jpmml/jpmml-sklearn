@@ -21,6 +21,7 @@ package sklearn.pipeline;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Schema;
@@ -33,6 +34,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.PassThrough;
+import sklearn.SkLearnFields;
 import sklearn.SkLearnSteps;
 import sklearn.Step;
 import sklearn.StepUtil;
@@ -93,13 +95,23 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		if(step instanceof Transformer){
 			return false;
-		} else
+		} // End if
 
-		{
-			step = CastUtil.deepCastTo(step, Estimator.class);
+		if(step instanceof ClassDict){
+			ClassDict dict = (ClassDict)step;
 
-			return (Estimator.class).isInstance(step);
+			if(isEstimatorLike(dict)){
+				return true;
+			} else
+
+			if(isTransformerLike(dict)){
+				return false;
+			}
 		}
+
+		step = CastUtil.deepCastTo(step, Estimator.class);
+
+		return (Estimator.class).isInstance(step);
 	}
 
 	@Override
@@ -235,5 +247,39 @@ public class SkLearnPipeline extends Composite implements Encodable {
 		put("steps", steps);
 
 		return this;
+	}
+
+	static
+	private boolean isEstimatorLike(ClassDict dict){
+		String name = dict.getClassName();
+
+		if(name.endsWith("Estimator")){
+			return true;
+		} else
+
+		if(name.endsWith("Classifier") || name.endsWith("Regressor")){
+			return true;
+		} // End if
+
+		if(dict.containsKey(SkLearnFields.N_OUTPUTS)){
+			return true;
+		} else
+
+		if(dict.containsKey(SkLearnFields.N_CLASSES) || dict.containsKey(SkLearnFields.CLASSES)){
+			return true;
+		}
+
+		return false;
+	}
+
+	static
+	private boolean isTransformerLike(ClassDict dict){
+		String name = dict.getClassName();
+
+		if(name.endsWith("Transformer")){
+			return true;
+		}
+
+		return false;
 	}
 }
