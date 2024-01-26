@@ -75,30 +75,30 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		Object[] finalStep = steps.get(steps.size() - 1);
 
-		Object estimator = TupleUtil.extractElement(finalStep, 1);
+		Object step = TupleUtil.extractElement(finalStep, 1);
 
-		if((estimator == null) || (SkLearnSteps.PASSTHROUGH).equals(estimator)){
+		if((step == null) || (SkLearnSteps.PASSTHROUGH).equals(step)){
 			return false;
 		} // End if
 
-		if(estimator instanceof Composite){
-			Composite composite = (Composite)estimator;
+		if(step instanceof Composite){
+			Composite composite = (Composite)step;
 
 			return composite.hasFinalEstimator();
 		} else
 
-		if(estimator instanceof Estimator){
+		if(step instanceof Estimator){
 			return true;
 		} else
 
-		if(estimator instanceof Transformer){
+		if(step instanceof Transformer){
 			return false;
 		} else
 
 		{
-			estimator = CastUtil.deepCastTo(estimator, Estimator.class);
+			step = CastUtil.deepCastTo(step, Estimator.class);
 
-			return (Estimator.class).isInstance(estimator);
+			return (Estimator.class).isInstance(step);
 		}
 	}
 
@@ -148,9 +148,9 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		Object[] finalStep = steps.get(steps.size() - 1);
 
-		Object estimator = TupleUtil.extractElement(finalStep, 1);
+		Object step = TupleUtil.extractElement(finalStep, 1);
 
-		if((estimator == null) || (SkLearnSteps.PASSTHROUGH).equals(estimator)){
+		if((step == null) || (SkLearnSteps.PASSTHROUGH).equals(step)){
 			throw new IllegalArgumentException();
 		}
 
@@ -162,7 +162,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 			}
 		};
 
-		return castFunction.apply(estimator);
+		return castFunction.apply(step);
 	}
 
 	@Override
