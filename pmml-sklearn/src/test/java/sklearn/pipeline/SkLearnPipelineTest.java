@@ -69,17 +69,19 @@ public class SkLearnPipelineTest {
 	}
 
 	@Test
+	public void nonePipeline(){
+		SkLearnPipeline pipeline = new SkLearnPipeline()
+			.setSteps(Collections.singletonList(new Object[]{"step", null}));
+
+		checkIdentityTransform(pipeline);
+	}
+
+	@Test
 	public void passthroughPipeline(){
 		SkLearnPipeline pipeline = new SkLearnPipeline()
-			.setSteps(Collections.singletonList(new Object[]{"estimator", SkLearnSteps.PASSTHROUGH}));
+			.setSteps(Collections.singletonList(new Object[]{"step", SkLearnSteps.PASSTHROUGH}));
 
-		assertFalse(pipeline.hasTransformers());
-		assertEquals(Collections.emptyList(), pipeline.getTransformers());
-
-		assertNull(pipeline.getHead());
-
-		assertTrue(pipeline.hasFinalEstimator());
-		assertEquals(null, pipeline.getFinalEstimator());
+		checkIdentityTransform(pipeline);
 	}
 
 	@Test
@@ -98,6 +100,24 @@ public class SkLearnPipelineTest {
 		Regressor regressor = pipeline.toRegressor();
 
 		assertTrue(regressor instanceof CompositeRegressor);
+	}
+
+	static
+	private void checkIdentityTransform(SkLearnPipeline pipeline){
+		assertTrue(pipeline.hasTransformers());
+		assertEquals(Collections.singletonList(PassThrough.INSTANCE), pipeline.getTransformers());
+
+		assertNull(pipeline.getHead());
+
+		assertFalse(pipeline.hasFinalEstimator());
+
+		try {
+			pipeline.getFinalEstimator();
+
+			fail();
+		} catch(IllegalArgumentException iae){
+			// Ignored
+		}
 	}
 
 	static

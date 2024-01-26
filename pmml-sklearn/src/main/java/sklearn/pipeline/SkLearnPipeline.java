@@ -77,8 +77,8 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		Object estimator = TupleUtil.extractElement(finalStep, 1);
 
-		if((SkLearnSteps.PASSTHROUGH).equals(estimator)){
-			return true;
+		if((estimator == null) || (SkLearnSteps.PASSTHROUGH).equals(estimator)){
+			return false;
 		} // End if
 
 		if(estimator instanceof Composite){
@@ -150,17 +150,11 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		Object estimator = TupleUtil.extractElement(finalStep, 1);
 
+		if((estimator == null) || (SkLearnSteps.PASSTHROUGH).equals(estimator)){
+			throw new IllegalArgumentException();
+		}
+
 		CastFunction<E> castFunction = new CastFunction<E>(clazz){
-
-			@Override
-			public E apply(Object object){
-
-				if((SkLearnSteps.PASSTHROUGH).equals(object)){
-					return null;
-				}
-
-				return super.apply(object);
-			}
 
 			@Override
 			public String formatMessage(Object object){
@@ -188,7 +182,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 			@Override
 			public Step apply(Object object){
 
-				if((SkLearnSteps.PASSTHROUGH).equals(object)){
+				if((object == null) || (SkLearnSteps.PASSTHROUGH).equals(object)){
 					return null;
 				}
 
