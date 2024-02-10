@@ -45,6 +45,8 @@ public class StackingUtil {
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
+		Schema segmentSchema = schema.toAnonymousSchema();
+
 		List<Feature> stackFeatures = new ArrayList<>();
 
 		List<Model> models = new ArrayList<>();
@@ -53,7 +55,7 @@ public class StackingUtil {
 			E estimator = estimators.get(i);
 			String stackMethod = stackMethods.get(i);
 
-			Model model = estimator.encode((i + 1), schema);
+			Model model = estimator.encode((i + 1), segmentSchema);
 
 			List<Feature> predictFeatures = predictFunction.apply(i, model, stackMethod, encoder);
 			if(predictFeatures != null && !predictFeatures.isEmpty()){
