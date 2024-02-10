@@ -27,9 +27,9 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -65,7 +65,7 @@ public class PCA extends BasePCA {
 		for(int i = 0; i < numberOfComponents; i++){
 			List<? extends Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.SUM);
+			Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
 
 			for(int j = 0; j < numberOfFeatures; j++){
 				Feature feature = features.get(j);
@@ -85,11 +85,11 @@ public class PCA extends BasePCA {
 				Expression expression = continuousFeature.ref();
 
 				if(!ValueUtil.isZero(meanValue)){
-					expression = PMMLUtil.createApply(PMMLFunctions.SUBTRACT, expression, PMMLUtil.createConstant(meanValue));
+					expression = ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, expression, ExpressionUtil.createConstant(meanValue));
 				} // End if
 
 				if(!ValueUtil.isOne(componentValue)){
-					expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, PMMLUtil.createConstant(componentValue));
+					expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, expression, ExpressionUtil.createConstant(componentValue));
 				}
 
 				apply.addExpressions(expression);
@@ -99,7 +99,7 @@ public class PCA extends BasePCA {
 				Number explainedVarianceValue = explainedVariance.get(i);
 
 				if(!ValueUtil.isOne(explainedVarianceValue)){
-					apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, apply, PMMLUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVarianceValue))));
+					apply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE, apply, ExpressionUtil.createConstant(Math.sqrt(ValueUtil.asDouble(explainedVarianceValue))));
 				}
 			}
 

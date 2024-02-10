@@ -31,6 +31,7 @@ import org.dmg.pmml.HasDefaultValue;
 import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
@@ -109,7 +110,7 @@ public class ExpressionTransformer extends Transformer {
 		} else
 
 		{
-			dataType = TypeUtil.getDataType(expression, scope);
+			dataType = ExpressionUtil.getDataType(expression, scope);
 
 			if(dataType == null){
 				dataType = DataType.DOUBLE;

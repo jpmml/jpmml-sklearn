@@ -25,8 +25,8 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -51,7 +51,7 @@ public class Formatter extends Transformer {
 
 		Feature feature = features.get(0);
 
-		Apply apply = PMMLUtil.createApply(function, feature.ref(), PMMLUtil.createConstant(pattern, DataType.STRING));
+		Apply apply = ExpressionUtil.createApply(function, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern));
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("format", feature, pattern), OpType.CATEGORICAL, DataType.STRING, apply);
 

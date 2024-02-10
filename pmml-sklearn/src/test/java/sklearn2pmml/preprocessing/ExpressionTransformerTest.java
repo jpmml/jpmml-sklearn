@@ -32,8 +32,8 @@ import org.dmg.pmml.HasExpression;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -68,7 +68,7 @@ public class ExpressionTransformerTest {
 
 		expr = "1.0";
 
-		expected = PMMLUtil.createConstant(1d, DataType.DOUBLE);
+		expected = ExpressionUtil.createConstant(DataType.DOUBLE, 1d);
 
 		try {
 			encode(expr, null, null, "as_missing");
@@ -81,7 +81,7 @@ public class ExpressionTransformerTest {
 		expr = "X[0] + 1.0";
 
 		expected = new Apply(PMMLFunctions.ADD)
-			.addExpressions(new FieldRef("x"), PMMLUtil.createConstant(1d, DataType.DOUBLE));
+			.addExpressions(new FieldRef("x"), ExpressionUtil.createConstant(DataType.DOUBLE, 1d));
 
 		expected = ((Apply)expected)
 			.setMapMissingTo(-1d)

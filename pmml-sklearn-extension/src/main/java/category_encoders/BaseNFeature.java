@@ -38,12 +38,12 @@ import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BinaryThresholdFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.IfElseBuilder;
 import org.jpmml.converter.PMMLEncoder;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.ToStringHelper;
-import org.jpmml.sklearn.IfElseBuilder;
 
 public class BaseNFeature extends BinaryThresholdFeature {
 
@@ -148,29 +148,25 @@ public class BaseNFeature extends BinaryThresholdFeature {
 					continue entries;
 				}
 
-				Apply valueApply = PMMLUtil.createApply((categories.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), new FieldRef(name));
+				Apply valueApply = ExpressionUtil.createValueApply(new FieldRef(name), dataType, categories);
 
-				for(Object category : categories){
-					valueApply.addExpressions(PMMLUtil.createConstant(category, dataType));
-				}
-
-				applyBuilder.add(valueApply, PMMLUtil.createConstant(baseValue));
+				applyBuilder.add(valueApply, ExpressionUtil.createConstant(baseValue));
 			}
 
 			if(applyBuilder.isEmpty()){
-				return PMMLUtil.createConstant(0);
+				return ExpressionUtil.createConstant(0);
 			} else
 
 			{
-				applyBuilder.terminate(PMMLUtil.createConstant(0));
+				applyBuilder.terminate(ExpressionUtil.createConstant(0));
 
 				Apply apply = applyBuilder.build();
 
 				if(missingValueAware){
-					apply = PMMLUtil.createApply(PMMLFunctions.IF,
-						PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, new FieldRef(name)),
+					apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+						ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, new FieldRef(name)),
 						apply,
-						PMMLUtil.createConstant(missingBaseValue)
+						ExpressionUtil.createConstant(missingBaseValue)
 					);
 				}
 

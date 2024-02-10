@@ -46,6 +46,7 @@ import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ObjectFeature;
@@ -103,7 +104,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		DataType dataType = (dtype != null ? dtype.getDataType() : DataType.DOUBLE);
 
 		if(lowercase){
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.LOWERCASE, feature.ref());
+			Apply apply = ExpressionUtil.createApply(PMMLFunctions.LOWERCASE, feature.ref());
 
 			DerivedField derivedField = encoder.ensureDerivedField(FieldNameUtil.create(PMMLFunctions.LOWERCASE, feature), OpType.CATEGORICAL, DataType.STRING, () -> apply);
 
@@ -203,9 +204,9 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public Apply encodeApply(DefineFunction defineFunction, Feature feature, int index, String term){
-		Constant constant = PMMLUtil.createConstant(term, DataType.STRING);
+		Constant constant = ExpressionUtil.createConstant(DataType.STRING, term);
 
-		return PMMLUtil.createApply(defineFunction, feature.ref(), constant);
+		return ExpressionUtil.createApply(defineFunction, feature.ref(), constant);
 	}
 
 	public String functionName(){

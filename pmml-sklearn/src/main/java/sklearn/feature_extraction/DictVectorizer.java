@@ -30,7 +30,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.FieldUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
 
@@ -78,7 +78,7 @@ public class DictVectorizer extends Initializer {
 			Feature feature;
 
 			if(value != null){
-				PMMLUtil.addValues(dataField, Collections.singletonList(value));
+				FieldUtil.addValues(dataField, Collections.singletonList(value));
 
 				feature = new BinaryFeature(encoder, dataField, value);
 			} else

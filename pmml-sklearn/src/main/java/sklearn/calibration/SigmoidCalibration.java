@@ -27,8 +27,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.FunctionUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -49,11 +49,11 @@ public class SigmoidCalibration extends Calibrator {
 
 		Feature feature = features.get(0);
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.MULTIPLY,
-			PMMLUtil.createConstant(-1),
-			PMMLUtil.createApply(PMMLFunctions.ADD,
-				PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(a), feature.ref()),
-				PMMLUtil.createConstant(b)
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
+			ExpressionUtil.createConstant(-1),
+			ExpressionUtil.createApply(PMMLFunctions.ADD,
+				ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(a), feature.ref()),
+				ExpressionUtil.createConstant(b)
 			)
 		);
 

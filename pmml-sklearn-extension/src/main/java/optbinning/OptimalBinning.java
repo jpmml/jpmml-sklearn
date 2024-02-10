@@ -39,8 +39,8 @@ import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
@@ -121,10 +121,10 @@ public class OptimalBinning extends Transformer {
 		} else
 
 		{
-			Expression apply = PMMLUtil.createApply(PMMLFunctions.IF,
-				PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
-				PMMLUtil.createConstant(categoriesOut.get(0), null),
-				PMMLUtil.createConstant(OptimalBinning.CATEGORY_MISSING)
+			Expression apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+				ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
+				ExpressionUtil.createConstant(null, categoriesOut.get(0)),
+				ExpressionUtil.createConstant(OptimalBinning.CATEGORY_MISSING)
 			);
 
 			expression = apply;
@@ -136,11 +136,7 @@ public class OptimalBinning extends Transformer {
 
 		// Special
 		if(!specialCodes.isEmpty()){
-			Apply valueApply = PMMLUtil.createApply((specialCodes.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), feature.ref());
-
-			for(Number specialCode : specialCodes){
-				valueApply.addExpressions(PMMLUtil.createConstant(specialCode));
-			}
+			Apply valueApply = ExpressionUtil.createValueApply(feature.ref(), specialCodes);
 
 			if(expression instanceof HasMapMissingTo){
 				HasMapMissingTo<?, ?> hasMapMissingTo = (HasMapMissingTo<?, ?>)expression;
@@ -148,13 +144,11 @@ public class OptimalBinning extends Transformer {
 				valueApply.setMapMissingTo(hasMapMissingTo.getMapMissingTo());
 			}
 
-			Apply ifApply = PMMLUtil.createApply(PMMLFunctions.IF,
+			expression = ExpressionUtil.createApply(PMMLFunctions.IF,
 				valueApply,
-				PMMLUtil.createConstant(OptimalBinning.CATEGORY_SPECIAL),
+				ExpressionUtil.createConstant(OptimalBinning.CATEGORY_SPECIAL),
 				expression
 			);
-
-			expression = ifApply;
 
 			Predicate specialPredicate = predicateManager.createPredicate(feature, specialCodes);
 
@@ -276,7 +270,7 @@ public class OptimalBinning extends Transformer {
 			predicates.add(predicate);
 		}
 
-		MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), inputValues, outputValues)
+		MapValues mapValues = ExpressionUtil.createMapValues(feature.getName(), inputValues, outputValues)
 			.setMapMissingTo(OptimalBinning.CATEGORY_MISSING);
 
 		return mapValues;

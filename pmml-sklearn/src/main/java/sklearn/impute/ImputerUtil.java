@@ -30,10 +30,11 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.BooleanFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.MissingValueDecorator;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
@@ -53,7 +54,7 @@ public class ImputerUtil {
 			encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatmentMethod, replacementValue));
 
 			if(missingValue != null){
-				PMMLUtil.addValues(dataField, Value.Property.MISSING, Collections.singletonList(missingValue));
+				FieldUtil.addValues(dataField, Value.Property.MISSING, Collections.singletonList(missingValue));
 			}
 
 			return feature;
@@ -63,16 +64,16 @@ public class ImputerUtil {
 			Expression expression = feature.ref();
 
 			if(missingValue != null){
-				expression = PMMLUtil.createApply(PMMLFunctions.EQUAL, expression, PMMLUtil.createConstant(missingValue, feature.getDataType()));
+				expression = ExpressionUtil.createApply(PMMLFunctions.EQUAL, expression, ExpressionUtil.createConstant(feature.getDataType(), missingValue));
 			} else
 
 			{
-				expression = PMMLUtil.createApply(PMMLFunctions.ISMISSING, expression);
+				expression = ExpressionUtil.createApply(PMMLFunctions.ISMISSING, expression);
 			}
 
-			expression = PMMLUtil.createApply(PMMLFunctions.IF,
+			expression = ExpressionUtil.createApply(PMMLFunctions.IF,
 				expression,
-				PMMLUtil.createConstant(replacementValue, feature.getDataType()),
+				ExpressionUtil.createConstant(feature.getDataType(), replacementValue),
 				feature.ref()
 			);
 
@@ -91,11 +92,11 @@ public class ImputerUtil {
 		Expression expression = feature.ref();
 
 		if(missingValue != null){
-			expression = PMMLUtil.createApply(PMMLFunctions.EQUAL, expression, PMMLUtil.createConstant(missingValue, feature.getDataType()));
+			expression = ExpressionUtil.createApply(PMMLFunctions.EQUAL, expression, ExpressionUtil.createConstant(feature.getDataType(), missingValue));
 		} else
 
 		{
-			expression = PMMLUtil.createApply(PMMLFunctions.ISMISSING, expression);
+			expression = ExpressionUtil.createApply(PMMLFunctions.ISMISSING, expression);
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("missingIndicator", feature), OpType.CATEGORICAL, DataType.BOOLEAN, expression);

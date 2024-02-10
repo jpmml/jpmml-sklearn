@@ -131,7 +131,7 @@ public class BinningProcess extends Initializer {
 	}
 
 	public List<Boolean> getSupport(){
-		return (List)getArray("_support", Boolean.class);
+		return getBooleanArray("_support");
 	}
 
 	public List<String> getVariableNames(){

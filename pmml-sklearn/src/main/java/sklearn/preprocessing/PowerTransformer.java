@@ -27,8 +27,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -67,11 +67,11 @@ public class PowerTransformer extends SkLearnTransformer {
 
 			if(!ValueUtil.isZero(lambda)){
 				// "($name ^ lambda - 1) / lambda"
-				apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createApply(PMMLFunctions.POW, continuousFeature.ref(), PMMLUtil.createConstant(lambda)), PMMLUtil.createConstant(1d)), PMMLUtil.createConstant(lambda));
+				apply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE, ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, ExpressionUtil.createApply(PMMLFunctions.POW, continuousFeature.ref(), ExpressionUtil.createConstant(lambda)), ExpressionUtil.createConstant(1d)), ExpressionUtil.createConstant(lambda));
 			} else
 
 			{
-				apply = PMMLUtil.createApply(PMMLFunctions.LN, continuousFeature.ref());
+				apply = ExpressionUtil.createApply(PMMLFunctions.LN, continuousFeature.ref());
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("boxCox", continuousFeature.getName()), OpType.CONTINUOUS, DataType.DOUBLE, apply);
@@ -89,7 +89,7 @@ public class PowerTransformer extends SkLearnTransformer {
 	}
 
 	public List<? extends Number> getLambdas(){
-		return getArray("lambdas_", Number.class);
+		return getNumberArray("lambdas_");
 	}
 
 	public String getMethod(){

@@ -38,9 +38,9 @@ import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueDecorator;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CalendarUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -100,7 +100,7 @@ public class Domain extends Transformer {
 			} // End if
 
 			if(missingValues != null){
-				PMMLUtil.addValues(dataField, Value.Property.MISSING, standardizeValues(dataType, missingValues));
+				FieldUtil.addValues(dataField, Value.Property.MISSING, standardizeValues(dataType, missingValues));
 			} // End if
 
 			if(invalidValueTreatment != null){

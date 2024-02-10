@@ -26,8 +26,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -51,7 +51,7 @@ public class ReplaceTransformer extends PatternTransformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), PMMLUtil.createConstant(pattern, DataType.STRING), PMMLUtil.createConstant(replacement, DataType.STRING));
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern), ExpressionUtil.createConstant(DataType.STRING, replacement));
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("replace", feature, formatArg(pattern), formatArg(replacement)), OpType.CATEGORICAL, DataType.STRING, apply);
 

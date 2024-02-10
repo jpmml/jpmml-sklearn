@@ -25,8 +25,8 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -65,7 +65,7 @@ public class MaxAbsScaler extends Scaler {
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 			// "$name / scale"
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.DIVIDE, continuousFeature.ref(), PMMLUtil.createConstant(value));
+			Apply apply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE, continuousFeature.ref(), ExpressionUtil.createConstant(value));
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("maxAbsScaler", continuousFeature), apply);
 

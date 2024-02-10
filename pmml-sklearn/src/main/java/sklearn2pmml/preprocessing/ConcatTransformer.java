@@ -27,8 +27,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
@@ -43,7 +43,7 @@ public class ConcatTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String separator = getSeparator();
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.CONCAT);
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.CONCAT);
 
 		List<Expression> expressions = apply.getExpressions();
 
@@ -51,7 +51,7 @@ public class ConcatTransformer extends Transformer {
 			Feature feature = features.get(i);
 
 			if((i > 0) && !("").equals(separator)){
-				expressions.add(PMMLUtil.createConstant(separator, DataType.STRING));
+				expressions.add(ExpressionUtil.createConstant(DataType.STRING, separator));
 			}
 
 			expressions.add(feature.ref());

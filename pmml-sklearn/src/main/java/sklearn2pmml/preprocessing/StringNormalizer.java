@@ -28,8 +28,8 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
@@ -55,11 +55,11 @@ public class StringNormalizer extends Transformer {
 			Expression expression = feature.ref();
 
 			if(function != null){
-				expression = PMMLUtil.createApply(translateFunction(function), expression);
+				expression = ExpressionUtil.createApply(translateFunction(function), expression);
 			} // End if
 
 			if(trimBlanks){
-				expression = PMMLUtil.createApply(PMMLFunctions.TRIMBLANKS, expression);
+				expression = ExpressionUtil.createApply(PMMLFunctions.TRIMBLANKS, expression);
 			}
 
 			Field<?> field = encoder.toCategorical(feature.getName(), Collections.emptyList());

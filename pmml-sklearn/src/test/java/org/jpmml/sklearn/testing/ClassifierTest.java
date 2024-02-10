@@ -21,14 +21,13 @@ package org.jpmml.sklearn.testing;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import org.jpmml.converter.FieldNamePrefixes;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
-import org.jpmml.sklearn.FieldNames;
 import org.junit.Test;
 import sklearn.Estimator;
 
@@ -181,8 +180,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateMultiLogisticRegression() throws Exception {
 		String[] resultFields = {
-			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", "Female"),
-			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 1)
+			FieldNameUtil.create(FieldNames.PROBABILITY, "Gender", "Male"), FieldNameUtil.create(FieldNames.PROBABILITY, "Gender", "Female"),
+			FieldNameUtil.create(FieldNames.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNames.PROBABILITY, "Adjusted", 1)
 		};
 
 		evaluate(MULTI_LOGISTIC_REGRESSION, AUDIT, excludeFields(resultFields));
@@ -213,8 +212,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateLogisticRegressionChainAudit() throws Exception {
 		String[] resultFields = {
-			FieldNameUtil.create(Estimator.FIELD_PREDICT, "Gender"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", -2), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Gender", 2),
-			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 1)
+			FieldNameUtil.create(Estimator.FIELD_PREDICT, "Gender"), FieldNameUtil.create(FieldNames.PROBABILITY, "Gender", -2), FieldNameUtil.create(FieldNames.PROBABILITY, "Gender", 2),
+			FieldNameUtil.create(FieldNames.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNames.PROBABILITY, "Adjusted", 1)
 		};
 
 		evaluate(LOGISTIC_REGRESSION_CHAIN, AUDIT, excludeFields(resultFields));

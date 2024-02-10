@@ -32,10 +32,10 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.MapValues;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.PMMLEncoder;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ThresholdFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.model.ToStringHelper;
@@ -82,7 +82,7 @@ public class MapFeature extends ThresholdFeature {
 
 			Number mapMissingTo = validMapping.remove(missingCategory);
 
-			MapValues mapValues = PMMLUtil.createMapValues(name, validMapping)
+			MapValues mapValues = ExpressionUtil.createMapValues(name, validMapping)
 				.setMapMissingTo(mapMissingTo)
 				.setDefaultValue(defaultValue);
 

@@ -27,8 +27,8 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.Value;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -77,7 +77,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 			DataField dataField = wildcardFeature.getField();
 
-			PMMLUtil.clearValues(dataField, Value.Property.VALID);
+			FieldUtil.clearValues(dataField, Value.Property.VALID);
 
 			Feature transformedLabelFeature = Iterables.getOnlyElement(transformer.encode(Collections.singletonList(labelFeature), encoder));
 

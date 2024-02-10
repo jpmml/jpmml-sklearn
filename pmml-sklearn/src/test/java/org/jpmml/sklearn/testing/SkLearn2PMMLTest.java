@@ -18,12 +18,11 @@
  */
 package org.jpmml.sklearn.testing;
 
-import org.jpmml.converter.FieldNamePrefixes;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
-import org.jpmml.sklearn.FieldNames;
 import org.junit.Test;
 import sklearn.Estimator;
 import sklearn.SkLearnMethods;
@@ -43,9 +42,9 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	@Test
 	public void evaluateMultiEstimatorChainAudit() throws Exception {
 		String[] resultFields = {
-			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Male"), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Female"),
+			FieldNameUtil.create(FieldNames.PROBABILITY, "Male"), FieldNameUtil.create(FieldNames.PROBABILITY, "Female"),
 			FieldNames.NODE_ID,
-			FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNamePrefixes.PROBABILITY, "Adjusted", 1)
+			FieldNameUtil.create(FieldNames.PROBABILITY, "Adjusted", 0), FieldNameUtil.create(FieldNames.PROBABILITY, "Adjusted", 1)
 		};
 
 		evaluate("MultiEstimatorChain", AUDIT, excludeFields(resultFields));
@@ -138,11 +137,11 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 
 	@Test
 	public void evaluateEstimatorChainWine() throws Exception {
-		evaluate("EstimatorChain", "Wine");
+		evaluate("EstimatorChain", WINE);
 	}
 
 	@Test
 	public void evaluateSelectFirstWine() throws Exception {
-		evaluate("SelectFirst", "Wine");
+		evaluate("SelectFirst", WINE);
 	}
 }

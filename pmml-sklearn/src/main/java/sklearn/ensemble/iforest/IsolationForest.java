@@ -35,9 +35,9 @@ import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
@@ -166,7 +166,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 				double averagePathLength = (corrected ? correctedAveragePathLength(maxSamples, nodeSampleCorrected) : averagePathLength(maxSamples));
 
-				return PMMLUtil.createApply(PMMLFunctions.DIVIDE, fieldRef, PMMLUtil.createConstant(averagePathLength));
+				return ExpressionUtil.createApply(PMMLFunctions.DIVIDE, fieldRef, ExpressionUtil.createConstant(averagePathLength));
 			}
 		};
 
@@ -187,7 +187,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			public Expression createExpression(FieldRef fieldRef){
 				Number offset = getOffset();
 
-				return PMMLUtil.createApply(PMMLFunctions.SUBTRACT, PMMLUtil.createConstant(-offset.doubleValue()), PMMLUtil.createApply(PMMLFunctions.POW, PMMLUtil.createConstant(2d), PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(-1d), fieldRef)));
+				return ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, ExpressionUtil.createConstant(-offset.doubleValue()), ExpressionUtil.createApply(PMMLFunctions.POW, ExpressionUtil.createConstant(2d), ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(-1d), fieldRef)));
 			}
 		};
 

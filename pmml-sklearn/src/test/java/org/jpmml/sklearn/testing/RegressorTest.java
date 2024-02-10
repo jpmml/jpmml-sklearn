@@ -22,11 +22,11 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.model.visitors.VisitorBattery;
-import org.jpmml.sklearn.FieldNames;
 import org.junit.Test;
 import sklearn.Estimator;
 

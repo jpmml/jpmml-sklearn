@@ -27,8 +27,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
@@ -52,7 +52,7 @@ public class Aggregator extends Transformer {
 			return features;
 		}
 
-		Apply apply = PMMLUtil.createApply(translateFunction(function));
+		Apply apply = ExpressionUtil.createApply(translateFunction(function));
 
 		for(Feature feature : features){
 			apply.addExpressions(feature.ref());

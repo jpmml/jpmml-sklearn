@@ -29,8 +29,8 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.transformations.OutlierTransformation;
 
@@ -67,7 +67,7 @@ public class OutlierDetectorUtil {
 			public Expression createExpression(FieldRef fieldRef){
 				Number threshold = estimator.getDecisionFunctionThreshold();
 
-				return PMMLUtil.createApply(PMMLFunctions.LESSOREQUAL, fieldRef, PMMLUtil.createConstant(threshold));
+				return ExpressionUtil.createApply(PMMLFunctions.LESSOREQUAL, fieldRef, ExpressionUtil.createConstant(threshold));
 			}
 		};
 

@@ -25,8 +25,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -71,11 +71,11 @@ public class MinMaxScaler extends Scaler {
 			Expression expression = continuousFeature.ref();
 
 			if(!ValueUtil.isOne(scaleValue)){
-				expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, PMMLUtil.createConstant(scaleValue));
+				expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, expression, ExpressionUtil.createConstant(scaleValue));
 			} // End if
 
 			if(!ValueUtil.isZero(minValue)){
-				expression = PMMLUtil.createApply(PMMLFunctions.ADD, expression, PMMLUtil.createConstant(minValue));
+				expression = ExpressionUtil.createApply(PMMLFunctions.ADD, expression, ExpressionUtil.createConstant(minValue));
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("minMaxScaler", continuousFeature), expression);

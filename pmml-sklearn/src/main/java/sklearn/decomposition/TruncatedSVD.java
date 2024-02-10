@@ -27,9 +27,9 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -58,7 +58,7 @@ public class TruncatedSVD extends BasePCA {
 		for(int i = 0; i < numberOfComponents; i++){
 			List<? extends Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.SUM);
+			Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
 
 			for(int j = 0; j < numberOfFeatures; j++){
 				Feature feature = features.get(j);
@@ -74,7 +74,7 @@ public class TruncatedSVD extends BasePCA {
 				ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 				// "$name[i] * component[i]"
-				Expression expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, continuousFeature.ref(), PMMLUtil.createConstant(componentValue));
+				Expression expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, continuousFeature.ref(), ExpressionUtil.createConstant(componentValue));
 
 				apply.addExpressions(expression);
 			}

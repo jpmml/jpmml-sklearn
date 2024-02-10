@@ -27,7 +27,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class OneHotEncoderTest {
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
-		assertEquals(Arrays.asList(), PMMLUtil.getValues(dataField));
+		assertEquals(Arrays.asList(), FieldUtil.getValues(dataField));
 
 		OneHotEncoder oneHotEncoder = new OneHotEncoder("sklearn.preprocessing.data", "OneHotEncoder");
 		oneHotEncoder.put("n_values_", 3);
@@ -56,6 +56,6 @@ public class OneHotEncoderTest {
 			assertEquals(i, outputFeature.getValue());
 		}
 
-		assertEquals(Arrays.asList(0, 1, 2), PMMLUtil.getValues(dataField));
+		assertEquals(Arrays.asList(0, 1, 2), FieldUtil.getValues(dataField));
 	}
 }

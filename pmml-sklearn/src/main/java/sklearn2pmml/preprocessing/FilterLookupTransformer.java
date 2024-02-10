@@ -25,9 +25,9 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -49,8 +49,8 @@ public class FilterLookupTransformer extends LookupTransformer {
 
 		Feature mappedFeature = mappedFeatures.get(0);
 
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-			PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, mappedFeature.ref()),
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, mappedFeature.ref()),
 			mappedFeature.ref(),
 			feature.ref()
 		);

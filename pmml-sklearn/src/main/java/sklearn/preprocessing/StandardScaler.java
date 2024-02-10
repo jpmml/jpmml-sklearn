@@ -25,8 +25,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -93,11 +93,11 @@ public class StandardScaler extends Scaler {
 			Expression expression = continuousFeature.ref();
 
 			if(!ValueUtil.isZero(meanValue)){
-				expression = PMMLUtil.createApply(PMMLFunctions.SUBTRACT, expression, PMMLUtil.createConstant(meanValue));
+				expression = ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, expression, ExpressionUtil.createConstant(meanValue));
 			} // End if
 
 			if(!ValueUtil.isOne(stdValue)){
-				expression = PMMLUtil.createApply(PMMLFunctions.DIVIDE, expression, PMMLUtil.createConstant(stdValue));
+				expression = ExpressionUtil.createApply(PMMLFunctions.DIVIDE, expression, ExpressionUtil.createConstant(stdValue));
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("standardScaler", continuousFeature), expression);

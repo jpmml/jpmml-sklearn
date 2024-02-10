@@ -32,10 +32,10 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -116,9 +116,9 @@ public class CutTransformer extends Transformer {
 			Object binValue = discretizeBin.requireBinValue();
 
 			if(interval.getLeftMargin() == null && interval.getRightMargin() == null){
-				Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-					PMMLUtil.createApply(PMMLFunctions.ISNOTMISSING, continuousFeature.ref()),
-					PMMLUtil.createConstant(binValue, null)
+				Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+					ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, continuousFeature.ref()),
+					ExpressionUtil.createConstant(null, binValue)
 				);
 
 				DerivedField derivedField = encoder.createDerivedField(createFieldName("cut", continuousFeature), OpType.CATEGORICAL, dataType, apply);

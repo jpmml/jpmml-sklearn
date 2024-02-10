@@ -26,8 +26,9 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.transformations.AbstractTransformation;
 
 public class SkLearnOutlierTransformation extends AbstractTransformation {
@@ -54,14 +55,14 @@ public class SkLearnOutlierTransformation extends AbstractTransformation {
 
 	@Override
 	public Expression createExpression(FieldRef fieldRef){
-		return PMMLUtil.createApply(PMMLFunctions.IF, fieldRef, PMMLUtil.createConstant(VALUE_OUTLIER), PMMLUtil.createConstant(VALUE_INLIER));
+		return ExpressionUtil.createApply(PMMLFunctions.IF, fieldRef, ExpressionUtil.createConstant(VALUE_OUTLIER), ExpressionUtil.createConstant(VALUE_INLIER));
 	}
 
 	@Override
 	public OutputField createOutputField(OutputField outputField){
 		outputField = super.createOutputField(outputField);
 
-		PMMLUtil.addValues(outputField, Arrays.asList(VALUE_OUTLIER, VALUE_INLIER));
+		FieldUtil.addValues(outputField, Arrays.asList(VALUE_OUTLIER, VALUE_INLIER));
 
 		return outputField;
 	}

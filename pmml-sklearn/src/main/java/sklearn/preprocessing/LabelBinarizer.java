@@ -28,8 +28,8 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -87,10 +87,10 @@ public class LabelBinarizer extends SkLearnTransformer implements HasSparseOutpu
 
 			{
 				// "($name == value) ? pos_label : neg_label"
-				Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-					PMMLUtil.createApply(PMMLFunctions.EQUAL, feature.ref(), PMMLUtil.createConstant(value, feature.getDataType())),
-					PMMLUtil.createConstant(posLabel),
-					PMMLUtil.createConstant(negLabel)
+				Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+					ExpressionUtil.createApply(PMMLFunctions.EQUAL, feature.ref(), ExpressionUtil.createConstant(feature.getDataType(), value)),
+					ExpressionUtil.createConstant(posLabel),
+					ExpressionUtil.createConstant(negLabel)
 				);
 
 				String name = (classes.size() > 1 ? createFieldName("labelBinarizer", feature, value) : createFieldName("labelBinarizer", feature));

@@ -248,18 +248,15 @@ public class KNeighborsUtil {
 			return null;
 		}
 
-		List<OutputField> outputFields = ModelUtil.createNeighborFields(numberOfNeighbors);
+		Output output = ModelUtil.createNeighborOutput(numberOfNeighbors);
 
 		if(scalarLabel != null){
+			List<OutputField> outputFields = output.getOutputFields();
 
 			for(OutputField outputField : outputFields){
 				outputField.setTargetField(scalarLabel.getName());
 			}
 		}
-
-		Output output = new Output();
-
-		(output.getOutputFields()).addAll(outputFields);
 
 		return output;
 	}

@@ -36,10 +36,10 @@ import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.IndexFeature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
@@ -152,7 +152,7 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 			encoder.addDefineFunction(defineFunction);
 		}
 
-		Apply apply = PMMLUtil.createApply(defineFunction, continuousFeature.ref());
+		Apply apply = ExpressionUtil.createApply(defineFunction, continuousFeature.ref());
 
 		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(defineFunction, continuousFeature.getName()), defineFunction.requireOpType(), defineFunction.requireDataType(), apply);
 
@@ -167,7 +167,7 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 		Double rtol = 1.0e-5;
 
 		// $name + (atol + rtol * abs($name))
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.ADD, new FieldRef(valueField), PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createConstant(atol), PMMLUtil.createApply(PMMLFunctions.MULTIPLY, PMMLUtil.createConstant(rtol), PMMLUtil.createApply(PMMLFunctions.ABS, new FieldRef(valueField)))));
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.ADD, new FieldRef(valueField), ExpressionUtil.createApply(PMMLFunctions.ADD, ExpressionUtil.createConstant(atol), ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(rtol), ExpressionUtil.createApply(PMMLFunctions.ABS, new FieldRef(valueField)))));
 
 		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
 			.addParameterFields(valueField);

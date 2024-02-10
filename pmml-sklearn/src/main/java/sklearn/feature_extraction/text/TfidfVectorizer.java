@@ -28,8 +28,8 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -95,7 +95,7 @@ public class TfidfVectorizer extends CountVectorizer {
 		if(sublinearTf){
 			DefineFunction sublinearDefineFunction = ensureSublinearDefineFunction(encoder);
 
-			expression = PMMLUtil.createApply(sublinearDefineFunction, expression);
+			expression = ExpressionUtil.createApply(sublinearDefineFunction, expression);
 		} // End if
 
 		if(useIdf){
@@ -103,7 +103,7 @@ public class TfidfVectorizer extends CountVectorizer {
 
 			defineFunction.addParameterFields(weightField);
 
-			expression = PMMLUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weightField));
+			expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, expression, new FieldRef(weightField));
 		}
 
 		defineFunction
@@ -123,7 +123,7 @@ public class TfidfVectorizer extends CountVectorizer {
 		if(useIdf){
 			Number weight = transformer.getWeight(index);
 
-			apply.addExpressions(PMMLUtil.createConstant(weight));
+			apply.addExpressions(ExpressionUtil.createConstant(weight));
 		}
 
 		return apply;
@@ -152,10 +152,10 @@ public class TfidfVectorizer extends CountVectorizer {
 		if(defineFunction == null){
 			ParameterField valueField = new ParameterField("x");
 
-			Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-				PMMLUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(valueField), PMMLUtil.createConstant(0)),
-				PMMLUtil.createApply(PMMLFunctions.ADD, PMMLUtil.createApply(PMMLFunctions.LN, new FieldRef(valueField)), PMMLUtil.createConstant(1)),
-				PMMLUtil.createConstant(0)
+			Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+				ExpressionUtil.createApply(PMMLFunctions.GREATERTHAN, new FieldRef(valueField), ExpressionUtil.createConstant(0)),
+				ExpressionUtil.createApply(PMMLFunctions.ADD, ExpressionUtil.createApply(PMMLFunctions.LN, new FieldRef(valueField)), ExpressionUtil.createConstant(1)),
+				ExpressionUtil.createConstant(0)
 			);
 
 			defineFunction = new DefineFunction("sublinearize", OpType.CONTINUOUS, DataType.DOUBLE, null, apply)

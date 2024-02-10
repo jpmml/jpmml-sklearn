@@ -29,17 +29,18 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Decorable;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Field;
+import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.ModelEncoder;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
@@ -74,18 +75,13 @@ public class EncoderUtil {
 
 	static
 	public Feature encodeRegroupFeature(Transformer transformer, Feature feature, List<?> oldCategories, Object newCategory, SkLearnEncoder encoder){
+		FieldRef fieldRef = feature.ref();
 		DataType dataType = feature.getDataType();
 
-		Apply valueApply = PMMLUtil.createApply((oldCategories.size() == 1 ? PMMLFunctions.EQUAL : PMMLFunctions.ISIN), feature.ref());
-
-		for(Object oldCategory : oldCategories){
-			valueApply.addExpressions(PMMLUtil.createConstant(oldCategory, dataType));
-		}
-
-		Apply apply = PMMLUtil.createApply(PMMLFunctions.IF,
-			valueApply,
-			PMMLUtil.createConstant(newCategory, dataType),
-			feature.ref()
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createValueApply(fieldRef, dataType, oldCategories),
+			ExpressionUtil.createConstant(dataType, newCategory),
+			fieldRef
 		);
 
 		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("regroup", feature), OpType.CATEGORICAL, dataType, apply);
@@ -123,7 +119,7 @@ public class EncoderUtil {
 
 		encoder.toCategorical(feature.getName(), filterCategories(categories));
 
-		MapValues mapValues = PMMLUtil.createMapValues(feature.getName(), categories, indexCategories)
+		MapValues mapValues = ExpressionUtil.createMapValues(feature.getName(), categories, indexCategories)
 			.setMapMissingTo(mapMissingTo)
 			.setDefaultValue(defaultValue);
 

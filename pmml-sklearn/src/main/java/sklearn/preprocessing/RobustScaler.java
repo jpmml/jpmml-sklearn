@@ -25,8 +25,8 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -93,11 +93,11 @@ public class RobustScaler extends Scaler {
 			Expression expression = continuousFeature.ref();
 
 			if(!ValueUtil.isZero(centerValue)){
-				expression = PMMLUtil.createApply(PMMLFunctions.SUBTRACT, expression, PMMLUtil.createConstant(centerValue));
+				expression = ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, expression, ExpressionUtil.createConstant(centerValue));
 			} // End if
 
 			if(!ValueUtil.isOne(scaleValue)){
-				expression = PMMLUtil.createApply(PMMLFunctions.DIVIDE, expression, PMMLUtil.createConstant(scaleValue));
+				expression = ExpressionUtil.createApply(PMMLFunctions.DIVIDE, expression, ExpressionUtil.createConstant(scaleValue));
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("robustScaler", continuousFeature), expression);

@@ -28,9 +28,9 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.CalendarUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
@@ -75,7 +75,7 @@ public class DurationTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			ObjectFeature objectFeature = (ObjectFeature)features.get(i);
 
-			DerivedField derivedField = encoder.ensureDerivedField(createFieldName(function, objectFeature, year), OpType.CONTINUOUS, DataType.INTEGER, () -> PMMLUtil.createApply(pmmlFunction, objectFeature.ref(), PMMLUtil.createConstant(year, DataType.INTEGER)));
+			DerivedField derivedField = encoder.ensureDerivedField(createFieldName(function, objectFeature, year), OpType.CONTINUOUS, DataType.INTEGER, () -> ExpressionUtil.createApply(pmmlFunction, objectFeature.ref(), ExpressionUtil.createConstant(DataType.INTEGER, year)));
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}

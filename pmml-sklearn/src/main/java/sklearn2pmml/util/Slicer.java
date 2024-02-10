@@ -63,8 +63,4 @@ public class Slicer extends Transformer {
 	public Integer getStep(){
 		return getOptionalInteger("step");
 	}
-
-	private Integer getOptionalInteger(String name){
-		return getOptional(name, Integer.class);
-	}
 }
