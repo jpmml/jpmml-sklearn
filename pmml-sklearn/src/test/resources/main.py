@@ -611,7 +611,7 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params)
-	pipeline.customizations = numpy.asarray(make_regressor_explanation(pipeline, auto_X, auto_y))
+	pipeline.customize(make_regressor_explanation(pipeline, auto_X, auto_y))
 	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_X, **predict_params), columns = ["mpg"])
 	store_csv(mpg, name)
