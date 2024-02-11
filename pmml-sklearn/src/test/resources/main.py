@@ -1,5 +1,6 @@
 from common import *
 
+from lxml import etree
 from pandas import CategoricalDtype, DataFrame, Series
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -60,6 +61,17 @@ def make_interaction(left, right):
 
 def make_kneighbor_cols(estimator):
 	return ["neighbor(" + str(x + 1) + ")" for x in range(estimator.n_neighbors)]
+
+def make_regressor_explanation(pipeline, X, y):
+	score = pipeline.score(X, y)
+
+	model_explanation = etree.Element("{http://www.dmg.org/PMML-4_4}ModelExplanation")
+
+	predictive_model_quality = etree.SubElement(model_explanation, "{http://www.dmg.org/PMML-4_4}PredictiveModelQuality")
+	predictive_model_quality.attrib["targetField"] = y.name
+	predictive_model_quality.attrib["r-squared"] = str(score)
+
+	return etree.tostring(model_explanation)
 
 datasets = []
 
@@ -599,6 +611,7 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params)
+	pipeline.customizations = numpy.asarray(make_regressor_explanation(pipeline, auto_X, auto_y))
 	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_X, **predict_params), columns = ["mpg"])
 	store_csv(mpg, name)

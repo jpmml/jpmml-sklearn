@@ -18,6 +18,8 @@
  */
 package sklearn2pmml.pipeline;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,8 +28,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.xml.transform.stream.StreamSource;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import numpy.core.NDArrayUtil;
 import org.dmg.pmml.DataField;
@@ -41,6 +47,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.PMML;
+import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.VerificationField;
 import org.jpmml.converter.CMatrixUtil;
@@ -57,6 +64,8 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.model.JAXBUtil;
+import org.jpmml.model.ReflectionUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
@@ -94,6 +103,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		Transformer predictProbaTransformer = getPredictProbaTransformer();
 		Transformer applyTransformer = getApplyTransformer();
 		Verification verification = getVerification();
+		List<String> customizations = getCustomizations();
 
 		Estimator estimator = null;
 
@@ -281,6 +291,28 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			}
 
 			model.setModelVerification(ModelUtil.createModelVerification(data));
+		} // End if
+
+		if(customizations != null && !customizations.isEmpty()){
+			Class<? extends Model> modelClazz = model.getClass();
+
+			for(String customization : customizations){
+				PMMLObject pmmlObject;
+
+				try(Reader reader = new StringReader(customization)){
+					pmmlObject = (PMMLObject)JAXBUtil.unmarshal(new StreamSource(reader));
+				} catch(Exception e){
+					throw new RuntimeException(e);
+				}
+
+				List<java.lang.reflect.Field> elementFields = (ReflectionUtil.getFields(modelClazz)).stream()
+					.filter(field -> (field.getType()).isInstance(pmmlObject))
+					.collect(Collectors.toList());
+
+				java.lang.reflect.Field elementField = Iterables.getOnlyElement(elementFields);
+
+				ReflectionUtil.setFieldValue(elementField, model, pmmlObject);
+			}
 		}
 
 		return encodePMML(header, model, repr, encoder);
@@ -528,6 +560,21 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 	public PMMLPipeline setVerification(Verification verification){
 		put("verification", verification);
+
+		return this;
+	}
+
+	public List<String> getCustomizations(){
+
+		if(!containsKey("customizations")){
+			return null;
+		}
+
+		return getStringArray("customizations");
+	}
+
+	public PMMLPipeline setCustomizations(List<String> customizations){
+		put("customizations", NDArrayUtil.toArray(customizations));
 
 		return this;
 	}

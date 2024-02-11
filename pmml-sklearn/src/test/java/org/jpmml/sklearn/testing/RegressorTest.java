@@ -48,15 +48,35 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
+				modelStats:
 				if((AUTO).equals(dataset) || (AUTO_NA).equals(dataset) || (HOUSING).equals(dataset) || (VISIT).equals(dataset)){
 
 					switch(algorithm){
 						case DUMMY:
-						case ISOTONIC_REGRESSION_INCR:
 						case ISOTONIC_REGRESSION_DECR:
+						case ISOTONIC_REGRESSION_INCR:
 							break;
 						default:
 							visitorBattery.add(ModelStatsInspector.class);
+							break;
+					}
+				} // End if
+
+				modelExplanation:
+				if((AUTO).equals(dataset)){
+
+					if(algorithm.startsWith("Multi")){
+						break modelExplanation;
+					}
+
+					switch(algorithm){
+						case HIST_GRADIENT_BOOSTING:
+						case ISOTONIC_REGRESSION_DECR:
+						case ISOTONIC_REGRESSION_INCR:
+						case LINEAR_REGRESSION_CHAIN:
+							break;
+						default:
+							visitorBattery.add(ModelExplanationInspector.class);
 							break;
 					}
 				}
@@ -146,13 +166,13 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
-	public void evaluateIsotonicRegressionIncrAuto() throws Exception {
-		evaluate(ISOTONIC_REGRESSION_INCR, AUTO);
+	public void evaluateIsotonicRegressionDecrAuto() throws Exception {
+		evaluate(ISOTONIC_REGRESSION_DECR, AUTO);
 	}
 
 	@Test
-	public void evaluateIsotonicRegressionDecrAuto() throws Exception {
-		evaluate(ISOTONIC_REGRESSION_DECR, AUTO);
+	public void evaluateIsotonicRegressionIncrAuto() throws Exception {
+		evaluate(ISOTONIC_REGRESSION_INCR, AUTO);
 	}
 
 	@Test
