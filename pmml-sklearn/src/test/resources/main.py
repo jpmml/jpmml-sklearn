@@ -86,7 +86,7 @@ def build_wheat(wheat_df, clusterer, name, with_affinity = False, with_kneighbor
 	wheat_X, wheat_y = split_csv(wheat_df)
 
 	mapper = DataFrameMapper([
-		(wheat_X.columns.values, [ContinuousDomain(dtype = float), PowerTransformer(method = "box-cox", standardize = True)])
+		(wheat_X.columns.values, [ContinuousDomain(with_statistics = True, dtype = float), PowerTransformer(method = "box-cox", standardize = True)])
 	])
 	pipeline = Pipeline([
 		("mapper", mapper),
@@ -124,16 +124,16 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 	audit_X, audit_y = split_csv(audit_df)
 
 	continuous_mapper = DataFrameMapper([
-		(["Age", "Hours"], MultiDomain([ContinuousDomain() for i in range(0, 2)])),
-		(["Income"], [ContinuousDomain(), KBinsDiscretizer(n_bins = 3, strategy = "quantile")])
+		(["Age", "Hours"], MultiDomain([ContinuousDomain(with_statistics = True) for i in range(0, 2)])),
+		(["Income"], [ContinuousDomain(with_statistics = True), KBinsDiscretizer(n_bins = 3, strategy = "quantile")])
 	])
 	categorical_mapper = DataFrameMapper([
-		(["Employment"], [CategoricalDomain(), SubstringTransformer(0, 3), OneHotEncoder(drop = ["Con"], min_frequency = 0.05), SelectorProxy(SelectFromModel(DecisionTreeClassifier(random_state = 13)))]),
-		(["Education"], [CategoricalDomain(), ReplaceTransformer("[aeiou]", ""), OneHotEncoder(drop = "first", max_categories = 10), SelectorProxy(SelectFromModel(RandomForestClassifier(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
-		(["Marital"], [CategoricalDomain(), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
-		(["Occupation"], [CategoricalDomain(), LabelBinarizer(), SelectKBest(k = 3)]),
-		(["Gender"], [CategoricalDomain(), MatchesTransformer("^Male$"), CastTransformer(int)]),
-		(["Deductions"], [CategoricalDomain()]),
+		(["Employment"], [CategoricalDomain(with_statistics = True), SubstringTransformer(0, 3), OneHotEncoder(drop = ["Con"], min_frequency = 0.05), SelectorProxy(SelectFromModel(DecisionTreeClassifier(random_state = 13)))]),
+		(["Education"], [CategoricalDomain(with_statistics = True), ReplaceTransformer("[aeiou]", ""), OneHotEncoder(drop = "first", max_categories = 10), SelectorProxy(SelectFromModel(RandomForestClassifier(n_estimators = 3, random_state = 13), threshold = "1.25 * mean"))]),
+		(["Marital"], [CategoricalDomain(with_statistics = True), LabelBinarizer(neg_label = -1, pos_label = 1), SelectKBest(k = 3)]),
+		(["Occupation"], [CategoricalDomain(with_statistics = True), LabelBinarizer(), SelectKBest(k = 3)]),
+		(["Gender"], [CategoricalDomain(with_statistics = True), MatchesTransformer("^Male$"), CastTransformer(int)]),
+		(["Deductions"], [CategoricalDomain(with_statistics = True)]),
 	])
 	pipeline = PMMLPipeline([
 		("union", FeatureUnion([
@@ -247,14 +247,14 @@ def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params 
 		"MISSING_VALUE" : 0.5
 	}
 	mapper = DataFrameMapper(
-		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("X[0] if pandas.notnull(X[0]) else -999", dtype = int), name = "flag_missing(Age, -999)"), SimpleImputer(missing_values = -999, strategy = "constant", fill_value = 38)])] +
+		[(["Age"], [ContinuousDomain(missing_values = None, with_data = False, with_statistics = True), Alias(ExpressionTransformer("X[0] if pandas.notnull(X[0]) else -999", dtype = int), name = "flag_missing(Age, -999)"), SimpleImputer(missing_values = -999, strategy = "constant", fill_value = 38)])] +
 		[(["Age"], MissingIndicator())] +
-		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False), Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else X[0]"), name = "flag_missing(Hours, -999)"), SimpleImputer(missing_values = -999, add_indicator = True)])] +
-		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False), SimpleImputer(strategy = "median", add_indicator = True)])] +
-		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False), CategoricalImputer(missing_values = None), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()])] +
-		[([column], [CategoricalDomain(missing_values = None, missing_value_replacement = "N/A", with_data = False), SimpleImputer(missing_values = "N/A", strategy = "most_frequent"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()]) for column in ["Education", "Marital", "Occupation"]] #+
+		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False, with_statistics = True), Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else X[0]"), name = "flag_missing(Hours, -999)"), SimpleImputer(missing_values = -999, add_indicator = True)])] +
+		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False, with_statistics = True), SimpleImputer(strategy = "median", add_indicator = True)])] +
+		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False, with_statistics = True), CategoricalImputer(missing_values = None), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()])] +
+		[([column], [CategoricalDomain(missing_values = None, missing_value_replacement = "N/A", with_data = False, with_statistics = True), SimpleImputer(missing_values = "N/A", strategy = "most_frequent"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()]) for column in ["Education", "Marital", "Occupation"]] #+
 		# XXX
-		#[(["Gender"], [CategoricalDomain(missing_values = None, with_data = False), SimpleImputer(strategy = "constant"), StringNormalizer(function = "uppercase"), LookupTransformer(gender_mapping, None)])]
+		#[(["Gender"], [CategoricalDomain(missing_values = None, with_data = False, with_statistics = True), SimpleImputer(strategy = "constant"), StringNormalizer(function = "uppercase"), LookupTransformer(gender_mapping, None)])]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -284,8 +284,8 @@ def build_hist_audit_na(audit_na_df, classifier, name):
 	audit_na_X, audit_na_y = split_csv(audit_na_df)
 
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
-		[([column], [CategoricalDomain(), PMMLLabelEncoder()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+		[([column], ContinuousDomain(with_statistics = True)) for column in ["Age", "Hours", "Income"]] +
+		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelEncoder()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
 	)
 	pipeline = PMMLPipeline([
 		("pipeline", Pipeline([
@@ -311,8 +311,8 @@ def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_y["Adjusted"] = audit_y["Adjusted"].astype(str)
 
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["Age", "Hours", "Income"]] +
-		[([column], [CategoricalDomain(), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation"]]
+		[([column], ContinuousDomain(with_statistics = True)) for column in ["Age", "Hours", "Income"]] +
+		[([column], [CategoricalDomain(with_statistics = True), LabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -350,7 +350,7 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 
 	transformer = ColumnTransformer([
 		("continuous_columns", Pipeline([
-			("domain", ContinuousDomain()),
+			("domain", ContinuousDomain(with_statistics = True)),
 			("scaler", MultiAlias(scaler, names = ["scaler(" + col + ")" for col in versicolor_X.columns.values]))
 		]), versicolor_X.columns.values)
 	])
@@ -419,7 +419,7 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 	pipeline = Pipeline([
 		("pipeline", Pipeline([
 			("mapper", DataFrameMapper([
-				(iris_X.columns.values, ContinuousDomain()),
+				(iris_X.columns.values, ContinuousDomain(with_statistics = True)),
 				(["Sepal.Length", "Petal.Length"], Aggregator(function = "mean")),
 				(["Sepal.Width", "Petal.Width"], Aggregator(function = "mean"))
 			])),
@@ -551,8 +551,8 @@ def build_auto_ordinal(auto_df, classifier, name):
 	auto_y = Series(numpy.vectorize(lambda x: category_mapping[x])(auto_y.ravel()), dtype = CategoricalDtype(categories = categories, ordered = True), name = "bin(mpg)")
 
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], [CategoricalDomain(), OneHotEncoder(drop = "first")]) for column in ["cylinders", "model_year", "origin"]]
+		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
+		[([column], [CategoricalDomain(with_statistics = True), OneHotEncoder(drop = "first")]) for column in ["cylinders", "model_year", "origin"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -581,12 +581,12 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 		(4, 3) : "4/3"
 	}
 	mapper = DataFrameMapper([
-		(["cylinders"], [CategoricalDomain(), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0", dtype = numpy.int8), name = "odd(cylinders)", prefit = True)]),
-		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain()]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), OneHotEncoder()]),
-		(["model_year"], [CategoricalDomain(), CastTransformer(str), ExpressionTransformer("'19' + X[0] + '-01-01'"), CastTransformer("datetime64[D]"), DaysSinceYearTransformer(1977), Binarizer(threshold = 0)], {"alias" : "bin(model_year, 1977)"}),
+		(["cylinders"], [CategoricalDomain(with_statistics = True), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0", dtype = numpy.int8), name = "odd(cylinders)", prefit = True)]),
+		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain(with_statistics = True)]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), OneHotEncoder()]),
+		(["model_year"], [CategoricalDomain(with_statistics = True), CastTransformer(str), ExpressionTransformer("'19' + X[0] + '-01-01'"), CastTransformer("datetime64[D]"), DaysSinceYearTransformer(1977), Binarizer(threshold = 0)], {"alias" : "bin(model_year, 1977)"}),
 		(["model_year", "origin"], [ConcatTransformer("/"), OneHotEncoder(sparse_output = False, max_categories = 15), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "0.75 * mean"))]),
-		(["weight", "displacement"], [ContinuousDomain(), ExpressionTransformer("(X[0] / X[1]) + 0.5", dtype = numpy.float64)], {"alias" : "weight / displacement + 0.5"}),
-		(["displacement", "horsepower", "weight", "acceleration"], [MultiDomain([None, ContinuousDomain(), None, ContinuousDomain()]), StandardScaler()])
+		(["weight", "displacement"], [ContinuousDomain(with_statistics = True), ExpressionTransformer("(X[0] / X[1]) + 0.5", dtype = numpy.float64)], {"alias" : "weight / displacement + 0.5"}),
+		(["displacement", "horsepower", "weight", "acceleration"], [MultiDomain([None, ContinuousDomain(with_statistics = True), None, ContinuousDomain(with_statistics = True)]), StandardScaler()])
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -641,8 +641,8 @@ def build_hist_auto(auto_df, regressor, name):
 	auto_X, auto_y = split_csv(auto_df)
 
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], [CategoricalDomain(), OrdinalEncoder()]) for column in ["cylinders", "model_year", "origin"]]
+		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
+		[([column], [CategoricalDomain(with_statistics = True), OrdinalEncoder()]) for column in ["cylinders", "model_year", "origin"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -695,12 +695,12 @@ def build_auto_na(auto_na_df, regressor, name, predict_transformer = None, apply
 	auto_na_X, auto_na_y = split_csv(auto_na_df)
 
 	mapper = DataFrameMapper(
-		[([column], [CategoricalDomain(missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
-		[(["origin"], [CategoricalDomain(missing_values = -1), SimpleImputer(missing_values = -1, strategy = "most_frequent"), OneHotEncoder()])] +
-		[(["acceleration"], [ContinuousDomain(missing_values = None), CutTransformer(bins = [5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25], labels = False), CategoricalImputer(), LabelBinarizer()])] +
-		[(["displacement"], [ContinuousDomain(missing_values = None), SimpleImputer(), CutTransformer(bins = [0, 100, 200, 300, 400, 500], labels = ["XS", "S", "M", "L", "XL"]), LabelBinarizer()])] +
-		[(["horsepower"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_extreme_values", low_value = 50, high_value = 225), SimpleImputer(strategy = "median")])] +
-		[(["weight"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_extreme_values", low_value = 2000, high_value = 5000), SimpleImputer(strategy = "median")])]
+		[([column], [CategoricalDomain(with_statistics = True, missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
+		[(["origin"], [CategoricalDomain(with_statistics = True, missing_values = -1), SimpleImputer(missing_values = -1, strategy = "most_frequent"), OneHotEncoder()])] +
+		[(["acceleration"], [ContinuousDomain(with_statistics = True, missing_values = None), CutTransformer(bins = [5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25], labels = False), CategoricalImputer(), LabelBinarizer()])] +
+		[(["displacement"], [ContinuousDomain(with_statistics = True, missing_values = None), SimpleImputer(), CutTransformer(bins = [0, 100, 200, 300, 400, 500], labels = ["XS", "S", "M", "L", "XL"]), LabelBinarizer()])] +
+		[(["horsepower"], [ContinuousDomain(with_statistics = True, missing_values = None, outlier_treatment = "as_extreme_values", low_value = 50, high_value = 225), SimpleImputer(strategy = "median")])] +
+		[(["weight"], [ContinuousDomain(with_statistics = True, missing_values = None, outlier_treatment = "as_extreme_values", low_value = 2000, high_value = 5000), SimpleImputer(strategy = "median")])]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -735,8 +735,8 @@ def build_hist_auto_na(auto_na_df, regressor, name):
 	auto_na_X, auto_na_y = split_csv(auto_na_df)
 
 	mapper = DataFrameMapper(
-		[([column], ContinuousDomain()) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], [CategoricalDomain(), PMMLLabelEncoder()]) for column in ["cylinders", "model_year", "origin"]]
+		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
+		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelEncoder()]) for column in ["cylinders", "model_year", "origin"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -761,10 +761,10 @@ def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
 
 	mapper = DataFrameMapper([
-		(["displacement", "horsepower", "weight"], ContinuousDomain()),
-		(["cylinders"], [CategoricalDomain(invalid_value_treatment = "as_is"), OneHotEncoder(handle_unknown = "infrequent_if_exist")]),
-		(["model_year"], [CategoricalDomain(invalid_value_treatment = "as_is"), OneHotEncoder(max_categories = 10, handle_unknown = "infrequent_if_exist")]),
-		(["origin"], [CategoricalDomain(invalid_value_treatment = "as_is"), OneHotEncoder()])
+		(["displacement", "horsepower", "weight"], ContinuousDomain(with_statistics = True)),
+		(["cylinders"], [CategoricalDomain(with_statistics = True, invalid_value_treatment = "as_is"), OneHotEncoder(handle_unknown = "infrequent_if_exist")]),
+		(["model_year"], [CategoricalDomain(with_statistics = True, invalid_value_treatment = "as_is"), OneHotEncoder(max_categories = 10, handle_unknown = "infrequent_if_exist")]),
+		(["origin"], [CategoricalDomain(with_statistics = True, invalid_value_treatment = "as_is"), OneHotEncoder()])
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -801,7 +801,7 @@ def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_o
 	housing_X, housing_y = split_csv(housing_df)
 
 	mapper = DataFrameMapper([
-		(housing_X.columns.values, ContinuousDomain())
+		(housing_X.columns.values, ContinuousDomain(with_statistics = True))
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -844,10 +844,10 @@ def build_visit(visit_df, regressor, name):
 	visit_X, visit_y = split_csv(visit_df)
 
 	mapper = DataFrameMapper(
-		[(["edlevel"], [CategoricalDomain(), OneHotEncoder()])] +
-		[([bin_column], [CategoricalDomain(), OneHotEncoder()]) for bin_column in ["outwork", "female", "married", "kids", "self"]] +
-		[(["age"], ContinuousDomain())] +
-		[(["hhninc", "educ"], ContinuousDomain())]
+		[(["edlevel"], [CategoricalDomain(with_statistics = True), OneHotEncoder()])] +
+		[([bin_column], [CategoricalDomain(with_statistics = True), OneHotEncoder()]) for bin_column in ["outwork", "female", "married", "kids", "self"]] +
+		[(["age"], ContinuousDomain(with_statistics = True))] +
+		[(["hhninc", "educ"], ContinuousDomain(with_statistics = True))]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -873,7 +873,7 @@ def build_ocsvm_iris(iris_df, linear_model, name):
 	iris_X, iris_y = split_csv(iris_df)
 
 	mapper = DataFrameMapper([
-		(iris_X.columns.values, [ContinuousDomain(), StandardScaler()])
+		(iris_X.columns.values, [ContinuousDomain(with_statistics = True), StandardScaler()])
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -892,7 +892,7 @@ def build_iforest_housing(housing_df, iforest, name, **pmml_options):
 	housing_X, housing_y = split_csv(housing_df)
 
 	mapper = DataFrameMapper([
-		(housing_X.columns.values, ContinuousDomain())
+		(housing_X.columns.values, ContinuousDomain(with_statistics = True))
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -912,7 +912,7 @@ def build_ocsvm_housing(housing_df, svm, name):
 	housing_X, housing_y = split_csv(housing_df)
 
 	mapper = DataFrameMapper([
-		(housing_X.columns.values, ContinuousDomain())
+		(housing_X.columns.values, ContinuousDomain(with_statistics = True))
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
