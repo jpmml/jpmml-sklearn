@@ -37,6 +37,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pandas.core.CategoricalDtype;
 
 abstract
 public class DiscreteDomain extends Domain {
@@ -70,6 +71,7 @@ public class DiscreteDomain extends Domain {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		features = super.encodeFeatures(features, encoder);
 
+		TypeInfo dtype = getDType();
 		Boolean withData = getWithData();
 		Boolean withStatistics = getWithStatistics();
 
@@ -98,13 +100,21 @@ public class DiscreteDomain extends Domain {
 
 			WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
+			List<?> values = Collections.emptyList();
+
 			if(withData){
-				feature = encodeFeature(wildcardFeature, dataValues.get(i));
+				values = dataValues.get(i);
 			} else
 
 			{
-				feature = encodeFeature(wildcardFeature, Collections.emptyList());
-			} // End if
+				if(dtype instanceof CategoricalDtype){
+					CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+					values = categoricalDtype.getValues();
+				}
+			}
+
+			feature = encodeFeature(wildcardFeature, values);
 
 			if(withStatistics){
 				UnivariateStats univariateStats = new UnivariateStats()
