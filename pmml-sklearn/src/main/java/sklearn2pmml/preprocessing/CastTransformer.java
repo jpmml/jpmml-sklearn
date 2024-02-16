@@ -25,8 +25,10 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.TypeInfo;
@@ -55,13 +57,27 @@ public class CastTransformer extends Transformer {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				wildcardFeature = refineWildcardFeature(wildcardFeature, opType, dataType, encoder);
+				feature = refineWildcardFeature(wildcardFeature, opType, dataType, encoder);
+			} else
 
-				if(dtype instanceof CategoricalDtype){
-					CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+			{
+				if(feature.getDataType() != dataType){
+					FieldRef fieldRef = feature.ref();
 
-					Boolean ordered = categoricalDtype.getOrdered();
-					List<?> values = categoricalDtype.getValues();
+					DerivedField derivedField = encoder.ensureDerivedField(createFieldName((dataType.name()).toLowerCase(), feature), opType, dataType, () -> fieldRef);
+
+					feature = FeatureUtil.createFeature(derivedField, encoder);
+				}
+			} // End if
+
+			if(dtype instanceof CategoricalDtype){
+				CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+				Boolean ordered = categoricalDtype.getOrdered();
+				List<?> values = categoricalDtype.getValues();
+
+				if(feature instanceof WildcardFeature){
+					WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
 					if(ordered){
 						feature = wildcardFeature.toOrdinalFeature(values);
@@ -73,17 +89,13 @@ public class CastTransformer extends Transformer {
 				} else
 
 				{
-					feature = wildcardFeature;
-				}
-			} else
+					if(ordered){
+						feature = new ObjectFeature(encoder, feature.getName(), feature.getDataType());
+					} else
 
-			{
-				if(feature.getDataType() != dataType){
-					FieldRef fieldRef = feature.ref();
-
-					DerivedField derivedField = encoder.ensureDerivedField(createFieldName((dataType.name()).toLowerCase(), feature), opType, dataType, () -> fieldRef);
-
-					feature = FeatureUtil.createFeature(derivedField, encoder);
+					{
+						feature = new CategoricalFeature(encoder, feature, values);
+					}
 				}
 			}
 
