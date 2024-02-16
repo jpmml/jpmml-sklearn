@@ -40,6 +40,8 @@ import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pandas.CategoricalDtypeUtil;
+import pandas.core.CategoricalDtype;
 import sklearn.Transformer;
 import sklearn2pmml.util.EvaluatableUtil;
 
@@ -128,6 +130,13 @@ public class ExpressionTransformer extends Transformer {
 				Field<?> field = feature.getField();
 
 				if((field.requireOpType() == opType) && (field.requireDataType() == dataType)){
+
+					if(dtype instanceof CategoricalDtype){
+						CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+						feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
+					}
+
 					return Collections.singletonList(feature);
 				}
 			}
@@ -143,7 +152,15 @@ public class ExpressionTransformer extends Transformer {
 			derivedField = encoder.createDerivedField(createFieldName("eval", EvaluatableUtil.toString(expr)), opType, dataType, expression);
 		}
 
-		return Collections.singletonList(FeatureUtil.createFeature(derivedField, encoder));
+		Feature feature = FeatureUtil.createFeature(derivedField, encoder);
+
+		if(dtype instanceof CategoricalDtype){
+			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+			feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
+		}
+
+		return Collections.singletonList(feature);
 	}
 
 	public Object getDefaultValue(){
@@ -157,6 +174,13 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public TypeInfo getDType(){
+
+		// SkLearn2PMML 0.103.2+
+		if(containsKey("dtype_")){
+			return super.getOptionalDType("dtype_", true);
+		}
+
+		// SkLearn2PMML 0.103.1
 		return super.getOptionalDType("dtype", true);
 	}
 

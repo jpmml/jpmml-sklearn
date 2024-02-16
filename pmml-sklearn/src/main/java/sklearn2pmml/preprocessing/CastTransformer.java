@@ -25,14 +25,13 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pandas.CategoricalDtypeUtil;
 import pandas.core.CategoricalDtype;
 import sklearn.Transformer;
 
@@ -73,30 +72,7 @@ public class CastTransformer extends Transformer {
 			if(dtype instanceof CategoricalDtype){
 				CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
 
-				Boolean ordered = categoricalDtype.getOrdered();
-				List<?> values = categoricalDtype.getValues();
-
-				if(feature instanceof WildcardFeature){
-					WildcardFeature wildcardFeature = (WildcardFeature)feature;
-
-					if(ordered){
-						feature = wildcardFeature.toOrdinalFeature(values);
-					} else
-
-					{
-						feature = wildcardFeature.toCategoricalFeature(values);
-					}
-				} else
-
-				{
-					if(ordered){
-						feature = new ObjectFeature(encoder, feature.getName(), feature.getDataType());
-					} else
-
-					{
-						feature = new CategoricalFeature(encoder, feature, values);
-					}
-				}
+				feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
 			}
 
 			result.add(feature);
