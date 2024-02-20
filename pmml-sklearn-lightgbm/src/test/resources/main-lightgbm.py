@@ -68,6 +68,8 @@ if "Iris" in datasets:
 
 	build_iris(iris_df, CalibratedClassifierCV(LGBMClassifier(m_estimators = 7, objective = "multiclass"), ensemble = False, method = "isotonic"), "LGBMIsotonicIris")
 
+	build_iris_cat(iris_df, LGBMClassifier(objective = "multiclass", n_estimators = 11, random_state = 13), "LGBMIrisCat")
+
 	build_iris_opt(iris_df, LGBMClassifier(objective = "multiclass"), "LGBMIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])], "classifier__eval_metric" : "multi_logloss", "classifier__callbacks" : [early_stopping(stopping_rounds = 3)]})
 
 if "Auto" in datasets:

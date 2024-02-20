@@ -22,6 +22,7 @@ from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOut
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, NearestCentroid, NearestNeighbors
 from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.pipeline import make_pipeline
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretizer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, PowerTransformer, RobustScaler, StandardScaler
@@ -33,7 +34,7 @@ from sklearn2pmml.ensemble import GBDTLRClassifier
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SubstringTransformer, StringNormalizer, WordCountTransformer
+from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SeriesConstructor, StringNormalizer, SubstringTransformer, WordCountTransformer
 from sklearn2pmml.util import Slicer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier
@@ -490,6 +491,36 @@ if "Iris" in datasets:
 	build_iris(iris_df, SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(iris_df, NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
 	build_iris(iris_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)
+
+def build_iris_cat(iris_df, classifier, name, **pmml_options):
+	iris_X, iris_y = split_csv(iris_df)
+
+	dtype = CategoricalDtype(categories = list(range(0, 10)))
+
+	pipeline = PMMLPipeline([
+		("discretizer", FunctionTransformer(numpy.rint)),
+		("transformer", ColumnTransformer([
+			("sepal_length", CastTransformer(dtype = "category"), [0]),
+			("sepal_width", Alias(ExpressionTransformer("X[0]", dtype = "category"), name = "rint(Sepal.With)", prefit = True), [1]),
+			("petal_length", make_pipeline(Alias(ExpressionTransformer("X[0]", dtype = int), name = "rint(Petal.Length)", prefit = True), SeriesConstructor(name = None, dtype = dtype)), [2]),
+			("petal_width", make_pipeline(Alias(ExpressionTransformer("X[0]", dtype = int), name = "rint(Petal.Width)", prefit = True), CastTransformer(dtype = dtype)), [3])
+		])),
+		("classifier", classifier)
+	])
+	pipeline.set_output(transform = "pandas")
+	pipeline.fit(iris_X, iris_y)
+	if isinstance(classifier, XGBClassifier):
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
+	pipeline.configure(**pmml_options)
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	if isinstance(classifier, XGBClassifier):
+		species["Species"] = classifier._le.inverse_transform(species["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
 
 # XXX
 iris_train_mask = numpy.random.choice([False, True], size = (150,), p = [0.5, 0.5])

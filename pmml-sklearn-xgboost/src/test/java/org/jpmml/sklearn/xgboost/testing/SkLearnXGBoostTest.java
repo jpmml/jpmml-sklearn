@@ -18,13 +18,40 @@
  */
 package org.jpmml.sklearn.xgboost.testing;
 
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.FloatEquivalence;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 
 public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
+
+	@Override
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public SkLearnXGBoostTest getArchiveBatchTest(){
+				return SkLearnXGBoostTest.this;
+			}
+
+			@Override
+			public String getInputCsvPath(){
+				String path = super.getInputCsvPath();
+
+				path = path.replace("Cat", "");
+
+				return path;
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
@@ -54,6 +81,11 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 	@Test
 	public void evaluateXGBIris() throws Exception {
 		evaluate("XGB", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA), new FloatEquivalence(16 + 4));
+	}
+
+	@Test
+	public void evaluateXGBIrisCat() throws Exception {
+		evaluate("XGB", IRIS + "Cat", new FloatEquivalence(8));
 	}
 
 	@Test

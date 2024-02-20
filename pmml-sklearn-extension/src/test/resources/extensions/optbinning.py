@@ -104,7 +104,7 @@ if "Audit" in datasets:
 	audit_df = load_audit("AuditNA")
 
 	build_audit(audit_df, LogisticRegression(), "BinningProcessAuditNA")
-	build_audit_ob(audit_df, LogisticRegression(), "OptimalBinningAuditNA")
+	build_ob_audit(audit_df, LogisticRegression(), "OptimalBinningAuditNA")
 
 def build_iris(iris_df, classifier, name):
 	iris_X, iris_y = split_csv(iris_df)

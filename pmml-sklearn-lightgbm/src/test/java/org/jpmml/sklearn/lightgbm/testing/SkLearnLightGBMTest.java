@@ -78,6 +78,11 @@ public class SkLearnLightGBMTest extends SkLearnEncoderBatchTest implements Data
 	}
 
 	@Test
+	public void evaluateLGBMIrisCat() throws Exception {
+		evaluate("LGBM", IRIS + "Cat");
+	}
+
+	@Test
 	public void evaluateLGBMIsotonicIris() throws Exception {
 		evaluate("LGBM" + "Isotonic", IRIS);
 	}
