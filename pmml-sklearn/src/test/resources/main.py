@@ -808,7 +808,7 @@ def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 		(["displacement", "horsepower", "weight"], ContinuousDomain(with_statistics = True)),
 		(["cylinders"], [CategoricalDomain(with_statistics = True, invalid_value_treatment = "as_is"), OneHotEncoder(handle_unknown = "infrequent_if_exist")]),
 		(["model_year"], [CategoricalDomain(with_statistics = True, invalid_value_treatment = "as_is"), OneHotEncoder(max_categories = 10, handle_unknown = "infrequent_if_exist")]),
-		(["origin"], [CategoricalDomain(with_statistics = True, invalid_value_treatment = "as_is"), OneHotEncoder()])
+		(["origin"], [CategoricalDomain(with_statistics = True, invalid_value_treatment = "as_is"), OneHotEncoder(handle_unknown = "infrequent_if_exist", max_categories = 5)])
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),

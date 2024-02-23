@@ -21,9 +21,7 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
@@ -67,11 +65,16 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 			List<Object> featureCategories = new ArrayList<>(categories.get(i));
-			Set<Integer> featureInfrequentIndices = infrequentEnabled ? new LinkedHashSet<>(infrequentIndices.get(i)) : Collections.emptySet();
+			List<Integer> featureInfrequentIndices = (infrequentEnabled ? infrequentIndices.get(i) : null);
+
+			boolean featureInfrequentEnabled = infrequentEnabled;
+			if(featureInfrequentIndices == null || featureInfrequentIndices.isEmpty()){
+				featureInfrequentEnabled = false;
+			}
 
 			Object infrequentCategory = null;
 
-			if(infrequentEnabled){
+			if(featureInfrequentEnabled){
 				infrequentCategory = getInfrequentCategory(feature);
 			}
 
@@ -90,7 +93,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 					break;
 				case "infrequent_if_exist":
 					{
-						if(infrequentEnabled){
+						if(featureInfrequentEnabled){
 							invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_VALUE, infrequentCategory);
 						} else
 
@@ -162,7 +165,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				throw new IllegalArgumentException();
 			} // End if
 
-			if(infrequentEnabled){
+			if(featureInfrequentEnabled){
 
 				if(infrequentCategory == null || featureCategories.contains(infrequentCategory)){
 					throw new IllegalArgumentException();
@@ -198,7 +201,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				}
 			}
 
-			if(infrequentEnabled){
+			if(featureInfrequentEnabled){
 				result.add(new BinaryFeature(encoder, feature, infrequentCategory));
 			}
 		}
@@ -268,6 +271,11 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 	static
 	private <E> List<E> selectValues(List<E> values, Collection<Integer> indices){
+
+		if(indices == null || indices.isEmpty()){
+			return Collections.emptyList();
+		}
+
 		List<E> result = new ArrayList<>();
 
 		for(Integer index : indices){

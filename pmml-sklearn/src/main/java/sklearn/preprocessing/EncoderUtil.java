@@ -164,6 +164,11 @@ public class EncoderUtil {
 
 			@Override
 			public List<Integer> apply(HasArray hasArray){
+
+				if(hasArray == null){
+					return null;
+				}
+
 				return ValueUtil.asIntegers((List)hasArray.getArrayContent());
 			}
 		};
