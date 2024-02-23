@@ -30,6 +30,8 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import pandas.CategoricalDtypeUtil;
+import pandas.core.CategoricalDtype;
 import sklearn.Initializer;
 
 public class DataFrameConstructor extends Initializer {
@@ -51,7 +53,15 @@ public class DataFrameConstructor extends Initializer {
 		for(String column : columns){
 			DataField dataField = encoder.createDataField(column, opType, dataType);
 
-			result.add(new WildcardFeature(encoder, dataField));
+			Feature feature = new WildcardFeature(encoder, dataField);
+
+			if(dtype instanceof CategoricalDtype){
+				CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+				feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
+			}
+
+			result.add(feature);
 		}
 
 		return result;
@@ -79,6 +89,12 @@ public class DataFrameConstructor extends Initializer {
 
 			if(feature.getDataType() != dataType){
 				throw new IllegalArgumentException();
+			} // End if
+
+			if(dtype instanceof CategoricalDtype){
+				CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+				feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
 			}
 
 			encoder.renameFeature(feature, column);
