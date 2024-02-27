@@ -26,6 +26,8 @@ import sklearn2pmml.SkLearn2PMMLFields;
 abstract
 public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
+	private final String MAX_SKLEARN_VERSION = "1.4.1.post1";
+
 	public Step(String module, String name){
 		super(module, name);
 	}
@@ -37,9 +39,9 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	public void checkSkLearnVersion(){
 		String sklearnVersion = getSkLearnVersion();
 
-		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.3.2") > 0){
+		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, MAX_SKLEARN_VERSION) > 0){
 			String message = "This converter version does not know about Scikit-Learn version " + sklearnVersion + " artifacts. " +
-				"Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version 1.3.2";
+				"Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version " + MAX_SKLEARN_VERSION;
 
 			throw new IllegalArgumentException(message);
 		}
