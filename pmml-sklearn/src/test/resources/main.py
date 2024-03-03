@@ -33,6 +33,7 @@ from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, 
 from sklearn2pmml.ensemble import GBDTLRClassifier
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
+from sklearn2pmml.metrics import BinaryClassifierQuality, ClassifierQuality, ModelExplanation, RegressorQuality
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SeriesConstructor, StringNormalizer, SubstringTransformer, WordCountTransformer
 from sklearn2pmml.util import Slicer
@@ -63,16 +64,12 @@ def make_interaction(left, right):
 def make_kneighbor_cols(estimator):
 	return ["neighbor(" + str(x + 1) + ")" for x in range(estimator.n_neighbors)]
 
-def make_regressor_explanation(pipeline, X, y):
-	score = pipeline.score(X, y)
-
-	model_explanation = etree.Element("{http://www.dmg.org/PMML-4_4}ModelExplanation")
-
-	predictive_model_quality = etree.SubElement(model_explanation, "{http://www.dmg.org/PMML-4_4}PredictiveModelQuality")
-	predictive_model_quality.attrib["targetField"] = y.name
-	predictive_model_quality.attrib["r-squared"] = str(score)
-
-	return etree.tostring(model_explanation).decode("utf-8")
+def make_model_explanation(pipeline, quality_impl, X, y):
+	model_explanation = ModelExplanation()
+	quality = quality_impl(pipeline, X, y, target_field = y.name) \
+		.with_all_metrics()
+	model_explanation.append(quality)
+	return model_explanation.tostring()
 
 datasets = []
 
@@ -181,6 +178,7 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
+	pipeline.customize(command = "insert", pmml_element = make_model_explanation(pipeline, BinaryClassifierQuality, audit_X, audit_y))
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_X, **predict_params), columns = ["Adjusted"])
 	if with_proba:
@@ -642,7 +640,7 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params)
-	pipeline.customize(command = "insert", pmml_element = make_regressor_explanation(pipeline, auto_X, auto_y))
+	pipeline.customize(command = "insert", pmml_element = make_model_explanation(pipeline, RegressorQuality, auto_X, auto_y))
 	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_X, **predict_params), columns = ["mpg"])
 	store_csv(mpg, name)

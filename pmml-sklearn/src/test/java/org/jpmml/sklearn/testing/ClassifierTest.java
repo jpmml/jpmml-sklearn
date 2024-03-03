@@ -58,6 +58,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
+				modelStats:
 				if((AUDIT).equals(dataset) || (AUDIT_NA).equals(dataset) || (IRIS).equals(dataset) || (IRIS_NA).equals(dataset)){
 
 					switch(algorithm){
@@ -65,6 +66,22 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 							break;
 						default:
 							visitorBattery.add(ModelStatsInspector.class);
+							break;
+					}
+				} // End if
+
+				modelExplanation:
+				if((AUDIT).equals(dataset)){
+
+					if(algorithm.startsWith("Multi")){
+						break modelExplanation;
+					}
+
+					switch(algorithm){
+						case LOGISTIC_REGRESSION_CHAIN:
+							break;
+						default:
+							visitorBattery.add(ModelExplanationInspector.class);
 							break;
 					}
 				} // End if
