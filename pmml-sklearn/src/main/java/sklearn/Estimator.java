@@ -43,6 +43,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sklearn2pmml.Customization;
 import sklearn2pmml.HasPMMLOptions;
 import sklearn2pmml.HasPMMLSegmentId;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -228,6 +229,21 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		}
 
 		pmmlOptions.putAll(options);
+	}
+
+	public List<? extends Customization> getPMMLCustomizations(){
+
+		if(!containsKey(SkLearn2PMMLFields.PMML_CUSTOMIZATIONS)){
+			return null;
+		}
+
+		return getArray(SkLearn2PMMLFields.PMML_CUSTOMIZATIONS, Customization.class);
+	}
+
+	public Estimator setPMMLCustomizations(List<? extends Customization> pmmlCustomizations){
+		put(SkLearn2PMMLFields.PMML_CUSTOMIZATIONS, NDArrayUtil.toArray(pmmlCustomizations));
+
+		return this;
 	}
 
 	public boolean hasFeatureImportances(){
