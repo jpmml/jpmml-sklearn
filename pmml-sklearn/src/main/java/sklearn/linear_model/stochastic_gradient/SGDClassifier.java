@@ -45,6 +45,11 @@ public class SGDClassifier extends LinearClassifier {
 		} else
 
 		// SkLearn 0.19+
-		return get("loss_function_", LossFunction.class);
+		if(containsKey("loss_function_")){
+			return get("loss_function_", LossFunction.class);
+		}
+
+		// SkLearn 1.4.0+
+		return get("_loss_function_", LossFunction.class);
 	}
 }

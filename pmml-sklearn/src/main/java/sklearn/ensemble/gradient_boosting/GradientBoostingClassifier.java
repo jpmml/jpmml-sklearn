@@ -32,13 +32,18 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
+import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.PythonObject;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiDecisionFunctionField;
 import sklearn.HasPriorProbability;
 import sklearn.SkLearnClassifier;
 import sklearn.VersionUtil;
+import sklearn.loss.BaseLoss;
+import sklearn.loss.HalfLogitLink;
+import sklearn.loss.Link;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn2pmml.EstimatorProxy;
@@ -69,40 +74,79 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
-		LossFunction loss = getLoss();
-
-		int numberOfClasses = loss.getK();
-
 		HasPriorProbability init = getInit();
-
 		Number learningRate = getLearningRate();
+		PythonObject loss = getLoss();
 
 		IntFunction<Number> initialPredictions = init::getPriorProbability;
 
-		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.21") >= 0){
-			List<? extends Number> computedInitialPredictions = loss.computeInitialPredictions(init);
+		if(loss instanceof LossFunction){
+			LossFunction lossFunction = (LossFunction)loss;
 
-			initialPredictions = computedInitialPredictions::get;
+			if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.21") >= 0){
+				List<? extends Number> computedInitialPredictions = lossFunction.computeInitialPredictions(init);
+
+				initialPredictions = computedInitialPredictions::get;
+			}
+		} else
+
+		if(loss instanceof BaseLoss){
+			BaseLoss baseLoss = (BaseLoss)loss;
+
+			if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.4.0") >= 0){
+				Link link = baseLoss.getLink();
+				int numClasses = baseLoss.getNumClasses();
+
+				List<? extends Number> computedInitialPredictions = link.computeInitialPredictions(numClasses, init);
+
+				initialPredictions = computedInitialPredictions::get;
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
 		}
 
 		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
+		Transformation[] transformations = {};
+
+		if(loss instanceof LossFunction){
+			LossFunction lossFunction = (LossFunction)loss;
+
+			transformations = new Transformation[]{lossFunction.createTransformation()};
+		}
+
 		MiningModel miningModel;
 
-		if(numberOfClasses == 1){
+		if(categoricalLabel.size() == 2){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
 			Model model = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
-				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, transformations));
 
-			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.NONE, false, schema);
+			double coefficient = 1d;
+
+			RegressionModel.NormalizationMethod normalizationMethod = RegressionModel.NormalizationMethod.NONE;
+
+			if(loss instanceof BaseLoss){
+				BaseLoss baseLoss = (BaseLoss)loss;
+
+				Link link = baseLoss.getLink();
+
+				normalizationMethod = RegressionModel.NormalizationMethod.LOGIT;
+
+				if(link instanceof HalfLogitLink){
+					coefficient = 2d;
+				}
+			}
+
+			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, coefficient, 0d, normalizationMethod, false, schema);
 		} else
 
-		if(numberOfClasses >= 3){
-			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
-
+		if(categoricalLabel.size() > 2){
 			List<? extends TreeRegressor> estimators = getEstimators();
 
 			List<Model> models = new ArrayList<>();
@@ -119,12 +163,18 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 				};
 
 				Model model = GradientBoostingUtil.encodeGradientBoosting(estimatorProxy, initialPredictions.apply(i), learningRate, segmentSchema)
-					.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, loss.createTransformation()));
+					.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(i)), OpType.CONTINUOUS, DataType.DOUBLE, transformations));
 
 				models.add(model);
 			}
 
-			miningModel = MiningModelUtil.createClassification(models, RegressionModel.NormalizationMethod.SIMPLEMAX, false, schema);
+			RegressionModel.NormalizationMethod normalizationMethod = RegressionModel.NormalizationMethod.SIMPLEMAX;
+
+			if(loss instanceof BaseLoss){
+				normalizationMethod = RegressionModel.NormalizationMethod.SOFTMAX;
+			}
+
+			miningModel = MiningModelUtil.createClassification(models, normalizationMethod, false, schema);
 		} else
 
 		{
@@ -136,15 +186,9 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		return miningModel;
 	}
 
-	public LossFunction getLoss(){
-
-		// SkLearn 1.0.2
-		if(containsKey("loss_")){
-			return get("loss_", LossFunction.class);
-		}
-
-		// SkLearn 1.1.0+
-		return get("_loss", LossFunction.class);
+	@Override
+	public List<? extends TreeRegressor> getEstimators(){
+		return getArray("estimators_", TreeRegressor.class);
 	}
 
 	public HasPriorProbability getInit(){
@@ -155,9 +199,21 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		return getNumber("learning_rate");
 	}
 
-	@Override
-	public List<? extends TreeRegressor> getEstimators(){
-		return getArray("estimators_", TreeRegressor.class);
+	public PythonObject getLoss(){
+
+		// SkLearn 1.0.2
+		if(containsKey("loss_")){
+			return get("loss_", LossFunction.class);
+		}
+
+		// SkLearn 1.1.0+
+		try {
+			return get("_loss", LossFunction.class);
+
+			// SkLearn 1.4.0+
+		} catch(IllegalArgumentException iae){
+			return get("_loss", sklearn.loss.BaseLoss.class);
+		}
 	}
 
 	abstract

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,19 +18,18 @@
  */
 package sklearn.loss;
 
+import java.util.List;
+
 import org.jpmml.python.PythonObject;
+import sklearn.HasPriorProbability;
 
-public class BaseLoss extends PythonObject {
+abstract
+public class Link extends PythonObject {
 
-	public BaseLoss(String module, String name){
+	public Link(String module, String name){
 		super(module, name);
 	}
 
-	public Link getLink(){
-		return get("link", Link.class);
-	}
-
-	public int getNumClasses(){
-		return getInteger("n_classes");
-	}
+	abstract
+	public List<? extends Number> computeInitialPredictions(int numClasses, HasPriorProbability hasPriorProbability);
 }

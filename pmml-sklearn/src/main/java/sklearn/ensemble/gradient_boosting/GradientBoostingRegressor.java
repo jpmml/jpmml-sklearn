@@ -60,16 +60,16 @@ public class GradientBoostingRegressor extends SkLearnRegressor implements HasEs
 		return GradientBoostingUtil.encodeGradientBoosting(this, init.getDefaultValue(), learningRate, schema);
 	}
 
+	@Override
+	public List<? extends TreeRegressor> getEstimators(){
+		return getArray("estimators_", TreeRegressor.class);
+	}
+
 	public HasDefaultValue getInit(){
 		return get("init_", HasDefaultValue.class);
 	}
 
 	public Number getLearningRate(){
 		return getNumber("learning_rate");
-	}
-
-	@Override
-	public List<? extends TreeRegressor> getEstimators(){
-		return getArray("estimators_", TreeRegressor.class);
 	}
 }

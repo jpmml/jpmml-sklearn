@@ -124,17 +124,26 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 
 					if(estimator instanceof GradientBoostingClassifier){
 
-						if(outputFields.size() != 2){
+						if(outputFields.size() == 1){
+							// Ignored
+						} else
+
+						if(outputFields.size() == 2){
+							outputFields.remove(1);
+						} else
+
+						{
 							throw new IllegalArgumentException();
 						}
-
-						// XXX
-						outputFields.remove(1);
 
 						outputField = Iterables.getOnlyElement(outputFields);
 					} else
 
 					{
+						throw new IllegalArgumentException();
+					} // End if
+
+					if(outputField.getResultFeature() != ResultFeature.PREDICTED_VALUE){
 						throw new IllegalArgumentException();
 					}
 

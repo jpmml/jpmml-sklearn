@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,19 +18,39 @@
  */
 package sklearn.loss;
 
-import org.jpmml.python.PythonObject;
+import java.util.AbstractList;
+import java.util.List;
 
-public class BaseLoss extends PythonObject {
+import sklearn.HasPriorProbability;
 
-	public BaseLoss(String module, String name){
+public class LogitLink extends Link {
+
+	public LogitLink(String module, String name){
 		super(module, name);
 	}
 
-	public Link getLink(){
-		return get("link", Link.class);
+	@Override
+	public List<? extends Number> computeInitialPredictions(int numClasses, HasPriorProbability hasPriorProbability){
+		List<Double> result = new AbstractList<Double>(){
+
+			@Override
+			public int size(){
+				return numClasses;
+			}
+
+			@Override
+			public Double get(int index){
+				Number priorProbability = hasPriorProbability.getPriorProbability(index);
+
+				return logit(priorProbability.doubleValue());
+			}
+		};
+
+		return result;
 	}
 
-	public int getNumClasses(){
-		return getInteger("n_classes");
+	static
+	public double logit(double x){
+		return Math.log(x / (1d - x));
 	}
 }
