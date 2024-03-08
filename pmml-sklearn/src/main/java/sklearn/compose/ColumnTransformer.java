@@ -137,7 +137,27 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 		if(columns instanceof HasArray){
 			HasArray hasArray = (HasArray)columns;
 
-			columns = hasArray.getArrayContent();
+			List<Object> values = new ArrayList<>();
+			values.addAll(hasArray.getArrayContent());
+
+			// Convert dense boolean array to sparse integer array (the indices of true values)
+			for(int i = values.size() - 1; i > -1; i--){
+				Object value = values.get(i);
+
+				if(value instanceof Boolean){
+					Boolean booleanValue = (Boolean)value;
+
+					if(booleanValue){
+						values.set(i, i);
+					} else
+
+					{
+						values.remove(i);
+					}
+				}
+			}
+
+			columns = values;
 		}
 
 		return InitializerUtil.selectFeatures((List)columns, features, encoder);
