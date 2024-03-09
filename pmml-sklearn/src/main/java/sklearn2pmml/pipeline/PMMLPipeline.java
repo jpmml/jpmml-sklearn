@@ -191,7 +191,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		if(estimator.isSupervised()){
 
 			if(verification == null){
-				logger.warn("Model verification data is not set. Use method \'" + ClassDictUtil.formatMember(this, "verify(X)") + "\' to correct this deficiency");
+				logger.warn("Model verification data is not set. Use the \'" + ClassDictUtil.formatMember(this, "verify(X)") + "\' method to correct this deficiency");
 
 				break verification;
 			}
