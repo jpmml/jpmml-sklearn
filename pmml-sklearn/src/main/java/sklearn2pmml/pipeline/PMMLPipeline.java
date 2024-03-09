@@ -75,7 +75,7 @@ import sklearn2pmml.decoration.Domain;
 public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMMLPipeline> {
 
 	public PMMLPipeline(){
-		this("sklearn2pmml", "PMMLPipeline");
+		this("sklearn2pmml.pipeline", "PMMLPipeline");
 	}
 
 	public PMMLPipeline(String module, String name){
