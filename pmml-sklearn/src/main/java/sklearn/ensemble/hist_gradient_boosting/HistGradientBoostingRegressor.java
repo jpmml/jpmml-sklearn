@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.SkLearnRegressor;
+import sklearn.compose.ColumnTransformer;
 
 public class HistGradientBoostingRegressor extends SkLearnRegressor {
 
@@ -36,6 +37,11 @@ public class HistGradientBoostingRegressor extends SkLearnRegressor {
 		Number baselinePrediction = getBaselinePrediction();
 		BinMapper binMapper = getBinMapper();
 		List<List<TreePredictor>> predictors = getPredictors();
+		ColumnTransformer preprocessor = getPreprocessor();
+
+		if(preprocessor != null){
+			schema = HistGradientBoostingUtil.preprocess(preprocessor, schema);
+		}
 
 		return HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, Collections.singletonList(baselinePrediction), 0, schema);
 	}
@@ -63,5 +69,9 @@ public class HistGradientBoostingRegressor extends SkLearnRegressor {
 
 	public List<List<TreePredictor>> getPredictors(){
 		return (List)getList("_predictors", List.class);
+	}
+
+	public ColumnTransformer getPreprocessor(){
+		return getOptional("_preprocessor", ColumnTransformer.class);
 	}
 }

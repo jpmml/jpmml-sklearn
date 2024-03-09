@@ -22,12 +22,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import functools.Partial;
+import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.FunctionUtil;
 import org.jpmml.python.Identifiable;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -65,6 +68,43 @@ public class FunctionTransformer extends SkLearnTransformer {
 	}
 
 	public Identifiable getFunc(){
+		Object func = getOptionalObject("func");
+
+		if(func instanceof Partial){
+			Partial partial = (Partial)func;
+
+			ClassDictConstructor partialFunc = partial.getFunc();
+
+			Identifiable result = new Identifiable(){
+
+				@Override
+				public String getModule(){
+					return ClassDictConstructorUtil.getModule(partialFunc);
+				}
+
+				@Override
+				public String getName(){
+					return ClassDictConstructorUtil.getName(partialFunc);
+				}
+			};
+
+			switch(result.getModule()){
+				case "sklearn.utils.validation":
+
+					switch(result.getName()){
+						case "check_array":
+							return null;
+						default:
+							break;
+					}
+					break;
+				default:
+					break;
+			}
+
+			return result;
+		}
+
 		return getOptional("func", Identifiable.class);
 	}
 

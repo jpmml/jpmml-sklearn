@@ -28,14 +28,30 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.compose.ColumnTransformer;
 
 public class HistGradientBoostingUtil {
 
 	private HistGradientBoostingUtil(){
+	}
+
+	static
+	public Schema preprocess(ColumnTransformer preprocessor, Schema schema){
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
+
+		Label label = schema.getLabel();
+		List<Feature> features = new ArrayList<>(schema.getFeatures());
+
+		features = preprocessor.encode(features, encoder);
+
+		return new Schema(encoder, label, features);
 	}
 
 	static

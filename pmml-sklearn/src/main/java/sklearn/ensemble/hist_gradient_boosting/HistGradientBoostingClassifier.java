@@ -35,6 +35,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import sklearn.HasMultiDecisionFunctionField;
 import sklearn.SkLearnClassifier;
+import sklearn.compose.ColumnTransformer;
 import sklearn.loss.HalfBinomialLoss;
 import sklearn.loss.HalfMultinomialLoss;
 
@@ -51,9 +52,14 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 		BinMapper binMapper = getBinMapper();
 		int numberOfTreesPerIteration = getNumberOfTreesPerIteration();
 		List<List<TreePredictor>> predictors = getPredictors();
+		ColumnTransformer preprocessor = getPreprocessor();
 
 		if(!predictors.isEmpty()){
 			ClassDictUtil.checkSize(numberOfTreesPerIteration, predictors.get(0), baselinePredictions);
+		} // End if
+
+		if(preprocessor != null){
+			schema = HistGradientBoostingUtil.preprocess(preprocessor, schema);
 		}
 
 		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
@@ -134,5 +140,9 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 
 	public List<List<TreePredictor>> getPredictors(){
 		return (List)getList("_predictors", List.class);
+	}
+
+	public ColumnTransformer getPreprocessor(){
+		return getOptional("_preprocessor", ColumnTransformer.class);
 	}
 }
