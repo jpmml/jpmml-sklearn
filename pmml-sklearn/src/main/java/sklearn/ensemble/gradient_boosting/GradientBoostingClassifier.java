@@ -210,7 +210,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		try {
 			return get("_loss", LossFunction.class);
 
-			// SkLearn 1.4.0+
+		// SkLearn 1.4.0+
 		} catch(IllegalArgumentException iae){
 			return get("_loss", sklearn.loss.BaseLoss.class);
 		}
