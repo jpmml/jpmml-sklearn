@@ -98,7 +98,7 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 	}
 
 	static
-	private Transformer getTransformer(Object[] fittedTransformer){
+	protected Transformer getTransformer(Object[] fittedTransformer){
 		Object transformer = TupleUtil.extractElement(fittedTransformer, 1);
 
 		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
@@ -127,7 +127,12 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 	}
 
 	static
-	private List<Feature> getFeatures(Object[] fittedTransformer, List<Feature> features, SkLearnEncoder encoder){
+	protected void setTransformer(Object[] fittedTransformer, Transformer transformer){
+		fittedTransformer[1] = transformer;
+	}
+
+	static
+	protected List<Feature> getFeatures(Object[] fittedTransformer, List<Feature> features, SkLearnEncoder encoder){
 		Object columns = TupleUtil.extractElement(fittedTransformer, 2);
 
 		if((columns instanceof String) || (columns instanceof Integer)){

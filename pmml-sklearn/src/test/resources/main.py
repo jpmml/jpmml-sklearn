@@ -296,13 +296,11 @@ def build_hist_audit_na(audit_na_df, classifier, name):
 
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain(with_statistics = True)) for column in ["Age", "Hours", "Income"]] +
-		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelEncoder()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
-	)
+		[([column], CategoricalDomain(with_statistics = True, dtype = "category")) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+	, input_df = True, df_out = True)
 	pipeline = PMMLPipeline([
-		("pipeline", Pipeline([
-			("mapper", mapper),
-			("classifier", classifier)
-		]))
+		("mapper", mapper),
+		("classifier", classifier)
 	])
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13))
@@ -313,7 +311,9 @@ def build_hist_audit_na(audit_na_df, classifier, name):
 	store_csv(adjusted, name)
 
 if "Audit" in datasets:
-	build_hist_audit_na(audit_na_df, HistGradientBoostingClassifier(max_iter = 71, categorical_features = [3, 4, 5, 6, 7], random_state = 13), "HistGradientBoostingAuditNA")
+	audit_na_df = load_audit("AuditNA")
+
+	build_hist_audit_na(audit_na_df, HistGradientBoostingClassifier(max_iter = 71, categorical_features = "from_dtype", random_state = 13), "HistGradientBoostingAuditNA")
 
 def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
@@ -684,7 +684,7 @@ def build_hist_auto(auto_df, regressor, name):
 
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], [CategoricalDomain(with_statistics = True), OrdinalEncoder()]) for column in ["cylinders", "model_year", "origin"]]
+		[([column], CategoricalDomain(with_statistics = True)) for column in ["cylinders", "model_year", "origin"]]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -778,8 +778,8 @@ def build_hist_auto_na(auto_na_df, regressor, name):
 
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelEncoder()]) for column in ["cylinders", "model_year", "origin"]]
-	)
+		[([column], CategoricalDomain(with_statistics = True, dtype = "category")) for column in ["cylinders", "model_year", "origin"]]
+	, input_df = True, df_out = True)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("regressor", regressor)
@@ -793,11 +793,7 @@ def build_hist_auto_na(auto_na_df, regressor, name):
 if "Auto" in datasets:
 	auto_na_df = load_auto("AutoNA")
 
-	auto_na_df["cylinders"] = auto_na_df["cylinders"].astype("Int64")
-	auto_na_df["model_year"] = auto_na_df["model_year"].astype("Int64")
-	auto_na_df["origin"] = auto_na_df["origin"].astype("Int64")
-	
-	build_hist_auto_na(auto_na_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = [4, 5, 6], random_state = 13), "HistGradientBoostingAutoNA")
+	build_hist_auto_na(auto_na_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = "from_dtype", random_state = 13), "HistGradientBoostingAutoNA")
 
 def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])

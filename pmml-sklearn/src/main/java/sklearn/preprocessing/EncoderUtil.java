@@ -154,7 +154,7 @@ public class EncoderUtil {
 	static
 	public <E> List<E> filterCategories(List<E> categories){
 		return categories.stream()
-			.filter(category -> !ValueUtil.isNaN(category))
+			.filter(category -> (category != null) && !ValueUtil.isNaN(category))
 			.collect(Collectors.toList());
 	}
 
