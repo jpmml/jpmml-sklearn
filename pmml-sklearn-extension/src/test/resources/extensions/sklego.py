@@ -59,7 +59,7 @@ def build_estimatortransformer_wheat(name):
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("cluster_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "clusterLabeler"), OneHotEncoder(sparse = False)))),
+		("cluster_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(KMeans(n_clusters = 5, random_state = 13), "clusterLabeler"), OneHotEncoder(sparse_output = False)))),
 		("classifier", LogisticRegression(random_state = 13))
 	])
 	pipeline.fit(wheat_X, wheat_y)
@@ -91,7 +91,7 @@ def build_estimatortransformer_versicolor(outlier_detector_estimator, final_esti
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("outlier_detector", make_enhancer(make_debug_pipeline(make_estimator_transformer(outlier_detector_estimator, "outlierDetector"), OneHotEncoder(sparse = False)))),
+		("outlier_detector", make_enhancer(make_debug_pipeline(make_estimator_transformer(outlier_detector_estimator, "outlierDetector"), OneHotEncoder(sparse_output = False)))),
 		("estimator", final_estimator)
 	])
 	pipeline.fit(versicolor_X, versicolor_y)
@@ -138,7 +138,7 @@ def build_estimatortransformer_housing(name):
 
 	pipeline = PMMLPipeline([
 		("decorator", ContinuousDomain()),
-		("leaf_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(DecisionTreeRegressor(max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), OneHotEncoder(sparse = False)))),
+		("leaf_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(DecisionTreeRegressor(max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), OneHotEncoder(sparse_output = False)))),
 		("estimator", LinearRegression())
 	])
 	pipeline.fit(housing_X, housing_y)
@@ -154,10 +154,10 @@ def build_estimatortransformer_visit(name):
 
 	pipeline = PMMLPipeline([
 		("mapper", ColumnTransformer([
-			("cat", OneHotEncoder(sparse = False), ["edlevel", "outwork", "female", "married", "kids", "self"]),
+			("cat", OneHotEncoder(sparse_output = False), ["edlevel", "outwork", "female", "married", "kids", "self"]),
 			("cont", "passthrough", ["age", "hhninc", "educ"])
 		])),
-		("leaf_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(RandomForestRegressor(n_estimators = 7, max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), Reshaper(newshape = (-1, 7)), OneHotEncoder(sparse = False)))),
+		("leaf_labeler", make_enhancer(make_debug_pipeline(make_estimator_transformer(RandomForestRegressor(n_estimators = 7, max_depth = 3, min_samples_leaf = 20, random_state = 13), "leafLabeler", predict_func = "apply"), Reshaper(newshape = (-1, 7)), OneHotEncoder(sparse_output = False)))),
 		("estimator", PoissonRegressor())
 	])
 	pipeline.fit(visit_X, visit_y)
