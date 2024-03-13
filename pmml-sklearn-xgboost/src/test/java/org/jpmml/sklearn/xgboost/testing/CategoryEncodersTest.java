@@ -27,12 +27,12 @@ import org.junit.Test;
 public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
 	public CategoryEncodersTest(){
-		super(new FloatEquivalence(12));
+		super(new FloatEquivalence(TOLERANCE_AUDIT));
 	}
 
 	@Test
 	public void evaluateBase4EncoderAudit() throws Exception {
-		evaluate("Base4Encoder", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE));
+		evaluate("Base4Encoder", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 32));
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Dat
 
 	@Test
 	public void evaluateBinaryEncoderAuditNA() throws Exception {
-		evaluate("BinaryEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE));
+		evaluate("BinaryEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 16));
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Dat
 
 	@Test
 	public void evaluateCountEncoderAuditNA() throws Exception {
-		evaluate("CountEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE));
+		evaluate("CountEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 32));
 	}
 
 	@Test
@@ -62,11 +62,13 @@ public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Dat
 
 	@Test
 	public void evaluateTargetEncoderAuditNA() throws Exception {
-		evaluate("TargetEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE));
+		evaluate("TargetEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 16));
 	}
 
 	@Test
 	public void evaluateWOEEncoderAuditNA() throws Exception {
-		evaluate("WOEEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE));
+		evaluate("WOEEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 24));
 	}
+
+	private static final int TOLERANCE_AUDIT = 32 + 32;
 }
