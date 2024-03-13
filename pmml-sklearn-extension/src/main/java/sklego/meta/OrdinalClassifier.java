@@ -133,8 +133,8 @@ public class OrdinalClassifier extends Classifier {
 	}
 
 	@Override
-	protected DiscreteLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
-		return encodeLabel(name, OpType.ORDINAL, categories, encoder);
+	protected DiscreteLabel encodeLabel(String name, OpType opType, DataType dataType, List<?> categories, SkLearnEncoder encoder){
+		return super.encodeLabel(name, OpType.ORDINAL, DataType.STRING, categories, encoder);
 	}
 
 	public Classifier getEstimator(){

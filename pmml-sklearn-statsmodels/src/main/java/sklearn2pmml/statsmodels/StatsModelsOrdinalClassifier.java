@@ -20,6 +20,7 @@ package sklearn2pmml.statsmodels;
 
 import java.util.List;
 
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -31,7 +32,7 @@ public class StatsModelsOrdinalClassifier extends StatsModelsClassifier {
 	}
 
 	@Override
-	protected DiscreteLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
-		return encodeLabel(name, OpType.ORDINAL, categories, encoder);
+	protected DiscreteLabel encodeLabel(String name, OpType opType, DataType dataType, List<?> categories, SkLearnEncoder encoder){
+		return super.encodeLabel(name, OpType.ORDINAL, dataType, categories, encoder);
 	}
 }

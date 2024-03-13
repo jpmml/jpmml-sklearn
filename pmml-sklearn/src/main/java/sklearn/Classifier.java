@@ -141,11 +141,12 @@ public class Classifier extends Estimator implements HasClasses {
 	}
 
 	protected DiscreteLabel encodeLabel(String name, List<?> categories, SkLearnEncoder encoder){
-		return encodeLabel(name, OpType.CATEGORICAL, categories, encoder);
+		DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
+
+		return encodeLabel(name, OpType.CATEGORICAL, dataType, categories, encoder);
 	}
 
-	protected DiscreteLabel encodeLabel(String name, OpType opType, List<?> categories, SkLearnEncoder encoder){
-		DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
+	protected DiscreteLabel encodeLabel(String name, OpType opType, DataType dataType, List<?> categories, SkLearnEncoder encoder){
 
 		if(name != null){
 			DataField dataField = encoder.createDataField(name, opType, dataType, categories);
