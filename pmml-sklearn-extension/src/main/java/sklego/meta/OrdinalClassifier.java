@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,13 +16,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.ensemble;
+package sklego.meta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -41,6 +45,8 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import org.jpmml.python.CastFunction;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 
@@ -52,7 +58,7 @@ public class OrdinalClassifier extends Classifier {
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Classifier> estimators = getEstimators();
+		Map<?, ? extends Classifier> estimators = getEstimators();
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
@@ -65,14 +71,17 @@ public class OrdinalClassifier extends Classifier {
 
 		List<Feature> probabilityFeatures = new ArrayList<>();
 
-		for(int i = 0; i < estimators.size(); i++){
-			Classifier estimator = estimators.get(i);
+		for(int i = 0, max = (ordinalLabel.size() - 1); i < max; i++){
+			Object category = ordinalLabel.getValue(i);
+
+			Classifier estimator = estimators.get(category);
+			if(estimator == null){
+				throw new IllegalArgumentException();
+			} // End if
 
 			if(!estimator.hasProbabilityDistribution()){
 				throw new IllegalArgumentException();
 			}
-
-			Object category = ordinalLabel.getValue(i);
 
 			CategoricalLabel segmentLabel = new CategoricalLabel(DataType.DOUBLE, Arrays.asList("<=" + ValueUtil.asString(category), ">" + ValueUtil.asString(category)));
 
@@ -99,7 +108,7 @@ public class OrdinalClassifier extends Classifier {
 
 		// The first category and one or more intermediate categories
 		for(int i = 0; i < estimators.size(); i++){
-			RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(probabilityFeatures.get(i)), Collections.singletonList(-1d), 1d)
+			RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(probabilityFeatures.get(i)), Collections.singletonList(1), 0d)
 				.setTargetCategory(ordinalLabel.getValue(i));
 
 			regressionTables.add(regressionTable);
@@ -132,7 +141,30 @@ public class OrdinalClassifier extends Classifier {
 		return get("estimator", Classifier.class);
 	}
 
-	public List<? extends Classifier> getEstimators(){
-		return getList("estimators_", Classifier.class);
+	public Map<?, ? extends Classifier> getEstimators(){
+		Map<?, ?> estimators = getDict("estimators_");
+
+		Function<Object, Object> keyFunction = new Function<Object, Object>(){
+
+			@Override
+			public Object apply(Object object){
+				object = ScalarUtil.decode(object);
+
+				return Classifier.canonicalizeValue(object);
+			}
+		};
+
+		Function<Object, Classifier> valueFunction = new CastFunction<Classifier>(Classifier.class){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "Dict attribute \'estimators_\' contains an unsupported item value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		Map<?, ? extends Classifier> result = (estimators.entrySet()).stream()
+			.collect(Collectors.toMap(entry -> keyFunction.apply(entry.getKey()), entry -> valueFunction.apply(entry.getValue())));
+
+		return result;
 	}
 }

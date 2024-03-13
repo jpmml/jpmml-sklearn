@@ -315,6 +315,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
 
   * `sklego.meta.EstimatorTransformer`
     * Predict functions `apply`, `decision_function`, `predict` and `predict_proba`.
+  * `sklego.meta.OrdinalClassifier`
   * `sklego.pipeline.DebugPipeline`
   * `sklego.preprocessing.IdentityTransformer`
 </details>
@@ -350,7 +351,6 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.ensemble.GBDTLRClassifier`
       * The GBDT side: All Scikit-Learn decision tree ensemble classifiers, `LGBMClassifier`, `XGBClassifier`, `XGBRFClassifier`.
       * The LR side: A Scikit-Learn binary linear classifier (eg. `LinearSVC`, `LogisticRegression`, `SGDClassifier`).
-    * `sklearn2pmml.ensemble.OrdinalClassifier`
     * `sklearn2pmml.ensemble.SelectFirstClassifier`
     * `sklearn2pmml.ensemble.SelectFirstRegressor`
   * UDF models:

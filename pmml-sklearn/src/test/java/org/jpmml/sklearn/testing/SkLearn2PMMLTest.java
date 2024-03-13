@@ -22,7 +22,6 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
-import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.junit.Test;
 import sklearn.Estimator;
 import sklearn.SkLearnMethods;
@@ -73,11 +72,6 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	@Test
 	public void evaluateMultiEstimatorChainAuto() throws Exception {
 		evaluate("MultiEstimatorChain", AUTO, excludeFields(FieldNameUtil.create(Estimator.FIELD_PREDICT, "acceleration"), FieldNames.NODE_ID));
-	}
-
-	@Test
-	public void evaluateOrdinalAuto() throws Exception {
-		evaluate("Ordinal", AUTO, new PMMLEquivalence(1e-9, 1e-12));
 	}
 
 	@Test

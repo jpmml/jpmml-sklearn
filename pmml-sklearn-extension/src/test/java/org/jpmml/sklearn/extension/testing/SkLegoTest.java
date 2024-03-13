@@ -19,6 +19,7 @@
 package org.jpmml.sklearn.extension.testing;
 
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 
@@ -57,5 +58,10 @@ public class SkLegoTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateEstimatorTransformerWheat() throws Exception {
 		evaluate("EstimatorTransformer", WHEAT);
+	}
+
+	@Test
+	public void evaluatePrdinalClassifierAuto() throws Exception {
+		evaluate("OrdinalClassifier", AUTO, new PMMLEquivalence(1e-12, 1e-12));
 	}
 }

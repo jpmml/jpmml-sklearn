@@ -16,13 +16,14 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.util import Reshaper
-from sklego.meta import EstimatorTransformer
+from sklego.meta import EstimatorTransformer, OrdinalClassifier
 from sklego.pipeline import DebugPipeline
 from sklego.preprocessing import IdentityTransformer
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
 
 from common import *
+from main import *
 
 def make_debug_pipeline(*steps):
 	return DebugPipeline(_name_estimators(steps))
@@ -166,3 +167,10 @@ def build_estimatortransformer_visit(name):
 	store_csv(docvis, name)
 
 build_estimatortransformer_visit("EstimatorTransformerVisit")
+
+def build_ordinal_auto(classifier, name):
+	auto_df = load_auto("Auto")
+
+	build_auto_ordinal(auto_df, OrdinalClassifier(classifier), name, with_str_labels = False)
+
+build_ordinal_auto(LogisticRegression(), "OrdinalClassifierAuto")

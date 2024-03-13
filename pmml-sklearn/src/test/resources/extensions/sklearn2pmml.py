@@ -12,7 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.cross_reference import make_memorizer_union, make_recaller_union
 from sklearn2pmml.cross_reference import Memory, Memorizer, Recaller
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, MultiAlias
-from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, OrdinalClassifier, SelectFirstClassifier, SelectFirstRegressor
+from sklearn2pmml.ensemble import EstimatorChain, GBDTLMRegressor, GBDTLRClassifier, Link, SelectFirstClassifier, SelectFirstRegressor
 from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
@@ -322,9 +322,6 @@ def build_expr_auto(auto_df, name):
 	mpg = Series(pipeline.predict(auto_X), name = "mpg")
 	store_csv(mpg, name)
 
-def build_ordinal_auto(auto_df, name):
-	build_auto_ordinal(auto_df, OrdinalClassifier(LogisticRegression()), name)
-
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
@@ -339,7 +336,6 @@ if "Auto" in datasets:
 
 	build_chaid_auto(auto_df, "CHAIDAuto")
 	build_expr_auto(auto_df, "ExpressionAuto")
-	build_ordinal_auto(auto_df, "OrdinalAuto")
 
 	build_multi_auto(auto_df, EstimatorChain([("acceleration", Link(DecisionTreeRegressor(max_depth = 3, random_state = 13), augment_funcs = ["predict", "apply"]), str(True)), ("mpg", LinearRegression(), str(True))]), "MultiEstimatorChainAuto")
 

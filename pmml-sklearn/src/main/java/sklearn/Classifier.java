@@ -226,9 +226,21 @@ public class Classifier extends Estimator implements HasClasses {
 	}
 
 	static
-	private List<?> canonicalizeValues(List<?> values){
+	public Object canonicalizeValue(Object value){
+
+		if(value instanceof Long){
+			Long longValue = (Long)value;
+
+			return Math.toIntExact(longValue);
+		}
+
+		return value;
+	}
+
+	static
+	public List<?> canonicalizeValues(List<?> values){
 		return values.stream()
-			.map(value -> (value instanceof Long) ? Math.toIntExact((Long)value) : value)
+			.map(value -> canonicalizeValue(value))
 			.collect(Collectors.toList());
 	}
 
