@@ -154,6 +154,15 @@ public class BaseNFeature extends BinaryThresholdFeature {
 			}
 
 			if(applyBuilder.isEmpty()){
+
+				if(missingBaseValue != 0){
+					return ExpressionUtil.createApply(PMMLFunctions.IF,
+						ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, new FieldRef(name)),
+						ExpressionUtil.createConstant(0),
+						ExpressionUtil.createConstant(missingBaseValue)
+					);
+				}
+
 				return ExpressionUtil.createConstant(0);
 			} else
 
