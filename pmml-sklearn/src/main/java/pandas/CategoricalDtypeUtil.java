@@ -54,12 +54,11 @@ public class CategoricalDtypeUtil {
 			String name = feature.getName();
 
 			if(ordered){
+				Field<?> field = encoder.toOrdinal(name, values);
 
 				if(feature instanceof ObjectFeature){
 					return feature;
 				}
-
-				Field<?> field = encoder.toOrdinal(name, values);
 
 				return new ObjectFeature(encoder, field);
 			} else
