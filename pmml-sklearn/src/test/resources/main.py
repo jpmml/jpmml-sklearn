@@ -584,15 +584,18 @@ def build_auto_ordinal(auto_df, classifier, name, with_str_labels = True):
 	auto_X, auto_y = split_csv(auto_df)
 
 	categories = ["bad", "poor", "fair", "good", "excellent"]
+	category_mapping = {idx : category for idx, category in enumerate(categories)}
+
+	def _encode(y):
+		return numpy.vectorize(lambda x: category_mapping[x])(y)
 
 	binner = KBinsDiscretizer(n_bins = len(categories), encode = "ordinal", strategy = "kmeans")
-	auto_y = binner.fit_transform(auto_y.values.reshape((-1, 1))).astype(int)
+	auto_y = binner.fit_transform(auto_y.values.reshape((-1, 1))).astype(int).ravel()
 
 	if with_str_labels:
-		category_mapping = {idx : category for idx, category in enumerate(categories)}
-		auto_y = Series(numpy.vectorize(lambda x: category_mapping[x])(auto_y.ravel()), dtype = CategoricalDtype(categories = categories, ordered = True), name = "bin(mpg)")
+		auto_y = Series(_encode(auto_y), dtype = CategoricalDtype(categories = categories, ordered = True), name = "bin(mpg)")
 	else:
-		auto_y = Series(auto_y.ravel(), name = "bin(mpg)")
+		auto_y = Series(auto_y, name = "bin(mpg)")
 
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
@@ -603,9 +606,16 @@ def build_auto_ordinal(auto_df, classifier, name, with_str_labels = True):
 		("classifier", classifier)
 	])
 	pipeline.fit(auto_X, auto_y)
+	if with_str_labels:
+		pass
+	else:
+		classifier.pmml_classes_ = categories
 	store_pkl(pipeline, name)
-	mpg_bin = DataFrame(pipeline.predict(auto_X), columns = ["bin(mpg)"])
-	mpg_bin_proba = DataFrame(pipeline.predict_proba(auto_X), columns = ["probability({})".format(category if with_str_labels else str(idx)) for idx, category in enumerate(categories)])
+	if with_str_labels:
+		mpg_bin = DataFrame(pipeline.predict(auto_X), columns = ["bin(mpg)"])
+	else:
+		mpg_bin = DataFrame(_encode(pipeline.predict(auto_X)), columns = ["bin(mpg)"])
+	mpg_bin_proba = DataFrame(pipeline.predict_proba(auto_X), columns = ["probability({})".format(category) for category in categories])
 	mpg_bin = pandas.concat((mpg_bin, mpg_bin_proba), axis = 1)
 	store_csv(mpg_bin, name)
 

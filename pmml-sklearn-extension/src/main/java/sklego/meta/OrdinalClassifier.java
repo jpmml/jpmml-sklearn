@@ -21,6 +21,7 @@ package sklego.meta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -49,6 +50,8 @@ import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
+import sklearn.SkLearnFields;
+import sklearn2pmml.SkLearn2PMMLFields;
 
 public class OrdinalClassifier extends Classifier {
 
@@ -59,6 +62,7 @@ public class OrdinalClassifier extends Classifier {
 	@Override
 	public Model encodeModel(Schema schema){
 		Map<?, ? extends Classifier> estimators = getEstimators();
+		Map<?, ?> estimatorCategories = getEstimatorCategories();
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
@@ -74,7 +78,22 @@ public class OrdinalClassifier extends Classifier {
 		for(int i = 0, max = (ordinalLabel.size() - 1); i < max; i++){
 			Object category = ordinalLabel.getValue(i);
 
-			Classifier estimator = estimators.get(category);
+			Classifier estimator;
+
+			if(estimatorCategories != null && !estimatorCategories.isEmpty()){
+				Object estimatorCategory = estimatorCategories.get(category);
+
+				if(estimatorCategory == null){
+					throw new IllegalArgumentException();
+				}
+
+				estimator = estimators.get(estimatorCategory);
+			} else
+
+			{
+				estimator = estimators.get(category);
+			} // End if
+
 			if(estimator == null){
 				throw new IllegalArgumentException();
 			} // End if
@@ -164,6 +183,26 @@ public class OrdinalClassifier extends Classifier {
 
 		Map<?, ? extends Classifier> result = (estimators.entrySet()).stream()
 			.collect(Collectors.toMap(entry -> keyFunction.apply(entry.getKey()), entry -> valueFunction.apply(entry.getValue())));
+
+		return result;
+	}
+
+	private Map<?, ?> getEstimatorCategories(){
+
+		if(!containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
+			return null;
+		}
+
+		List<?> classes = getClasses(SkLearnFields.CLASSES);
+		List<?> pmmlClasses = getClasses(SkLearn2PMMLFields.PMML_CLASSES);
+
+		ClassDictUtil.checkSize(classes, pmmlClasses);
+
+		Map<Object, Object> result = new LinkedHashMap<>();
+
+		for(int i = 0; i < classes.size(); i++){
+			result.put(pmmlClasses.get(i), classes.get(i));
+		}
 
 		return result;
 	}
