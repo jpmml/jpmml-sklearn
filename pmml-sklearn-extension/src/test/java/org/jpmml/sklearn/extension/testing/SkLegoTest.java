@@ -64,4 +64,14 @@ public class SkLegoTest extends SkLearnEncoderBatchTest implements Datasets {
 	public void evaluatePrdinalClassifierAuto() throws Exception {
 		evaluate("OrdinalClassifier", AUTO, new PMMLEquivalence(1e-12, 1e-12));
 	}
+
+	@Test
+	public void evaluateOrdinalClassifierIsotonicAuto() throws Exception {
+		evaluate("OrdinalClassifierIsotonic", AUTO, new PMMLEquivalence(1e-12, 1e-12));
+	}
+
+	@Test
+	public void evaluateOrdinalClassifierSigmoidAuto() throws Exception {
+		evaluate("OrdinalClassifierSigmoid", AUTO);
+	}
 }

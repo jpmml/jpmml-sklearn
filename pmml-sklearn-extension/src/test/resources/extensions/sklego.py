@@ -168,9 +168,11 @@ def build_estimatortransformer_visit(name):
 
 build_estimatortransformer_visit("EstimatorTransformerVisit")
 
-def build_ordinal_auto(classifier, name):
+def build_ordinal_auto(classifier, name, **calibration_kwargs):
 	auto_df = load_auto("Auto")
 
-	build_auto_ordinal(auto_df, OrdinalClassifier(classifier), name, with_str_labels = False)
+	build_auto_ordinal(auto_df, OrdinalClassifier(classifier, use_calibration = (len(calibration_kwargs) > 0), **calibration_kwargs), name, with_str_labels = False)
 
 build_ordinal_auto(LogisticRegression(), "OrdinalClassifierAuto")
+build_ordinal_auto(LogisticRegression(), "OrdinalClassifierIsotonicAuto", method = "isotonic", ensemble = False)
+build_ordinal_auto(LogisticRegression(), "OrdinalClassifierSigmoidAuto", method = "sigmoid", ensemble = True)
