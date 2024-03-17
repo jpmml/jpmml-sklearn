@@ -267,6 +267,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateRandomForestAuditNA() throws Exception {
+		evaluate(RANDOM_FOREST, AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateRidgeAudit() throws Exception {
 		evaluate(RIDGE, AUDIT);
 	}
@@ -299,6 +304,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateDecisionTreeIris() throws Exception {
 		evaluate(DECISION_TREE, IRIS);
+	}
+
+	@Test
+	public void evaluateDecisionTreeIrisNA() throws Exception {
+		evaluate(DECISION_TREE, IRIS_NA);
 	}
 
 	@Test
@@ -384,6 +394,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateRandomForestIris() throws Exception {
 		evaluate(RANDOM_FOREST, IRIS);
+	}
+
+	@Test
+	public void evaluateRandomForestIrisNA() throws Exception {
+		evaluate(RANDOM_FOREST, IRIS_NA);
 	}
 
 	@Test

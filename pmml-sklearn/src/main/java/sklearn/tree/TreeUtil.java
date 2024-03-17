@@ -67,6 +67,7 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.VersionUtil;
 import sklearn.tree.visitors.TreeModelCompactor;
 import sklearn.tree.visitors.TreeModelFlattener;
 import sklearn.tree.visitors.TreeModelPruner;
@@ -78,10 +79,11 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
+		Boolean allowMissing = (Boolean)estimator.getOption(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.FALSE);
 		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
 
 		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
-		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
+		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, allowMissing || winnerId);
 		Boolean nodeScore = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
 
 		boolean fixed = ((nodeExtensions != null) || (nodeId != null && nodeId) || (nodeScore != null && nodeScore));
@@ -107,6 +109,31 @@ public class TreeUtil {
 		}
 
 		List<Visitor> visitors = new ArrayList<>();
+
+		if((Boolean.FALSE).equals(allowMissing)){
+			Visitor defaultChildCleaner = new AbstractVisitor(){
+
+				@Override
+				public VisitorAction visit(TreeModel treeModel){
+					treeModel.setMissingValueStrategy(null);
+
+					return super.visit(treeModel);
+				}
+
+				@Override
+				public VisitorAction visit(Node node){
+					Object defaultChild = node.getDefaultChild();
+
+					if(defaultChild != null){
+						node.setDefaultChild(null);
+					}
+
+					return super.visit(node);
+				}
+			};
+
+			visitors.add(defaultChildCleaner);
+		} // End if
 
 		// Prune first, in order to make the tree model smaller for subsequent transformers
 		if((Boolean.TRUE).equals(prune)){
@@ -289,11 +316,22 @@ public class TreeUtil {
 		int[] features = tree.getFeature();
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
+		int[] missingGoToLeft = null;
 
-		Node root = encodeNode(0, True.INSTANCE, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
+		String sklearnVersion = estimator.getSkLearnVersion();
+		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.3.0") >= 0){
+			missingGoToLeft = tree.getMissingToToLeft();
+		}
+
+		Node root = encodeNode(0, True.INSTANCE, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
+
+		// SkLearn 1.3.0+
+		if(missingGoToLeft != null){
+			treeModel.setMissingValueStrategy(TreeModel.MissingValueStrategy.DEFAULT_CHILD);
+		}
 
 		ClassDictUtil.clearContent(tree);
 
@@ -301,7 +339,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, boolean numeric, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, boolean numeric, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -318,6 +356,12 @@ public class TreeUtil {
 			Predicate leftPredicate;
 			Predicate rightPredicate;
 
+			Boolean defaultLeft = null;
+
+			if(missingGoToLeft != null){
+				defaultLeft = (missingGoToLeft[index] == 1);
+			} // End if
+
 			if(feature instanceof BinaryFeature){
 				BinaryFeature binaryFeature = (BinaryFeature)feature;
 
@@ -329,6 +373,11 @@ public class TreeUtil {
 
 				leftPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.NOT_EQUAL, value);
 				rightPredicate = predicateManager.createSimplePredicate(binaryFeature, SimplePredicate.Operator.EQUAL, value);
+
+				// XXX
+				if(missingGoToLeft != null){
+					defaultLeft = Boolean.TRUE;
+				}
 			} else
 
 			if(feature instanceof ThresholdFeature && !numeric){
@@ -371,8 +420,8 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
-			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
 
 			Node result;
 
@@ -393,6 +442,10 @@ public class TreeUtil {
 			result
 				.setId(id)
 				.addNodes(leftChild, rightChild);
+
+			if(defaultLeft != null){
+				result.setDefaultChild(defaultLeft ? leftChild.getId() : rightChild.getId());
+			}
 
 			return result;
 		} else

@@ -22,7 +22,6 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
@@ -115,9 +114,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 	@Test
 	public void evaluateDecisionTreeAutoNA() throws Exception {
-		String[] transformFields = {FieldNameUtil.create("eval", FieldNames.NODE_ID)};
-
-		evaluate(DECISION_TREE, AUTO_NA, excludeFields(transformFields));
+		evaluate(DECISION_TREE, AUTO_NA);
 	}
 
 	@Test
@@ -240,6 +237,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluateRandomForestAuto() throws Exception {
 		evaluate(RANDOM_FOREST, AUTO);
+	}
+
+	@Test
+	public void evaluateRandomForestAutoNA() throws Exception {
+		evaluate(RANDOM_FOREST, AUTO_NA);
 	}
 
 	@Test

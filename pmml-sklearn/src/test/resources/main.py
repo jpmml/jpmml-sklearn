@@ -241,7 +241,7 @@ if "Audit" in datasets:
 	build_audit_dict(audit_df, LogisticRegression(), "LogisticRegressionAuditDict")
 	build_audit_dict(audit_df, NearestCentroid(), "NearestCentroidAuditDict", with_proba = False)
 
-def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, predict_transformer = None, predict_proba_transformer = None, apply_transformer = None, **pmml_options):
+def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, predict_transformer = None, predict_proba_transformer = None, **pmml_options):
 	audit_na_X, audit_na_y = split_csv(audit_na_df)
 
 	employment_mapping = {
@@ -270,7 +270,7 @@ def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params 
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("classifier", classifier)
-	], predict_transformer = predict_transformer, predict_proba_transformer = predict_proba_transformer, apply_transformer = apply_transformer)
+	], predict_transformer = predict_transformer, predict_proba_transformer = predict_proba_transformer)
 	pipeline.fit(audit_na_X, audit_na_y, **fit_params)
 	pipeline.configure(**pmml_options)
 	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, predict_proba_params = predict_proba_params)
@@ -288,7 +288,6 @@ def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params 
 if "Audit" in datasets:
 	audit_na_df = load_audit("AuditNA")
 
-	build_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_audit_na(audit_na_df, LogisticRegression(solver = "newton-cg", max_iter = 500), "LogisticRegressionAuditNA", predict_proba_transformer = Alias(ExpressionTransformer("1 if X[1] > 0.75 else 0"), name = "eval(probability(1))", prefit = True))
 
 def build_hist_audit_na(audit_na_df, classifier, name):
@@ -314,6 +313,34 @@ if "Audit" in datasets:
 	audit_na_df = load_audit("AuditNA")
 
 	build_hist_audit_na(audit_na_df, HistGradientBoostingClassifier(max_iter = 71, categorical_features = "from_dtype", random_state = 13), "HistGradientBoostingAuditNA")
+
+def build_tree_audit_na(audit_na_df, classifier, name, apply_transformer = None, **pmml_options):
+	audit_na_X, audit_na_y = split_csv(audit_na_df)
+
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain(with_statistics = True)) for column in ["Age", "Hours", "Income"]] +
+		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	], apply_transformer = apply_transformer)
+	pipeline.fit(audit_na_X, audit_na_y)
+	pipeline.configure(**pmml_options)
+	store_pkl(pipeline, name)
+	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	if isinstance(classifier, DecisionTreeClassifier):
+		adjusted_apply = DataFrame(pipeline.apply_transform(audit_na_X), columns = ["nodeId", "eval(nodeId)"])
+		adjusted = pandas.concat((adjusted, adjusted_apply), axis = 1)
+	store_csv(adjusted, name)
+
+if "Audit" in datasets:
+	audit_na_df = load_audit("AuditNA")
+
+	build_tree_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
+	build_tree_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuditNA", allow_missing = True, compact = False)
 
 def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
@@ -544,6 +571,28 @@ def build_iris_opt(iris_df, classifier, name, fit_params = {}, **pmml_options):
 	species = pandas.concat((species, species_proba), axis = 1)
 	store_csv(species, name)
 
+def build_tree_iris_na(iris_na_df, classifier, name, **pmml_options):
+	iris_na_X, iris_na_y = split_csv(iris_na_df)
+
+	pipeline = PMMLPipeline([
+		("domain", ContinuousDomain(with_statistics = True)),
+		("classifier", classifier)
+	])
+	pipeline.fit(iris_na_X, iris_na_y)
+	pipeline.configure(**pmml_options)
+	pipeline.verify(iris_na_X.sample(frac = 0.10, random_state = 13))
+	store_pkl(pipeline, name)
+	species = DataFrame(pipeline.predict(iris_na_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_na_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
+if "Iris" in datasets:
+	iris_na_df = load_iris("IrisNA")
+
+	build_tree_iris_na(iris_na_df, DecisionTreeClassifier(random_state = 13), "DecisionTreeIrisNA", allow_missing = True, compact = False)
+	build_tree_iris_na(iris_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIrisNA", allow_missing = True, compact = False)
+
 #
 # Text classification
 #
@@ -746,7 +795,7 @@ def build_auto_opt(auto_df, regressor, name, fit_params = {}, **pmml_options):
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	store_csv(mpg, name)
 
-def build_auto_na(auto_na_df, regressor, name, predict_transformer = None, apply_transformer = None, **pmml_options):
+def build_auto_na(auto_na_df, regressor, name, predict_transformer = None, **pmml_options):
 	auto_na_X, auto_na_y = split_csv(auto_na_df)
 
 	mapper = DataFrameMapper(
@@ -760,20 +809,12 @@ def build_auto_na(auto_na_df, regressor, name, predict_transformer = None, apply
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("regressor", regressor)
-	], predict_transformer = predict_transformer, apply_transformer = apply_transformer)
+	], predict_transformer = predict_transformer)
 	pipeline.fit(auto_na_X, auto_na_y)
-	if isinstance(regressor, DecisionTreeRegressor):
-		tree = regressor.tree_
-		node_impurity = {node_idx : tree.impurity[node_idx] for node_idx in range(0, tree.node_count) if tree.impurity[node_idx] != 0.0}
-		pmml_options["node_extensions"] = {regressor.criterion : node_impurity}
 	pipeline.configure(**pmml_options)
 	pipeline.verify(auto_na_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
-	if isinstance(regressor, DecisionTreeRegressor):
-		Xt = pipeline_transform(pipeline, auto_na_X)
-		mpg_apply = DataFrame(regressor.apply(Xt), columns = ["nodeId"])
-		mpg = pandas.concat((mpg, mpg_apply), axis = 1)
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
@@ -783,7 +824,6 @@ if "Auto" in datasets:
 	auto_na_df["model_year"] = auto_na_df["model_year"].fillna(-1).astype(int)
 	auto_na_df["origin"] = auto_na_df["origin"].fillna(-1).astype(int)
 
-	build_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1"), "eval(nodeId)", prefit = True), winner_id = True)
 	build_auto_na(auto_na_df, LinearRegression(), "LinearRegressionAutoNA", predict_transformer = CutTransformer(bins = [0, 10, 20, 30, 40], labels = ["0-10", "10-20", "20-30", "30-40"]))
 
 def build_hist_auto_na(auto_na_df, regressor, name):
@@ -807,6 +847,46 @@ if "Auto" in datasets:
 	auto_na_df = load_auto("AutoNA")
 
 	build_hist_auto_na(auto_na_df, HistGradientBoostingRegressor(max_iter = 31, categorical_features = "from_dtype", random_state = 13), "HistGradientBoostingAutoNA")
+
+def build_tree_auto_na(auto_na_df, regressor, name, apply_transformer = None, **pmml_options):
+	auto_na_X, auto_na_y = split_csv(auto_na_df)
+
+	mapper = DataFrameMapper(
+		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
+		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+	)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	], apply_transformer = apply_transformer)
+	pipeline.fit(auto_na_X, auto_na_y)
+	if isinstance(regressor, DecisionTreeRegressor):
+		tree = regressor.tree_
+		node_impurity = {node_idx : tree.impurity[node_idx] for node_idx in range(0, tree.node_count) if tree.impurity[node_idx] != 0.0}
+		pmml_options["node_extensions"] = {regressor.criterion : node_impurity}
+	pipeline.configure(**pmml_options)
+	pipeline.verify(auto_na_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
+	if isinstance(regressor, DecisionTreeRegressor):
+		mpg_apply = DataFrame(pipeline.apply_transform(auto_na_X), columns = ["nodeId", "eval(nodeId)"])
+		mpg = pandas.concat((mpg, mpg_apply), axis = 1)
+	store_csv(mpg, name)
+
+if "Auto" in datasets:
+	auto_na_df = load_auto("AutoNA")
+
+	def _format(x):
+		if pandas.isnull(x):
+			return None
+		return str(int(x))
+
+	auto_na_df["cylinders"] = auto_na_df["cylinders"].map(_format)
+	auto_na_df["model_year"] = auto_na_df["model_year"].map(_format)
+	auto_na_df["origin"] = auto_na_df["origin"].map(_format)
+
+	build_tree_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, compact = False, winner_id = True)
+	build_tree_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAutoNA", allow_missing = True, compact = False)
 
 def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])

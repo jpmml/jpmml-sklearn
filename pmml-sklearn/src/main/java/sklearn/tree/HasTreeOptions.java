@@ -34,6 +34,11 @@ import sklearn.tree.visitors.TreeModelPruner;
 public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguration {
 
 	/**
+	 * @see Node#getDefaultChild()
+	 */
+	String OPTION_ALLOW_MISSING = "allow_missing";
+
+	/**
 	 * @see TreeModelCompactor
 	 */
 	String OPTION_COMPACT = "compact";

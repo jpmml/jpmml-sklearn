@@ -65,6 +65,13 @@ public class Main {
 	private File output = null;
 
 	@Parameter (
+		names = {"--X-" + HasTreeOptions.OPTION_ALLOW_MISSING},
+		description = "Allow \"value is missing\" node split conditions",
+		arity = 1
+	)
+	private Boolean allowMissing = null;
+
+	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_COMPACT},
 		description = "Transform SkLearn-style trees to PMML-style trees",
 		arity = 1
@@ -209,6 +216,7 @@ public class Main {
 	private Map<String, ?> getOptions(){
 		Map<String, Object> options = new LinkedHashMap<>();
 
+		options.put(HasTreeOptions.OPTION_ALLOW_MISSING, this.allowMissing);
 		options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
 		options.put(HasTreeOptions.OPTION_FLAT, this.flat);
 		options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);

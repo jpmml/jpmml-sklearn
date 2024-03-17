@@ -61,6 +61,10 @@ public class Tree extends CustomPythonObject {
 		return Ints.toArray(getNodeAttribute("n_node_samples"));
 	}
 
+	public int[] getMissingToToLeft(){
+		return Ints.toArray(getNodeAttribute("missing_go_to_left"));
+	}
+
 	private List<? extends Number> getNodeAttribute(String key){
 		return (List)getArray("nodes", key);
 	}
