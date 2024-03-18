@@ -320,13 +320,14 @@ def build_tree_audit_na(audit_na_df, classifier, name, apply_transformer = None,
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain(with_statistics = True)) for column in ["Age", "Hours", "Income"]] +
 		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelBinarizer()]) for column in ["Employment", "Education", "Marital", "Occupation", "Gender"]]
-	)
+	, input_df = True, df_out = True)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("classifier", classifier)
 	], apply_transformer = apply_transformer)
 	pipeline.fit(audit_na_X, audit_na_y)
 	pipeline.configure(**pmml_options)
+	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13))
 	store_pkl(pipeline, name)
 	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
 	adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
@@ -853,8 +854,8 @@ def build_tree_auto_na(auto_na_df, regressor, name, apply_transformer = None, **
 
 	mapper = DataFrameMapper(
 		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], [CategoricalDomain(with_statistics = True), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
-	)
+		[([column], [CategoricalDomain(with_statistics = True, dtype = "Int64"), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year", "origin"]]
+	, input_df = True, df_out = True)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("regressor", regressor)
@@ -875,15 +876,6 @@ def build_tree_auto_na(auto_na_df, regressor, name, apply_transformer = None, **
 
 if "Auto" in datasets:
 	auto_na_df = load_auto("AutoNA")
-
-	def _format(x):
-		if pandas.isnull(x):
-			return None
-		return str(int(x))
-
-	auto_na_df["cylinders"] = auto_na_df["cylinders"].map(_format)
-	auto_na_df["model_year"] = auto_na_df["model_year"].map(_format)
-	auto_na_df["origin"] = auto_na_df["origin"].map(_format)
 
 	build_tree_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, compact = False, winner_id = True)
 	build_tree_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAutoNA", allow_missing = True, compact = False)
