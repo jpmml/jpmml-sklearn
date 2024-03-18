@@ -75,18 +75,7 @@ public class FunctionTransformer extends SkLearnTransformer {
 
 			ClassDictConstructor partialFunc = partial.getFunc();
 
-			Identifiable result = new Identifiable(){
-
-				@Override
-				public String getModule(){
-					return ClassDictConstructorUtil.getModule(partialFunc);
-				}
-
-				@Override
-				public String getName(){
-					return ClassDictConstructorUtil.getName(partialFunc);
-				}
-			};
+			Identifiable result = ClassDictConstructorUtil.toIdentifiable(partialFunc);
 
 			switch(result.getModule()){
 				case "sklearn.utils.validation":
