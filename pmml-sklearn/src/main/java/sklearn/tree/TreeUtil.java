@@ -411,7 +411,16 @@ public class TreeUtil {
 			{
 				ContinuousFeature continuousFeature = toContinuousFeature(feature);
 
-				Double value = threshold;
+				Object value;
+
+				// Happens when missing values are allowed
+				if(threshold == Double.POSITIVE_INFINITY){
+					value = "INF";
+				} else
+
+				{
+					value = threshold;
+				}
 
 				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
 				rightPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.GREATER_THAN, value);

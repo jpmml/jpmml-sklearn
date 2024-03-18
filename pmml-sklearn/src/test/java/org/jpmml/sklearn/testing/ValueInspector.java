@@ -48,7 +48,7 @@ public class ValueInspector extends AbstractVisitor {
 	public VisitorAction visit(Constant constant){
 		Object value = constant.getValue();
 
-		if(isNaN(value)){
+		if(isNonFinite(value)){
 			throw new AssertionError();
 		}
 
@@ -58,7 +58,7 @@ public class ValueInspector extends AbstractVisitor {
 	private void checkValue(HasValue<?> hasValue){
 		Object value = hasValue.getValue();
 
-		if(isNaN(value)){
+		if(isNonFinite(value)){
 			throw new AssertionError();
 		}
 	}
@@ -73,19 +73,19 @@ public class ValueInspector extends AbstractVisitor {
 
 			for(Object value : values){
 
-				if(isNaN(value)){
+				if(isNonFinite(value)){
 					throw new AssertionError();
 				}
 			}
 		}
 	}
 
-	private boolean isNaN(Object value){
+	private boolean isNonFinite(Object value){
 
 		if(value instanceof Number){
 			Number number = (Number)value;
 
-			return Double.isNaN(number.doubleValue());
+			return !Double.isFinite(number.doubleValue());
 		}
 
 		return false;
