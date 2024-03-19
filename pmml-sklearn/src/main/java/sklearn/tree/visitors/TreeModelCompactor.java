@@ -41,6 +41,7 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 	public void enterNode(Node node){
 		Object id = node.getId();
 		Object score = node.getScore();
+		Object defaultChild = node.getDefaultChild();
 
 		if(id == null){
 			throw new UnsupportedElementException(node);
@@ -62,19 +63,41 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 			checkFieldReference((HasFieldReference<?>)firstPredicate, secondPredicate);
 			checkValue((HasValue<?>)firstPredicate, secondPredicate);
 
-			if(hasOperator(firstPredicate, SimplePredicate.Operator.NOT_EQUAL) && hasOperator(secondPredicate, SimplePredicate.Operator.EQUAL)){
-				children = swapChildren(node);
+			if(defaultChild != null){
 
-				firstChild = children.get(0);
-				secondChild = children.get(1);
-			} else
+				if(equalsNode(defaultChild, firstChild)){
+					children = swapChildren(node);
 
-			if(hasOperator(firstPredicate, SimplePredicate.Operator.LESS_OR_EQUAL) && hasOperator(secondPredicate, SimplePredicate.Operator.GREATER_THAN)){
-				// Ignored
+					firstChild = children.get(0);
+					secondChild = children.get(1);
+				} else
+
+				if(equalsNode(defaultChild, secondChild)){
+					// Ignored
+				} else
+
+				{
+					throw new UnsupportedElementException(node);
+				}
+
+				node.setDefaultChild(null);
 			} else
 
 			{
-				throw new UnsupportedElementException(node);
+				if(hasOperator(firstPredicate, SimplePredicate.Operator.NOT_EQUAL) && hasOperator(secondPredicate, SimplePredicate.Operator.EQUAL)){
+					children = swapChildren(node);
+
+					firstChild = children.get(0);
+					secondChild = children.get(1);
+				} else
+
+				if(hasOperator(firstPredicate, SimplePredicate.Operator.LESS_OR_EQUAL) && hasOperator(secondPredicate, SimplePredicate.Operator.GREATER_THAN)){
+					// Ignored
+				} else
+
+				{
+					throw new UnsupportedElementException(node);
+				}
 			}
 
 			secondChild.setPredicate(True.INSTANCE);
@@ -122,7 +145,17 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 		super.enterTreeModel(treeModel);
 
 		TreeModel.MissingValueStrategy missingValueStrategy = treeModel.getMissingValueStrategy();
-		if(missingValueStrategy != TreeModel.MissingValueStrategy.NONE){
+		if(missingValueStrategy == TreeModel.MissingValueStrategy.NONE){
+			// Missing values are not allowed
+			missingValueStrategy = TreeModel.MissingValueStrategy.NULL_PREDICTION;
+		} else
+
+		if(missingValueStrategy == TreeModel.MissingValueStrategy.DEFAULT_CHILD){
+			// Missing values are allowed
+			missingValueStrategy = TreeModel.MissingValueStrategy.NONE;
+		} else
+
+		{
 			throw new UnsupportedAttributeException(treeModel, missingValueStrategy);
 		}
 
@@ -137,7 +170,7 @@ public class TreeModelCompactor extends AbstractTreeModelTransformer {
 		}
 
 		treeModel
-			.setMissingValueStrategy(TreeModel.MissingValueStrategy.NULL_PREDICTION)
+			.setMissingValueStrategy(missingValueStrategy)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.MULTI_SPLIT);
 
 		MiningFunction miningFunction = treeModel.requireMiningFunction();

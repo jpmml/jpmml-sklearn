@@ -18,6 +18,9 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -25,11 +28,13 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 import sklearn.Estimator;
+import sklearn.tree.HasTreeOptions;
 
 public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
 
@@ -40,6 +45,25 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 			@Override
 			public ClassifierTest getArchiveBatchTest(){
 				return ClassifierTest.this;
+			}
+
+			@Override
+			public List<Map<String, Object>> getOptionsMatrix(){
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if((AUDIT_NA).equals(dataset) || (IRIS_NA).equals(dataset)){
+
+					if((RANDOM_FOREST).equals(algorithm)){
+						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
+						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{true, false});
+
+						return OptionsUtil.generateOptionsMatrix(options);
+					}
+				}
+
+				return super.getOptionsMatrix();
 			}
 
 			@Override

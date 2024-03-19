@@ -341,7 +341,7 @@ if "Audit" in datasets:
 	audit_na_df = load_audit("AuditNA")
 
 	build_tree_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
-	build_tree_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuditNA", allow_missing = True, compact = False)
+	build_tree_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuditNA", allow_missing = True)
 
 def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
@@ -591,8 +591,8 @@ def build_tree_iris_na(iris_na_df, classifier, name, **pmml_options):
 if "Iris" in datasets:
 	iris_na_df = load_iris("IrisNA")
 
-	build_tree_iris_na(iris_na_df, DecisionTreeClassifier(random_state = 13), "DecisionTreeIrisNA", allow_missing = True, compact = False)
-	build_tree_iris_na(iris_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIrisNA", allow_missing = True, compact = False)
+	build_tree_iris_na(iris_na_df, DecisionTreeClassifier(random_state = 13), "DecisionTreeIrisNA", allow_missing = True)
+	build_tree_iris_na(iris_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIrisNA", allow_missing = True)
 
 #
 # Text classification
@@ -877,8 +877,8 @@ def build_tree_auto_na(auto_na_df, regressor, name, apply_transformer = None, **
 if "Auto" in datasets:
 	auto_na_df = load_auto("AutoNA")
 
-	build_tree_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, compact = False, winner_id = True)
-	build_tree_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAutoNA", allow_missing = True, compact = False)
+	build_tree_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True)
+	build_tree_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAutoNA", allow_missing = True)
 
 def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])

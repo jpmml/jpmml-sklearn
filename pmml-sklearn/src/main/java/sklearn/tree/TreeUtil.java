@@ -83,7 +83,7 @@ public class TreeUtil {
 		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
 
 		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
-		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, allowMissing || winnerId);
+		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
 		Boolean nodeScore = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
 
 		boolean fixed = ((nodeExtensions != null) || (nodeId != null && nodeId) || (nodeScore != null && nodeScore));
@@ -100,7 +100,7 @@ public class TreeUtil {
 
 			// Activate defaults
 			nodeExtensions = null;
-			nodeId = winnerId;
+			nodeId = (winnerId ? Boolean.TRUE : allowMissing);
 			nodeScore = (winnerId ? Boolean.TRUE : null);
 		} // End if
 
