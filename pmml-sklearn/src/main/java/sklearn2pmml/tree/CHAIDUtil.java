@@ -130,7 +130,7 @@ public class CHAIDUtil {
 					Integer splitIndex = splitIndices.get(j);
 					Object splitValue = splitValues.get(j);
 
-					if(splitIndex == -1){
+					if(isMissing(splitIndex, splitValue)){
 						// Ignored
 					} else
 
@@ -168,7 +168,7 @@ public class CHAIDUtil {
 					Integer splitIndex = splitIndices.get(j);
 					Object splitValue = splitValues.get(j);
 
-					if(splitIndex == -1){
+					if(isMissing(splitIndex, splitValue)){
 						withMissing = true;
 					} else
 
@@ -262,6 +262,22 @@ public class CHAIDUtil {
 		}
 
 		return result;
+	}
+
+	static
+	private boolean isMissing(Integer splitIndex, Object splitValue){
+
+		// Floating-point data type columns
+		if(splitIndex == -1){
+			return true;
+		} else
+
+		// Object data type columns
+		if(splitValue == null){
+			return true;
+		}
+
+		return false;
 	}
 
 	static

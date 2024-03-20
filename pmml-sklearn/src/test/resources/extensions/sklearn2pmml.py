@@ -291,6 +291,8 @@ def build_chaid_auto(auto_df, name):
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
 	cat_cols = ["cylinders", "model_year", "origin"]
 
+	auto_X[cat_cols] = auto_X[cat_cols].astype("Int64")
+
 	bins = make_bins(auto_X, cont_cols)
 	labels = make_bin_labels(bins)
 
