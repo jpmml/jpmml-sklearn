@@ -46,6 +46,7 @@ public class ExpressionRegressor extends Regressor {
 	@Override
 	public RegressionModel encodeModel(Schema schema){
 		Expression expr = getExpr();
+		RegressionModel.NormalizationMethod normalizationMethod = parseNormalizationMethod(getNormalizationMethod());
 
 		PMMLEncoder encoder = schema.getEncoder();
 
@@ -61,7 +62,7 @@ public class ExpressionRegressor extends Regressor {
 		RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(exprFeature), Collections.singletonList(1d), 0d);
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel), null)
-			.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE)
+			.setNormalizationMethod(normalizationMethod)
 			.addRegressionTables(regressionTable);
 
 		return regressionModel;
@@ -69,5 +70,28 @@ public class ExpressionRegressor extends Regressor {
 
 	public Expression getExpr(){
 		return get("expr", Expression.class);
+	}
+
+	public String getNormalizationMethod(){
+
+		if(!containsKey("normalization_method")){
+			return "none";
+		}
+
+		// SkLearn2PMML 0.105.0+
+		return getString("normalization_method");
+	}
+
+	static
+	private RegressionModel.NormalizationMethod parseNormalizationMethod(String normalizationMethod){
+
+		switch(normalizationMethod){
+			case "none":
+				return RegressionModel.NormalizationMethod.NONE;
+			case "exp":
+				return RegressionModel.NormalizationMethod.EXP;
+			default:
+				throw new IllegalArgumentException(normalizationMethod);
+		}
 	}
 }

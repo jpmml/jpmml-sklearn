@@ -317,7 +317,7 @@ def build_expr_auto(auto_df, name):
 	expr = Expression("-1.724 * _scale_displacement(X['displacement']) + 4.879 * _scale_weight(X['weight']) + 23.45", function_defs = [_scale_displacement, _scale_weight])
 
 	pipeline = PMMLPipeline([
-		("regressor", ExpressionRegressor(expr))
+		("regressor", ExpressionRegressor(expr, normalization_method = "none"))
 	])
 	pipeline.fit(auto_X, auto_y)
 	store_pkl(pipeline, name)
