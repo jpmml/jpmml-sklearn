@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.expression;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -83,50 +84,42 @@ public class ExpressionClassifier extends Classifier {
 		List<RegressionTable> regressionTables;
 
 		switch(normalizationMethod){
-			case LOGIT:
-				{
-					if((categoryRegressionTables.size() != 1) || (categories.size() != 2)){
-						throw new IllegalArgumentException();
-					}
+			case NONE:
+				if(categoricalLabel.size() == 2){
+					regressionTables = encodeBinaryClassifier(categories, categoryRegressionTables);
+				} else
 
-					Object activeCategory = Iterables.getOnlyElement(categoryRegressionTables.keySet());
-					Object passiveCategory;
-
-					int index = categories.indexOf(activeCategory);
-					if(index == 0){
-						passiveCategory = categories.get(1);
-					} else
-
-					if(index == 1){
-						passiveCategory = categories.get(0);
-					} else
-
-					{
-						throw new IllegalArgumentException();
-					}
-
-					RegressionTable activeRegressionTable = categoryRegressionTables.get(activeCategory)
-						.setTargetCategory(activeCategory);
+				if(categoricalLabel.size() >= 3){
+					List<RegressionTable> activeRegressionTables = encodeMultinomialClassifier(categories.subList(0, categories.size() - 1), categoryRegressionTables);
 
 					RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.emptyList(), Collections.emptyList(), null)
-						.setTargetCategory(passiveCategory);
+						.setTargetCategory(categories.get(categories.size() - 1));
 
-					regressionTables = Arrays.asList(activeRegressionTable, passiveRegressionTable);
+					regressionTables = new ArrayList<>(activeRegressionTables);
+					regressionTables.add(passiveRegressionTable);
+				} else
+
+				{
+					throw new IllegalArgumentException();
 				}
 				break;
-			case SIMPLEMAX:
-			case SOFTMAX:
-				{
-					if((categoryRegressionTables.size() != categories.size()) || !(categoryRegressionTables.keySet()).containsAll(categories)){
-						throw new IllegalArgumentException();
-					}
+			case LOGIT:
+				if(categoricalLabel.size() == 2){
+					regressionTables = encodeBinaryClassifier(categories, categoryRegressionTables);
+				} else
 
-					regressionTables = categories.stream()
-						.map(category -> {
-							return categoryRegressionTables.get(category)
-								.setTargetCategory(category);
-						})
-						.collect(Collectors.toList());
+				{
+					throw new IllegalArgumentException();
+				}
+				break;
+			case SOFTMAX:
+			case SIMPLEMAX:
+				if(categoricalLabel.size() >= 2){
+					regressionTables = encodeMultinomialClassifier(categories, categoryRegressionTables);
+				} else
+
+				{
+					throw new IllegalArgumentException();
 				}
 				break;
 			default:
@@ -150,9 +143,60 @@ public class ExpressionClassifier extends Classifier {
 	}
 
 	static
+	private List<RegressionTable> encodeBinaryClassifier(List<?> categories, Map<?, RegressionTable> categoryRegressionTables){
+
+		if(categoryRegressionTables.size() != 1){
+			throw new IllegalArgumentException();
+		}
+
+		Map.Entry<?, RegressionTable> entry = Iterables.getOnlyElement(categoryRegressionTables.entrySet());
+
+		Object activeCategory = entry.getKey();
+		Object passiveCategory;
+
+		int index = categories.indexOf(activeCategory);
+		if(index == 0){
+			passiveCategory = categories.get(1);
+		} else
+
+		if(index == 1){
+			passiveCategory = categories.get(0);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+
+		RegressionTable activeRegressionTable = entry.getValue()
+			.setTargetCategory(activeCategory);
+
+		RegressionTable passiveRegressionTable = RegressionModelUtil.createRegressionTable(Collections.emptyList(), Collections.emptyList(), null)
+			.setTargetCategory(passiveCategory);
+
+		return Arrays.asList(activeRegressionTable, passiveRegressionTable);
+	}
+
+	static
+	private List<RegressionTable> encodeMultinomialClassifier(List<?> categories, Map<?, RegressionTable> categoryRegressionTables){
+
+		if(categoryRegressionTables.size() != categories.size() || !(categoryRegressionTables.keySet()).containsAll(categories)){
+			throw new IllegalArgumentException();
+		}
+
+		return categories.stream()
+			.map(category -> {
+				return categoryRegressionTables.get(category)
+					.setTargetCategory(category);
+			})
+			.collect(Collectors.toList());
+	}
+
+	static
 	private RegressionModel.NormalizationMethod parseNormalizationMethod(String normalizationMethod){
 
 		switch(normalizationMethod){
+			case "none":
+				return RegressionModel.NormalizationMethod.NONE;
 			case "logit":
 				return RegressionModel.NormalizationMethod.LOGIT;
 			case "simplemax":
