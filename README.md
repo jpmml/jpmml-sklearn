@@ -446,6 +446,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * [`statsmodels.api.MNLogit`](https://www.statsmodels.org/dev/generated/statsmodels.discrete.discrete_model.MNLogit.html)
   * [`statsmodels.api.OLS`](https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLS.html)
   * [`statsmodels.api.Poisson`](https://www.statsmodels.org/dev/generated/statsmodels.discrete.discrete_model.Poisson.html)
+  * [`statsmodels.api.QuantReg`](https://www.statsmodels.org/dev/generated/statsmodels.regression.quantile_regression.QuantReg.html)
   * [`statsmodels.api.WLS`](https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.WLS.html)
   * [`statsmodels.miscmodels.ordinal_model.OrderedModel`](https://www.statsmodels.org/dev/generated/statsmodels.miscmodels.ordinal_model.OrderedModel.html)
 </details>
