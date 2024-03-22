@@ -40,6 +40,11 @@ public class BSplineTest extends SkLearnEncoderBatchTest {
 			}
 
 			@Override
+			public String getSeparator(){
+				return "\t";
+			}
+
+			@Override
 			public EvaluatorBuilder getEvaluatorBuilder() throws Exception {
 				ModelEvaluatorBuilder evaluatorBuilder = (ModelEvaluatorBuilder)super.getEvaluatorBuilder();
 
@@ -55,8 +60,38 @@ public class BSplineTest extends SkLearnEncoderBatchTest {
 	}
 
 	@Test
+	public void evaluateCubic2() throws Exception {
+		evaluate("Cubic2", "BSpline", excludeFields(BSplineTest.predictedValue));
+	}
+
+	@Test
+	public void evaluateCubic3() throws Exception {
+		evaluate("Cubic3", "BSpline", excludeFields(BSplineTest.predictedValue));
+	}
+
+	@Test
 	public void evaluateGaussian() throws Exception {
 		evaluate("Gaussian", "BSpline", excludeFields(BSplineTest.predictedValue));
+	}
+
+	@Test
+	public void evaluateQuadratic2() throws Exception {
+		evaluate("Quadratic2", "BSpline", excludeFields(BSplineTest.predictedValue));
+	}
+
+	@Test
+	public void evaluateQuadratic3() throws Exception {
+		evaluate("Quadratic3", "BSpline", excludeFields(BSplineTest.predictedValue));
+	}
+
+	@Test
+	public void evaluateQuadratic4() throws Exception {
+		evaluate("Quadratic4", "BSpline", excludeFields(BSplineTest.predictedValue));
+	}
+
+	@Test
+	public void evaluateQuadratic5() throws Exception {
+		evaluate("Quadratic5", "BSpline", excludeFields(BSplineTest.predictedValue));
 	}
 
 	@Test

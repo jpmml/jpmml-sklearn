@@ -45,4 +45,4 @@ for fun in [gaussian, sin, tanh]:
 	store_pkl(pipeline, name)
 
 	y = DataFrame(pipeline.predict_transform(X), columns = ["y", "bspline(predict(y))"])
-	store_csv(y, name)
+	y.to_csv("csv/" + name + ".csv", index = False, sep = "\t")

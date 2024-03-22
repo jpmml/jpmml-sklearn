@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,12 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.preprocessing;
+package sklearn.preprocessing;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
@@ -32,17 +31,30 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import scipy.interpolate.BSpline;
 import scipy.interpolate.BSplineUtil;
-import sklearn.Transformer;
+import sklearn.SkLearnTransformer;
 
-public class BSplineTransformer extends Transformer {
+public class SplineTransformer extends SkLearnTransformer {
 
-	public BSplineTransformer(String module, String name){
+	public SplineTransformer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		BSpline bspline = getBSpline();
+		List<BSpline> bsplines = getBSplines();
+		String extrapolation = getExtrapolation();
+		Boolean includeBias = getIncludeBias();
+
+		switch(extrapolation){
+			case "error":
+				break;
+			default:
+				throw new IllegalArgumentException(extrapolation);
+		}
+
+		if(!includeBias){
+			throw new IllegalArgumentException();
+		}
 
 		ClassDictUtil.checkSize(1, features);
 
@@ -50,18 +62,34 @@ public class BSplineTransformer extends Transformer {
 
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
+		BSpline bspline = bsplines.get(0);
+
 		List<DefineFunction> splineFunctions = BSplineUtil.createSplineFunction(bspline, encoder);
 
-		DefineFunction splineFunction = Iterables.getOnlyElement(splineFunctions);
+		List<Feature> result = new ArrayList<>();
 
-		Apply apply = ExpressionUtil.createApply(splineFunction, continuousFeature.ref());
+		for(int i = 0; i < splineFunctions.size(); i++){
+			DefineFunction splineFunction = splineFunctions.get(i);
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("bspline", continuousFeature), apply);
+			Apply apply = ExpressionUtil.createApply(splineFunction, continuousFeature.ref());
 
-		return Collections.singletonList(new ContinuousFeature(encoder, derivedField));
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("bspline", continuousFeature, i), apply);
+
+			result.add(new ContinuousFeature(encoder, derivedField));
+		}
+
+		return result;
 	}
 
-	public BSpline getBSpline(){
-		return get("bspline", BSpline.class);
+	public List<BSpline> getBSplines(){
+		return getList("bsplines_", BSpline.class);
+	}
+
+	public String getExtrapolation(){
+		return getString("extrapolation");
+	}
+
+	public Boolean getIncludeBias(){
+		return getBoolean("include_bias");
 	}
 }
