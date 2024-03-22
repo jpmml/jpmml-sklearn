@@ -53,6 +53,10 @@
 		<url>https://github.com/jpmml/jpmml-sklearn/issues</url>
 	</issueManagement>
 
+    <properties>
+		<project.build.outputTimestamp>2024-03-22T07:12:04Z</project.build.outputTimestamp>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
