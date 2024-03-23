@@ -244,6 +244,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateTargetEncoderAutoNA() throws Exception {
+		evaluate("TargetEncoder", AUTO_NA);
+	}
+
+	@Test
 	public void evaluateTransformedLinearRegressionAuto() throws Exception {
 		evaluate(TRANSFORMED_LINEAR_REGRESSION, AUTO);
 	}

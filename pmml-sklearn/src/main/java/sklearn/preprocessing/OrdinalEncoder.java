@@ -93,6 +93,10 @@ public class OrdinalEncoder extends BaseEncoder {
 		return result;
 	}
 
+	public TypeInfo getDType(){
+		return getDType("dtype", false);
+	}
+
 	public Number getUnknownValue(){
 		return getNumber("unknown_value");
 	}

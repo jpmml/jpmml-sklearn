@@ -21,12 +21,13 @@ package sklearn.preprocessing;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.HasArray;
-import org.jpmml.python.TypeInfo;
 import sklearn.SkLearnTransformer;
 
 abstract
@@ -75,14 +76,24 @@ public class BaseEncoder extends SkLearnTransformer {
 	}
 
 	public List<List<?>> getCategories(){
-		return EncoderUtil.transformCategories(getList("categories_", HasArray.class));
-	}
-
-	public TypeInfo getDType(){
-		return getDType("dtype", false);
+		return getArrayList("categories_");
 	}
 
 	public String getHandleUnknown(){
 		return getOptionalString("handle_unknown");
+	}
+
+	List<List<?>> getArrayList(String name){
+		List<HasArray> encodings = getList(name, HasArray.class);
+
+		Function<HasArray, List<?>> function = new Function<HasArray, List<?>>(){
+
+			@Override
+			public List<?> apply(HasArray hasArray){
+				return hasArray.getArrayContent();
+			}
+		};
+
+		return Lists.transform(encodings, function);
 	}
 }

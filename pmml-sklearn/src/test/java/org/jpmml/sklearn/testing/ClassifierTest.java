@@ -321,6 +321,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateTargetEncoderAuditNA() throws Exception {
+		evaluate("TargetEncoder", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateVotingEnsembleAudit() throws Exception {
 		evaluate(VOTING_ENSEMBLE, AUDIT);
 	}

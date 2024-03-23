@@ -139,19 +139,6 @@ public class EncoderUtil {
 	}
 
 	static
-	public List<List<?>> transformCategories(List<HasArray> arrays){
-		Function<HasArray, List<?>> function = new Function<HasArray, List<?>>(){
-
-			@Override
-			public List<?> apply(HasArray hasArray){
-				return hasArray.getArrayContent();
-			}
-		};
-
-		return Lists.transform(arrays, function);
-	}
-
-	static
 	public <E> List<E> filterCategories(List<E> categories){
 		return categories.stream()
 			.filter(category -> (category != null) && !ValueUtil.isNaN(category))

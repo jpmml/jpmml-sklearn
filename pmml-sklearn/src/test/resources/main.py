@@ -25,7 +25,7 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretizer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, PowerTransformer, RobustScaler, StandardScaler
+from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretizer, LabelBinarizer, LabelEncoder, MaxAbsScaler, MinMaxScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures, PowerTransformer, RobustScaler, StandardScaler, TargetEncoder
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml import EstimatorProxy, SelectorProxy
@@ -342,6 +342,54 @@ if "Audit" in datasets:
 
 	build_tree_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_tree_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuditNA", allow_missing = True)
+
+def build_encoder_audit_na(audit_na_df, classifier, name, cont_transformer = None, cat_transformer = None, with_invalid = False, **pmml_options):
+	audit_na_X, audit_na_y = split_csv(audit_na_df)
+
+	if with_invalid:
+		mask = numpy.ones((audit_na_X.shape[0], ), dtype = bool)
+
+		mask = numpy.logical_and(mask, audit_na_X.Employment != "SelfEmp")
+		mask = numpy.logical_and(mask, audit_na_X.Education != "Professional")
+		mask = numpy.logical_and(mask, audit_na_X.Marital != "Divorced")
+		mask = numpy.logical_and(mask, audit_na_X.Occupation != "Service")
+
+		audit_na_X = audit_na_X[mask]
+		audit_na_y = audit_na_y[mask]
+
+	cont_cols = ["Age", "Hours", "Income"]
+	cat_cols = ["Employment", "Education", "Marital", "Occupation", "Gender"]
+
+	audit_na_X[cat_cols] = audit_na_X[cat_cols].replace({numpy.NaN : None})
+
+	cont_transformer = [ContinuousDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cont_transformer] if cont_transformer else [])
+	cat_transformer = [CategoricalDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cat_transformer] if cat_transformer else [])
+
+	mapper = DataFrameMapper([
+		(cont_cols, cont_transformer),
+		(cat_cols, cat_transformer)
+	], input_df = True, df_out = True)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_na_X, audit_na_y)
+	pipeline.configure(**pmml_options)
+	pipeline.verify(audit_na_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+
+	if with_invalid:
+		audit_na_X, audit_na_y = split_csv(audit_na_df)
+
+	adjusted = DataFrame(pipeline.predict(audit_na_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_na_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
+if "Audit" in datasets:
+	audit_na_df = load_audit("AuditNA")
+
+	build_encoder_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "TargetEncoderAuditNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
 
 def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
@@ -879,6 +927,45 @@ if "Auto" in datasets:
 
 	build_tree_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True)
 	build_tree_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAutoNA", allow_missing = True)
+
+def build_encoder_auto_na(auto_na_df, regressor, name, cont_transformer = None, cat_transformer = None, with_invalid = False, **pmml_options):
+	auto_na_X, auto_na_y = split_csv(auto_na_df)
+
+	if with_invalid:
+		mask = numpy.ones((auto_na_X.shape[0], ), dtype = bool)
+
+		mask = numpy.logical_and(mask, auto_na_X.cylinders != 6)
+		mask = numpy.logical_and(mask, ~auto_na_X.model_year.isin([76, 77]))
+
+		auto_na_X = auto_na_X[mask]
+		auto_na_y = auto_na_y[mask] 
+
+	cont_transformer = [ContinuousDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cont_transformer] if cont_transformer else [])
+	cat_transformer = [CategoricalDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cat_transformer] if cat_transformer else [])
+
+	mapper = DataFrameMapper([
+		(["displacement", "horsepower", "weight", "acceleration"], cont_transformer),
+		(["cylinders", "model_year", "origin"], cat_transformer)
+	], input_df = True, df_out = True)
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_na_X, auto_na_y)
+	pipeline.configure(**pmml_options)
+	pipeline.verify(auto_na_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+
+	if with_invalid:
+		auto_na_X, auto_na_y = split_csv(auto_na_df)
+
+	mpg = DataFrame(pipeline.predict(auto_na_X), columns = ["mpg"])
+	store_csv(mpg, name)
+
+if "Auto" in datasets:
+	auto_na_df = load_auto("AutoNA")
+
+	build_encoder_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "TargetEncoderAutoNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
 
 def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
