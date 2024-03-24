@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import hex.genmodel.MojoModel;
+import hex.genmodel.algos.glm.GlmOrdinalMojoModel;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
@@ -38,7 +39,9 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureList;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.OrdinalLabel;
 import org.jpmml.converter.PMMLEncoder;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.h2o.Converter;
@@ -131,6 +134,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		String estimatorType = getEstimatorType();
+		MojoModel mojoModel = getMojoModel();
 
 		ClassDictUtil.checkSize(1, names);
 
@@ -141,16 +145,29 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 				{
 					List<?> categories = getClasses();
 
+					OpType opType = OpType.CATEGORICAL;
 					DataType dataType = TypeUtil.getDataType(categories, DataType.STRING);
 
-					if(name != null){
-						DataField dataField = encoder.createDataField(name, OpType.CATEGORICAL, dataType, categories);
+					// XXX
+					if(mojoModel instanceof GlmOrdinalMojoModel){
+						opType = OpType.ORDINAL;
+					} // End if
 
-						return new CategoricalLabel(dataField);
+					if(name != null){
+						DataField dataField = encoder.createDataField(name, opType, dataType, categories);
+
+						return ScalarLabelUtil.createScalarLabel(dataField);
 					} else
 
 					{
-						return new CategoricalLabel(dataType, categories);
+						switch(opType){
+							case CATEGORICAL:
+								return new CategoricalLabel(dataType, categories);
+							case ORDINAL:
+								return new OrdinalLabel(dataType, categories);
+							default:
+								throw new IllegalArgumentException();
+						}
 					}
 				}
 			case "regressor":
@@ -158,7 +175,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 					if(name != null){
 						DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
 
-						return new ContinuousLabel(dataField);
+						return ScalarLabelUtil.createScalarLabel(dataField);
 					} else
 
 					{
