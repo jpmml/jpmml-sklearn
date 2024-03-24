@@ -29,6 +29,21 @@ import sklearn.SkLearnMethods;
 public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
 	@Test
+	public void evaluateDayOfWeekApollo() throws Exception {
+		evaluate("DayMonthYear", "Apollo");
+	}
+
+	@Test
+	public void evaluateDurationInDaysApollo() throws Exception {
+		evaluate("DurationInDays", "Apollo");
+	}
+
+	@Test
+	public void evaluateDurationInSecondsApollo() throws Exception {
+		evaluate("DurationInSeconds", "Apollo");
+	}
+
+	@Test
 	public void evaluateCHAIDAudit() throws Exception {
 		evaluate("CHAID", AUDIT, excludeFields(AUDIT_ADJUSTED, AUDIT_PROBABILITY_FALSE, AUDIT_PROBABILITY_TRUE));
 	}

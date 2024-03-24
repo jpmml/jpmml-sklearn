@@ -132,21 +132,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluateDayOfWeekApollo() throws Exception {
-		evaluate("DayMonthYear", "Apollo");
-	}
-
-	@Test
-	public void evaluateDurationInDaysApollo() throws Exception {
-		evaluate("DurationInDays", "Apollo");
-	}
-
-	@Test
-	public void evaluateDurationInSecondsApollo() throws Exception {
-		evaluate("DurationInSeconds", "Apollo");
-	}
-
-	@Test
 	public void evaluateDecisionTreeAudit() throws Exception {
 		evaluate(DECISION_TREE, AUDIT);
 	}
