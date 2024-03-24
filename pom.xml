@@ -53,6 +53,10 @@
 		<url>https://github.com/jpmml/jpmml-sklearn/issues</url>
 	</issueManagement>
 
+	<properties>
+		<project.build.outputTimestamp>2024-03-24T10:40:19Z</project.build.outputTimestamp>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -152,7 +156,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.11.0</version>
+				<version>3.13.0</version>
 				<configuration>
 					<!--
 					<compilerArgument>-Xlint:unchecked</compilerArgument>
@@ -184,7 +188,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.2.3</version>
+				<version>3.2.5</version>
 				<configuration>
 					<argLine>${jacoco.agent}</argLine>
 					<systemProperties>
