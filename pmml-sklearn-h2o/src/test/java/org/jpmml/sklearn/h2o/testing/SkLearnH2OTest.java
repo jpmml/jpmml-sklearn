@@ -107,6 +107,11 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 	}
 
 	@Test
+	public void evaluateLinearRegressionAuto() throws Exception {
+		evaluate("H2OLinearRegression", AUTO);
+	}
+
+	@Test
 	public void evaluateLogisticRegressionAudit() throws Exception {
 		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
 
@@ -114,8 +119,8 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 	}
 
 	@Test
-	public void evaluateLinearRegressionAuto() throws Exception {
-		evaluate("H2OLinearRegression", AUTO);
+	public void evaluateOrdinalRegressionAuto() throws Exception {
+		evaluate("H2OOrdinalRegression", AUTO);
 	}
 
 	@Test

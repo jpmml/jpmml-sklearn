@@ -6,12 +6,14 @@ from h2o.estimators.glm import H2OGeneralizedLinearEstimator
 from h2o.estimators.random_forest import H2ORandomForestEstimator
 from h2o.estimators.xgboost import H2OXGBoostEstimator
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import KBinsDiscretizer
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing.h2o import H2OFrameConstructor
 from sklearn_pandas import DataFrameMapper
 
 import h2o
+import numpy
 
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
@@ -65,7 +67,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, H2ORandomForestEstimator(distribution = "bernoulli", seed = 13), "H2ORandomForestAudit")
 	build_audit(audit_df, H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAudit")
 
-def build_auto(auto_df, regressor, name):
+def build_auto(auto_df, regressor, name, classes = None):
 	auto_X, auto_y = split_csv(auto_df)
 
 	cat_cols = ["cylinders", "model_year", "origin"]
@@ -80,18 +82,33 @@ def build_auto(auto_df, regressor, name):
 		("uploader", H2OFrameConstructor(column_names = cat_cols + cont_cols, column_types = ["enum"] * len(cat_cols) + ["numeric"] * len(cont_cols))),
 		("regressor", regressor)
 	])
-	pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
+	if classes:
+		pipeline.fit(auto_X, H2OFrame(auto_y.to_frame(), column_types = ["categorical"]))
+	else:
+		pipeline.fit(auto_X, H2OFrame(auto_y.to_frame()))
 	if isinstance(regressor, H2OXGBoostEstimator):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
 	else:
-		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
+		if classes:
+			pass
+		else:
+			pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
 	regressor = pipeline._final_estimator
+	if classes:
+		regressor.pmml_classes_ = classes
 	store_mojo(regressor, name)
 	embed_stored_mojo(regressor, 50000)
 	store_pkl(pipeline, name, flavour = "dill")
 	mpg = pipeline.predict(auto_X)
-	mpg.set_names(["mpg"])
-	store_csv(mpg.as_data_frame(), name)
+	if classes:
+		mpg.set_names(["bin(mpg)"] + ["probability({})".format(clazz) for clazz in classes])
+	else:
+		mpg.set_names(["mpg"])
+	mpg = mpg.as_data_frame()
+	if classes:
+		class_mapping = {idx : clazz for idx, clazz in enumerate(classes)}
+		mpg["bin(mpg)"] = numpy.vectorize(lambda x: class_mapping[x])(mpg["bin(mpg)"])
+	store_csv(mpg, name)
 
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
@@ -104,5 +121,14 @@ if "Auto" in datasets:
 	build_auto(auto_df, H2OGeneralizedLinearEstimator(family = "gaussian"), "H2OLinearRegressionAuto")
 	build_auto(auto_df, H2ORandomForestEstimator(distribution = "gaussian", seed = 13), "H2ORandomForestAuto")
 	build_auto(auto_df, H2OXGBoostEstimator(ntrees = 17, seed = 13), "H2OXGBoostAuto")
+
+	auto_df.rename(columns = {"mpg" : "bin(mpg)"}, inplace = True)
+
+	categories = ["bad", "poor", "fair", "good", "excellent"]
+
+	binner = KBinsDiscretizer(n_bins = len(categories), encode = "ordinal", strategy = "kmeans")
+	auto_df["bin(mpg)"] = binner.fit_transform(auto_df["bin(mpg)"].values.reshape(-1, 1)).astype(int)
+
+	build_auto(auto_df, H2OGeneralizedLinearEstimator(family = "ordinal", seed = 13), "H2OOrdinalRegressionAuto", classes = categories)
 
 h2o.shutdown()

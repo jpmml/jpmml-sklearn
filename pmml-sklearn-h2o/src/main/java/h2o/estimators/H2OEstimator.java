@@ -51,8 +51,10 @@ import org.jpmml.h2o.MojoModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasClasses;
+import sklearn2pmml.SkLearn2PMMLFields;
 
 public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 
@@ -106,6 +108,12 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	@Override
 	public List<?> getClasses(){
 		MojoModel mojoModel = getMojoModel();
+
+		if(containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
+			List<?> values = getListLike(SkLearn2PMMLFields.PMML_CLASSES);
+
+			return Classifier.canonicalizeValues(values);
+		}
 
 		int responseIdx = mojoModel.getResponseIdx();
 
