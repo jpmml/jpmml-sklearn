@@ -261,8 +261,18 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateOneHotEncoderAuditNA() throws Exception {
+		evaluate("OneHotEncoder", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateOneVsRestAudit() throws Exception {
 		evaluate(ONE_VS_REST, AUDIT);
+	}
+
+	@Test
+	public void evaluateOrdinalEncoderAuditNA() throws Exception {
+		evaluate("OrdinalEncoder", AUDIT_NA);
 	}
 
 	@Test

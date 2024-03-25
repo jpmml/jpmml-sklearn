@@ -26,7 +26,6 @@ import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.TypeUtil;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.HasArray;
 import sklearn.SkLearnTransformer;
 
@@ -52,7 +51,7 @@ public class BaseEncoder extends SkLearnTransformer {
 			List<?> featureCategories = categories.get(i);
 
 			featureCategories = featureCategories.stream()
-				.filter(value -> (value != null) && !ValueUtil.isNaN(value))
+				.filter(category -> !EncoderUtil.isMissingCategory(category))
 				.collect(Collectors.toList());
 
 			DataType dataType = TypeUtil.getDataType(featureCategories, null);

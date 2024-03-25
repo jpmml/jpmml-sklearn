@@ -362,8 +362,8 @@ def build_encoder_audit_na(audit_na_df, classifier, name, cont_transformer = Non
 
 	audit_na_X[cat_cols] = audit_na_X[cat_cols].replace({numpy.NaN : None})
 
-	cont_transformer = [ContinuousDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cont_transformer] if cont_transformer else [])
-	cat_transformer = [CategoricalDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cat_transformer] if cat_transformer else [])
+	cont_transformer = [ContinuousDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_invalid"), with_statistics = True)] + ([cont_transformer] if cont_transformer else [])
+	cat_transformer = [CategoricalDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_invalid"), with_statistics = True)] + ([cat_transformer] if cat_transformer else [])
 
 	mapper = DataFrameMapper([
 		(cont_cols, cont_transformer),
@@ -389,7 +389,12 @@ def build_encoder_audit_na(audit_na_df, classifier, name, cont_transformer = Non
 if "Audit" in datasets:
 	audit_na_df = load_audit("AuditNA")
 
-	build_encoder_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "TargetEncoderAuditNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
+	def make_rf_classifier():
+		return RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)
+
+	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "OneHotEncoderAuditNA", cat_transformer = OneHotEncoder(handle_unknown = "ignore"), with_invalid = True, allow_missing = True)
+	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "OrdinalEncoderAuditNA", cat_transformer = make_pipeline(OrdinalEncoder(), OneHotEncoder()), with_invalid = False, allow_missing = True)
+	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "TargetEncoderAuditNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
 
 def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
@@ -940,8 +945,8 @@ def build_encoder_auto_na(auto_na_df, regressor, name, cont_transformer = None, 
 		auto_na_X = auto_na_X[mask]
 		auto_na_y = auto_na_y[mask] 
 
-	cont_transformer = [ContinuousDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cont_transformer] if cont_transformer else [])
-	cat_transformer = [CategoricalDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_error"), with_statistics = True)] + ([cat_transformer] if cat_transformer else [])
+	cont_transformer = [ContinuousDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_invalid"), with_statistics = True)] + ([cont_transformer] if cont_transformer else [])
+	cat_transformer = [CategoricalDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_invalid"), with_statistics = True)] + ([cat_transformer] if cat_transformer else [])
 
 	mapper = DataFrameMapper([
 		(["displacement", "horsepower", "weight", "acceleration"], cont_transformer),
@@ -965,7 +970,12 @@ def build_encoder_auto_na(auto_na_df, regressor, name, cont_transformer = None, 
 if "Auto" in datasets:
 	auto_na_df = load_auto("AutoNA")
 
-	build_encoder_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "TargetEncoderAutoNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
+	def make_rf_regressor():
+		return RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13)
+
+	build_encoder_auto_na(auto_na_df, make_rf_regressor(), "OneHotEncoderAutoNA", cat_transformer = OneHotEncoder(handle_unknown = "ignore"), with_invalid = True, allow_missing = True)
+	build_encoder_auto_na(auto_na_df, make_rf_regressor(), "OrdinalEncoderAutoNA", cat_transformer = make_pipeline(OrdinalEncoder(), OneHotEncoder()), with_invalid = False, allow_missing = True)
+	build_encoder_auto_na(auto_na_df, make_rf_regressor(), "TargetEncoderAutoNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
 
 def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])

@@ -244,6 +244,16 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateOneHotEncoderAutoNA() throws Exception {
+		evaluate("OneHotEncoder", AUTO_NA);
+	}
+
+	@Test
+	public void evaluateOrdinalEncoderAutoNA() throws Exception {
+		evaluate("OrdinalEncoder", AUTO_NA);
+	}
+
+	@Test
 	public void evaluateTargetEncoderAutoNA() throws Exception {
 		evaluate("TargetEncoder", AUTO_NA);
 	}

@@ -66,11 +66,11 @@ public class TargetEncoder extends BaseEncoder {
 			ClassDictUtil.checkSize(featureCategories, featureEncodings);
 
 			// A NaN value or null
-			Object nanCategory = getNaNCategory(featureCategories);
+			Object missingCategory = getMissingCategory(featureCategories);
 
 			Number mapMissingTo = null;
 
-			int index = featureCategories.indexOf(nanCategory);
+			int index = featureCategories.indexOf(missingCategory);
 			if(index > -1){
 				featureCategories = new ArrayList<>(featureCategories);
 				featureCategories.remove(index);
@@ -106,7 +106,7 @@ public class TargetEncoder extends BaseEncoder {
 	}
 
 	static
-	private Object getNaNCategory(List<?> categories){
+	private Object getMissingCategory(List<?> categories){
 
 		for(Object category : categories){
 

@@ -141,8 +141,13 @@ public class EncoderUtil {
 	static
 	public <E> List<E> filterCategories(List<E> categories){
 		return categories.stream()
-			.filter(category -> (category != null) && !ValueUtil.isNaN(category))
+			.filter(category -> !isMissingCategory(category))
 			.collect(Collectors.toList());
+	}
+
+	static
+	public boolean isMissingCategory(Object category){
+		return (category == null) || ValueUtil.isNaN(category);
 	}
 
 	static

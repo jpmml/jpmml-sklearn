@@ -122,11 +122,30 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			if(feature instanceof CategoricalFeature){
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-				if(hasNaNCategory(featureCategories)){
-					ClassDictUtil.checkSize(dropNaNCategory(featureCategories), categoricalFeature.getValues());
+				if(hasMissingCategory(featureCategories)){
 
-					featureCategories = new ArrayList<>(categoricalFeature.getValues());
-					featureCategories.add(Double.NaN);
+					if(hasMissingCategory(categoricalFeature.getValues())){
+						ClassDictUtil.checkSize(featureCategories, categoricalFeature.getValues());
+
+						featureCategories = new ArrayList<>(categoricalFeature.getValues());
+					} else
+
+					{
+						ClassDictUtil.checkSize(dropMissingCategory(featureCategories), categoricalFeature.getValues());
+
+						featureCategories = new ArrayList<>(categoricalFeature.getValues());
+
+						DataType dataType = categoricalFeature.getDataType();
+						switch(dataType){
+							case FLOAT:
+							case DOUBLE:
+								featureCategories.add(Double.NaN);
+								break;
+							default:
+								featureCategories.add(null);
+								break;
+						}
+					}
 				} else
 
 				{
@@ -143,8 +162,8 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				if(hasNaNCategory(featureCategories)){
-					feature = wildcardFeature.toCategoricalFeature(dropNaNCategory(featureCategories));
+				if(hasMissingCategory(featureCategories)){
+					feature = wildcardFeature.toCategoricalFeature(dropMissingCategory(featureCategories));
 				} else
 
 				{
@@ -190,14 +209,14 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			}
 
 			for(int j = 0; j < featureCategories.size(); j++){
-				Object featureCategory = featureCategories.get(j);
+				Object category = featureCategories.get(j);
 
-				if(ValueUtil.isNaN(featureCategory)){
+				if(EncoderUtil.isMissingCategory(category)){
 					result.add(new MissingValueFeature(encoder, feature));
 				} else
 
 				{
-					result.add(new BinaryFeature(encoder, feature, featureCategory));
+					result.add(new BinaryFeature(encoder, feature, category));
 				}
 			}
 
@@ -232,21 +251,21 @@ public class MultiOneHotEncoder extends BaseEncoder {
 	}
 
 	static
-	private boolean hasNaNCategory(List<?> categories){
+	private boolean hasMissingCategory(List<?> categories){
 
 		if(!categories.isEmpty()){
 			Object lastCategory = categories.get(categories.size() - 1);
 
-			return ValueUtil.isNaN(lastCategory);
+			return EncoderUtil.isMissingCategory(lastCategory);
 		}
 
 		return false;
 	}
 
 	static
-	private <E> List<E> dropNaNCategory(List<E> categories){
+	private <E> List<E> dropMissingCategory(List<E> categories){
 
-		if(hasNaNCategory(categories)){
+		if(hasMissingCategory(categories)){
 			return categories.subList(0, categories.size() - 1);
 		}
 
