@@ -54,6 +54,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
@@ -380,6 +381,17 @@ public class TreeUtil {
 				}
 			} else
 
+			if(feature instanceof MissingValueFeature){
+				MissingValueFeature missingValueFeature = (MissingValueFeature)feature;
+
+				if(threshold != 0.5d){
+					throw new IllegalArgumentException();
+				}
+
+				leftPredicate = predicateManager.createSimplePredicate(missingValueFeature, SimplePredicate.Operator.IS_NOT_MISSING, null);
+				rightPredicate = predicateManager.createSimplePredicate(missingValueFeature, SimplePredicate.Operator.IS_MISSING, null);
+			} else
+
 			if(feature instanceof ThresholdFeature && !numeric){
 				ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
@@ -566,6 +578,12 @@ public class TreeUtil {
 					return binaryFeature;
 				} else
 
+				if(feature instanceof MissingValueFeature){
+					MissingValueFeature missingValueFeature = (MissingValueFeature)feature;
+
+					return missingValueFeature;
+				} else
+
 				if(feature instanceof ThresholdFeature && !numeric){
 					ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
@@ -594,6 +612,12 @@ public class TreeUtil {
 					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
 					return binaryFeature;
+				} else
+
+				if(feature instanceof MissingValueFeature){
+					MissingValueFeature missingValueFeature = (MissingValueFeature)feature;
+
+					return missingValueFeature;
 				} else
 
 				if(feature instanceof ThresholdFeature && !numeric){
