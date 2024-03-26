@@ -46,6 +46,7 @@ import sklearn.loss.HalfLogitLink;
 import sklearn.loss.Link;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 import sklearn2pmml.EstimatorProxy;
 
 public class GradientBoostingClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<TreeRegressor>, HasMultiDecisionFunctionField, HasTreeOptions {
@@ -69,6 +70,11 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
 	}
 
 	@Override

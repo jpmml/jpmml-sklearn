@@ -33,6 +33,7 @@ import sklearn.HasMultiApplyField;
 import sklearn.SkLearnClassifier;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeClassifier;
+import sklearn.tree.TreeUtil;
 
 public class ForestClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<TreeClassifier>, HasMultiApplyField, HasTreeOptions {
 
@@ -53,6 +54,11 @@ public class ForestClassifier extends SkLearnClassifier implements HasEstimatorE
 	@Override
 	public String getMultiApplyField(Object segmentId){
 		return FieldNameUtil.create(FieldNames.NODE_ID, segmentId);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
 	}
 
 	@Override

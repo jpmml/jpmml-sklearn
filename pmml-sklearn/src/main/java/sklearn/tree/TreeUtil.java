@@ -79,6 +79,13 @@ public class TreeUtil {
 	}
 
 	static
+	public <E extends Estimator & HasTreeOptions> Schema configureSchema(E estimator, Schema schema){
+		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
+
+		return toTreeModelSchema(estimator.getDataType(), numeric, schema);
+	}
+
+	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
 		Boolean allowMissing = (Boolean)estimator.getOption(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.FALSE);
 		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
@@ -260,14 +267,10 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Schema schema){
-		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-
-		Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), numeric, schema);
-
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModelEnsemble(estimator, miningFunction, predicateManager, scoreDistributionManager, treeModelSchema);
+		return encodeTreeModelEnsemble(estimator, miningFunction, predicateManager, scoreDistributionManager, schema);
 	}
 
 	static
@@ -300,14 +303,10 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Schema schema){
-		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-
-		Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), numeric, schema);
-
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, treeModelSchema);
+		return encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, schema);
 	}
 
 	static
@@ -568,7 +567,7 @@ public class TreeUtil {
 	}
 
 	static
-	public Schema toTreeModelSchema(DataType dataType, boolean numeric, Schema schema){
+	private Schema toTreeModelSchema(DataType dataType, boolean numeric, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
@@ -604,7 +603,7 @@ public class TreeUtil {
 	}
 
 	static
-	public Schema toTreeModelFeatureImportanceSchema(Schema schema){
+	private Schema toTreeModelFeatureImportanceSchema(Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override

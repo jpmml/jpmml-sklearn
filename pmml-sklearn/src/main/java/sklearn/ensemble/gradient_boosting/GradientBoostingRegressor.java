@@ -28,6 +28,7 @@ import sklearn.HasEstimatorEnsemble;
 import sklearn.SkLearnRegressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 
 public class GradientBoostingRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<TreeRegressor>, HasTreeOptions {
 
@@ -50,6 +51,11 @@ public class GradientBoostingRegressor extends SkLearnRegressor implements HasEs
 	@Override
 	public DataType getDataType(){
 		return DataType.FLOAT;
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
 	}
 
 	@Override

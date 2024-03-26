@@ -120,6 +120,8 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		checkLabel(schema.getLabel());
 		checkFeatures(schema.getFeatures());
 
+		schema = configureSchema(schema);
+
 		Model model = encodeModel(schema);
 
 		String modelName = model.getModelName();
@@ -174,6 +176,10 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 	public void checkFeatures(List<? extends Feature> features){
 		StepUtil.checkNumberOfFeatures(this, features);
+	}
+
+	public Schema configureSchema(Schema schema){
+		return schema;
 	}
 
 	public void addFeatureImportances(Model model, Schema schema){

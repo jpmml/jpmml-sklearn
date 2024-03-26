@@ -32,6 +32,7 @@ import sklearn.HasMultiApplyField;
 import sklearn.SkLearnRegressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 
 public class ForestRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<TreeRegressor>, HasMultiApplyField, HasTreeOptions {
 
@@ -52,6 +53,11 @@ public class ForestRegressor extends SkLearnRegressor implements HasEstimatorEns
 	@Override
 	public String getMultiApplyField(Object segmentId){
 		return FieldNameUtil.create(FieldNames.NODE_ID, segmentId);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
 	}
 
 	@Override

@@ -43,6 +43,11 @@ public class TreeRegressor extends SkLearnRegressor implements HasApplyField, Ha
 	}
 
 	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
 	public TreeModel encodeModel(Schema schema){
 		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
 

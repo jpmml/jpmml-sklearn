@@ -44,6 +44,11 @@ public class TreeClassifier extends SkLearnClassifier implements HasApplyField, 
 	}
 
 	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
 	public TreeModel encodeModel(Schema schema){
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 

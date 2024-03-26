@@ -82,6 +82,11 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
 	public MiningModel encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
 		List<? extends Regressor> estimators = getEstimators();
@@ -93,14 +98,10 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		// See https://github.com/scikit-learn/scikit-learn/issues/11839
 		boolean nodeSampleCorrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.21") >= 0);
 
-		Boolean numeric = (Boolean)getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-
-		Schema treeModelSchema = TreeUtil.toTreeModelSchema(getDataType(), numeric, schema);
-
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		Schema segmentSchema = treeModelSchema.toAnonymousSchema();
+		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<TreeModel> treeModels = new ArrayList<>();
 
