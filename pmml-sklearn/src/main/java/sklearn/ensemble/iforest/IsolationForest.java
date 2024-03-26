@@ -95,10 +95,12 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 		Boolean numeric = (Boolean)getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
 
+		Schema treeModelSchema = TreeUtil.toTreeModelSchema(getDataType(), numeric, schema);
+
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		Schema segmentSchema = schema.toAnonymousSchema();
+		Schema segmentSchema = treeModelSchema.toAnonymousSchema();
 
 		List<TreeModel> treeModels = new ArrayList<>();
 
@@ -112,7 +114,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 			Tree tree = treeRegressor.getTree();
 
-			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, numeric, predicateManager, scoreDistributionManager, estimatorSchema);
+			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, predicateManager, scoreDistributionManager, estimatorSchema);
 
 			Visitor visitor = new AbstractVisitor(){
 

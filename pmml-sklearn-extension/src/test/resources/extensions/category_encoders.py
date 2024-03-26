@@ -105,18 +105,18 @@ if "Audit" in datasets:
 
 	classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
 
-	rf_pmml_options = {"compact" : False, "numeric": True}
+	rf_pmml_options = {"compact" : False, "numeric": False}
 
 	build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", **rf_pmml_options)
-	build_audit(BinaryEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAudit", **rf_pmml_options)
-	build_audit(CatBoostEncoder(a = 0.5, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAudit", **rf_pmml_options)
-	build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "CountEncoderAudit", **rf_pmml_options)
-	build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAudit", **rf_pmml_options)
+	build_audit(BinaryEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "BinaryEncoderAudit", **rf_pmml_options)
+	build_audit(CatBoostEncoder(a = 0.5, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "CatBoostEncoderAudit", **rf_pmml_options)
+	build_audit(CountEncoder(normalize = True, min_group_size = 0.05, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "CountEncoderAudit", **rf_pmml_options)
+	build_audit(LeaveOneOutEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "LeaveOneOutEncoderAudit", **rf_pmml_options)
 
-	build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "TargetEncoderAudit", **rf_pmml_options)
-	build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "value"), "passthrough", clone(classifier), "WOEEncoderAudit", **rf_pmml_options)
+	build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "TargetEncoderAudit", **rf_pmml_options)
+	build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "WOEEncoderAudit", **rf_pmml_options)
 
-	rf_pmml_options["allow_missing"] = True
+	rf_pmml_options = {"compact" : False, "numeric" : True, "allow_missing" : True}
 
 	build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "Base4EncoderAuditNA", **rf_pmml_options)
 	build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAuditNA", **rf_pmml_options)

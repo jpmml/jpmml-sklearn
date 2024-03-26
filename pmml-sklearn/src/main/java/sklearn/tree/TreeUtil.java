@@ -262,14 +262,16 @@ public class TreeUtil {
 	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Schema schema){
 		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
 
+		Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), numeric, schema);
+
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModelEnsemble(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, schema);
+		return encodeTreeModelEnsemble(estimator, miningFunction, predicateManager, scoreDistributionManager, treeModelSchema);
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Boolean numeric, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
@@ -278,13 +280,11 @@ public class TreeUtil {
 
 			@Override
 			public TreeModel apply(T estimator){
-				Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), numeric, segmentSchema);
-
-				TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, treeModelSchema);
+				TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, segmentSchema);
 
 				// XXX
 				if(estimator.hasFeatureImportances()){
-					Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(numeric, treeModelSchema);
+					Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(segmentSchema);
 
 					estimator.addFeatureImportances(treeModel, featureImportanceSchema);
 				}
@@ -302,14 +302,16 @@ public class TreeUtil {
 	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Schema schema){
 		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
 
+		Schema treeModelSchema = toTreeModelSchema(estimator.getDataType(), numeric, schema);
+
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
-		return encodeTreeModel(estimator, miningFunction, numeric, predicateManager, scoreDistributionManager, schema);
+		return encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, treeModelSchema);
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Boolean numeric, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Tree tree = estimator.getTree();
 
 		int[] leftChildren = tree.getChildrenLeft();
@@ -324,7 +326,7 @@ public class TreeUtil {
 			missingGoToLeft = tree.getMissingToToLeft();
 		}
 
-		Node root = encodeNode(0, True.INSTANCE, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
+		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
@@ -340,7 +342,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, boolean numeric, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -392,7 +394,7 @@ public class TreeUtil {
 				rightPredicate = predicateManager.createSimplePredicate(missingValueFeature, SimplePredicate.Operator.IS_MISSING, null);
 			} else
 
-			if(feature instanceof ThresholdFeature && !numeric){
+			if(feature instanceof ThresholdFeature){
 				ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
 				String name = thresholdFeature.getName();
@@ -441,8 +443,8 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
-			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, numeric, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
 
 			Node result;
 
@@ -566,7 +568,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Schema toTreeModelSchema(DataType dataType, boolean numeric, Schema schema){
+	public Schema toTreeModelSchema(DataType dataType, boolean numeric, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
@@ -602,7 +604,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Schema toTreeModelFeatureImportanceSchema(boolean numeric, Schema schema){
+	public Schema toTreeModelFeatureImportanceSchema(Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
@@ -620,7 +622,7 @@ public class TreeUtil {
 					return missingValueFeature;
 				} else
 
-				if(feature instanceof ThresholdFeature && !numeric){
+				if(feature instanceof ThresholdFeature){
 					ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
 					return thresholdFeature;
