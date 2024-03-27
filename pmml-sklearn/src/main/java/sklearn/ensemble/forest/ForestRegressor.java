@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.FieldNameUtil;
@@ -56,13 +57,18 @@ public class ForestRegressor extends SkLearnRegressor implements HasEstimatorEns
 	}
 
 	@Override
+	public MiningModel encodeModel(Schema schema){
+		return ForestUtil.encodeBaseForest(this, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
+	}
+
+	@Override
 	public Schema configureSchema(Schema schema){
 		return TreeUtil.configureSchema(this, schema);
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
-		return ForestUtil.encodeBaseForest(this, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	@Override

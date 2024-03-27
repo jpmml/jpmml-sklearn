@@ -52,6 +52,6 @@ public class ForestUtil {
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels));
 
-		return TreeUtil.transform(estimator, miningModel);
+		return miningModel;
 	}
 }

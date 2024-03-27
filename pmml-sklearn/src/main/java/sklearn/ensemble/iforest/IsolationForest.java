@@ -26,6 +26,7 @@ import com.google.common.primitives.Ints;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
@@ -79,11 +80,6 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	@Override
 	public Label encodeLabel(List<String> names, SkLearnEncoder encoder){
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Schema configureSchema(Schema schema){
-		return TreeUtil.configureSchema(this, schema);
 	}
 
 	@Override
@@ -198,7 +194,17 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))
 			.setOutput(OutlierDetectorUtil.createPredictedOutput(this, "rawAnomalyScore", normalizedAnomalyScore, decisionFunction));
 
-		return TreeUtil.transform(this, miningModel);
+		return miningModel;
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	@Override

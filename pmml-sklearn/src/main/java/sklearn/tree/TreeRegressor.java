@@ -20,6 +20,7 @@ package sklearn.tree;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.Schema;
@@ -43,15 +44,18 @@ public class TreeRegressor extends SkLearnRegressor implements HasApplyField, Ha
 	}
 
 	@Override
+	public TreeModel encodeModel(Schema schema){
+		return TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
+	}
+
+	@Override
 	public Schema configureSchema(Schema schema){
 		return TreeUtil.configureSchema(this, schema);
 	}
 
 	@Override
-	public TreeModel encodeModel(Schema schema){
-		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
-
-		return TreeUtil.transform(this, treeModel);
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	@Override

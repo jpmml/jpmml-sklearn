@@ -20,6 +20,7 @@ package sklearn.tree;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.FieldNames;
@@ -44,11 +45,6 @@ public class TreeClassifier extends SkLearnClassifier implements HasApplyField, 
 	}
 
 	@Override
-	public Schema configureSchema(Schema schema){
-		return TreeUtil.configureSchema(this, schema);
-	}
-
-	@Override
 	public TreeModel encodeModel(Schema schema){
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -56,7 +52,17 @@ public class TreeClassifier extends SkLearnClassifier implements HasApplyField, 
 
 		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
 
-		return TreeUtil.transform(this, treeModel);
+		return treeModel;
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	@Override

@@ -73,11 +73,6 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 	}
 
 	@Override
-	public Schema configureSchema(Schema schema){
-		return TreeUtil.configureSchema(this, schema);
-	}
-
-	@Override
 	public MiningModel encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
 		HasPriorProbability init = getInit();
@@ -190,6 +185,16 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 
 		return miningModel;
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	@Override

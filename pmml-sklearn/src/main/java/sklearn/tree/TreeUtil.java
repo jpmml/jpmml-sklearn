@@ -79,193 +79,6 @@ public class TreeUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTreeOptions> Schema configureSchema(E estimator, Schema schema){
-		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-
-		return toTreeModelSchema(estimator.getDataType(), numeric, schema);
-	}
-
-	static
-	public <E extends Estimator & HasTreeOptions, M extends Model> M transform(E estimator, M model){
-		Boolean allowMissing = (Boolean)estimator.getOption(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.FALSE);
-		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
-
-		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
-		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
-		Boolean nodeScore = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
-
-		boolean fixed = ((nodeExtensions != null) || (nodeId != null && nodeId) || (nodeScore != null && nodeScore));
-
-		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
-		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
-		Boolean prune = (Boolean)estimator.getOption(HasTreeOptions.OPTION_PRUNE, fixed ? Boolean.FALSE : Boolean.TRUE);
-
-		if(compact || flat || prune){
-
-			if(fixed){
-				throw new IllegalArgumentException("Conflicting tree model options");
-			}
-
-			// Activate defaults
-			nodeExtensions = null;
-			nodeId = (winnerId ? Boolean.TRUE : allowMissing);
-			nodeScore = (winnerId ? Boolean.TRUE : null);
-		} // End if
-
-		if((Boolean.TRUE).equals(winnerId)){
-			encodeNodeId(estimator, model);
-		}
-
-		List<Visitor> visitors = new ArrayList<>();
-
-		if((Boolean.FALSE).equals(allowMissing)){
-			Visitor defaultChildCleaner = new AbstractVisitor(){
-
-				@Override
-				public VisitorAction visit(TreeModel treeModel){
-					treeModel.setMissingValueStrategy(null);
-
-					return super.visit(treeModel);
-				}
-
-				@Override
-				public VisitorAction visit(Node node){
-					Object defaultChild = node.getDefaultChild();
-
-					if(defaultChild != null){
-						node.setDefaultChild(null);
-					}
-
-					return super.visit(node);
-				}
-			};
-
-			visitors.add(defaultChildCleaner);
-		} // End if
-
-		// Prune first, in order to make the tree model smaller for subsequent transformers
-		if((Boolean.TRUE).equals(prune)){
-			visitors.add(new TreeModelPruner());
-		} // End if
-
-		if((Boolean.TRUE).equals(compact)){
-			visitors.add(new TreeModelCompactor());
-		} // End if
-
-		if((Boolean.TRUE).equals(flat)){
-			visitors.add(new TreeModelFlattener());
-		} // End if
-
-		if(nodeExtensions != null){
-			Collection<? extends Map.Entry<String, Map<Integer, ?>>> entries = nodeExtensions.entrySet();
-
-			for(Map.Entry<String, Map<Integer, ?>> entry : entries){
-				String name = entry.getKey();
-				Map<Integer, ?> values = entry.getValue();
-
-				Visitor nodeExtender = new AbstractExtender(name){
-
-					private NodeTransformer nodeTransformer = SimplifyingNodeTransformer.INSTANCE;
-
-
-					@Override
-					public VisitorAction visit(TreeModel treeModel){
-						treeModel.setNode(ensureExtensibility(treeModel.getNode()));
-
-						return super.visit(treeModel);
-					}
-
-					@Override
-					public VisitorAction visit(Node node){
-
-						if(node.hasNodes()){
-							List<Node> children = node.getNodes();
-
-							for(ListIterator<Node> childIt = children.listIterator(); childIt.hasNext(); ){
-								childIt.set(ensureExtensibility(childIt.next()));
-							}
-						}
-
-						Object value = getValue(node);
-						if(value != null){
-							value = ScalarUtil.decode(value);
-
-							addExtension((Node & HasExtensions)node, ValueUtil.asString(value));
-						}
-
-						return super.visit(node);
-					}
-
-					private Node ensureExtensibility(Node node){
-
-						if(node instanceof HasExtensions){
-							return node;
-						}
-
-						Object value = getValue(node);
-						if(value != null){
-							return this.nodeTransformer.toComplexNode(node);
-						}
-
-						return node;
-					}
-
-					private Object getValue(Node node){
-						Integer id = ValueUtil.asInteger((Number)node.getId());
-
-						return values.get(id);
-					}
-				};
-
-				visitors.add(nodeExtender);
-			}
-		} // End if
-
-		if((Boolean.FALSE).equals(nodeId)){
-			Visitor nodeIdCleaner = new AbstractVisitor(){
-
-				@Override
-				public VisitorAction visit(Node node){
-					node.setId(null);
-
-					return super.visit(node);
-				}
-			};
-
-			visitors.add(nodeIdCleaner);
-		} // End if
-
-		if((Boolean.FALSE).equals(nodeScore)){
-			Visitor nodeScoreCleaner = new AbstractVisitor(){
-
-				@Override
-				public VisitorAction visit(Node node){
-
-					if(node.hasNodes()){
-						node.setScore(null);
-
-						if(node.hasScoreDistributions()){
-							List<ScoreDistribution> scoreDistributions = node.getScoreDistributions();
-
-							scoreDistributions.clear();
-						}
-					}
-
-					return super.visit(node);
-				}
-			};
-
-			visitors.add(nodeScoreCleaner);
-		}
-
-		for(Visitor visitor : visitors){
-			visitor.applyTo(model);
-		}
-
-		return model;
-	}
-
-	static
 	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
@@ -527,6 +340,193 @@ public class TreeUtil {
 
 			return result;
 		}
+	}
+
+	static
+	public <E extends Estimator & HasTreeOptions> Schema configureSchema(E estimator, Schema schema){
+		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
+
+		return toTreeModelSchema(estimator.getDataType(), numeric, schema);
+	}
+
+	static
+	public <E extends Estimator & HasTreeOptions, M extends Model> M configureModel(E estimator, M model){
+		Boolean allowMissing = (Boolean)estimator.getOption(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.FALSE);
+		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
+
+		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
+		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
+		Boolean nodeScore = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
+
+		boolean fixed = ((nodeExtensions != null) || (nodeId != null && nodeId) || (nodeScore != null && nodeScore));
+
+		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
+		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+		Boolean prune = (Boolean)estimator.getOption(HasTreeOptions.OPTION_PRUNE, fixed ? Boolean.FALSE : Boolean.TRUE);
+
+		if(compact || flat || prune){
+
+			if(fixed){
+				throw new IllegalArgumentException("Conflicting tree model options");
+			}
+
+			// Activate defaults
+			nodeExtensions = null;
+			nodeId = (winnerId ? Boolean.TRUE : allowMissing);
+			nodeScore = (winnerId ? Boolean.TRUE : null);
+		} // End if
+
+		if((Boolean.TRUE).equals(winnerId)){
+			encodeNodeId(estimator, model);
+		}
+
+		List<Visitor> visitors = new ArrayList<>();
+
+		if((Boolean.FALSE).equals(allowMissing)){
+			Visitor defaultChildCleaner = new AbstractVisitor(){
+
+				@Override
+				public VisitorAction visit(TreeModel treeModel){
+					treeModel.setMissingValueStrategy(null);
+
+					return super.visit(treeModel);
+				}
+
+				@Override
+				public VisitorAction visit(Node node){
+					Object defaultChild = node.getDefaultChild();
+
+					if(defaultChild != null){
+						node.setDefaultChild(null);
+					}
+
+					return super.visit(node);
+				}
+			};
+
+			visitors.add(defaultChildCleaner);
+		} // End if
+
+		// Prune first, in order to make the tree model smaller for subsequent transformers
+		if((Boolean.TRUE).equals(prune)){
+			visitors.add(new TreeModelPruner());
+		} // End if
+
+		if((Boolean.TRUE).equals(compact)){
+			visitors.add(new TreeModelCompactor());
+		} // End if
+
+		if((Boolean.TRUE).equals(flat)){
+			visitors.add(new TreeModelFlattener());
+		} // End if
+
+		if(nodeExtensions != null){
+			Collection<? extends Map.Entry<String, Map<Integer, ?>>> entries = nodeExtensions.entrySet();
+
+			for(Map.Entry<String, Map<Integer, ?>> entry : entries){
+				String name = entry.getKey();
+				Map<Integer, ?> values = entry.getValue();
+
+				Visitor nodeExtender = new AbstractExtender(name){
+
+					private NodeTransformer nodeTransformer = SimplifyingNodeTransformer.INSTANCE;
+
+
+					@Override
+					public VisitorAction visit(TreeModel treeModel){
+						treeModel.setNode(ensureExtensibility(treeModel.getNode()));
+
+						return super.visit(treeModel);
+					}
+
+					@Override
+					public VisitorAction visit(Node node){
+
+						if(node.hasNodes()){
+							List<Node> children = node.getNodes();
+
+							for(ListIterator<Node> childIt = children.listIterator(); childIt.hasNext(); ){
+								childIt.set(ensureExtensibility(childIt.next()));
+							}
+						}
+
+						Object value = getValue(node);
+						if(value != null){
+							value = ScalarUtil.decode(value);
+
+							addExtension((Node & HasExtensions)node, ValueUtil.asString(value));
+						}
+
+						return super.visit(node);
+					}
+
+					private Node ensureExtensibility(Node node){
+
+						if(node instanceof HasExtensions){
+							return node;
+						}
+
+						Object value = getValue(node);
+						if(value != null){
+							return this.nodeTransformer.toComplexNode(node);
+						}
+
+						return node;
+					}
+
+					private Object getValue(Node node){
+						Integer id = ValueUtil.asInteger((Number)node.getId());
+
+						return values.get(id);
+					}
+				};
+
+				visitors.add(nodeExtender);
+			}
+		} // End if
+
+		if((Boolean.FALSE).equals(nodeId)){
+			Visitor nodeIdCleaner = new AbstractVisitor(){
+
+				@Override
+				public VisitorAction visit(Node node){
+					node.setId(null);
+
+					return super.visit(node);
+				}
+			};
+
+			visitors.add(nodeIdCleaner);
+		} // End if
+
+		if((Boolean.FALSE).equals(nodeScore)){
+			Visitor nodeScoreCleaner = new AbstractVisitor(){
+
+				@Override
+				public VisitorAction visit(Node node){
+
+					if(node.hasNodes()){
+						node.setScore(null);
+
+						if(node.hasScoreDistributions()){
+							List<ScoreDistribution> scoreDistributions = node.getScoreDistributions();
+
+							scoreDistributions.clear();
+						}
+					}
+
+					return super.visit(node);
+				}
+			};
+
+			visitors.add(nodeScoreCleaner);
+		}
+
+		for(Visitor visitor : visitors){
+			visitor.applyTo(model);
+		}
+
+		return model;
 	}
 
 	static

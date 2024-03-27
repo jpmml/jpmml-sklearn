@@ -49,6 +49,6 @@ public class GradientBoostingUtil {
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))
 			.setTargets(ModelUtil.createRescaleTargets(learningRate, initialPrediction, continuousLabel));
 
-		return TreeUtil.transform(estimator, miningModel);
+		return miningModel;
 	}
 }

@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
@@ -57,11 +58,6 @@ public class ForestClassifier extends SkLearnClassifier implements HasEstimatorE
 	}
 
 	@Override
-	public Schema configureSchema(Schema schema){
-		return TreeUtil.configureSchema(this, schema);
-	}
-
-	@Override
 	public MiningModel encodeModel(Schema schema){
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -70,6 +66,16 @@ public class ForestClassifier extends SkLearnClassifier implements HasEstimatorE
 		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 
 		return miningModel;
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	@Override

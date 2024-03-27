@@ -142,6 +142,8 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		addFeatureImportances(model, schema);
 
+		model = configureModel(model);
+
 		return model;
 	}
 
@@ -155,6 +157,14 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} finally {
 			setPMMLSegmentId(prevSegmentId);
 		}
+	}
+
+	public Schema configureSchema(Schema schema){
+		return schema;
+	}
+
+	public Model configureModel(Model model){
+		return model;
 	}
 
 	public void checkLabel(Label label){
@@ -176,10 +186,6 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 	public void checkFeatures(List<? extends Feature> features){
 		StepUtil.checkNumberOfFeatures(this, features);
-	}
-
-	public Schema configureSchema(Schema schema){
-		return schema;
 	}
 
 	public void addFeatureImportances(Model model, Schema schema){

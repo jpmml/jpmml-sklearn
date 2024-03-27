@@ -21,6 +21,7 @@ package sklearn.ensemble.gradient_boosting;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.HasDefaultValue;
@@ -54,16 +55,21 @@ public class GradientBoostingRegressor extends SkLearnRegressor implements HasEs
 	}
 
 	@Override
-	public Schema configureSchema(Schema schema){
-		return TreeUtil.configureSchema(this, schema);
-	}
-
-	@Override
 	public MiningModel encodeModel(Schema schema){
 		HasDefaultValue init = getInit();
 		Number learningRate = getLearningRate();
 
 		return GradientBoostingUtil.encodeGradientBoosting(this, init.getDefaultValue(), learningRate, schema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	@Override
