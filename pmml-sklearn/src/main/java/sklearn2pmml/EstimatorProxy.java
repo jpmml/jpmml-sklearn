@@ -134,6 +134,20 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
+	public Schema configureSchema(Schema schema){
+		Estimator estimator = getEstimator();
+
+		return estimator.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Estimator estimator = getEstimator();
+
+		return estimator.configureModel(model);
+	}
+
+	@Override
 	public void checkLabel(Label label){
 		Estimator estimator = getEstimator();
 

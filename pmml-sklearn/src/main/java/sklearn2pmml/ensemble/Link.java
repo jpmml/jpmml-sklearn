@@ -108,6 +108,34 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 		return estimator.encodeModel(schema);
 	}
 
+	@Override
+	public Schema configureSchema(Schema schema){
+		Estimator estimator = getEstimator();
+
+		return estimator.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Estimator estimator = getEstimator();
+
+		return estimator.configureModel(model);
+	}
+
+	@Override
+	public void checkLabel(Label label){
+		Estimator estimator = getEstimator();
+
+		estimator.checkLabel(label);
+	}
+
+	@Override
+	public void checkFeatures(List<? extends Feature> features){
+		Estimator estimator = getEstimator();
+
+		estimator.checkFeatures(features);
+	}
+
 	public Schema augmentSchema(Model model, Schema schema){
 		List<String> augmentFuncs = getAugmentFuncs();
 		Estimator estimator = getEstimator();
