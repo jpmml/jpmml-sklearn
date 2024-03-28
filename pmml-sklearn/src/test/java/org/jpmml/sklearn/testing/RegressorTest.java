@@ -50,12 +50,22 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
+				if((AUTO).equals(dataset)){
+
+					if((DECISION_TREE).equals(algorithm) || (RANDOM_FOREST).equals(algorithm)){
+						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
+
+						return OptionsUtil.generateOptionsMatrix(options);
+					}
+				} else
+
 				if((AUTO_NA).equals(dataset)){
 
 					if((RANDOM_FOREST).equals(algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
 						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
-						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{true, false});
+						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
 
 						return OptionsUtil.generateOptionsMatrix(options);
 					}

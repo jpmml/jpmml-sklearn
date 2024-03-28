@@ -21,6 +21,7 @@ package sklearn.tree;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.SimpleSetPredicate;
@@ -47,6 +48,11 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 	 * @see TreeModelFlattener
 	 */
 	String OPTION_FLAT = "flat";
+
+	/**
+	 * @see DerivedField
+	 */
+	String OPTION_INPUT_FLOAT = "input_float";
 
 	/**
 	 * @see Node#hasExtensions()

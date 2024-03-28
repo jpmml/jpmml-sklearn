@@ -30,7 +30,10 @@ import java.util.stream.Collectors;
 import com.google.common.primitives.Doubles;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Field;
+import org.dmg.pmml.HasContinuousDomain;
 import org.dmg.pmml.HasExtensions;
+import org.dmg.pmml.Interval;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
@@ -345,8 +348,9 @@ public class TreeUtil {
 	static
 	public <E extends Estimator & HasTreeOptions> Schema configureSchema(E estimator, Schema schema){
 		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
+		Boolean inputFloat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_INPUT_FLOAT, null);
 
-		return toTreeModelSchema(estimator.getDataType(), numeric, schema);
+		return toTreeModelSchema(numeric, inputFloat, schema);
 	}
 
 	static
@@ -567,7 +571,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Schema toTreeModelSchema(DataType dataType, boolean numeric, Schema schema){
+	private Schema toTreeModelSchema(Boolean numeric, Boolean inputFloat, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
@@ -585,14 +589,51 @@ public class TreeUtil {
 					return missingValueFeature;
 				} else
 
-				if(feature instanceof ThresholdFeature && !numeric){
+				if(feature instanceof ThresholdFeature && (numeric != null && !numeric)){
 					ThresholdFeature thresholdFeature = (ThresholdFeature)feature;
 
 					return thresholdFeature;
 				} else
 
+				if(inputFloat != null && inputFloat){
+					ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+					DataType dataType = continuousFeature.getDataType();
+					if(dataType != DataType.FLOAT){
+						Field<?> field = continuousFeature.getField();
+
+						field.setDataType(DataType.FLOAT);
+
+						// XXX
+						if(field instanceof HasContinuousDomain){
+							HasContinuousDomain<?> hasContinuousDomain = (HasContinuousDomain<?>)field;
+
+							if(hasContinuousDomain.hasIntervals()){
+								List<Interval> intervals = hasContinuousDomain.getIntervals();
+
+								for(Interval interval : intervals){
+									Number leftMargin = interval.getLeftMargin();
+									Number rightMargin = interval.getRightMargin();
+
+									if(leftMargin != null){
+										interval.setLeftMargin((double)leftMargin.floatValue());
+									} // End if
+
+									if(rightMargin != null){
+										interval.setRightMargin((double)rightMargin.floatValue());
+									}
+								}
+							}
+						}
+
+						return new ContinuousFeature(continuousFeature.getEncoder(), field);
+					}
+
+					return continuousFeature;
+				} else
+
 				{
-					ContinuousFeature continuousFeature = feature.toContinuousFeature(dataType);
+					ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.FLOAT);
 
 					return continuousFeature;
 				}

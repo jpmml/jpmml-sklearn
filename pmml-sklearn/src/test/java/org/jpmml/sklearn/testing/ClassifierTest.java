@@ -52,12 +52,22 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
+				if((AUDIT).equals(dataset) || (IRIS).equals(dataset)){
+
+					if((DECISION_TREE).equals(algorithm) || (RANDOM_FOREST).equals(algorithm)){
+						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
+
+						return OptionsUtil.generateOptionsMatrix(options);
+					}
+				} else
+
 				if((AUDIT_NA).equals(dataset) || (IRIS_NA).equals(dataset)){
 
 					if((RANDOM_FOREST).equals(algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
 						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
-						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{true, false});
+						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
 
 						return OptionsUtil.generateOptionsMatrix(options);
 					}

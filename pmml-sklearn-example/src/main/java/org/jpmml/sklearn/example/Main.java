@@ -86,6 +86,13 @@ public class Main {
 	private Boolean flat = null;
 
 	@Parameter (
+		names = {"--X-" + HasTreeOptions.OPTION_INPUT_FLOAT},
+		description = "Allow field data type updates",
+		arity = 1
+	)
+	private Boolean inputFloat = null;
+
+	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_NODE_ID},
 		description = "Keep SkLearn node identifiers",
 		arity = 1
@@ -219,6 +226,7 @@ public class Main {
 		options.put(HasTreeOptions.OPTION_ALLOW_MISSING, this.allowMissing);
 		options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
 		options.put(HasTreeOptions.OPTION_FLAT, this.flat);
+		options.put(HasTreeOptions.OPTION_INPUT_FLOAT, this.inputFloat);
 		options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
 		options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
 		options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
