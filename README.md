@@ -190,6 +190,8 @@ Java library and command-line application for converting [Scikit-Learn](https://
 <details>
   <summary>BorutaPy</summary>
 
+  Examples: [extensions/boruta.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/boruta.py)
+
   * `boruta.BorutaPy`
 </details>
 
