@@ -25,9 +25,8 @@ import org.dmg.pmml.Field;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
-public class Recaller extends Transformer {
+public class Recaller extends MemoryManager {
 
 	public Recaller(String module, String name){
 		super(module, name);
@@ -53,9 +52,5 @@ public class Recaller extends Transformer {
 		}
 
 		return result;
-	}
-
-	public List<String> getNames(){
-		return getList("names", String.class);
 	}
 }

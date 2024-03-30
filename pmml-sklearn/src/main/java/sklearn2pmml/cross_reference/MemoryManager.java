@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,32 +18,34 @@
  */
 package sklearn2pmml.cross_reference;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.jpmml.converter.Feature;
-import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
+import sklearn.Transformer;
 
-public class Memorizer extends MemoryManager {
+abstract
+public class MemoryManager extends Transformer {
 
-	public Memorizer(String module, String name){
+	public MemoryManager(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<String> names = getNames();
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
 
-		ClassDictUtil.checkSize(names, features);
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
+	}
 
-		for(int i = 0; i < names.size(); i++){
-			String name = names.get(i);
-			Feature feature = features.get(i);
+	public Object getMemory(){
+		return getObject("memory");
+	}
 
-			encoder.memorize(name, feature);
-		}
-
-		return Collections.emptyList();
+	public List<String> getNames(){
+		return getList("names", String.class);
 	}
 }
