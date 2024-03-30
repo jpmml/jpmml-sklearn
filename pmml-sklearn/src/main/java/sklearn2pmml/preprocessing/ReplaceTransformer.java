@@ -32,7 +32,7 @@ import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class ReplaceTransformer extends PatternTransformer {
+public class ReplaceTransformer extends RegExTransformer {
 
 	public ReplaceTransformer(String module, String name){
 		super(module, name);

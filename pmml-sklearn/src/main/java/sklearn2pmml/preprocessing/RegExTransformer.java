@@ -23,9 +23,9 @@ import org.dmg.pmml.OpType;
 import sklearn.Transformer;
 
 abstract
-public class PatternTransformer extends Transformer {
+public class RegExTransformer extends Transformer {
 
-	public PatternTransformer(String module, String name){
+	public RegExTransformer(String module, String name){
 		super(module, name);
 	}
 
