@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,19 +18,24 @@
  */
 package sklearn2pmml.preprocessing;
 
-abstract
-public class RegExTransformer extends StringTransformer {
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
+import sklearn.Transformer;
 
-	public RegExTransformer(String module, String name){
+abstract
+public class StringTransformer extends Transformer {
+
+	public StringTransformer(String module, String name){
 		super(module, name);
 	}
 
-	public String getPattern(){
-		return getString("pattern");
+	@Override
+	public OpType getOpType(){
+		return OpType.CATEGORICAL;
 	}
 
-	static
-	protected String formatArg(String string){
-		return ("\"" + string + "\"");
+	@Override
+	public DataType getDataType(){
+		return DataType.STRING;
 	}
 }

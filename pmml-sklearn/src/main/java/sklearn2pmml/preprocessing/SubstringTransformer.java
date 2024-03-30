@@ -31,22 +31,11 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
-public class SubstringTransformer extends Transformer {
+public class SubstringTransformer extends StringTransformer {
 
 	public SubstringTransformer(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.CATEGORICAL;
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.STRING;
 	}
 
 	@Override

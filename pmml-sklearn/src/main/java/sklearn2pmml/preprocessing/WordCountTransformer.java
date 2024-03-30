@@ -20,28 +20,16 @@ package sklearn2pmml.preprocessing;
 
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
 
-public class WordCountTransformer extends Transformer {
+public class WordCountTransformer extends StringTransformer {
 
 	public WordCountTransformer(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		return OpType.CATEGORICAL;
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.STRING;
 	}
 
 	@Override

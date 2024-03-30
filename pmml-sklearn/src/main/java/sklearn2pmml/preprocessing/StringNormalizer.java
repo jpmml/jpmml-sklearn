@@ -32,9 +32,8 @@ import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
-public class StringNormalizer extends Transformer {
+public class StringNormalizer extends StringTransformer {
 
 	public StringNormalizer(String module, String name){
 		super(module, name);
