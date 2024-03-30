@@ -35,7 +35,6 @@ import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import sklearn.Regressor;
 import sklearn2pmml.util.EvaluatableUtil;
-import sklearn2pmml.util.Expression;
 
 public class ExpressionRegressor extends Regressor {
 
@@ -45,7 +44,7 @@ public class ExpressionRegressor extends Regressor {
 
 	@Override
 	public RegressionModel encodeModel(Schema schema){
-		Expression expr = getExpr();
+		Object expr = getExpr();
 		RegressionModel.NormalizationMethod normalizationMethod = parseNormalizationMethod(getNormalizationMethod());
 
 		PMMLEncoder encoder = schema.getEncoder();
@@ -68,8 +67,8 @@ public class ExpressionRegressor extends Regressor {
 		return regressionModel;
 	}
 
-	public Expression getExpr(){
-		return get("expr", Expression.class);
+	public Object getExpr(){
+		return getObject("expr");
 	}
 
 	public String getNormalizationMethod(){
