@@ -43,7 +43,6 @@ import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import sklearn.Classifier;
 import sklearn2pmml.util.EvaluatableUtil;
-import sklearn2pmml.util.Expression;
 
 public class ExpressionClassifier extends Classifier {
 
@@ -53,7 +52,7 @@ public class ExpressionClassifier extends Classifier {
 
 	@Override
 	public RegressionModel encodeModel(Schema schema){
-		Map<?, Expression> classExprs = getClassExprs();
+		Map<?, ?> classExprs = getClassExprs();
 		RegressionModel.NormalizationMethod normalizationMethod = parseNormalizationMethod(getNormalizationMethod());
 
 		PMMLEncoder encoder = schema.getEncoder();
@@ -65,10 +64,10 @@ public class ExpressionClassifier extends Classifier {
 
 		Map<Object, RegressionTable> categoryRegressionTables = new LinkedHashMap<>();
 
-		Collection<? extends Map.Entry<?, Expression>> entries = classExprs.entrySet();
-		for(Map.Entry<?, Expression> entry : entries){
+		Collection<? extends Map.Entry<?, ?>> entries = classExprs.entrySet();
+		for(Map.Entry<?, ?> entry : entries){
 			Object category = entry.getKey();
-			Expression expr = entry.getValue();
+			Object expr = entry.getValue();
 
 			org.dmg.pmml.Expression pmmlExpression = EvaluatableUtil.translateExpression(expr, scope);
 
@@ -134,8 +133,8 @@ public class ExpressionClassifier extends Classifier {
 		return regressionModel;
 	}
 
-	public Map<?, Expression> getClassExprs(){
-		return (Map)getDict("class_exprs");
+	public Map<?, ?> getClassExprs(){
+		return getDict("class_exprs");
 	}
 
 	public String getNormalizationMethod(){
