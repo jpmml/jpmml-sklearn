@@ -21,6 +21,7 @@ package sklearn2pmml.decoration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -36,6 +37,11 @@ public class TemporalDomain extends Domain {
 	@Override
 	public int getNumberOfFeatures(){
 		return HasNumberOfFeatures.UNKNOWN;
+	}
+
+	@Override
+	public OpType getOpType(){
+		return OpType.CONTINUOUS;
 	}
 
 	@Override

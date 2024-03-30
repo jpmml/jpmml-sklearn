@@ -47,10 +47,9 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
 abstract
-public class Domain extends Transformer {
+public class Domain extends Decorator {
 
 	public Domain(String module, String name){
 		super(module, name);

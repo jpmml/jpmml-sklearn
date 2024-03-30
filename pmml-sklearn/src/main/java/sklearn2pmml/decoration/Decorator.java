@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,31 +18,24 @@
  */
 package sklearn2pmml.decoration;
 
-import java.util.List;
-
-import org.dmg.pmml.Field;
-import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.SkLearnEncoder;
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
+import sklearn.Transformer;
 
 abstract
-public class DomainEraser extends Decorator {
+public class Decorator extends Transformer {
 
-	public DomainEraser(String module, String name){
+	public Decorator(String module, String name){
 		super(module, name);
 	}
 
-	abstract
-	public void clear(Field<?> field);
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-
-		for(Feature feature : features){
-			Field<?> field = feature.getField();
-
-			clear(field);
-		}
-
-		return features;
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 }

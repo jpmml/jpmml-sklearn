@@ -22,27 +22,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 
-public class MultiDomain extends Transformer {
+public class MultiDomain extends Decorator {
 
 	public MultiDomain(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public OpType getOpType(){
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public DataType getDataType(){
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
