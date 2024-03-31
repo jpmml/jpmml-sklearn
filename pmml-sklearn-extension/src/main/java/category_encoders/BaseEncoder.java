@@ -22,10 +22,12 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import sklearn.HasFeatureNamesIn;
+import sklearn.SkLearnFields;
 import sklearn.Transformer;
 
 abstract
-public class BaseEncoder extends Transformer {
+public class BaseEncoder extends Transformer implements HasFeatureNamesIn {
 
 	public BaseEncoder(String module, String name){
 		super(module, name);
@@ -39,6 +41,16 @@ public class BaseEncoder extends Transformer {
 	@Override
 	public DataType getDataType(){
 		return DataType.STRING;
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+
+		if(containsKey(SkLearnFields.FEATURE_NAMES_IN)){
+			return getListLike(SkLearnFields.FEATURE_NAMES_IN, String.class);
+		}
+
+		return null;
 	}
 
 	public List<?> getCols(){
