@@ -22,12 +22,15 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMML;
+import org.jpmml.sklearn.Encodable;
 import sklearn.HasFeatureNamesIn;
 import sklearn.SkLearnFields;
 import sklearn.Transformer;
+import sklearn.TransformerUtil;
 
 abstract
-public class BaseEncoder extends Transformer implements HasFeatureNamesIn {
+public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encodable {
 
 	public BaseEncoder(String module, String name){
 		super(module, name);
@@ -51,6 +54,11 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn {
 		}
 
 		return null;
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return TransformerUtil.encodePMML(this);
 	}
 
 	public List<?> getCols(){
