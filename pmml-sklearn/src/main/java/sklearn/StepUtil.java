@@ -20,6 +20,8 @@ package sklearn;
 
 import java.util.List;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
 
@@ -41,6 +43,16 @@ public class StepUtil {
 	}
 
 	static
+	public int getNumberOfFeatures(List<? extends Step> steps){
+
+		for(Step step : steps){
+			return step.getNumberOfFeatures();
+		}
+
+		return HasNumberOfFeatures.UNKNOWN;
+	}
+
+	static
 	public void checkNumberOfFeatures(Step step, List<? extends Feature> features){
 		int numberOfFeatures = step.getNumberOfFeatures();
 
@@ -50,12 +62,44 @@ public class StepUtil {
 	}
 
 	static
-	public int getNumberOfFeatures(List<? extends Step> steps){
+	public HasMultiType getType(Step step){
 
-		for(Step step : steps){
-			return step.getNumberOfFeatures();
+		if(step instanceof HasMultiType){
+			HasMultiType hasMultiType = (HasMultiType)step;
+
+			return hasMultiType;
+		} else
+
+		{
+			HasMultiType hasMultiType = new HasMultiType(){
+
+				private OpType opType = null;
+
+				private DataType dataType = null;
+
+
+				@Override
+				public OpType getOpType(){
+
+					if(this.opType == null){
+						this.opType = step.getOpType();
+					}
+
+					return this.opType;
+				}
+
+				@Override
+				public DataType getDataType(){
+
+					if(this.dataType == null){
+						this.dataType = step.getDataType();
+					}
+
+					return this.dataType;
+				}
+			};
+
+			return hasMultiType;
 		}
-
-		return HasNumberOfFeatures.UNKNOWN;
 	}
 }

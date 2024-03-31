@@ -81,22 +81,26 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	}
 
 	public List<Feature> updateFeatures(List<Feature> features, SkLearnEncoder encoder){
-		OpType opType;
-		DataType dataType;
-
-		try {
-			opType = getOpType();
-			dataType = getDataType();
-		} catch(UnsupportedOperationException uoe){
-			return features;
-		}
+		HasMultiType hasMultiType = StepUtil.getType(this);
 
 		List<Feature> result = new ArrayList<>(features.size());
 
-		for(Feature feature : features){
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
 
+			update:
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
+
+				OpType opType;
+				DataType dataType;
+
+				try {
+					opType = hasMultiType.getOpType(i);
+					dataType = hasMultiType.getDataType(i);
+				} catch(UnsupportedOperationException uoe){
+					break update;
+				}
 
 				feature = refineWildcardFeature(wildcardFeature, opType, dataType, encoder);
 			}

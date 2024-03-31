@@ -59,7 +59,9 @@ import org.jpmml.python.PythonEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.HasMultiType;
 import sklearn.Step;
+import sklearn.StepUtil;
 import sklearn.ensemble.hist_gradient_boosting.TreePredictor;
 import sklearn.neighbors.BinaryTree;
 import sklearn.tree.Tree;
@@ -152,12 +154,16 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public List<Feature> initFeatures(Step step, List<String> names){
+		HasMultiType hasMultiType = StepUtil.getType(step);
+
 		List<Feature> features = new ArrayList<>();
 
-		OpType opType = step.getOpType();
-		DataType dataType = step.getDataType();
+		for(int i = 0; i < names.size(); i++){
+			String name = names.get(i);
 
-		for(String name : names){
+			OpType opType = hasMultiType.getOpType(i);
+			DataType dataType = hasMultiType.getDataType(i);
+
 			DataField dataField = createDataField(name, opType, dataType);
 
 			Feature feature = new WildcardFeature(this, dataField);
