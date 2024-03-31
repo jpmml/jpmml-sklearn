@@ -105,6 +105,6 @@ public class DictVectorizer extends Initializer {
 	}
 
 	public Map<String, Integer> getVocabulary(){
-		return get("vocabulary_", Map.class);
+		return (Map)getDict("vocabulary_");
 	}
 }

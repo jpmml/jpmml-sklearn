@@ -34,7 +34,7 @@ public class MapEncoder extends CategoryEncoder {
 	public String functionName();
 
 	public Map<Object, Series> getMapping(){
-		Map<?, ?> mapping = get("mapping", Map.class);
+		Map<?, ?> mapping = getDict("mapping");
 
 		return CategoryEncoderUtil.toTransformedMap(mapping, key -> ScalarUtil.decode(key), value -> (Series)value);
 	}

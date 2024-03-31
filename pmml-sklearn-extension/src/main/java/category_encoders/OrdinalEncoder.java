@@ -134,7 +134,7 @@ public class OrdinalEncoder extends CategoryEncoder {
 
 				return SeriesUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
 			} catch(IllegalArgumentException iae){
-				return get("mapping", Map.class);
+				return (Map)getDict("mapping");
 			}
 		}
 	}

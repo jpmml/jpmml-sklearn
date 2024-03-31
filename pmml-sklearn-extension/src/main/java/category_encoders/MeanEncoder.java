@@ -129,7 +129,7 @@ public class MeanEncoder extends MapEncoder {
 
 	@Override
 	public Map<Object, Series> getMapping(){
-		Map<?, ?> mapping = get("mapping", Map.class);
+		Map<?, ?> mapping = getDict("mapping");
 
 		return CategoryEncoderUtil.toTransformedMap(mapping, key -> ScalarUtil.decode(key), value -> toMeanSeries((DataFrame)value, createFunction()));
 	}

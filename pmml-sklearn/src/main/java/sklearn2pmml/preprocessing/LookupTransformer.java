@@ -137,7 +137,7 @@ public class LookupTransformer extends Transformer {
 	}
 
 	public Map<?, ?> getMapping(){
-		return get("mapping", Map.class);
+		return getDict("mapping");
 	}
 
 	public Object getDefaultValue(){

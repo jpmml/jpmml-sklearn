@@ -176,7 +176,7 @@ public class CountEncoder extends MapEncoder {
 
 	@SuppressWarnings("unchecked")
 	public Map<Object, Map<Object, String>> getMinGroupCategories(){
-		Map<Object, String> minGroupCategories = get("_min_group_categories", Map.class);
+		Map<Object, String> minGroupCategories = (Map)getDict("_min_group_categories");
 
 		return CategoryEncoderUtil.toTransformedMap(minGroupCategories, key -> ScalarUtil.decode(key), value -> (Map<Object, String>)value);
 	}
