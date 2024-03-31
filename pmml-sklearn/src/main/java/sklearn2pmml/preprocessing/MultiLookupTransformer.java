@@ -23,13 +23,17 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.XMLUtil;
+import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasMultiType;
 
-public class MultiLookupTransformer extends LookupTransformer {
+public class MultiLookupTransformer extends LookupTransformer implements HasMultiType {
 
 	public MultiLookupTransformer(String module, String name){
 		super(module, name);
@@ -38,6 +42,19 @@ public class MultiLookupTransformer extends LookupTransformer {
 	@Override
 	public DataType getDataType(){
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(int index){
+		Map<?, ?> mapping = getMapping();
+
+		List<?> values = (mapping.entrySet()).stream()
+			.map(entry -> {
+				return TupleUtil.extractElement((Object[])entry.getKey(), index);
+			})
+			.collect(Collectors.toList());
+
+		return TypeUtil.getDataType(values, DataType.STRING);
 	}
 
 	@Override

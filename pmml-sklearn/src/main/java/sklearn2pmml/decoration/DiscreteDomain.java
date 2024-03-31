@@ -38,9 +38,10 @@ import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.CategoricalDtype;
+import sklearn.HasMultiType;
 
 abstract
-public class DiscreteDomain extends Domain {
+public class DiscreteDomain extends Domain implements HasMultiType {
 
 	public DiscreteDomain(String module, String name){
 		super(module, name);
@@ -52,19 +53,27 @@ public class DiscreteDomain extends Domain {
 	@Override
 	public DataType getDataType(){
 		TypeInfo dtype = getDType();
-		Boolean withData = getWithData();
 
 		if(dtype != null){
 			return dtype.getDataType();
-		} // End if
+		}
+
+		return DataType.STRING;
+	}
+
+	@Override
+	public DataType getDataType(int index){
+		Boolean withData = getWithData();
 
 		if(withData){
 			List<? extends List<?>> dataValues = getDataValues();
 
-			return TypeUtil.getDataType(dataValues.get(0), DataType.STRING);
+			List<?> values = dataValues.get(index);
+
+			return TypeUtil.getDataType(values, DataType.STRING);
 		}
 
-		return DataType.STRING;
+		return getDataType();
 	}
 
 	@Override

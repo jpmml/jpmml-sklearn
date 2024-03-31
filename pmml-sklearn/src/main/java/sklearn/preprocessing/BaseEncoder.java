@@ -27,10 +27,11 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.HasArray;
+import sklearn.HasMultiType;
 import sklearn.SkLearnTransformer;
 
 abstract
-public class BaseEncoder extends SkLearnTransformer {
+public class BaseEncoder extends SkLearnTransformer implements HasMultiType {
 
 	public BaseEncoder(String module, String name){
 		super(module, name);
@@ -43,35 +44,20 @@ public class BaseEncoder extends SkLearnTransformer {
 
 	@Override
 	public DataType getDataType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(int index){
 		List<List<?>> categories = getCategories();
 
-		DataType result = null;
+		List<?> featureCategories = categories.get(index);
 
-		for(int i = 0; i < categories.size(); i++){
-			List<?> featureCategories = categories.get(i);
+		featureCategories = featureCategories.stream()
+			.filter(category -> !EncoderUtil.isMissingCategory(category))
+			.collect(Collectors.toList());
 
-			featureCategories = featureCategories.stream()
-				.filter(category -> !EncoderUtil.isMissingCategory(category))
-				.collect(Collectors.toList());
-
-			DataType dataType = TypeUtil.getDataType(featureCategories, null);
-
-			if(result == null){
-				result = dataType;
-			} else
-
-			{
-				if(result != dataType){
-					throw new UnsupportedOperationException();
-				}
-			}
-		}
-
-		if(result == null){
-			result = DataType.STRING;
-		}
-
-		return result;
+		return TypeUtil.getDataType(featureCategories, DataType.STRING);
 	}
 
 	public List<List<?>> getCategories(){
