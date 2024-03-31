@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import category_encoders.CategoryEncoder;
+import category_encoders.BaseEncoder;
 import org.dmg.pmml.Field;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
@@ -121,8 +121,8 @@ public class TransformerWrapper extends Initializer {
 			replaceFeatures = true;
 		} else
 
-		if(transformer instanceof CategoryEncoder){
-			CategoryEncoder categoryEncoder = (CategoryEncoder)transformer;
+		if(transformer instanceof BaseEncoder){
+			BaseEncoder baseEncoder = (BaseEncoder)transformer;
 
 			replaceFeatures = true;
 		} // End if

@@ -71,7 +71,7 @@ public class MeanEncoder extends MapEncoder {
 			case "return_nan":
 				break;
 			case "value":
-				missingCategory = CategoryEncoder.CATEGORY_NAN;
+				missingCategory = BaseEncoder.CATEGORY_NAN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);

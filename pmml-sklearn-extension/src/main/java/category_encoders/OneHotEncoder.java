@@ -28,7 +28,7 @@ import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class OneHotEncoder extends CategoryEncoder {
+public class OneHotEncoder extends BaseEncoder {
 
 	public OneHotEncoder(String module, String name){
 		super(module, name);

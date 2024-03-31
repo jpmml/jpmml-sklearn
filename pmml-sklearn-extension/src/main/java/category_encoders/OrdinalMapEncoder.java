@@ -63,7 +63,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 			case "return_nan":
 				break;
 			case "value":
-				missingCategory = CategoryEncoder.CATEGORY_NAN;
+				missingCategory = BaseEncoder.CATEGORY_NAN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
@@ -96,7 +96,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 			switch(handleMissing){
 				case "error":
-					ordinalCategoryMappings.remove(CategoryEncoder.CATEGORY_NAN);
+					ordinalCategoryMappings.remove(BaseEncoder.CATEGORY_NAN);
 					break;
 				default:
 					break;

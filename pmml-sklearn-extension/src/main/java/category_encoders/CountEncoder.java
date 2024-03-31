@@ -71,7 +71,7 @@ public class CountEncoder extends MapEncoder {
 				break;
 			case "count":
 			case "value":
-				missingCategory = CategoryEncoder.CATEGORY_NAN;
+				missingCategory = BaseEncoder.CATEGORY_NAN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);

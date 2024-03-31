@@ -35,7 +35,7 @@ import pandas.core.Series;
 import pandas.core.SeriesUtil;
 import sklearn.preprocessing.EncoderUtil;
 
-public class OrdinalEncoder extends CategoryEncoder {
+public class OrdinalEncoder extends BaseEncoder {
 
 	public OrdinalEncoder(String module, String name){
 		super(module, name);

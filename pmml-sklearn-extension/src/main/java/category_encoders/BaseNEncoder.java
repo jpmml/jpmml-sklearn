@@ -37,7 +37,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.preprocessing.EncoderUtil;
 
-public class BaseNEncoder extends CategoryEncoder {
+public class BaseNEncoder extends BaseEncoder {
 
 	public BaseNEncoder(String module, String name){
 		super(module, name);
@@ -69,7 +69,7 @@ public class BaseNEncoder extends CategoryEncoder {
 			case "return_nan":
 				break;
 			case "value":
-				missingCategory = CategoryEncoder.CATEGORY_NAN;
+				missingCategory = BaseEncoder.CATEGORY_NAN;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);

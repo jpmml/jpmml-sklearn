@@ -25,9 +25,9 @@ import org.dmg.pmml.OpType;
 import sklearn.Transformer;
 
 abstract
-public class CategoryEncoder extends Transformer {
+public class BaseEncoder extends Transformer {
 
-	public CategoryEncoder(String module, String name){
+	public BaseEncoder(String module, String name){
 		super(module, name);
 	}
 

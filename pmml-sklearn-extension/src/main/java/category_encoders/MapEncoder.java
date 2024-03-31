@@ -24,7 +24,7 @@ import numpy.core.ScalarUtil;
 import pandas.core.Series;
 
 abstract
-public class MapEncoder extends CategoryEncoder {
+public class MapEncoder extends BaseEncoder {
 
 	public MapEncoder(String module, String name){
 		super(module, name);

@@ -139,8 +139,8 @@ public class BaseNFeature extends BinaryThresholdFeature {
 				} else
 
 				{
-					if(categories.contains(CategoryEncoder.CATEGORY_NAN)){
-						categories.remove(CategoryEncoder.CATEGORY_NAN);
+					if(categories.contains(BaseEncoder.CATEGORY_NAN)){
+						categories.remove(BaseEncoder.CATEGORY_NAN);
 					}
 				} // End if
 
