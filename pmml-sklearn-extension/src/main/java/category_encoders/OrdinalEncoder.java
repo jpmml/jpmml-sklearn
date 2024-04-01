@@ -79,11 +79,10 @@ public class OrdinalEncoder extends BaseEncoder {
 
 			Map<?, Integer> categoryMappings = mapping.getCategoryMapping();
 
-			List<Object> categories = new ArrayList<>();
-			categories.addAll(categoryMappings.keySet());
+			List<Object> categories = new ArrayList<>(categoryMappings.keySet());
+			List<Integer> indexCategories = new ArrayList<>(categoryMappings.values());
 
-			List<Integer> indices = new ArrayList<>();
-			indices.addAll(categoryMappings.values());
+			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			Integer defaultValue = null;
 
@@ -95,7 +94,7 @@ public class OrdinalEncoder extends BaseEncoder {
 					break;
 			}
 
-			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indices, null, defaultValue, DataType.INTEGER, encoder));
+			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indexCategories, null, defaultValue, DataType.INTEGER, encoder));
 		}
 
 		return result;

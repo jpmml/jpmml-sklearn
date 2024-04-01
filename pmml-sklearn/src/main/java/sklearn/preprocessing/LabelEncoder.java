@@ -56,6 +56,8 @@ public class LabelEncoder extends SkLearnTransformer {
 
 		Feature feature = features.get(0);
 
+		encoder.toCategorical(feature.getName(), classes);
+
 		return Collections.singletonList(EncoderUtil.encodeIndexFeature(this, feature, classes, null, null, DataType.INTEGER, encoder));
 	}
 

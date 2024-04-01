@@ -64,6 +64,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
+
 			List<Object> featureCategories = new ArrayList<>(categories.get(i));
 			List<Integer> featureInfrequentIndices = (infrequentEnabled ? infrequentIndices.get(i) : null);
 

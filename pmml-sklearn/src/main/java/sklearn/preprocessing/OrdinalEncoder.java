@@ -68,7 +68,10 @@ public class OrdinalEncoder extends BaseEncoder {
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
-			List<?> featureCategories = categories.get(i);
+
+			List<?> featureCategories = new ArrayList<>(categories.get(i));
+
+			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(featureCategories));
 
 			if(handleUnknown != null){
 				InvalidValueTreatmentMethod invalidValueTreatmentMethod;

@@ -117,8 +117,6 @@ public class EncoderUtil {
 	public Feature encodeIndexFeature(Transformer transformer, Feature feature, List<?> categories, List<? extends Number> indexCategories, Number mapMissingTo, Number defaultValue, DataType dataType, SkLearnEncoder encoder){
 		ClassDictUtil.checkSize(categories, indexCategories);
 
-		encoder.toCategorical(feature.getName(), filterCategories(categories));
-
 		MapValues mapValues = ExpressionUtil.createMapValues(feature.getName(), categories, indexCategories)
 			.setMapMissingTo(mapMissingTo)
 			.setDefaultValue(defaultValue);
