@@ -52,18 +52,26 @@ public class OrdinalEncoder extends BaseEncoder {
 			throw new IllegalArgumentException();
 		}
 
+		Integer mapMissingTo = null;
+
 		switch(handleMissing){
 			case "error":
 			case "return_nan":
+				break;
 			case "value":
+				mapMissingTo = -1;
 				break;
 			default:
 				throw new IllegalArgumentException(handleMissing);
-		} // End switch
+		}
+
+		Integer defaultValue = null;
 
 		switch(handleUnknown){
 			case "error":
+				break;
 			case "value":
+				defaultValue = -2;
 				break;
 			default:
 				throw new IllegalArgumentException(handleUnknown);
@@ -84,17 +92,7 @@ public class OrdinalEncoder extends BaseEncoder {
 
 			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
-			Integer defaultValue = null;
-
-			switch(handleUnknown){
-				case "value":
-					defaultValue = -2;
-					break;
-				default:
-					break;
-			}
-
-			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indexCategories, null, defaultValue, DataType.INTEGER, encoder));
+			result.add(EncoderUtil.encodeIndexFeature(this, feature, categories, indexCategories, mapMissingTo, defaultValue, DataType.INTEGER, encoder));
 		}
 
 		return result;
