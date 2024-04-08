@@ -34,6 +34,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.PythonObject;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
@@ -59,7 +60,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 	public int getNumberOfFeatures(){
 
 		// SkLearn 0.18
-		if(containsKey("n_features")){
+		if(hasattr("n_features")){
 			return getInteger("n_features");
 		}
 
@@ -148,17 +149,17 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		} else
 
 		if(categoricalLabel.size() > 2){
-			List<? extends TreeRegressor> estimators = getEstimators();
+			List<TreeRegressor> estimators = getEstimators();
 
 			List<Model> models = new ArrayList<>();
 
 			for(int i = 0, columns = categoricalLabel.size(), rows = (estimators.size() / columns); i < columns; i++){
-				List<? extends TreeRegressor> columnEstimators = CMatrixUtil.getColumn(estimators, rows, columns, i);
+				List<TreeRegressor> columnEstimators = CMatrixUtil.getColumn(estimators, rows, columns, i);
 
 				GradientBoostingClassifierProxy estimatorProxy = new GradientBoostingClassifierProxy(){
 
 					@Override
-					public List<? extends TreeRegressor> getEstimators(){
+					public List<TreeRegressor> getEstimators(){
 						return columnEstimators;
 					}
 				};
@@ -198,7 +199,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 	}
 
 	@Override
-	public List<? extends TreeRegressor> getEstimators(){
+	public List<TreeRegressor> getEstimators(){
 		return getArray("estimators_", TreeRegressor.class);
 	}
 
@@ -213,7 +214,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 	public PythonObject getLoss(){
 
 		// SkLearn 1.0.2
-		if(containsKey("loss_")){
+		if(hasattr("loss_")){
 			return get("loss_", LossFunction.class);
 		}
 
@@ -222,7 +223,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 			return get("_loss", LossFunction.class);
 
 		// SkLearn 1.4.0+
-		} catch(IllegalArgumentException iae){
+		} catch(AttributeException ae){
 			return get("_loss", sklearn.loss.BaseLoss.class);
 		}
 	}

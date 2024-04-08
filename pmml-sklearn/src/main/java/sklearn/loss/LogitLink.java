@@ -30,7 +30,7 @@ public class LogitLink extends Link {
 	}
 
 	@Override
-	public List<? extends Number> computeInitialPredictions(int numClasses, HasPriorProbability hasPriorProbability){
+	public List<Double> computeInitialPredictions(int numClasses, HasPriorProbability hasPriorProbability){
 		List<Double> result = new AbstractList<Double>(){
 
 			@Override

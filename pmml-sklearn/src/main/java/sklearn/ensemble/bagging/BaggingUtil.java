@@ -37,14 +37,14 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Integer>> estimatorsFeatures, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Number>> estimatorsFeatures, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<Model> models = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
 			E estimator = estimators.get(i);
-			List<Integer> estimatorFeatures = estimatorsFeatures.get(i);
+			List<Number> estimatorFeatures = estimatorsFeatures.get(i);
 
 			Schema estimatorSchema = segmentSchema.toSubSchema(Ints.toArray(estimatorFeatures));
 

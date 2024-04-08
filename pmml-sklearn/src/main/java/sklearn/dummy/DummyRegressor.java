@@ -40,21 +40,21 @@ public class DummyRegressor extends SkLearnRegressor implements HasDefaultValue 
 
 	@Override
 	public Number getDefaultValue(){
-		List<? extends Number> constant = getConstant();
+		List<Number> constant = getConstant();
 
 		return Iterables.getOnlyElement(constant);
 	}
 
 	@Override
 	public RegressionModel encodeModel(Schema schema){
-		List<? extends Number> constant = getConstant();
+		List<Number> constant = getConstant();
 
 		Number intercept = Iterables.getOnlyElement(constant);
 
 		return RegressionModelUtil.createRegression(Collections.emptyList(), Collections.emptyList(), intercept.doubleValue(), null, schema);
 	}
 
-	public List<? extends Number> getConstant(){
+	public List<Number> getConstant(){
 		return getNumberArray("constant_");
 	}
 }

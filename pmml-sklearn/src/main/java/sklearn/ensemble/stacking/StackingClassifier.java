@@ -43,14 +43,14 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<? extends Classifier> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 
 		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends Classifier> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 		Classifier finalEstimator = getFinalEstimator();
 		Boolean passthrough = getPassthrough();
 		List<String> stackMethod = getStackMethod();
@@ -95,7 +95,7 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 	}
 
 	@Override
-	public List<? extends Classifier> getEstimators(){
+	public List<Classifier> getEstimators(){
 		return getList("estimators_", Classifier.class);
 	}
 
@@ -108,6 +108,6 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 	}
 
 	public List<String> getStackMethod(){
-		return getList("stack_method_", String.class);
+		return getStringList("stack_method_");
 	}
 }

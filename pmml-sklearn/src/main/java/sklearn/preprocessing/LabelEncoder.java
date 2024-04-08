@@ -61,7 +61,7 @@ public class LabelEncoder extends SkLearnTransformer {
 		return Collections.singletonList(EncoderUtil.encodeIndexFeature(this, feature, classes, null, null, DataType.INTEGER, encoder));
 	}
 
-	public List<?> getClasses(){
-		return getArray(SkLearnFields.CLASSES);
+	public List<Object> getClasses(){
+		return getObjectArray(SkLearnFields.CLASSES);
 	}
 }

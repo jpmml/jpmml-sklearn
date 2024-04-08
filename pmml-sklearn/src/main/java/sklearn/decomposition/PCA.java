@@ -47,14 +47,14 @@ public class PCA extends BasePCA {
 		int numberOfComponents = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<? extends Number> components = getComponents();
-		List<? extends Number> mean = getMean();
+		List<Number> components = getComponents();
+		List<Number> mean = getMean();
 
 		ClassDictUtil.checkSize(numberOfFeatures, features, mean);
 
 		Boolean whiten = getWhiten();
 
-		List<? extends Number> explainedVariance = (whiten ? getExplainedVariance() : null);
+		List<Number> explainedVariance = (whiten ? getExplainedVariance() : null);
 
 		ClassDictUtil.checkSize(numberOfComponents, explainedVariance);
 
@@ -63,7 +63,7 @@ public class PCA extends BasePCA {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < numberOfComponents; i++){
-			List<? extends Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
+			List<Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
 			Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
 
@@ -115,11 +115,11 @@ public class PCA extends BasePCA {
 		return getBoolean("whiten");
 	}
 
-	public List<? extends Number> getExplainedVariance(){
+	public List<Number> getExplainedVariance(){
 		return getNumberArray("explained_variance_");
 	}
 
-	public List<? extends Number> getMean(){
+	public List<Number> getMean(){
 		return getNumberArray("mean_");
 	}
 }

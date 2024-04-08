@@ -60,8 +60,8 @@ public class GaussianNB extends SkLearnClassifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<? extends Number> theta = getTheta();
-		List<? extends Number> sigma = getSigma();
+		List<Number> theta = getTheta();
+		List<Number> sigma = getSigma();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -70,8 +70,8 @@ public class GaussianNB extends SkLearnClassifier {
 		for(int i = 0; i < numberOfFeatures; i++){
 			Feature feature = schema.getFeature(i);
 
-			List<? extends Number> means = CMatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
-			List<? extends Number> variances = CMatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
+			List<Number> means = CMatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
+			List<Number> variances = CMatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
@@ -97,7 +97,7 @@ public class GaussianNB extends SkLearnClassifier {
 		return getIntegerArray("class_count_");
 	}
 
-	public List<? extends Number> getTheta(){
+	public List<Number> getTheta(){
 		return getNumberArray("theta_");
 	}
 
@@ -105,10 +105,10 @@ public class GaussianNB extends SkLearnClassifier {
 		return getArrayShape("theta_", 2);
 	}
 
-	public List<? extends Number> getSigma(){
+	public List<Number> getSigma(){
 
 		// SkLearn 1.0+
-		if(containsKey("var_")){
+		if(hasattr("var_")){
 			return getNumberArray("var_");
 		}
 

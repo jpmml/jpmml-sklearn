@@ -109,7 +109,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	public List<?> getClasses(){
 		MojoModel mojoModel = getMojoModel();
 
-		if(containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
+		if(hasattr(SkLearn2PMMLFields.PMML_CLASSES)){
 			List<?> values = getListLike(SkLearn2PMMLFields.PMML_CLASSES);
 
 			return Classifier.canonicalizeValues(values);
@@ -260,7 +260,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	}
 
 	public H2OEstimator setMojoPath(String mojoPath){
-		put("_mojo_path", mojoPath);
+		setattr("_mojo_path", mojoPath);
 
 		return this;
 	}
@@ -291,7 +291,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 
 		try {
 
-			if(containsKey("_mojo_bytes")){
+			if(hasattr("_mojo_bytes")){
 				byte[] mojoBytes = getMojoBytes();
 
 				try(InputStream is = new ByteArrayInputStream(mojoBytes)){

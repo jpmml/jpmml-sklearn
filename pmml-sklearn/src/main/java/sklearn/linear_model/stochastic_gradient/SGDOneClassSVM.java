@@ -53,8 +53,8 @@ public class SGDOneClassSVM extends SkLearnRegressor implements OutlierDetector 
 
 	@Override
 	public RegressionModel encodeModel(Schema schema){
-		List<? extends Number> coef = getCoef();
-		List<? extends Number> offset = getOffset();
+		List<Number> coef = getCoef();
+		List<Number> offset = getOffset();
 
 		RegressionModel regressionModel = RegressionModelUtil.createRegression(schema.getFeatures(), coef, -1 * (Iterables.getOnlyElement(offset).doubleValue()), null, schema)
 			.setOutput(OutlierDetectorUtil.createPredictedOutput(this));
@@ -62,11 +62,11 @@ public class SGDOneClassSVM extends SkLearnRegressor implements OutlierDetector 
 		return regressionModel;
 	}
 
-	public List<? extends Number> getCoef(){
+	public List<Number> getCoef(){
 		return getNumberArray("coef_");
 	}
 
-	public List<? extends Number> getOffset(){
+	public List<Number> getOffset(){
 		return getNumberArray("offset_");
 	}
 }

@@ -76,7 +76,7 @@ public class NearestNeighbors extends SkLearnClusterer implements HasMetric, Has
 	}
 
 	@Override
-	public List<? extends Number> getFitX(){
+	public List<Number> getFitX(){
 		return getNumberArray("_fit_X");
 	}
 
@@ -86,20 +86,20 @@ public class NearestNeighbors extends SkLearnClusterer implements HasMetric, Has
 	}
 
 	@Override
-	public List<?> getId(){
+	public List<Object> getId(){
 
 		// XXX
-		if(!containsKey("_id")){
+		if(!hasattr("_id")){
 			int[] shape = getFitXShape();
 
-			return SliceUtil.indices(0, shape[0]);
+			return (List)SliceUtil.indices(0, shape[0]);
 		}
 
-		return getArray("_id");
+		return getObjectArray("_id");
 	}
 
 	@Override
-	public List<? extends Number> getY(){
+	public List<Number> getY(){
 		return null;
 	}
 

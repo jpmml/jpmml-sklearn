@@ -45,7 +45,7 @@ public class SelectFromModel extends SkLearnSelector implements HasEstimator<Est
 		Estimator estimator = getEstimator();
 		Number threshold = getThreshold();
 
-		List<? extends Number> featureImportances;
+		List<Number> featureImportances;
 
 		try {
 			featureImportances = estimator.getNumberArray("feature_importances_");

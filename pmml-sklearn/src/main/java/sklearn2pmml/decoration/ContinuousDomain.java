@@ -106,8 +106,8 @@ public class ContinuousDomain extends Domain {
 		Boolean withData = getWithData();
 		Boolean withStatistics = getWithStatistics();
 
-		List<? extends Number> dataMin = null;
-		List<? extends Number> dataMax = null;
+		List<Number> dataMin = null;
+		List<Number> dataMax = null;
 
 		if(withData){
 			dataMin = getDataMin();
@@ -186,7 +186,7 @@ public class ContinuousDomain extends Domain {
 		return getNumber("high_value");
 	}
 
-	public List<? extends Number> getDataMin(){
+	public List<Number> getDataMin(){
 		return getNumberArray("data_min_");
 	}
 
@@ -194,7 +194,7 @@ public class ContinuousDomain extends Domain {
 		return getArrayShape("data_min_", 1);
 	}
 
-	public List<? extends Number> getDataMax(){
+	public List<Number> getDataMax(){
 		return getNumberArray("data_max_");
 	}
 

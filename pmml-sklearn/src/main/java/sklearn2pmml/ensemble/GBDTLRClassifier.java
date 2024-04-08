@@ -66,8 +66,8 @@ public class GBDTLRClassifier extends Classifier implements HasMultiDecisionFunc
 
 		SchemaUtil.checkSize(2, categoricalLabel);
 
-		List<? extends Number> coef = lr.getCoef();
-		List<? extends Number> intercept = lr.getIntercept();
+		List<Number> coef = lr.getCoef();
+		List<Number> intercept = lr.getIntercept();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 

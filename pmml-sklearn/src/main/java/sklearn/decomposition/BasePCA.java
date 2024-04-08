@@ -36,7 +36,7 @@ public class BasePCA extends SkLearnTransformer {
 		return shape[1];
 	}
 
-	public List<? extends Number> getComponents(){
+	public List<Number> getComponents(){
 		return getNumberArray("components_");
 	}
 

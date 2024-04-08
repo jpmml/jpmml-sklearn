@@ -46,7 +46,7 @@ public class ClassifierChain extends SkLearnClassifier {
 		return ChainUtil.encodeChain(estimators, order, schema);
 	}
 
-	public List<? extends Classifier> getEstimators(){
+	public List<Classifier> getEstimators(){
 		return getList("estimators_", Classifier.class);
 	}
 

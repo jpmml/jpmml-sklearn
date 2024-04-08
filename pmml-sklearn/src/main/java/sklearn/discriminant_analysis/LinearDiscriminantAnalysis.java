@@ -70,8 +70,8 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<? extends Number> coef = getCoef();
-		List<? extends Number> intercept = getIntercept();
+		List<Number> coef = getCoef();
+		List<Number> intercept = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();

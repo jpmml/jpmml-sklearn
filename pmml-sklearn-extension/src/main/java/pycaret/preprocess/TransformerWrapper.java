@@ -181,15 +181,15 @@ public class TransformerWrapper extends Initializer {
 	}
 
 	public List<String> getFeatureNames(){
-		return getList("_feature_names_in", String.class);
+		return getStringList("_feature_names_in");
 	}
 
 	public List<String> getExclude(){
-		return getList("_exclude", String.class);
+		return getStringList("_exclude");
 	}
 
 	public List<String> getInclude(){
-		return getList("_include", String.class);
+		return getStringList("_include");
 	}
 
 	public String getTargetName(){

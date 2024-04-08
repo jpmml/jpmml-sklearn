@@ -33,19 +33,19 @@ public class MultiOutputClassifier extends SkLearnClassifier {
 
 	@Override
 	public int getNumberOfOutputs(){
-		List<? extends Classifier> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 
 		return estimators.size();
 	}
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Classifier> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 
 		return MultiOutputUtil.encodeEstimators(estimators, schema);
 	}
 
-	public List<? extends Classifier> getEstimators(){
+	public List<Classifier> getEstimators(){
 		return getList("estimators_", Classifier.class);
 	}
 }

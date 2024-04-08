@@ -47,7 +47,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public List<String> getFeatureNamesIn(){
 
-		if(containsKey(SkLearnFields.FEATURE_NAMES_IN)){
+		if(hasattr(SkLearnFields.FEATURE_NAMES_IN)){
 			return getStringArray(SkLearnFields.FEATURE_NAMES_IN);
 		}
 
@@ -59,7 +59,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public Step setPMMLName(String pmmlName){
-		put(SkLearn2PMMLFields.PMML_NAME, pmmlName);
+		setattr(SkLearn2PMMLFields.PMML_NAME, pmmlName);
 
 		return this;
 	}

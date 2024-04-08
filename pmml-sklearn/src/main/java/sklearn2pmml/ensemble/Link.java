@@ -159,7 +159,7 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 
 
 	public List<String> getAugmentFuncs(){
-		return getList("augment_funcs", String.class);
+		return getStringList("augment_funcs");
 	}
 
 	@Override

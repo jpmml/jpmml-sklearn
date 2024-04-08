@@ -49,7 +49,7 @@ public class CutTransformer extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Number> bins = getBins();
+		List<Number> bins = getBins();
 		List<?> labels = getLabels();
 		Boolean right = getRight();
 		Boolean includeLowest = getIncludeLowest();
@@ -144,18 +144,18 @@ public class CutTransformer extends Transformer {
 		return Collections.singletonList(result);
 	}
 
-	public List<? extends Number> getBins(){
+	public List<Number> getBins(){
 		return getListLike("bins", Number.class);
 	}
 
-	public List<?> getLabels(){
+	public List<Object> getLabels(){
 		Object labels = getOptionalScalar("labels");
 
 		if(labels == null || (Boolean.FALSE).equals(labels)){
 			return null;
 		}
 
-		return getList("labels");
+		return getObjectList("labels");
 	}
 
 	public Boolean getRight(){

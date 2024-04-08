@@ -34,7 +34,7 @@ public class TreePredictor extends PythonObject {
 	public int[] getRawLeftCatBitsets(){
 
 		// SkLearn 0.23
-		if(!containsKey("raw_left_cat_bitsets")){
+		if(!hasattr("raw_left_cat_bitsets")){
 			return null;
 		}
 
@@ -54,7 +54,7 @@ public class TreePredictor extends PythonObject {
 	}
 
 	public double[] getThreshold(){
-		List<? extends Number> threshold = getNodeAttribute("threshold");
+		List<Number> threshold = getNodeAttribute("threshold");
 
 		// SkLearn 0.23
 		if(threshold != null){
@@ -86,7 +86,7 @@ public class TreePredictor extends PythonObject {
 	}
 
 	public int[] isCategorical(){
-		List<? extends Number> isCategorical = getNodeAttribute("is_categorical");
+		List<Number> isCategorical = getNodeAttribute("is_categorical");
 
 		// SkLearn 0.23
 		if(isCategorical == null){
@@ -98,7 +98,7 @@ public class TreePredictor extends PythonObject {
 	}
 
 	public int[] getBitsetIdx(){
-		List<? extends Number> bitsetIdx = getNodeAttribute("bitset_idx");
+		List<Number> bitsetIdx = getNodeAttribute("bitset_idx");
 
 		// SkLearn 0.23
 		if(bitsetIdx == null){
@@ -109,7 +109,7 @@ public class TreePredictor extends PythonObject {
 		return Ints.toArray(bitsetIdx);
 	}
 
-	private List<? extends Number> getNodeAttribute(String key){
+	private List<Number> getNodeAttribute(String key){
 		return (List)getArray("nodes", key);
 	}
 

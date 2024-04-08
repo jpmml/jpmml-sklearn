@@ -177,7 +177,7 @@ public class OrdinalClassifier extends Classifier {
 
 			@Override
 			protected String formatMessage(Object object){
-				return "Dict attribute \'estimators_\' contains an unsupported item value (" + ClassDictUtil.formatClass(object) + ")";
+				return "The item value object (" + ClassDictUtil.formatClass(object) + ") is not a supported Classifier";
 			}
 		};
 
@@ -189,7 +189,7 @@ public class OrdinalClassifier extends Classifier {
 
 	private Map<?, ?> getEstimatorCategories(){
 
-		if(!containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
+		if(!hasattr(SkLearn2PMMLFields.PMML_CLASSES)){
 			return null;
 		}
 

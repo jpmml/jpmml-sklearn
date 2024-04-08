@@ -130,7 +130,7 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 	}
 
 	public List<List<Number>> getBinEdges(){
-		List<? extends HasArray> arrays = getArray("bin_edges_", HasArray.class);
+		List<HasArray> arrays = getArray("bin_edges_", HasArray.class);
 
 		Function<HasArray, List<Number>> function = new Function<HasArray, List<Number>>(){
 

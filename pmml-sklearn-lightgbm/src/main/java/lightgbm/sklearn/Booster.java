@@ -60,7 +60,7 @@ public class Booster extends PythonObject {
 	public String getHandle(){
 
 		// LightGBM 3.3.5
-		if(containsKey("handle")){
+		if(hasattr("handle")){
 			return getString("handle");
 		}
 

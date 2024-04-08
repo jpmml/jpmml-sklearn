@@ -244,7 +244,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 	}
 
 	protected SkLearnPipeline setSteps(List<Object[]> steps){
-		put("steps", steps);
+		setattr("steps", steps);
 
 		return this;
 	}

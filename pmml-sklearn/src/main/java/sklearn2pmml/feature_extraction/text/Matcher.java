@@ -75,7 +75,7 @@ public class Matcher extends Tokenizer {
 	}
 
 	public Matcher setWordRE(String wordRE){
-		put("word_re", wordRE);
+		setattr("word_re", wordRE);
 
 		return this;
 	}

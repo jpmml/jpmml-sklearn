@@ -42,8 +42,8 @@ public class IsotonicRegression extends Calibrator {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Number> xThresholds = getXThresholds();
-		List<? extends Number> yThresholds = getYThresholds();
+		List<Number> xThresholds = getXThresholds();
+		List<Number> yThresholds = getYThresholds();
 		String outOfBounds = getOutOfBounds();
 
 		ClassDictUtil.checkSize(xThresholds, yThresholds);
@@ -73,9 +73,9 @@ public class IsotonicRegression extends Calibrator {
 		return getBoolean("increasing_");
 	}
 
-	public List<? extends Number> getXThresholds(){
+	public List<Number> getXThresholds(){
 		// SkLearn 0.23
-		if(containsKey("_necessary_X_")){
+		if(hasattr("_necessary_X_")){
 			return getNumberArray("_necessary_X_");
 		}
 
@@ -83,9 +83,9 @@ public class IsotonicRegression extends Calibrator {
 		return getNumberArray("X_thresholds_");
 	}
 
-	public List<? extends Number> getYThresholds(){
+	public List<Number> getYThresholds(){
 		// SkLearn 0.23
-		if(containsKey("_necessary_y_")){
+		if(hasattr("_necessary_y_")){
 			getNumberArray("_necessary_y_");
 		}
 

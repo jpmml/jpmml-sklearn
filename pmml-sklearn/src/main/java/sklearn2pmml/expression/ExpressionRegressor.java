@@ -73,7 +73,7 @@ public class ExpressionRegressor extends Regressor {
 
 	public String getNormalizationMethod(){
 
-		if(!containsKey("normalization_method")){
+		if(!hasattr("normalization_method")){
 			return "none";
 		}
 

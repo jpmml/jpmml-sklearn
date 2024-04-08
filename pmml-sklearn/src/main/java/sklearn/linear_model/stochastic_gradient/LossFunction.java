@@ -18,10 +18,10 @@
  */
 package sklearn.linear_model.stochastic_gradient;
 
-import org.jpmml.python.CustomPythonObject;
+import org.jpmml.python.CythonObject;
 
 abstract
-public class LossFunction extends CustomPythonObject {
+public class LossFunction extends CythonObject {
 
 	public LossFunction(String module, String name){
 		super(module, name);

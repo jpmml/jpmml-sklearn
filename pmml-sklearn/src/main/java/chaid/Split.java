@@ -32,13 +32,7 @@ public class Split extends PythonObject {
 	}
 
 	public Integer getColumnId(){
-		Object columnId = get("column_id");
-
-		if(columnId == null){
-			return null;
-		}
-
-		return getInteger("column_id");
+		return getOptionalInteger("column_id");
 	}
 
 	public InvalidSplitReason getInvalidReason(){
@@ -46,13 +40,13 @@ public class Split extends PythonObject {
 	}
 
 	public List<List<Integer>> getSplits(){
-		List<?> splits = getList("splits");
+		List<Object> splits = getObjectList("splits");
 
 		return decodeSplits(splits);
 	}
 
-	public List<List<?>> getSplitMap(){
-		List<?> splitMap = getList("split_map");
+	public List<List<Object>> getSplitMap(){
+		List<Object> splitMap = getObjectList("split_map");
 
 		return decodeSplitMap(splitMap);
 	}
@@ -67,7 +61,7 @@ public class Split extends PythonObject {
 	}
 
 	static
-	public List<List<?>> decodeSplitMap(List<?> splits){
+	public List<List<Object>> decodeSplitMap(List<?> splits){
 		return Lists.transform(splits, split -> {
 			return Lists.transform((List<?>)split, value -> {
 				return ScalarUtil.decode(value);

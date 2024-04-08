@@ -34,7 +34,7 @@ public class MLPRegressor extends SkLearnRegressor {
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<? extends HasArray> coefs = getCoefs();
+		List<HasArray> coefs = getCoefs();
 
 		return MultilayerPerceptronUtil.getNumberOfFeatures(coefs);
 	}
@@ -43,8 +43,8 @@ public class MLPRegressor extends SkLearnRegressor {
 	public NeuralNetwork encodeModel(Schema schema){
 		String activation = getActivation();
 
-		List<? extends HasArray> coefs = getCoefs();
-		List<? extends HasArray> intercepts = getIntercepts();
+		List<HasArray> coefs = getCoefs();
+		List<HasArray> intercepts = getIntercepts();
 
 		NeuralNetwork neuralNetwork = MultilayerPerceptronUtil.encodeNeuralNetwork(MiningFunction.REGRESSION, activation, coefs, intercepts, schema);
 
@@ -55,11 +55,11 @@ public class MLPRegressor extends SkLearnRegressor {
 		return getString("activation");
 	}
 
-	public List<? extends HasArray> getCoefs(){
-		return getList("coefs_", HasArray.class);
+	public List<HasArray> getCoefs(){
+		return getArrayList("coefs_");
 	}
 
-	public List<? extends HasArray> getIntercepts(){
-		return getList("intercepts_", HasArray.class);
+	public List<HasArray> getIntercepts(){
+		return getArrayList("intercepts_");
 	}
 }

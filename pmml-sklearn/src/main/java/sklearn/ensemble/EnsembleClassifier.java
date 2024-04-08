@@ -50,7 +50,7 @@ public class EnsembleClassifier extends SkLearnClassifier implements HasEstimato
 	public Classifier getEstimator(){
 
 		// SkLearn 1.1
-		if(containsKey("base_estimator_")){
+		if(hasattr("base_estimator_")){
 			return get("base_estimator_", Classifier.class);
 		}
 
@@ -59,7 +59,7 @@ public class EnsembleClassifier extends SkLearnClassifier implements HasEstimato
 	}
 
 	@Override
-	public List<? extends Classifier> getEstimators(){
+	public List<Classifier> getEstimators(){
 		return getList("estimators_", Classifier.class);
 	}
 }

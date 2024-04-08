@@ -34,7 +34,7 @@ public class MultiDomain extends Decorator {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Domain> domains = getDomains();
+		List<Domain> domains = getDomains();
 
 		ClassDictUtil.checkSize(domains, features);
 
@@ -56,7 +56,7 @@ public class MultiDomain extends Decorator {
 		return result;
 	}
 
-	public List<? extends Domain> getDomains(){
+	public List<Domain> getDomains(){
 		return getList("domains", Domain.class);
 	}
 }

@@ -49,7 +49,7 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 	@Override
 	public List<String> getFeatureNamesIn(){
 
-		if(containsKey(SkLearnFields.FEATURE_NAMES_IN)){
+		if(hasattr(SkLearnFields.FEATURE_NAMES_IN)){
 			return getListLike(SkLearnFields.FEATURE_NAMES_IN, String.class);
 		}
 
@@ -61,19 +61,19 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 		return TransformerUtil.encodePMML(this);
 	}
 
-	public List<?> getCols(){
-		return getList("cols");
+	public List<Object> getCols(){
+		return getObjectList("cols");
 	}
 
 	public List<String> getInvariantCols(){
 
 		// CategoryEncoders 2.3
-		if(containsKey("drop_cols")){
-			return getList("drop_cols", String.class);
+		if(hasattr("drop_cols")){
+			return getStringList("drop_cols");
 		}
 
 		// CategoryEncoders 2.5+
-		return getList("invariant_cols", String.class);
+		return getStringList("invariant_cols");
 	}
 
 	public Boolean getDropInvariant(){
@@ -83,12 +83,12 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 	public List<String> getFeatureNamesOut(){
 
 		// CategoryEncoders 2.5.1post0
-		if(containsKey("feature_names")){
-			return getList("feature_names", String.class);
+		if(hasattr("feature_names")){
+			return getStringList("feature_names");
 		}
 
 		// CategoryEncoders 2.6+
-		return getList("feature_names_out_", String.class);
+		return getStringList("feature_names_out_");
 	}
 
 	public String getHandleMissing(){

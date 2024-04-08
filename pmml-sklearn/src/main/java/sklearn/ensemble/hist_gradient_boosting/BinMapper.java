@@ -20,9 +20,6 @@ package sklearn.ensemble.hist_gradient_boosting;
 
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.jpmml.python.HasArray;
 import org.jpmml.python.PythonObject;
 
 public class BinMapper extends PythonObject {
@@ -36,16 +33,6 @@ public class BinMapper extends PythonObject {
 	}
 
 	public List<List<Number>> getBinThresholds(){
-		List<? extends HasArray> arrays = getList("bin_thresholds_", HasArray.class);
-
-		Function<HasArray, List<Number>> function = new Function<HasArray, List<Number>>(){
-
-			@Override
-			public List<Number> apply(HasArray hasArray){
-				return (List)hasArray.getArrayContent();
-			}
-		};
-
-		return Lists.transform(arrays, function);
+		return getArrayList("bin_thresholds_", Number.class);
 	}
 }

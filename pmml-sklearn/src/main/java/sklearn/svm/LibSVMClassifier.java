@@ -54,10 +54,10 @@ public class LibSVMClassifier extends SkLearnClassifier {
 		int numberOfFeatures = shape[1];
 
 		List<Integer> support = getSupport();
-		List<? extends Number> supportVectors = getSupportVectors();
+		List<Number> supportVectors = getSupportVectors();
 		List<Integer> supportSizes = getSupportSizes();
-		List<? extends Number> dualCoef = getDualCoef();
-		List<? extends Number> intercept = getIntercept();
+		List<Number> dualCoef = getDualCoef();
+		List<Number> intercept = getIntercept();
 
 		Kernel kernel = SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0());
 
@@ -97,7 +97,7 @@ public class LibSVMClassifier extends SkLearnClassifier {
 		return getIntegerArray("support_");
 	}
 
-	public List<? extends Number> getSupportVectors(){
+	public List<Number> getSupportVectors(){
 		return getNumberArray("support_vectors_");
 	}
 
@@ -108,7 +108,7 @@ public class LibSVMClassifier extends SkLearnClassifier {
 	public List<Integer> getSupportSizes(){
 
 		// SkLearn 0.21
-		if(containsKey("n_support_")){
+		if(hasattr("n_support_")){
 			return getIntegerArray("n_support_");
 		}
 
@@ -116,11 +116,11 @@ public class LibSVMClassifier extends SkLearnClassifier {
 		return getIntegerArray("_n_support");
 	}
 
-	public List<? extends Number> getDualCoef(){
+	public List<Number> getDualCoef(){
 		return getNumberArray("_dual_coef_");
 	}
 
-	public List<? extends Number> getIntercept(){
+	public List<Number> getIntercept(){
 		return getNumberArray("_intercept_");
 	}
 }

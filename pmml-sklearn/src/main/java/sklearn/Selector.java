@@ -49,7 +49,7 @@ public class Selector extends Transformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Boolean> supportMask = getSupportMask();
+		List<Boolean> supportMask = getSupportMask();
 
 		if(supportMask == null){
 			return features;

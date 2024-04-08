@@ -41,6 +41,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.VersionUtil;
@@ -68,7 +69,7 @@ public class LogisticRegression extends LinearClassifier {
 		} // End if
 
 		if(("auto").equals(multiClass)){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be explicitly set to the 'ovr' or 'multinomial' value");
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be explicitly set to the 'ovr' or 'multinomial' value");
 		} else
 
 		if(("multinomial").equals(multiClass)){
@@ -91,8 +92,8 @@ public class LogisticRegression extends LinearClassifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<? extends Number> coef = getCoef();
-		List<? extends Number> intercept = getIntercept();
+		List<Number> coef = getCoef();
+		List<Number> intercept = getIntercept();
 
 		PMMLEncoder encoder = schema.getEncoder();
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();

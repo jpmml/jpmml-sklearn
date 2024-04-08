@@ -35,7 +35,7 @@ public class QuantileEstimator extends PythonObject implements HasDefaultValue {
 		return Iterables.getOnlyElement(getQuantile());
 	}
 
-	public List<? extends Number> getQuantile(){
+	public List<Number> getQuantile(){
 		return getNumberArray("quantile");
 	}
 }

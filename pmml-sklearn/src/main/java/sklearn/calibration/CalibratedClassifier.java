@@ -284,10 +284,10 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 
 	@Override
 	public List<?> getClasses(){
-		return getListLike("classes");
+		return getClasses("classes");
 	}
 
-	public List<? extends Calibrator> getCalibrators(){
+	public List<Calibrator> getCalibrators(){
 		return getList("calibrators", Calibrator.class);
 	}
 

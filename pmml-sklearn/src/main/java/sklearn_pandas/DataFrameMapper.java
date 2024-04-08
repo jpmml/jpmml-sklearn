@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
@@ -52,7 +53,7 @@ public class DataFrameMapper extends Initializer {
 		List<Object[]> rows = getFeatures();
 
 		if(!(Boolean.FALSE).equals(_default)){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, "default") + "\' must be set to the 'False' value");
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "default") + "\' must be set to the 'False' value");
 		}
 
 		List<Feature> result = new ArrayList<>();
@@ -92,7 +93,7 @@ public class DataFrameMapper extends Initializer {
 	}
 
 	public DataFrameMapper setDefault(Object _default){
-		put("default", _default);
+		setattr("default", _default);
 
 		return this;
 	}
@@ -102,7 +103,7 @@ public class DataFrameMapper extends Initializer {
 	}
 
 	public DataFrameMapper setFeatures(List<Object[]> features){
-		put("features", features);
+		setattr("features", features);
 
 		return this;
 	}

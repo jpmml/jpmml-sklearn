@@ -41,7 +41,7 @@ public class GradientBoostingRegressor extends SkLearnRegressor implements HasEs
 	public int getNumberOfFeatures(){
 
 		// SkLearn 0.18
-		if(containsKey("n_features")){
+		if(hasattr("n_features")){
 			return getInteger("n_features");
 		}
 
@@ -73,7 +73,7 @@ public class GradientBoostingRegressor extends SkLearnRegressor implements HasEs
 	}
 
 	@Override
-	public List<? extends TreeRegressor> getEstimators(){
+	public List<TreeRegressor> getEstimators(){
 		return getArray("estimators_", TreeRegressor.class);
 	}
 

@@ -43,7 +43,7 @@ public class BinaryEncoder extends BaseNEncoder {
 	public BaseNEncoder getBaseNEncoder(){
 
 		// CategoryEncoders 2.3
-		if(containsKey("base_n_encoder")){
+		if(hasattr("base_n_encoder")){
 			return get("base_n_encoder", BaseNEncoder.class);
 		}
 

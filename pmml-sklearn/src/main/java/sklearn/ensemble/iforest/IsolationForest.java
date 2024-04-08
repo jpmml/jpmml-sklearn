@@ -48,14 +48,12 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.transformations.AbstractTransformation;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
 import sklearn.VersionUtil;
 import sklearn.ensemble.EnsembleRegressor;
-import sklearn.ensemble.EnsembleUtil;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.Tree;
 import sklearn.tree.TreeRegressor;
@@ -85,8 +83,8 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
-		List<? extends Regressor> estimators = getEstimators();
-		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
+		List<Regressor> estimators = getEstimators();
+		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/8549
 		boolean corrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.19") >= 0);
@@ -103,7 +101,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 		for(int i = 0; i < estimators.size(); i++){
 			Regressor estimator = estimators.get(i);
-			List<Integer> estimatorFeatures = estimatorsFeatures.get(i);
+			List<Number> estimatorFeatures = estimatorsFeatures.get(i);
 
 			Schema estimatorSchema = segmentSchema.toSubSchema(Ints.toArray(estimatorFeatures));
 
@@ -236,8 +234,8 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		return threshold;
 	}
 
-	public List<List<Integer>> getEstimatorsFeatures(){
-		return EnsembleUtil.transformEstimatorsFeatures(getList("estimators_features_", HasArray.class));
+	public List<List<Number>> getEstimatorsFeatures(){
+		return getArrayList("estimators_features_", Number.class);
 	}
 
 	public String getBehaviour(){
@@ -250,7 +248,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 	public Number getOffset(){
 
-		if(!containsKey("offset_")){
+		if(!hasattr("offset_")){
 			return 0.5d;
 		}
 
@@ -260,12 +258,12 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	public Number getThreshold(){
 
 		// SkLearn 0.19
-		if(containsKey("threshold_")){
+		if(hasattr("threshold_")){
 			return getNumber("threshold_");
 		} else
 
 		// SkLearn 0.20+
-		if(containsKey("_threshold_")){
+		if(hasattr("_threshold_")){
 			return getNumber("_threshold_");
 		}
 

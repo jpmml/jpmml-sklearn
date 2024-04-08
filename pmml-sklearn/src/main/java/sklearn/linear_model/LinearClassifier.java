@@ -59,8 +59,8 @@ public class LinearClassifier extends SkLearnClassifier implements HasMultiDecis
 
 		boolean hasProbabilityDistribution = hasProbabilityDistribution();
 
-		List<? extends Number> coef = getCoef();
-		List<? extends Number> intercept = getIntercept();
+		List<Number> coef = getCoef();
+		List<Number> intercept = getIntercept();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
@@ -105,7 +105,7 @@ public class LinearClassifier extends SkLearnClassifier implements HasMultiDecis
 		}
 	}
 
-	public List<? extends Number> getCoef(){
+	public List<Number> getCoef(){
 		return getNumberArray("coef_");
 	}
 
@@ -113,7 +113,7 @@ public class LinearClassifier extends SkLearnClassifier implements HasMultiDecis
 		return getArrayShape("coef_", 2);
 	}
 
-	public List<? extends Number> getIntercept(){
+	public List<Number> getIntercept(){
 		return getNumberArray("intercept_");
 	}
 }

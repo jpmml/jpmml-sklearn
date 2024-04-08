@@ -120,8 +120,8 @@ public class LabelBinarizer extends SkLearnTransformer implements HasSparseOutpu
 		return classes;
 	}
 
-	public List<?> getClasses(){
-		return getArray(SkLearnFields.CLASSES);
+	public List<Object> getClasses(){
+		return getObjectArray(SkLearnFields.CLASSES);
 	}
 
 	public Number getNegLabel(){

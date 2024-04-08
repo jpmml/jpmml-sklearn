@@ -32,7 +32,7 @@ public class LogOddsEstimator extends PythonObject implements HasPriorProbabilit
 
 	@Override
 	public Number getPriorProbability(int index){
-		List<? extends Number> prior = getPrior();
+		List<Number> prior = getPrior();
 
 		if(prior.size() <= 1 && index <= 1){
 			return Iterables.getOnlyElement(prior);
@@ -41,7 +41,7 @@ public class LogOddsEstimator extends PythonObject implements HasPriorProbabilit
 		return Iterables.get(prior, index);
 	}
 
-	public List<? extends Number> getPrior(){
+	public List<Number> getPrior(){
 		return getNumberArray("prior");
 	}
 }

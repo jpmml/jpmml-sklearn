@@ -43,14 +43,14 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<? extends Regressor> estimators = getEstimators();
+		List<Regressor> estimators = getEstimators();
 
 		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends Regressor> estimators = getEstimators();
+		List<Regressor> estimators = getEstimators();
 		Regressor finalEstimator = getFinalEstimator();
 		Boolean passthrough = getPassthrough();
 		List<String> stackMethod = getStackMethod();
@@ -79,7 +79,7 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 	}
 
 	@Override
-	public List<? extends Regressor> getEstimators(){
+	public List<Regressor> getEstimators(){
 		return getList("estimators_", Regressor.class);
 	}
 
@@ -92,6 +92,6 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 	}
 
 	public List<String> getStackMethod(){
-		return getList("stack_method_", String.class);
+		return getStringList("stack_method_");
 	}
 }

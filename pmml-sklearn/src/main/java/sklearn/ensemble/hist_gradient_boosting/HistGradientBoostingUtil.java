@@ -58,7 +58,7 @@ public class HistGradientBoostingUtil {
 		ColumnTransformer filterPreprocessor = new ColumnTransformer(preprocessor.getPythonModule(), preprocessor.getPythonName()){
 
 			{
-				putAll(preprocessor);
+				update(preprocessor);
 			}
 
 			@Override
@@ -88,16 +88,16 @@ public class HistGradientBoostingUtil {
 							OrdinalEncoder filterOrdinalEncoder = new OrdinalEncoder(ordinalEncoder.getPythonModule(), ordinalEncoder.getPythonName()){
 
 								{
-									putAll(ordinalEncoder);
+									update(ordinalEncoder);
 								}
 
 								@Override
-								public List<List<?>> getCategories(){
-									List<List<?>> categories = super.getCategories();
+								public List<List<Object>> getCategories(){
+									List<List<Object>> categories = super.getCategories();
 
 									ClassDictUtil.checkSize(categories, rowFeatures);
 
-									List<List<?>> result = new AbstractList<List<?>>(){
+									List<List<Object>> result = new AbstractList<List<Object>>(){
 
 										@Override
 										public int size(){
@@ -105,13 +105,13 @@ public class HistGradientBoostingUtil {
 										}
 
 										@Override
-										public List<?> get(int index){
+										public List<Object> get(int index){
 											Feature rowFeature = rowFeatures.get(index);
 
 											if(rowFeature instanceof CategoricalFeature){
 												CategoricalFeature categoricalFeature = (CategoricalFeature)rowFeature;
 
-												return categoricalFeature.getValues();
+												return (List)categoricalFeature.getValues();
 											}
 
 											return categories.get(index);

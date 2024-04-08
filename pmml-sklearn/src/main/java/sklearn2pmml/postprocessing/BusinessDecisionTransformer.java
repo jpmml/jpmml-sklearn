@@ -127,7 +127,7 @@ public class BusinessDecisionTransformer extends Transformer {
 	public Transformer getTransformer(){
 
 		// SkLearn2PMML 0.80.0
-		if(containsKey("expr")){
+		if(hasattr("expr")){
 			String expr = getString("expr");
 			Object dtype = getOptionalObject("dtype");
 
@@ -145,7 +145,7 @@ public class BusinessDecisionTransformer extends Transformer {
 	private boolean isEmbedded(){
 
 		// SkLearn2PMML 0.80.0
-		if(containsKey("expr")){
+		if(hasattr("expr")){
 			return true;
 		}
 

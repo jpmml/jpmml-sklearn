@@ -31,7 +31,7 @@ public class BinomialDeviance extends LossFunction {
 	}
 
 	@Override
-	public List<? extends Number> computeInitialPredictions(HasPriorProbability init){
+	public List<Double> computeInitialPredictions(HasPriorProbability init){
 		Number probaPosClass = init.getPriorProbability(1);
 
 		double result = Math.log(probaPosClass.doubleValue() / (1d - probaPosClass.doubleValue()));

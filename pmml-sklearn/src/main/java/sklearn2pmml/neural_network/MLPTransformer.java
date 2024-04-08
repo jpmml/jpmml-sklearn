@@ -64,8 +64,8 @@ public class MLPTransformer extends Transformer {
 
 		NeuralNetwork.ActivationFunction activationFunction = MultilayerPerceptronUtil.parseActivationFunction(activation);
 
-		List<? extends HasArray> coefs = mlp.getCoefs();
-		List<? extends HasArray> intercepts = mlp.getIntercepts();
+		List<HasArray> coefs = mlp.getCoefs();
+		List<HasArray> intercepts = mlp.getIntercepts();
 
 		MiningSchema miningSchema = new MiningSchema();
 

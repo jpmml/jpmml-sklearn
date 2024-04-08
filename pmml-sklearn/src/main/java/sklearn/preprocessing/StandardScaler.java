@@ -64,8 +64,8 @@ public class StandardScaler extends Scaler {
 		Boolean withMean = getWithMean();
 		Boolean withStd = getWithStd();
 
-		List<? extends Number> mean = (withMean ? getMean() : null);
-		List<? extends Number> std = (withStd ? getStd() : null);
+		List<Number> mean = (withMean ? getMean() : null);
+		List<Number> std = (withStd ? getStd() : null);
 
 		if(mean == null && std == null){
 			return features;
@@ -116,7 +116,7 @@ public class StandardScaler extends Scaler {
 		return getBoolean("with_std");
 	}
 
-	public List<? extends Number> getMean(){
+	public List<Number> getMean(){
 		return getNumberArray("mean_");
 	}
 
@@ -124,10 +124,10 @@ public class StandardScaler extends Scaler {
 		return getArrayShape("mean_", 1);
 	}
 
-	public List<? extends Number> getStd(){
+	public List<Number> getStd(){
 
 		// SkLearn 0.16
-		if(containsKey("std_") && !containsKey("scale_")){
+		if(hasattr("std_") && !hasattr("scale_")){
 			return getNumberArray("std_");
 		}
 
@@ -138,7 +138,7 @@ public class StandardScaler extends Scaler {
 	public int[] getStdShape(){
 
 		// SkLearn 0.16
-		if(containsKey("std_") && !containsKey("scale_")){
+		if(hasattr("std_") && !hasattr("scale_")){
 			return getArrayShape("std_", 1);
 		}
 

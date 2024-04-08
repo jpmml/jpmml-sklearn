@@ -69,7 +69,7 @@ public class NearestCentroid extends SkLearnClassifier implements HasMetric, Has
 		return nearestNeighborModel;
 	}
 
-	public List<? extends Number> getCentroids(){
+	public List<Number> getCentroids(){
 		return getNumberArray("centroids_");
 	}
 
@@ -86,7 +86,7 @@ public class NearestCentroid extends SkLearnClassifier implements HasMetric, Has
 	public int getP(){
 
 		// XXX
-		if(!containsKey("p")){
+		if(!hasattr("p")){
 			return -1;
 		}
 
@@ -99,7 +99,7 @@ public class NearestCentroid extends SkLearnClassifier implements HasMetric, Has
 	}
 
 	@Override
-	public List<? extends Number> getFitX(){
+	public List<Number> getFitX(){
 		return getCentroids();
 	}
 
@@ -114,7 +114,7 @@ public class NearestCentroid extends SkLearnClassifier implements HasMetric, Has
 	}
 
 	@Override
-	public List<? extends Number> getY(){
+	public List<Integer> getY(){
 		List<?> classes = getClasses();
 
 		return SliceUtil.indices(0, classes.size());

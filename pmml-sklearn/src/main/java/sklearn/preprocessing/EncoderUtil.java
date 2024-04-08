@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Decorable;
@@ -43,7 +41,6 @@ import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -146,23 +143,5 @@ public class EncoderUtil {
 	static
 	public boolean isMissingCategory(Object category){
 		return (category == null) || ValueUtil.isNaN(category);
-	}
-
-	static
-	public List<List<Integer>> transformInfrequentIndices(List<HasArray> arrays){
-		Function<HasArray, List<Integer>> function = new Function<HasArray, List<Integer>>(){
-
-			@Override
-			public List<Integer> apply(HasArray hasArray){
-
-				if(hasArray == null){
-					return null;
-				}
-
-				return ValueUtil.asIntegers((List)hasArray.getArrayContent());
-			}
-		};
-
-		return Lists.transform(arrays, function);
 	}
 }

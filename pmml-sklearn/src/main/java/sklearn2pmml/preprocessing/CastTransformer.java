@@ -84,7 +84,7 @@ public class CastTransformer extends Transformer {
 	public TypeInfo getDType(){
 
 		// SkLearn2PMML 0.101.0+
-		if(containsKey("dtype_")){
+		if(hasattr("dtype_")){
 			return getDType("dtype_", true);
 		} else
 

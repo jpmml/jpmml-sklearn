@@ -49,9 +49,9 @@ public class LibSVMRegressor extends SkLearnRegressor {
 		int numberOfFeatures = shape[1];
 
 		List<Integer> support = getSupport();
-		List<? extends Number> supportVectors = getSupportVectors();
-		List<? extends Number> dualCoef = getDualCoef();
-		List<? extends Number> intercept = getIntercept();
+		List<Number> supportVectors = getSupportVectors();
+		List<Number> dualCoef = getDualCoef();
+		List<Number> intercept = getIntercept();
 
 		Kernel kernel = SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0());
 
@@ -78,7 +78,7 @@ public class LibSVMRegressor extends SkLearnRegressor {
 		return getIntegerArray("support_");
 	}
 
-	public List<? extends Number> getSupportVectors(){
+	public List<Number> getSupportVectors(){
 		return getNumberArray("support_vectors_");
 	}
 
@@ -86,11 +86,11 @@ public class LibSVMRegressor extends SkLearnRegressor {
 		return getArrayShape("support_vectors_", 2);
 	}
 
-	public List<? extends Number> getDualCoef(){
+	public List<Number> getDualCoef(){
 		return getNumberArray("_dual_coef_");
 	}
 
-	public List<? extends Number> getIntercept(){
+	public List<Number> getIntercept(){
 		return getNumberArray("_intercept_");
 	}
 }

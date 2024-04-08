@@ -82,10 +82,10 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		// SkLearn 1.0+
 		nFeaturesIn:
-		if(containsKey(SkLearnFields.N_FEATURES_IN)){
+		if(hasattr(SkLearnFields.N_FEATURES_IN)){
 
 			// Deprecated attributes are explicitly set to None values
-			if(get(SkLearnFields.N_FEATURES_IN) == null){
+			if(getattr(SkLearnFields.N_FEATURES_IN) == null){
 				break nFeaturesIn;
 			}
 
@@ -93,7 +93,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} // End if
 
 		// SkLearn 0.24
-		if(containsKey(SkLearnFields.N_FEATURES)){
+		if(hasattr(SkLearnFields.N_FEATURES)){
 			return getInteger(SkLearnFields.N_FEATURES);
 		}
 
@@ -103,7 +103,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	@Override
 	public int getNumberOfOutputs(){
 
-		if(containsKey(SkLearnFields.N_OUTPUTS)){
+		if(hasattr(SkLearnFields.N_OUTPUTS)){
 			return getInteger(SkLearnFields.N_OUTPUTS);
 		}
 
@@ -189,7 +189,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	}
 
 	public void addFeatureImportances(Model model, Schema schema){
-		List<? extends Number> featureImportances = getPMMLFeatureImportances();
+		List<Number> featureImportances = getPMMLFeatureImportances();
 		if(featureImportances == null){
 			featureImportances = getFeatureImportances();
 		}
@@ -217,10 +217,10 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} // End if
 
 		// XXX
-		if(containsKey(key)){
+		if(hasattr(key)){
 			logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, SkLearn2PMMLFields.PMML_OPTIONS) + "\' is not set. Falling back to the surrogate attribute \'" + ClassDictUtil.formatMember(this, key) + "\'");
 
-			return get(key);
+			return getattr(key);
 		}
 
 		return defaultValue;
@@ -243,9 +243,9 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		pmmlOptions.putAll(options);
 	}
 
-	public List<? extends Customization> getPMMLCustomizations(){
+	public List<Customization> getPMMLCustomizations(){
 
-		if(!containsKey(SkLearn2PMMLFields.PMML_CUSTOMIZATIONS)){
+		if(!hasattr(SkLearn2PMMLFields.PMML_CUSTOMIZATIONS)){
 			return null;
 		}
 
@@ -253,53 +253,47 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	}
 
 	public Estimator setPMMLCustomizations(List<? extends Customization> pmmlCustomizations){
-		put(SkLearn2PMMLFields.PMML_CUSTOMIZATIONS, NDArrayUtil.toArray(pmmlCustomizations));
+		setattr(SkLearn2PMMLFields.PMML_CUSTOMIZATIONS, NDArrayUtil.toArray(pmmlCustomizations));
 
 		return this;
 	}
 
 	public boolean hasFeatureImportances(){
-		return containsKey(SkLearnFields.FEATURE_IMPORTANCES) || containsKey(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES);
+		return hasattr(SkLearnFields.FEATURE_IMPORTANCES) || hasattr(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES);
 	}
 
-	public List<? extends Number> getFeatureImportances(){
+	public List<Number> getFeatureImportances(){
 
-		if(!containsKey(SkLearnFields.FEATURE_IMPORTANCES)){
+		if(!hasattr(SkLearnFields.FEATURE_IMPORTANCES)){
 			return null;
 		}
 
 		return getNumberArray(SkLearnFields.FEATURE_IMPORTANCES);
 	}
 
-	public List<? extends Number> getPMMLFeatureImportances(){
+	public List<Number> getPMMLFeatureImportances(){
 
-		if(!containsKey(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES)){
+		if(!hasattr(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES)){
 			return null;
 		}
 
 		return getNumberArray(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES);
 	}
 
-	public Estimator setPMMLFeatureImportances(List<? extends Number> pmmlFeatureImportances){
-		put(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES, NDArrayUtil.toArray(pmmlFeatureImportances));
+	public Estimator setPMMLFeatureImportances(List<Number> pmmlFeatureImportances){
+		setattr(SkLearn2PMMLFields.PMML_FEATURE_IMPORTANCES, NDArrayUtil.toArray(pmmlFeatureImportances));
 
 		return this;
 	}
 
 	@Override
 	public Map<String, ?> getPMMLOptions(){
-		Object value = get(SkLearn2PMMLFields.PMML_OPTIONS);
-
-		if(value == null){
-			return null;
-		}
-
-		return getDict(SkLearn2PMMLFields.PMML_OPTIONS);
+		return getOptionalDict(SkLearn2PMMLFields.PMML_OPTIONS);
 	}
 
 	@Override
 	public Estimator setPMMLOptions(Map<String, ?> pmmlOptions){
-		put(SkLearn2PMMLFields.PMML_OPTIONS, pmmlOptions);
+		setattr(SkLearn2PMMLFields.PMML_OPTIONS, pmmlOptions);
 
 		return this;
 	}
@@ -313,7 +307,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	public Estimator setPMMLSegmentId(Object pmmlSegmentId){
 
 		if(pmmlSegmentId != null){
-			put(SkLearn2PMMLFields.PMML_SEGMENT_ID, pmmlSegmentId);
+			setattr(SkLearn2PMMLFields.PMML_SEGMENT_ID, pmmlSegmentId);
 		} else
 
 		{

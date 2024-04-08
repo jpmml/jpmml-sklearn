@@ -57,7 +57,7 @@ public class KMeans extends SkLearnClusterer {
 		int numberOfClusters = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<? extends Number> clusterCenters = getClusterCenters();
+		List<Number> clusterCenters = getClusterCenters();
 		List<Integer> labels = getLabels();
 
 		Multiset<Integer> labelCounts = HashMultiset.create();
@@ -85,7 +85,7 @@ public class KMeans extends SkLearnClusterer {
 		return clusteringModel;
 	}
 
-	public List<? extends Number> getClusterCenters(){
+	public List<Number> getClusterCenters(){
 		return getNumberArray("cluster_centers_");
 	}
 

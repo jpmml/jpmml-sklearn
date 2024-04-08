@@ -46,7 +46,7 @@ public class MultilayerPerceptronUtil {
 	}
 
 	static
-	public int getNumberOfFeatures(List<? extends HasArray> coefs){
+	public int getNumberOfFeatures(List<HasArray> coefs){
 		HasArray input = coefs.get(0);
 
 		int[] shape = input.getArrayShape();
@@ -58,7 +58,7 @@ public class MultilayerPerceptronUtil {
 	}
 
 	static
-	public NeuralNetwork encodeNeuralNetwork(MiningFunction miningFunction, String activation, List<? extends HasArray> coefs, List<? extends HasArray> intercepts, Schema schema){
+	public NeuralNetwork encodeNeuralNetwork(MiningFunction miningFunction, String activation, List<HasArray> coefs, List<HasArray> intercepts, Schema schema){
 		NeuralNetwork.ActivationFunction activationFunction = parseActivationFunction(activation);
 
 		Label label = schema.getLabel();
@@ -77,12 +77,12 @@ public class MultilayerPerceptronUtil {
 	}
 
 	static
-	public List<NeuralLayer> encodeNeuralLayers(NeuralInputs neuralInputs, List<? extends HasArray> coefs, List<? extends HasArray> intercepts){
+	public List<NeuralLayer> encodeNeuralLayers(NeuralInputs neuralInputs, List<HasArray> coefs, List<HasArray> intercepts){
 		return encodeNeuralLayers(neuralInputs, coefs.size(), coefs, intercepts);
 	}
 
 	static
-	public List<NeuralLayer> encodeNeuralLayers(NeuralInputs neuralInputs, int numberOfLayers, List<? extends HasArray> coefs, List<? extends HasArray> intercepts){
+	public List<NeuralLayer> encodeNeuralLayers(NeuralInputs neuralInputs, int numberOfLayers, List<HasArray> coefs, List<HasArray> intercepts){
 		ClassDictUtil.checkSize(coefs, intercepts);
 
 		List<? extends NeuralEntity> entities = neuralInputs.getNeuralInputs();

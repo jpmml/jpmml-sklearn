@@ -169,7 +169,7 @@ public class PolynomialFeatures extends SkLearnTransformer implements HasSparseO
 	public int getNumberOfInputFeatures(){
 
 		// SkLearn 1.0+
-		if(containsKey(SkLearnFields.N_FEATURES_IN)){
+		if(hasattr(SkLearnFields.N_FEATURES_IN)){
 			return getInteger(SkLearnFields.N_FEATURES_IN);
 		}
 

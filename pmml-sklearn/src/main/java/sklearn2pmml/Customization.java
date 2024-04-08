@@ -35,7 +35,7 @@ public class Customization extends PythonObject {
 	}
 
 	public Customization setCommand(String command){
-		put("command", command);
+		setattr("command", command);
 
 		return this;
 	}
@@ -45,7 +45,7 @@ public class Customization extends PythonObject {
 	}
 
 	public Customization setXPathExpr(String xPathExpr){
-		put("xpath_expr", xPathExpr);
+		setattr("xpath_expr", xPathExpr);
 
 		return this;
 	}
@@ -55,7 +55,7 @@ public class Customization extends PythonObject {
 	}
 
 	public Customization setPMMLElement(String pmmlElement){
-		put("pmml_element", pmmlElement);
+		setattr("pmml_element", pmmlElement);
 
 		return this;
 	}

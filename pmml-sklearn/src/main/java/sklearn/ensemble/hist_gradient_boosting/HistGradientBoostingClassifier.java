@@ -31,6 +31,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import sklearn.HasMultiDecisionFunctionField;
@@ -47,7 +48,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends Number> baselinePredictions = getBaselinePrediction();
+		List<Number> baselinePredictions = getBaselinePrediction();
 		PythonObject loss = getLoss();
 		BinMapper binMapper = getBinMapper();
 		int numberOfTreesPerIteration = getNumberOfTreesPerIteration();
@@ -109,7 +110,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 		return miningModel;
 	}
 
-	public List<? extends Number> getBaselinePrediction(){
+	public List<Number> getBaselinePrediction(){
 		return getNumberArray("_baseline_prediction");
 	}
 
@@ -120,7 +121,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 	public PythonObject getLoss(){
 
 		// SkLearn 0.23
-		if(containsKey("loss_")){
+		if(hasattr("loss_")){
 			get("loss_", BaseLoss.class);
 		}
 
@@ -129,7 +130,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 			return get("_loss", BaseLoss.class);
 
 		// SkLearn 1.1.0+
-		} catch(IllegalArgumentException iae){
+		} catch(AttributeException ae){
 			return get("_loss", sklearn.loss.BaseLoss.class);
 		}
 	}

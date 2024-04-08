@@ -28,9 +28,6 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.CastFunction;
-import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -161,37 +158,18 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		estimator.checkFeatures(features);
 	}
 
-	/**
-	 * @see PythonObject#get(String, Class)
-	 */
 	@Override
 	public Estimator getEstimator(){
-		String name;
 
 		// SkLearn2PMML 0.54.0
-		if(containsKey("estimator_")){
-			name = "estimator_";
+		if(hasattr("estimator_")){
+			return get("estimator_", Estimator.class);
 		} else
 
 		// SkLearn2PMML 0.55.0+
 		{
-			name = "estimator";
+			return get("estimator", Estimator.class);
 		}
-
-		Object estimator = get(name);
-		if(estimator == null){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(this, name) + "\' has a missing (None/null) value");
-		}
-
-		CastFunction<Estimator> castFunction = new CastFunction<Estimator>(Estimator.class){
-
-			@Override
-			protected String formatMessage(Object object){
-				return "Attribute \'" + ClassDictUtil.formatMember(EstimatorProxy.this, name) + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
-			}
-		};
-
-		return castFunction.apply(estimator);
 	}
 
 	@Override

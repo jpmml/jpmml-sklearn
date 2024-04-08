@@ -57,11 +57,11 @@ public class RemoveMulticollinearity extends Transformer {
 	public List<String> getDrop(){
 
 		// PyCaret 3.0.0-RC
-		if(containsKey("_drop")){
-			return getList("_drop", String.class);
+		if(hasattr("_drop")){
+			return getStringList("_drop");
 		}
 
 		// PyCaret 3.0.0+
-		return getList("drop_", String.class);
+		return getStringList("drop_");
 	}
 }

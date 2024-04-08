@@ -84,8 +84,8 @@ public class BinningProcess extends Initializer {
 					String key = entry.getKey();
 					Object value = entry.getValue();
 
-					if(!optimalBinning.containsKey(key)){
-						optimalBinning.put(key, value);
+					if(!optimalBinning.hasattr(key)){
+						optimalBinning.setattr(key, value);
 					}
 				}
 			}
@@ -135,7 +135,7 @@ public class BinningProcess extends Initializer {
 	}
 
 	public List<String> getVariableNames(){
-		return (List)getListLike("variable_names", String.class);
+		return getListLike("variable_names", String.class);
 	}
 
 	public Map<String, String> getVariableDTypes(){

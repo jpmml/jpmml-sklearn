@@ -29,7 +29,7 @@ public class MiniBatchKMeans extends KMeans {
 	@Override
 	public List<Integer> getLabels(){
 
-		if(!containsKey("labels_")){
+		if(!hasattr("labels_")){
 			return null;
 		}
 

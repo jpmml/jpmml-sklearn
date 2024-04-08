@@ -61,7 +61,7 @@ public class Splitter extends Tokenizer {
 	}
 
 	public Splitter setWordSeparatorRE(String wordSeparatorRE){
-		put("word_separator_re", wordSeparatorRE);
+		setattr("word_separator_re", wordSeparatorRE);
 
 		return this;
 	}

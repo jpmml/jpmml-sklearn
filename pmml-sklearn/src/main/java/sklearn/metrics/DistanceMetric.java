@@ -20,10 +20,9 @@ package sklearn.metrics;
 
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.python.ClassDictConstructorUtil;
-import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.CustomPythonObject;
+import org.jpmml.python.CythonObject;
 
-public class DistanceMetric extends CustomPythonObject {
+public class DistanceMetric extends CythonObject {
 
 	public DistanceMetric(String module, String name){
 		super(module, name);
@@ -45,7 +44,7 @@ public class DistanceMetric extends CustomPythonObject {
 
 	@Override
 	public void __setstate__(Object[] args){
-		super.__setstate__(ClassDictUtil.createAttributeMap(SETSTATE_ATTRIBUTES, args));
+		super.__setstate__(SETSTATE_ATTRIBUTES, args);
 	}
 
 	private static final String[] SETSTATE_ATTRIBUTES = {

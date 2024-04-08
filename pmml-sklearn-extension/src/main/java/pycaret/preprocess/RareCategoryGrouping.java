@@ -73,7 +73,7 @@ public class RareCategoryGrouping extends Transformer {
 	public Map<String, ?> getToOther(){
 
 		// PyCaret 3.0.0-RC
-		if(containsKey("_to_other")){
+		if(hasattr("_to_other")){
 			return getDict("_to_other");
 		}
 

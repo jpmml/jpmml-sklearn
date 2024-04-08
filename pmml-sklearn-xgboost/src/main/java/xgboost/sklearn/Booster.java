@@ -57,7 +57,7 @@ public class Booster extends PythonObject {
 
 	public Integer getBestNTreeLimit(){
 
-		if(!containsKey("best_ntree_limit")){
+		if(!hasattr("best_ntree_limit")){
 			return null;
 		}
 

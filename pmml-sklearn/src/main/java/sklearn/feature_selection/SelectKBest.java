@@ -41,7 +41,7 @@ public class SelectKBest extends SkLearnSelector {
 	@Override
 	public List<Boolean> getSupportMask(){
 		Object k = getK();
-		List<? extends Number> scores = getScores();
+		List<Number> scores = getScores();
 
 		if(("all").equals(k)){
 			return null;
@@ -79,7 +79,7 @@ public class SelectKBest extends SkLearnSelector {
 		return getObject("k");
 	}
 
-	public List<? extends Number> getScores(){
+	public List<Number> getScores(){
 		return getNumberArray("scores_");
 	}
 

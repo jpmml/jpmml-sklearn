@@ -49,7 +49,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 	@Override
 	public Number getPriorProbability(int index){
 		List<?> classes = getClasses();
-		List<? extends Number> classPrior = getClassPrior();
+		List<Number> classPrior = getClassPrior();
 		String strategy = getStrategy();
 
 		ClassDictUtil.checkSize(classes, classPrior);
@@ -67,7 +67,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 	@Override
 	public TreeModel encodeModel(Schema schema){
 		List<?> classes = getClasses();
-		List<? extends Number> classPrior = getClassPrior();
+		List<Number> classPrior = getClassPrior();
 		Object constant = getConstant();
 		String strategy = getStrategy();
 
@@ -121,7 +121,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 		return treeModel;
 	}
 
-	public List<? extends Number> getClassPrior(){
+	public List<Number> getClassPrior(){
 		return getNumberArray("class_prior_");
 	}
 

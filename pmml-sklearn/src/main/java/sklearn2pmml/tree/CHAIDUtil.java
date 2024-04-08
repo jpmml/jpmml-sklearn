@@ -87,7 +87,7 @@ public class CHAIDUtil {
 
 		Integer columnId = split.getColumnId();
 		List<List<Integer>> splits = split.getSplits();
-		List<List<?>> splitMap = split.getSplitMap();
+		List<List<Object>> splitMap = split.getSplitMap();
 
 		ClassDictUtil.checkSize(successors, splits, splitMap);
 

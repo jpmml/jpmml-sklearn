@@ -18,8 +18,6 @@
  */
 package sklearn.linear_model.stochastic_gradient;
 
-import org.jpmml.python.ClassDictUtil;
-
 public class SquaredHinge extends LossFunction {
 
 	public SquaredHinge(String module, String name){
@@ -28,7 +26,7 @@ public class SquaredHinge extends LossFunction {
 
 	@Override
 	public void __init__(Object[] args){
-		super.__setstate__(ClassDictUtil.createAttributeMap(INIT_ATTRIBUTES, args));
+		super.__setstate__(INIT_ATTRIBUTES, args);
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {

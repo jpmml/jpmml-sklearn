@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.AttributeException;
 import sklearn.SkLearnRegressor;
 import sklearn.compose.ColumnTransformer;
 
@@ -52,7 +53,7 @@ public class HistGradientBoostingRegressor extends SkLearnRegressor {
 		try {
 			return getNumber("_baseline_prediction");
 		// SkLearn 1.1.0+
-		} catch(IllegalArgumentException iae){
+		} catch(AttributeException ae){
 			List<Number> baselinePredictions = getNumberArray("_baseline_prediction");
 
 			if(baselinePredictions.size() != 1){

@@ -136,7 +136,7 @@ public class Domain extends Decorator {
 	public TypeInfo getDType(){
 
 		// SkLearn2PMML 0.78.0+
-		if(containsKey("dtype_")){
+		if(hasattr("dtype_")){
 			return getDType("dtype_", true);
 		} else
 
@@ -188,7 +188,7 @@ public class Domain extends Decorator {
 	}
 
 	public List<String> getDisplayName(){
-		Object object = get("display_name");
+		Object object = getOptionalObject("display_name");
 
 		if(object == null){
 			return null;

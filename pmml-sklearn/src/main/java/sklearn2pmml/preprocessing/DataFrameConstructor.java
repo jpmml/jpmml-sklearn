@@ -106,7 +106,7 @@ public class DataFrameConstructor extends Initializer {
 	}
 
 	public List<String> getColumns(){
-		return getList("columns", String.class);
+		return getStringList("columns");
 	}
 
 	public TypeInfo getDType(){

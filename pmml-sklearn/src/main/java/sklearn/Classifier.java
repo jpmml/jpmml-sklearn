@@ -82,7 +82,7 @@ public class Classifier extends Estimator implements HasClasses {
 	@Override
 	public List<?> getClasses(){
 
-		if(containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
+		if(hasattr(SkLearn2PMMLFields.PMML_CLASSES)){
 			return getClasses(SkLearn2PMMLFields.PMML_CLASSES);
 		}
 
@@ -93,7 +93,16 @@ public class Classifier extends Estimator implements HasClasses {
 		List<?> values = getListLike(name);
 
 		values = values.stream()
-			.map(value -> (value instanceof HasArray) ? canonicalizeValues(((HasArray)value).getArrayContent()) : value)
+			.map(value -> {
+
+				if(value instanceof HasArray){
+					HasArray hasArray = (HasArray)value;
+
+					return canonicalizeValues(hasArray.getArrayContent());
+				}
+
+				return value;
+			})
 			.collect(Collectors.toList());
 
 		return canonicalizeValues(values);

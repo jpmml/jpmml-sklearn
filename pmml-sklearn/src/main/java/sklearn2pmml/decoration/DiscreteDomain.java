@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.UnivariateStats;
@@ -34,7 +32,6 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.CategoricalDtype;
@@ -140,37 +137,27 @@ public class DiscreteDomain extends Domain implements HasMultiType {
 		return result;
 	}
 
-	public List<? extends List<?>> getDataValues(){
+	public List<List<Object>> getDataValues(){
 
 		// SkLearn2PMML 0.101.0+
-		if(containsKey("data_values_")){
-			Object dataValues = get("data_values_");
+		if(hasattr("data_values_")){
+			Object dataValues = getObject("data_values_");
 
 			if(dataValues instanceof List){
-				List<? extends HasArray> arrays = getList("data_values_", HasArray.class);
-
-				Function<HasArray, List<?>> function = new Function<HasArray, List<?>>(){
-
-					@Override
-					public List<?> apply(HasArray hasArray){
-						return (List)hasArray.getArrayContent();
-					}
-				};
-
-				return Lists.transform(arrays, function);
+				return getArrayList("data_values_", Object.class);
 			}
 
-			return Collections.singletonList(getArray("data_values_"));
+			return Collections.singletonList(getObjectArray("data_values_"));
 		} else
 
 		// SkLearn2PMML 0.100.2
 		{
-			return Collections.singletonList(getArray("data_"));
+			return Collections.singletonList(getObjectArray("data_"));
 		}
 	}
 
 	public List<Object[]> getDiscrStats(){
-		Object discrStats = get("discr_stats_");
+		Object discrStats = getObject("discr_stats_");
 
 		if(discrStats instanceof List){
 			return getTupleList("discr_stats_");

@@ -39,8 +39,8 @@ public class GBDTLMRegressor extends Regressor {
 		MultiOneHotEncoder ohe = getOHE();
 		LinearRegressor lm = getLM();
 
-		List<? extends Number> coef = lm.getCoef();
-		List<? extends Number> intercept = lm.getIntercept();
+		List<Number> coef = lm.getCoef();
+		List<Number> intercept = lm.getIntercept();
 
 		return GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), schema);
 	}

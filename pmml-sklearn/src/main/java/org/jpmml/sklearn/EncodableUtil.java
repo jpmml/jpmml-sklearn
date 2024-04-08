@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
@@ -63,7 +64,7 @@ public class EncodableUtil {
 		int numberOfFeatures = step.getNumberOfFeatures();
 
 		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(step, SkLearnFields.N_FEATURES_IN) + "\' is not set");
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(step, SkLearnFields.N_FEATURES_IN) + "\' is not set");
 		}
 
 		return generateNames("x", numberOfFeatures, true);
@@ -74,7 +75,7 @@ public class EncodableUtil {
 		int numberOfOutputs = estimator.getNumberOfOutputs();
 
 		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
-			throw new IllegalArgumentException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.N_OUTPUTS) + "\' is not set");
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(estimator, SkLearnFields.N_OUTPUTS) + "\' is not set");
 		}
 
 		return generateNames("y", numberOfOutputs, false);

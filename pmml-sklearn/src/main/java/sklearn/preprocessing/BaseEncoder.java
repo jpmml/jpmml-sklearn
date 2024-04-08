@@ -21,12 +21,9 @@ package sklearn.preprocessing;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.TypeUtil;
-import org.jpmml.python.HasArray;
 import sklearn.HasMultiType;
 import sklearn.SkLearnTransformer;
 
@@ -49,9 +46,9 @@ public class BaseEncoder extends SkLearnTransformer implements HasMultiType {
 
 	@Override
 	public DataType getDataType(int index){
-		List<List<?>> categories = getCategories();
+		List<List<Object>> categories = getCategories();
 
-		List<?> featureCategories = categories.get(index);
+		List<Object> featureCategories = categories.get(index);
 
 		featureCategories = featureCategories.stream()
 			.filter(category -> !EncoderUtil.isMissingCategory(category))
@@ -60,25 +57,11 @@ public class BaseEncoder extends SkLearnTransformer implements HasMultiType {
 		return TypeUtil.getDataType(featureCategories, DataType.STRING);
 	}
 
-	public List<List<?>> getCategories(){
-		return getArrayList("categories_");
+	public List<List<Object>> getCategories(){
+		return getArrayList("categories_", Object.class);
 	}
 
 	public String getHandleUnknown(){
 		return getOptionalString("handle_unknown");
-	}
-
-	List<List<?>> getArrayList(String name){
-		List<HasArray> encodings = getList(name, HasArray.class);
-
-		Function<HasArray, List<?>> function = new Function<HasArray, List<?>>(){
-
-			@Override
-			public List<?> apply(HasArray hasArray){
-				return hasArray.getArrayContent();
-			}
-		};
-
-		return Lists.transform(encodings, function);
 	}
 }

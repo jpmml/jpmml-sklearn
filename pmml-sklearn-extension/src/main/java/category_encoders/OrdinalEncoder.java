@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -107,7 +108,7 @@ public class OrdinalEncoder extends BaseEncoder {
 			@Override
 			public Mapping apply(Map<String, ?> map){
 				Mapping mapping = new Mapping(getClassName(), "mapping");
-				mapping.putAll(map);
+				mapping.update(map);
 
 				return mapping;
 			}
@@ -130,7 +131,7 @@ public class OrdinalEncoder extends BaseEncoder {
 				Series mapping = get("mapping", Series.class);
 
 				return SeriesUtil.toMap(mapping, Functions.identity(), ValueUtil::asInteger);
-			} catch(IllegalArgumentException iae){
+			} catch(AttributeException ae){
 				return (Map)getDict("mapping");
 			}
 		}

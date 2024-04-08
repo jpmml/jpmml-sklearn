@@ -36,7 +36,7 @@ public class MLPClassifier extends SkLearnClassifier {
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<? extends HasArray> coefs = getCoefs();
+		List<HasArray> coefs = getCoefs();
 
 		return MultilayerPerceptronUtil.getNumberOfFeatures(coefs);
 	}
@@ -50,8 +50,8 @@ public class MLPClassifier extends SkLearnClassifier {
 	public NeuralNetwork encodeModel(Schema schema){
 		String activation = getActivation();
 
-		List<? extends HasArray> coefs = getCoefs();
-		List<? extends HasArray> intercepts = getIntercepts();
+		List<HasArray> coefs = getCoefs();
+		List<HasArray> intercepts = getIntercepts();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -66,11 +66,11 @@ public class MLPClassifier extends SkLearnClassifier {
 		return getString("activation");
 	}
 
-	public List<? extends HasArray> getCoefs(){
-		return getList("coefs_", HasArray.class);
+	public List<HasArray> getCoefs(){
+		return getArrayList("coefs_");
 	}
 
-	public List<? extends HasArray> getIntercepts(){
-		return getList("intercepts_", HasArray.class);
+	public List<HasArray> getIntercepts(){
+		return getArrayList("intercepts_");
 	}
 }

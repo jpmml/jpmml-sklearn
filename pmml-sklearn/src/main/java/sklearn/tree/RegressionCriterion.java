@@ -18,10 +18,9 @@
  */
 package sklearn.tree;
 
-import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.CustomPythonObject;
+import org.jpmml.python.CythonObject;
 
-public class RegressionCriterion extends CustomPythonObject {
+public class RegressionCriterion extends CythonObject {
 
 	public RegressionCriterion(String module, String name){
 		super(module, name);
@@ -29,7 +28,7 @@ public class RegressionCriterion extends CustomPythonObject {
 
 	@Override
 	public void __init__(Object[] args){
-		super.__setstate__(ClassDictUtil.createAttributeMap(INIT_ATTRIBUTES, args));
+		super.__setstate__(INIT_ATTRIBUTES, args);
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {

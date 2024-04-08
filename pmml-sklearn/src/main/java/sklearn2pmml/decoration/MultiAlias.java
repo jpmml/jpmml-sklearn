@@ -41,6 +41,6 @@ public class MultiAlias extends TransformerWrapper {
 	}
 
 	public List<String> getNames(){
-		return getList("names", String.class);
+		return getStringList("names");
 	}
 }

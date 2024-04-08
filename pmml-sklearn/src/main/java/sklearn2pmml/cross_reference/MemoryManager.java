@@ -46,6 +46,6 @@ public class MemoryManager extends Transformer {
 	}
 
 	public List<String> getNames(){
-		return getList("names", String.class);
+		return getStringList("names");
 	}
 }

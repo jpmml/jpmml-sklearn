@@ -31,7 +31,7 @@ public class MultinomialLogit extends Link {
 	}
 
 	@Override
-	public List<? extends Number> computeInitialPredictions(int numClasses, HasPriorProbability hasPriorProbability){
+	public List<Double> computeInitialPredictions(int numClasses, HasPriorProbability hasPriorProbability){
 		List<Number> priorProbabilities = new ArrayList<>();
 
 		for(int i = 0; i < numClasses; i++){

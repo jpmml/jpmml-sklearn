@@ -29,11 +29,11 @@ public class Verification extends PythonObject {
 	}
 
 	public boolean hasProbabilityValues(){
-		return containsKey("probability_values");
+		return hasattr("probability_values");
 	}
 
-	public List<?> getActiveValues(){
-		return getArray("active_values");
+	public List<Object> getActiveValues(){
+		return getObjectArray("active_values");
 	}
 
 	public int[] getActiveValuesShape(){
@@ -46,7 +46,7 @@ public class Verification extends PythonObject {
 		return getArrayShape("active_values", 2);
 	}
 
-	public List<? extends Number> getProbabilityValues(){
+	public List<Number> getProbabilityValues(){
 		return getNumberArray("probability_values");
 	}
 
@@ -54,8 +54,8 @@ public class Verification extends PythonObject {
 		return getArrayShape("probability_values", 2);
 	}
 
-	public List<?> getTargetValues(){
-		return getArray("target_values");
+	public List<Object> getTargetValues(){
+		return getObjectArray("target_values");
 	}
 
 	public int[] getTargetValuesShape(){

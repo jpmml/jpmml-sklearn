@@ -47,7 +47,7 @@ public class TruncatedSVD extends BasePCA {
 		int numberOfComponents = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<? extends Number> components = getComponents();
+		List<Number> components = getComponents();
 
 		ClassDictUtil.checkSize(numberOfFeatures, features);
 
@@ -56,7 +56,7 @@ public class TruncatedSVD extends BasePCA {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < numberOfComponents; i++){
-			List<? extends Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
+			List<Number> component = CMatrixUtil.getRow(components, numberOfComponents, numberOfFeatures, i);
 
 			Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
 

@@ -18,9 +18,9 @@
  */
 package sklearn.loss;
 
-import org.jpmml.python.CustomPythonObject;
+import org.jpmml.python.CythonObject;
 
-public class CyLossFunction extends CustomPythonObject {
+public class CyLossFunction extends CythonObject {
 
 	public CyLossFunction(String module, String name){
 		super(module, name);

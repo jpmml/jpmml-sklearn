@@ -35,7 +35,7 @@ public class MeanEstimator extends PythonObject implements HasDefaultValue {
 		return Iterables.getOnlyElement(getMean());
 	}
 
-	public List<? extends Number> getMean(){
+	public List<Number> getMean(){
 		return getNumberArray("mean");
 	}
 }

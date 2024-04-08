@@ -42,7 +42,7 @@ public class PowerTransformer extends SkLearnTransformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Number> lambdas = getLambdas();
+		List<Number> lambdas = getLambdas();
 		String method = getMethod();
 		Boolean standardize = getStandardize();
 
@@ -88,7 +88,7 @@ public class PowerTransformer extends SkLearnTransformer {
 		return result;
 	}
 
-	public List<? extends Number> getLambdas(){
+	public List<Number> getLambdas(){
 		return getNumberArray("lambdas_");
 	}
 

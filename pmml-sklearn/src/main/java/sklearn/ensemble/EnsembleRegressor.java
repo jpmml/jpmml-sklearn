@@ -50,7 +50,7 @@ public class EnsembleRegressor extends SkLearnRegressor implements HasEstimatorE
 	public Regressor getEstimator(){
 
 		// SkLearn 1.1
-		if(containsKey("base_estimator_")){
+		if(hasattr("base_estimator_")){
 			return get("base_estimator_", Regressor.class);
 		}
 
@@ -59,7 +59,7 @@ public class EnsembleRegressor extends SkLearnRegressor implements HasEstimatorE
 	}
 
 	@Override
-	public List<? extends Regressor> getEstimators(){
+	public List<Regressor> getEstimators(){
 		return getList("estimators_", Regressor.class);
 	}
 }

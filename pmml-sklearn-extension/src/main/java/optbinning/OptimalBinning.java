@@ -276,8 +276,8 @@ public class OptimalBinning extends Transformer {
 		return mapValues;
 	}
 
-	public List<?> getCategoriesIn(){
-		return getArray("_categories");
+	public List<Object> getCategoriesIn(){
+		return getObjectArray("_categories");
 	}
 
 	public List<Double> getCategoriesOut(){
@@ -333,7 +333,7 @@ public class OptimalBinning extends Transformer {
 
 	public String getMetric(){
 
-		if(!containsKey("metric")){
+		if(!hasattr("metric")){
 			return getDefaultMetric();
 		}
 
@@ -341,7 +341,7 @@ public class OptimalBinning extends Transformer {
 	}
 
 	public OptimalBinning setMetric(String metric){
-		put("metric", metric);
+		setattr("metric", metric);
 
 		return this;
 	}
@@ -355,7 +355,7 @@ public class OptimalBinning extends Transformer {
 	}
 
 	public List<Number> getSpecialCodes(){
-		Object specialCodes = get("special_codes");
+		Object specialCodes = getOptionalObject("special_codes");
 
 		if(specialCodes == null){
 			return Collections.emptyList();

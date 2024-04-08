@@ -43,15 +43,15 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<? extends Classifier> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 
 		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends Classifier> estimators = getEstimators();
-		List<? extends Number> weights = getWeights();
+		List<Classifier> estimators = getEstimators();
+		List<Number> weights = getWeights();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -76,7 +76,7 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 	}
 
 	@Override
-	public List<? extends Classifier> getEstimators(){
+	public List<Classifier> getEstimators(){
 		return getList("estimators_", Classifier.class);
 	}
 
@@ -84,7 +84,7 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 		return getString("voting");
 	}
 
-	public List<? extends Number> getWeights(){
+	public List<Number> getWeights(){
 		Object weights = getOptionalObject("weights");
 
 		if((weights == null) || (weights instanceof List)){

@@ -53,14 +53,14 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 			return numberOfFeatures;
 		}
 
-		List<? extends Classifier> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 
 		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Classifier> estimators = getEstimators();
+		List<Classifier> estimators = getEstimators();
 		Boolean multilabel = getMultilabel();
 
 		if(multilabel){
@@ -115,7 +115,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 	}
 
 	@Override
-	public List<? extends Classifier> getEstimators(){
+	public List<Classifier> getEstimators(){
 		return getList("estimators_", Classifier.class);
 	}
 

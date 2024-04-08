@@ -64,8 +64,8 @@ public class RobustScaler extends Scaler {
 		Boolean withCentering = getWithCentering();
 		Boolean withScaling = getWithScaling();
 
-		List<? extends Number> center = (withCentering ? getCenter() : null);
-		List<? extends Number> scale = (withScaling ? getScale() : null);
+		List<Number> center = (withCentering ? getCenter() : null);
+		List<Number> scale = (withScaling ? getScale() : null);
 
 		if(center == null && scale == null){
 			return features;
@@ -116,7 +116,7 @@ public class RobustScaler extends Scaler {
 		return getBoolean("with_scaling");
 	}
 
-	public List<? extends Number> getCenter(){
+	public List<Number> getCenter(){
 		return getNumberArray("center_");
 	}
 
@@ -124,7 +124,7 @@ public class RobustScaler extends Scaler {
 		return getArrayShape("center_", 1);
 	}
 
-	public List<? extends Number> getScale(){
+	public List<Number> getScale(){
 		return getNumberArray("scale_");
 	}
 

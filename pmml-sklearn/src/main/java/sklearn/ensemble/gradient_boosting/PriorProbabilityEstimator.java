@@ -32,7 +32,7 @@ public class PriorProbabilityEstimator extends PythonObject implements HasPriorP
 
 	@Override
 	public Number getPriorProbability(int index){
-		List<? extends Number> priors = getPriors();
+		List<Number> priors = getPriors();
 
 		if(priors.size() <= 1 && index <= 1){
 			return Iterables.getOnlyElement(priors);
@@ -41,7 +41,7 @@ public class PriorProbabilityEstimator extends PythonObject implements HasPriorP
 		return Iterables.get(priors, index);
 	}
 
-	public List<? extends Number> getPriors(){
+	public List<Number> getPriors(){
 		return getNumberArray("priors");
 	}
 }

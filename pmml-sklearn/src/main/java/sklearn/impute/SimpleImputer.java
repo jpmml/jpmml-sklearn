@@ -131,18 +131,18 @@ public class SimpleImputer extends SkLearnTransformer {
 		return getOptionalScalar("missing_values");
 	}
 
-	public List<?> getStatistics(){
+	public List<Object> getStatistics(){
 
-		if(!containsKey("statistics_")){
+		if(!hasattr("statistics_")){
 			return Collections.emptyList();
 		}
 
-		return getArray("statistics_");
+		return getObjectArray("statistics_");
 	}
 
 	public int[] getStatisticsShape(){
 
-		if(!containsKey("statistics_")){
+		if(!hasattr("statistics_")){
 			return new int[]{0};
 		}
 

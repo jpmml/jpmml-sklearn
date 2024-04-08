@@ -40,8 +40,8 @@ public class TargetEncoder extends BaseEncoder {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<List<?>> categories = getCategories();
-		List<List<?>> encodings = getEncodings();
+		List<List<Object>> categories = getCategories();
+		List<List<Number>> encodings = getEncodings();
 		Number targetMean = getTargetMean();
 		String targetType = getTargetType();
 
@@ -60,8 +60,8 @@ public class TargetEncoder extends BaseEncoder {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			List<?> featureCategories = categories.get(i);
-			List<?> featureEncodings = encodings.get(i);
+			List<Object> featureCategories = categories.get(i);
+			List<Number> featureEncodings = encodings.get(i);
 
 			ClassDictUtil.checkSize(featureCategories, featureEncodings);
 
@@ -76,7 +76,7 @@ public class TargetEncoder extends BaseEncoder {
 				featureCategories.remove(index);
 
 				featureEncodings = new ArrayList<>(featureEncodings);
-				mapMissingTo = (Number)featureEncodings.remove(index);
+				mapMissingTo = featureEncodings.remove(index);
 			}
 
 			encoder.toCategorical(feature.getName(), featureCategories);
@@ -93,8 +93,8 @@ public class TargetEncoder extends BaseEncoder {
 		return result;
 	}
 
-	public List<List<?>> getEncodings(){
-		return getArrayList("encodings_");
+	public List<List<Number>> getEncodings(){
+		return getArrayList("encodings_", Number.class);
 	}
 
 	public Number getTargetMean(){

@@ -26,10 +26,8 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.HasArray;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
-import sklearn.ensemble.EnsembleUtil;
 
 public class BaggingClassifier extends EnsembleClassifier {
 
@@ -39,8 +37,8 @@ public class BaggingClassifier extends EnsembleClassifier {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends Classifier> estimators = getEstimators();
-		List<List<Integer>> estimatorsFeatures = getEstimatorsFeatures();
+		List<Classifier> estimators = getEstimators();
+		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
@@ -62,7 +60,7 @@ public class BaggingClassifier extends EnsembleClassifier {
 		return miningModel;
 	}
 
-	public List<List<Integer>> getEstimatorsFeatures(){
-		return EnsembleUtil.transformEstimatorsFeatures(getList("estimators_features_", HasArray.class));
+	public List<List<Number>> getEstimatorsFeatures(){
+		return getArrayList("estimators_features_", Number.class);
 	}
 }

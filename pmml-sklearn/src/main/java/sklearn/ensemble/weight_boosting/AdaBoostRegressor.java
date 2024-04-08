@@ -48,15 +48,15 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 			return numberOfFeatures;
 		}
 
-		List<? extends Regressor> estimators = getEstimators();
+		List<Regressor> estimators = getEstimators();
 
 		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends Regressor> estimators = getEstimators();
-		List<? extends Number> estimatorWeights = getEstimatorWeights();
+		List<Regressor> estimators = getEstimators();
+		List<Number> estimatorWeights = getEstimatorWeights();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
@@ -74,7 +74,7 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 		return miningModel;
 	}
 
-	public List<? extends Number> getEstimatorWeights(){
+	public List<Number> getEstimatorWeights(){
 		return getNumberArray("estimator_weights_");
 	}
 }

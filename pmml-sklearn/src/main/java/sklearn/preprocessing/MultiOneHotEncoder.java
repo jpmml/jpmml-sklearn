@@ -40,7 +40,6 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class MultiOneHotEncoder extends BaseEncoder {
@@ -51,12 +50,12 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<List<?>> categories = getCategories();
+		List<List<Object>> categories = getCategories();
 		Object drop = getDrop();
 		List<Integer> dropIdx = (drop != null ? getDropIdx() : null);
 		String handleUnknown = getHandleUnknown();
 		Boolean infrequentEnabled = getInfrequentEnabled();
-		List<List<Integer>> infrequentIndices = (infrequentEnabled ? getInfrequentIndices() : null);
+		List<List<Number>> infrequentIndices = (infrequentEnabled ? getInfrequentIndices() : null);
 
 		ClassDictUtil.checkSize(categories, features);
 
@@ -66,7 +65,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			Feature feature = features.get(i);
 
 			List<Object> featureCategories = new ArrayList<>(categories.get(i));
-			List<Integer> featureInfrequentIndices = (infrequentEnabled ? infrequentIndices.get(i) : null);
+			List<Number> featureInfrequentIndices = (infrequentEnabled ? infrequentIndices.get(i) : null);
 
 			boolean featureInfrequentEnabled = infrequentEnabled;
 			if(featureInfrequentIndices == null || featureInfrequentIndices.isEmpty()){
@@ -234,7 +233,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 	}
 
 	public List<Integer> getDropIdx(){
-		List<? extends Number> dropIdx = getNumberArray("drop_idx_");
+		List<Number> dropIdx = getNumberArray("drop_idx_");
 
 		if(dropIdx == null){
 			return null;
@@ -247,8 +246,8 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		return getOptionalBoolean("_infrequent_enabled", false);
 	}
 
-	public List<List<Integer>> getInfrequentIndices(){
-		return EncoderUtil.transformInfrequentIndices(getList("_infrequent_indices", HasArray.class));
+	public List<List<Number>> getInfrequentIndices(){
+		return getArrayList("_infrequent_indices", Number.class);
 	}
 
 	static
@@ -290,7 +289,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 	}
 
 	static
-	private <E> List<E> selectValues(List<E> values, Collection<Integer> indices){
+	private <E> List<E> selectValues(List<E> values, Collection<Number> indices){
 
 		if(indices == null || indices.isEmpty()){
 			return Collections.emptyList();
@@ -298,8 +297,8 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 		List<E> result = new ArrayList<>();
 
-		for(Integer index : indices){
-			E value = values.get(index);
+		for(Number index : indices){
+			E value = values.get(ValueUtil.asInt(index));
 
 			result.add(value);
 		}

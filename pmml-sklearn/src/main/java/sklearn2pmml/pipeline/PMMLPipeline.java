@@ -90,14 +90,14 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		List<String> probabilityFields = null;
 		List<String> targetFields = getTargetFields();
 
-		Map<?, ?> header = getHeader();
+		Map<String, ?> header = getHeader();
 		String repr = getRepr();
 		Transformer predictTransformer = getPredictTransformer();
 		Transformer predictProbaTransformer = getPredictProbaTransformer();
 		Transformer applyTransformer = getApplyTransformer();
 		Verification verification = getVerification();
 
-		List<? extends Customization> customizations = null;
+		List<Customization> customizations = null;
 
 		Estimator estimator = null;
 
@@ -122,7 +122,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		encoder.setModel(model);
 
 		if(!estimator.hasFeatureImportances()){
-			List<? extends Number> featureImportances = getPMMLFeatureImportances();
+			List<Number> featureImportances = getPMMLFeatureImportances();
 
 			if(featureImportances != null){
 				ClassDictUtil.checkSize(activeFields, featureImportances);
@@ -232,7 +232,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			} // End if
 
 			if(hasProbabilityValues){
-				List<? extends Number> probabilityValues = verification.getProbabilityValues();
+				List<Number> probabilityValues = verification.getProbabilityValues();
 				int[] probabilityValuesShape = verification.getProbabilityValuesShape();
 
 				ClassDictUtil.checkShapes(0, activeValuesShape, probabilityValuesShape);
@@ -301,7 +301,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		return encodePMML(header, model, repr, encoder);
 	}
 
-	private PMML encodePMML(Map<?, ?> header, Model model, String repr, SkLearnEncoder encoder){
+	private PMML encodePMML(Map<String, ?> header, Model model, String repr, SkLearnEncoder encoder){
 		PMML pmml = encoder.encodePMML(model);
 
 		if(header != null){
@@ -462,13 +462,13 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		return this;
 	}
 
-	public Map<?, ?> getHeader(){
-		return getOptional("header", Map.class);
+	public Map<String, ?> getHeader(){
+		return getOptionalDict("header");
 	}
 
-	public List<? extends Number> getPMMLFeatureImportances(){
+	public List<Number> getPMMLFeatureImportances(){
 
-		if(!containsKey("pmml_feature_importances_")){
+		if(!hasattr("pmml_feature_importances_")){
 			return null;
 		}
 
@@ -493,7 +493,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 	public List<String> getActiveFields(){
 
-		if(!containsKey("active_fields")){
+		if(!hasattr("active_fields")){
 			return null;
 		}
 
@@ -501,7 +501,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	public PMMLPipeline setActiveFields(List<String> activeFields){
-		put("active_fields", NDArrayUtil.toArray(activeFields));
+		setattr("active_fields", NDArrayUtil.toArray(activeFields));
 
 		return this;
 	}
@@ -509,12 +509,12 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	public List<String> getTargetFields(){
 
 		// SkLearn2PMML 0.24.3
-		if(containsKey("target_field")){
+		if(hasattr("target_field")){
 			return Collections.singletonList(getOptionalString("target_field"));
 		} // End if
 
 		// SkLearn2PMML 0.25+
-		if(!containsKey("target_fields")){
+		if(!hasattr("target_fields")){
 			return null;
 		}
 
@@ -522,7 +522,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	public PMMLPipeline setTargetFields(List<String> targetFields){
-		put("target_fields", NDArrayUtil.toArray(targetFields));
+		setattr("target_fields", NDArrayUtil.toArray(targetFields));
 
 		return this;
 	}
@@ -532,7 +532,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	public PMMLPipeline setRepr(String repr){
-		put("repr_", repr);
+		setattr("repr_", repr);
 
 		return this;
 	}
@@ -542,7 +542,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	public PMMLPipeline setVerification(Verification verification){
-		put("verification", verification);
+		setattr("verification", verification);
 
 		return this;
 	}

@@ -46,7 +46,7 @@ public class MaxAbsScaler extends Scaler {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Number> scale = getScale();
+		List<Number> scale = getScale();
 
 		ClassDictUtil.checkSize(features, scale);
 
@@ -75,7 +75,7 @@ public class MaxAbsScaler extends Scaler {
 		return result;
 	}
 
-	public List<? extends Number> getScale(){
+	public List<Number> getScale(){
 		return getNumberArray("scale_");
 	}
 

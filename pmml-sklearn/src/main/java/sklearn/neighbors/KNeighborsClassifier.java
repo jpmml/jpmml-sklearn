@@ -98,7 +98,7 @@ public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric
 	}
 
 	@Override
-	public List<? extends Number> getFitX(){
+	public List<Number> getFitX(){
 		return getNumberArray("_fit_X");
 	}
 
@@ -108,17 +108,17 @@ public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric
 	}
 
 	@Override
-	public List<?> getId(){
+	public List<Object> getId(){
 
-		if(!containsKey("_id")){
+		if(!hasattr("_id")){
 			return null;
 		}
 
-		return getArray("_id");
+		return getObjectArray("_id");
 	}
 
 	@Override
-	public List<? extends Number> getY(){
+	public List<Number> getY(){
 		return getNumberArray("_y");
 	}
 

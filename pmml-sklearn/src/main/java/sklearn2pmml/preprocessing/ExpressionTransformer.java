@@ -168,7 +168,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public ExpressionTransformer setDefaultValue(Object defaultValue){
-		put("default_value", defaultValue);
+		setattr("default_value", defaultValue);
 
 		return this;
 	}
@@ -176,7 +176,7 @@ public class ExpressionTransformer extends Transformer {
 	public TypeInfo getDType(){
 
 		// SkLearn2PMML 0.103.2+
-		if(containsKey("dtype_")){
+		if(hasattr("dtype_")){
 			return super.getOptionalDType("dtype_", true);
 		}
 
@@ -185,7 +185,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public ExpressionTransformer setDType(Object dtype){
-		put("dtype", dtype);
+		setattr("dtype", dtype);
 
 		return this;
 	}
@@ -193,7 +193,7 @@ public class ExpressionTransformer extends Transformer {
 	public Object getExpr(){
 
 		// SkLearn2PMML 0.31.0
-		if(containsKey("expr_")){
+		if(hasattr("expr_")){
 			return getString("expr_");
 		} else
 
@@ -204,7 +204,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public ExpressionTransformer setExpr(String expr){
-		put("expr", expr);
+		setattr("expr", expr);
 
 		return this;
 	}
@@ -214,7 +214,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public ExpressionTransformer setInvalidValueTreatment(String invalidValueTreatment){
-		put("invalid_value_treatment", invalidValueTreatment);
+		setattr("invalid_value_treatment", invalidValueTreatment);
 
 		return this;
 	}
@@ -224,7 +224,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public ExpressionTransformer setMapMissingTo(Object mapMissingTo){
-		put("map_missing_to", mapMissingTo);
+		setattr("map_missing_to", mapMissingTo);
 
 		return this;
 	}

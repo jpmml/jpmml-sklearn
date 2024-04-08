@@ -66,8 +66,8 @@ public class LinearRegressor extends SkLearnRegressor {
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Number> coef = getCoef();
-		List<? extends Number> intercept = getIntercept();
+		List<Number> coef = getCoef();
+		List<Number> intercept = getIntercept();
 
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
@@ -104,7 +104,7 @@ public class LinearRegressor extends SkLearnRegressor {
 		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, null, schema);
 	}
 
-	public List<? extends Number> getCoef(){
+	public List<Number> getCoef(){
 		return getNumberArray("coef_");
 	}
 
@@ -112,7 +112,7 @@ public class LinearRegressor extends SkLearnRegressor {
 		return getArrayShape("coef_");
 	}
 
-	public List<? extends Number> getIntercept(){
+	public List<Number> getIntercept(){
 		return getNumberArray("intercept_");
 	}
 }

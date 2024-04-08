@@ -50,14 +50,14 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 
 	@Override
 	public DataType getDataType(){
-		List<? extends Number> values = getValues();
+		List<Number> values = getValues();
 
 		return TypeUtil.getDataType(values, DataType.INTEGER);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Number> values = getValues();
+		List<Number> values = getValues();
 
 		ClassDictUtil.checkSize(1, features);
 
@@ -100,7 +100,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 		return result;
 	}
 
-	public List<? extends Number> getValues(){
+	public List<Number> getValues(){
 		List<Integer> featureSizes = getFeatureSizes();
 
 		ClassDictUtil.checkSize(1, featureSizes);
@@ -113,13 +113,13 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 
 		Integer featureSize = featureSizes.get(0);
 
-		List<Integer> result = new ArrayList<>();
+		List<Number> result = new ArrayList<>();
 		result.addAll(ContiguousSet.create(Range.closedOpen(0, featureSize), DiscreteDomain.integers()));
 
 		return result;
 	}
 
-	public List<? extends Number> getActiveFeatures(){
+	public List<Number> getActiveFeatures(){
 		return getNumberArray("active_features_");
 	}
 
@@ -130,7 +130,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 	@Override
 	public Boolean getSparseOutput(){
 
-		if(containsKey("sparse")){
+		if(hasattr("sparse")){
 			return getBoolean("sparse");
 		}
 

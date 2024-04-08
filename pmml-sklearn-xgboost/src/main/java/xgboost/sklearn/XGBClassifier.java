@@ -54,7 +54,7 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	public List<?> getClasses(){
 
 		// XGBoost 0.4 through 1.7
-		if(containsKey("_le") || containsKey(SkLearnFields.CLASSES) || containsKey(SkLearn2PMMLFields.PMML_CLASSES)){
+		if(hasattr("_le") || hasattr(SkLearnFields.CLASSES) || hasattr(SkLearn2PMMLFields.PMML_CLASSES)){
 			return super.getClasses();
 		}
 

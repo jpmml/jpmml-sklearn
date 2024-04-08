@@ -33,20 +33,20 @@ public class RegressorChain extends SkLearnRegressor {
 
 	@Override
 	public int getNumberOfOutputs(){
-		List<? extends Regressor> estimators = getEstimators();
+		List<Regressor> estimators = getEstimators();
 
 		return estimators.size();
 	}
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Regressor> estimators = getEstimators();
+		List<Regressor> estimators = getEstimators();
 		List<Integer> order = getOrder();
 
 		return ChainUtil.encodeChain(estimators, order, schema);
 	}
 
-	public List<? extends Regressor> getEstimators(){
+	public List<Regressor> getEstimators(){
 		return getList("estimators_", Regressor.class);
 	}
 

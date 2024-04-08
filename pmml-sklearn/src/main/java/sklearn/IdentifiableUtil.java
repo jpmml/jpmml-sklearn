@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,30 +16,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble;
+package sklearn;
 
-import java.util.List;
+import org.jpmml.python.Identifiable;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.jpmml.converter.ValueUtil;
-import org.jpmml.python.HasArray;
+public class IdentifiableUtil {
 
-public class EnsembleUtil {
-
-	private EnsembleUtil(){
+	private IdentifiableUtil(){
 	}
 
 	static
-	public List<List<Integer>> transformEstimatorsFeatures(List<? extends HasArray> estimatorsFeatures){
-		Function<HasArray, List<Integer>> function = new Function<HasArray, List<Integer>>(){
+	public Identifiable filter(Identifiable identifiable){
 
-			@Override
-			public List<Integer> apply(HasArray hasArray){
-				return ValueUtil.asIntegers((List)hasArray.getArrayContent());
+		if(identifiable != null){
+
+			switch(identifiable.getModule()){
+				case "sklearn.utils.validation":
+
+					switch(identifiable.getName()){
+						case "check_array":
+							return null;
+						default:
+							break;
+					}
+					break;
+				default:
+					break;
 			}
-		};
+		}
 
-		return Lists.transform(estimatorsFeatures, function);
+		return identifiable;
 	}
 }

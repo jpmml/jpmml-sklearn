@@ -38,7 +38,7 @@ public class OrdinalEncoder extends BaseEncoder {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<List<?>> categories = getCategories();
+		List<List<Object>> categories = getCategories();
 		TypeInfo dtype = getDType();
 		String handleUnknown = getHandleUnknown();
 		Number unknownValue = null;
@@ -69,7 +69,7 @@ public class OrdinalEncoder extends BaseEncoder {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			List<?> featureCategories = new ArrayList<>(categories.get(i));
+			List<Object> featureCategories = new ArrayList<>(categories.get(i));
 
 			encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(featureCategories));
 

@@ -49,8 +49,7 @@ public class BSplineUtil {
 		List<Number> c = bspline.getC();
 		List<Number> t = bspline.getT();
 
-		// XXX
-		int[] cShape = bspline.getArrayShape("c");
+		int[] cShape = bspline.getCShape();
 
 		int n = (t.size() - k - 1);
 

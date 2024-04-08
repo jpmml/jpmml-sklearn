@@ -57,6 +57,6 @@ public class CategoricalImputer extends Transformer {
 	}
 
 	public Object getMissingValues(){
-		return getScalar("missing_values");
+		return getOptionalScalar("missing_values");
 	}
 }

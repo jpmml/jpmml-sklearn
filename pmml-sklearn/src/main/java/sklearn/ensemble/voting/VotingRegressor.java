@@ -41,15 +41,15 @@ public class VotingRegressor extends SkLearnRegressor implements HasEstimatorEns
 
 	@Override
 	public int getNumberOfFeatures(){
-		List<? extends Regressor> estimators = getEstimators();
+		List<Regressor> estimators = getEstimators();
 
 		return StepUtil.getNumberOfFeatures(estimators);
 	}
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<? extends Regressor> estimators = getEstimators();
-		List<? extends Number> weights = getWeights();
+		List<Regressor> estimators = getEstimators();
+		List<Number> weights = getWeights();
 
 		List<Model> models = new ArrayList<>();
 
@@ -68,11 +68,11 @@ public class VotingRegressor extends SkLearnRegressor implements HasEstimatorEns
 	}
 
 	@Override
-	public List<? extends Regressor> getEstimators(){
+	public List<Regressor> getEstimators(){
 		return getList("estimators_", Regressor.class);
 	}
 
-	public List<? extends Number> getWeights(){
+	public List<Number> getWeights(){
 		Object weights = getOptionalObject("weights");
 
 		if((weights == null) || (weights instanceof List)){

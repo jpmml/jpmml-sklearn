@@ -68,7 +68,7 @@ public class GBDTUtil {
 		};
 		modelVisitor.applyTo(model);
 
-		List<List<?>> treeCategories = ohe.getCategories();
+		List<? extends List<?>> treeCategories = ohe.getCategories();
 
 		ClassDictUtil.checkSize(treeModels, treeCategories);
 

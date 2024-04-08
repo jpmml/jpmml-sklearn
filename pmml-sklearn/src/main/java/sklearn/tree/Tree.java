@@ -23,10 +23,9 @@ import java.util.List;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
-import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.CustomPythonObject;
+import org.jpmml.python.CythonObject;
 
-public class Tree extends CustomPythonObject {
+public class Tree extends CythonObject {
 
 	public Tree(String module, String name){
 		super(module, name);
@@ -34,7 +33,7 @@ public class Tree extends CustomPythonObject {
 
 	@Override
 	public void __init__(Object[] args){
-		super.__setstate__(ClassDictUtil.createAttributeMap(INIT_ATTRIBUTES, args));
+		super.__setstate__(INIT_ATTRIBUTES, args);
 	}
 
 	public double[] getValues(){
@@ -65,7 +64,7 @@ public class Tree extends CustomPythonObject {
 		return Ints.toArray(getNodeAttribute("missing_go_to_left"));
 	}
 
-	private List<? extends Number> getNodeAttribute(String key){
+	private List<Number> getNodeAttribute(String key){
 		return (List)getArray("nodes", key);
 	}
 

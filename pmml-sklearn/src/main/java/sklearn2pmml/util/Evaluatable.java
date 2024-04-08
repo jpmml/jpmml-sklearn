@@ -39,6 +39,6 @@ public class Evaluatable<E extends PMMLObject> extends PythonObject {
 	}
 
 	public List<String> getFunctionDefs(){
-		return getList("function_defs", String.class);
+		return getStringList("function_defs");
 	}
 }

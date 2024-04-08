@@ -46,8 +46,8 @@ public class MinMaxScaler extends Scaler {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Number> min = getMin();
-		List<? extends Number> scale = getScale();
+		List<Number> min = getMin();
+		List<Number> scale = getScale();
 
 		ClassDictUtil.checkSize(features, min, scale);
 
@@ -86,11 +86,11 @@ public class MinMaxScaler extends Scaler {
 		return result;
 	}
 
-	public List<? extends Number> getMin(){
+	public List<Number> getMin(){
 		return getNumberArray("min_");
 	}
 
-	public List<? extends Number> getScale(){
+	public List<Number> getScale(){
 		return getNumberArray("scale_");
 	}
 
