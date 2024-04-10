@@ -32,6 +32,7 @@ import org.jpmml.python.Castable;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 
 abstract
 public class Composite extends Step implements Castable, HasFeatureNamesIn, HasHead {
@@ -178,7 +179,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 			Estimator estimator = getFinalEstimator();
 
 			if(estimator != null){
-				throw new IllegalArgumentException("The pipeline ends with an estimator object");
+				throw new SkLearnException("The pipeline ends with an estimator object");
 			}
 		}
 
@@ -269,7 +270,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 				throw new IllegalArgumentException();
 			}
 		} catch(UnsupportedOperationException uoe){
-			throw new IllegalArgumentException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information", uoe);
+			throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information", uoe);
 		}
 
 		return activeFields;

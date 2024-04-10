@@ -21,6 +21,7 @@ package sklearn;
 import java.util.List;
 
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
@@ -41,7 +42,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 			String message = "This converter version does not know about Scikit-Learn version " + sklearnVersion + " artifacts. " +
 				"Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version " + "1.4.1";
 
-			throw new IllegalArgumentException(message);
+			throw new SkLearnException(message);
 		}
 	}
 

@@ -281,7 +281,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		org.dmg.pmml.Field<?> pmmlField = getField(name);
 
 		if(pmmlField instanceof DataField){
-			throw new IllegalArgumentException("User input field " + name + " cannot be renamed");
+			throw new SkLearnException("User input field " + name + " cannot be renamed");
 		}
 
 		DerivedField derivedField = removeDerivedField(name);

@@ -31,6 +31,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.PassThrough;
@@ -155,7 +156,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 		List<Object[]> steps = getSteps();
 
 		if(steps.isEmpty()){
-			throw new IllegalArgumentException("Expected one or more steps, got zero steps");
+			throw new SkLearnException("Expected one or more steps, got zero steps");
 		}
 
 		Object[] finalStep = steps.get(steps.size() - 1);
@@ -163,7 +164,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 		Object step = TupleUtil.extractElement(finalStep, 1);
 
 		if((step == null) || (SkLearnSteps.PASSTHROUGH).equals(step)){
-			throw new IllegalArgumentException();
+			throw new SkLearnException("The pipeline ends with a transformer-like object");
 		}
 
 		CastFunction<E> castFunction = new CastFunction<E>(clazz){
@@ -182,7 +183,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 		List<Object[]> steps = getSteps();
 
 		if(steps.isEmpty()){
-			throw new IllegalArgumentException("Expected one or more steps, got zero steps");
+			throw new SkLearnException("Expected one or more steps, got zero steps");
 		}
 
 		Object[] headStep = steps.get(0);

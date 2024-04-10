@@ -41,6 +41,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 
 public class EstimatorUtil {
 
@@ -69,7 +70,7 @@ public class EstimatorUtil {
 			return hasClasses.getClasses();
 		}
 
-		throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
+		throw new SkLearnException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
 	}
 
 	static
@@ -81,7 +82,7 @@ public class EstimatorUtil {
 			return hasClasses.hasProbabilityDistribution();
 		}
 
-		throw new IllegalArgumentException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
+		throw new SkLearnException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
 	}
 
 	static

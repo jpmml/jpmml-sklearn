@@ -41,6 +41,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn2pmml.Customization;
@@ -173,13 +174,13 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		if(supervised){
 
 			if(label == null){
-				throw new IllegalArgumentException("Expected a label, got no label");
+				throw new SkLearnException("Expected a label, got no label");
 			}
 		} else
 
 		{
 			if(label != null){
-				throw new IllegalArgumentException("Expected no label, got " + label);
+				throw new SkLearnException("Expected no label, got " + label);
 			}
 		}
 	}

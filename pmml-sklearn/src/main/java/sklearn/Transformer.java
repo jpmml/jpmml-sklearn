@@ -35,6 +35,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonTypeUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.HasPMMLName;
 
 abstract
@@ -117,7 +118,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 		DataField dataField = encoder.getDataField(name);
 		if(dataField == null){
-			throw new IllegalArgumentException("Field " + name + " is undefined");
+			throw new SkLearnException("Field " + name + " is undefined");
 		} // End if
 
 		if((dataField.requireOpType() != opType) || (dataField.requireDataType() != dataType)){

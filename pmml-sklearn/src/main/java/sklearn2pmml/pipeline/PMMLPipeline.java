@@ -59,6 +59,7 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.Classifier;
@@ -133,7 +134,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 					DataField dataField = encoder.getDataField(activeField);
 					if(dataField == null){
-						throw new IllegalArgumentException("Field " + activeField + " is undefined");
+						throw new SkLearnException("Field " + activeField + " is undefined");
 					}
 
 					Feature feature = new WildcardFeature(encoder, dataField);

@@ -47,6 +47,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 
 abstract
 public class Domain extends Decorator {
@@ -121,7 +122,7 @@ public class Domain extends Decorator {
 		String name = dataField.requireName();
 
 		if(encoder.isFrozen(name)){
-			throw new IllegalArgumentException("Field " + name + " is frozen for type information updates");
+			throw new SkLearnException("Field " + name + " is frozen for type information updates");
 		}
 
 		dataField
@@ -251,7 +252,7 @@ public class Domain extends Decorator {
 			return wildcardFeature;
 		}
 
-		throw new IllegalArgumentException("Field " + feature.getName() + " is not decorable");
+		throw new SkLearnException("Field " + feature.getName() + " is not decorable");
 	}
 
 	static
@@ -267,7 +268,7 @@ public class Domain extends Decorator {
 			return Collections.singletonList(object);
 		}
 
-		throw new IllegalArgumentException(ClassDictUtil.formatClass(object) + " is not a supported array type");
+		throw new SkLearnException(ClassDictUtil.formatClass(object) + " is not a supported array type");
 	}
 
 	static

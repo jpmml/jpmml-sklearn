@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jpmml.sklearn.SkLearnException;
 import org.junit.Test;
 import sklearn.Classifier;
 import sklearn.CompositeClassifier;
@@ -53,7 +54,7 @@ public class SkLearnPipelineTest {
 			pipeline.getHead();
 
 			fail();
-		} catch(IllegalArgumentException iae){
+		} catch(SkLearnException se){
 			// Ignored
 		}
 
@@ -63,7 +64,7 @@ public class SkLearnPipelineTest {
 			pipeline.getFinalEstimator();
 
 			fail();
-		} catch(IllegalArgumentException iae){
+		} catch(SkLearnException se){
 			// Ignored
 		}
 	}
@@ -115,7 +116,7 @@ public class SkLearnPipelineTest {
 			pipeline.getFinalEstimator();
 
 			fail();
-		} catch(IllegalArgumentException iae){
+		} catch(SkLearnException se){
 			// Ignored
 		}
 	}

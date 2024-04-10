@@ -21,6 +21,7 @@ package sklearn.feature_selection;
 import java.util.List;
 
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.HasFeatureNamesIn;
 import sklearn.Selector;
 import sklearn2pmml.SelectorProxy;
@@ -33,12 +34,12 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 
 	@Override
 	public int getNumberOfFeatures(){
-		throw new IllegalArgumentException(formatMessage());
+		throw new SkLearnException(formatMessage());
 	}
 
 	@Override
 	public List<Boolean> getSupportMask(){
-		throw new IllegalArgumentException(formatMessage());
+		throw new SkLearnException(formatMessage());
 	}
 
 	private String formatMessage(){

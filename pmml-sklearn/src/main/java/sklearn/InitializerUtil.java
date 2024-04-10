@@ -30,6 +30,7 @@ import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 
 public class InitializerUtil {
 
@@ -60,7 +61,7 @@ public class InitializerUtil {
 							return feature;
 						}
 
-						throw new IllegalArgumentException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
+						throw new SkLearnException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
 					}
 
 					return createWildcardFeature(column, encoder);
@@ -79,7 +80,7 @@ public class InitializerUtil {
 				} else
 
 				{
-					throw new IllegalArgumentException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string or integer");
+					throw new SkLearnException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string or integer");
 				}
 			}
 		};

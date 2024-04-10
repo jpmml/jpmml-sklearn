@@ -56,6 +56,7 @@ import org.dmg.pmml.VisitorAction;
 import org.jpmml.model.JAXBUtil;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.SkLearnException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.Locator;
@@ -119,7 +120,7 @@ public class CustomizationUtil {
 
 						xPathExprObject = (PMMLObject)binder.getJAXBNode(node);
 						if(xPathExprObject == null){
-							throw new IllegalArgumentException("XPath expression \'" + xPathExpr + "\' is not associated with a PMML object");
+							throw new SkLearnException("XPath expression \'" + xPathExpr + "\' is not associated with a PMML object");
 						}
 					}
 					break;
