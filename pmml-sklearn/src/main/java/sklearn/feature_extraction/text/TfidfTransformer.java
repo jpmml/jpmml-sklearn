@@ -18,6 +18,7 @@
  */
 package sklearn.feature_extraction.text;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.jpmml.python.PythonObject;
@@ -38,7 +39,7 @@ public class TfidfTransformer extends PythonObject {
 	}
 
 	public String getNorm(){
-		return getOptionalString("norm");
+		return getOptionalEnum("norm", this::getOptionalString, Collections.emptyList());
 	}
 
 	public Boolean getSublinearTf(){

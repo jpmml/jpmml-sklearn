@@ -53,12 +53,14 @@ import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasSparseOutput;
 import sklearn.SkLearnTransformer;
 import sklearn2pmml.feature_extraction.text.Matcher;
+import sklearn2pmml.feature_extraction.text.Splitter;
 
 public class CountVectorizer extends SkLearnTransformer implements HasSparseOutput {
 
@@ -145,10 +147,6 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		String stripAccents = getStripAccents();
 		Tokenizer tokenizer = getTokenizer();
 
-		if(preprocessor != null){
-			throw new IllegalArgumentException();
-		}
-
 		if(tokenizer == null){
 			String tokenPattern = getTokenPattern();
 
@@ -223,7 +221,13 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public Object getPreprocessor(){
-		return getOptionalObject("preprocessor");
+		Object object = getOptionalObject("preprocessor");
+
+		if(object != null){
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "preprocessor") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")");
+		}
+
+		return object;
 	}
 
 	@Override
@@ -246,6 +250,12 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public Tokenizer getTokenizer(){
+		Object object = getOptionalObject("tokenizer");
+
+		if((object != null) && !(Tokenizer.class).isInstance(object)){
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "tokenizer") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +"). Supported value classes are " + Arrays.asList(Matcher.class.getName(), Splitter.class.getName()));
+		}
+
 		return getOptional("tokenizer", Tokenizer.class);
 	}
 

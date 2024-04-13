@@ -18,7 +18,6 @@
  */
 package sklearn.neighbors;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -118,6 +117,6 @@ public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric
 	}
 
 	public String getWeights(){
-		return getEnum("weights", this::getString, Arrays.asList(KNeighborsClassifier.WEIGHTS_DISTANCE, KNeighborsClassifier.WEIGHTS_UNIFORM));
+		return getEnum("weights", this::getString, KNeighborsClassifier.ENUM_WEIGHTS);
 	}
 }

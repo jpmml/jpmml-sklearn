@@ -49,10 +49,6 @@ public class OrdinalEncoder extends BaseEncoder {
 		String handleUnknown = getHandleUnknown();
 		List<Mapping> mappings = getMapping();
 
-		if(dropInvariant){
-			throw new IllegalArgumentException();
-		}
-
 		Integer mapMissingTo = null;
 
 		if((OrdinalEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){

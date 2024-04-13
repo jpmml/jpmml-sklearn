@@ -164,6 +164,11 @@ public class BaseNEncoder extends BaseEncoder {
 		return getInteger("base");
 	}
 
+	@Override
+	public Boolean getDropInvariant(){
+		return getBoolean("drop_invariant");
+	}
+
 	public OrdinalEncoder getOrdinalEncoder(){
 		return get("ordinal_encoder", OrdinalEncoder.class);
 	}

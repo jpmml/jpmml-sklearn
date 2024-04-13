@@ -60,10 +60,6 @@ public class CountEncoder extends MapEncoder implements BaseEncoderConstants {
 		Map<Object, Series> mapping = getMapping();
 		Map<Object, Map<Object, String>> minGroupCategories = getMinGroupCategories();
 
-		if(dropInvariant){
-			throw new IllegalArgumentException();
-		}
-
 		Object missingCategory = null;
 
 		if((CountEncoder.HANDLEMISSING_COUNT).equals(handleMissing) || (CountEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){

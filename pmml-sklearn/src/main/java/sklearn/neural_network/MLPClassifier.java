@@ -63,7 +63,7 @@ public class MLPClassifier extends SkLearnClassifier implements MLPConstants {
 	}
 
 	public String getActivation(){
-		return getEnum("activation", this::getString, MLPConstants.ENUM_ACTIVATION);
+		return getEnum("activation", this::getString, MLPClassifier.ENUM_ACTIVATION);
 	}
 
 	public List<HasArray> getCoefs(){

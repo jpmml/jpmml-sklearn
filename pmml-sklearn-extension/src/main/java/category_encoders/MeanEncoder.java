@@ -60,10 +60,6 @@ public class MeanEncoder extends MapEncoder {
 		String handleUnknown = getHandleUnknown();
 		Map<Object, Series> mapping = getMapping();
 
-		if(dropInvariant){
-			throw new IllegalArgumentException();
-		}
-
 		Object missingCategory = null;
 
 		if((MeanEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){

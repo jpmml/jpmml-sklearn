@@ -42,10 +42,6 @@ public class OneHotEncoder extends BaseEncoder {
 		String handleUnknown = getHandleUnknown();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 
-		if(dropInvariant){
-			throw new IllegalArgumentException();
-		}
-
 		features = ordinalEncoder.encode(features, encoder);
 
 		List<Feature> result = new ArrayList<>();

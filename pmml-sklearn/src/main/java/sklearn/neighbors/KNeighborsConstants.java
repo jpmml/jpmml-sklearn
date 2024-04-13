@@ -31,4 +31,6 @@ interface KNeighborsConstants {
 
 	String WEIGHTS_DISTANCE = "distance";
 	String WEIGHTS_UNIFORM = "uniform";
+
+	List<String> ENUM_WEIGHTS = Arrays.asList(WEIGHTS_DISTANCE, WEIGHTS_UNIFORM);
 }

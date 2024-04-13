@@ -52,10 +52,6 @@ public class OrdinalMapEncoder extends MapEncoder {
 		Map<Object, Series> mapping = getMapping();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 
-		if(dropInvariant){
-			throw new IllegalArgumentException();
-		}
-
 		Object missingCategory = null;
 
 		if((OrdinalMapEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){

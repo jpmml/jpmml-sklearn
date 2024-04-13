@@ -46,10 +46,6 @@ public class SplineTransformer extends SkLearnTransformer {
 		String extrapolation = getExtrapolation();
 		Boolean includeBias = getIncludeBias();
 
-		if(!includeBias){
-			throw new IllegalArgumentException();
-		}
-
 		ClassDictUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
@@ -84,7 +80,7 @@ public class SplineTransformer extends SkLearnTransformer {
 	}
 
 	public Boolean getIncludeBias(){
-		return getBoolean("include_bias");
+		return getEnum("include_bias", this::getBoolean, Arrays.asList(Boolean.TRUE));
 	}
 
 	private static final String EXTRAPOLATION_ERROR = "error";

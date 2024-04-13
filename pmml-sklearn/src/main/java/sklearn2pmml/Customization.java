@@ -18,6 +18,8 @@
  */
 package sklearn2pmml;
 
+import java.util.Arrays;
+
 import org.jpmml.python.PythonObject;
 
 public class Customization extends PythonObject {
@@ -31,7 +33,7 @@ public class Customization extends PythonObject {
 	}
 
 	public String getCommand(){
-		return getString("command");
+		return getEnum("command", this::getString, Arrays.asList(Customization.COMMAND_INSERT, Customization.COMMAND_UPDATE, Customization.COMMAND_DELETE));
 	}
 
 	public Customization setCommand(String command){

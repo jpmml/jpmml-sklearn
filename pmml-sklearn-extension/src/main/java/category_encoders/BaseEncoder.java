@@ -18,6 +18,7 @@
  */
 package category_encoders;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -77,7 +78,7 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 	}
 
 	public Boolean getDropInvariant(){
-		return getBoolean("drop_invariant");
+		return getEnum("drop_invariant", this::getBoolean, Arrays.asList(Boolean.FALSE));
 	}
 
 	public List<String> getFeatureNamesOut(){
