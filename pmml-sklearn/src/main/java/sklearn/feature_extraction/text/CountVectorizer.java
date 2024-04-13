@@ -145,20 +145,9 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		String stripAccents = getStripAccents();
 		Tokenizer tokenizer = getTokenizer();
 
-		switch(analyzer){
-			case "word":
-				break;
-			default:
-				throw new IllegalArgumentException(analyzer);
-		}
-
 		if(preprocessor != null){
 			throw new IllegalArgumentException();
-		} // End if
-
-		if(stripAccents != null){
-			throw new IllegalArgumentException(stripAccents);
-		} // End if
+		}
 
 		if(tokenizer == null){
 			String tokenPattern = getTokenPattern();
@@ -214,7 +203,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public String getAnalyzer(){
-		return getString("analyzer");
+		return getEnum("analyzer", this::getString, Arrays.asList(CountVectorizer.ANALYZER_WORD));
 	}
 
 	public Boolean getBinary(){
@@ -253,7 +242,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public String getStripAccents(){
-		return getOptionalString("strip_accents");
+		return getOptionalEnum("strip_accents", this::getOptionalString, Collections.emptyList());
 	}
 
 	public Tokenizer getTokenizer(){
@@ -287,4 +276,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public static final String TOKEN_PATTERN = "(?u)\\b\\w\\w+\\b";
+
+	private static final String ANALYZER_WORD = "word";
+
 }

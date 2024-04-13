@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,35 +16,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.svm;
+package sklearn.neighbors;
 
 import java.util.Arrays;
+import java.util.List;
 
-import org.dmg.pmml.Model;
-import org.jpmml.converter.Schema;
-import sklearn.linear_model.LinearClassifier;
+interface KNeighborsConstants {
 
-public class LinearSVC extends LinearClassifier {
+	String METRIC_EUCLIDEAN = "euclidean";
+	String METRIC_MANHATTAN = "manhattan";
+	String METRIC_MINKOWSKI = "minkowski";
 
-	public LinearSVC(String module, String name){
-		super(module, name);
-	}
+	List<String> ENUM_METRIC = Arrays.asList(METRIC_EUCLIDEAN, METRIC_MANHATTAN, METRIC_MINKOWSKI);
 
-	@Override
-	public boolean hasProbabilityDistribution(){
-		return false;
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		String multiClass = getMultiClass();
-
-		return super.encodeModel(schema);
-	}
-
-	public String getMultiClass(){
-		return getEnum("multi_class", this::getString, Arrays.asList(LinearSVC.MULTICLASS_OVR));
-	}
-
-	private static final String MULTICLASS_OVR = "ovr";
+	String WEIGHTS_DISTANCE = "distance";
+	String WEIGHTS_UNIFORM = "uniform";
 }

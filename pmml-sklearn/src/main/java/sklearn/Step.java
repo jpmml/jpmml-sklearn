@@ -18,8 +18,13 @@
  */
 package sklearn;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
+import com.google.common.collect.Lists;
+import org.jpmml.python.AttributeException;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -67,5 +72,44 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public String getSkLearnVersion(){
 		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
+	}
+
+	public <E> E getEnum(String name, Function<String, E> function, Collection<E> values){
+		E value = function.apply(name);
+
+		if(!values.contains(value)){
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, name) + "\' has an unsupported value " + formatValue(value) + ". Supported values are " + formatValues(values));
+		}
+
+		return value;
+	}
+
+	public <E> E getOptionalEnum(String name, Function< String, E> function, Collection<E> values){
+		E value = function.apply(name);
+
+		if((value != null)  && (!values.contains(value))){
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, name) + "\' has an unsupported value " + formatValue(value) + ". Supported values are " + formatValues(values));
+		}
+
+		return value;
+	}
+
+	static
+	private String formatValue(Object value){
+
+		if(value instanceof String){
+			String string = (String)value;
+
+			return "\'" + string + "\'";
+		}
+
+		return String.valueOf(value);
+	}
+
+	static
+	public String formatValues(Collection<?> values){
+		values = Lists.transform(Lists.newArrayList(values), Step::formatValue);
+
+		return String.valueOf(values);
 	}
 }

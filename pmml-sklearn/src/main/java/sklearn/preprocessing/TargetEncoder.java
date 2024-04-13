@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -44,14 +45,6 @@ public class TargetEncoder extends BaseEncoder {
 		List<List<Number>> encodings = getEncodings();
 		Number targetMean = getTargetMean();
 		String targetType = getTargetType();
-
-		switch(targetType){
-			case "continuous":
-			case "binary":
-				break;
-			default:
-				throw new IllegalArgumentException(targetType);
-		}
 
 		ClassDictUtil.checkSize(features.size(), categories, encodings);
 
@@ -102,7 +95,7 @@ public class TargetEncoder extends BaseEncoder {
 	}
 
 	public String getTargetType(){
-		return getString("target_type_");
+		return getEnum("target_type_", this::getString, Arrays.asList(TargetEncoder.TARGETTYPE_BINARY, TargetEncoder.TARGETTYPE_CONTINUOUS));
 	}
 
 	static
@@ -117,4 +110,7 @@ public class TargetEncoder extends BaseEncoder {
 
 		return null;
 	}
+
+	private static final String TARGETTYPE_BINARY = "binary";
+	private static final String TARGETTYPE_CONTINUOUS = "continuous";
 }

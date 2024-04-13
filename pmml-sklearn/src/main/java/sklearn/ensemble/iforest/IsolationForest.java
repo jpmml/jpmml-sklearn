@@ -19,6 +19,7 @@
 package sklearn.ensemble.iforest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 
@@ -209,29 +210,23 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	public Number getDecisionFunctionThreshold(){
 		String behaviour = getBehaviour();
 
-		Number threshold;
-
 		// SkLearn 0.19 or SkLearn 0.24+
 		if(behaviour == null){
-			threshold = getThreshold();
+			return getThreshold();
 		} else
 
 		// SkLearn 0.20 through 0.23
 		{
-			if(("old").equals(behaviour)){
-				threshold = getThreshold();
-			} else
-
-			if(("new").equals(behaviour) || ("deprecated").equals(behaviour)){
-				threshold = 0d;
-			} else
-
-			{
-				throw new IllegalArgumentException(behaviour);
+			switch(behaviour){
+				case IsolationForest.BEHAVIOUR_OLD:
+					return getThreshold();
+				case IsolationForest.BEHAVIOUR_DEPRECATED:
+				case IsolationForest.BEHAVIOUR_NEW:
+					return 0d;
+				default:
+					throw new IllegalArgumentException(behaviour);
 			}
 		}
-
-		return threshold;
 	}
 
 	public List<List<Number>> getEstimatorsFeatures(){
@@ -239,7 +234,7 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	}
 
 	public String getBehaviour(){
-		return getOptionalString("behaviour");
+		return getOptionalEnum("behaviour", this::getOptionalString, Arrays.asList(IsolationForest.BEHAVIOUR_DEPRECATED, IsolationForest.BEHAVIOUR_NEW, IsolationForest.BEHAVIOUR_OLD));
 	}
 
 	public int getMaxSamples(){
@@ -303,4 +298,8 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 		return 2d * (Math.log(n - 1d) + 0.577215664901532860606512090082402431d) - 2d * ((n - 1d) / n);
 	}
+
+	private static final String BEHAVIOUR_DEPRECATED = "deprecated";
+	private static final String BEHAVIOUR_NEW = "new";
+	private static final String BEHAVIOUR_OLD = "old";
 }

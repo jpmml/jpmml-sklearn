@@ -58,6 +58,23 @@ public class MultilayerPerceptronUtil {
 	}
 
 	static
+	public NeuralNetwork.ActivationFunction parseActivationFunction(String activation){
+
+		switch(activation){
+			case MLPConstants.ACTIVATION_IDENTITY:
+				return NeuralNetwork.ActivationFunction.IDENTITY;
+			case MLPConstants.ACTIVATION_LOGISTIC:
+				return NeuralNetwork.ActivationFunction.LOGISTIC;
+			case MLPConstants.ACTIVATION_RELU:
+				return NeuralNetwork.ActivationFunction.RECTIFIER;
+			case MLPConstants.ACTIVATION_TANH:
+				return NeuralNetwork.ActivationFunction.TANH;
+			default:
+				throw new IllegalArgumentException(activation);
+		}
+	}
+
+	static
 	public NeuralNetwork encodeNeuralNetwork(MiningFunction miningFunction, String activation, List<HasArray> coefs, List<HasArray> intercepts, Schema schema){
 		NeuralNetwork.ActivationFunction activationFunction = parseActivationFunction(activation);
 
@@ -162,23 +179,6 @@ public class MultilayerPerceptronUtil {
 				}
 			default:
 				throw new IllegalArgumentException();
-		}
-	}
-
-	static
-	public NeuralNetwork.ActivationFunction parseActivationFunction(String activation){
-
-		switch(activation){
-			case "identity":
-				return NeuralNetwork.ActivationFunction.IDENTITY;
-			case "logistic":
-				return NeuralNetwork.ActivationFunction.LOGISTIC;
-			case "relu":
-				return NeuralNetwork.ActivationFunction.RECTIFIER;
-			case "tanh":
-				return NeuralNetwork.ActivationFunction.TANH;
-			default:
-				throw new IllegalArgumentException(activation);
 		}
 	}
 }

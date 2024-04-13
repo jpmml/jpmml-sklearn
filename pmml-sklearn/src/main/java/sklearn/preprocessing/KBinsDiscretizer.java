@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -98,15 +99,15 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("discretize", continuousFeature), OpType.CATEGORICAL, discretize.getDataType(), discretize);
 
 			switch(encode){
-				case "onehot":
-				case "onehot-dense":
+				case KBinsDiscretizer.ENCODE_ONEHOT:
+				case KBinsDiscretizer.ENCODE_ONEHOT_DENSE:
 					for(int j = 0; j < labelCategories.size(); j++){
 						Integer label = labelCategories.get(j);
 
 						result.add(new BinaryFeature(encoder, derivedField, label));
 					}
 					break;
-				case "ordinal":
+				case KBinsDiscretizer.ENCODE_ORDINAL:
 					result.add(new IndexFeature(encoder, derivedField, labelCategories));
 					break;
 				default:
@@ -122,7 +123,7 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 	}
 
 	public String getEncode(){
-		return getString("encode");
+		return getEnum("encode", this::getString, Arrays.asList(KBinsDiscretizer.ENCODE_ONEHOT, KBinsDiscretizer.ENCODE_ONEHOT_DENSE, KBinsDiscretizer.ENCODE_ORDINAL));
 	}
 
 	public List<Integer> getNumberOfBins(){
@@ -174,4 +175,8 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 
 		return defineFunction;
 	}
+
+	private static final String ENCODE_ONEHOT = "onehot";
+	private static final String ENCODE_ONEHOT_DENSE = "onehot-dense";
+	private static final String ENCODE_ORDINAL = "ordinal";
 }

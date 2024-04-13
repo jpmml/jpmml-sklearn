@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,35 +16,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.svm;
+package category_encoders;
 
 import java.util.Arrays;
+import java.util.List;
 
-import org.dmg.pmml.Model;
-import org.jpmml.converter.Schema;
-import sklearn.linear_model.LinearClassifier;
+interface BaseEncoderConstants {
 
-public class LinearSVC extends LinearClassifier {
+	String HANDLEMISSING_ERROR = "error";
+	String HANDLEMISSING_RETURN_NAN = "return_nan";
+	String HANDLEMISSING_VALUE = "value";
 
-	public LinearSVC(String module, String name){
-		super(module, name);
-	}
+	List<String> ENUM_HANDLEMISSING = Arrays.asList(HANDLEMISSING_ERROR, HANDLEMISSING_RETURN_NAN, HANDLEMISSING_VALUE);
 
-	@Override
-	public boolean hasProbabilityDistribution(){
-		return false;
-	}
+	String HANDLEUNKNOWN_ERROR = "error";
+	String HANDLEUNKNOWN_VALUE = "value";
 
-	@Override
-	public Model encodeModel(Schema schema){
-		String multiClass = getMultiClass();
-
-		return super.encodeModel(schema);
-	}
-
-	public String getMultiClass(){
-		return getEnum("multi_class", this::getString, Arrays.asList(LinearSVC.MULTICLASS_OVR));
-	}
-
-	private static final String MULTICLASS_OVR = "ovr";
+	List<String> ENUM_HANDLEUNKNOWN = Arrays.asList(HANDLEUNKNOWN_ERROR, HANDLEUNKNOWN_VALUE);
 }

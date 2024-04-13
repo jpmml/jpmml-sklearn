@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
@@ -44,13 +45,6 @@ public class SplineTransformer extends SkLearnTransformer {
 		List<BSpline> bsplines = getBSplines();
 		String extrapolation = getExtrapolation();
 		Boolean includeBias = getIncludeBias();
-
-		switch(extrapolation){
-			case "error":
-				break;
-			default:
-				throw new IllegalArgumentException(extrapolation);
-		}
 
 		if(!includeBias){
 			throw new IllegalArgumentException();
@@ -86,10 +80,12 @@ public class SplineTransformer extends SkLearnTransformer {
 	}
 
 	public String getExtrapolation(){
-		return getString("extrapolation");
+		return getEnum("extrapolation", this::getString, Arrays.asList(SplineTransformer.EXTRAPOLATION_ERROR));
 	}
 
 	public Boolean getIncludeBias(){
 		return getBoolean("include_bias");
 	}
+
+	private static final String EXTRAPOLATION_ERROR = "error";
 }

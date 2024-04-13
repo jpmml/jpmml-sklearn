@@ -83,7 +83,7 @@ public class Customization extends PythonObject {
 			.setXPathExpr(xPathExpr);
 	}
 
+	public static final String COMMAND_DELETE = "delete";
 	public static final String COMMAND_INSERT = "insert";
 	public static final String COMMAND_UPDATE = "update";
-	public static final String COMMAND_DELETE = "delete";
 }

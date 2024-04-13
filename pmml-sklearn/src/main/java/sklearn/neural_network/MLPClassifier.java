@@ -28,7 +28,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.HasArray;
 import sklearn.SkLearnClassifier;
 
-public class MLPClassifier extends SkLearnClassifier {
+public class MLPClassifier extends SkLearnClassifier implements MLPConstants {
 
 	public MLPClassifier(String module, String name){
 		super(module, name);
@@ -63,7 +63,7 @@ public class MLPClassifier extends SkLearnClassifier {
 	}
 
 	public String getActivation(){
-		return getString("activation");
+		return getEnum("activation", this::getString, MLPConstants.ENUM_ACTIVATION);
 	}
 
 	public List<HasArray> getCoefs(){

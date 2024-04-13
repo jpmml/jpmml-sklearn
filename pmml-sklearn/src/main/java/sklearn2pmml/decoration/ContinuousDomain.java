@@ -19,6 +19,7 @@
 package sklearn2pmml.decoration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class ContinuousDomain extends Domain {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		features = super.encodeFeatures(features, encoder);
 
-		OutlierTreatmentMethod outlierTreatment = DomainUtil.parseOutlierTreatment(getOutlierTreatment());
+		OutlierTreatmentMethod outlierTreatment = parseOutlierTreatment(getOutlierTreatment());
 
 		Number lowValue;
 		Number highValue;
@@ -175,7 +176,7 @@ public class ContinuousDomain extends Domain {
 	}
 
 	public String getOutlierTreatment(){
-		return getOptionalString("outlier_treatment");
+		return getOptionalEnum("outlier_treatment", this::getOptionalString, Arrays.asList(ContinuousDomain.OUTLIERTREATMENT_AS_IS, ContinuousDomain.OUTLIERTREATMENT_AS_EXTREME_VALUES, ContinuousDomain.OUTLIERTREATMENT_AS_MISSING_VALUES));
 	}
 
 	public Number getLowValue(){
@@ -207,6 +208,25 @@ public class ContinuousDomain extends Domain {
 	}
 
 	static
+	public OutlierTreatmentMethod parseOutlierTreatment(String outlierTreatment){
+
+		if(outlierTreatment == null){
+			return null;
+		}
+
+		switch(outlierTreatment){
+			case ContinuousDomain.OUTLIERTREATMENT_AS_IS:
+				return OutlierTreatmentMethod.AS_IS;
+			case ContinuousDomain.OUTLIERTREATMENT_AS_MISSING_VALUES:
+				return OutlierTreatmentMethod.AS_MISSING_VALUES;
+			case ContinuousDomain.OUTLIERTREATMENT_AS_EXTREME_VALUES:
+				return OutlierTreatmentMethod.AS_EXTREME_VALUES;
+			default:
+				throw new IllegalArgumentException(outlierTreatment);
+		}
+	}
+
+	static
 	public NumericInfo createNumericInfo(DataType dataType, Map<String, ?> values){
 		NumericInfo numericInfo = new NumericInfo()
 			.setMinimum(selectValue(values, "minimum"))
@@ -218,4 +238,8 @@ public class ContinuousDomain extends Domain {
 
 		return numericInfo;
 	}
+
+	private static final String OUTLIERTREATMENT_AS_IS = "as_is";
+	private static final String OUTLIERTREATMENT_AS_EXTREME_VALUES = "as_extreme_values";
+	private static final String OUTLIERTREATMENT_AS_MISSING_VALUES = "as_missing_values";
 }

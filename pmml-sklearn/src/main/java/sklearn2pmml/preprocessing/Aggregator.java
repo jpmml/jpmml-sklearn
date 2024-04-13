@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.preprocessing;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,27 +65,39 @@ public class Aggregator extends Transformer {
 	}
 
 	public String getFunction(){
-		return getString("function");
+		return getEnum("function", this::getString, Arrays.asList(Aggregator.FUNCTION_AVG, Aggregator.FUNCTION_MAX, Aggregator.FUNCTION_MEAN, Aggregator.FUNCTION_MIN, Aggregator.FUNCTION_PROD, Aggregator.FUNCTION_PRODUCT, Aggregator.FUNCTION_SUM));
 	}
 
 	static
 	private String translateFunction(String function){
 
 		switch(function){
-			case "max":
+			case Aggregator.FUNCTION_MAX:
 				return PMMLFunctions.MAX;
-			case "mean":
-			case "avg":
+			// Python style
+			case Aggregator.FUNCTION_MEAN:
+			// PMML style
+			case Aggregator.FUNCTION_AVG:
 				return PMMLFunctions.AVG;
-			case "min":
+			case Aggregator.FUNCTION_MIN:
 				return PMMLFunctions.MIN;
-			case "prod":
-			case "product":
+			// Python style
+			case Aggregator.FUNCTION_PROD:
+			// PMML style
+			case Aggregator.FUNCTION_PRODUCT:
 				return PMMLFunctions.PRODUCT;
-			case "sum":
+			case Aggregator.FUNCTION_SUM:
 				return PMMLFunctions.SUM;
 			default:
 				throw new IllegalArgumentException(function);
 		}
 	}
+
+	private static final String FUNCTION_AVG = "avg";
+	private static final String FUNCTION_MAX = "max";
+	private static final String FUNCTION_MEAN = "mean";
+	private static final String FUNCTION_MIN = "min";
+	private static final String FUNCTION_PROD = "prod";
+	private static final String FUNCTION_PRODUCT = "product";
+	private static final String FUNCTION_SUM = "sum";
 }

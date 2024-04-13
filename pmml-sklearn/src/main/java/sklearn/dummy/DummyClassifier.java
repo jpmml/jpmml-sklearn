@@ -18,6 +18,7 @@
  */
 package sklearn.dummy;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.primitives.Doubles;
@@ -55,7 +56,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 		ClassDictUtil.checkSize(classes, classPrior);
 
 		switch(strategy){
-			case "prior":
+			case DummyClassifier.STRATEGY_PRIOR:
 				{
 					return classPrior.get(index);
 				}
@@ -80,7 +81,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 		List<? extends Number> probabilities;
 
 		switch(strategy){
-			case "constant":
+			case DummyClassifier.STRATEGY_CONSTANT:
 				{
 					maxIndex = classes.indexOf(constant);
 					if(maxIndex < 0){
@@ -90,14 +91,14 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 					probabilities = createProbabilities(classes, maxIndex);
 				}
 				break;
-			case "most_frequent":
+			case DummyClassifier.STRATEGY_MOST_FREQUENT:
 				{
 					maxIndex = ScoreDistributionManager.indexOfMax((List)classPrior);
 
 					probabilities = createProbabilities(classes, maxIndex);
 				}
 				break;
-			case "prior":
+			case DummyClassifier.STRATEGY_PRIOR:
 				{
 					maxIndex = ScoreDistributionManager.indexOfMax((List)classPrior);
 
@@ -135,7 +136,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 	}
 
 	public String getStrategy(){
-		return getString("strategy");
+		return getEnum("strategy", this::getString, Arrays.asList(DummyClassifier.STRATEGY_CONSTANT, DummyClassifier.STRATEGY_MOST_FREQUENT, DummyClassifier.STRATEGY_PRIOR));
 	}
 
 	static
@@ -146,4 +147,8 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 
 		return Doubles.asList(values);
 	}
+
+	private static final String STRATEGY_CONSTANT = "constant";
+	private static final String STRATEGY_MOST_FREQUENT = "most_frequent";
+	private static final String STRATEGY_PRIOR = "prior";
 }

@@ -138,7 +138,24 @@ public class ExpressionClassifier extends Classifier {
 	}
 
 	public String getNormalizationMethod(){
-		return getString("normalization_method");
+		return getEnum("normalization_method", this::getString, Arrays.asList(ExpressionClassifier.NORMALIZATIONMETHOD_NONE, ExpressionClassifier.NORMALIZATIONMETHOD_LOGIT, ExpressionClassifier.NORMALIZATIONMETHOD_SIMPLEMAX, ExpressionClassifier.NORMALIZATIONMETHOD_SOFTMAX));
+	}
+
+	static
+	private RegressionModel.NormalizationMethod parseNormalizationMethod(String normalizationMethod){
+
+		switch(normalizationMethod){
+			case ExpressionClassifier.NORMALIZATIONMETHOD_NONE:
+				return RegressionModel.NormalizationMethod.NONE;
+			case ExpressionClassifier.NORMALIZATIONMETHOD_LOGIT:
+				return RegressionModel.NormalizationMethod.LOGIT;
+			case ExpressionClassifier.NORMALIZATIONMETHOD_SIMPLEMAX:
+				return RegressionModel.NormalizationMethod.SIMPLEMAX;
+			case ExpressionClassifier.NORMALIZATIONMETHOD_SOFTMAX:
+				return RegressionModel.NormalizationMethod.SOFTMAX;
+			default:
+				throw new IllegalArgumentException(normalizationMethod);
+		}
 	}
 
 	static
@@ -190,20 +207,8 @@ public class ExpressionClassifier extends Classifier {
 			.collect(Collectors.toList());
 	}
 
-	static
-	private RegressionModel.NormalizationMethod parseNormalizationMethod(String normalizationMethod){
-
-		switch(normalizationMethod){
-			case "none":
-				return RegressionModel.NormalizationMethod.NONE;
-			case "logit":
-				return RegressionModel.NormalizationMethod.LOGIT;
-			case "simplemax":
-				return RegressionModel.NormalizationMethod.SIMPLEMAX;
-			case "softmax":
-				return RegressionModel.NormalizationMethod.SOFTMAX;
-			default:
-				throw new IllegalArgumentException(normalizationMethod);
-		}
-	}
+	private static final String NORMALIZATIONMETHOD_LOGIT = "logit";
+	private static final String NORMALIZATIONMETHOD_NONE = "none";
+	private static final String NORMALIZATIONMETHOD_SIMPLEMAX = "simplemax";
+	private static final String NORMALIZATIONMETHOD_SOFTMAX = "softmax";
 }

@@ -18,6 +18,7 @@
  */
 package sklearn.neighbors;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -26,7 +27,7 @@ import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import sklearn.SkLearnClassifier;
 
-public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData, KNeighborsConstants {
 
 	public KNeighborsClassifier(String module, String name){
 		super(module, name);
@@ -62,18 +63,7 @@ public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
-		boolean weighted;
-
-		switch(weights){
-			case "distance":
-				weighted = true;
-				break;
-			case "uniform":
-				weighted = false;
-				break;
-			default:
-				throw new IllegalArgumentException(weights);
-		}
+		boolean weighted = KNeighborsUtil.parseWeights(weights);
 
 		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunction.CLASSIFICATION, numberOfInstances, numberOfFeatures, schema)
 			.setCategoricalScoringMethod(weighted ? NearestNeighborModel.CategoricalScoringMethod.WEIGHTED_MAJORITY_VOTE : NearestNeighborModel.CategoricalScoringMethod.MAJORITY_VOTE)
@@ -84,7 +74,7 @@ public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric
 
 	@Override
 	public String getMetric(){
-		return getString("metric");
+		return getEnum("metric", this::getString, KNeighborsClassifier.ENUM_METRIC);
 	}
 
 	@Override
@@ -128,6 +118,6 @@ public class KNeighborsClassifier extends SkLearnClassifier implements HasMetric
 	}
 
 	public String getWeights(){
-		return getString("weights");
+		return getEnum("weights", this::getString, Arrays.asList(KNeighborsClassifier.WEIGHTS_DISTANCE, KNeighborsClassifier.WEIGHTS_UNIFORM));
 	}
 }

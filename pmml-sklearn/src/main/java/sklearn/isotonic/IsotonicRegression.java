@@ -18,6 +18,7 @@
  */
 package sklearn.isotonic;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -94,19 +95,22 @@ public class IsotonicRegression extends Calibrator {
 	}
 
 	public String getOutOfBounds(){
-		return getString("out_of_bounds");
+		return getEnum("out_of_bounds", this::getString, Arrays.asList(IsotonicRegression.OUTOFBOUNDS_CLIP, IsotonicRegression.OUTOFBOUNDS_NAN));
 	}
 
 	static
 	public OutlierTreatmentMethod parseOutlierTreatment(String outOfBounds){
 
 		switch(outOfBounds){
-			case "nan":
-				return OutlierTreatmentMethod.AS_MISSING_VALUES;
-			case "clip":
+			case IsotonicRegression.OUTOFBOUNDS_CLIP:
 				return OutlierTreatmentMethod.AS_EXTREME_VALUES;
+			case IsotonicRegression.OUTOFBOUNDS_NAN:
+				return OutlierTreatmentMethod.AS_MISSING_VALUES;
 			default:
 				throw new IllegalArgumentException(outOfBounds);
 		}
 	}
+
+	private static final String OUTOFBOUNDS_CLIP = "clip";
+	private static final String OUTOFBOUNDS_NAN = "nan";
 }

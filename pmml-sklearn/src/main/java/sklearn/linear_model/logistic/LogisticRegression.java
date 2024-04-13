@@ -57,31 +57,27 @@ public class LogisticRegression extends LinearClassifier {
 	public Model encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
 		String multiClass = getMultiClass();
-		String solver = getSolver();
 
-		if(("auto").equals(multiClass)){
+		if((LogisticRegression.MULTICLASS_AUTO).equals(multiClass)){
+			int[] shape = getCoefShape();
+			String solver = getSolver();
 
 			if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.22") >= 0){
-				int[] shape = getCoefShape();
-
 				multiClass = getAutoMultiClass(solver, shape);
+			} else
+
+			{
+				throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be explicitly set to the \'" + LogisticRegression.MULTICLASS_OVR + "\' or \'" + LogisticRegression.MULTICLASS_MULTINOMIAL + "\' value");
 			}
-		} // End if
+		}
 
-		if(("auto").equals(multiClass)){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be explicitly set to the 'ovr' or 'multinomial' value");
-		} else
-
-		if(("multinomial").equals(multiClass)){
-			return encodeMultinomialModel(schema);
-		} else
-
-		if(("ovr").equals(multiClass)){
-			return encodeOvRModel(schema);
-		} else
-
-		{
-			throw new IllegalArgumentException(multiClass);
+		switch(multiClass){
+			case LogisticRegression.MULTICLASS_MULTINOMIAL:
+				return encodeMultinomialModel(schema);
+			case LogisticRegression.MULTICLASS_OVR:
+				return encodeOvRModel(schema);
+			default:
+				throw new IllegalArgumentException(multiClass);
 		}
 	}
 
@@ -166,11 +162,11 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	public String getMultiClass(){
-		String multiClass = getString("multi_class");
+		String multiClass = getEnum("multi_class", this::getString, Arrays.asList(LogisticRegression.MULTICLASS_AUTO, LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR, LogisticRegression.MULTICLASS_WARN));
 
 		// SkLearn 0.20
-		if(("warn").equals(multiClass)){
-			return "ovr";
+		if((LogisticRegression.MULTICLASS_WARN).equals(multiClass)){
+			multiClass = LogisticRegression.MULTICLASS_OVR;
 		}
 
 		return multiClass;
@@ -185,16 +181,23 @@ public class LogisticRegression extends LinearClassifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		if(("liblinear").equals(solver)){
-			return "ovr";
+		if((LogisticRegression.SOLVER_LIBLINEAR).equals(solver)){
+			return LogisticRegression.MULTICLASS_OVR;
 		} // End if
 
 		if(numberOfClasses == 1){
-			return "ovr";
+			return LogisticRegression.MULTICLASS_OVR;
 		} else
 
 		{
-			return "multinomial";
+			return LogisticRegression.MULTICLASS_MULTINOMIAL;
 		}
 	}
+
+	private static final String MULTICLASS_AUTO = "auto";
+	private static final String MULTICLASS_MULTINOMIAL = "multinomial";
+	private static final String MULTICLASS_OVR = "ovr";
+	private static final String MULTICLASS_WARN = "warn";
+
+	private static final String SOLVER_LIBLINEAR = "liblinear";
 }

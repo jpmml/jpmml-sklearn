@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -19,32 +19,14 @@
 package sklearn.svm;
 
 import java.util.Arrays;
+import java.util.List;
 
-import org.dmg.pmml.Model;
-import org.jpmml.converter.Schema;
-import sklearn.linear_model.LinearClassifier;
+interface LibSVMConstants {
 
-public class LinearSVC extends LinearClassifier {
+	String KERNEL_LINEAR = "linear";
+	String KERNEL_POLY = "poly";
+	String KERNEL_RBF = "rbf";
+	String KERNEL_SIGMOID = "sigmoid";
 
-	public LinearSVC(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public boolean hasProbabilityDistribution(){
-		return false;
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		String multiClass = getMultiClass();
-
-		return super.encodeModel(schema);
-	}
-
-	public String getMultiClass(){
-		return getEnum("multi_class", this::getString, Arrays.asList(LinearSVC.MULTICLASS_OVR));
-	}
-
-	private static final String MULTICLASS_OVR = "ovr";
+	List<String> ENUM_KERNEL = Arrays.asList(KERNEL_LINEAR, KERNEL_POLY, KERNEL_RBF, KERNEL_SIGMOID);
 }

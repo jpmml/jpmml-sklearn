@@ -69,14 +69,6 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		Classifier estimator = getEstimator();
 		String method = getMethod();
 
-		switch(method){
-			case "isotonic":
-			case "sigmoid":
-				break;
-			default:
-				throw new IllegalArgumentException(method);
-		}
-
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
@@ -297,7 +289,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 	}
 
 	public String getMethod(){
-		return getString("method");
+		return getEnum("method", this::getString, Arrays.asList(CalibratedClassifier.METHOD_ISOTONIC, CalibratedClassifier.METHOD_SIGMOID));
 	}
 
 	private String getDecisionFunctionField(Object value){
@@ -340,4 +332,8 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 
 		return new ContinuousFeature(encoder, derivedField);
 	}
+
+	private static final String METHOD_ISOTONIC = "isotonic";
+	private static final String METHOD_SIGMOID = "sigmoid";
+
 }

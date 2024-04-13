@@ -30,7 +30,7 @@ import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
 abstract
-public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encodable {
+public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encodable, BaseEncoderConstants {
 
 	public BaseEncoder(String module, String name){
 		super(module, name);
@@ -92,11 +92,11 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 	}
 
 	public String getHandleMissing(){
-		return getString("handle_missing");
+		return getEnum("handle_missing", this::getString, BaseEncoder.ENUM_HANDLEMISSING);
 	}
 
 	public String getHandleUnknown(){
-		return getString("handle_unknown");
+		return getEnum("handle_unknown", this::getString, BaseEncoder.ENUM_HANDLEUNKNOWN);
 	}
 
 	public static final Object CATEGORY_NAN = Double.NaN;

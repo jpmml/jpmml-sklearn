@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,35 +16,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.svm;
+package sklearn.neural_network;
 
 import java.util.Arrays;
+import java.util.List;
 
-import org.dmg.pmml.Model;
-import org.jpmml.converter.Schema;
-import sklearn.linear_model.LinearClassifier;
+interface MLPConstants {
 
-public class LinearSVC extends LinearClassifier {
+	String ACTIVATION_IDENTITY = "identity";
+	String ACTIVATION_LOGISTIC = "logistic";
+	String ACTIVATION_RELU = "relu";
+	String ACTIVATION_TANH = "tanh";
 
-	public LinearSVC(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public boolean hasProbabilityDistribution(){
-		return false;
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		String multiClass = getMultiClass();
-
-		return super.encodeModel(schema);
-	}
-
-	public String getMultiClass(){
-		return getEnum("multi_class", this::getString, Arrays.asList(LinearSVC.MULTICLASS_OVR));
-	}
-
-	private static final String MULTICLASS_OVR = "ovr";
+	List<String> ENUM_ACTIVATION = Arrays.asList(ACTIVATION_IDENTITY, ACTIVATION_LOGISTIC, ACTIVATION_RELU, ACTIVATION_TANH);
 }

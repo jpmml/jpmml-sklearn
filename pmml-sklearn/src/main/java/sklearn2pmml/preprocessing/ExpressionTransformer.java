@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.preprocessing;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -210,7 +211,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public String getInvalidValueTreatment(){
-		return getOptionalString("invalid_value_treatment");
+		return getOptionalEnum("invalid_value_treatment", this::getOptionalString, Arrays.asList(ExpressionTransformer.INVALIDVALUETREATMENT_AS_MISSING, ExpressionTransformer.INVALIDVALUETREATMENT_RETURN_INVALID));
 	}
 
 	public ExpressionTransformer setInvalidValueTreatment(String invalidValueTreatment){
@@ -237,12 +238,15 @@ public class ExpressionTransformer extends Transformer {
 		}
 
 		switch(invalidValueTreatment){
-			case "return_invalid":
-				return InvalidValueTreatmentMethod.RETURN_INVALID;
-			case "as_missing":
+			case ExpressionTransformer.INVALIDVALUETREATMENT_AS_MISSING:
 				return InvalidValueTreatmentMethod.AS_MISSING;
+			case ExpressionTransformer.INVALIDVALUETREATMENT_RETURN_INVALID:
+				return InvalidValueTreatmentMethod.RETURN_INVALID;
 			default:
 				throw new IllegalArgumentException(invalidValueTreatment);
 		}
 	}
+
+	private static final String INVALIDVALUETREATMENT_AS_MISSING = "as_missing";
+	private static final String INVALIDVALUETREATMENT_RETURN_INVALID = "return_invalid";
 }

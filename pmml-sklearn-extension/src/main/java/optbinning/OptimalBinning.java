@@ -19,6 +19,7 @@
 package optbinning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,14 +62,6 @@ public class OptimalBinning extends Transformer {
 		List<Number> specialCodes = getSpecialCodes();
 		List<Number> splits = getSplitsOptimal();
 
-		switch(dtype){
-			case "numerical":
-			case "categorical":
-				break;
-			default:
-				throw new IllegalArgumentException(dtype);
-		}
-
 		List<Double> categoriesOut = getCategoriesOut();
 
 		ClassDictUtil.checkSize(splits.size() + 3, categoriesOut);
@@ -90,12 +83,12 @@ public class OptimalBinning extends Transformer {
 			OptimalBinningUtil.checkIncreasingOrder(splits);
 
 			switch(dtype){
-				case "numerical":
+				case OptimalBinning.DTYPE_NUMERICAL:
 					{
 						expression = encodeNumericalBinning(feature, splits, categoriesOut, predicateManager, predicates);
 					}
 					break;
-				case "categorical":
+				case OptimalBinning.DTYPE_CATEGORICAL:
 					{
 						List<?> categoriesIn = getCategoriesIn();
 
@@ -285,14 +278,6 @@ public class OptimalBinning extends Transformer {
 		List<Integer> numberOfEvents = getNumberOfEvents();
 		List<Integer> numberOfNonEvents = getNumberOfNonEvents();
 
-		switch(metric){
-			case "event_rate":
-			case "woe":
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
-
 		ClassDictUtil.checkSize(numberOfEvents, numberOfNonEvents);
 
 		double constant = Math.log((double)OptimalBinningUtil.sumExact(numberOfEvents) / (double)OptimalBinningUtil.sumExact(numberOfNonEvents));
@@ -303,12 +288,12 @@ public class OptimalBinning extends Transformer {
 			double eventRate = (double)numberOfEvents.get(i) / (double)Math.addExact(numberOfEvents.get(i), numberOfNonEvents.get(i));
 
 			switch(metric){
-				case "event_rate":
+				case OptimalBinning.METRIC_EVENT_RATE:
 					{
 						result.add(eventRate);
 					}
 					break;
-				case "woe":
+				case OptimalBinning.METRIC_WOE:
 					{
 						double woe = Math.log((1d / eventRate) - 1d) + constant;
 
@@ -316,7 +301,7 @@ public class OptimalBinning extends Transformer {
 					}
 					break;
 				default:
-					throw new IllegalArgumentException();
+					throw new IllegalArgumentException(metric);
 			}
 		}
 
@@ -324,11 +309,11 @@ public class OptimalBinning extends Transformer {
 	}
 
 	public String getDType(){
-		return getString("dtype");
+		return getEnum("dtype", this::getString, Arrays.asList(OptimalBinning.DTYPE_CATEGORICAL, OptimalBinning.DTYPE_NUMERICAL));
 	}
 
 	public String getDefaultMetric(){
-		return "woe";
+		return OptimalBinning.METRIC_WOE;
 	}
 
 	public String getMetric(){
@@ -337,7 +322,7 @@ public class OptimalBinning extends Transformer {
 			return getDefaultMetric();
 		}
 
-		return getString("metric");
+		return getEnum("metric", this::getString, Arrays.asList(OptimalBinning.METRIC_EVENT_RATE, OptimalBinning.METRIC_WOE));
 	}
 
 	public OptimalBinning setMetric(String metric){
@@ -370,4 +355,10 @@ public class OptimalBinning extends Transformer {
 
 	public static final Double CATEGORY_MISSING = 0d;
 	public static final Double CATEGORY_SPECIAL = 0d;
+
+	private static final String DTYPE_CATEGORICAL = "categorical";
+	private static final String DTYPE_NUMERICAL = "numerical";
+
+	private static final String METRIC_EVENT_RATE = "event_rate";
+	private static final String METRIC_WOE = "woe";
 }

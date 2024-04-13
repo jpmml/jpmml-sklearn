@@ -37,10 +37,10 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 		List<Integer> numberOfEvents = getNumberOfEvents();
 
 		switch(metric){
-			case "mean_woe":
+			case MulticlassOptimalBinning.METRIC_MEAN_WOE:
 				break;
 			default:
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException(metric);
 		}
 
 		int cols = numberOfClasses;
@@ -119,7 +119,7 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 
 	@Override
 	public String getDefaultMetric(){
-		return "mean_woe";
+		return MulticlassOptimalBinning.METRIC_MEAN_WOE;
 	}
 
 	public Integer getNumberOfClasses(){
@@ -130,4 +130,6 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 	public List<Integer> getNumberOfEvents(){
 		return getIntegerArray("_n_event");
 	}
+
+	private static final String METRIC_MEAN_WOE = "mean_woe";
 }

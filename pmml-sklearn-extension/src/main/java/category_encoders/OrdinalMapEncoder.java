@@ -58,27 +58,14 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 		Object missingCategory = null;
 
-		switch(handleMissing){
-			case "error":
-			case "return_nan":
-				break;
-			case "value":
-				missingCategory = BaseEncoder.CATEGORY_NAN;
-				break;
-			default:
-				throw new IllegalArgumentException(handleMissing);
+		if((OrdinalMapEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Object unknownCategory = null;
 
-		switch(handleUnknown){
-			case "error":
-				break;
-			case "value":
-				unknownCategory = OrdinalEncoder.CATEGORY_UNKNOWN;
-				break;
-			default:
-				throw new IllegalArgumentException(handleUnknown);
+		if((OrdinalMapEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+			unknownCategory = OrdinalEncoder.CATEGORY_UNKNOWN;
 		}
 
 		List<OrdinalEncoder.Mapping> ordinalMappings = ordinalEncoder.getMapping();
@@ -95,7 +82,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 			Map<?, Integer> ordinalCategoryMappings = ordinalMapping.getCategoryMapping();
 
 			switch(handleMissing){
-				case "error":
+				case OrdinalMapEncoder.HANDLEMISSING_ERROR:
 					ordinalCategoryMappings.remove(BaseEncoder.CATEGORY_NAN);
 					break;
 				default:
@@ -118,7 +105,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 			Double defaultValue = null;
 
 			switch(handleUnknown){
-				case "value":
+				case OrdinalMapEncoder.HANDLEUNKNOWN_VALUE:
 					{
 						if(!valueMappings.containsKey(unknownCategory)){
 							throw new IllegalArgumentException();

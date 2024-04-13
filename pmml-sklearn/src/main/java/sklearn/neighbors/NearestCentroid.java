@@ -28,7 +28,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.SliceUtil;
 import sklearn.SkLearnClassifier;
 
-public class NearestCentroid extends SkLearnClassifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class NearestCentroid extends SkLearnClassifier implements HasMetric, HasNumberOfNeighbors, HasTrainingData, KNeighborsConstants {
 
 	public NearestCentroid(String module, String name){
 		super(module, name);
@@ -79,7 +79,7 @@ public class NearestCentroid extends SkLearnClassifier implements HasMetric, Has
 
 	@Override
 	public String getMetric(){
-		return getString("metric");
+		return getEnum("metric", this::getString, NearestCentroid.ENUM_METRIC);
 	}
 
 	@Override

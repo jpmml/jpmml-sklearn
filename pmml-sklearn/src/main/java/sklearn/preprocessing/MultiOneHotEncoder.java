@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -81,17 +82,17 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			Decorator invalidValueDecorator;
 
 			switch(handleUnknown){
-				case "error":
+				case MultiOneHotEncoder.HANDLEUNKNOWN_ERROR:
 					{
 						invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.RETURN_INVALID, null);
 					}
 					break;
-				case "ignore":
+				case MultiOneHotEncoder.HANDLEUNKNOWN_IGNORE:
 					{
 						invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null);
 					}
 					break;
-				case "infrequent_if_exist":
+				case MultiOneHotEncoder.HANDLEUNKNOWN_INFREQUENT_IF_EXIST:
 					{
 						if(featureInfrequentEnabled){
 							invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_VALUE, infrequentCategory);
@@ -242,6 +243,10 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		return Lists.transform(dropIdx, number -> number != null ? ValueUtil.asInteger(number) : null);
 	}
 
+	public String getHandleUnknown(){
+		return getEnum("handle_unknown", this::getString, Arrays.asList(MultiOneHotEncoder.HANDLEUNKNOWN_ERROR, MultiOneHotEncoder.HANDLEUNKNOWN_IGNORE, MultiOneHotEncoder.HANDLEUNKNOWN_INFREQUENT_IF_EXIST));
+	}
+
 	public Boolean getInfrequentEnabled(){
 		return getOptionalBoolean("_infrequent_enabled", false);
 	}
@@ -305,4 +310,8 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 		return result;
 	}
+
+	private static final String HANDLEUNKNOWN_ERROR = "error";
+	private static final String HANDLEUNKNOWN_IGNORE = "ignore";
+	private static final String HANDLEUNKNOWN_INFREQUENT_IF_EXIST = "infrequent_if_exist";
 }

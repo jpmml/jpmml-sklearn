@@ -28,7 +28,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.SkLearnRegressor;
 
-public class LibSVMRegressor extends SkLearnRegressor {
+public class LibSVMRegressor extends SkLearnRegressor implements LibSVMConstants {
 
 	public LibSVMRegressor(String module, String name){
 		super(module, name);
@@ -59,7 +59,7 @@ public class LibSVMRegressor extends SkLearnRegressor {
 	}
 
 	public String getKernel(){
-		return getString("kernel");
+		return getEnum("kernel", this::getString, LibSVMRegressor.ENUM_KERNEL);
 	}
 
 	public Integer getDegree(){

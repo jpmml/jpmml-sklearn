@@ -19,6 +19,7 @@
 package category_encoders;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jpmml.converter.BinaryFeature;
@@ -45,24 +46,6 @@ public class OneHotEncoder extends BaseEncoder {
 			throw new IllegalArgumentException();
 		}
 
-		switch(handleMissing){
-			case "error":
-			case "return_nan":
-			case "value":
-			case "indicator":
-				break;
-			default:
-				throw new IllegalArgumentException(handleMissing);
-		} // End switch
-
-		switch(handleUnknown){
-			case "error":
-			case "value":
-				break;
-			default:
-				throw new IllegalArgumentException(handleUnknown);
-		}
-
 		features = ordinalEncoder.encode(features, encoder);
 
 		List<Feature> result = new ArrayList<>();
@@ -81,8 +64,8 @@ public class OneHotEncoder extends BaseEncoder {
 					if(ValueUtil.isNaN(category)){
 
 						switch(handleMissing){
-							case "value":
-							case "indicator":
+							case OneHotEncoder.HANDLEMISSING_INDICATOR:
+							case OneHotEncoder.HANDLEMISSING_VALUE:
 								result.add(new MissingValueFeature(encoder, categoricalFeature));
 								break;
 							default:
@@ -104,7 +87,14 @@ public class OneHotEncoder extends BaseEncoder {
 		return result;
 	}
 
+	@Override
+	public String getHandleMissing(){
+		return getEnum("handle_missing", this::getString, Arrays.asList(OneHotEncoder.HANDLEMISSING_ERROR, OneHotEncoder.HANDLEMISSING_RETURN_NAN, OneHotEncoder.HANDLEMISSING_INDICATOR, OneHotEncoder.HANDLEMISSING_VALUE));
+	}
+
 	public OrdinalEncoder getOrdinalEncoder(){
 		return get("ordinal_encoder", OrdinalEncoder.class);
 	}
+
+	private static final String HANDLEMISSING_INDICATOR = "indicator";
 }

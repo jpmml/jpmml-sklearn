@@ -18,6 +18,7 @@
  */
 package sklearn.neighbors;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -26,7 +27,7 @@ import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
 import sklearn.SkLearnRegressor;
 
-public class KNeighborsRegressor extends SkLearnRegressor implements HasMetric, HasNumberOfNeighbors, HasTrainingData {
+public class KNeighborsRegressor extends SkLearnRegressor implements HasMetric, HasNumberOfNeighbors, HasTrainingData, KNeighborsConstants {
 
 	public KNeighborsRegressor(String module, String name){
 		super(module, name);
@@ -57,18 +58,7 @@ public class KNeighborsRegressor extends SkLearnRegressor implements HasMetric, 
 		int numberOfInstances = shape[0];
 		int numberOfFeatures = shape[1];
 
-		boolean weighted;
-
-		switch(weights){
-			case "distance":
-				weighted = true;
-				break;
-			case "uniform":
-				weighted = false;
-				break;
-			default:
-				throw new IllegalArgumentException(weights);
-		}
+		boolean weighted = KNeighborsUtil.parseWeights(weights);
 
 		NearestNeighborModel nearestNeighborModel = KNeighborsUtil.encodeNeighbors(this, MiningFunction.REGRESSION, numberOfInstances, numberOfFeatures, schema)
 			.setContinuousScoringMethod(weighted ? NearestNeighborModel.ContinuousScoringMethod.WEIGHTED_AVERAGE : NearestNeighborModel.ContinuousScoringMethod.AVERAGE)
@@ -79,7 +69,7 @@ public class KNeighborsRegressor extends SkLearnRegressor implements HasMetric, 
 
 	@Override
 	public String getMetric(){
-		return getString("metric");
+		return getEnum("metric", this::getString, KNeighborsRegressor.ENUM_METRIC);
 	}
 
 	@Override
@@ -123,6 +113,6 @@ public class KNeighborsRegressor extends SkLearnRegressor implements HasMetric, 
 	}
 
 	public String getWeights(){
-		return getString("weights");
+		return getEnum("weights", this::getString, Arrays.asList(KNeighborsRegressor.WEIGHTS_DISTANCE, KNeighborsRegressor.WEIGHTS_UNIFORM));
 	}
 }

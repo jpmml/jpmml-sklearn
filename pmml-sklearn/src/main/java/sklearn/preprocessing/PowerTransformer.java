@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.Apply;
@@ -45,13 +46,6 @@ public class PowerTransformer extends SkLearnTransformer {
 		List<Number> lambdas = getLambdas();
 		String method = getMethod();
 		Boolean standardize = getStandardize();
-
-		switch(method){
-			case "box-cox":
-				break;
-			default:
-				throw new IllegalArgumentException(method);
-		}
 
 		ClassDictUtil.checkSize(features, lambdas);
 
@@ -93,7 +87,7 @@ public class PowerTransformer extends SkLearnTransformer {
 	}
 
 	public String getMethod(){
-		return getString("method");
+		return getEnum("method", this::getString, Arrays.asList(PowerTransformer.METHOD_BOXCOX));
 	}
 
 	public StandardScaler getScaler(){
@@ -103,4 +97,6 @@ public class PowerTransformer extends SkLearnTransformer {
 	public Boolean getStandardize(){
 		return getBoolean("standardize");
 	}
+
+	private static final String METHOD_BOXCOX = "box-cox";
 }

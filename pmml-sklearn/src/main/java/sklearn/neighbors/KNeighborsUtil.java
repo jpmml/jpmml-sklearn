@@ -81,6 +81,19 @@ public class KNeighborsUtil {
 	}
 
 	static
+	public boolean parseWeights(String weights){
+
+		switch(weights){
+			case KNeighborsConstants.WEIGHTS_DISTANCE:
+				return true;
+			case KNeighborsConstants.WEIGHTS_UNIFORM:
+				return false;
+			default:
+				throw new IllegalArgumentException(weights);
+		}
+	}
+
+	static
 	public <E extends Estimator & HasMetric & HasNumberOfNeighbors & HasTrainingData> NearestNeighborModel encodeNeighbors(E estimator, MiningFunction miningFunction, int numberOfInstances, int numberOfFeatures, Schema schema){
 		int numberOfNeighbors = estimator.getNumberOfNeighbors();
 		int numberOfOutputs = estimator.getNumberOfOutputs();
@@ -223,11 +236,11 @@ public class KNeighborsUtil {
 		int p = estimator.getP();
 
 		switch(metric){
-			case "euclidean":
+			case KNeighborsConstants.METRIC_EUCLIDEAN:
 				return new Euclidean();
-			case "manhattan":
+			case KNeighborsConstants.METRIC_MANHATTAN:
 				return new CityBlock();
-			case "minkowski":
+			case KNeighborsConstants.METRIC_MINKOWSKI:
 				switch(p){
 					case 1:
 						return new CityBlock();

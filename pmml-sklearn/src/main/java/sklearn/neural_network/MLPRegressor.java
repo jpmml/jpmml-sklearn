@@ -26,7 +26,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.HasArray;
 import sklearn.SkLearnRegressor;
 
-public class MLPRegressor extends SkLearnRegressor {
+public class MLPRegressor extends SkLearnRegressor implements MLPConstants {
 
 	public MLPRegressor(String module, String name){
 		super(module, name);
@@ -52,7 +52,7 @@ public class MLPRegressor extends SkLearnRegressor {
 	}
 
 	public String getActivation(){
-		return getString("activation");
+		return getEnum("activation", this::getString, MLPRegressor.ENUM_ACTIVATION);
 	}
 
 	public List<HasArray> getCoefs(){

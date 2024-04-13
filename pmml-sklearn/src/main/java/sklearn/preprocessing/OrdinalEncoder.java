@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -47,18 +48,12 @@ public class OrdinalEncoder extends BaseEncoder {
 
 		if(handleUnknown != null){
 
-			switch(handleUnknown){
-				case "error":
-					break;
-				case "use_encoded_value":
-					unknownValue = getUnknownValue();
+			if((OrdinalEncoder.HANDLEUNKNOWN_USE_ENCODED_VALUE).equals(handleUnknown)){
+				unknownValue = getUnknownValue();
 
-					if(ValueUtil.isNaN(unknownValue)){
-						unknownValue = null;
-					}
-					break;
-				default:
-					throw new IllegalArgumentException(handleUnknown);
+				if(ValueUtil.isNaN(unknownValue)){
+					unknownValue = null;
+				}
 			}
 		}
 
@@ -77,10 +72,10 @@ public class OrdinalEncoder extends BaseEncoder {
 				InvalidValueTreatmentMethod invalidValueTreatmentMethod;
 
 				switch(handleUnknown){
-					case "error":
+					case OrdinalEncoder.HANDLEUNKNOWN_ERROR:
 						invalidValueTreatmentMethod = InvalidValueTreatmentMethod.RETURN_INVALID;
 						break;
-					case "use_encoded_value":
+					case OrdinalEncoder.HANDLEUNKNOWN_USE_ENCODED_VALUE:
 						invalidValueTreatmentMethod = InvalidValueTreatmentMethod.AS_IS;
 						break;
 					default:
@@ -100,7 +95,14 @@ public class OrdinalEncoder extends BaseEncoder {
 		return getDType("dtype", false);
 	}
 
+	public String getHandleUnknown(){
+		return getEnum("handle_unknown", this::getOptionalString, Arrays.asList(OrdinalEncoder.HANDLEUNKNOWN_ERROR, OrdinalEncoder.HANDLEUNKNOWN_USE_ENCODED_VALUE));
+	}
+
 	public Number getUnknownValue(){
 		return getNumber("unknown_value");
 	}
+
+	private static final String HANDLEUNKNOWN_ERROR = "error";
+	private static final String HANDLEUNKNOWN_USE_ENCODED_VALUE = "use_encoded_value";
 }

@@ -19,6 +19,7 @@
 package sklearn.impute;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,14 +44,14 @@ public class SimpleImputer extends SkLearnTransformer {
 		String strategy = getStrategy();
 
 		switch(strategy){
-			case "constant":
+			case SimpleImputer.STRATEGY_CONSTANT:
 				DataType dataType = getDataType();
 
 				return TypeUtil.getOpType(dataType);
-			case "mean":
-			case "median":
+			case SimpleImputer.STRATEGY_MEAN:
+			case SimpleImputer.STRATEGY_MEDIAN:
 				return OpType.CONTINUOUS;
-			case "most_frequent":
+			case SimpleImputer.STRATEGY_MOST_FREQUENT:
 				return OpType.CATEGORICAL;
 			default:
 				throw new IllegalArgumentException(strategy);
@@ -63,12 +64,12 @@ public class SimpleImputer extends SkLearnTransformer {
 		List<?> statistics = getStatistics();
 
 		switch(strategy){
-			case "constant":
+			case SimpleImputer.STRATEGY_CONSTANT:
 				return TypeUtil.getDataType(statistics, DataType.STRING);
-			case "mean":
-			case "median":
+			case SimpleImputer.STRATEGY_MEAN:
+			case SimpleImputer.STRATEGY_MEDIAN:
 				return DataType.DOUBLE;
-			case "most_frequent":
+			case SimpleImputer.STRATEGY_MOST_FREQUENT:
 				return TypeUtil.getDataType(statistics, DataType.STRING);
 			default:
 				throw new IllegalArgumentException(strategy);
@@ -150,23 +151,28 @@ public class SimpleImputer extends SkLearnTransformer {
 	}
 
 	public String getStrategy(){
-		return getString("strategy");
+		return getEnum("strategy", this::getString, Arrays.asList(SimpleImputer.STRATEGY_CONSTANT, SimpleImputer.STRATEGY_MEAN, SimpleImputer.STRATEGY_MEDIAN, SimpleImputer.STRATEGY_MOST_FREQUENT));
 	}
 
 	static
 	private MissingValueTreatmentMethod parseStrategy(String strategy){
 
 		switch(strategy){
-			case "constant":
+			case SimpleImputer.STRATEGY_CONSTANT:
 				return MissingValueTreatmentMethod.AS_VALUE;
-			case "mean":
+			case SimpleImputer.STRATEGY_MEAN:
 				return MissingValueTreatmentMethod.AS_MEAN;
-			case "median":
+			case SimpleImputer.STRATEGY_MEDIAN:
 				return MissingValueTreatmentMethod.AS_MEDIAN;
-			case "most_frequent":
+			case SimpleImputer.STRATEGY_MOST_FREQUENT:
 				return MissingValueTreatmentMethod.AS_MODE;
 			default:
 				throw new IllegalArgumentException(strategy);
 		}
 	}
+
+	private static final String STRATEGY_CONSTANT = "constant";
+	private static final String STRATEGY_MEAN = "mean";
+	private static final String STRATEGY_MEDIAN = "median";
+	private static final String STRATEGY_MOST_FREQUENT = "most_frequent";
 }

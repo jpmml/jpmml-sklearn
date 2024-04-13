@@ -66,27 +66,14 @@ public class MeanEncoder extends MapEncoder {
 
 		Object missingCategory = null;
 
-		switch(handleMissing){
-			case "error":
-			case "return_nan":
-				break;
-			case "value":
-				missingCategory = BaseEncoder.CATEGORY_NAN;
-				break;
-			default:
-				throw new IllegalArgumentException(handleMissing);
+		if((MeanEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Number defaultValue = null;
 
-		switch(handleUnknown){
-			case "error":
-				break;
-			case "value":
-				defaultValue = getMean();
-				break;
-			default:
-				throw new IllegalArgumentException(handleUnknown);
+		if((MeanEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+			defaultValue = getMean();
 		}
 
 		List<Feature> result = new ArrayList<>();
@@ -104,7 +91,7 @@ public class MeanEncoder extends MapEncoder {
 			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			switch(handleUnknown){
-				case "value":
+				case MeanEncoder.HANDLEUNKNOWN_VALUE:
 					{
 						EncoderUtil.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null), encoder);
 					}

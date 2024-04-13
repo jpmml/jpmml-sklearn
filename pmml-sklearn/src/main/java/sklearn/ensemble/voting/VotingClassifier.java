@@ -19,6 +19,7 @@
 package sklearn.ensemble.voting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -51,6 +52,7 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		List<Classifier> estimators = getEstimators();
+		String voting = getVoting();
 		List<Number> weights = getWeights();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
@@ -62,8 +64,6 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 
 			models.add(model);
 		}
-
-		String voting = getVoting();
 
 		Segmentation.MultipleModelMethod multipleModelMethod = parseVoting(voting, (weights != null && !weights.isEmpty()));
 
@@ -81,7 +81,7 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 	}
 
 	public String getVoting(){
-		return getString("voting");
+		return getEnum("voting", this::getString, Arrays.asList(VotingClassifier.VOTING_HARD, VotingClassifier.VOTING_SOFT));
 	}
 
 	public List<Number> getWeights(){
@@ -98,12 +98,15 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 	private Segmentation.MultipleModelMethod parseVoting(String voting, boolean weighted){
 
 		switch(voting){
-			case "hard":
+			case VotingClassifier.VOTING_HARD:
 				return (weighted ? Segmentation.MultipleModelMethod.WEIGHTED_MAJORITY_VOTE : Segmentation.MultipleModelMethod.MAJORITY_VOTE);
-			case "soft":
+			case VotingClassifier.VOTING_SOFT:
 				return (weighted ? Segmentation.MultipleModelMethod.WEIGHTED_AVERAGE : Segmentation.MultipleModelMethod.AVERAGE);
 			default:
 				throw new IllegalArgumentException(voting);
 		}
 	}
+
+	private static final String VOTING_HARD = "hard";
+	private static final String VOTING_SOFT = "soft";
 }

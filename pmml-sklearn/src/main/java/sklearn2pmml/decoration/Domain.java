@@ -20,6 +20,7 @@ package sklearn2pmml.decoration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -58,7 +59,7 @@ public class Domain extends Decorator {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		MissingValueTreatmentMethod missingValueTreatment = DomainUtil.parseMissingValueTreatment(getMissingValueTreatment());
+		MissingValueTreatmentMethod missingValueTreatment = parseMissingValueTreatment(getMissingValueTreatment());
 		Object missingValueReplacement = getMissingValueReplacement();
 		List<?> missingValues = getMissingValues();
 
@@ -69,7 +70,7 @@ public class Domain extends Decorator {
 			}
 		}
 
-		InvalidValueTreatmentMethod invalidValueTreatment = DomainUtil.parseInvalidValueTreatment(getInvalidValueTreatment());
+		InvalidValueTreatmentMethod invalidValueTreatment = parseInvalidValueTreatment(getInvalidValueTreatment());
 		Object invalidValueReplacement = getInvalidValueReplacement();
 
 		if(invalidValueReplacement != null){
@@ -148,7 +149,7 @@ public class Domain extends Decorator {
 	}
 
 	public String getMissingValueTreatment(){
-		return getOptionalString("missing_value_treatment");
+		return getOptionalEnum("missing_value_treatment", this::getOptionalString, Arrays.asList(Domain.MISSINGVALUETREATMENT_AS_IS, Domain.MISSINGVALUETREATMENT_AS_MEAN, Domain.MISSINGVALUETREATMENT_AS_MEDIAN, Domain.MISSINGVALUETREATMENT_AS_MODE, Domain.MISSINGVALUETREATMENT_AS_VALUE, Domain.MISSINGVALUETREATMENT_RETURN_INVALID));
 	}
 
 	public Object getMissingValueReplacement(){
@@ -173,7 +174,7 @@ public class Domain extends Decorator {
 	}
 
 	public String getInvalidValueTreatment(){
-		return getOptionalString("invalid_value_treatment");
+		return getOptionalEnum("invalid_value_treatment", this::getOptionalString, Arrays.asList(Domain.INVALIDVALUETREATMENT_AS_IS, Domain.INVALIDVALUETREATMENT_AS_MISSING, Domain.INVALIDVALUETREATMENT_AS_VALUE, Domain.INVALIDVALUETREATMENT_RETURN_INVALID));
 	}
 
 	public Object getInvalidValueReplacement(){
@@ -332,4 +333,62 @@ public class Domain extends Decorator {
 
 		return object;
 	}
+
+	static
+	public MissingValueTreatmentMethod parseMissingValueTreatment(String missingValueTreatment){
+
+		if(missingValueTreatment == null){
+			return null;
+		}
+
+		switch(missingValueTreatment){
+			case Domain.MISSINGVALUETREATMENT_AS_IS:
+				return MissingValueTreatmentMethod.AS_IS;
+			case Domain.MISSINGVALUETREATMENT_AS_MEAN:
+				return MissingValueTreatmentMethod.AS_MEAN;
+			case Domain.MISSINGVALUETREATMENT_AS_MODE:
+				return MissingValueTreatmentMethod.AS_MODE;
+			case Domain.MISSINGVALUETREATMENT_AS_MEDIAN:
+				return MissingValueTreatmentMethod.AS_MEDIAN;
+			case Domain.MISSINGVALUETREATMENT_AS_VALUE:
+				return MissingValueTreatmentMethod.AS_VALUE;
+			case Domain.MISSINGVALUETREATMENT_RETURN_INVALID:
+				return MissingValueTreatmentMethod.RETURN_INVALID;
+			default:
+				throw new IllegalArgumentException(missingValueTreatment);
+		}
+	}
+
+	static
+	public InvalidValueTreatmentMethod parseInvalidValueTreatment(String invalidValueTreatment){
+
+		if(invalidValueTreatment == null){
+			return null;
+		}
+
+		switch(invalidValueTreatment){
+			case Domain.INVALIDVALUETREATMENT_AS_IS:
+				return InvalidValueTreatmentMethod.AS_IS;
+			case Domain.INVALIDVALUETREATMENT_AS_MISSING:
+				return InvalidValueTreatmentMethod.AS_MISSING;
+			case Domain.INVALIDVALUETREATMENT_AS_VALUE:
+				return InvalidValueTreatmentMethod.AS_VALUE;
+			case Domain.INVALIDVALUETREATMENT_RETURN_INVALID:
+				return InvalidValueTreatmentMethod.RETURN_INVALID;
+			default:
+				throw new IllegalArgumentException(invalidValueTreatment);
+		}
+	}
+
+	private static final String MISSINGVALUETREATMENT_AS_IS = "as_is";
+	private static final String MISSINGVALUETREATMENT_AS_MEAN = "as_mean";
+	private static final String MISSINGVALUETREATMENT_AS_MEDIAN = "as_median";
+	private static final String MISSINGVALUETREATMENT_AS_MODE = "as_mode";
+	private static final String MISSINGVALUETREATMENT_AS_VALUE = "as_value";
+	private static final String MISSINGVALUETREATMENT_RETURN_INVALID = "return_invalid";
+
+	private static final String INVALIDVALUETREATMENT_AS_IS = "as_is";
+	private static final String INVALIDVALUETREATMENT_AS_MISSING = "as_missing";
+	private static final String INVALIDVALUETREATMENT_AS_VALUE = "as_value";
+	private static final String INVALIDVALUETREATMENT_RETURN_INVALID = "return_invalid";
 }

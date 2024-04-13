@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.expression;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,23 +75,26 @@ public class ExpressionRegressor extends Regressor {
 	public String getNormalizationMethod(){
 
 		if(!hasattr("normalization_method")){
-			return "none";
+			return ExpressionRegressor.NORMALIZATIONMETHOD_NONE;
 		}
 
 		// SkLearn2PMML 0.105.0+
-		return getString("normalization_method");
+		return getEnum("normalization_method", this::getString, Arrays.asList(ExpressionRegressor.NORMALIZATIONMETHOD_NONE, ExpressionRegressor.NORMALIZATIONMETHOD_EXP));
 	}
 
 	static
 	private RegressionModel.NormalizationMethod parseNormalizationMethod(String normalizationMethod){
 
 		switch(normalizationMethod){
-			case "none":
+			case ExpressionRegressor.NORMALIZATIONMETHOD_NONE:
 				return RegressionModel.NormalizationMethod.NONE;
-			case "exp":
+			case ExpressionRegressor.NORMALIZATIONMETHOD_EXP:
 				return RegressionModel.NormalizationMethod.EXP;
 			default:
 				throw new IllegalArgumentException(normalizationMethod);
 		}
 	}
+
+	private static final String NORMALIZATIONMETHOD_EXP = "exp";
+	private static final String NORMALIZATIONMETHOD_NONE = "none";
 }

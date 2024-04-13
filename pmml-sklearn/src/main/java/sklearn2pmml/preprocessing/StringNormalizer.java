@@ -19,6 +19,7 @@
 package sklearn2pmml.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class StringNormalizer extends StringTransformer {
 	}
 
 	public String getFunction(){
-		return getOptionalString("function");
+		return getOptionalEnum("function", this::getOptionalString, Arrays.asList(StringNormalizer.FUNCTION_LOWER, StringNormalizer.FUNCTION_LOWERCASE, StringNormalizer.FUNCTION_UPPER, StringNormalizer.FUNCTION_UPPERCASE));
 	}
 
 	public Boolean getTrimBlanks(){
@@ -88,15 +89,23 @@ public class StringNormalizer extends StringTransformer {
 	private String translateFunction(String function){
 
 		switch(function){
-			case "lower":
-			case "lowercase":
+			// Python style
+			case StringNormalizer.FUNCTION_LOWER:
+			// PMML style
+			case StringNormalizer.FUNCTION_LOWERCASE:
 				return PMMLFunctions.LOWERCASE;
-			case "upper":
-			case "uppercase":
+			// Python style
+			case StringNormalizer.FUNCTION_UPPER:
+			// PMML style
+			case StringNormalizer.FUNCTION_UPPERCASE:
 				return PMMLFunctions.UPPERCASE;
 			default:
 				throw new IllegalArgumentException(function);
 		}
-
 	}
+
+	private static final String FUNCTION_LOWER = "lower";
+	private static final String FUNCTION_LOWERCASE = "lowercase";
+	private static final String FUNCTION_UPPER = "upper";
+	private static final String FUNCTION_UPPERCASE = "uppercase";
 }

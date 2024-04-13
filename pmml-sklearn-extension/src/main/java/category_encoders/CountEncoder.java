@@ -19,6 +19,7 @@
 package category_encoders;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ import pandas.core.Series;
 import pandas.core.SeriesUtil;
 import sklearn.preprocessing.EncoderUtil;
 
-public class CountEncoder extends MapEncoder {
+public class CountEncoder extends MapEncoder implements BaseEncoderConstants {
 
 	public CountEncoder(String module, String name){
 		super(module, name);
@@ -65,33 +66,14 @@ public class CountEncoder extends MapEncoder {
 
 		Object missingCategory = null;
 
-		switch(handleMissing){
-			case "error":
-			case "return_nan":
-				break;
-			case "count":
-			case "value":
-				missingCategory = BaseEncoder.CATEGORY_NAN;
-				break;
-			default:
-				throw new IllegalArgumentException(handleMissing);
-		}
-
-		// XXX
-		if(handleUnknown == null){
-			throw new IllegalArgumentException();
+		if((CountEncoder.HANDLEMISSING_COUNT).equals(handleMissing) || (CountEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Integer defaultValue = null;
 
-		switch(handleUnknown){
-			case "error":
-				break;
-			case "value":
-				defaultValue = getDefaultValue();
-				break;
-			default:
-				throw new IllegalArgumentException(handleUnknown);
+		if((CountEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+			defaultValue = getDefaultValue();
 		}
 
 		ClassDictUtil.checkSize(features, cols);
@@ -126,7 +108,7 @@ public class CountEncoder extends MapEncoder {
 			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			switch(handleUnknown){
-				case "value":
+				case CountEncoder.HANDLEUNKNOWN_VALUE:
 					{
 						EncoderUtil.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null), encoder);
 					}
@@ -160,14 +142,19 @@ public class CountEncoder extends MapEncoder {
 	}
 
 	@Override
+	public String getHandleMissing(){
+		return getEnum("handle_missing", this::getString, Arrays.asList(CountEncoder.HANDLEMISSING_ERROR, CountEncoder.HANDLEMISSING_RETURN_NAN, CountEncoder.HANDLEMISSING_COUNT, CountEncoder.HANDLEMISSING_VALUE));
+	}
+
+	@Override
 	public String getHandleUnknown(){
 		Object handleUnknown = getOptionalObject("handle_unknown");
 
 		if(handleUnknown instanceof Integer){
-			return "value";
+			return CountEncoder.HANDLEUNKNOWN_VALUE;
 		}
 
-		return getOptionalString("handle_unknown");
+		return super.getHandleUnknown();
 	}
 
 	public Boolean getNormalize(){
@@ -180,4 +167,6 @@ public class CountEncoder extends MapEncoder {
 
 		return CategoryEncoderUtil.toTransformedMap(minGroupCategories, key -> ScalarUtil.decode(key), value -> (Map<Object, String>)value);
 	}
+
+	private static final String HANDLEMISSING_COUNT = "count";
 }

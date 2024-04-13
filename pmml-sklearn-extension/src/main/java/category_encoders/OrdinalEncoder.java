@@ -55,27 +55,14 @@ public class OrdinalEncoder extends BaseEncoder {
 
 		Integer mapMissingTo = null;
 
-		switch(handleMissing){
-			case "error":
-			case "return_nan":
-				break;
-			case "value":
-				mapMissingTo = -1;
-				break;
-			default:
-				throw new IllegalArgumentException(handleMissing);
+		if((OrdinalEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+			mapMissingTo = -1;
 		}
 
 		Integer defaultValue = null;
 
-		switch(handleUnknown){
-			case "error":
-				break;
-			case "value":
-				defaultValue = -2;
-				break;
-			default:
-				throw new IllegalArgumentException(handleUnknown);
+		if((OrdinalEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+			defaultValue = -2;
 		}
 
 		ClassDictUtil.checkSize(features, mappings);

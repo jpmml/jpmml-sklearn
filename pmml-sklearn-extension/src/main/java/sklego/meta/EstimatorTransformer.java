@@ -18,6 +18,7 @@
  */
 package sklego.meta;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,17 +62,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 	private List<Feature> encodePreProcessor(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
-		String predictFunc = getPredictFunc();
-
-		switch(predictFunc){
-			case SkLearnMethods.APPLY:
-			case SkLearnMethods.DECISION_FUNCTION:
-			case SkLearnMethods.PREDICT:
-			case SkLearnMethods.PREDICT_PROBA:
-				break;
-			default:
-				throw new IllegalArgumentException(predictFunc);
-		}
+		String predictFunc = getPrePredictFunc();
 
 		ScalarLabel scalarLabel = null;
 
@@ -114,14 +105,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 	private List<Feature> encodePostProcessor(List<Feature> features, SkLearnEncoder encoder){
 		Calibrator estimator = getEstimator(Calibrator.class);
-		String predictFunc = getPredictFunc();
-
-		switch(predictFunc){
-			case SkLearnMethods.PREDICT:
-				break;
-			default:
-				throw new IllegalArgumentException(predictFunc);
-		}
+		String predictFunc = getPostPredictFunc();
 
 		Model model = encoder.getModel();
 
@@ -157,5 +141,13 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 	public String getPredictFunc(){
 		return getString("predict_func");
+	}
+
+	public String getPrePredictFunc(){
+		return getEnum("predict_func", this::getString, Arrays.asList(SkLearnMethods.APPLY, SkLearnMethods.DECISION_FUNCTION, SkLearnMethods.PREDICT, SkLearnMethods.PREDICT_PROBA));
+	}
+
+	public String getPostPredictFunc(){
+		return getEnum("predict_func", this::getString, Arrays.asList(SkLearnMethods.PREDICT));
 	}
 }

@@ -64,27 +64,14 @@ public class BaseNEncoder extends BaseEncoder {
 
 		Object missingCategory = null;
 
-		switch(handleMissing){
-			case "error":
-			case "return_nan":
-				break;
-			case "value":
-				missingCategory = BaseEncoder.CATEGORY_NAN;
-				break;
-			default:
-				throw new IllegalArgumentException(handleMissing);
+		if((BaseNEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Integer defaultValue = null;
 
-		switch(handleUnknown){
-			case "error":
-				break;
-			case "value":
-				defaultValue = 0;
-				break;
-			default:
-				throw new IllegalArgumentException(handleUnknown);
+		if((BaseNEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+			defaultValue = 0;
 		}
 
 		List<OrdinalEncoder.Mapping> ordinalMappings = ordinalEncoder.getMapping();
@@ -128,7 +115,7 @@ public class BaseNEncoder extends BaseEncoder {
 			Field<?> field = encoder.toCategorical(feature.getName(), EncoderUtil.filterCategories(categories));
 
 			switch(handleUnknown){
-				case "value":
+				case BaseNEncoder.HANDLEUNKNOWN_VALUE:
 					{
 						EncoderUtil.addDecorator(field, new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null), encoder);
 					}

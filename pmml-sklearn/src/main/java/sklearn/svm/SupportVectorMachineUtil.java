@@ -50,17 +50,17 @@ public class SupportVectorMachineUtil {
 	public Kernel createKernel(String kernel, Number degree, Number gamma, Number coef0){
 
 		switch(kernel){
-			case "linear":
+			case LibSVMConstants.KERNEL_LINEAR:
 				return new LinearKernel();
-			case "poly":
+			case LibSVMConstants.KERNEL_POLY:
 				return new PolynomialKernel()
 					.setGamma(gamma)
 					.setCoef0(coef0)
 					.setDegree(degree);
-			case "rbf":
+			case LibSVMConstants.KERNEL_RBF:
 				return new RadialBasisKernel()
 					.setGamma(gamma);
-			case "sigmoid":
+			case LibSVMConstants.KERNEL_SIGMOID:
 				return new SigmoidKernel()
 					.setGamma(gamma)
 					.setCoef0(coef0);

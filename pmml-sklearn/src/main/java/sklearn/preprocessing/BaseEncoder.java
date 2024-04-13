@@ -60,8 +60,4 @@ public class BaseEncoder extends SkLearnTransformer implements HasMultiType {
 	public List<List<Object>> getCategories(){
 		return getArrayList("categories_", Object.class);
 	}
-
-	public String getHandleUnknown(){
-		return getOptionalString("handle_unknown");
-	}
 }

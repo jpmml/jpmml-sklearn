@@ -70,9 +70,9 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 		String estimatorType = getEstimatorType();
 
 		switch(estimatorType){
-			case "classifier":
+			case H2OEstimator.TYPE_CLASSIFIER:
 				return MiningFunction.CLASSIFICATION;
-			case "regressor":
+			case H2OEstimator.TYPE_REGRESSOR:
 				return MiningFunction.REGRESSION;
 			default:
 				throw new IllegalArgumentException(estimatorType);
@@ -84,8 +84,8 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 		String estimatorType = getEstimatorType();
 
 		switch(estimatorType){
-			case "classifier":
-			case "regressor":
+			case H2OEstimator.TYPE_CLASSIFIER:
+			case H2OEstimator.TYPE_REGRESSOR:
 				return true;
 			default:
 				throw new IllegalArgumentException(estimatorType);
@@ -97,8 +97,8 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 		String estimatorType = getEstimatorType();
 
 		switch(estimatorType){
-			case "classifier":
-			case "regressor":
+			case H2OEstimator.TYPE_CLASSIFIER:
+			case H2OEstimator.TYPE_REGRESSOR:
 				return 1;
 			default:
 				throw new IllegalArgumentException(estimatorType);
@@ -130,9 +130,9 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 		String estimatorType = getEstimatorType();
 
 		switch(estimatorType){
-			case "classifier":
+			case H2OEstimator.TYPE_CLASSIFIER:
 				return true;
-			case "regressor":
+			case H2OEstimator.TYPE_REGRESSOR:
 				return false;
 			default:
 				throw new IllegalArgumentException(estimatorType);
@@ -149,7 +149,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 		String name = names.get(0);
 
 		switch(estimatorType){
-			case "classifier":
+			case H2OEstimator.TYPE_CLASSIFIER:
 				{
 					List<?> categories = getClasses();
 
@@ -178,7 +178,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 						}
 					}
 				}
-			case "regressor":
+			case H2OEstimator.TYPE_REGRESSOR:
 				{
 					if(name != null){
 						DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
@@ -248,7 +248,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	}
 
 	public String getEstimatorType(){
-		return getString("_estimator_type");
+		return getEnum("_estimator_type", this::getString, Arrays.asList(H2OEstimator.TYPE_CLASSIFIER, H2OEstimator.TYPE_REGRESSOR));
 	}
 
 	public byte[] getMojoBytes(){
@@ -310,4 +310,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 
 		return mojoModel;
 	}
+
+	private static final String TYPE_CLASSIFIER = "classifier";
+	private static final String TYPE_REGRESSOR = "regressor";
 }
