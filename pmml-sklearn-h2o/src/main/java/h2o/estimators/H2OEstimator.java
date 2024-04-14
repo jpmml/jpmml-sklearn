@@ -51,6 +51,7 @@ import org.jpmml.h2o.MojoModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasClasses;
@@ -273,7 +274,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 
 			return converterFactory.newConverter(mojoModel);
 		} catch(Exception e){
-			throw new IllegalArgumentException(e);
+			throw new SkLearnException("Failed to create H2O.ai converter", e);
 		}
 	}
 
@@ -287,28 +288,26 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	}
 
 	private MojoModel loadMojoModel(){
-		MojoModel mojoModel;
 
-		try {
+		if(hasattr("_mojo_bytes")){
+			byte[] mojoBytes = getMojoBytes();
 
-			if(hasattr("_mojo_bytes")){
-				byte[] mojoBytes = getMojoBytes();
-
-				try(InputStream is = new ByteArrayInputStream(mojoBytes)){
-					mojoModel = MojoModelUtil.readFrom(is);
-				}
-			} else
-
-			{
-				String mojoPath = getMojoPath();
-
-				mojoModel = MojoModelUtil.readFrom(new File(mojoPath), false);
+			try(InputStream is = new ByteArrayInputStream(mojoBytes)){
+				return MojoModelUtil.readFrom(is);
+			} catch(Exception e){
+				throw new SkLearnException("Failed to load H2O.ai MOJO object", e);
 			}
-		} catch(Exception e){
-			throw new IllegalArgumentException(e);
-		}
+		} else
 
-		return mojoModel;
+		{
+			String mojoPath = getMojoPath();
+
+			try {
+				return MojoModelUtil.readFrom(new File(mojoPath), false);
+			} catch(Exception e){
+				throw new SkLearnException("Failed to load H2O.ai MOJO object", e);
+			}
+		}
 	}
 
 	private static final String TYPE_CLASSIFIER = "classifier";

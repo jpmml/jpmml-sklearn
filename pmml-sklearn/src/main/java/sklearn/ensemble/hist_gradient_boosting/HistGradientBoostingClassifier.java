@@ -37,8 +37,6 @@ import org.jpmml.python.PythonObject;
 import sklearn.HasMultiDecisionFunctionField;
 import sklearn.SkLearnClassifier;
 import sklearn.compose.ColumnTransformer;
-import sklearn.loss.HalfBinomialLoss;
-import sklearn.loss.HalfMultinomialLoss;
 
 public class HistGradientBoostingClassifier extends SkLearnClassifier implements HasMultiDecisionFunctionField {
 
@@ -49,6 +47,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		List<Number> baselinePredictions = getBaselinePrediction();
+		@SuppressWarnings("unused")
 		PythonObject loss = getLoss();
 		BinMapper binMapper = getBinMapper();
 		int numberOfTreesPerIteration = getNumberOfTreesPerIteration();
@@ -72,10 +71,6 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 		if(numberOfTreesPerIteration == 1){
 			SchemaUtil.checkSize(2, categoricalLabel);
 
-			if(!(loss instanceof BinaryCrossEntropy) && !(loss instanceof HalfBinomialLoss)){
-				throw new IllegalArgumentException();
-			}
-
 			Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
@@ -84,10 +79,6 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 
 		if(numberOfTreesPerIteration >= 3){
 			SchemaUtil.checkSize(numberOfTreesPerIteration, categoricalLabel);
-
-			if(!(loss instanceof CategoricalCrossEntropy) && !(loss instanceof HalfMultinomialLoss)){
-				throw new IllegalArgumentException();
-			}
 
 			List<Model> models = new ArrayList<>();
 

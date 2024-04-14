@@ -54,10 +54,6 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 
 		OutlierDetector outlierDetector = castFunction.apply(estimator);
 
-		if(estimator.isSupervised()){
-			throw new IllegalArgumentException();
-		}
-
 		Schema schema = new Schema(encoder, null, features);
 
 		Model model = estimator.encode(schema);

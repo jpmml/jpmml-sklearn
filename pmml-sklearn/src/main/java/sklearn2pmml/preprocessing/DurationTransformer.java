@@ -31,7 +31,9 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
+import org.jpmml.python.AttributeException;
 import org.jpmml.python.CalendarUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -56,8 +58,8 @@ public class DurationTransformer extends Transformer {
 		String pmmlFunction = getPMMLFunction();
 
 		LocalDateTime epochDateTime = CalendarUtil.toLocalDateTime(epoch);
-		if(epochDateTime.getMonthValue() != 1 || epochDateTime.getDayOfMonth() != 1){
-			throw new IllegalArgumentException(String.valueOf(epochDateTime));
+		if(epochDateTime.getDayOfMonth() != 1 || epochDateTime.getMonthValue() != 1){
+			throw new AttributeException("Date attribute \'" + ClassDictUtil.formatMember(this, "epoch") + "\' must be set to the 1st of January of some year");
 		}
 
 		int year = epochDateTime.getYear();

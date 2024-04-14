@@ -29,6 +29,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PythonException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 
@@ -80,7 +81,7 @@ public class InitializerUtil {
 				} else
 
 				{
-					throw new SkLearnException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string or integer");
+					throw new PythonException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string nor integer");
 				}
 			}
 		};

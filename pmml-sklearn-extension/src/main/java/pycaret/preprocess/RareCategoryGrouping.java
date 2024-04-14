@@ -55,9 +55,11 @@ public class RareCategoryGrouping extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			List<?> categories = (List<?>)toOther.get(feature.getName());
+			String name = feature.getName();
+
+			List<?> categories = (List<?>)toOther.get(name);
 			if(categories == null){
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException(name);
 			} // End if
 
 			if(!categories.isEmpty()){

@@ -89,8 +89,6 @@ public class CustomizationUtil {
 
 		for(Customization customization : customizations){
 			String command = customization.getCommand();
-			String xPathExpr = customization.getXPathExpr();
-			String pmmlElement = customization.getPMMLElement();
 
 			PMMLObject xPathExprObject;
 
@@ -98,6 +96,8 @@ public class CustomizationUtil {
 				case Customization.COMMAND_INSERT:
 				case Customization.COMMAND_UPDATE:
 					{
+						String xPathExpr = customization.getOptionalXPathExpr();
+
 						if(xPathExpr == null){
 							xPathExprObject = model;
 
@@ -107,9 +107,7 @@ public class CustomizationUtil {
 					// Falls through
 				case Customization.COMMAND_DELETE:
 					{
-						if(xPathExpr == null){
-							throw new IllegalArgumentException();
-						}
+						String xPathExpr = customization.getXPathExpr();
 
 						XPath xPath = xPathFactory.newXPath();
 						xPath.setNamespaceContext(namespaceContext);
@@ -134,19 +132,13 @@ public class CustomizationUtil {
 				case Customization.COMMAND_INSERT:
 				case Customization.COMMAND_UPDATE:
 					{
-						if(pmmlElement == null){
-							throw new IllegalArgumentException();
-						}
+						String pmmlElement = customization.getPMMLElement();
 
 						pmmlElementObject = (PMMLObject)parsePMML(pmmlElement);
 					}
 					break;
 				case Customization.COMMAND_DELETE:
 					{
-						if(pmmlElement != null){
-							throw new IllegalArgumentException();
-						}
-
 						pmmlElementObject = null;
 					}
 					break;
@@ -368,7 +360,7 @@ public class CustomizationUtil {
 		try(Reader reader = new StringReader(string)){
 			return JAXBUtil.unmarshal(new StreamSource(reader));
 		} catch(Exception e){
-			throw new RuntimeException(e);
+			throw new SkLearnException("Failed to parse PMML string", e);
 		}
 	}
 
@@ -380,7 +372,7 @@ public class CustomizationUtil {
 
 			return writer.toString();
 		} catch(Exception e){
-			throw new RuntimeException(e);
+			throw new SkLearnException("Failed to format PMML object", e);
 		}
 	}
 

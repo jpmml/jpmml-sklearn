@@ -37,11 +37,9 @@ import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.SkLearnException;
 
 public class EstimatorUtil {
 
@@ -68,9 +66,11 @@ public class EstimatorUtil {
 			HasClasses hasClasses = (HasClasses)estimator;
 
 			return hasClasses.getClasses();
-		}
+		} else
 
-		throw new SkLearnException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	static
@@ -80,9 +80,11 @@ public class EstimatorUtil {
 			HasClasses hasClasses = (HasClasses)estimator;
 
 			return hasClasses.hasProbabilityDistribution();
-		}
+		} else
 
-		throw new SkLearnException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not a classifier");
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	static

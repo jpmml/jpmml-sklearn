@@ -18,7 +18,6 @@
  */
 package lightgbm.sklearn;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
@@ -26,6 +25,7 @@ import com.google.common.io.CharStreams;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.SkLearnException;
 
 public class Booster extends PythonObject {
 
@@ -52,8 +52,8 @@ public class Booster extends PythonObject {
 			List<String> lines = CharStreams.readLines(reader);
 
 			return LightGBMUtil.loadGBDT(lines.iterator());
-		} catch(IOException ioe){
-			throw new RuntimeException(ioe);
+		} catch(Exception e){
+			throw new SkLearnException("Failed to load LightGBM booster object", e);
 		}
 	}
 

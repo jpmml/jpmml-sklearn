@@ -270,7 +270,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 				throw new IllegalArgumentException();
 			}
 		} catch(UnsupportedOperationException uoe){
-			throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information", uoe);
+			throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information");
 		}
 
 		return activeFields;

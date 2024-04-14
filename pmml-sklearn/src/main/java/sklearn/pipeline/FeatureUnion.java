@@ -75,7 +75,7 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 			return StepUtil.getHead(transformer);
 		}
 
-		throw new IllegalArgumentException();
+		throw new UnsupportedOperationException();
 	}
 
 	public List<? extends Transformer> getTransformers(){

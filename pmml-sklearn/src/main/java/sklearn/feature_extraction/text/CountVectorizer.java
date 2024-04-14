@@ -18,7 +18,6 @@
  */
 package sklearn.feature_extraction.text;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -57,6 +56,7 @@ import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.HasSparseOutput;
 import sklearn.SkLearnTransformer;
 import sklearn2pmml.feature_extraction.text.Matcher;
@@ -256,7 +256,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Object object = getOptionalObject("tokenizer");
 
 		if((object != null) && !(Tokenizer.class).isInstance(object)){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "tokenizer") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +"). Supported value classes are " + Arrays.asList(Matcher.class.getName(), Splitter.class.getName()));
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "tokenizer") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +"). Supported Python classes are " + Arrays.asList(Matcher.class.getName(), Splitter.class.getName()));
 		}
 
 		return getOptional("tokenizer", Tokenizer.class);
@@ -278,13 +278,13 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		InputStream is = (CountVectorizer.class).getResourceAsStream("/stop_words/" + stopWords + ".txt");
 
 		if(is == null){
-			throw new IllegalArgumentException(stopWords);
+			throw new SkLearnException("Failed to locate the stop words list resource \'" + stopWords + "\'");
 		}
 
 		try(Reader reader = new InputStreamReader(is, "UTF-8")){
 			return CharStreams.readLines(reader);
-		} catch(IOException ioe){
-			throw new IllegalArgumentException(stopWords, ioe);
+		} catch(Exception e){
+			throw new SkLearnException("Failed to load the stop words list", e);
 		}
 	}
 

@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.AttributeException;
+import org.jpmml.python.ClassDictUtil;
 import sklearn.SkLearnRegressor;
 import sklearn.compose.ColumnTransformer;
 
@@ -56,9 +57,7 @@ public class HistGradientBoostingRegressor extends SkLearnRegressor {
 		} catch(AttributeException ae){
 			List<Number> baselinePredictions = getNumberArray("_baseline_prediction");
 
-			if(baselinePredictions.size() != 1){
-				throw new IllegalArgumentException();
-			}
+			ClassDictUtil.checkSize(1, baselinePredictions);
 
 			return baselinePredictions.get(0);
 		}

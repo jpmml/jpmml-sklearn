@@ -19,11 +19,11 @@
 package xgboost.sklearn;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteOrder;
 
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
 
@@ -50,8 +50,8 @@ public class Booster extends PythonObject {
 
 		try(InputStream is = new ByteArrayInputStream(handle)){
 			return XGBoostUtil.loadLearner(is, byteOrder, charset, "$.Model");
-		} catch(IOException ioe){
-			throw new RuntimeException(ioe);
+		} catch(Exception e){
+			throw new SkLearnException("Failed to load XGBoost booster object", e);
 		}
 	}
 

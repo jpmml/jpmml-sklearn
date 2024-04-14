@@ -43,6 +43,10 @@ public class Customization extends PythonObject {
 	}
 
 	public String getXPathExpr(){
+		return getString("xpath_expr");
+	}
+
+	public String getOptionalXPathExpr(){
 		return getOptionalString("xpath_expr");
 	}
 

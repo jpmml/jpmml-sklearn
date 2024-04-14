@@ -264,14 +264,14 @@ public class SkLearnEncoder extends PythonEncoder {
 
 		try {
 			super.addDerivedField(derivedField);
-		} catch(RuntimeException re){
+		} catch(IllegalArgumentException iae){
 			String name = derivedField.requireName();
 
 			String message = "Field " + name + " is already defined. " +
 				"Please refactor the pipeline so that it would not contain duplicate field declarations, " +
 				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + Alias.formatAliasExample() + ")";
 
-			throw new IllegalArgumentException(message, re);
+			throw new SkLearnException(message, iae);
 		}
 	}
 

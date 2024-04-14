@@ -24,7 +24,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnException;
 
 public class StepUtil {
 
@@ -58,7 +57,7 @@ public class StepUtil {
 		int numberOfFeatures = step.getNumberOfFeatures();
 
 		if((numberOfFeatures != HasNumberOfFeatures.UNKNOWN) && (numberOfFeatures != features.size())){
-			throw new SkLearnException("Expected " + numberOfFeatures + " feature(s) (" + ClassDictUtil.formatClass(step)  + "), got " + features.size() + " feature(s)");
+			throw new IllegalArgumentException("Expected " + numberOfFeatures + " feature(s) (" + ClassDictUtil.formatClass(step)  + "), got " + features.size() + " feature(s)");
 		}
 	}
 

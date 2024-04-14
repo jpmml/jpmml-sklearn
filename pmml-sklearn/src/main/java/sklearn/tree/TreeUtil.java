@@ -69,6 +69,7 @@ import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.VersionUtil;
@@ -371,7 +372,7 @@ public class TreeUtil {
 		if(compact || flat || prune){
 
 			if(fixed){
-				throw new IllegalArgumentException("Conflicting tree model options");
+				throw new SkLearnException("Conflicting tree model options");
 			}
 
 			// Activate defaults

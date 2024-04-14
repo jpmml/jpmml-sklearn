@@ -134,7 +134,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 					DataField dataField = encoder.getDataField(activeField);
 					if(dataField == null){
-						throw new SkLearnException("Field " + activeField + " is undefined");
+						throw new IllegalArgumentException("Field " + activeField + " is undefined");
 					}
 
 					Feature feature = new WildcardFeature(encoder, dataField);
@@ -295,7 +295,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			try {
 				CustomizationUtil.customize(model, customizations);
 			} catch(Exception e){
-				throw new RuntimeException(e);
+				throw new SkLearnException("Failed to customize PMML model", e);
 			}
 		}
 
