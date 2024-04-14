@@ -44,6 +44,7 @@ public class PowerTransformer extends SkLearnTransformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Number> lambdas = getLambdas();
+		@SuppressWarnings("unused")
 		String method = getMethod();
 		Boolean standardize = getStandardize();
 

@@ -105,6 +105,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 	private List<Feature> encodePostProcessor(List<Feature> features, SkLearnEncoder encoder){
 		Calibrator estimator = getEstimator(Calibrator.class);
+		@SuppressWarnings("unused")
 		String predictFunc = getPostPredictFunc();
 
 		Model model = encoder.getModel();

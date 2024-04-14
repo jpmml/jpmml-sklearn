@@ -43,7 +43,9 @@ public class SplineTransformer extends SkLearnTransformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<BSpline> bsplines = getBSplines();
+		@SuppressWarnings("unused")
 		String extrapolation = getExtrapolation();
+		@SuppressWarnings("unused")
 		Boolean includeBias = getIncludeBias();
 
 		ClassDictUtil.checkSize(1, features);

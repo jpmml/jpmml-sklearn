@@ -44,6 +44,7 @@ public class TargetEncoder extends BaseEncoder {
 		List<List<Object>> categories = getCategories();
 		List<List<Number>> encodings = getEncodings();
 		Number targetMean = getTargetMean();
+		@SuppressWarnings("unused")
 		String targetType = getTargetType();
 
 		ClassDictUtil.checkSize(features.size(), categories, encodings);

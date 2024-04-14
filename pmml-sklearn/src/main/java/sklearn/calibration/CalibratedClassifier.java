@@ -67,6 +67,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		List<? extends Calibrator> calibrators = getCalibrators();
 		List<?> classes = getClasses();
 		Classifier estimator = getEstimator();
+		@SuppressWarnings("unused")
 		String method = getMethod();
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();

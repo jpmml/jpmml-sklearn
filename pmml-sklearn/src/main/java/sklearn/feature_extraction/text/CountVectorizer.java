@@ -139,11 +139,14 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public DefineFunction encodeDefineFunction(Feature feature, SkLearnEncoder encoder){
+		@SuppressWarnings("unused")
 		String analyzer = getAnalyzer();
 		List<String> stopWords = getStopWords();
 		Object[] nGramRange = getNGramRange();
 		Boolean binary = getBinary();
+		@SuppressWarnings("unused")
 		Object preprocessor = getPreprocessor();
+		@SuppressWarnings("unused")
 		String stripAccents = getStripAccents();
 		Tokenizer tokenizer = getTokenizer();
 

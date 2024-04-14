@@ -37,6 +37,7 @@ public class LinearSVC extends LinearClassifier {
 
 	@Override
 	public Model encodeModel(Schema schema){
+		@SuppressWarnings("unused")
 		String multiClass = getMultiClass();
 
 		return super.encodeModel(schema);

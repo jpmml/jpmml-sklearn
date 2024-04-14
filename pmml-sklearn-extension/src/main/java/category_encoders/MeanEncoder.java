@@ -55,6 +55,7 @@ public class MeanEncoder extends MapEncoder {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<?> cols = getCols();
+		@SuppressWarnings("unused")
 		Boolean dropInvariant = getDropInvariant();
 		String handleMissing = getHandleMissing();
 		String handleUnknown = getHandleUnknown();

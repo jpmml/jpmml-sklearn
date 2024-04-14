@@ -37,8 +37,10 @@ public class OneHotEncoder extends BaseEncoder {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		@SuppressWarnings("unused")
 		Boolean dropInvariant = getDropInvariant();
 		String handleMissing = getHandleMissing();
+		@SuppressWarnings("unused")
 		String handleUnknown = getHandleUnknown();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 
