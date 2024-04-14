@@ -20,6 +20,7 @@ package optbinning;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -316,13 +317,17 @@ public class OptimalBinning extends Transformer {
 		return OptimalBinning.METRIC_WOE;
 	}
 
+	public Collection<String> getSupportedMetrics(){
+		return Arrays.asList(OptimalBinning.METRIC_EVENT_RATE, OptimalBinning.METRIC_WOE);
+	}
+
 	public String getMetric(){
 
 		if(!hasattr("metric")){
 			return getDefaultMetric();
 		}
 
-		return getEnum("metric", this::getString, Arrays.asList(OptimalBinning.METRIC_EVENT_RATE, OptimalBinning.METRIC_WOE));
+		return getEnum("metric", this::getString, getSupportedMetrics());
 	}
 
 	public OptimalBinning setMetric(String metric){

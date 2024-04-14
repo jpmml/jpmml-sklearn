@@ -19,6 +19,8 @@
 package optbinning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.math.DoubleMath;
@@ -120,6 +122,11 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 	@Override
 	public String getDefaultMetric(){
 		return MulticlassOptimalBinning.METRIC_MEAN_WOE;
+	}
+
+	@Override
+	public Collection<String> getSupportedMetrics(){
+		return Arrays.asList(MulticlassOptimalBinning.METRIC_MEAN_WOE);
 	}
 
 	public Integer getNumberOfClasses(){

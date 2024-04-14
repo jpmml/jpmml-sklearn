@@ -19,6 +19,8 @@
 package optbinning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.jpmml.python.ClassDictUtil;
@@ -58,6 +60,11 @@ public class ContinuousOptimalBinning extends OptimalBinning {
 	@Override
 	public String getDefaultMetric(){
 		return ContinuousOptimalBinning.METRIC_MEAN;
+	}
+
+	@Override
+	public Collection<String> getSupportedMetrics(){
+		return Arrays.asList(ContinuousOptimalBinning.METRIC_MEAN);
 	}
 
 	public List<Integer> getNumberOfRecords(){
