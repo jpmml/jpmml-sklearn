@@ -19,6 +19,7 @@
 package sklearn.ensemble.stacking;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -108,6 +109,6 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 	}
 
 	public List<String> getStackMethod(){
-		return getStringList("stack_method_");
+		return getEnumList("stack_method_", this::getStringList, Arrays.asList(SkLearnMethods.PREDICT_PROBA));
 	}
 }

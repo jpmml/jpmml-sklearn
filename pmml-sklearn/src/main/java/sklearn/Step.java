@@ -18,8 +18,13 @@
  */
 package sklearn;
 
+import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.jpmml.python.AttributeException;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -67,5 +72,25 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public String getSkLearnVersion(){
 		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
+	}
+
+	public <E> List<E> getEnumList(String name, Function<String, List<E>> function, Collection<E> enumValues){
+		List<E> values = function.apply(name);
+
+		Function<E, E> enumFunction = new Function<E, E>(){
+
+			@Override
+			public E apply(E value){
+
+				if(!enumValues.contains(value)){
+					// XXX
+					throw new AttributeException("List attribute \'" + ClassDictUtil.formatMember(Step.this, name) + "\' contains an unsupported value " + String.valueOf(value) + ". Supported values are " + formatValues(enumValues));
+				}
+
+				return value;
+			}
+		};
+
+		return Lists.transform(values, enumFunction);
 	}
 }
