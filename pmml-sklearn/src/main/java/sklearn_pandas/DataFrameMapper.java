@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.google.common.collect.Lists;
 import org.jpmml.converter.Feature;
@@ -49,12 +50,9 @@ public class DataFrameMapper extends Initializer {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		Object _default = getDefault();
+		@SuppressWarnings("unused")
+		Boolean _default = getDefault();
 		List<Object[]> rows = getFeatures();
-
-		if(!(Boolean.FALSE).equals(_default)){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "default") + "\' must be set to the 'False' value");
-		}
 
 		List<Feature> result = new ArrayList<>();
 
@@ -88,8 +86,14 @@ public class DataFrameMapper extends Initializer {
 		return result;
 	}
 
-	public Object getDefault(){
-		return getOptionalObject("default");
+	public Boolean getDefault(){
+		Object object = getOptionalObject("default");
+
+		if(!Objects.equals(Boolean.FALSE, object)){
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "default") + "\' must be set to the 'False' value");
+		}
+
+		return (Boolean)object;
 	}
 
 	public DataFrameMapper setDefault(Object _default){
