@@ -21,6 +21,7 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
@@ -48,7 +49,7 @@ public class OrdinalEncoder extends BaseEncoder {
 
 		if(handleUnknown != null){
 
-			if((OrdinalEncoder.HANDLEUNKNOWN_USE_ENCODED_VALUE).equals(handleUnknown)){
+			if(Objects.equals(OrdinalEncoder.HANDLEUNKNOWN_USE_ENCODED_VALUE, handleUnknown)){
 				unknownValue = getUnknownValue();
 
 				if(ValueUtil.isNaN(unknownValue)){

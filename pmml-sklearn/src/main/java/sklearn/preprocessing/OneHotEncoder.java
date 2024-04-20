@@ -20,6 +20,7 @@ package sklearn.preprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
@@ -107,7 +108,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 
 		Object numberOfValues = getOptionalScalar("n_values");
 
-		if(("auto").equals(numberOfValues)){
+		if(Objects.equals("auto", numberOfValues)){
 			return getActiveFeatures();
 		}
 

@@ -21,6 +21,7 @@ package sklearn.feature_selection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.common.primitives.Booleans;
 import org.jpmml.converter.ValueUtil;
@@ -43,7 +44,7 @@ public class SelectKBest extends SkLearnSelector {
 		Object k = getK();
 		List<Number> scores = getScores();
 
-		if(("all").equals(k)){
+		if(Objects.equals("all", k)){
 			return null;
 		}
 

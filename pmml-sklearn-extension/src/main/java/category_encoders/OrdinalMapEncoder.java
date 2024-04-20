@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.Field;
@@ -55,13 +56,13 @@ public class OrdinalMapEncoder extends MapEncoder {
 
 		Object missingCategory = null;
 
-		if((OrdinalMapEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+		if(Objects.equals(OrdinalMapEncoder.HANDLEMISSING_VALUE, handleMissing)){
 			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Object unknownCategory = null;
 
-		if((OrdinalMapEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+		if(Objects.equals(OrdinalMapEncoder.HANDLEUNKNOWN_VALUE, handleUnknown)){
 			unknownCategory = OrdinalEncoder.CATEGORY_UNKNOWN;
 		}
 

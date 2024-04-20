@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.Functions;
@@ -63,13 +64,13 @@ public class CountEncoder extends MapEncoder implements BaseEncoderConstants {
 
 		Object missingCategory = null;
 
-		if((CountEncoder.HANDLEMISSING_COUNT).equals(handleMissing) || (CountEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+		if(Objects.equals(CountEncoder.HANDLEMISSING_COUNT, handleMissing) || Objects.equals(CountEncoder.HANDLEMISSING_VALUE, handleMissing)){
 			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Integer defaultValue = null;
 
-		if((CountEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+		if(Objects.equals(CountEncoder.HANDLEUNKNOWN_VALUE, handleUnknown)){
 			defaultValue = getDefaultValue();
 		}
 

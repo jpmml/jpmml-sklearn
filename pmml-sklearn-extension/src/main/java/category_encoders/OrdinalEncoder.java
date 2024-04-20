@@ -21,6 +21,7 @@ package category_encoders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -52,13 +53,13 @@ public class OrdinalEncoder extends BaseEncoder {
 
 		Integer mapMissingTo = null;
 
-		if((OrdinalEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+		if(Objects.equals(OrdinalEncoder.HANDLEMISSING_VALUE, handleMissing)){
 			mapMissingTo = -1;
 		}
 
 		Integer defaultValue = null;
 
-		if((OrdinalEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+		if(Objects.equals(OrdinalEncoder.HANDLEUNKNOWN_VALUE, handleUnknown)){
 			defaultValue = -2;
 		}
 

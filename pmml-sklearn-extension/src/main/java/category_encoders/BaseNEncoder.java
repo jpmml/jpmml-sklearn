@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
@@ -64,13 +65,13 @@ public class BaseNEncoder extends BaseEncoder {
 
 		Object missingCategory = null;
 
-		if((BaseNEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+		if(Objects.equals(BaseNEncoder.HANDLEMISSING_VALUE, handleMissing)){
 			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Integer defaultValue = null;
 
-		if((BaseNEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+		if(Objects.equals(BaseNEncoder.HANDLEUNKNOWN_VALUE, handleUnknown)){
 			defaultValue = 0;
 		}
 

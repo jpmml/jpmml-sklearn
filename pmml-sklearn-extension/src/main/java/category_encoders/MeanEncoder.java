@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 import com.google.common.base.Functions;
@@ -63,13 +64,13 @@ public class MeanEncoder extends MapEncoder {
 
 		Object missingCategory = null;
 
-		if((MeanEncoder.HANDLEMISSING_VALUE).equals(handleMissing)){
+		if(Objects.equals(MeanEncoder.HANDLEMISSING_VALUE, handleMissing)){
 			missingCategory = BaseEncoder.CATEGORY_NAN;
 		}
 
 		Number defaultValue = null;
 
-		if((MeanEncoder.HANDLEUNKNOWN_VALUE).equals(handleUnknown)){
+		if(Objects.equals(MeanEncoder.HANDLEUNKNOWN_VALUE, handleUnknown)){
 			defaultValue = getMean();
 		}
 

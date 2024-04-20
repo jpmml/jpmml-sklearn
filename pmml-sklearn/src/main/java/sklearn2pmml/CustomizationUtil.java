@@ -390,7 +390,7 @@ public class CustomizationUtil {
 		public String getNamespaceURI(String prefix){
 			Document document = getDocument();
 
-			if((XMLConstants.DEFAULT_NS_PREFIX).equals(prefix)){
+			if(Objects.equals(XMLConstants.DEFAULT_NS_PREFIX, prefix)){
 				return document.lookupNamespaceURI(null);
 			}
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
@@ -59,7 +60,7 @@ public class LogisticRegression extends LinearClassifier {
 		String sklearnVersion = getSkLearnVersion();
 		String multiClass = getMultiClass();
 
-		if((LogisticRegression.MULTICLASS_AUTO).equals(multiClass)){
+		if(Objects.equals(LogisticRegression.MULTICLASS_AUTO, multiClass)){
 			int[] shape = getCoefShape();
 			String solver = getSolver();
 
@@ -166,7 +167,7 @@ public class LogisticRegression extends LinearClassifier {
 		String multiClass = getEnum("multi_class", this::getString, Arrays.asList(LogisticRegression.MULTICLASS_AUTO, LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR, LogisticRegression.MULTICLASS_WARN));
 
 		// SkLearn 0.20
-		if((LogisticRegression.MULTICLASS_WARN).equals(multiClass)){
+		if(Objects.equals(LogisticRegression.MULTICLASS_WARN, multiClass)){
 			multiClass = LogisticRegression.MULTICLASS_OVR;
 		}
 
@@ -182,7 +183,7 @@ public class LogisticRegression extends LinearClassifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		if((LogisticRegression.SOLVER_LIBLINEAR).equals(solver)){
+		if(Objects.equals(LogisticRegression.SOLVER_LIBLINEAR, solver)){
 			return LogisticRegression.MULTICLASS_OVR;
 		} // End if
 

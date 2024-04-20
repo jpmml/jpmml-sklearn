@@ -20,6 +20,7 @@ package sklearn2pmml.preprocessing;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
@@ -50,7 +51,7 @@ public class ConcatTransformer extends Transformer {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			if((i > 0) && !("").equals(separator)){
+			if((i > 0) && !Objects.equals("", separator)){
 				expressions.add(ExpressionUtil.createConstant(DataType.STRING, separator));
 			}
 

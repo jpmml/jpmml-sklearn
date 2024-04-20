@@ -21,6 +21,7 @@ package sklearn.compose;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
@@ -106,11 +107,11 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 			@Override
 			public Transformer apply(Object object){
 
-				if((SkLearnSteps.DROP).equals(object)){
+				if(Objects.equals(SkLearnSteps.DROP, object)){
 					return Drop.INSTANCE;
 				} else
 
-				if((SkLearnSteps.PASSTHROUGH).equals(object)){
+				if(Objects.equals(SkLearnSteps.PASSTHROUGH, object)){
 					return PassThrough.INSTANCE;
 				}
 

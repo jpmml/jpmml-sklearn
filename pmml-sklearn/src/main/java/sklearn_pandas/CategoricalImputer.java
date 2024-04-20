@@ -20,6 +20,7 @@ package sklearn_pandas;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.jpmml.converter.Feature;
@@ -41,7 +42,7 @@ public class CategoricalImputer extends Transformer {
 
 		ClassDictUtil.checkSize(1, features);
 
-		if(("NaN").equals(missingValues)){
+		if(Objects.equals("NaN", missingValues)){
 			missingValues = null;
 		}
 

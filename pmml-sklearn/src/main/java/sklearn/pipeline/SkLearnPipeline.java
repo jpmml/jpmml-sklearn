@@ -19,6 +19,7 @@
 package sklearn.pipeline;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.google.common.collect.Lists;
 import net.razorvine.pickle.objects.ClassDict;
@@ -80,7 +81,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		Object step = TupleUtil.extractElement(finalStep, 1);
 
-		if((step == null) || (SkLearnSteps.PASSTHROUGH).equals(step)){
+		if((step == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, step)){
 			return false;
 		} // End if
 
@@ -130,7 +131,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 			@Override
 			public Transformer apply(Object object){
 
-				if((object == null) || (SkLearnSteps.PASSTHROUGH).equals(object)){
+				if((object == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, object)){
 					return PassThrough.INSTANCE;
 				}
 
@@ -163,7 +164,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 
 		Object step = TupleUtil.extractElement(finalStep, 1);
 
-		if((step == null) || (SkLearnSteps.PASSTHROUGH).equals(step)){
+		if((step == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, step)){
 			throw new SkLearnException("The pipeline ends with a transformer-like object");
 		}
 
@@ -195,7 +196,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 			@Override
 			public Step apply(Object object){
 
-				if((object == null) || (SkLearnSteps.PASSTHROUGH).equals(object)){
+				if((object == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, object)){
 					return null;
 				}
 

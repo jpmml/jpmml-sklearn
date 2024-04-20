@@ -19,6 +19,7 @@
 package sklearn.preprocessing;
 
 import java.util.List;
+import java.util.Objects;
 
 import sklearn.impute.SimpleImputer;
 
@@ -32,7 +33,7 @@ public class Imputer extends SimpleImputer {
 	public Object getMissingValues(){
 		Object missingValues = super.getMissingValues();
 
-		if(("NaN").equals(missingValues)){
+		if(Objects.equals("NaN", missingValues)){
 			missingValues = null;
 		}
 

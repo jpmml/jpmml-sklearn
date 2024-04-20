@@ -20,6 +20,7 @@ package sklearn2pmml.preprocessing;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
@@ -57,7 +58,7 @@ public class SeriesConstructor extends Transformer {
 			feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
 		} // End if
 
-		if(name != null && !(feature.getName()).equals(name)){
+		if(name != null && !Objects.equals(feature.getName(), name)){
 			encoder.renameFeature(feature, name);
 		}
 
