@@ -227,7 +227,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Object object = getOptionalObject("preprocessor");
 
 		if(object != null){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "preprocessor") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")");
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "preprocessor") + "\' must be set to the missing (None) value");
 		}
 
 		return object;
