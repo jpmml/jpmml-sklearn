@@ -52,6 +52,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import sklearn.Estimator;
 import treelib.Node;
 import treelib.Tree;
 
@@ -61,7 +62,9 @@ public class CHAIDUtil {
 	}
 
 	static
-	public TreeModel encodeModel(MiningFunction miningFunction, Tree tree, Schema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeModel(E estimator, MiningFunction miningFunction, Schema schema){
+		Tree tree = estimator.getTree();
+
 		org.dmg.pmml.tree.Node root = encodeNode(True.INSTANCE, tree.selectRoot(), tree, new PredicateManager(), schema);
 
 		return new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root);

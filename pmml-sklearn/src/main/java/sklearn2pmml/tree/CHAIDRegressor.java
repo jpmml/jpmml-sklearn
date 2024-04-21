@@ -27,7 +27,7 @@ import sklearn.HasApplyField;
 import sklearn.Regressor;
 import treelib.Tree;
 
-public class CHAIDRegressor extends Regressor implements HasApplyField {
+public class CHAIDRegressor extends Regressor implements HasApplyField, HasTree {
 
 	public CHAIDRegressor(String module, String name){
 		super(module, name);
@@ -40,15 +40,14 @@ public class CHAIDRegressor extends Regressor implements HasApplyField {
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		Tree tree = getTree();
-
-		TreeModel treeModel = CHAIDUtil.encodeModel(MiningFunction.REGRESSION, tree, schema);
+		TreeModel treeModel = CHAIDUtil.encodeModel(this, MiningFunction.REGRESSION, schema);
 
 		encodeApplyOutput(treeModel, DataType.INTEGER);
 
 		return treeModel;
 	}
 
+	@Override
 	public Tree getTree(){
 		return get("treelib_tree_", Tree.class);
 	}

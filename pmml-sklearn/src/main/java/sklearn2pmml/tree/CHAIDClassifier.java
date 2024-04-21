@@ -28,7 +28,7 @@ import sklearn.Classifier;
 import sklearn.HasApplyField;
 import treelib.Tree;
 
-public class CHAIDClassifier extends Classifier implements HasApplyField {
+public class CHAIDClassifier extends Classifier implements HasApplyField, HasTree {
 
 	public CHAIDClassifier(String module, String name){
 		super(module, name);
@@ -41,11 +41,9 @@ public class CHAIDClassifier extends Classifier implements HasApplyField {
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		Tree tree = getTree();
-
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		TreeModel treeModel = CHAIDUtil.encodeModel(MiningFunction.CLASSIFICATION, tree, schema);
+		TreeModel treeModel = CHAIDUtil.encodeModel(this, MiningFunction.CLASSIFICATION, schema);
 
 		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
 		encodeApplyOutput(treeModel, DataType.INTEGER);
@@ -53,6 +51,7 @@ public class CHAIDClassifier extends Classifier implements HasApplyField {
 		return treeModel;
 	}
 
+	@Override
 	public Tree getTree(){
 		return get("treelib_tree_", Tree.class);
 	}
