@@ -5,6 +5,7 @@ from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn2pmml.pipeline import PMMLPipeline
+from sktree import ObliqueRandomForestRegressor
 from sktree.tree import ObliqueDecisionTreeClassifier, ObliqueDecisionTreeRegressor
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
@@ -88,3 +89,4 @@ if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_auto(auto_df, ObliqueDecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), "ObliqueDecisionTreeAuto")
+	build_auto(auto_df, ObliqueRandomForestRegressor(n_estimators = 10, max_depth = 5, random_state = 13), "ObliqueRandomForestAuto")

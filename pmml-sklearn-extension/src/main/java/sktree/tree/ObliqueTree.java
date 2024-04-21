@@ -82,18 +82,18 @@ public class ObliqueTree extends Tree {
 		return result;
 	}
 
-	public Schema transformSchema(Schema schema){
+	public Schema transformSchema(Object segmentId, Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		features = encodeFeatures((List)features, encoder);
+		features = encodeFeatures(segmentId, (List)features, encoder);
 
 		return new Schema(encoder, label, features);
 	}
 
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(Object segmentId, List<Feature> features, SkLearnEncoder encoder){
 		Integer nodeCount = getNodeCount();
 		List<Number> projVecs = getProjVecs();
 
@@ -114,7 +114,17 @@ public class ObliqueTree extends Tree {
 			} else
 
 			{
-				feature = encodeFeature(row, features, weights, encoder);
+				String name;
+
+				if(segmentId != null){
+					name = FieldNameUtil.create("lc", segmentId, row);
+				} else
+
+				{
+					name = FieldNameUtil.create("lc", row);
+				}
+
+				feature = encodeFeature(name, features, weights, encoder);
 
 				lcFeatures.put(weights, feature);
 			}
@@ -125,7 +135,7 @@ public class ObliqueTree extends Tree {
 		return result;
 	}
 
-	private Feature encodeFeature(int index, List<Feature> features, List<Number> weights, SkLearnEncoder encoder){
+	private Feature encodeFeature(String name, List<Feature> features, List<Number> weights, SkLearnEncoder encoder){
 		ClassDictUtil.checkSize(features, weights);
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
@@ -174,7 +184,7 @@ public class ObliqueTree extends Tree {
 			}
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("lc", index), OpType.CONTINUOUS, DataType.FLOAT, expression);
+		DerivedField derivedField = encoder.createDerivedField(name, OpType.CONTINUOUS, DataType.FLOAT, expression);
 
 		return new ContinuousFeature(encoder, derivedField);
 	}

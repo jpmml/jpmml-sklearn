@@ -20,7 +20,7 @@ package sktree.tree;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Model;
+import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 import sklearn.tree.HasTree;
@@ -44,11 +44,13 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
+	public TreeModel encodeModel(Schema schema){
 		ObliqueTree tree = getTree();
 
 		if(tree.hasProjVecs()){
-			Schema sklearnSchema = tree.transformSchema(schema);
+			Object segmentId = getPMMLSegmentId();
+
+			Schema sklearnSchema = tree.transformSchema(segmentId, schema);
 
 			ObliqueDecisionTreeRegressor sklearnRegressor = new ObliqueDecisionTreeRegressor(this){
 
