@@ -3,7 +3,7 @@ import sys
 
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn2pmml.pipeline import PMMLPipeline
 from sktree.tree import ObliqueDecisionTreeClassifier, ObliqueDecisionTreeRegressor
 
@@ -24,7 +24,7 @@ def build_audit(audit_df, classifier, name):
 
 	transformer = ColumnTransformer([
 		("cat", OneHotEncoder(sparse_output = False), ["Education", "Employment", "Gender", "Marital", "Occupation"]),
-		("cont", "passthrough", ["Age", "Hours", "Income"])
+		("cont", StandardScaler(), ["Age", "Hours", "Income"])
 	])
 
 	pipeline = PMMLPipeline([
@@ -47,7 +47,10 @@ if "Audit" in datasets:
 def build_iris(iris_df, classifier, name):
 	iris_X, iris_y = split_csv(iris_df)
 
+	transformer = StandardScaler()
+
 	pipeline = PMMLPipeline([
+		("transformer", transformer),
 		("classifier", classifier)
 	])
 	pipeline.fit(iris_X, iris_y)
@@ -68,7 +71,7 @@ def build_auto(auto_df, regressor, name):
 
 	transformer = ColumnTransformer([
 		("cat", OneHotEncoder(sparse_output = False), ["cylinders", "model_year", "origin"]),
-		("cont", "passthrough", ["acceleration", "displacement", "horsepower", "weight"])
+		("cont", StandardScaler(), ["acceleration", "displacement", "horsepower", "weight"])
 	])
 
 	pipeline = PMMLPipeline([
