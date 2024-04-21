@@ -100,7 +100,7 @@ public class ObliqueTree extends Tree {
 		int rows = nodeCount;
 		int columns = features.size();
 
-		Map<List<Number>, Feature> projFeatures = new LinkedHashMap<>();
+		Map<List<Number>, Feature> lcFeatures = new LinkedHashMap<>();
 
 		List<Feature> result = new ArrayList<>();
 
@@ -109,14 +109,14 @@ public class ObliqueTree extends Tree {
 
 			Feature feature;
 
-			if(projFeatures.containsKey(weights)){
-				feature = projFeatures.get(weights);
+			if(lcFeatures.containsKey(weights)){
+				feature = lcFeatures.get(weights);
 			} else
 
 			{
 				feature = encodeFeature(row, features, weights, encoder);
 
-				projFeatures.put(weights, feature);
+				lcFeatures.put(weights, feature);
 			}
 
 			result.add(feature);
@@ -174,7 +174,7 @@ public class ObliqueTree extends Tree {
 			}
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("projVec", index), OpType.CONTINUOUS, DataType.FLOAT, expression);
+		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("lc", index), OpType.CONTINUOUS, DataType.FLOAT, expression);
 
 		return new ContinuousFeature(encoder, derivedField);
 	}
