@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.tree;
+package sktree.tree;
 
-public class RegressionCriterion extends Criterion {
+import org.jpmml.python.CythonObject;
 
-	public RegressionCriterion(String module, String name){
+public class ObliqueSplitter extends CythonObject {
+
+	public ObliqueSplitter(String module, String name){
 		super(module, name);
 	}
 
@@ -30,6 +32,12 @@ public class RegressionCriterion extends Criterion {
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {
-		"n_outputs"
+		"criterion",
+		"max_features",
+		"min_samples_leaf",
+		"min_weight_leaf",
+		"random_state",
+		"monotonic_cst",
+		"feature_combinations"
 	};
 }

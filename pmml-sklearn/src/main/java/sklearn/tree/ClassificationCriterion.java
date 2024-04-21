@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,9 +18,9 @@
  */
 package sklearn.tree;
 
-public class RegressionCriterion extends Criterion {
+public class ClassificationCriterion extends Criterion {
 
-	public RegressionCriterion(String module, String name){
+	public ClassificationCriterion(String module, String name){
 		super(module, name);
 	}
 
@@ -30,6 +30,7 @@ public class RegressionCriterion extends Criterion {
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {
-		"n_outputs"
+		"n_outputs",
+		"n_classes"
 	};
 }

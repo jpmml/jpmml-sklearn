@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,18 +18,31 @@
  */
 package sklearn.tree;
 
-public class RegressionCriterion extends Criterion {
+import org.jpmml.python.ClassDictUtil;
 
-	public RegressionCriterion(String module, String name){
+public class DepthFirstTreeBuilder extends TreeBuilder {
+
+	public DepthFirstTreeBuilder(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public void __init__(Object[] args){
+
+		// XXX
+		if(args.length == 8){
+			args = ClassDictUtil.extractArgs(args, 0, 6);
+		}
+
 		super.__setstate__(INIT_ATTRIBUTES, args);
 	}
 
 	private static final String[] INIT_ATTRIBUTES = {
-		"n_outputs"
+		"splitter",
+		"min_samples_split",
+		"min_samples_leaf",
+		"min_weight_leaf",
+		"max_depth",
+		"min_impurity_decrease"
 	};
 }

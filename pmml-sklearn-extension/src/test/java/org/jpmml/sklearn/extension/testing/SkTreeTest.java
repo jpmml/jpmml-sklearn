@@ -25,7 +25,17 @@ import org.junit.Test;
 public class SkTreeTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
+	public void evaluateObliqueDecisionTreeAudit() throws Exception {
+		evaluate("ObliqueDecisionTree", AUDIT);
+	}
+
+	@Test
 	public void evaluateObliqueDecisionTreeAuto() throws Exception {
 		evaluate("ObliqueDecisionTree", AUTO);
+	}
+
+	@Test
+	public void evaluateObliqueDecisionTreeIris() throws Exception {
+		evaluate("ObliqueDecisionTree", IRIS);
 	}
 }

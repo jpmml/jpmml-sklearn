@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,18 +18,12 @@
  */
 package sklearn.tree;
 
-public class RegressionCriterion extends Criterion {
+import org.jpmml.python.CythonObject;
 
-	public RegressionCriterion(String module, String name){
+abstract
+public class Criterion extends CythonObject {
+
+	public Criterion(String module, String name){
 		super(module, name);
 	}
-
-	@Override
-	public void __init__(Object[] args){
-		super.__setstate__(INIT_ATTRIBUTES, args);
-	}
-
-	private static final String[] INIT_ATTRIBUTES = {
-		"n_outputs"
-	};
 }

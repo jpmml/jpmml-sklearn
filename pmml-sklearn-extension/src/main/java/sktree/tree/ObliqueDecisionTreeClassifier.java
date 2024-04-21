@@ -21,18 +21,20 @@ package sktree.tree;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+import sklearn.Classifier;
 import sklearn.tree.HasTree;
 import sklearn.tree.TreeUtil;
 
-public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
+public class ObliqueDecisionTreeClassifier extends Classifier implements HasTree {
 
-	public ObliqueDecisionTreeRegressor(String module, String name){
+	public ObliqueDecisionTreeClassifier(String module, String name){
 		super(module, name);
 	}
 
-	public ObliqueDecisionTreeRegressor(ObliqueDecisionTreeRegressor that){
+	public ObliqueDecisionTreeClassifier(ObliqueDecisionTreeClassifier that){
 		this(that.getPythonModule(), that.getPythonName());
 
 		update(that);
@@ -50,7 +52,7 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 		if(tree.hasProjVecs()){
 			Schema sklearnSchema = tree.transformSchema(schema);
 
-			ObliqueDecisionTreeRegressor sklearnRegressor = new ObliqueDecisionTreeRegressor(this){
+			ObliqueDecisionTreeClassifier sklearnClassifier = new ObliqueDecisionTreeClassifier(this){
 
 				private ObliqueTree sklearnTree = tree.transform(sklearnSchema);
 
@@ -61,10 +63,16 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 				}
 			};
 
-			return sklearnRegressor.encodeModel(sklearnSchema);
+			return sklearnClassifier.encodeModel(sklearnSchema);
 		}
 
-		return TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, schema);
+
+		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
+
+		return treeModel;
 	}
 
 	@Override

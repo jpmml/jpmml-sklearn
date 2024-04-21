@@ -174,7 +174,7 @@ public class ObliqueTree extends Tree {
 			}
 		}
 
-		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("projVec", index), OpType.CONTINUOUS, DataType.DOUBLE, expression);
+		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("projVec", index), OpType.CONTINUOUS, DataType.FLOAT, expression);
 
 		return new ContinuousFeature(encoder, derivedField);
 	}
