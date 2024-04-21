@@ -40,7 +40,17 @@ public class SkTreeTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateObliqueRandomForestAudit() throws Exception {
+		evaluate("ObliqueRandomForest", AUDIT);
+	}
+
+	@Test
 	public void evaluateObliqueRandomForestAuto() throws Exception {
 		evaluate("ObliqueRandomForest", AUTO);
+	}
+
+	@Test
+	public void evaluateObliqueRandomForestIris() throws Exception {
+		evaluate("ObliqueRandomForest", IRIS);
 	}
 }

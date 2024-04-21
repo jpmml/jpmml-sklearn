@@ -24,14 +24,15 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
+import sklearn.Classifier;
 import sklearn.HasEstimatorEnsemble;
-import sklearn.Regressor;
-import sktree.tree.ObliqueDecisionTreeRegressor;
+import sktree.tree.ObliqueDecisionTreeClassifier;
 
-public class ObliqueRandomForestRegressor extends Regressor implements HasEstimatorEnsemble<ObliqueDecisionTreeRegressor> {
+public class ObliqueRandomForestClassifier extends Classifier implements HasEstimatorEnsemble<ObliqueDecisionTreeClassifier> {
 
-	public ObliqueRandomForestRegressor(String module, String name){
+	public ObliqueRandomForestClassifier(String module, String name){
 		super(module, name);
 	}
 
@@ -42,11 +43,17 @@ public class ObliqueRandomForestRegressor extends Regressor implements HasEstima
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		return ObliqueForestUtil.encodeBaseObliqueForest(this, MiningFunction.REGRESSION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+		MiningModel miningModel = ObliqueForestUtil.encodeBaseObliqueForest(this, MiningFunction.CLASSIFICATION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+
+		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+
+		return miningModel;
 	}
 
 	@Override
-	public List<ObliqueDecisionTreeRegressor> getEstimators(){
-		return getList("estimators_", ObliqueDecisionTreeRegressor.class);
+	public List<ObliqueDecisionTreeClassifier> getEstimators(){
+		return getList("estimators_", ObliqueDecisionTreeClassifier.class);
 	}
 }

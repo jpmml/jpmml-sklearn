@@ -5,7 +5,7 @@ from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn2pmml.pipeline import PMMLPipeline
-from sktree import ObliqueRandomForestRegressor
+from sktree import ObliqueRandomForestClassifier, ObliqueRandomForestRegressor
 from sktree.tree import ObliqueDecisionTreeClassifier, ObliqueDecisionTreeRegressor
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
@@ -44,6 +44,7 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
 	build_audit(audit_df, ObliqueDecisionTreeClassifier(criterion = "gini", splitter = "best", min_samples_leaf = 10, random_state = 13), "ObliqueDecisionTreeAudit")
+	build_audit(audit_df, ObliqueRandomForestClassifier(n_estimators = 10, max_depth = 6, random_state = 13), "ObliqueRandomForestAudit")
 
 def build_iris(iris_df, classifier, name):
 	iris_X, iris_y = split_csv(iris_df)
@@ -65,7 +66,8 @@ def build_iris(iris_df, classifier, name):
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
-	build_iris(iris_df, ObliqueDecisionTreeClassifier(criterion = "entropy", splitter = "random", max_depth = 3, random_state = 13), "ObliqueDecisionTreeIris")
+	build_iris(iris_df, ObliqueDecisionTreeClassifier(criterion = "entropy", splitter = "random", min_samples_leaf = 3, random_state = 13), "ObliqueDecisionTreeIris")
+	build_iris(iris_df, ObliqueRandomForestClassifier(n_estimators = 10, max_depth = 3, random_state = 13), "ObliqueRandomForestIris")
 
 def build_auto(auto_df, regressor, name):
 	auto_X, auto_y = split_csv(auto_df)
