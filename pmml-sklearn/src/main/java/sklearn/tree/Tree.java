@@ -36,10 +36,6 @@ public class Tree extends CythonObject {
 		super.__setstate__(INIT_ATTRIBUTES, args);
 	}
 
-	public double[] getValues(){
-		return Doubles.toArray(getNumberArray("values"));
-	}
-
 	public int[] getChildrenLeft(){
 		return Ints.toArray(getNodeAttribute("left_child"));
 	}
@@ -62,6 +58,10 @@ public class Tree extends CythonObject {
 
 	public int[] getMissingToToLeft(){
 		return Ints.toArray(getNodeAttribute("missing_go_to_left"));
+	}
+
+	public double[] getValues(){
+		return Doubles.toArray(getNumberArray("values"));
 	}
 
 	private List<Number> getNodeAttribute(String key){

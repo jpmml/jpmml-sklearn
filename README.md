@@ -325,6 +325,14 @@ Java library and command-line application for converting [Scikit-Learn](https://
 </details>
 
 <details>
+  <summary>Scikit-Tree</summary>
+
+  Examples: [extensions/sktree.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/sktree.py)
+
+  * [`sktree.tree.ObliqueDecisionTreeRegressor`](https://docs.neurodata.io/scikit-tree/dev/generated/sktree.tree.ObliqueDecisionTreeRegressor.html)
+</details>
+
+<details>
   <summary>SkLearn2PMML</summary>
 
   Examples: [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/main.py) and [extensions/sklearn2pmml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/extensions/sklearn2pmml.py)
