@@ -53,7 +53,7 @@ public class BaggingClassifier extends EnsembleClassifier {
 			}
 		}
 
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, multipleModelMethod, MiningFunction.CLASSIFICATION, schema);
+		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunction.CLASSIFICATION, multipleModelMethod, schema);
 
 		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 

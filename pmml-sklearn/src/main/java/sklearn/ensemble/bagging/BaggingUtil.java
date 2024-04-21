@@ -37,7 +37,7 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Number>> estimatorsFeatures, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Number>> estimatorsFeatures, MiningFunction miningFunction, Segmentation.MultipleModelMethod multipleModelMethod, Schema schema){
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<Model> models = new ArrayList<>();

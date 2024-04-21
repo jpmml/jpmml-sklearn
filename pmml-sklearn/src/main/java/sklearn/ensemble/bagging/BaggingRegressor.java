@@ -38,7 +38,7 @@ public class BaggingRegressor extends EnsembleRegressor {
 		List<Regressor> estimators = getEstimators();
 		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, Segmentation.MultipleModelMethod.AVERAGE, MiningFunction.REGRESSION, schema);
+		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunction.REGRESSION, Segmentation.MultipleModelMethod.AVERAGE, schema);
 
 		return miningModel;
 	}

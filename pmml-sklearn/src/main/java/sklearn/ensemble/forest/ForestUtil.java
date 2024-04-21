@@ -46,7 +46,7 @@ public class ForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T> & HasTreeOptions, T extends Estimator & HasTree> MiningModel encodeBaseForest(E estimator, Segmentation.MultipleModelMethod multipleModelMethod, MiningFunction miningFunction, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T> & HasTreeOptions, T extends Estimator & HasTree> MiningModel encodeBaseForest(E estimator, MiningFunction miningFunction, Segmentation.MultipleModelMethod multipleModelMethod, Schema schema){
 		List<TreeModel> treeModels = TreeUtil.encodeTreeModelEnsemble(estimator, miningFunction, schema);
 
 		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
