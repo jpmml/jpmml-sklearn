@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sktree.ensemble.forest;
+package sktree.ensemble.supervised_forest;
 
 import java.util.List;
 import java.util.function.Function;
