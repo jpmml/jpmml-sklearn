@@ -27,11 +27,15 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTree;
+import sktree.tree.ObliqueDecisionTreeClassifier;
+import sktree.tree.ObliqueDecisionTreeRegressor;
 
 public class ObliqueForestUtil {
 
@@ -39,10 +43,13 @@ public class ObliqueForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> MiningModel encodeBaseObliqueForest(E estimator, MiningFunction miningFunction, Segmentation.MultipleModelMethod multipleModelMethod, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> MiningModel encodeObliqueForest(E estimator, MiningFunction miningFunction, Segmentation.MultipleModelMethod multipleModelMethod, Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
+
+		PredicateManager predicateManager = new PredicateManager();
+		ScoreDistributionManager scoreDistributionManager = (miningFunction == MiningFunction.CLASSIFICATION) ? new ScoreDistributionManager() : null;
 
 		Function<T, TreeModel> function = new Function<T, TreeModel>(){
 
@@ -59,7 +66,21 @@ public class ObliqueForestUtil {
 				try {
 					estimator.setPMMLSegmentId((i + 1));
 
-					treeModel = (TreeModel)estimator.encodeModel(segmentSchema);
+					if(estimator instanceof ObliqueDecisionTreeClassifier){
+						ObliqueDecisionTreeClassifier classifier = (ObliqueDecisionTreeClassifier)estimator;
+
+						treeModel = classifier.encodeModel(predicateManager, scoreDistributionManager, segmentSchema);
+					} else
+
+					if(estimator instanceof ObliqueDecisionTreeRegressor){
+						ObliqueDecisionTreeRegressor regressor = (ObliqueDecisionTreeRegressor)estimator;
+
+						treeModel = regressor.encodeModel(predicateManager, segmentSchema);
+					} else
+
+					{
+						throw new IllegalArgumentException();
+					}
 				} finally {
 					estimator.setPMMLSegmentId(null);
 				}

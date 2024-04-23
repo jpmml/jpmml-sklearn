@@ -30,7 +30,6 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
@@ -77,7 +76,6 @@ public class IsolationForest extends EnsembleRegressor implements HasIsolationFo
 		boolean nodeSampleCorrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.21") >= 0);
 
 		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
@@ -91,7 +89,7 @@ public class IsolationForest extends EnsembleRegressor implements HasIsolationFo
 
 			Tree tree = estimator.getTree();
 
-			TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, MiningFunction.REGRESSION, predicateManager, scoreDistributionManager, estimatorSchema);
+			TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, MiningFunction.REGRESSION, predicateManager, null, estimatorSchema);
 
 			IsolationForestUtil.transformTreeModel(treeModel, tree, corrected, nodeSampleCorrected);
 

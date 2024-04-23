@@ -58,7 +58,7 @@ public class ForestRegressor extends SkLearnRegressor implements HasEstimatorEns
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		return ForestUtil.encodeBaseForest(this, MiningFunction.REGRESSION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+		return ForestUtil.encodeForest(this, MiningFunction.REGRESSION, Segmentation.MultipleModelMethod.AVERAGE, schema);
 	}
 
 	@Override

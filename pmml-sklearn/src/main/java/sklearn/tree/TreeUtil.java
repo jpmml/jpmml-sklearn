@@ -71,7 +71,6 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
-import sklearn.HasEstimatorEnsemble;
 import sklearn.VersionUtil;
 import sklearn.tree.visitors.TreeModelCompactor;
 import sklearn.tree.visitors.TreeModelFlattener;
@@ -80,50 +79,6 @@ import sklearn.tree.visitors.TreeModelPruner;
 public class TreeUtil {
 
 	private TreeUtil(){
-	}
-
-	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Schema schema){
-		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
-
-		return encodeTreeModelEnsemble(estimator, miningFunction, predicateManager, scoreDistributionManager, schema);
-	}
-
-	static
-	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
-		List<? extends T> estimators = estimator.getEstimators();
-
-		Schema segmentSchema = schema.toAnonymousSchema();
-
-		Function<T, TreeModel> function = new Function<T, TreeModel>(){
-
-			@Override
-			public TreeModel apply(T estimator){
-				TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, segmentSchema);
-
-				// XXX
-				if(estimator.hasFeatureImportances()){
-					Schema featureImportanceSchema = toTreeModelFeatureImportanceSchema(segmentSchema);
-
-					estimator.addFeatureImportances(treeModel, featureImportanceSchema);
-				}
-
-				return treeModel;
-			}
-		};
-
-		return estimators.stream()
-			.map(function)
-			.collect(Collectors.toList());
-	}
-
-	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, Schema schema){
-		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
-
-		return encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, schema);
 	}
 
 	static
@@ -535,44 +490,7 @@ public class TreeUtil {
 	}
 
 	static
-	private void encodeNodeId(Estimator estimator, Model model){
-
-		if(model instanceof TreeModel){
-			TreeModel treeModel = (TreeModel)model;
-
-			estimator.encodeApplyOutput(treeModel, DataType.INTEGER);
-		} else
-
-		if(model instanceof MiningModel){
-			MiningModel miningModel = (MiningModel)model;
-
-			Segmentation segmentation = miningModel.requireSegmentation();
-
-			List<Segment> segments = segmentation.requireSegments();
-
-			List<String> segmentIds = new ArrayList<>();
-
-			for(Segment segment : segments){
-				TreeModel treeModel = segment.requireModel(TreeModel.class);
-
-				String segmentId = segment.getId();
-				if(segmentId == null){
-					throw new UnsupportedElementException(segment);
-				}
-
-				segmentIds.add(segmentId);
-			}
-
-			estimator.encodeMultiApplyOutput(miningModel, DataType.INTEGER, segmentIds);
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
-	}
-
-	static
-	private Schema toTreeModelSchema(Boolean numeric, Boolean inputFloat, Schema schema){
+	Schema toTreeModelSchema(Boolean numeric, Boolean inputFloat, Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
@@ -645,7 +563,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Schema toTreeModelFeatureImportanceSchema(Schema schema){
+	Schema toTreeModelFeatureImportanceSchema(Schema schema){
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
 			@Override
@@ -704,5 +622,42 @@ public class TreeUtil {
 		System.arraycopy(values, (row * columns), result, 0, columns);
 
 		return result;
+	}
+
+	static
+	private void encodeNodeId(Estimator estimator, Model model){
+
+		if(model instanceof TreeModel){
+			TreeModel treeModel = (TreeModel)model;
+
+			estimator.encodeApplyOutput(treeModel, DataType.INTEGER);
+		} else
+
+		if(model instanceof MiningModel){
+			MiningModel miningModel = (MiningModel)model;
+
+			Segmentation segmentation = miningModel.requireSegmentation();
+
+			List<Segment> segments = segmentation.requireSegments();
+
+			List<String> segmentIds = new ArrayList<>();
+
+			for(Segment segment : segments){
+				TreeModel treeModel = segment.requireModel(TreeModel.class);
+
+				String segmentId = segment.getId();
+				if(segmentId == null){
+					throw new UnsupportedElementException(segment);
+				}
+
+				segmentIds.add(segmentId);
+			}
+
+			estimator.encodeMultiApplyOutput(miningModel, DataType.INTEGER, segmentIds);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 }

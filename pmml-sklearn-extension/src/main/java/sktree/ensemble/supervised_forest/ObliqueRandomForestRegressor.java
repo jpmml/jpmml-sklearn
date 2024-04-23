@@ -42,7 +42,7 @@ public class ObliqueRandomForestRegressor extends Regressor implements HasEstima
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		return ObliqueForestUtil.encodeBaseObliqueForest(this, MiningFunction.REGRESSION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+		return ObliqueForestUtil.encodeObliqueForest(this, MiningFunction.REGRESSION, Segmentation.MultipleModelMethod.AVERAGE, schema);
 	}
 
 	@Override

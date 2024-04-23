@@ -21,6 +21,7 @@ package sktree.tree;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.tree.TreeModel;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 import sklearn.tree.HasTree;
@@ -45,6 +46,12 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
+		PredicateManager predicateManager = new PredicateManager();
+
+		return encodeModel(predicateManager, schema);
+	}
+
+	public TreeModel encodeModel(PredicateManager predicateManager, Schema schema){
 		ObliqueTree tree = getTree();
 
 		if(tree.hasProjVecs()){
@@ -63,10 +70,10 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 				}
 			};
 
-			return sklearnRegressor.encodeModel(sklearnSchema);
+			return sklearnRegressor.encodeModel(predicateManager, sklearnSchema);
 		}
 
-		return TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
+		return TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, predicateManager, null, schema);
 	}
 
 	@Override

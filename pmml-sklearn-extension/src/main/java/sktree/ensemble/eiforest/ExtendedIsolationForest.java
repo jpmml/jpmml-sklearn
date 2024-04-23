@@ -25,6 +25,7 @@ import com.google.common.primitives.Ints;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
@@ -67,6 +68,8 @@ public class ExtendedIsolationForest extends Regressor implements HasIsolationFo
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
+		PredicateManager predicateManager = new PredicateManager();
+
 		List<TreeModel> treeModels = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
@@ -82,7 +85,7 @@ public class ExtendedIsolationForest extends Regressor implements HasIsolationFo
 			try {
 				estimator.setPMMLSegmentId((i + 1));
 
-				treeModel = (TreeModel)estimator.encodeModel(estimatorSchema);
+				treeModel = estimator.encodeModel(predicateManager, estimatorSchema);
 			} finally {
 				estimator.setPMMLSegmentId(null);
 			}

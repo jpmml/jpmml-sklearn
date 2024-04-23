@@ -31,8 +31,8 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeEnsembleUtil;
 import sklearn.tree.TreeRegressor;
-import sklearn.tree.TreeUtil;
 
 public class GradientBoostingUtil {
 
@@ -43,7 +43,7 @@ public class GradientBoostingUtil {
 	public <E extends Estimator & HasEstimatorEnsemble<TreeRegressor> & HasTreeOptions> MiningModel encodeGradientBoosting(E estimator, Number initialPrediction, Number learningRate, Schema schema){
 		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 
-		List<TreeModel> treeModels = TreeUtil.encodeTreeModelEnsemble(estimator, MiningFunction.REGRESSION, schema);
+		List<TreeModel> treeModels = TreeEnsembleUtil.encodeTreeModelEnsemble(estimator, MiningFunction.REGRESSION, schema);
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
 			.setSegmentation(MiningModelUtil.createSegmentation(Segmentation.MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))

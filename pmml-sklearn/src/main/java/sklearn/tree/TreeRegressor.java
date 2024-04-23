@@ -23,6 +23,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.FieldNames;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import sklearn.HasApplyField;
 import sklearn.SkLearnRegressor;
@@ -45,7 +46,13 @@ public class TreeRegressor extends SkLearnRegressor implements HasApplyField, Ha
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		return TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, schema);
+		PredicateManager predicateManager = new PredicateManager();
+
+		return encodeModel(predicateManager, schema);
+	}
+
+	public TreeModel encodeModel(PredicateManager predicateManager, Schema schema){
+		return TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, predicateManager, null, schema);
 	}
 
 	@Override

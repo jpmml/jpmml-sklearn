@@ -45,7 +45,7 @@ public class ObliqueRandomForestClassifier extends Classifier implements HasEsti
 	public MiningModel encodeModel(Schema schema){
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-		MiningModel miningModel = ObliqueForestUtil.encodeBaseObliqueForest(this, MiningFunction.CLASSIFICATION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+		MiningModel miningModel = ObliqueForestUtil.encodeObliqueForest(this, MiningFunction.CLASSIFICATION, Segmentation.MultipleModelMethod.AVERAGE, schema);
 
 		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 
