@@ -22,5 +22,5 @@ public interface HasMetric {
 
 	String getMetric();
 
-	int getP();
+	Integer getP();
 }

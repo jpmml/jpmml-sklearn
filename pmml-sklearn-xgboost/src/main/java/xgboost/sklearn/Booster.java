@@ -56,12 +56,7 @@ public class Booster extends PythonObject {
 	}
 
 	public Integer getBestNTreeLimit(){
-
-		if(!hasattr("best_ntree_limit")){
-			return null;
-		}
-
-		return getInteger("best_ntree_limit");
+		return getOptionalInteger("best_ntree_limit");
 	}
 
 	public byte[] getHandle(){

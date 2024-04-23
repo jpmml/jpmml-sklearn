@@ -72,7 +72,7 @@ public class KNeighborsRegressor extends SkLearnRegressor implements HasMetric, 
 	}
 
 	@Override
-	public int getP(){
+	public Integer getP(){
 		return getInteger("p");
 	}
 

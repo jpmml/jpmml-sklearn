@@ -83,13 +83,7 @@ public class NearestCentroid extends SkLearnClassifier implements HasMetric, Has
 	}
 
 	@Override
-	public int getP(){
-
-		// XXX
-		if(!hasattr("p")){
-			return -1;
-		}
-
+	public Integer getP(){
 		return getInteger("p");
 	}
 

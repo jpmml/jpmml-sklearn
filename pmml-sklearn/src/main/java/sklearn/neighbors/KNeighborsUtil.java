@@ -233,7 +233,6 @@ public class KNeighborsUtil {
 	static
 	private <E extends Estimator & HasMetric> Measure encodeMeasure(E estimator){
 		String metric = estimator.getMetric();
-		int p = estimator.getP();
 
 		switch(metric){
 			case KNeighborsConstants.METRIC_EUCLIDEAN:
@@ -241,13 +240,17 @@ public class KNeighborsUtil {
 			case KNeighborsConstants.METRIC_MANHATTAN:
 				return new CityBlock();
 			case KNeighborsConstants.METRIC_MINKOWSKI:
-				switch(p){
-					case 1:
-						return new CityBlock();
-					case 2:
-						return new Euclidean();
-					default:
-						return new Minkowski(p);
+				{
+					Integer p = estimator.getP();
+
+					switch(p){
+						case 1:
+							return new CityBlock();
+						case 2:
+							return new Euclidean();
+						default:
+							return new Minkowski(p);
+					}
 				}
 			default:
 				throw new IllegalArgumentException(metric);

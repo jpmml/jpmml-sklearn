@@ -66,7 +66,7 @@ public class NearestNeighbors extends SkLearnClusterer implements HasMetric, Has
 	}
 
 	@Override
-	public int getP(){
+	public Integer getP(){
 		return getInteger("p");
 	}
 

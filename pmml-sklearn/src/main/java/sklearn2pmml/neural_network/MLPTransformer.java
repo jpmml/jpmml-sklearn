@@ -137,7 +137,7 @@ public class MLPTransformer extends Transformer {
 		return get("mlp_", MLPRegressor.class);
 	}
 
-	public int getTransformerOutputLayer(){
+	public Integer getTransformerOutputLayer(){
 		return getInteger("transformer_output_layer");
 	}
 }

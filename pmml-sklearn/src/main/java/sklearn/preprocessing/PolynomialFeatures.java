@@ -154,7 +154,7 @@ public class PolynomialFeatures extends SkLearnTransformer implements HasSparseO
 		return result;
 	}
 
-	public int getDegree(){
+	public Integer getDegree(){
 		return getInteger("degree");
 	}
 
