@@ -20,38 +20,20 @@ package sklearn.ensemble.iforest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
 
 import com.google.common.primitives.Ints;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.PMMLFunctions;
-import org.dmg.pmml.PMMLObject;
-import org.dmg.pmml.Visitor;
-import org.dmg.pmml.VisitorAction;
 import org.dmg.pmml.mining.MiningModel;
-import org.dmg.pmml.mining.Segmentation;
-import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
-import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
-import org.jpmml.converter.Transformation;
-import org.jpmml.converter.ValueUtil;
-import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.converter.transformations.AbstractTransformation;
-import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
-import sklearn.OutlierDetectorUtil;
 import sklearn.Regressor;
 import sklearn.VersionUtil;
 import sklearn.ensemble.EnsembleRegressor;
@@ -60,7 +42,7 @@ import sklearn.tree.Tree;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class IsolationForest extends EnsembleRegressor implements HasTreeOptions, OutlierDetector {
+public class IsolationForest extends EnsembleRegressor implements HasIsolationForest, HasTreeOptions, OutlierDetector {
 
 	public IsolationForest(String module, String name){
 		super(module, name);
@@ -84,7 +66,8 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
-		List<Regressor> estimators = getEstimators();
+		@SuppressWarnings({"rawtypes", "unchecked"})
+		List<TreeRegressor> estimators = (List)getEstimators();
 		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/8549
@@ -101,99 +84,23 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		List<TreeModel> treeModels = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
-			Regressor estimator = estimators.get(i);
+			TreeRegressor estimator = estimators.get(i);
 			List<Number> estimatorFeatures = estimatorsFeatures.get(i);
 
 			Schema estimatorSchema = segmentSchema.toSubSchema(Ints.toArray(estimatorFeatures));
 
-			TreeRegressor treeRegressor = (TreeRegressor)estimator;
+			Tree tree = estimator.getTree();
 
-			Tree tree = treeRegressor.getTree();
+			TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, MiningFunction.REGRESSION, predicateManager, scoreDistributionManager, estimatorSchema);
 
-			TreeModel treeModel = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, predicateManager, scoreDistributionManager, estimatorSchema);
-
-			Visitor visitor = new AbstractVisitor(){
-
-				private int[] nodeSamples = tree.getNodeSamples();
-
-
-				@Override
-				public VisitorAction visit(Node node){
-
-					if(node.hasScore()){
-						double nodeDepth = 0d;
-
-						Deque<PMMLObject> parents = getParents();
-						for(PMMLObject parent : parents){
-
-							if(!(parent instanceof Node)){
-								break;
-							}
-
-							nodeDepth++;
-						}
-
-						double nodeSample = this.nodeSamples[ValueUtil.asInt((Number)node.getId())];
-
-						double averagePathLength = (corrected ? correctedAveragePathLength(nodeSample, nodeSampleCorrected) : averagePathLength(nodeSample));
-
-						node.setScore(nodeDepth + averagePathLength);
-					}
-
-					return super.visit(node);
-				}
-			};
-			visitor.applyTo(treeModel);
+			IsolationForestUtil.transformTreeModel(treeModel, tree, corrected, nodeSampleCorrected);
 
 			ClassDictUtil.clearContent(tree);
 
 			treeModels.add(treeModel);
 		}
 
-		// "rawAnomalyScore / averagePathLength(maxSamples)"
-		Transformation normalizedAnomalyScore = new AbstractTransformation(){
-
-			@Override
-			public String getName(String name){
-				return "normalizedAnomalyScore";
-			}
-
-			@Override
-			public Expression createExpression(FieldRef fieldRef){
-				double maxSamples = getMaxSamples();
-
-				double averagePathLength = (corrected ? correctedAveragePathLength(maxSamples, nodeSampleCorrected) : averagePathLength(maxSamples));
-
-				return ExpressionUtil.createApply(PMMLFunctions.DIVIDE, fieldRef, ExpressionUtil.createConstant(averagePathLength));
-			}
-		};
-
-		// "0.5 - 2 ^ (-1 * normalizedAnomalyScore)"
-		Transformation decisionFunction = new AbstractTransformation(){
-
-			@Override
-			public String getName(String name){
-				return getDecisionFunctionField();
-			}
-
-			@Override
-			public boolean isFinalResult(){
-				return true;
-			}
-
-			@Override
-			public Expression createExpression(FieldRef fieldRef){
-				Number offset = getOffset();
-
-				return ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, ExpressionUtil.createConstant(-offset.doubleValue()), ExpressionUtil.createApply(PMMLFunctions.POW, ExpressionUtil.createConstant(2d), ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(-1d), fieldRef)));
-			}
-		};
-
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
-			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.AVERAGE, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels))
-			.setOutput(OutlierDetectorUtil.createPredictedOutput(this, "rawAnomalyScore", normalizedAnomalyScore, decisionFunction));
-
-		return miningModel;
+		return IsolationForestUtil.encodeMiningModel(this, treeModels, corrected, nodeSampleCorrected, schema);
 	}
 
 	@Override
@@ -229,6 +136,12 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		}
 	}
 
+	@Override
+	public List<Regressor> getEstimators(){
+		return getList("estimators_", TreeRegressor.class);
+	}
+
+	@Override
 	public List<List<Number>> getEstimatorsFeatures(){
 		return getArrayList("estimators_features_", Number.class);
 	}
@@ -237,10 +150,12 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 		return getOptionalEnum("behaviour", this::getOptionalString, Arrays.asList(IsolationForest.BEHAVIOUR_DEPRECATED, IsolationForest.BEHAVIOUR_NEW, IsolationForest.BEHAVIOUR_OLD));
 	}
 
-	public int getMaxSamples(){
+	@Override
+	public Integer getMaxSamples(){
 		return getInteger("max_samples_");
 	}
 
+	@Override
 	public Number getOffset(){
 
 		if(!hasattr("offset_")){
@@ -264,39 +179,6 @@ public class IsolationForest extends EnsembleRegressor implements HasTreeOptions
 
 		// SkLearn 0.24+
 		return 0d;
-	}
-
-	static
-	private double averagePathLength(double n){
-
-		if(n <= 1d){
-			return 1d;
-		}
-
-		return 2d * (Math.log(n) + 0.5772156649) - 2d * ((n - 1d) / n);
-	}
-
-	static
-	private double correctedAveragePathLength(double n, boolean nodeSampleCorrected){
-
-		if(nodeSampleCorrected){
-
-			if(n <= 1d){
-				return 0d;
-			} else
-
-			if(n <= 2d){
-				return 1d;
-			}
-		} else
-
-		{
-			if(n <= 1d){
-				return 1d;
-			}
-		}
-
-		return 2d * (Math.log(n - 1d) + 0.577215664901532860606512090082402431d) - 2d * ((n - 1d) / n);
 	}
 
 	private static final String BEHAVIOUR_DEPRECATED = "deprecated";
