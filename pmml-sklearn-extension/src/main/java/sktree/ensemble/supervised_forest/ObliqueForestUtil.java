@@ -54,7 +54,17 @@ public class ObliqueForestUtil {
 					throw new IllegalArgumentException();
 				}
 
-				return (TreeModel)estimator.encode((i + 1), segmentSchema);
+				TreeModel treeModel;
+
+				try {
+					estimator.setPMMLSegmentId((i + 1));
+
+					treeModel = (TreeModel)estimator.encodeModel(segmentSchema);
+				} finally {
+					estimator.setPMMLSegmentId(null);
+				}
+
+				return treeModel;
 			}
 		};
 

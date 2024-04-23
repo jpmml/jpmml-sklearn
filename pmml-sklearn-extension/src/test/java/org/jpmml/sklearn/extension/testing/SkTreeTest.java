@@ -18,11 +18,20 @@
  */
 package org.jpmml.sklearn.extension.testing;
 
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
+import sklearn.Estimator;
+import sklearn.OutlierDetector;
 
 public class SkTreeTest extends SkLearnEncoderBatchTest implements Datasets {
+
+	@Test
+	public void evaluateExtendedIsolationForestHousing() throws Exception {
+		evaluate("ExtendedIsolationForest", HOUSING, excludeFields("rawAnomalyScore", "normalizedAnomalyScore", SkTreeTest.predictedValue), new PMMLEquivalence(5e-12, 5e-12));
+	}
 
 	@Test
 	public void evaluateObliqueDecisionTreeAudit() throws Exception {
@@ -53,4 +62,6 @@ public class SkTreeTest extends SkLearnEncoderBatchTest implements Datasets {
 	public void evaluateObliqueRandomForestIris() throws Exception {
 		evaluate("ObliqueRandomForest", IRIS);
 	}
+
+	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, OutlierDetector.FIELD_OUTLIER);
 }

@@ -5,7 +5,7 @@ from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn2pmml.pipeline import PMMLPipeline
-from sktree import ObliqueRandomForestClassifier, ObliqueRandomForestRegressor
+from sktree.ensemble import ExtendedIsolationForest, ObliqueRandomForestClassifier, ObliqueRandomForestRegressor
 from sktree.tree import ObliqueDecisionTreeClassifier, ObliqueDecisionTreeRegressor
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
@@ -18,7 +18,7 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Audit", "Auto", "Iris"]
+		datasets = ["Audit", "Auto", "Housing", "Iris"]
 
 def build_audit(audit_df, classifier, name):
 	audit_X, audit_y = split_csv(audit_df)
@@ -92,3 +92,25 @@ if "Auto" in datasets:
 
 	build_auto(auto_df, ObliqueDecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), "ObliqueDecisionTreeAuto")
 	build_auto(auto_df, ObliqueRandomForestRegressor(n_estimators = 10, max_depth = 5, random_state = 13), "ObliqueRandomForestAuto")
+
+def build_housing(housing_df, estimator, name):
+	housing_X, housing_y = split_csv(housing_df)
+
+	transformer = ColumnTransformer([
+		("cat", OneHotEncoder(sparse_output = False), ["CHAS", "RAD"])
+	], remainder = StandardScaler())
+
+	pipeline = PMMLPipeline([
+		("transformer", transformer),
+		("estimator", estimator)
+	])
+	pipeline.fit(housing_X)
+	store_pkl(pipeline, name)
+	decisionFunction = DataFrame(pipeline.decision_function(housing_X), columns = ["decisionFunction"])
+	outlier = DataFrame(pipeline.predict(housing_X) <= 0, columns = ["outlier"]).replace(True, "true").replace(False, "false")
+	store_csv(pandas.concat([decisionFunction, outlier], axis = 1), name)
+
+if "Housing" in datasets:
+	housing_df = load_housing("Housing")
+
+	build_housing(housing_df, ExtendedIsolationForest(n_estimators = 31, contamination = 0.1, random_state = 13), "ExtendedIsolationForestHousing")
