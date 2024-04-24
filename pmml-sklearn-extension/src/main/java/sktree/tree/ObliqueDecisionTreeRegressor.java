@@ -47,17 +47,18 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 	@Override
 	public TreeModel encodeModel(Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
+		ProjectionManager projectionManager = new ProjectionManager();
 
-		return encodeModel(predicateManager, schema);
+		return encodeModel(predicateManager, projectionManager, schema);
 	}
 
-	public TreeModel encodeModel(PredicateManager predicateManager, Schema schema){
+	public TreeModel encodeModel(PredicateManager predicateManager, ProjectionManager projectionManager, Schema schema){
 		ObliqueTree tree = getTree();
 
 		if(tree.hasProjVecs()){
 			Object segmentId = getPMMLSegmentId();
 
-			Schema sklearnSchema = tree.transformSchema(segmentId, schema);
+			Schema sklearnSchema = tree.transformSchema(segmentId, projectionManager, schema);
 
 			ObliqueDecisionTreeRegressor sklearnRegressor = new ObliqueDecisionTreeRegressor(this){
 
@@ -70,7 +71,7 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 				}
 			};
 
-			return sklearnRegressor.encodeModel(predicateManager, sklearnSchema);
+			return sklearnRegressor.encodeModel(predicateManager, projectionManager, sklearnSchema);
 		}
 
 		return TreeUtil.encodeTreeModel(this, MiningFunction.REGRESSION, predicateManager, null, schema);

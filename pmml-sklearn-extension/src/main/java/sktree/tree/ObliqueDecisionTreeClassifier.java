@@ -50,17 +50,18 @@ public class ObliqueDecisionTreeClassifier extends Classifier implements HasTree
 	public TreeModel encodeModel(Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
+		ProjectionManager projectionManager = new ProjectionManager();
 
-		return encodeModel(predicateManager, scoreDistributionManager, schema);
+		return encodeModel(predicateManager, scoreDistributionManager, projectionManager, schema);
 	}
 
-	public TreeModel encodeModel(PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	public TreeModel encodeModel(PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, ProjectionManager projectionManager, Schema schema){
 		ObliqueTree tree = getTree();
 
 		if(tree.hasProjVecs()){
 			Object segmentId = getPMMLSegmentId();
 
-			Schema sklearnSchema = tree.transformSchema(segmentId, schema);
+			Schema sklearnSchema = tree.transformSchema(segmentId, projectionManager, schema);
 
 			ObliqueDecisionTreeClassifier sklearnClassifier = new ObliqueDecisionTreeClassifier(this){
 
@@ -73,7 +74,7 @@ public class ObliqueDecisionTreeClassifier extends Classifier implements HasTree
 				}
 			};
 
-			return sklearnClassifier.encodeModel(predicateManager, scoreDistributionManager, sklearnSchema);
+			return sklearnClassifier.encodeModel(predicateManager, scoreDistributionManager, projectionManager, sklearnSchema);
 		}
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();

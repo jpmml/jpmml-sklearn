@@ -19,28 +19,13 @@
 package sktree.tree;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.google.common.collect.Iterables;
-import org.dmg.pmml.Apply;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
-import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CMatrixUtil;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.tree.Tree;
 
@@ -82,111 +67,45 @@ public class ObliqueTree extends Tree {
 		return result;
 	}
 
-	public Schema transformSchema(Object segmentId, Schema schema){
+	public Schema transformSchema(Object segmentId, ProjectionManager projectionManager, Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		features = encodeFeatures(segmentId, (List)features, encoder);
+		features = encodeFeatures(segmentId, (List)features, projectionManager, encoder);
 
 		return new Schema(encoder, label, features);
 	}
 
-	public List<Feature> encodeFeatures(Object segmentId, List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encodeFeatures(Object segmentId, List<Feature> features, ProjectionManager projectionManager, SkLearnEncoder encoder){
 		Integer nodeCount = getNodeCount();
 		List<Number> projVecs = getProjVecs();
 
 		int rows = nodeCount;
 		int columns = features.size();
 
-		Map<List<Number>, Feature> lcFeatures = new LinkedHashMap<>();
-
 		List<Feature> result = new ArrayList<>();
 
 		for(int row = 0; row < rows; row++){
-			List<Number> weights = CMatrixUtil.getRow(projVecs, rows, columns, row);
+			String name;
 
-			Feature feature;
-
-			if(lcFeatures.containsKey(weights)){
-				feature = lcFeatures.get(weights);
+			if(segmentId != null){
+				name = FieldNameUtil.create("lc", segmentId, row);
 			} else
 
 			{
-				String name;
-
-				if(segmentId != null){
-					name = FieldNameUtil.create("lc", segmentId, row);
-				} else
-
-				{
-					name = FieldNameUtil.create("lc", row);
-				}
-
-				feature = encodeFeature(name, features, weights, encoder);
-
-				lcFeatures.put(weights, feature);
+				name = FieldNameUtil.create("lc", row);
 			}
+
+			List<Number> weights = CMatrixUtil.getRow(projVecs, rows, columns, row);
+
+			Feature feature = projectionManager.getOrCreateFeature(name, features, weights, encoder);
 
 			result.add(feature);
 		}
 
 		return result;
-	}
-
-	private Feature encodeFeature(String name, List<Feature> features, List<Number> weights, SkLearnEncoder encoder){
-		ClassDictUtil.checkSize(features, weights);
-
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
-
-		Map<String, Feature> originalFeatures = new HashMap<>();
-
-		for(int i = 0; i < features.size(); i++){
-			Feature feature = features.get(i);
-			Number weight = weights.get(i);
-
-			if(ValueUtil.isZero(weight)){
-				continue;
-			}
-
-			ContinuousFeature continuousFeature = feature.toContinuousFeature();
-
-			Expression expression = continuousFeature.ref();
-			if(!ValueUtil.isOne(weight)){
-				expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(weight), expression);
-			} else
-
-			{
-				FieldRef fieldRef = (FieldRef)expression;
-
-				originalFeatures.put(fieldRef.requireField(), feature);
-			}
-
-			apply.addExpressions(expression);
-		}
-
-		List<Expression> expressions = apply.getExpressions();
-
-		if(expressions.isEmpty()){
-			return null;
-		}
-
-		Expression expression = apply;
-
-		if(expressions.size() == 1){
-			expression = Iterables.getOnlyElement(expressions);
-
-			if(expression instanceof FieldRef){
-				FieldRef fieldRef = (FieldRef)expression;
-
-				return originalFeatures.get(fieldRef.requireField());
-			}
-		}
-
-		DerivedField derivedField = encoder.createDerivedField(name, OpType.CONTINUOUS, DataType.FLOAT, expression);
-
-		return new ContinuousFeature(encoder, derivedField);
 	}
 
 	public Integer getNodeCount(){

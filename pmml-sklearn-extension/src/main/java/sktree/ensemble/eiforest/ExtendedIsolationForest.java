@@ -34,6 +34,7 @@ import sklearn.ensemble.iforest.HasIsolationForest;
 import sklearn.ensemble.iforest.IsolationForestUtil;
 import sklearn.tree.Tree;
 import sktree.tree.ObliqueDecisionTreeRegressor;
+import sktree.tree.ProjectionManager;
 
 public class ExtendedIsolationForest extends Regressor implements HasIsolationForest, OutlierDetector {
 
@@ -69,6 +70,7 @@ public class ExtendedIsolationForest extends Regressor implements HasIsolationFo
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		PredicateManager predicateManager = new PredicateManager();
+		ProjectionManager projectionManager = new ProjectionManager();
 
 		List<TreeModel> treeModels = new ArrayList<>();
 
@@ -85,7 +87,7 @@ public class ExtendedIsolationForest extends Regressor implements HasIsolationFo
 			try {
 				estimator.setPMMLSegmentId((i + 1));
 
-				treeModel = estimator.encodeModel(predicateManager, estimatorSchema);
+				treeModel = estimator.encodeModel(predicateManager, projectionManager, estimatorSchema);
 			} finally {
 				estimator.setPMMLSegmentId(null);
 			}

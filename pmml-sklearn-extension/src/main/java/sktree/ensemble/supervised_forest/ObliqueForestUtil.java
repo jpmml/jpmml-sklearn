@@ -36,6 +36,7 @@ import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTree;
 import sktree.tree.ObliqueDecisionTreeClassifier;
 import sktree.tree.ObliqueDecisionTreeRegressor;
+import sktree.tree.ProjectionManager;
 
 public class ObliqueForestUtil {
 
@@ -50,6 +51,7 @@ public class ObliqueForestUtil {
 
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = (miningFunction == MiningFunction.CLASSIFICATION) ? new ScoreDistributionManager() : null;
+		ProjectionManager projectionManager = new ProjectionManager();
 
 		Function<T, TreeModel> function = new Function<T, TreeModel>(){
 
@@ -69,13 +71,13 @@ public class ObliqueForestUtil {
 					if(estimator instanceof ObliqueDecisionTreeClassifier){
 						ObliqueDecisionTreeClassifier classifier = (ObliqueDecisionTreeClassifier)estimator;
 
-						treeModel = classifier.encodeModel(predicateManager, scoreDistributionManager, segmentSchema);
+						treeModel = classifier.encodeModel(predicateManager, scoreDistributionManager, projectionManager, segmentSchema);
 					} else
 
 					if(estimator instanceof ObliqueDecisionTreeRegressor){
 						ObliqueDecisionTreeRegressor regressor = (ObliqueDecisionTreeRegressor)estimator;
 
-						treeModel = regressor.encodeModel(predicateManager, segmentSchema);
+						treeModel = regressor.encodeModel(predicateManager, projectionManager, segmentSchema);
 					} else
 
 					{
