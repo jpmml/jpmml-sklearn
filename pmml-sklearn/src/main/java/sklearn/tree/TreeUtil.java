@@ -82,30 +82,33 @@ public class TreeUtil {
 	}
 
 	static
+	public <E extends Estimator & HasTree> boolean hasMissingValueSupport(E estimator){
+		String sklearnVersion = estimator.getSkLearnVersion();
+
+		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.3.0") >= 0){
+			return true;
+		}
+
+		return false;
+	}
+
+	static
 	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
 		Tree tree = estimator.getTree();
+		boolean hasMissingValueSupport = estimator.hasMissingValueSupport();
 
 		int[] leftChildren = tree.getChildrenLeft();
 		int[] rightChildren = tree.getChildrenRight();
 		int[] features = tree.getFeature();
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
-		int[] missingGoToLeft = null;
-
-		String sklearnVersion = estimator.getSkLearnVersion();
-		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.3.0") >= 0){
-			missingGoToLeft = tree.getMissingToToLeft();
-		}
+		int[] missingGoToLeft = hasMissingValueSupport ? tree.getMissingToToLeft() : null;
 
 		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
-			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
-
-		// SkLearn 1.3.0+
-		if(missingGoToLeft != null){
-			treeModel.setMissingValueStrategy(TreeModel.MissingValueStrategy.DEFAULT_CHILD);
-		}
+			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
+			.setMissingValueStrategy(hasMissingValueSupport ? TreeModel.MissingValueStrategy.DEFAULT_CHILD : TreeModel.MissingValueStrategy.NULL_PREDICTION);
 
 		ClassDictUtil.clearContent(tree);
 

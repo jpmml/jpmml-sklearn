@@ -21,4 +21,6 @@ package sklearn.tree;
 public interface HasTree {
 
 	Tree getTree();
+
+	boolean hasMissingValueSupport();
 }

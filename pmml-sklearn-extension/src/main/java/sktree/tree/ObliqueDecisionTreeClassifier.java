@@ -90,4 +90,9 @@ public class ObliqueDecisionTreeClassifier extends Classifier implements HasTree
 	public ObliqueTree getTree(){
 		return get("tree_", ObliqueTree.class);
 	}
+
+	@Override
+	public boolean hasMissingValueSupport(){
+		return false;
+	}
 }

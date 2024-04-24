@@ -69,4 +69,9 @@ public class TreeRegressor extends SkLearnRegressor implements HasApplyField, Ha
 	public Tree getTree(){
 		return get("tree_", Tree.class);
 	}
+
+	@Override
+	public boolean hasMissingValueSupport(){
+		return TreeUtil.hasMissingValueSupport(this);
+	}
 }

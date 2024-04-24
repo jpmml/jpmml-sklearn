@@ -78,4 +78,9 @@ public class TreeClassifier extends SkLearnClassifier implements HasApplyField, 
 	public Tree getTree(){
 		return get("tree_", Tree.class);
 	}
+
+	@Override
+	public boolean hasMissingValueSupport(){
+		return TreeUtil.hasMissingValueSupport(this);
+	}
 }

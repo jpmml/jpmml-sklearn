@@ -81,4 +81,9 @@ public class ObliqueDecisionTreeRegressor extends Regressor implements HasTree {
 	public ObliqueTree getTree(){
 		return get("tree_", ObliqueTree.class);
 	}
+
+	@Override
+	public boolean hasMissingValueSupport(){
+		return false;
+	}
 }
