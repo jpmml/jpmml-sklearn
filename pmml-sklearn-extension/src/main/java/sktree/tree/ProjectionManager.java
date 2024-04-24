@@ -19,7 +19,6 @@
 package sktree.tree;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +29,10 @@ import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
-import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.NormDiscrete;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
@@ -72,9 +72,8 @@ public class ProjectionManager {
 
 	static
 	private Feature encodeFeature(String name, List<Vector> key, SkLearnEncoder encoder){
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
-
-		Map<String, Feature> originalFeatures = new HashMap<>();
+		List<Expression> plusExpressions = new ArrayList<>();
+		List<Expression> minusExpressions = new ArrayList<>();
 
 		for(int i = 0; i < key.size(); i++){
 			Vector vector = key.get(i);
@@ -82,39 +81,90 @@ public class ProjectionManager {
 			Feature feature = vector.getFeature();
 			Number weight = vector.getWeight();
 
-			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+			// XXX
+			if(key.size() == 1){
 
-			Expression expression = continuousFeature.ref();
-			if(!ValueUtil.isOne(weight)){
-				expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(weight), expression);
+				if(weight.doubleValue() == 1d){
+					return feature;
+				}
+			}
+
+			Expression expression;
+
+			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+				expression = new NormDiscrete(binaryFeature.getName(), binaryFeature.getValue());
 			} else
 
 			{
-				FieldRef fieldRef = (FieldRef)expression;
+				ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-				originalFeatures.put(fieldRef.requireField(), feature);
+				expression = continuousFeature.ref();
+			} // End if
+
+			if(weight.doubleValue() == 1d){
+				plusExpressions.add(expression);
+			} else
+
+			if(weight.doubleValue() == -1d){
+				minusExpressions.add(expression);
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
-
-			apply.addExpressions(expression);
 		}
 
-		List<Expression> expressions = apply.getExpressions();
+		Expression plusExpression = aggregate(plusExpressions);
+		Expression minusExpression = aggregate(minusExpressions);
 
-		Expression expression = apply;
+		Expression expression;
 
-		if(expressions.size() == 1){
-			expression = Iterables.getOnlyElement(expressions);
+		if(plusExpression != null){
 
-			if(expression instanceof FieldRef){
-				FieldRef fieldRef = (FieldRef)expression;
+			if(minusExpression != null){
+				expression = ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, plusExpression, minusExpression);
+			} else
 
-				return originalFeatures.get(fieldRef.requireField());
+			{
+				expression = plusExpression;
+			}
+		} else
+
+		{
+			if(minusExpression != null){
+				expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(-1d), minusExpression);
+			} else
+
+			{
+				throw new IllegalArgumentException();
 			}
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(name, OpType.CONTINUOUS, DataType.FLOAT, expression);
 
 		return new ContinuousFeature(encoder, derivedField);
+	}
+
+	static
+	private Expression aggregate(List<Expression> expressions){
+
+		if(expressions.isEmpty()){
+			return null;
+		} // End if
+
+		if(expressions.size() == 1){
+			return Iterables.getOnlyElement(expressions);
+		} else
+
+		{
+			Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUM);
+
+			(apply.getExpressions()).addAll(expressions);
+
+			return apply;
+		}
 	}
 
 	static
