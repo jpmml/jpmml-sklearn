@@ -102,7 +102,7 @@ public class TreeUtil {
 		int[] features = tree.getFeature();
 		double[] thresholds = tree.getThreshold();
 		double[] values = tree.getValues();
-		int[] missingGoToLeft = hasMissingValueSupport ? tree.getMissingToToLeft() : null;
+		int[] missingGoToLeft = hasMissingValueSupport ? tree.getMissingGoToLeft() : null;
 
 		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
 
