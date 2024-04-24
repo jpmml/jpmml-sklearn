@@ -121,7 +121,6 @@ public class Scorecard extends Estimator implements HasClasses {
 		String scalingMethod = getScalingMethod();
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 

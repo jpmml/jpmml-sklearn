@@ -49,7 +49,6 @@ public class ExpressionRegressor extends Regressor {
 		RegressionModel.NormalizationMethod normalizationMethod = parseNormalizationMethod(getNormalizationMethod());
 
 		PMMLEncoder encoder = schema.getEncoder();
-
 		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 

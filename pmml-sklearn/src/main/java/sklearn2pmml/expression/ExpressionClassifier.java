@@ -56,7 +56,6 @@ public class ExpressionClassifier extends Classifier {
 		RegressionModel.NormalizationMethod normalizationMethod = parseNormalizationMethod(getNormalizationMethod());
 
 		PMMLEncoder encoder = schema.getEncoder();
-
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 

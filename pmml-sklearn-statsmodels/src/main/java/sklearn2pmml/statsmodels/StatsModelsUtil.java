@@ -48,7 +48,6 @@ public class StatsModelsUtil {
 	static
 	public Schema addConstant(Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
 		Label label = schema.getLabel();
 		List<Feature> features = (List)schema.getFeatures();
 

@@ -69,7 +69,6 @@ public class ObliqueTree extends Tree {
 
 	public Schema transformSchema(Object segmentId, ProjectionManager projectionManager, Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 

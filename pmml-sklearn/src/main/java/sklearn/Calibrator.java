@@ -48,7 +48,6 @@ public class Calibrator extends SkLearnRegressor implements HasPMMLName<Calibrat
 	@Override
 	public RegressionModel encodeModel(Schema schema){
 		PMMLEncoder encoder = schema.getEncoder();
-
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 

@@ -51,7 +51,6 @@ public class HistGradientBoostingUtil {
 	static
 	public Schema preprocess(ColumnTransformer preprocessor, Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
 		Label label = schema.getLabel();
 		List<Feature> features = new ArrayList<>(schema.getFeatures());
 

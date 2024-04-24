@@ -71,7 +71,6 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		String method = getMethod();
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
