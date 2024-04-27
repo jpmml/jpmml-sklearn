@@ -79,6 +79,7 @@ public class BoosterUtil {
 		Number missing = (Number)estimator.getOptionalScalar("missing");
 
 		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());
+		Boolean inputFloat = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, null);
 		Boolean numeric = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
 		Boolean prune = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
 		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
@@ -86,13 +87,16 @@ public class BoosterUtil {
 		Map<String, Object> options = new LinkedHashMap<>();
 		options.put(HasXGBoostOptions.OPTION_MISSING, missing);
 		options.put(HasXGBoostOptions.OPTION_COMPACT, compact);
+		options.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
 		options.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
 		options.put(HasXGBoostOptions.OPTION_PRUNE, prune);
 		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
-		Schema xgbSchema = learner.toXGBoostSchema(numeric, schema);
+		Schema xgbSchema = learner.configureSchema(options, schema);
 
-		MiningModel miningModel = learner.encodeMiningModel(options, xgbSchema);
+		MiningModel miningModel = learner.encodeModel(options, xgbSchema);
+
+		miningModel = learner.configureModel(options, miningModel);
 
 		return miningModel;
 	}
