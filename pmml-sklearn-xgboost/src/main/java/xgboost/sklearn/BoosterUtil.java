@@ -92,13 +92,9 @@ public class BoosterUtil {
 		options.put(HasXGBoostOptions.OPTION_PRUNE, prune);
 		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
-		Schema xgbSchema = learner.configureSchema(options, schema);
+		Schema xgbSchema = learner.toXGBoostSchema(schema);
 
-		MiningModel miningModel = learner.encodeModel(options, xgbSchema);
-
-		miningModel = learner.configureModel(options, miningModel);
-
-		return miningModel;
+		return learner.encodeModel(options, xgbSchema);
 	}
 
 	static
