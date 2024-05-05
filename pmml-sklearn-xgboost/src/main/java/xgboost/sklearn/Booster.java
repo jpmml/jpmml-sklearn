@@ -22,18 +22,25 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.ByteOrder;
 
+import org.dmg.pmml.PMML;
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
 
-public class Booster extends PythonObject {
+public class Booster extends PythonObject implements Encodable {
 
 	private Learner learner = null;
 
 
 	public Booster(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return BoosterUtil.encodePMML(this);
 	}
 
 	public Learner getLearner(ByteOrder byteOrder, String charset){

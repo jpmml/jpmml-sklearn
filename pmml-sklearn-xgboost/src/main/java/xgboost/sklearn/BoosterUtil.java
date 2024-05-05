@@ -65,6 +65,15 @@ public class BoosterUtil {
 	}
 
 	static
+	public PMML encodePMML(Booster booster){
+		Learner learner = booster.getLearner(ByteOrder.nativeOrder(), null);
+
+		Map<String, ?> options = getOptions(booster, learner);
+
+		return learner.encodePMML(options, null, null, null);
+	}
+
+	static
 	public <E extends Estimator & HasBooster & HasXGBoostOptions> PMML encodePMML(E estimator){
 		Booster booster = estimator.getBooster();
 
@@ -83,6 +92,25 @@ public class BoosterUtil {
 		String charset = (String)estimator.getOption(HasXGBoostOptions.OPTION_CHARSET, null);
 
 		return booster.getLearner(ByteOrderUtil.forValue(byteOrder), charset);
+	}
+
+	static
+	private Map<String, ?> getOptions(Booster booster, Learner learner){
+		Map<String, Object> options = new LinkedHashMap<>();
+
+		Integer bestNTreeLimit = booster.getBestNTreeLimit();
+
+		if(bestNTreeLimit == null){
+			Integer bestIteration = learner.getBestIteration();
+
+			if(bestIteration != null){
+				bestNTreeLimit = (bestIteration + 1);
+			}
+		}
+
+		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
+
+		return options;
 	}
 
 	static
@@ -106,7 +134,7 @@ public class BoosterUtil {
 			Integer bestIteration = learner.getBestIteration();
 
 			if(bestIteration != null){
-				bestNTreeLimit = bestIteration + 1;
+				bestNTreeLimit = (bestIteration + 1);
 			}
 		}
 
