@@ -28,6 +28,7 @@ import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
+import pandas.core.DataFrame;
 
 public class Booster extends PythonObject implements Encodable {
 
@@ -64,6 +65,10 @@ public class Booster extends PythonObject implements Encodable {
 
 	public Integer getBestNTreeLimit(){
 		return getOptionalInteger("best_ntree_limit");
+	}
+
+	public DataFrame getFMap(){
+		return getOptional("fmap", DataFrame.class);
 	}
 
 	public byte[] getHandle(){

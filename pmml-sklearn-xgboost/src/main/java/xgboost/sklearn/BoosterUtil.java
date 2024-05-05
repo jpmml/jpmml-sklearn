@@ -19,17 +19,25 @@
 package xgboost.sklearn;
 
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.HasArray;
 import org.jpmml.xgboost.ByteOrderUtil;
+import org.jpmml.xgboost.FeatureMap;
 import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.ObjFunction;
+import pandas.core.BlockManager;
+import pandas.core.DataFrame;
+import pandas.core.Index;
 import sklearn.Estimator;
 
 public class BoosterUtil {
@@ -66,11 +74,18 @@ public class BoosterUtil {
 
 	static
 	public PMML encodePMML(Booster booster){
+		FeatureMap featureMap = null;
+
+		DataFrame fmap = booster.getFMap();
+		if(fmap != null){
+			featureMap = parseFMap(fmap);
+		}
+
 		Learner learner = booster.getLearner(ByteOrder.nativeOrder(), null);
 
 		Map<String, ?> options = getOptions(booster, learner);
 
-		return learner.encodePMML(options, null, null, null);
+		return learner.encodePMML(options, null, null, featureMap);
 	}
 
 	static
@@ -152,5 +167,39 @@ public class BoosterUtil {
 		options.put(HasXGBoostOptions.OPTION_PRUNE, prune);
 
 		return options;
+	}
+
+	static
+	private FeatureMap parseFMap(DataFrame fmap){
+		BlockManager data = fmap.getData();
+
+		Index columnAxis = data.getColumnAxis();
+		Index rowAxis = data.getRowAxis();
+
+		if(!(Arrays.asList("id", "name", "type")).equals(columnAxis.getValues())){
+			throw new IllegalArgumentException();
+		}
+
+		List<HasArray> blockValues = data.getBlockValues();
+
+		HasArray idColumn = blockValues.get(0);
+		HasArray nameTypeColumns = blockValues.get(1);
+
+		List<?> nameTypeContent = nameTypeColumns.getArrayContent();
+		int[] nameTypeShape = nameTypeColumns.getArrayShape();
+
+		List<?> nameValues = CMatrixUtil.getRow(nameTypeContent, nameTypeShape[0], nameTypeShape[1], 0);
+		List<?> typeValues = CMatrixUtil.getRow(nameTypeContent, nameTypeShape[0], nameTypeShape[1], 1);
+
+		FeatureMap result = new FeatureMap();
+
+		for(int i = 0; i < nameTypeShape[1]; i++){
+			String name = (String)nameValues.get(i);
+			String type = (String)typeValues.get(i);
+
+			result.addEntry(name, type);
+		}
+
+		return result;
 	}
 }
