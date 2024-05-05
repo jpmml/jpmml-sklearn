@@ -26,7 +26,6 @@ import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.xgboost.ByteOrderUtil;
-import org.jpmml.xgboost.FeatureMap;
 import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
@@ -56,11 +55,46 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel encodeModel(E estimator, Schema schema){
 		Booster booster = estimator.getBooster();
 
-		Integer bestNTreeLimit = booster.getBestNTreeLimit();
+		Learner learner = getLearner(estimator);
+
+		Map<String, ?> options = getOptions(booster, learner, estimator);
+
+		Schema xgbSchema = learner.toXGBoostSchema(schema);
+
+		return learner.encodeModel(options, xgbSchema);
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> PMML encodePMML(E estimator){
+		Booster booster = estimator.getBooster();
 
 		Learner learner = getLearner(estimator);
 
+		Map<String, ?> options = getOptions(booster, learner, estimator);
+
+		return learner.encodePMML(options, null, null, null);
+	}
+
+	static
+	private <E extends Estimator & HasBooster & HasXGBoostOptions> Learner getLearner(E estimator){
+		Booster booster = estimator.getBooster();
+
+		String byteOrder = (String)estimator.getOption(HasXGBoostOptions.OPTION_BYTE_ORDER, (ByteOrder.nativeOrder()).toString());
+		String charset = (String)estimator.getOption(HasXGBoostOptions.OPTION_CHARSET, null);
+
+		return booster.getLearner(ByteOrderUtil.forValue(byteOrder), charset);
+	}
+
+	static
+	private <E extends Estimator & HasBooster & HasXGBoostOptions> Map<String, ?> getOptions(Booster booster, Learner learner, E estimator){
 		GBTree gbtree = learner.gbtree();
+
+		Map<String, Object> options = new LinkedHashMap<>();
+
+		Number missing = (Number)estimator.getOptionalScalar("missing");
+		options.put(HasXGBoostOptions.OPTION_MISSING, missing);
+
+		Integer bestNTreeLimit = booster.getBestNTreeLimit();
 
 		// XGBoost 1.7
 		if(bestNTreeLimit == null){
@@ -76,49 +110,19 @@ public class BoosterUtil {
 			}
 		}
 
-		Number missing = (Number)estimator.getOptionalScalar("missing");
+		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
+		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
 		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());
 		Boolean inputFloat = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, null);
 		Boolean numeric = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
 		Boolean prune = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
-		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
 
-		Map<String, Object> options = new LinkedHashMap<>();
-		options.put(HasXGBoostOptions.OPTION_MISSING, missing);
 		options.put(HasXGBoostOptions.OPTION_COMPACT, compact);
 		options.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
 		options.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
 		options.put(HasXGBoostOptions.OPTION_PRUNE, prune);
-		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
-		Schema xgbSchema = learner.toXGBoostSchema(schema);
-
-		return learner.encodeModel(options, xgbSchema);
-	}
-
-	static
-	public <E extends Estimator & HasBooster & HasXGBoostOptions> PMML encodePMML(E estimator){
-		Learner learner = getLearner(estimator);
-
-		FeatureMap featureMap = learner.encodeFeatureMap();
-		if(featureMap == null){
-			throw new IllegalArgumentException();
-		}
-
-		// XXX
-		Map<String, ?> options = estimator.getNativeConfiguration();
-
-		return learner.encodePMML(options, null, null, featureMap);
-	}
-
-	static
-	private <E extends Estimator & HasBooster & HasXGBoostOptions> Learner getLearner(E estimator){
-		Booster booster = estimator.getBooster();
-
-		String byteOrder = (String)estimator.getOption(HasXGBoostOptions.OPTION_BYTE_ORDER, (ByteOrder.nativeOrder()).toString());
-		String charset = (String)estimator.getOption(HasXGBoostOptions.OPTION_CHARSET, null);
-
-		return booster.getLearner(ByteOrderUtil.forValue(byteOrder), charset);
+		return options;
 	}
 }
