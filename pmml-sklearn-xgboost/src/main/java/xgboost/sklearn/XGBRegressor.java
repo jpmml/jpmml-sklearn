@@ -20,6 +20,7 @@ package xgboost.sklearn;
 
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
@@ -72,6 +73,16 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		return BoosterUtil.encodeModel(this, schema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return BoosterUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public MiningModel configureModel(Model model){
+		return BoosterUtil.configureModel(this, (MiningModel)model);
 	}
 
 	@Override

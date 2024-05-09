@@ -67,9 +67,39 @@ public class BoosterUtil {
 
 		Map<String, ?> options = getOptions(booster, learner, estimator);
 
+		Integer ntreeLimit = (Integer)options.get(HasXGBoostOptions.OPTION_NTREE_LIMIT);
+
+		MiningModel miningModel = learner.encodeModel(ntreeLimit, schema);
+
+		return miningModel;
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> Schema configureSchema(E estimator, Schema schema){
+		Booster booster = estimator.getBooster();
+
+		Learner learner = getLearner(estimator);
+
+		Map<String, ?> options = getOptions(booster, learner, estimator);
+
 		Schema xgbSchema = learner.toXGBoostSchema(schema);
 
-		return learner.encodeModel(options, xgbSchema);
+		xgbSchema = learner.configureSchema(options, xgbSchema);
+
+		return xgbSchema;
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel configureModel(E estimator, MiningModel miningModel){
+		Booster booster = estimator.getBooster();
+
+		Learner learner = getLearner(estimator);
+
+		Map<String, ?> options = getOptions(booster, learner, estimator);
+
+		miningModel = learner.configureModel(options, miningModel);
+
+		return miningModel;
 	}
 
 	static

@@ -59,11 +59,35 @@ public class BoosterUtil {
 
 		Map<String, ?> options = getOptions(gbdt, estimator);
 
-		Schema lgbmSchema = gbdt.toLightGBMSchema(schema);
+		Integer numIterations = (Integer)options.get(HasLightGBMOptions.OPTION_NUM_ITERATION);
 
-		MiningModel miningModel = gbdt.encodeModel(options, lgbmSchema);
+		MiningModel miningModel = gbdt.encodeModel(numIterations, schema);
 
 		encoder.transferFeatureImportances(null, miningModel);
+
+		return miningModel;
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasLightGBMOptions> Schema configureSchema(E estimator, Schema schema){
+		GBDT gbdt = getGBDT(estimator);
+
+		Map<String, ?> options = getOptions(gbdt, estimator);
+
+		Schema lgbmSchema = gbdt.toLightGBMSchema(schema);
+
+		lgbmSchema = gbdt.configureSchema(options, lgbmSchema);
+
+		return lgbmSchema;
+	}
+
+	static
+	public <E extends Estimator & HasBooster & HasLightGBMOptions> MiningModel configureModel(E estimator, MiningModel miningModel){
+		GBDT gbdt = getGBDT(estimator);
+
+		Map<String, ?> options = getOptions(gbdt, estimator);
+
+		miningModel = gbdt.configureModel(options, miningModel);
 
 		return miningModel;
 	}

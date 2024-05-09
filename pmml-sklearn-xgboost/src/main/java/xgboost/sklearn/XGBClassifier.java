@@ -21,6 +21,7 @@ package xgboost.sklearn;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Label;
@@ -79,6 +80,16 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		return BoosterUtil.encodeModel(this, schema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return BoosterUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public MiningModel configureModel(Model model){
+		return BoosterUtil.configureModel(this, (MiningModel)model);
 	}
 
 	@Override
