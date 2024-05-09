@@ -16,21 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn.extension.testing;
+package interpret.glassbox;
 
-import org.jpmml.converter.testing.Datasets;
-import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.dmg.pmml.Model;
+import org.jpmml.converter.Schema;
+import sklearn.Regressor;
 
-public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
+public class RegressionTree extends Regressor {
 
-	@Test
-	public void evaluateLinearRegressionAuto() throws Exception {
-		evaluate("LinearRegression", AUTO);
+	public RegressionTree(String module, String name){
+		super(module, name);
 	}
 
-	@Test
-	public void evaluateRegressionTreeAuto() throws Exception {
-		evaluate("RegressionTree", AUTO);
+	@Override
+	public Model encodeModel(Schema schema){
+		Regressor skModel = getSkModel();
+
+		return skModel.encodeModel(schema);
+	}
+
+	public Regressor getSkModel(){
+		return get("sk_model_", Regressor.class);
 	}
 }
