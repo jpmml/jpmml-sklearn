@@ -55,16 +55,9 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> MiningModel encodeModel(E estimator, Schema schema){
 		GBDT gbdt = getGBDT(estimator);
 
-		Integer bestIteration = (Integer)estimator.getOptionalScalar("best_iteration_");
-
-		Boolean compact = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.TRUE);
-		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
-
-		Map<String, Object> options = new LinkedHashMap<>();
-		options.put(HasLightGBMOptions.OPTION_COMPACT, compact);
-		options.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);
-
 		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
+
+		Map<String, ?> options = getOptions(gbdt, estimator);
 
 		Schema lgbmSchema = gbdt.toLightGBMSchema(schema);
 
@@ -79,8 +72,7 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> PMML encodePMML(E estimator){
 		GBDT gbdt = getGBDT(estimator);
 
-		// XXX
-		Map<String, ?> options = estimator.getNativeConfiguration();
+		Map<String, ?> options = getOptions(gbdt, estimator);
 
 		return gbdt.encodePMML(options, null, null);
 	}
@@ -90,5 +82,23 @@ public class BoosterUtil {
 		Booster booster = hasBooster.getBooster();
 
 		return booster.getGBDT();
+	}
+
+	static
+	private <E extends Estimator & HasBooster & HasLightGBMOptions> Map<String, ?> getOptions(GBDT gbdt, E estimator){
+		Map<String, Object> result = new LinkedHashMap<>();
+
+		Integer bestIteration = (Integer)estimator.getOptionalScalar("best_iteration_");
+
+		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
+		result.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);
+
+		Boolean nanAsMissing = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, Boolean.TRUE);
+		result.put(HasLightGBMOptions.OPTION_NAN_AS_MISSING, nanAsMissing);
+
+		Boolean compact = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.TRUE);
+		result.put(HasLightGBMOptions.OPTION_COMPACT, compact);
+
+		return result;
 	}
 }

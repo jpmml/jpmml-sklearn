@@ -111,7 +111,7 @@ public class BoosterUtil {
 
 	static
 	private Map<String, ?> getOptions(Booster booster, Learner learner){
-		Map<String, Object> options = new LinkedHashMap<>();
+		Map<String, Object> result = new LinkedHashMap<>();
 
 		Integer bestNTreeLimit = booster.getBestNTreeLimit();
 
@@ -123,19 +123,16 @@ public class BoosterUtil {
 			}
 		}
 
-		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
+		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
 
-		return options;
+		return result;
 	}
 
 	static
 	private <E extends Estimator & HasBooster & HasXGBoostOptions> Map<String, ?> getOptions(Booster booster, Learner learner, E estimator){
 		GBTree gbtree = learner.gbtree();
 
-		Map<String, Object> options = new LinkedHashMap<>();
-
-		Number missing = (Number)estimator.getOptionalScalar("missing");
-		options.put(HasXGBoostOptions.OPTION_MISSING, missing);
+		Map<String, Object> result = new LinkedHashMap<>();
 
 		Integer bestNTreeLimit = booster.getBestNTreeLimit();
 
@@ -154,19 +151,22 @@ public class BoosterUtil {
 		}
 
 		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
-		options.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
+		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
+
+		Number missing = (Number)estimator.getOptionalScalar("missing");
+		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
 
 		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());
 		Boolean inputFloat = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, null);
 		Boolean numeric = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
 		Boolean prune = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
 
-		options.put(HasXGBoostOptions.OPTION_COMPACT, compact);
-		options.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
-		options.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
-		options.put(HasXGBoostOptions.OPTION_PRUNE, prune);
+		result.put(HasXGBoostOptions.OPTION_COMPACT, compact);
+		result.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
+		result.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
+		result.put(HasXGBoostOptions.OPTION_PRUNE, prune);
 
-		return options;
+		return result;
 	}
 
 	static
