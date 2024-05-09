@@ -69,6 +69,15 @@ public class BoosterUtil {
 	}
 
 	static
+	public PMML encodePMML(Booster booster){
+		GBDT gbdt = booster.getGBDT();
+
+		Map<String, ?> options = getOptions(gbdt);
+
+		return gbdt.encodePMML(options, null, null);
+	}
+
+	static
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> PMML encodePMML(E estimator){
 		GBDT gbdt = getGBDT(estimator);
 
@@ -82,6 +91,16 @@ public class BoosterUtil {
 		Booster booster = hasBooster.getBooster();
 
 		return booster.getGBDT();
+	}
+
+	static
+	private Map<String, ?> getOptions(GBDT gbdt){
+		Map<String, Object> result = new LinkedHashMap<>();
+
+		Boolean nanAsMissing = Boolean.TRUE;
+		result.put(HasLightGBMOptions.OPTION_NAN_AS_MISSING, nanAsMissing);
+
+		return result;
 	}
 
 	static

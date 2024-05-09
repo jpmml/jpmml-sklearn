@@ -22,18 +22,25 @@ import java.io.StringReader;
 import java.util.List;
 
 import com.google.common.io.CharStreams;
+import org.dmg.pmml.PMML;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnException;
 
-public class Booster extends PythonObject {
+public class Booster extends PythonObject implements Encodable {
 
 	private GBDT gbdt = null;
 
 
 	public Booster(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return BoosterUtil.encodePMML(this);
 	}
 
 	public GBDT getGBDT(){
