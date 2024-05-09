@@ -269,6 +269,14 @@ Java library and command-line application for converting [Scikit-Learn](https://
 </details>
 
 <details>
+  <summary>InterpretML</summary>
+
+  Examples: [extensions/interpret.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/interpret.py)
+
+  * [`interpret.glassbox.LinearRegression`](https://interpret.ml/docs/python/api/LinearRegression.html)
+</details>
+
+<details>
   <summary>LightGBM</summary>
 
   Examples: [main-lightgbm.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-lightgbm/src/test/resources/main-lightgbm.py)
