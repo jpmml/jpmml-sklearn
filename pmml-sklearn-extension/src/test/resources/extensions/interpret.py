@@ -2,7 +2,7 @@ import os
 import sys
 
 from pandas import DataFrame
-from interpret.glassbox import LinearRegression, LogisticRegression, RegressionTree
+from interpret.glassbox import ClassificationTree, LinearRegression, LogisticRegression, RegressionTree
 from sklearn2pmml.pipeline import PMMLPipeline
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
@@ -35,6 +35,7 @@ def build_iris(iris_df, classifier, name):
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
+	build_iris(iris_df, ClassificationTree(max_depth = 3, random_state = 13), "ClassificationTreeIris")
 	build_iris(iris_df, LogisticRegression(), "LogisticRegressionIris")
 
 def build_auto(auto_df, regressor, name):
