@@ -18,14 +18,28 @@
  */
 package interpret.glassbox;
 
+import java.util.List;
+
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 
-public class ClassificationTree extends Classifier {
+public class GlassboxClassifier extends Classifier {
 
-	public ClassificationTree(String module, String name){
+	public GlassboxClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<?> getClasses(){
+		return super.getClasses();
+	}
+
+	@Override
+	public boolean hasProbabilityDistribution(){
+		Classifier classifier = getSkModel();
+
+		return classifier.hasProbabilityDistribution();
 	}
 
 	@Override
