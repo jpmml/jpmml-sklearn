@@ -22,9 +22,9 @@ import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
-public class LinearRegression extends Regressor {
+public class GlassboxRegressor extends Regressor {
 
-	public LinearRegression(String module, String name){
+	public GlassboxRegressor(String module, String name){
 		super(module, name);
 	}
 
