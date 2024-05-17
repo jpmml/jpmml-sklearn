@@ -23,10 +23,6 @@
 		</license>
 	</licenses>
 
-	<properties>
-		<project.build.outputTimestamp>2024-05-09T08:58:49Z</project.build.outputTimestamp>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.jpmml</groupId>
