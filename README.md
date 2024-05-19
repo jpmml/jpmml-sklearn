@@ -274,6 +274,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   Examples: [extensions/interpret.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/interpret.py)
 
   * [`interpret.glassbox.ClassificationTree`](https://interpret.ml/docs/python/api/ClassificationTree.html)
+  * [`interpret.glassbox.ExplainableBoostingClassifier`](https://interpret.ml/docs/python/api/ExplainableBoostingClassifier.html)
   * [`interpret.glassbox.ExplainableBoostingRegressor`](https://interpret.ml/docs/python/api/ExplainableBoostingRegressor.html)
   * [`interpret.glassbox.LinearRegression`](https://interpret.ml/docs/python/api/LinearRegression.html)
   * [`interpret.glassbox.LogisticRegression`](https://interpret.ml/docs/python/api/LogisticRegression.html)

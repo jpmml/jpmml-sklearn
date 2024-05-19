@@ -22,24 +22,29 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.collect.Iterables;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.HasArray;
-import sklearn.Regressor;
+import sklearn.Classifier;
 
-public class ExplainableBoostingRegressor extends Regressor implements HasExplainableBooster {
+public class ExplainableBoostingClassifier extends Classifier implements HasExplainableBooster {
 
-	public ExplainableBoostingRegressor(String module, String name){
+	public ExplainableBoostingClassifier(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public Model encodeModel(Schema schema){
-		Number intercept = getIntercept();
+		List<Number> intercept = getIntercept();
 		RegressionModel.NormalizationMethod normalizationMethod = parseLink(getLink());
+
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
 		List<Feature> features = ExplainableBoostingUtil.encodeExplainableBooster(this, schema);
 
@@ -56,7 +61,19 @@ public class ExplainableBoostingRegressor extends Regressor implements HasExplai
 			}
 		};
 
-		return RegressionModelUtil.createRegression(features, coefficients, intercept, normalizationMethod, schema);
+		RegressionModel regressionModel;
+
+		if(categoricalLabel.size() == 2){
+			regressionModel = RegressionModelUtil.createBinaryLogisticClassification(features, coefficients, Iterables.getOnlyElement(intercept), normalizationMethod, false, schema);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
+
+		encodePredictProbaOutput(regressionModel, DataType.DOUBLE, categoricalLabel);
+
+		return regressionModel;
 	}
 
 	@Override
@@ -64,12 +81,12 @@ public class ExplainableBoostingRegressor extends Regressor implements HasExplai
 		return (List)getList("bins_", List.class);
 	}
 
-	public Number getIntercept(){
-		return getNumber("intercept_");
+	public List<Number> getIntercept(){
+		return getNumberArray("intercept_");
 	}
 
 	public String getLink(){
-		return getEnum("link_", this::getString, Arrays.asList(ExplainableBoostingRegressor.LINK_IDENTITY));
+		return getEnum("link_", this::getString, Arrays.asList(ExplainableBoostingClassifier.LINK_LOGIT));
 	}
 
 	@Override
@@ -86,12 +103,12 @@ public class ExplainableBoostingRegressor extends Regressor implements HasExplai
 	private RegressionModel.NormalizationMethod parseLink(String link){
 
 		switch(link){
-			case ExplainableBoostingRegressor.LINK_IDENTITY:
-				return RegressionModel.NormalizationMethod.NONE;
+			case ExplainableBoostingClassifier.LINK_LOGIT:
+				return RegressionModel.NormalizationMethod.LOGIT;
 			default:
 				throw new IllegalArgumentException(link);
 		}
 	}
 
-	private static final String LINK_IDENTITY = "identity";
+	private static final String LINK_LOGIT = "logit";
 }

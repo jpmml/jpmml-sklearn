@@ -19,10 +19,16 @@
 package org.jpmml.sklearn.extension.testing;
 
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.Test;
 
 public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
+
+	@Test
+	public void evaluateExplainableBoostingClassifierVersicolor() throws Exception {
+		evaluate("ExplainableBoostingClassifier", VERSICOLOR, new PMMLEquivalence(1e-12, 1e-12));
+	}
 
 	@Test
 	public void evaluateExplainableBoostingRegressorAuto() throws Exception {
