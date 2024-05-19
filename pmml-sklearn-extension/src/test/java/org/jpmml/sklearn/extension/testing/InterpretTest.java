@@ -25,6 +25,11 @@ import org.junit.Test;
 public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
+	public void evaluateExplainableBoostingRegressorAuto() throws Exception {
+		evaluate("ExplainableBoostingRegressor", AUTO);
+	}
+
+	@Test
 	public void evaluateLinearRegressionAuto() throws Exception {
 		evaluate("LinearRegression", AUTO);
 	}

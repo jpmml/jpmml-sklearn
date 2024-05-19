@@ -2,7 +2,7 @@ import os
 import sys
 
 from pandas import DataFrame
-from interpret.glassbox import ClassificationTree, LinearRegression, LogisticRegression, RegressionTree
+from interpret.glassbox import ClassificationTree, LinearRegression, ExplainableBoostingRegressor, LogisticRegression, RegressionTree
 from sklearn2pmml.pipeline import PMMLPipeline
 
 sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
@@ -56,6 +56,8 @@ if "Auto" in datasets:
 
 	cat_cols = ["cylinders", "model_year", "origin"]
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
+
+	build_auto(auto_df, ExplainableBoostingRegressor(max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingRegressorAuto")
 
 	auto_df[cat_cols] = auto_df[cat_cols].astype("category")
 
