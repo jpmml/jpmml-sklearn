@@ -77,7 +77,7 @@ public class ExplainableBoostingClassifier extends Classifier implements HasExpl
 	}
 
 	@Override
-	public List<List<HasArray>> getBins(){
+	public List<List<?>> getBins(){
 		return (List)getList("bins_", List.class);
 	}
 

@@ -24,7 +24,7 @@ import org.jpmml.python.HasArray;
 
 public interface HasExplainableBooster {
 
-	List<List<HasArray>> getBins();
+	List<List<?>> getBins();
 
 	List<Object[]> getTermFeatures();
 

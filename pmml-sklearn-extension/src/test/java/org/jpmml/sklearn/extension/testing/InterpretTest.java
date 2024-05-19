@@ -26,6 +26,11 @@ import org.junit.Test;
 public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
+	public void evaluateExplainableBoostingClassifierAudit() throws Exception {
+		evaluate("ExplainableBoostingClassifier", AUDIT);
+	}
+
+	@Test
 	public void evaluateExplainableBoostingClassifierVersicolor() throws Exception {
 		evaluate("ExplainableBoostingClassifier", VERSICOLOR, new PMMLEquivalence(1e-12, 1e-12));
 	}

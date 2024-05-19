@@ -60,7 +60,7 @@ public class ExplainableBoostingRegressor extends Regressor implements HasExplai
 	}
 
 	@Override
-	public List<List<HasArray>> getBins(){
+	public List<List<?>> getBins(){
 		return (List)getList("bins_", List.class);
 	}
 

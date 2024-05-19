@@ -22,17 +22,21 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Discretize;
 import org.dmg.pmml.DiscretizeBin;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldColumnPair;
 import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.NamespacePrefixes;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
@@ -41,6 +45,7 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.XMLUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
@@ -53,7 +58,7 @@ public class ExplainableBoostingUtil {
 
 	static
 	public <E extends Estimator & HasExplainableBooster> List<Feature> encodeExplainableBooster(E estimator, Schema schema){
-		List<List<HasArray>> bins = estimator.getBins();
+		List<List<?>> bins = estimator.getBins();
 		List<Object[]> termFeatures = estimator.getTermFeatures();
 		List<HasArray> termScores = estimator.getTermScores();
 
@@ -63,11 +68,11 @@ public class ExplainableBoostingUtil {
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		List<List<IndexFeature>> binLevelFeatures = new ArrayList<>();
+		List<List<CategoricalFeature>> binLevelFeatures = new ArrayList<>();
 
 		for(int i = 0; i < bins.size(); i++){
 			Feature feature = features.get(i);
-			List<HasArray> binLevels = bins.get(i);
+			List<?> binLevels = bins.get(i);
 
 			binLevelFeatures.add(encodeBinLevelFeatures(feature, binLevels, encoder));
 		}
@@ -87,73 +92,123 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private List<IndexFeature> encodeBinLevelFeatures(Feature feature, List<HasArray> binLevels, PMMLEncoder encoder){
-		ContinuousFeature continuousFeature = feature.toContinuousFeature();
-
-		List<IndexFeature> result = new ArrayList<>();
+	private List<CategoricalFeature> encodeBinLevelFeatures(Feature feature, List<?> binLevels, PMMLEncoder encoder){
+		List<CategoricalFeature> result = new ArrayList<>();
 
 		for(int i = 0; i < binLevels.size(); i++){
-			HasArray binLevel = binLevels.get(i);
+			Object binLevel = binLevels.get(i);
 
-			Discretize discretize = new Discretize(continuousFeature.getName());
+			if(binLevel instanceof HasArray){
+				HasArray hasArray = (HasArray)binLevel;
 
-			List<Number> bins = (List<Number>)binLevel.getArrayContent();
-			if(bins.isEmpty()){
-				throw new IllegalArgumentException();
-			}
+				result.add(binContinuous(feature, hasArray, (binLevels.size() > 1 ? i : null), encoder));
+			} else
 
-			List<Integer> labelCategories = new ArrayList<>();
+			if(binLevel instanceof Map){
+				Map<?, ?> map = (Map<?, ?>)binLevel;
 
-			for(int j = 0; j <= bins.size(); j++){
-				Number leftMargin = null;
-				Number rightMargin = null;
-
-				if(j == 0){
-					rightMargin = bins.get(j);
-				} else
-
-				if(j == bins.size()){
-					leftMargin = bins.get(j - 1);
-				} else
-
-				{
-					leftMargin = bins.get(j - 1);
-					rightMargin = bins.get(j);
-				}
-
-				Integer label = j;
-
-				labelCategories.add(label);
-
-				Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
-					.setLeftMargin(leftMargin)
-					.setRightMargin(rightMargin);
-
-				DiscretizeBin discretizeBin = new DiscretizeBin(label, interval);
-
-				discretize.addDiscretizeBins(discretizeBin);
-			}
-
-			String name;
-
-			if(binLevels.size() > 1){
-				name = FieldNameUtil.create("bin", continuousFeature, i);
+				result.add(binNominal(feature, map, encoder));
 			} else
 
 			{
-				name = FieldNameUtil.create("bin", continuousFeature);
+				throw new IllegalArgumentException();
 			}
-
-			DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, discretize);
-
-			result.add(new IndexFeature(encoder, derivedField, labelCategories));
 		}
 
 		return result;
 	}
 
 	static
-	private Feature encodeLookupFeature(Object[] termFeature, HasArray termScore, List<List<IndexFeature>> binLevelFeatures, PMMLEncoder encoder){
+	private IndexFeature binContinuous(Feature feature, HasArray binLevel, Integer binLevelIndex, PMMLEncoder encoder){
+		ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+		Discretize discretize = new Discretize(continuousFeature.getName());
+
+		List<Number> bins = (List<Number>)binLevel.getArrayContent();
+		if(bins.isEmpty()){
+			throw new IllegalArgumentException();
+		}
+
+		List<Integer> labelCategories = new ArrayList<>();
+
+		for(int j = 0; j <= bins.size(); j++){
+			Number leftMargin = null;
+			Number rightMargin = null;
+
+			if(j == 0){
+				rightMargin = bins.get(j);
+			} else
+
+			if(j == bins.size()){
+				leftMargin = bins.get(j - 1);
+			} else
+
+			{
+				leftMargin = bins.get(j - 1);
+				rightMargin = bins.get(j);
+			}
+
+			Integer label = j;
+
+			labelCategories.add(label);
+
+			Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
+				.setLeftMargin(leftMargin)
+				.setRightMargin(rightMargin);
+
+			DiscretizeBin discretizeBin = new DiscretizeBin(label, interval);
+
+			discretize.addDiscretizeBins(discretizeBin);
+		}
+
+		String name;
+
+		if(binLevelIndex != null){
+			name = FieldNameUtil.create("bin", continuousFeature, binLevelIndex);
+		} else
+
+		{
+			name = FieldNameUtil.create("bin", continuousFeature);
+		}
+
+		DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, discretize);
+
+		return new IndexFeature(encoder, derivedField, labelCategories);
+	}
+
+	static
+	private CategoricalFeature binNominal(Feature feature, Map<?, ?> binLevel, PMMLEncoder encoder){
+		List<Map.Entry<?, ?>> entries = (binLevel.entrySet()).stream()
+			.sorted((left, right) -> {
+				return ((Comparable)left.getValue()).compareTo((right.getValue()));
+			})
+			.collect(Collectors.toList());
+
+		List<Object> categories = new ArrayList<>();
+
+		for(int j = 0; j < entries.size(); j++){
+			Map.Entry<?, ?> entry = entries.get(j);
+
+			Object category = ScalarUtil.decode(entry.getKey());
+			Number bin = (Number)entry.getValue();
+
+			if(bin.intValue() != (j + 1)){
+				throw new IllegalArgumentException();
+			}
+
+			categories.add(category);
+		}
+
+		Field<?> field = encoder.toCategorical(feature.getName(), categories);
+
+		// XXX
+		field.setDataType(TypeUtil.getDataType(categories, DataType.STRING));
+
+		return new CategoricalFeature(encoder, field, categories);
+	}
+
+	static
+	private Feature encodeLookupFeature(Object[] termFeature, HasArray termScore, List<List<CategoricalFeature>> binLevelFeatures, PMMLEncoder encoder){
 		int[] termScoreShape = termScore.getArrayShape();
 		List<Number> termScoreContent = (List<Number>)termScore.getArrayContent();
 
@@ -182,17 +237,17 @@ public class ExplainableBoostingUtil {
 			.setMapMissingTo(0d)
 			.setOutputColumn(outputColumn);
 
-		Map<String, List<Number>> data = new LinkedHashMap<>();
+		Map<String, List<Object>> data = new LinkedHashMap<>();
 
 		for(int j = 0; j < termFeature.length; j++){
 			Integer featureIndex = (Integer)termFeature[j];
 
-			List<IndexFeature> binnedFeatures = binLevelFeatures.get(featureIndex);
+			List<CategoricalFeature> binnedFeatures = binLevelFeatures.get(featureIndex);
 
-			IndexFeature binnedFeature;
+			CategoricalFeature binnedFeature;
 
 			String inputColumn;
-			List<Number> categoryValues;
+			List<Object> categoryValues;
 
 			if(termFeature.length == 1){
 				binnedFeature = binnedFeatures.get(0);
@@ -210,18 +265,21 @@ public class ExplainableBoostingUtil {
 				categoryValues = new ArrayList<>();
 
 				for(int k = 0, max = (rows * columns); k < max; k++){
+					int index;
 
 					if(j == 0){
-						categoryValues.add(k / columns);
+						index = (k / columns);
 					} else
 
 					if(j == 1){
-						categoryValues.add(k % columns);
+						index = (k % columns);
 					} else
 
 					{
 						throw new IllegalArgumentException();
 					}
+
+					categoryValues.add(binnedFeature.getValue(index));
 				}
 			}
 
@@ -234,10 +292,10 @@ public class ExplainableBoostingUtil {
 			data.put(inputColumn, categoryValues);
 		}
 
-		List<Number> outputValues;
+		List<Object> outputValues;
 
 		if(termFeature.length == 1){
-			outputValues = termScoreContent.subList(1, termScoreContent.size() - 1);
+			outputValues = (List)termScoreContent.subList(1, termScoreContent.size() - 1);
 		} else
 
 		if(termFeature.length == 2){
