@@ -23,10 +23,6 @@
 		</license>
 	</licenses>
 
-	<properties>
-		<project.build.outputTimestamp>2024-05-09T08:58:49Z</project.build.outputTimestamp>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.jpmml</groupId>
@@ -54,7 +50,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.4.1</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
