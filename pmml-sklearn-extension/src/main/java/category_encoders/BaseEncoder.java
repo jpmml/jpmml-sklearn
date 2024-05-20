@@ -26,7 +26,6 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.jpmml.sklearn.Encodable;
 import sklearn.HasFeatureNamesIn;
-import sklearn.SkLearnFields;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
@@ -45,16 +44,6 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 	@Override
 	public DataType getDataType(){
 		return DataType.STRING;
-	}
-
-	@Override
-	public List<String> getFeatureNamesIn(){
-
-		if(hasattr(SkLearnFields.FEATURE_NAMES_IN)){
-			return getListLike(SkLearnFields.FEATURE_NAMES_IN, String.class);
-		}
-
-		return null;
 	}
 
 	@Override

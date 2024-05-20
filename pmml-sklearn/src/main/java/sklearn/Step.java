@@ -49,7 +49,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	public List<String> getFeatureNamesIn(){
 
 		if(hasattr(SkLearnFields.FEATURE_NAMES_IN)){
-			return getStringArray(SkLearnFields.FEATURE_NAMES_IN);
+			return getListLike(SkLearnFields.FEATURE_NAMES_IN, String.class);
 		}
 
 		return null;

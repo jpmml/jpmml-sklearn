@@ -29,17 +29,11 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.HasArray;
 import sklearn.Regressor;
-import sklearn.SkLearnFields;
 
 public class ExplainableBoostingRegressor extends Regressor implements HasExplainableBooster {
 
 	public ExplainableBoostingRegressor(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public List<String> getFeatureNamesIn(){
-		return getStringList(SkLearnFields.FEATURE_NAMES_IN);
 	}
 
 	@Override
