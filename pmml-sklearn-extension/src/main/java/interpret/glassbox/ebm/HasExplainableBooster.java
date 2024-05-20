@@ -21,8 +21,9 @@ package interpret.glassbox.ebm;
 import java.util.List;
 
 import org.jpmml.python.HasArray;
+import sklearn.HasFeatureNamesIn;
 
-public interface HasExplainableBooster {
+public interface HasExplainableBooster extends HasFeatureNamesIn {
 
 	List<List<?>> getBins();
 
