@@ -59,9 +59,11 @@ public class ExplainableBoostingUtil {
 	static
 	public <E extends Estimator & HasExplainableBooster> List<Feature> encodeExplainableBooster(E estimator, Schema schema){
 		List<List<?>> bins = estimator.getBins();
+		List<String> featureTypesIn = estimator.getFeatureTypesIn();
 		List<Object[]> termFeatures = estimator.getTermFeatures();
 		List<HasArray> termScores = estimator.getTermScores();
 
+		ClassDictUtil.checkSize(bins, featureTypesIn);
 		ClassDictUtil.checkSize(termFeatures, termScores);
 
 		PMMLEncoder encoder = schema.getEncoder();
@@ -73,8 +75,9 @@ public class ExplainableBoostingUtil {
 		for(int i = 0; i < bins.size(); i++){
 			Feature feature = features.get(i);
 			List<?> binLevels = bins.get(i);
+			String featureType = featureTypesIn.get(i);
 
-			binLevelFeatures.add(encodeBinLevelFeatures(feature, binLevels, encoder));
+			binLevelFeatures.add(encodeBinLevelFeatures(feature, binLevels, featureType, encoder));
 		}
 
 		List<Feature> result = new ArrayList<>();
@@ -92,26 +95,25 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private List<CategoricalFeature> encodeBinLevelFeatures(Feature feature, List<?> binLevels, PMMLEncoder encoder){
+	private List<CategoricalFeature> encodeBinLevelFeatures(Feature feature, List<?> binLevels, String featureType, PMMLEncoder encoder){
 		List<CategoricalFeature> result = new ArrayList<>();
 
 		for(int i = 0; i < binLevels.size(); i++){
 			Object binLevel = binLevels.get(i);
 
-			if(binLevel instanceof HasArray){
-				HasArray hasArray = (HasArray)binLevel;
-
-				result.add(binContinuous(feature, hasArray, (binLevels.size() > 1 ? i : null), encoder));
-			} else
-
-			if(binLevel instanceof Map){
-				Map<?, ?> map = (Map<?, ?>)binLevel;
-
-				result.add(binNominal(feature, map, encoder));
-			} else
-
-			{
-				throw new IllegalArgumentException();
+			switch(featureType){
+				case HasExplainableBooster.FEATURETYPE_CONTINUOUS:
+					{
+						result.add(binContinuous(feature, (HasArray)binLevel, (binLevels.size() > 1 ? i : null), encoder));
+					}
+					break;
+				case HasExplainableBooster.FEATURETYPE_NOMINAL:
+					{
+						result.add(binNominal(feature, (Map<?, ?>)binLevel, encoder));
+					}
+					break;
+				default:
+					throw new IllegalArgumentException(featureType);
 			}
 		}
 

@@ -32,11 +32,17 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.HasArray;
 import sklearn.Classifier;
+import sklearn.SkLearnFields;
 
 public class ExplainableBoostingClassifier extends Classifier implements HasExplainableBooster {
 
 	public ExplainableBoostingClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<String> getFeatureNamesIn(){
+		return getStringList(SkLearnFields.FEATURE_NAMES_IN);
 	}
 
 	@Override
@@ -79,6 +85,11 @@ public class ExplainableBoostingClassifier extends Classifier implements HasExpl
 	@Override
 	public List<List<?>> getBins(){
 		return (List)getList("bins_", List.class);
+	}
+
+	@Override
+	public List<String> getFeatureTypesIn(){
+		return getEnumList("feature_types_in_", this::getStringList, Arrays.asList(ExplainableBoostingClassifier.FEATURETYPE_CONTINUOUS, ExplainableBoostingClassifier.FEATURETYPE_NOMINAL));
 	}
 
 	public List<Number> getIntercept(){

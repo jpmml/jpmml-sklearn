@@ -26,7 +26,12 @@ public interface HasExplainableBooster {
 
 	List<List<?>> getBins();
 
+	List<String> getFeatureTypesIn();
+
 	List<Object[]> getTermFeatures();
 
 	List<HasArray> getTermScores();
+
+	String FEATURETYPE_CONTINUOUS = "continuous";
+	String FEATURETYPE_NOMINAL = "nominal";
 }
