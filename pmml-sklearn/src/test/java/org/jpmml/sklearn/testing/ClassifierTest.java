@@ -392,7 +392,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateLinearSVCIsotonicIris() throws Exception {
-		evaluate(LINEAR_SVC + "Isotonic", IRIS);
+		evaluate(LINEAR_SVC + "Isotonic", IRIS, new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test

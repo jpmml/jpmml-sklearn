@@ -69,8 +69,24 @@ public class LogisticRegression extends LinearClassifier {
 			} else
 
 			{
-				throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be set to one of " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_OVR) + " or " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_MULTINOMIAL) + " values");
+				multiClass = null;
 			}
+		} else
+
+		if(Objects.equals(LogisticRegression.MULTICLASS_DEPRECATED, multiClass)){
+			int[] shape = getCoefShape();
+
+			if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.5.0") >= 0){
+				multiClass = getAutoMultiClass(null, shape);
+			} else
+
+			{
+				multiClass = null;
+			}
+		} // End if
+
+		if(multiClass == null){
+			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be set to one of " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_OVR) + " or " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_MULTINOMIAL) + " values");
 		}
 
 		switch(multiClass){
@@ -164,7 +180,7 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	public String getMultiClass(){
-		String multiClass = getEnum("multi_class", this::getString, Arrays.asList(LogisticRegression.MULTICLASS_AUTO, LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR, LogisticRegression.MULTICLASS_WARN));
+		String multiClass = getEnum("multi_class", this::getString, Arrays.asList(LogisticRegression.MULTICLASS_AUTO, LogisticRegression.MULTICLASS_DEPRECATED, LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR, LogisticRegression.MULTICLASS_WARN));
 
 		// SkLearn 0.20
 		if(Objects.equals(LogisticRegression.MULTICLASS_WARN, multiClass)){
@@ -197,6 +213,7 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	private static final String MULTICLASS_AUTO = "auto";
+	private static final String MULTICLASS_DEPRECATED = "deprecated";
 	private static final String MULTICLASS_MULTINOMIAL = "multinomial";
 	private static final String MULTICLASS_OVR = "ovr";
 	private static final String MULTICLASS_WARN = "warn";

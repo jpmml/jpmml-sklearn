@@ -136,6 +136,13 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 	protected List<Feature> getFeatures(Object[] fittedTransformer, List<Feature> features, SkLearnEncoder encoder){
 		Object columns = TupleUtil.extractElement(fittedTransformer, 2);
 
+		// SkLearn 1.5+
+		if(columns instanceof RemainderColsList){
+			RemainderColsList remainderColsList = (RemainderColsList)columns;
+
+			columns = remainderColsList.getData();
+		} // End if
+
 		if((columns instanceof String) || (columns instanceof Integer)){
 			columns = Collections.singletonList(columns);
 		} else

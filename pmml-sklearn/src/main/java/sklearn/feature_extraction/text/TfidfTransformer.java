@@ -21,6 +21,7 @@ package sklearn.feature_extraction.text;
 import java.util.Collections;
 import java.util.List;
 
+import org.jpmml.python.HasArray;
 import org.jpmml.python.PythonObject;
 import scipy.sparse.CSRMatrix;
 
@@ -31,9 +32,21 @@ public class TfidfTransformer extends PythonObject {
 	}
 
 	public Number getWeight(int index){
-		CSRMatrix idfDiag = get("_idf_diag", CSRMatrix.class);
+		List<?> data;
 
-		List<?> data = idfDiag.getData();
+		// SkLearn 1.4.2
+		if(hasattr("_idf_diag")){
+			CSRMatrix idfDiag = get("_idf_diag", CSRMatrix.class);
+
+			data = idfDiag.getData();
+		} else
+
+		// SkLearn 1.5+
+		{
+			HasArray idf = getArray("idf_");
+
+			data = idf.getArrayContent();
+		}
 
 		return (Number)data.get(index);
 	}
