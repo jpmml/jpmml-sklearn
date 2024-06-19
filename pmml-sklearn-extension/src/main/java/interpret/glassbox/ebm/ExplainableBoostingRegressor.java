@@ -74,7 +74,7 @@ public class ExplainableBoostingRegressor extends Regressor implements HasExplai
 	}
 
 	public String getLink(){
-		return getEnum("link_", this::getString, Arrays.asList(ExplainableBoostingRegressor.LINK_IDENTITY));
+		return getEnum("link_", this::getString, Arrays.asList(ExplainableBoostingRegressor.LINK_IDENTITY, ExplainableBoostingRegressor.LINK_LOG));
 	}
 
 	@Override
@@ -93,10 +93,13 @@ public class ExplainableBoostingRegressor extends Regressor implements HasExplai
 		switch(link){
 			case ExplainableBoostingRegressor.LINK_IDENTITY:
 				return RegressionModel.NormalizationMethod.NONE;
+			case ExplainableBoostingRegressor.LINK_LOG:
+				return RegressionModel.NormalizationMethod.EXP;
 			default:
 				throw new IllegalArgumentException(link);
 		}
 	}
 
 	private static final String LINK_IDENTITY = "identity";
+	private static final String LINK_LOG = "log";
 }

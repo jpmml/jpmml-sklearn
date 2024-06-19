@@ -104,6 +104,6 @@ if "Auto" in datasets:
 
 	auto_df[cat_cols] = auto_df[cat_cols].astype("category")
 
-	build_auto(auto_df, ExplainableBoostingRegressor(max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingRegressorAuto")
+	build_auto(auto_df, ExplainableBoostingRegressor(objective = "rmse_log", max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingRegressorAuto")
 	build_auto(auto_df, LinearRegression(), "LinearRegressionAuto")
 	build_auto(auto_df, RegressionTree(max_depth = 5, random_state = 13), "RegressionTreeAuto")
