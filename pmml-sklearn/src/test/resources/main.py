@@ -92,11 +92,11 @@ def kmeans_affinity(kmeans, X):
 def kmeans_distance(kmeans, center, X):
 	return numpy.sum(numpy.power(kmeans.cluster_centers_[center] - X, 2), axis = 1)
 
-def build_wheat(wheat_df, clusterer, name, with_affinity = False, with_kneighbors = False, **pmml_options):
+def build_wheat(wheat_df, clusterer, name, power_method = "box-cox", with_affinity = False, with_kneighbors = False, **pmml_options):
 	wheat_X, wheat_y = split_csv(wheat_df)
 
 	mapper = DataFrameMapper([
-		(wheat_X.columns.values, [ContinuousDomain(with_statistics = True, dtype = float), PowerTransformer(method = "box-cox", standardize = True)])
+		(wheat_X.columns.values, [ContinuousDomain(with_statistics = True, dtype = float), PowerTransformer(method = power_method, standardize = True)])
 	])
 	pipeline = Pipeline([
 		("mapper", mapper),
@@ -122,8 +122,8 @@ def build_wheat(wheat_df, clusterer, name, with_affinity = False, with_kneighbor
 if "Wheat" in datasets:
 	wheat_df = load_wheat("Wheat")
 
-	build_wheat(wheat_df, KMeans(n_clusters = 3, random_state = 13), "KMeansWheat", with_affinity = True)
-	build_wheat(wheat_df, MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state = 13), "MiniBatchKMeansWheat", with_affinity = True)
+	build_wheat(wheat_df, KMeans(n_clusters = 3, random_state = 13), "KMeansWheat", power_method = "box-cox", with_affinity = True)
+	build_wheat(wheat_df, MiniBatchKMeans(n_clusters = 3, compute_labels = False, random_state = 13), "MiniBatchKMeansWheat", power_method = "yeo-johnson", with_affinity = True)
 	build_wheat(wheat_df, NearestNeighbors(n_neighbors = 3, algorithm = "ball_tree"), "NearestNeighborsWheat", with_kneighbors = True)
 
 #

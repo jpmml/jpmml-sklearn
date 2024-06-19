@@ -44,7 +44,6 @@ public class PowerTransformer extends SkLearnTransformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Number> lambdas = getLambdas();
-		@SuppressWarnings("unused")
 		String method = getMethod();
 		Boolean standardize = getStandardize();
 
@@ -60,16 +59,18 @@ public class PowerTransformer extends SkLearnTransformer {
 
 			Apply apply;
 
-			if(!ValueUtil.isZero(lambda)){
-				// "($name ^ lambda - 1) / lambda"
-				apply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE, ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, ExpressionUtil.createApply(PMMLFunctions.POW, continuousFeature.ref(), ExpressionUtil.createConstant(lambda)), ExpressionUtil.createConstant(1d)), ExpressionUtil.createConstant(lambda));
-			} else
-
-			{
-				apply = ExpressionUtil.createApply(PMMLFunctions.LN, continuousFeature.ref());
+			switch(method){
+				case PowerTransformer.METHOD_BOXCOX:
+					apply = encodeBoxCoxTransform(continuousFeature, lambda);
+					break;
+				case PowerTransformer.METHOD_YEOJOHNSON:
+					apply = encodeYeoJohnsonTransform(continuousFeature, lambda);
+					break;
+				default:
+					throw new IllegalArgumentException();
 			}
 
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("boxCox", continuousFeature.getName()), OpType.CONTINUOUS, DataType.DOUBLE, apply);
+			DerivedField derivedField = encoder.createDerivedField(createFieldName("power", continuousFeature.getName()), OpType.CONTINUOUS, DataType.DOUBLE, apply);
 
 			result.add(new ContinuousFeature(encoder, derivedField));
 		}
@@ -88,7 +89,7 @@ public class PowerTransformer extends SkLearnTransformer {
 	}
 
 	public String getMethod(){
-		return getEnum("method", this::getString, Arrays.asList(PowerTransformer.METHOD_BOXCOX));
+		return getEnum("method", this::getString, Arrays.asList(PowerTransformer.METHOD_BOXCOX, PowerTransformer.METHOD_YEOJOHNSON));
 	}
 
 	public StandardScaler getScaler(){
@@ -99,5 +100,82 @@ public class PowerTransformer extends SkLearnTransformer {
 		return getBoolean("standardize");
 	}
 
+	static
+	private Apply encodeBoxCoxTransform(ContinuousFeature continuousFeature, Number lambda){
+
+		if(!ValueUtil.isZero(lambda)){
+			// "($name ^ lambda - 1) / lambda"
+			return ExpressionUtil.createApply(PMMLFunctions.DIVIDE,
+				ExpressionUtil.createApply(PMMLFunctions.SUBTRACT,
+					ExpressionUtil.createApply(PMMLFunctions.POW, continuousFeature.ref(), ExpressionUtil.createConstant(lambda)),
+					ExpressionUtil.createConstant(1d)
+				),
+				ExpressionUtil.createConstant(lambda)
+			);
+		} else
+
+		{
+			return ExpressionUtil.createApply(PMMLFunctions.LN, continuousFeature.ref());
+		}
+	}
+
+	static
+	private Apply encodeYeoJohnsonTransform(ContinuousFeature continuousFeature, Number lambda){
+		Apply trueApply;
+
+		if(!ValueUtil.isZero(lambda)){
+			// "(($name + 1) ^ lambda - 1) / lambda"
+			trueApply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE,
+				ExpressionUtil.createApply(PMMLFunctions.SUBTRACT,
+					ExpressionUtil.createApply(PMMLFunctions.POW,
+						ExpressionUtil.createApply(PMMLFunctions.ADD, continuousFeature.ref(), ExpressionUtil.createConstant(1d)),
+						ExpressionUtil.createConstant(lambda)
+					),
+					ExpressionUtil.createConstant(1d)
+				),
+				ExpressionUtil.createConstant(lambda)
+			);
+		} else
+
+		{
+			// "ln($name + 1)"
+			trueApply = ExpressionUtil.createApply(PMMLFunctions.LN1P, continuousFeature.ref());
+		}
+
+		Apply falseApply;
+
+		if(lambda.doubleValue() != 2d){
+			double twoMinusLambda = (2d - lambda.doubleValue());
+
+			// "-((-$name + 1) ^ (2 - lambda) - 1) / (2 - lambda)"
+			falseApply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE,
+				ExpressionUtil.createApply(PMMLFunctions.SUBTRACT,
+					ExpressionUtil.createApply(PMMLFunctions.POW,
+						ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, ExpressionUtil.createConstant(1d), continuousFeature.ref()),
+						ExpressionUtil.createConstant(twoMinusLambda)
+					),
+					ExpressionUtil.createConstant(1d)
+				),
+				ExpressionUtil.createConstant(-1d * twoMinusLambda)
+			);
+		} else
+
+		{
+			// "-ln(-$name + 1)"
+			falseApply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
+				ExpressionUtil.createConstant(-1d),
+				ExpressionUtil.createApply(PMMLFunctions.LN1P,
+					ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(-1d), continuousFeature.ref())
+				)
+			);
+		}
+
+		return ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createApply(PMMLFunctions.GREATEROREQUAL, continuousFeature.ref(), ExpressionUtil.createConstant(0d)),
+			trueApply, falseApply
+		);
+	}
+
 	private static final String METHOD_BOXCOX = "box-cox";
+	private static final String METHOD_YEOJOHNSON = "yeo-johnson";
 }
