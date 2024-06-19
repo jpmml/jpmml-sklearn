@@ -1,3 +1,6 @@
+import importlib
+import sys
+
 from pandas import DataFrame
 from scipy.interpolate import make_interp_spline
 from scipy.stats import norm
@@ -8,6 +11,10 @@ from sklearn2pmml.preprocessing import BSplineTransformer
 import numpy
 
 from common import *
+
+sys.path.append("../")
+
+make_dummy_pipeline = importlib.import_module("main-preprocessing").make_dummy_pipeline
 
 # See https://ndsplines.readthedocs.io/en/latest/auto_examples/1d-interp.html
 
@@ -35,13 +42,9 @@ for fun in [gaussian, sin, tanh]:
 
 	bspline = make_interp_spline(train, fun(train), k = 3)
 
-	regressor = LinearRegression()
-	regressor.coef_ = numpy.array([1])
-	regressor.intercept_ = numpy.array([0])
+	transformer = BSplineTransformer(bspline)
 
-	pipeline = PMMLPipeline([
-		("regressor", regressor)
-	], predict_transformer = BSplineTransformer(bspline))
+	pipeline = make_dummy_pipeline(transformer)
 	store_pkl(pipeline, name)
 
 	y = DataFrame(pipeline.predict_transform(X), columns = ["y", "bspline(predict(y))"])
