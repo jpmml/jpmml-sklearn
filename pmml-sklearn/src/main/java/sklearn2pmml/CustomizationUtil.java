@@ -45,7 +45,6 @@ import javax.xml.xpath.XPathFactory;
 
 import com.google.common.collect.Iterables;
 import jakarta.xml.bind.Binder;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -68,8 +67,6 @@ public class CustomizationUtil {
 
 	static
 	public void customize(Model model, List<? extends Customization> customizations) throws Exception {
-		JAXBContext jaxbContext = JAXBUtil.getContext();
-
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
 
@@ -81,7 +78,7 @@ public class CustomizationUtil {
 
 		NamespaceContext namespaceContext = new DocumentNamespaceContext(document);
 
-		Binder<Node> binder = jaxbContext.createBinder(Node.class);
+		Binder<Node> binder = JAXBUtil.createBinder(Node.class);
 		binder.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
 		binder.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
@@ -302,28 +299,14 @@ public class CustomizationUtil {
 
 	static
 	private void addListElement(Field field, PMMLObject parent, PMMLObject child) throws ReflectiveOperationException {
-		Class<? extends PMMLObject> parentClazz = parent.getClass();
-		Class<? extends PMMLObject> childClazz = child.getClass();
+		@SuppressWarnings("unused")
+		List<?> fieldValue = (List<?>)ReflectionUtil.getFieldValue(field, parent);
 
 		ParameterizedType listType = (ParameterizedType)field.getGenericType();
 
 		Class<?> listElementType = (Class<?>)listType.getActualTypeArguments()[0];
 
-		Method getterMethod = ReflectionUtil.getGetterMethod(field);
-
-		String name = getterMethod.getName();
-		if(name.startsWith("get")){
-			name = "add" + name.substring(3);
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
-
-		// See https://stackoverflow.com/a/1679444
-		Class<?> valueArrayClazz = Class.forName("[L" + childClazz.getName() + ";");
-
-		Method appenderMethod = parentClazz.getMethod(name, valueArrayClazz);
+		Method appenderMethod = ReflectionUtil.getAppenderMethod(field);
 
 		// See https://stackoverflow.com/a/36125994
 		Object[] valueArray = (Object[])Array.newInstance(listElementType, 1);

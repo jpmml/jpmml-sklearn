@@ -134,7 +134,7 @@ public class ProjectionManager {
 
 		{
 			if(minusExpression != null){
-				expression = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(-1d), minusExpression);
+				expression = ExpressionUtil.toNegative(minusExpression);
 			} else
 
 			{

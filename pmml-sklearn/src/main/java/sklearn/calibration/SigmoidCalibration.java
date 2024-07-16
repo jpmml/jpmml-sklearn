@@ -49,8 +49,7 @@ public class SigmoidCalibration extends Calibrator {
 
 		Feature feature = features.get(0);
 
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
-			ExpressionUtil.createConstant(-1),
+		Apply apply = (Apply)ExpressionUtil.toNegative(
 			ExpressionUtil.createApply(PMMLFunctions.ADD,
 				ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(a), feature.ref()),
 				ExpressionUtil.createConstant(b)

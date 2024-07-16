@@ -145,7 +145,7 @@ public class GBDTUtil {
 			treeModelVisitor.applyTo(treeModel);
 		}
 
-		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
+		ModelEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
 
 		ContinuousLabel continuousLabel;

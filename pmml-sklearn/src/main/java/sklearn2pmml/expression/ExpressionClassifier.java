@@ -35,8 +35,8 @@ import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.DataFrameScope;
@@ -55,7 +55,7 @@ public class ExpressionClassifier extends Classifier {
 		Map<?, ?> classExprs = getClassExprs();
 		RegressionModel.NormalizationMethod normalizationMethod = parseNormalizationMethod(getNormalizationMethod());
 
-		PMMLEncoder encoder = schema.getEncoder();
+		ModelEncoder encoder = schema.getEncoder();
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 

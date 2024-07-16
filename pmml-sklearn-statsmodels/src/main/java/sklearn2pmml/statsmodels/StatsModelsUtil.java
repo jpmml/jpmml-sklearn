@@ -24,8 +24,8 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.statsmodels.InterceptFeature;
 import org.jpmml.statsmodels.StatsModelsEncoder;
 import sklearn.Estimator;
@@ -47,7 +47,7 @@ public class StatsModelsUtil {
 
 	static
 	public Schema addConstant(Schema schema){
-		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
+		ModelEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
 		List<Feature> features = (List)schema.getFeatures();
 

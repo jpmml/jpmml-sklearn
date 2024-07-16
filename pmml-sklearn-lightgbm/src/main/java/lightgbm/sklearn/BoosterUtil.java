@@ -55,7 +55,7 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> MiningModel encodeModel(E estimator, Schema schema){
 		GBDT gbdt = getGBDT(estimator);
 
-		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
+		ModelEncoder encoder = schema.getEncoder();
 
 		Map<String, ?> options = getOptions(gbdt, estimator);
 

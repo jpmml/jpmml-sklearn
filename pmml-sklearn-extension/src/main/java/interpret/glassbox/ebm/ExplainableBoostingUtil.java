@@ -42,6 +42,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
@@ -66,7 +67,7 @@ public class ExplainableBoostingUtil {
 		ClassDictUtil.checkSize(bins, featureTypesIn);
 		ClassDictUtil.checkSize(termFeatures, termScores);
 
-		PMMLEncoder encoder = schema.getEncoder();
+		ModelEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
@@ -95,7 +96,7 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private List<CategoricalFeature> encodeBinLevelFeatures(Feature feature, List<?> binLevels, String featureType, PMMLEncoder encoder){
+	private List<CategoricalFeature> encodeBinLevelFeatures(Feature feature, List<?> binLevels, String featureType, ModelEncoder encoder){
 		List<CategoricalFeature> result = new ArrayList<>();
 
 		for(int i = 0; i < binLevels.size(); i++){
@@ -121,7 +122,7 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private IndexFeature binContinuous(Feature feature, HasArray binLevel, Integer binLevelIndex, PMMLEncoder encoder){
+	private IndexFeature binContinuous(Feature feature, HasArray binLevel, Integer binLevelIndex, ModelEncoder encoder){
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 		Discretize discretize = new Discretize(continuousFeature.getName());

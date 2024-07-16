@@ -98,42 +98,42 @@
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-evaluator-testing</artifactId>
-				<version>1.6.4</version>
+				<version>1.6.5</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-h2o</artifactId>
-				<version>1.2.12</version>
+				<version>1.2.13</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-lightgbm</artifactId>
-				<version>1.5.3</version>
+				<version>1.5.4</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-python</artifactId>
-				<version>1.2.2</version>
+				<version>1.2.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-python-testing</artifactId>
-				<version>1.2.2</version>
+				<version>1.2.4</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-statsmodels</artifactId>
-				<version>1.1.0</version>
+				<version>1.1.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-xgboost</artifactId>
-				<version>1.8.5</version>
+				<version>1.8.6</version>
 			</dependency>
 
 			<dependency>

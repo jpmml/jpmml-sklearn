@@ -18,6 +18,7 @@
  */
 package lightgbm.sklearn;
 
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class Booster extends PythonObject implements Encodable {
 	private GBDT loadGBDT(){
 		String handle = getHandle();
 
-		try(StringReader reader = new StringReader(handle)){
+		try(Reader reader = new StringReader(handle)){
 			List<String> lines = CharStreams.readLines(reader);
 
 			return LightGBMUtil.loadGBDT(lines.iterator());

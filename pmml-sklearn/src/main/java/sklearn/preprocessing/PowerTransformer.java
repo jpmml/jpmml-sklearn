@@ -162,10 +162,9 @@ public class PowerTransformer extends SkLearnTransformer {
 
 		{
 			// "-ln(-$name + 1)"
-			falseApply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
-				ExpressionUtil.createConstant(-1d),
+			falseApply = (Apply)ExpressionUtil.toNegative(
 				ExpressionUtil.createApply(PMMLFunctions.LN1P,
-					ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(-1d), continuousFeature.ref())
+					ExpressionUtil.toNegative(continuousFeature.ref())
 				)
 			);
 		}

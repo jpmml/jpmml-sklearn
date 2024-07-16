@@ -195,7 +195,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			featureImportances = getFeatureImportances();
 		}
 
-		ModelEncoder encoder = (ModelEncoder)schema.getEncoder();
+		ModelEncoder encoder = schema.getEncoder();
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(featureImportances != null){

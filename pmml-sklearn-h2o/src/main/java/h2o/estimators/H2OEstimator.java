@@ -39,8 +39,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureList;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.OrdinalLabel;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
@@ -200,7 +200,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	public Model encodeModel(Schema schema){
 		Converter<?> converter = createConverter();
 
-		PMMLEncoder encoder = schema.getEncoder();
+		ModelEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
