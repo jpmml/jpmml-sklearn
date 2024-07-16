@@ -140,7 +140,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 					}
 
 					// XXX
-					outputField.setName(getDecisionFunctionField(outputField.getName()));
+					outputField.setName(getDecisionFunctionField(outputField.requireName()));
 
 					models.add(decisionFunctionModel);
 

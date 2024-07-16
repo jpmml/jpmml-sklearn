@@ -153,7 +153,7 @@ public class EstimatorUtil {
 
 							OutputField outputField = Iterables.getLast(predictionOutputFields);
 
-							return encoder.export(model, outputField.getName());
+							return encoder.export(model, outputField.requireName());
 						} else
 
 						{
