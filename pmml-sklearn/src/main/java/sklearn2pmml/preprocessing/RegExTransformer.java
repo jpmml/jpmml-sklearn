@@ -18,11 +18,25 @@
  */
 package sklearn2pmml.preprocessing;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
+import sklearn.Transformer;
+
 abstract
-public class RegExTransformer extends StringTransformer {
+public class RegExTransformer extends Transformer {
 
 	public RegExTransformer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public OpType getOpType(){
+		return OpType.CATEGORICAL;
+	}
+
+	@Override
+	public DataType getDataType(){
+		return DataType.STRING;
 	}
 
 	public String getPattern(){
