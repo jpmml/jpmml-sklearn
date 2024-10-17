@@ -18,7 +18,6 @@
  */
 package sklearn2pmml.preprocessing;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +31,7 @@ import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.StringFeature;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class StringNormalizer extends StringTransformer {
@@ -49,32 +49,28 @@ public class StringNormalizer extends StringTransformer {
 			return features;
 		}
 
-		List<Feature> result = new ArrayList<>();
+		ClassDictUtil.checkSize(1, features);
 
-		for(Feature feature : features){
-			Expression expression = feature.ref();
+		Feature feature = features.get(0);
 
-			if(function != null){
-				expression = ExpressionUtil.createApply(translateFunction(function), expression);
-			} // End if
+		Expression expression = feature.ref();
 
-			if(trimBlanks){
-				expression = ExpressionUtil.createApply(PMMLFunctions.TRIMBLANKS, expression);
-			}
+		if(function != null){
+			expression = ExpressionUtil.createApply(translateFunction(function), expression);
+		} // End if
 
-			Field<?> field = encoder.toCategorical(feature.getName(), Collections.emptyList());
-
-			// XXX: Should have been set by the previous transformer
-			field.setDataType(DataType.STRING);
-
-			DerivedField derivedField = encoder.createDerivedField(createFieldName("normalize", feature), OpType.CATEGORICAL, DataType.STRING, expression);
-
-			feature = new StringFeature(encoder, derivedField);
-
-			result.add(feature);
+		if(trimBlanks){
+			expression = ExpressionUtil.createApply(PMMLFunctions.TRIMBLANKS, expression);
 		}
 
-		return result;
+		Field<?> field = encoder.toCategorical(feature.getName(), Collections.emptyList());
+
+		// XXX: Should have been set by the previous transformer
+		field.setDataType(DataType.STRING);
+
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("normalize", feature), OpType.CATEGORICAL, DataType.STRING, expression);
+
+		return Collections.singletonList(new StringFeature(encoder, derivedField));
 	}
 
 	public String getFunction(){
