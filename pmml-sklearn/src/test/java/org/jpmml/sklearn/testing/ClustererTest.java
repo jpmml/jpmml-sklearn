@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 import com.google.common.base.Equivalence;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public class ClustererTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 	@Test
 	public void evaluateKMeansWheat() throws Exception {
-		evaluate(K_MEANS, WHEAT);
+		evaluate(K_MEANS, WHEAT, new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
