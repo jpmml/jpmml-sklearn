@@ -18,6 +18,8 @@
  */
 package sklearn2pmml.preprocessing;
 
+import java.util.Arrays;
+
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import sklearn.Transformer;
@@ -43,8 +45,29 @@ public class RegExTransformer extends Transformer {
 		return getString("pattern");
 	}
 
+	public String getReFlavour(){
+		return getOptionalEnum("re_flavour", this::getOptionalString, Arrays.asList(RegExTransformer.RE_FLAVOUR_PCRE, RegExTransformer.RE_FLAVOUR_PCRE2, RegExTransformer.RE_FLAVOUR_RE));
+	}
+
+	static
+	public String translatePattern(String pattern, String reFlavour){
+
+		switch(reFlavour){
+			case RegExTransformer.RE_FLAVOUR_PCRE:
+			case RegExTransformer.RE_FLAVOUR_PCRE2:
+			case RegExTransformer.RE_FLAVOUR_RE:
+				return pattern;
+			default:
+				throw new IllegalArgumentException(reFlavour);
+		}
+	}
+
 	static
 	protected String formatArg(String string){
 		return ("\"" + string + "\"");
 	}
+
+	protected static final String RE_FLAVOUR_PCRE = "pcre";
+	protected static final String RE_FLAVOUR_PCRE2 = "pcre2";
+	protected static final String RE_FLAVOUR_RE = "re";
 }

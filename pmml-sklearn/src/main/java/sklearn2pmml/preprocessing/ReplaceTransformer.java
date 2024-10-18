@@ -28,6 +28,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -43,6 +44,12 @@ public class ReplaceTransformer extends RegExTransformer {
 		String pattern = getPattern();
 		String replacement = getReplacement();
 
+		String reFlavour = getReFlavour();
+		if(reFlavour != null){
+			pattern = translatePattern(pattern, reFlavour);
+			replacement = translateReplacement(replacement, reFlavour);
+		}
+
 		ClassDictUtil.checkSize(1, features);
 
 		Feature feature = features.get(0);
@@ -53,6 +60,10 @@ public class ReplaceTransformer extends RegExTransformer {
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern), ExpressionUtil.createConstant(DataType.STRING, replacement));
 
+		if(reFlavour != null){
+			apply.addExtensions(PMMLUtil.createExtension("re_flavour", reFlavour));
+		}
+
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("replace", feature, formatArg(pattern), formatArg(replacement)), OpType.CATEGORICAL, DataType.STRING, apply);
 
 		return Collections.singletonList(new StringFeature(encoder, derivedField));
@@ -60,5 +71,18 @@ public class ReplaceTransformer extends RegExTransformer {
 
 	public String getReplacement(){
 		return getString("replacement");
+	}
+
+	static
+	public String translateReplacement(String replacement, String reFlavour){
+
+		switch(reFlavour){
+			case RegExTransformer.RE_FLAVOUR_PCRE:
+			case RegExTransformer.RE_FLAVOUR_PCRE2:
+			case RegExTransformer.RE_FLAVOUR_RE:
+				return replacement;
+			default:
+				throw new IllegalArgumentException(reFlavour);
+		}
 	}
 }
