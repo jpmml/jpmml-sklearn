@@ -100,12 +100,6 @@ public class ExpressionTransformerTest {
 
 	static
 	private Expression encode(String expr, Object mapMissingTo, Object defaultValue, String invalidValueTreatment){
-		SkLearnEncoder encoder = new SkLearnEncoder();
-
-		DataField dataField = encoder.createDataField("x", OpType.CONTINUOUS, DataType.DOUBLE);
-
-		Feature inputFeature = new WildcardFeature(encoder, dataField);
-
 		ExpressionTransformer expressionTransformer = new ExpressionTransformer();
 
 		expressionTransformer
@@ -113,6 +107,17 @@ public class ExpressionTransformerTest {
 			.setMapMissingTo(mapMissingTo)
 			.setDefaultValue(defaultValue)
 			.setInvalidValueTreatment(invalidValueTreatment);
+
+		return encode(expressionTransformer);
+	}
+
+	static
+	private Expression encode(ExpressionTransformer expressionTransformer){
+		SkLearnEncoder encoder = new SkLearnEncoder();
+
+		DataField dataField = encoder.createDataField("x", OpType.CONTINUOUS, DataType.DOUBLE);
+
+		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
 		List<Feature> outputFeatures = expressionTransformer.encode(Collections.singletonList(inputFeature), encoder);
 

@@ -35,6 +35,10 @@ import org.jpmml.sklearn.SkLearnEncoder;
 
 public class MatchesTransformer extends RegExTransformer {
 
+	public MatchesTransformer(){
+		this("sklearn2pmml.preprocessing", "MatchesTransformer");
+	}
+
 	public MatchesTransformer(String module, String name){
 		super(module, name);
 	}
@@ -65,5 +69,15 @@ public class MatchesTransformer extends RegExTransformer {
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("matches", feature, formatArg(pattern)), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
 
 		return Collections.singletonList(new BooleanFeature(encoder, derivedField));
+	}
+
+	@Override
+	MatchesTransformer setPattern(String pattern){
+		return (MatchesTransformer)super.setPattern(pattern);
+	}
+
+	@Override
+	MatchesTransformer setReFlavour(String reFlavour){
+		return (MatchesTransformer)super.setReFlavour(reFlavour);
 	}
 }

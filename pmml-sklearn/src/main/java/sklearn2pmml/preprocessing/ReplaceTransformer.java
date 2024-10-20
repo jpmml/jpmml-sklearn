@@ -35,6 +35,10 @@ import org.jpmml.sklearn.SkLearnEncoder;
 
 public class ReplaceTransformer extends RegExTransformer {
 
+	public ReplaceTransformer(){
+		this("sklearn2pmml.preprocessing", "ReplaceTransformer");
+	}
+
 	public ReplaceTransformer(String module, String name){
 		super(module, name);
 	}
@@ -43,8 +47,8 @@ public class ReplaceTransformer extends RegExTransformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String pattern = getPattern();
 		String replacement = getReplacement();
-
 		String reFlavour = getReFlavour();
+
 		if(reFlavour != null){
 			pattern = translatePattern(pattern, reFlavour);
 			replacement = translateReplacement(replacement, reFlavour);
@@ -69,8 +73,24 @@ public class ReplaceTransformer extends RegExTransformer {
 		return Collections.singletonList(new StringFeature(encoder, derivedField));
 	}
 
+	@Override
+	ReplaceTransformer setPattern(String pattern){
+		return (ReplaceTransformer)super.setPattern(pattern);
+	}
+
+	@Override
+	ReplaceTransformer setReFlavour(String reFlavour){
+		return (ReplaceTransformer)super.setReFlavour(reFlavour);
+	}
+
 	public String getReplacement(){
 		return getString("replacement");
+	}
+
+	ReplaceTransformer setReplacement(String replacement){
+		setattr("replacement", replacement);
+
+		return this;
 	}
 
 	static
@@ -79,8 +99,11 @@ public class ReplaceTransformer extends RegExTransformer {
 		switch(reFlavour){
 			case RegExTransformer.RE_FLAVOUR_PCRE:
 			case RegExTransformer.RE_FLAVOUR_PCRE2:
-			case RegExTransformer.RE_FLAVOUR_RE:
 				return replacement;
+			case RegExTransformer.RE_FLAVOUR_RE:
+				return replacement
+					.replaceAll("\\$", "\\$\\$")
+					.replaceAll("\\\\(\\d)", "\\$$1");
 			default:
 				throw new IllegalArgumentException(reFlavour);
 		}

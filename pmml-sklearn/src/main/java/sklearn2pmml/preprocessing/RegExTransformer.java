@@ -45,8 +45,20 @@ public class RegExTransformer extends Transformer {
 		return getString("pattern");
 	}
 
+	RegExTransformer setPattern(String pattern){
+		setattr("pattern", pattern);
+
+		return this;
+	}
+
 	public String getReFlavour(){
 		return getOptionalEnum("re_flavour", this::getOptionalString, Arrays.asList(RegExTransformer.RE_FLAVOUR_PCRE, RegExTransformer.RE_FLAVOUR_PCRE2, RegExTransformer.RE_FLAVOUR_RE));
+	}
+
+	RegExTransformer setReFlavour(String reFlavour){
+		setattr("re_flavour", reFlavour);
+
+		return this;
 	}
 
 	static
