@@ -624,7 +624,7 @@ import joblib
 joblib.dump(pipeline, "pipeline.pkl.z", compress = 9)
 ```
 
-Please see the test script file [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.
+Please see the test script file [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.
 
 ### The JPMML-SkLearn side of operations
 
