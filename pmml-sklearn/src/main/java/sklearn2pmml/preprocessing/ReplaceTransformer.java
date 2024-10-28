@@ -31,6 +31,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.RegExFlavour;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class ReplaceTransformer extends RegExTransformer {
@@ -47,11 +48,11 @@ public class ReplaceTransformer extends RegExTransformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String pattern = getPattern();
 		String replacement = getReplacement();
-		String reFlavour = getReFlavour();
+		RegExFlavour reFlavour = parseReFlavour(getReFlavour());
 
 		if(reFlavour != null){
-			pattern = translatePattern(pattern, reFlavour);
-			replacement = translateReplacement(replacement, reFlavour);
+			pattern = reFlavour.translatePattern(pattern);
+			replacement = reFlavour.translateReplacement(replacement);
 		}
 
 		ClassDictUtil.checkSize(1, features);
@@ -65,7 +66,7 @@ public class ReplaceTransformer extends RegExTransformer {
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern), ExpressionUtil.createConstant(DataType.STRING, replacement));
 
 		if(reFlavour != null){
-			apply.addExtensions(PMMLUtil.createExtension("re_flavour", reFlavour));
+			apply.addExtensions(PMMLUtil.createExtension("re_flavour", reFlavour.module()));
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("replace", feature, formatArg(pattern), formatArg(replacement)), OpType.CATEGORICAL, DataType.STRING, apply);
@@ -91,21 +92,5 @@ public class ReplaceTransformer extends RegExTransformer {
 		setattr("replacement", replacement);
 
 		return this;
-	}
-
-	static
-	public String translateReplacement(String replacement, String reFlavour){
-
-		switch(reFlavour){
-			case RegExTransformer.RE_FLAVOUR_PCRE:
-			case RegExTransformer.RE_FLAVOUR_PCRE2:
-				return replacement;
-			case RegExTransformer.RE_FLAVOUR_RE:
-				return replacement
-					.replaceAll("\\$", "\\$\\$")
-					.replaceAll("\\\\(\\d)", "\\$$1");
-			default:
-				throw new IllegalArgumentException(reFlavour);
-		}
 	}
 }

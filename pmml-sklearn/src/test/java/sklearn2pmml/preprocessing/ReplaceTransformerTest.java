@@ -50,18 +50,4 @@ public class ReplaceTransformerTest extends RegExTransformerTest {
 
 		assertEquals("$$$$$", evaluate(apply, "Puppy"));
 	}
-
-	@Test
-	public void translateReplacement(){
-		assertEquals("$$", ReplaceTransformer.translateReplacement("$", RegExTransformer.RE_FLAVOUR_RE));
-
-		assertEquals("$$", ReplaceTransformer.translateReplacement("$$", RegExTransformer.RE_FLAVOUR_PCRE));
-		assertEquals("$$$$", ReplaceTransformer.translateReplacement("$$", RegExTransformer.RE_FLAVOUR_RE));
-
-		assertEquals("$1", ReplaceTransformer.translateReplacement("$1", RegExTransformer.RE_FLAVOUR_PCRE));
-		assertEquals("$$1", ReplaceTransformer.translateReplacement("$1", RegExTransformer.RE_FLAVOUR_RE));
-
-		assertEquals("\\1", ReplaceTransformer.translateReplacement("\\1", RegExTransformer.RE_FLAVOUR_PCRE));
-		assertEquals("$1", ReplaceTransformer.translateReplacement("\\1", RegExTransformer.RE_FLAVOUR_RE));
-	}
 }

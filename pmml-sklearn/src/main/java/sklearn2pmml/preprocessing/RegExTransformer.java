@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.jpmml.python.RegExFlavour;
 import sklearn.Transformer;
 
 abstract
@@ -62,13 +63,19 @@ public class RegExTransformer extends Transformer {
 	}
 
 	static
-	public String translatePattern(String pattern, String reFlavour){
+	protected RegExFlavour parseReFlavour(String reFlavour){
+
+		if(reFlavour == null){
+			return null;
+		}
 
 		switch(reFlavour){
 			case RegExTransformer.RE_FLAVOUR_PCRE:
+				return RegExFlavour.PCRE;
 			case RegExTransformer.RE_FLAVOUR_PCRE2:
+				return RegExFlavour.PCRE2;
 			case RegExTransformer.RE_FLAVOUR_RE:
-				return pattern;
+				return RegExFlavour.RE;
 			default:
 				throw new IllegalArgumentException(reFlavour);
 		}

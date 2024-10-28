@@ -31,6 +31,7 @@ import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.RegExFlavour;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class MatchesTransformer extends RegExTransformer {
@@ -46,10 +47,10 @@ public class MatchesTransformer extends RegExTransformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String pattern = getPattern();
-		String reFlavour = getReFlavour();
+		RegExFlavour reFlavour = parseReFlavour(getReFlavour());
 
 		if(reFlavour != null){
-			pattern = translatePattern(pattern, reFlavour);
+			pattern = reFlavour.translatePattern(pattern);
 		}
 
 		ClassDictUtil.checkSize(1, features);
@@ -63,7 +64,7 @@ public class MatchesTransformer extends RegExTransformer {
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.MATCHES, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern));
 
 		if(reFlavour != null){
-			apply.addExtensions(PMMLUtil.createExtension("re_flavour", reFlavour));
+			apply.addExtensions(PMMLUtil.createExtension("re_flavour", reFlavour.module()));
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("matches", feature, formatArg(pattern)), OpType.CATEGORICAL, DataType.BOOLEAN, apply);
