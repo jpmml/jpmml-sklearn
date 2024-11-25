@@ -20,17 +20,14 @@ package sklearn2pmml.preprocessing;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
-import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
-import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.evaluator.EvaluationContext;
@@ -45,22 +42,6 @@ public class RegExTransformerTest {
 
 	static
 	Object evaluate(Expression expression, String string){
-		Apply apply = (Apply)expression;
-
-		// XXX
-		if(Objects.equals(PMMLFunctions.REPLACE, apply.requireFunction())){
-			List<Expression> expressions = apply.getExpressions();
-
-			Constant replacementConstant = (Constant)expressions.get(2);
-
-			String replacement = (String)replacementConstant.getValue();
-
-			// Replace PCRE-style dollar literal with Java-style dollar literal
-			replacement = replacement.replace("$$", "\\$");
-
-			replacementConstant.setValue(replacement);
-		}
-
 		EvaluationContext content = new VirtualEvaluationContext();
 		content.declare("x", string);
 
