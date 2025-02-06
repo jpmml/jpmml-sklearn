@@ -54,6 +54,7 @@
 	</issueManagement>
 
 	<properties>
+		<jdk.version>11</jdk.version>
 		<project.build.outputTimestamp>2025-01-11T10:32:12Z</project.build.outputTimestamp>
 	</properties>
 
@@ -163,8 +164,8 @@
 					-->
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -179,6 +180,9 @@
 						</goals>
 						<configuration>
 							<rules>
+								<requireJavaVersion>
+									<version>[11,)</version>
+								</requireJavaVersion>
 								<requireMavenVersion>
 									<version>3.6.3</version>
 								</requireMavenVersion>
@@ -192,7 +196,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.10.1</version>
 				<configuration>
-					<javadocVersion>1.8</javadocVersion>
+					<release>${jdk.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>
