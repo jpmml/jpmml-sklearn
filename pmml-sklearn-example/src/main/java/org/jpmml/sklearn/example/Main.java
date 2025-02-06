@@ -25,6 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.beust.jcommander.DefaultUsageFormatter;
+import com.beust.jcommander.IUsageFormatter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -45,88 +47,100 @@ import sklearn2pmml.HasPMMLOptions;
 public class Main {
 
 	@Parameter (
-		names = {"--help"},
-		description = "Show the list of configuration options and exit",
-		help = true
-	)
-	private boolean help = false;
-
-	@Parameter (
 		names = {"--pkl-pipeline-input", "--pkl-input"},
 		description = "Pickle input file",
-		required = true
+		required = true,
+		order = 1
 	)
 	private File input = null;
 
 	@Parameter (
 		names = {"--pmml-output"},
 		description = "PMML output file",
-		required = true
+		required = true,
+		order = 2
 	)
 	private File output = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_ALLOW_MISSING},
 		description = "Allow \"value is missing\" node split conditions",
-		arity = 1
+		arity = 1,
+		order = 3
 	)
 	private Boolean allowMissing = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_COMPACT},
 		description = "Transform SkLearn-style trees to PMML-style trees",
-		arity = 1
+		arity = 1,
+		order = 4
 	)
 	private Boolean compact = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_FLAT},
 		description = "Flatten trees",
-		arity = 1
+		arity = 1,
+		order = 5
 	)
 	private Boolean flat = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_INPUT_FLOAT},
 		description = "Allow field data type updates",
-		arity = 1
+		arity = 1,
+		order = 6
 	)
 	private Boolean inputFloat = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_NODE_ID},
 		description = "Keep SkLearn node identifiers",
-		arity = 1
+		arity = 1,
+		order = 7
 	)
 	private Boolean nodeId = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_NODE_SCORE},
 		description = "Keep SkLearn node scores for branch (non-leaf) nodes",
-		arity = 1
+		arity = 1,
+		order = 8
 	)
 	private Boolean nodeScore = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_NUMERIC},
 		description = "Transform non-numeric node split conditions to numeric",
-		arity = 1
+		arity = 1,
+		order = 9
 	)
 	private Boolean numeric = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_PRUNE},
 		description = "Truncate invariant leaf nodes",
-		arity = 1
+		arity = 1,
+		order = 10
 	)
 	private Boolean prune = null;
 
 	@Parameter (
 		names = {"--X-" + HasTreeOptions.OPTION_WINNER_ID},
 		description = "Output node identifiers",
-		arity = 1
+		arity = 1,
+		order = 11
 	)
 	private Boolean winnerId = null;
+
+	@Parameter (
+		names = {"--help"},
+		description = "Show the list of configuration options and exit",
+		help = true,
+		order = Integer.MAX_VALUE
+	)
+	private boolean help = false;
 
 
 	static
@@ -136,6 +150,8 @@ public class Main {
 		JCommander commander = new JCommander(main);
 		commander.setProgramName(Main.class.getName());
 
+		IUsageFormatter usageFormatter = new DefaultUsageFormatter(commander);
+
 		try {
 			commander.parse(args);
 		} catch(ParameterException pe){
@@ -144,7 +160,7 @@ public class Main {
 			sb.append(pe.toString());
 			sb.append("\n");
 
-			commander.usage(sb);
+			usageFormatter.usage(sb);
 
 			System.err.println(sb.toString());
 
@@ -154,7 +170,7 @@ public class Main {
 		if(main.help){
 			StringBuilder sb = new StringBuilder();
 
-			commander.usage(sb);
+			usageFormatter.usage(sb);
 
 			System.out.println(sb.toString());
 
