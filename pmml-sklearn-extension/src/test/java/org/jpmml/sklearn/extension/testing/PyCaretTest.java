@@ -18,12 +18,9 @@
  */
 package org.jpmml.sklearn.extension.testing;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -49,17 +46,6 @@ public class PyCaretTest extends SkLearnEncoderBatchTest implements Datasets {
 			@Override
 			public PyCaretTest getArchiveBatchTest(){
 				return PyCaretTest.this;
-			}
-
-			@Override
-			public List<? extends Map<String, ?>> getOutput() throws IOException {
-				List<? extends Map<String, ?>> records = super.getOutput();
-
-				for(Map<String, ?> record : records){
-					(record.values()).removeIf(Objects::isNull);
-				}
-
-				return records;
 			}
 		};
 

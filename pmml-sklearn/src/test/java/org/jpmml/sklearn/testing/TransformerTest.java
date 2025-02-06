@@ -40,8 +40,8 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 			}
 
 			@Override
-			public String getSeparator(){
-				return "\t";
+			public char getSeparator(){
+				return '\t';
 			}
 
 			@Override

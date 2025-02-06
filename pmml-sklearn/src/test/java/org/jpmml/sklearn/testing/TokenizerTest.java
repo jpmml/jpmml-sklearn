@@ -31,6 +31,7 @@ import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.TextUtil;
 import org.jpmml.evaluator.TokenizedString;
 import org.jpmml.evaluator.testing.Batch;
@@ -75,10 +76,10 @@ public class TokenizerTest extends SkLearnEncoderBatchTest implements Datasets {
 			}
 		};
 
-		List<? extends Map<String, ?>> input = batch.getInput();
-		List<? extends Map<String, ?>> output = batch.getOutput();
+		Table input = batch.getInput();
+		Table output = batch.getOutput();
 
-		if(input.size() != output.size()){
+		if(input.getNumberOfRows() != output.getNumberOfRows()){
 			throw new IllegalArgumentException();
 		}
 
@@ -91,9 +92,12 @@ public class TokenizerTest extends SkLearnEncoderBatchTest implements Datasets {
 
 		boolean success = true;
 
-		for(int i = 0; i < input.size(); i++){
-			String inputSentence = getSentence(input.get(i));
-			String outputSentence = getSentence(output.get(i));
+		Table.Row inputRow = input.createReaderRow(0);
+		Table.Row outputRow = output.createReaderRow(0);
+
+		for(int i = 0; i < input.getNumberOfRows(); i++){
+			String inputSentence = getSentence(inputRow);
+			String outputSentence = getSentence(outputRow);
 
 			TokenizedString actualTokens = tokenize(textIndex, inputSentence.toLowerCase());
 			Map<String, TokenizedString> actualResults = Collections.singletonMap("Sentence", actualTokens);
@@ -109,6 +113,9 @@ public class TokenizerTest extends SkLearnEncoderBatchTest implements Datasets {
 
 				success = false;
 			}
+
+			inputRow.advance();
+			outputRow.advance();
 		}
 
 		if(!success){

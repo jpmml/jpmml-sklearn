@@ -45,6 +45,7 @@ import javax.xml.xpath.XPathFactory;
 
 import com.google.common.collect.Iterables;
 import jakarta.xml.bind.Binder;
+import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -52,6 +53,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.jpmml.model.JAXBSerializer;
 import org.jpmml.model.JAXBUtil;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
@@ -78,7 +80,9 @@ public class CustomizationUtil {
 
 		NamespaceContext namespaceContext = new DocumentNamespaceContext(document);
 
-		Binder<Node> binder = JAXBUtil.createBinder(Node.class);
+		JAXBContext context = JAXBUtil.getContext();
+
+		Binder<Node> binder = context.createBinder(Node.class);
 		binder.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
 		binder.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
@@ -341,7 +345,9 @@ public class CustomizationUtil {
 	public Object parsePMML(String string){
 
 		try(Reader reader = new StringReader(string)){
-			return JAXBUtil.unmarshal(new StreamSource(reader));
+			JAXBSerializer jaxbSerializer = new JAXBSerializer();
+
+			return jaxbSerializer.unmarshal(new StreamSource(reader));
 		} catch(Exception e){
 			throw new SkLearnException("Failed to parse PMML string", e);
 		}
@@ -351,7 +357,9 @@ public class CustomizationUtil {
 	public String formatPMML(PMMLObject object){
 
 		try(StringWriter writer = new StringWriter()){
-			JAXBUtil.marshal(object, new StreamResult(writer));
+			JAXBSerializer jaxbSerializer = new JAXBSerializer();
+
+			jaxbSerializer.marshal(object, new StreamResult(writer));
 
 			return writer.toString();
 		} catch(Exception e){
