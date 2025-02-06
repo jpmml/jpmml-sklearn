@@ -22,7 +22,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 import sklearn.SkLearnMethods;
 

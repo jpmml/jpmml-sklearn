@@ -33,16 +33,16 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.Transformer;
 import sklearn2pmml.decoration.CategoricalDomain;
 import sklearn2pmml.decoration.ContinuousDomain;
 import sklearn_pandas.DataFrameMapper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ImputerTest {
 

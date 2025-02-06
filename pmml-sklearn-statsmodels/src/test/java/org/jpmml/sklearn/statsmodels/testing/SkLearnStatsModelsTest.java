@@ -20,7 +20,7 @@ package org.jpmml.sklearn.statsmodels.testing;
 
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SkLearnStatsModelsTest extends SkLearnEncoderBatchTest implements Datasets {
 

@@ -21,7 +21,7 @@ package org.jpmml.sklearn.extension.testing;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 

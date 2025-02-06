@@ -30,7 +30,7 @@ import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 import sklearn.OutlierDetector;
 import sklearn.tree.HasTreeOptions;

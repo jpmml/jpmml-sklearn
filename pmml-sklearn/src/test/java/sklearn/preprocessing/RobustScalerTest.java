@@ -19,7 +19,7 @@
 package sklearn.preprocessing;
 
 import org.dmg.pmml.PMMLFunctions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RobustScalerTest extends ScalerTest {
 

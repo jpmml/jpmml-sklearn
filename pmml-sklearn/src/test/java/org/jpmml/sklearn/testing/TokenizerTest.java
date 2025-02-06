@@ -36,13 +36,13 @@ import org.jpmml.evaluator.TextUtil;
 import org.jpmml.evaluator.TokenizedString;
 import org.jpmml.evaluator.testing.Batch;
 import org.jpmml.evaluator.testing.Conflict;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.feature_extraction.text.CountVectorizer;
 import sklearn.feature_extraction.text.Tokenizer;
 import sklearn2pmml.feature_extraction.text.Matcher;
 import sklearn2pmml.feature_extraction.text.Splitter;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TokenizerTest extends SkLearnEncoderBatchTest implements Datasets {
 

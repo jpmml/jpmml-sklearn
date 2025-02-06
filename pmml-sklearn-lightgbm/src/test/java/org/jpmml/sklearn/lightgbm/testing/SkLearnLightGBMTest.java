@@ -26,7 +26,7 @@ import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SkLearnLightGBMTest extends SkLearnEncoderBatchTest implements Datasets {
 

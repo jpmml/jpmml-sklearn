@@ -22,7 +22,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 import sklearn.OutlierDetector;
 

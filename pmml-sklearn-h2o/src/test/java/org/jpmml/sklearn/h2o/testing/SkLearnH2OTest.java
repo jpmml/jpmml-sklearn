@@ -34,7 +34,7 @@ import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.Composite;
 
 public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets, Fields {

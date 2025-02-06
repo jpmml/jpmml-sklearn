@@ -20,7 +20,7 @@ package org.jpmml.sklearn.extension.testing;
 
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BorutaTest extends SkLearnEncoderBatchTest implements Datasets {
 

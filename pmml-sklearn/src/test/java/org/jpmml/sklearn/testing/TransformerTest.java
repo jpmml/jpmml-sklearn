@@ -25,7 +25,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.EvaluatorBuilder;
 import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.ResultField;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 
 public class TransformerTest extends SkLearnEncoderBatchTest {

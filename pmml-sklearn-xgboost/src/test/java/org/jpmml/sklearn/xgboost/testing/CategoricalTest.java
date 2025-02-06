@@ -32,7 +32,7 @@ import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.jpmml.xgboost.HasXGBoostOptions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CategoricalTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 

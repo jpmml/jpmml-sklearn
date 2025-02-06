@@ -34,11 +34,11 @@ import org.jpmml.evaluator.ResultField;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sklearn.tree.HasTreeOptions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PredicateTest extends SkLearnEncoderBatchTest implements Datasets {
 
