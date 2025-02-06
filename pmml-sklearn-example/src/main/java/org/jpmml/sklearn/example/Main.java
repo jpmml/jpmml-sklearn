@@ -29,7 +29,8 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
-import org.jpmml.model.metro.MetroJAXBUtil;
+import org.jpmml.model.JAXBSerializer;
+import org.jpmml.model.metro.MetroJAXBSerializer;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
@@ -208,8 +209,10 @@ public class Main {
 		try(OutputStream os = new FileOutputStream(this.output)){
 			logger.info("Marshalling PMML..");
 
+			JAXBSerializer jaxbSerializer = new MetroJAXBSerializer();
+
 			long begin = System.currentTimeMillis();
-			MetroJAXBUtil.marshalPMML(pmml, os);
+			jaxbSerializer.serializePretty(pmml, os);
 			long end = System.currentTimeMillis();
 
 			logger.info("Marshalled PMML in {} ms.", (end - begin));
