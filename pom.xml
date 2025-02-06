@@ -34,6 +34,7 @@
 
 	<modules>
 		<module>pmml-sklearn</module>
+		<module>pmml-sklearn-evaluator</module>
 		<module>pmml-sklearn-example</module>
 		<module>pmml-sklearn-extension</module>
 		<module>pmml-sklearn-h2o</module>
@@ -73,6 +74,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-sklearn-evaluator</artifactId>
+				<version>1.9-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-example</artifactId>
 				<version>1.9-SNAPSHOT</version>
 			</dependency>
@@ -102,6 +108,11 @@
 				<version>1.9-SNAPSHOT</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-evaluator</artifactId>
+				<version>${jpmml-evaluator.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-evaluator-testing</artifactId>
