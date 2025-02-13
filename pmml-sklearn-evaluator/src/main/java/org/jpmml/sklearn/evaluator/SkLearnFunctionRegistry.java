@@ -46,15 +46,15 @@ public class SkLearnFunctionRegistry {
 
 	static
 	private void publish(Predicate<String> predicate){
-		(SkLearnFunctionRegistry.rexpFunctions.entrySet()).stream()
+		(SkLearnFunctionRegistry.functions.entrySet()).stream()
 			.filter(entry -> predicate.test(entry.getKey()))
 			.forEach(entry -> FunctionRegistry.putFunction(entry.getKey(), entry.getValue()));
 
-		(SkLearnFunctionRegistry.rexpFunctionClazzes.entrySet()).stream()
+		(SkLearnFunctionRegistry.functionClazzes.entrySet()).stream()
 			.filter(entry -> predicate.test(entry.getKey()))
 			.forEach(entry -> FunctionRegistry.putFunction(entry.getKey(), entry.getValue()));
 	}
 
-	private static final Map<String, Function> rexpFunctions = Collections.emptyMap();
-	private static final Map<String, Class<? extends Function>> rexpFunctionClazzes = Collections.emptyMap();
+	private static final Map<String, Function> functions = Collections.emptyMap();
+	private static final Map<String, Class<? extends Function>> functionClazzes = Collections.emptyMap();
 }
