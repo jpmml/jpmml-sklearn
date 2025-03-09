@@ -39,10 +39,5 @@
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-lightgbm</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-		</dependency>
 	</dependencies>
 </project>
