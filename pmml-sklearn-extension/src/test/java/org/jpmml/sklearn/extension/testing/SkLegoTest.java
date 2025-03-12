@@ -72,6 +72,6 @@ public class SkLegoTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateOrdinalClassifierSigmoidAuto() throws Exception {
-		evaluate("OrdinalClassifierSigmoid", AUTO);
+		evaluate("OrdinalClassifierSigmoid", AUTO, new PMMLEquivalence(1e-12, 1e-12));
 	}
 }

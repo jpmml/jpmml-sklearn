@@ -5,5 +5,7 @@ category_encoders==2.6.4
 hyperopt==0.2.7
 imbalanced-learn==0.12.4
 interpret==0.6.9
+mlxtend==0.23.4
 optbinning==0.20.1
 pycaret==3.3.2
+scikit-lego==0.9.4
