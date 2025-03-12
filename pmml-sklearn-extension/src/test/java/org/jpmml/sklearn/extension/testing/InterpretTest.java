@@ -32,7 +32,7 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateExplainableBoostingClassifierVersicolor() throws Exception {
-		evaluate("ExplainableBoostingClassifier", VERSICOLOR, new PMMLEquivalence(1e-12, 1e-12));
+		evaluate("ExplainableBoostingClassifier", VERSICOLOR, new PMMLEquivalence(5e-11, 5e-11));
 	}
 
 	@Test

@@ -4,3 +4,4 @@ category_encoders==2.6.4
 #hpsklearn==1.0.3
 hyperopt==0.2.7
 imbalanced-learn==0.12.4
+interpret==0.6.9
