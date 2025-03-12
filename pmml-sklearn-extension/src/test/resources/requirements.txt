@@ -3,3 +3,4 @@ category_encoders==2.6.4
 # python -m pip install git+https://github.com/hyperopt/hyperopt-sklearn
 #hpsklearn==1.0.3
 hyperopt==0.2.7
+imbalanced-learn==0.12.4
