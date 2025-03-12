@@ -143,6 +143,7 @@ if "Audit" in datasets:
 	audit_df = load_audit("AuditNA")
 	audit_df = audit_df.drop("Deductions", axis = 1)
 
+	# XXX: Downgrade to fix_imbalance = False
 	make_classification(audit_df, "lr", "PyCaretAuditNA", normalize = True, normalize_method = "robust", fix_imbalance = True)
 
 if "Iris" in datasets:
