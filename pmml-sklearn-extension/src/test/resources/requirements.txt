@@ -10,3 +10,4 @@ optbinning==0.20.1
 pycaret==3.3.2
 scikit-lego==0.9.4
 scikit-tree==0.8.0
+tpot==0.12.2
