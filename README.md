@@ -444,6 +444,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.SecondsSinceYearTransformer`
     * `sklearn2pmml.preprocessing.SelectFirstTransformer`
     * `sklearn2pmml.preprocessing.SeriesConstructor`
+    * `sklearn2pmml.preprocessing.StringLengthTransformer`
     * `sklearn2pmml.preprocessing.StringNormalizer`
     * `sklearn2pmml.preprocessing.SubstringTransformer`
     * `sklearn2pmml.preprocessing.WordCountTransformer`
