@@ -1,2 +1,1 @@
-Boruta==0.4.3
 category_encoders==2.6.4
