@@ -132,6 +132,11 @@ public class HistGradientBoostingUtil {
 
 									return result;
 								}
+
+								@Override
+								public String createFieldName(String function, List<?> args){
+									return super.createFieldName("hist_" + function, args);
+								}
 							};
 
 							ColumnTransformer.setTransformer(fittedTransformer, filterOrdinalEncoder);
