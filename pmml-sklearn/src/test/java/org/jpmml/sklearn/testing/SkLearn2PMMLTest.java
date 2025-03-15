@@ -18,6 +18,8 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.io.IOException;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -26,6 +28,7 @@ import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.visitors.UnsupportedMarkupInspector;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
@@ -41,6 +44,30 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 			@Override
 			public SkLearnEncoderBatchTest getArchiveBatchTest(){
 				return SkLearn2PMMLTest.this;
+			}
+
+			@Override
+			public Table getInput() throws IOException {
+				Table table = super.getInput();
+
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(("LinearRegression").equals(algorithm) && ("Airline").equals(dataset)){
+					Function<Object, Number> function = new Function<Object, Number>(){
+
+						@Override
+						public Number apply(Object value){
+							String string = (String)value;
+
+							return Integer.valueOf(string);
+						}
+					};
+
+					table.apply("Passengers", function);
+				}
+
+				return table;
 			}
 
 			@Override

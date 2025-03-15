@@ -52,9 +52,7 @@ public class LagTransformer extends Transformer {
 
 			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("lag", feature, n), field.requireOpType(), field.requireDataType(), lag);
 
-			feature = FeatureUtil.createFeature(derivedField, encoder);
-
-			result.add(feature);
+			result.add(FeatureUtil.createFeature(derivedField, encoder));
 		}
 
 		return result;

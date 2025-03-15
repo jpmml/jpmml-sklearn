@@ -17,7 +17,7 @@ from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
-from sklearn2pmml.preprocessing import CutTransformer, LagTransformer, SelectFirstTransformer
+from sklearn2pmml.preprocessing import CutTransformer, LagTransformer, RollingAggregateTransformer, SelectFirstTransformer
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
 from sklearn2pmml.util import Expression, Predicate
@@ -399,10 +399,13 @@ if "Wine" in datasets:
 	build_wine(wine_df, SelectFirstRegressor(make_steps(eval_rows = False), eval_rows = False), "SelectFirstWine", eval_rows = False)
 
 def build_airline(airline_df, regressor, name):
-	lags = [(n + 1) for n in range(0, 12)]
+	lags = [1, 2, 3]
+	max_lag = max(lags)
 
 	union = FeatureUnion(
-		[("lag_{}".format(lag), LagTransformer(n = lag)) for lag in lags]
+		[("lag_{}".format(lag), LagTransformer(n = lag)) for lag in lags] +
+		[("rolling_average_3", RollingAggregateTransformer(function = "avg", n = 12))] +
+		[("rolling_sum_3", RollingAggregateTransformer(function = "sum", n = 12))]
 	)
 
 	X = airline_df[["Passengers"]]
@@ -410,10 +413,10 @@ def build_airline(airline_df, regressor, name):
 
 	Xt = union.transform(X)
 
-	regressor.fit(Xt[12:], y[12:])
+	regressor.fit(Xt[max_lag:], y[max_lag:])
 
 	yt = numpy.full_like(y, fill_value = numpy.nan, dtype = float)
-	yt[12:] = regressor.predict(Xt[12:])
+	yt[max_lag:] = regressor.predict(Xt[max_lag:])
 
 	pipeline = PMMLPipeline([
 		("union", union),
