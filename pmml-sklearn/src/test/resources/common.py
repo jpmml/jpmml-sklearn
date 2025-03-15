@@ -40,6 +40,14 @@ def store_pkl(obj, name, flavour = "joblib"):
 	else:
 		raise ValueError(flavour)
 
+def load_airline(name):
+	df = load_csv(name)
+	print(df.dtypes)
+	df["Month"] = pandas.to_datetime(df["Month"])
+	df.set_index("Month", inplace = True)
+	print(df.dtypes)
+	return df
+
 def load_audit(name, stringify = True):
 	df = load_csv(name)
 	print(df.dtypes)

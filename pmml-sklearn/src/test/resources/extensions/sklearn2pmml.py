@@ -6,7 +6,7 @@ from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegress
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn2pmml.cross_reference import make_memorizer_union, make_recaller_union
@@ -17,7 +17,7 @@ from sklearn2pmml.expression import ExpressionClassifier, ExpressionRegressor
 from sklearn2pmml.neural_network import MLPTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import BusinessDecisionTransformer
-from sklearn2pmml.preprocessing import CutTransformer, SelectFirstTransformer
+from sklearn2pmml.preprocessing import CutTransformer, LagTransformer, SelectFirstTransformer
 from sklearn2pmml.ruleset import RuleSetClassifier
 from sklearn2pmml.tree.chaid import CHAIDClassifier, CHAIDRegressor
 from sklearn2pmml.util import Expression, Predicate
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Audit", "Auto", "Housing", "Iris", "Versicolor", "Wine"]
+		datasets = ["Airline", "Audit", "Auto", "Housing", "Iris", "Versicolor", "Wine"]
 
 def make_bins(X, cols):
 	result = dict()
@@ -397,3 +397,34 @@ if "Wine" in datasets:
 
 	build_wine(wine_df, EstimatorChain(make_steps(eval_rows = True), multioutput = False), "EstimatorChainWine")
 	build_wine(wine_df, SelectFirstRegressor(make_steps(eval_rows = False), eval_rows = False), "SelectFirstWine", eval_rows = False)
+
+def build_airline(airline_df, regressor, name):
+	lags = [(n + 1) for n in range(0, 12)]
+
+	union = FeatureUnion(
+		[("lag_{}".format(lag), LagTransformer(n = lag)) for lag in lags]
+	)
+
+	X = airline_df[["Passengers"]]
+	y = airline_df["Passengers"]
+
+	Xt = union.transform(X)
+
+	regressor.fit(Xt[12:], y[12:])
+
+	yt = numpy.full_like(y, fill_value = numpy.nan, dtype = float)
+	yt[12:] = regressor.predict(Xt[12:])
+
+	pipeline = PMMLPipeline([
+		("union", union),
+		("regressor", regressor)
+	])
+	pipeline.active_fields = X.columns.values
+	store_pkl(pipeline, name)
+	passengers = Series(yt, name = "y")
+	store_csv(passengers, name)
+
+if "Airline" in datasets:
+	airline_df = load_airline("Airline")
+
+	build_airline(airline_df, LinearRegression(), "LinearRegressionAirline")

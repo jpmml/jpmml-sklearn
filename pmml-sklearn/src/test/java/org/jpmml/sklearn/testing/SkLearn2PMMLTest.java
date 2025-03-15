@@ -18,15 +18,48 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.visitors.UnsupportedMarkupInspector;
+import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 import sklearn.SkLearnMethods;
 
 public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
+
+	@Override
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public SkLearnEncoderBatchTest getArchiveBatchTest(){
+				return SkLearn2PMMLTest.this;
+			}
+
+			@Override
+			public VisitorBattery getValidators(){
+				VisitorBattery visitorBattery = super.getValidators();
+
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(("LinearRegression").equals(algorithm) && ("Airline").equals(dataset)){
+					visitorBattery.remove(UnsupportedMarkupInspector.class);
+				}
+
+				return visitorBattery;
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluateDayOfWeekApollo() throws Exception {
@@ -41,6 +74,11 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 	@Test
 	public void evaluateDurationInSecondsApollo() throws Exception {
 		evaluate("DurationInSeconds", "Apollo");
+	}
+
+	@Test
+	public void evaluateLinearRegressionAirline() throws Exception {
+		evaluate("LinearRegression", "Airline");
 	}
 
 	@Test
