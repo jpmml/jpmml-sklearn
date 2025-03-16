@@ -516,6 +516,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateLogisticRegressionVersicolor() throws Exception {
+		evaluate(LOGISTIC_REGRESSION, VERSICOLOR, excludeFields(IRIS_SPECIES));
+	}
+
+	@Test
 	public void evaluateMLPVersicolor() throws Exception {
 		evaluate(MLP, VERSICOLOR);
 	}

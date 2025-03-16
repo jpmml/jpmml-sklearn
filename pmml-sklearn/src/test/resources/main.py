@@ -16,7 +16,7 @@ from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercen
 from sklearn.impute import MissingIndicator, SimpleImputer
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, PoissonRegressor, QuantileRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDOneClassSVM, SGDRegressor, TheilSenRegressor
-from sklearn.model_selection import FixedThresholdClassifier, GridSearchCV, RandomizedSearchCV
+from sklearn.model_selection import FixedThresholdClassifier, GridSearchCV, RandomizedSearchCV, TunedThresholdClassifierCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOutputRegressor, RegressorChain
 from sklearn.naive_bayes import GaussianNB
@@ -459,7 +459,7 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 	pipeline.configure(**pmml_options)
 	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
 	store_pkl(pipeline, name)
-	if isinstance(classifier, FixedThresholdClassifier):
+	if isinstance(classifier, (FixedThresholdClassifier, TunedThresholdClassifierCV)):
 		species = DataFrame(pipeline.predict(versicolor_X), columns = ["thresholded(Species)"])
 	else:
 		species = DataFrame(pipeline.predict(versicolor_X), columns = ["Species"])
@@ -473,6 +473,7 @@ if "Versicolor" in datasets:
 
 	build_versicolor(versicolor_df, DummyClassifier(strategy = "prior"), "DummyVersicolor")
 	build_versicolor(versicolor_df, KNeighborsClassifier(metric = "euclidean"), "KNNVersicolor", with_proba = False)
+	build_versicolor(versicolor_df, TunedThresholdClassifierCV(LogisticRegression(), response_method = "predict_proba"), "LogisticRegressionVersicolor")
 	build_versicolor(versicolor_df, MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPVersicolor")
 	build_versicolor(versicolor_df, SGDClassifier(max_iter = 100, random_state = 13), "SGDVersicolor", with_proba = False)
 	build_versicolor(versicolor_df, FixedThresholdClassifier(SGDClassifier(loss = "log_loss", max_iter = 100, random_state = 13), response_method = "predict_proba", threshold = 0.75), "SGDLogVersicolor")

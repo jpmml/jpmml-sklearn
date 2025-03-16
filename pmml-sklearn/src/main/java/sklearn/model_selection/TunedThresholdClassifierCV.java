@@ -20,19 +20,16 @@ package sklearn.model_selection;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.AttributeException;
-import org.jpmml.python.ClassDictUtil;
 import sklearn.Classifier;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
 
-public class FixedThresholdClassifier extends SkLearnClassifier implements HasEstimator<Classifier> {
+public class TunedThresholdClassifierCV extends SkLearnClassifier implements HasEstimator<Classifier> {
 
-	public FixedThresholdClassifier(String module, String name){
+	public TunedThresholdClassifierCV(String module, String name){
 		super(module, name);
 	}
 
@@ -48,9 +45,9 @@ public class FixedThresholdClassifier extends SkLearnClassifier implements HasEs
 		Classifier estimator = getEstimator();
 		@SuppressWarnings("unused")
 		String responseMethod = getResponseMethod();
-		Number threshold = getThreshold();
+		Number bestThreshold = getBestThreshold();
 
-		return ThresholdClassifierUtil.encodeModel(estimator, threshold, schema);
+		return ThresholdClassifierUtil.encodeModel(estimator, bestThreshold, schema);
 	}
 
 	@Override
@@ -58,21 +55,13 @@ public class FixedThresholdClassifier extends SkLearnClassifier implements HasEs
 		return get("estimator_", Classifier.class);
 	}
 
-	public String getResponseMethod(){
-		return getEnum("response_method", this::getString, Arrays.asList(FixedThresholdClassifier.RESPONSEMETHOD_PREDICT_PROBA));
+	public Number getBestThreshold(){
+		return getNumber("best_threshold_");
 	}
 
-	public Number getThreshold(){
-		Object threshold = getObject("threshold");
-
-		if(Objects.equals(FixedThresholdClassifier.THRESHOLD_AUTO, threshold)){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "threshold") + "\' must be set to a numeric value");
-		}
-
-		return getNumber("threshold");
+	public String getResponseMethod(){
+		return getEnum("response_method", this::getString, Arrays.asList(TunedThresholdClassifierCV.RESPONSEMETHOD_PREDICT_PROBA));
 	}
 
 	private static final String RESPONSEMETHOD_PREDICT_PROBA = "predict_proba";
-
-	private static final String THRESHOLD_AUTO = "auto";
 }
