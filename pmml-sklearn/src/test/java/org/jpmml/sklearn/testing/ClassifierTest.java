@@ -527,7 +527,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateSGDLogVersicolor() throws Exception {
-		evaluate(SGD_LOG, VERSICOLOR);
+		evaluate(SGD_LOG, VERSICOLOR, excludeFields(IRIS_SPECIES));
 	}
 
 	@Test
