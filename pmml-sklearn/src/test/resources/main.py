@@ -35,7 +35,7 @@ from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.metrics import BinaryClassifierQuality, ClassifierQuality, ModelExplanation, RegressorQuality
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import Aggregator, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SeriesConstructor, StringNormalizer, SubstringTransformer, WordCountTransformer
+from sklearn2pmml.preprocessing import AggregateTransformer, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SeriesConstructor, StringNormalizer, SubstringTransformer, WordCountTransformer
 from sklearn2pmml.util import Slicer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier
@@ -516,8 +516,8 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 		("pipeline", Pipeline([
 			("mapper", DataFrameMapper([
 				(iris_X.columns.values, ContinuousDomain(with_statistics = True)),
-				(["Sepal.Length", "Petal.Length"], Aggregator(function = "mean")),
-				(["Sepal.Width", "Petal.Width"], Aggregator(function = "mean"))
+				(["Sepal.Length", "Petal.Length"], AggregateTransformer(function = "mean")),
+				(["Sepal.Width", "Petal.Width"], AggregateTransformer(function = "mean"))
 			])),
 			("transform", FeatureUnion([
 				("normal_scale", FunctionTransformer(None, validate = True)),

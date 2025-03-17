@@ -402,7 +402,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
   * Postprocessing:
     * `sklearn2pmml.postprocessing.BusinessDecisionTransformer`
   * Preprocessing:
-    * `sklearn2pmml.preprocessing.Aggregator`
+    * `sklearn2pmml.preprocessing.AggregateTransformer`
     * `sklearn2pmml.preprocessing.BSplineTransformer`
     * `sklearn2pmml.preprocessing.CastTransformer`
     * `sklearn2pmml.preprocessing.ConcatTransformer`

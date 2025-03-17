@@ -34,9 +34,9 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Transformer;
 
-public class Aggregator extends Transformer {
+public class AggregateTransformer extends Transformer {
 
-	public Aggregator(String module, String name){
+	public AggregateTransformer(String module, String name){
 		super(module, name);
 	}
 
@@ -65,28 +65,24 @@ public class Aggregator extends Transformer {
 	}
 
 	public String getFunction(){
-		return getEnum("function", this::getString, Arrays.asList(Aggregator.FUNCTION_AVG, Aggregator.FUNCTION_MAX, Aggregator.FUNCTION_MEAN, Aggregator.FUNCTION_MIN, Aggregator.FUNCTION_PROD, Aggregator.FUNCTION_PRODUCT, Aggregator.FUNCTION_SUM));
+		return getEnum("function", this::getString, Arrays.asList(AggregateTransformer.FUNCTION_AVG, AggregateTransformer.FUNCTION_MAX, AggregateTransformer.FUNCTION_MEAN, AggregateTransformer.FUNCTION_MIN, AggregateTransformer.FUNCTION_PROD, AggregateTransformer.FUNCTION_PRODUCT, AggregateTransformer.FUNCTION_SUM));
 	}
 
 	static
 	private String translateFunction(String function){
 
 		switch(function){
-			case Aggregator.FUNCTION_MAX:
-				return PMMLFunctions.MAX;
-			// Python style
-			case Aggregator.FUNCTION_MEAN:
-			// PMML style
-			case Aggregator.FUNCTION_AVG:
+			case AggregateTransformer.FUNCTION_AVG: // PMML-style
+			case AggregateTransformer.FUNCTION_MEAN: // Python-style
 				return PMMLFunctions.AVG;
-			case Aggregator.FUNCTION_MIN:
+			case AggregateTransformer.FUNCTION_MAX:
+				return PMMLFunctions.MAX;
+			case AggregateTransformer.FUNCTION_MIN:
 				return PMMLFunctions.MIN;
-			// Python style
-			case Aggregator.FUNCTION_PROD:
-			// PMML style
-			case Aggregator.FUNCTION_PRODUCT:
+			case AggregateTransformer.FUNCTION_PROD: // Python-style
+			case AggregateTransformer.FUNCTION_PRODUCT: // PMML-style
 				return PMMLFunctions.PRODUCT;
-			case Aggregator.FUNCTION_SUM:
+			case AggregateTransformer.FUNCTION_SUM:
 				return PMMLFunctions.SUM;
 			default:
 				throw new IllegalArgumentException(function);
