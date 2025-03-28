@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dmg.pmml.BlockIndicator;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Field;
@@ -43,8 +44,20 @@ public class RollingAggregateTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String function = getFunction();
 		Integer n = getN();
+		List<Object> blockIndicators = getBlockIndicators();
 
 		Lag.Aggregate aggregate = parseFunction(function);
+
+		BlockIndicator[] pmmlBlockIndicators = null;
+
+		if(blockIndicators != null){
+			List<Feature> blockIndicatorFeatures = BlockIndicatorUtil.selectFeatures(blockIndicators, features);
+
+			features = new ArrayList<>(features);
+			features.removeAll(blockIndicatorFeatures);
+
+			pmmlBlockIndicators = BlockIndicatorUtil.toBlockIndicators(blockIndicatorFeatures);
+		}
 
 		List<Feature> result = new ArrayList<>();
 
@@ -56,6 +69,10 @@ public class RollingAggregateTransformer extends Transformer {
 			Lag lag = new Lag(field.requireName())
 				.setAggregate(aggregate)
 				.setN(n);
+
+			if(pmmlBlockIndicators != null){
+				lag = lag.addBlockIndicators(pmmlBlockIndicators);
+			}
 
 			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(aggregate.value(), feature, n), OpType.CONTINUOUS, DataType.DOUBLE, lag);
 
@@ -71,6 +88,15 @@ public class RollingAggregateTransformer extends Transformer {
 
 	public Integer getN(){
 		return getInteger("n");
+	}
+
+	public List<Object> getBlockIndicators(){
+
+		if(!hasattr("block_indicators")){
+			return null;
+		}
+
+		return getObjectList("block_indicators");
 	}
 
 	static
