@@ -21,6 +21,7 @@ package sklearn2pmml.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dmg.pmml.BlockIndicator;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.Lag;
@@ -39,6 +40,18 @@ public class LagTransformer extends Transformer {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Integer n = getN();
+		List<Object> blockIndicators = getBlockIndicators();
+
+		BlockIndicator[] pmmlBlockIndicators = null;
+
+		if(blockIndicators != null){
+			List<Feature> blockIndicatorFeatures = BlockIndicatorUtil.selectFeatures(blockIndicators, features);
+
+			features = new ArrayList<>(features);
+			features.removeAll(blockIndicatorFeatures);
+
+			pmmlBlockIndicators = BlockIndicatorUtil.toBlockIndicators(blockIndicatorFeatures);
+		}
 
 		List<Feature> result = new ArrayList<>();
 
@@ -50,6 +63,10 @@ public class LagTransformer extends Transformer {
 			Lag lag = new Lag(field.requireName())
 				.setN(n);
 
+			if(pmmlBlockIndicators != null){
+				lag = lag.addBlockIndicators(pmmlBlockIndicators);
+			}
+
 			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("lag", feature, n), field.requireOpType(), field.requireDataType(), lag);
 
 			result.add(FeatureUtil.createFeature(derivedField, encoder));
@@ -60,5 +77,14 @@ public class LagTransformer extends Transformer {
 
 	public Integer getN(){
 		return getInteger("n");
+	}
+
+	public List<Object> getBlockIndicators(){
+
+		if(!hasattr("block_indicators")){
+			return null;
+		}
+
+		return getObjectList("block_indicators");
 	}
 }
