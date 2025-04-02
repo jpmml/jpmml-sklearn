@@ -18,11 +18,14 @@
  */
 package sklearn2pmml.preprocessing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
@@ -37,10 +40,12 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import pandas.CategoricalDtypeUtil;
 import pandas.core.CategoricalDtype;
 import sklearn.Transformer;
@@ -88,10 +93,41 @@ public class ExpressionTransformer extends Transformer {
 			}
 		} // End if
 
-		if(mapMissingTo != null){
-			HasMapMissingTo<?, Object> hasMapMissingTp = (HasMapMissingTo<?, Object>)expression;
+		udf:
+		if(expression instanceof Apply){
+			Apply apply = (Apply)expression;
 
-			hasMapMissingTp.setMapMissingTo(mapMissingTo);
+			if(isConstantLike(apply)){
+				break udf;
+			}
+
+			List<String> attributes = new ArrayList<>();
+
+			if(mapMissingTo != null){
+				attributes.add(ClassDictUtil.formatMember(this, "map_missing_to"));
+			} // End if
+
+			if(defaultValue != null){
+				attributes.add(ClassDictUtil.formatMember(this, "default_value"));
+			} // End if
+
+			if(invalidValueTreatment != null){
+				attributes.add(ClassDictUtil.formatMember(this, "invalid_value_treatment"));
+			} // End if
+
+			if(!attributes.isEmpty()){
+				List<String> quotedAttributes = attributes.stream()
+					.map(name -> "\'" + name + "\'")
+					.collect(Collectors.toList());
+
+				throw new SkLearnException("The target PMML element for " + String.join(", ", quotedAttributes) + " attribute(s) is unclear. Please refactor the expression from inline string representation to UDF representation");
+			}
+		} // End if
+
+		if(mapMissingTo != null){
+			HasMapMissingTo<?, Object> hasMapMissingTo = (HasMapMissingTo<?, Object>)expression;
+
+			hasMapMissingTo.setMapMissingTo(mapMissingTo);
 		} // End if
 
 		if(defaultValue != null){
@@ -245,6 +281,31 @@ public class ExpressionTransformer extends Transformer {
 			default:
 				throw new IllegalArgumentException(invalidValueTreatment);
 		}
+	}
+
+	static
+	private boolean isConstantLike(Apply apply){
+
+		if(apply.hasExpressions()){
+			List<Expression> expressions = apply.getExpressions();
+
+			for(Expression expression : expressions){
+
+				if(expression instanceof Constant){
+					Constant constant = (Constant)expression;
+				} else
+
+				if(expression instanceof FieldRef){
+					FieldRef fieldRef = (FieldRef)expression;
+				} else
+
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	private static final String INVALIDVALUETREATMENT_AS_MISSING = "as_missing";
