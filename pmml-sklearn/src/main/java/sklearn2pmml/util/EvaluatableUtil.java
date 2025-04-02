@@ -21,8 +21,6 @@ package sklearn2pmml.util;
 import java.util.Collections;
 import java.util.List;
 
-import org.dmg.pmml.DerivedField;
-import org.dmg.pmml.FieldRef;
 import org.jpmml.python.ExpressionTranslator;
 import org.jpmml.python.PredicateTranslator;
 import org.jpmml.python.Scope;
@@ -62,12 +60,6 @@ public class EvaluatableUtil {
 
 		for(String functionDef : functionDefs){
 			expressionTranslator.addFunctionDef(functionDef);
-		}
-
-		if(expr.indexOf('\n') > -1){
-			DerivedField derivedField = expressionTranslator.translateDef(expr);
-
-			return new FieldRef(derivedField);
 		}
 
 		return expressionTranslator.translateExpression(expr);
