@@ -59,9 +59,7 @@ public class CustomizationTest {
 
 		assertFalse(regressionModel.hasExtensions());
 
-		Extension insertExtension = new Extension()
-			.setName("customized")
-			.setValue("true");
+		Extension insertExtension = new Extension("customized", "true");
 
 		assertFalse(regressionModel.hasRegressionTables());
 

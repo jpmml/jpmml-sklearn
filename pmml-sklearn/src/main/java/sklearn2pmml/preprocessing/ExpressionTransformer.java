@@ -32,6 +32,7 @@ import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.HasDefaultValue;
+import org.dmg.pmml.HasInvalidValueTreatment;
 import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
@@ -137,9 +138,9 @@ public class ExpressionTransformer extends Transformer {
 		} // End if
 
 		if(invalidValueTreatment != null){
-			Apply apply = (Apply)expression;
+			HasInvalidValueTreatment hasInvalidValueTreatment = (HasInvalidValueTreatment)expression;
 
-			apply.setInvalidValueTreatment(invalidValueTreatment);
+			hasInvalidValueTreatment.setInvalidValueTreatment(invalidValueTreatment);
 		}
 
 		DataType dataType;
