@@ -29,8 +29,6 @@ import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
-import org.jpmml.evaluator.visitors.UnsupportedMarkupInspector;
-import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 import sklearn.SkLearnMethods;
@@ -68,20 +66,6 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 				}
 
 				return table;
-			}
-
-			@Override
-			public VisitorBattery getValidators(){
-				VisitorBattery visitorBattery = super.getValidators();
-
-				String algorithm = getAlgorithm();
-				String dataset = getDataset();
-
-				if(("LinearRegression").equals(algorithm) && ("Airline").equals(dataset)){
-					visitorBattery.remove(UnsupportedMarkupInspector.class);
-				}
-
-				return visitorBattery;
 			}
 		};
 
