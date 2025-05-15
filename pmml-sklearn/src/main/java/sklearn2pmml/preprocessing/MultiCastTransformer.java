@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Villu Ruusmann
+ * Copyright (c) 2025 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -22,23 +22,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jpmml.converter.Feature;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class CastTransformer extends TypeTransformer {
+public class MultiCastTransformer extends TypeTransformer {
 
-	public CastTransformer(String module, String name){
+	public MultiCastTransformer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		TypeInfo dtype = getDType();
+		List<TypeInfo> dtypes = getDTypes();
+
+		ClassDictUtil.checkSize(features.size(), dtypes);
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
+			TypeInfo dtype = dtypes.get(i);
 
 			feature = refineFeature(feature, dtype, encoder);
 
@@ -48,16 +52,7 @@ public class CastTransformer extends TypeTransformer {
 		return result;
 	}
 
-	public TypeInfo getDType(){
-
-		// SkLearn2PMML 0.101.0+
-		if(hasattr("dtype_")){
-			return getDType("dtype_", true);
-		} else
-
-		// SkLearn2PMML 0.100.2
-		{
-			return getDType("dtype", true);
-		}
+	public List<TypeInfo> getDTypes(){
+		return getDTypeList("dtypes_", true);
 	}
 }

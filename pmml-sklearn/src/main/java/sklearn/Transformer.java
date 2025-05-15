@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import builtins.TypeConstructor;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -159,26 +160,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 			@Override
 			public TypeInfo apply(Object object){
-
-				if(object instanceof TypeConstructor){
-					TypeConstructor typeConstructor = (TypeConstructor)object;
-
-					return (TypeInfo)typeConstructor.construct();
-				} else
-
-				if(object instanceof String){
-					String string = (String)object;
-
-					if(extended){
-						return new TypeInfo(){
-
-							@Override
-							public DataType getDataType(){
-								return PythonTypeUtil.parseDataType(string);
-							}
-						};
-					}
-				}
+				object = toTypeInfo(object, extended);
 
 				return super.apply(object);
 			}
@@ -202,6 +184,27 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 		return getDType(name, extended);
 	}
 
+	public List<TypeInfo> getDTypeList(String name, boolean extended){
+		List<?> values = getList(name);
+
+		CastFunction<TypeInfo> castFunction = new AttributeCastFunction<TypeInfo>(TypeInfo.class){
+
+			@Override
+			public TypeInfo apply(Object object){
+				object = toTypeInfo(object, extended);
+
+				return super.apply(object);
+			}
+
+			@Override
+			protected String formatMessage(Object object){
+				return "List attribute \'" + ClassDictUtil.formatMember(Transformer.this, name) + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+			}
+		};
+
+		return Lists.transform(values, castFunction);
+	}
+
 	public String createFieldName(String function, Object... args){
 		return createFieldName(function, Arrays.asList(args));
 	}
@@ -219,5 +222,31 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	@Override
 	public Transformer setPMMLName(String pmmlName){
 		return (Transformer)super.setPMMLName(pmmlName);
+	}
+
+	static
+	private Object toTypeInfo(Object object, boolean extended){
+
+		if(object instanceof TypeConstructor){
+			TypeConstructor typeConstructor = (TypeConstructor)object;
+
+			return (TypeInfo)typeConstructor.construct();
+		} else
+
+		if(object instanceof String){
+			String string = (String)object;
+
+			if(extended){
+				return new TypeInfo(){
+
+					@Override
+					public DataType getDataType(){
+						return PythonTypeUtil.parseDataType(string);
+					}
+				};
+			}
+		}
+
+		return object;
 	}
 }

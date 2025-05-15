@@ -438,6 +438,7 @@ Java library and command-line application for converting [Scikit-Learn](https://
     * `sklearn2pmml.preprocessing.LagTransformer`
     * `sklearn2pmml.preprocessing.LookupTransformer`
     * `sklearn2pmml.preprocessing.MatchesTransformer`
+    * `sklearn2pmml.preprocessing.MultiCastTransformer`
     * `sklearn2pmml.preprocessing.MultiLookupTransformer`
     * `sklearn2pmml.preprocessing.NumberFormatter`
     * `sklearn2pmml.preprocessing.PMMLLabelBinarizer`

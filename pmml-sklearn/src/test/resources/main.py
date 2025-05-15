@@ -35,7 +35,7 @@ from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
 from sklearn2pmml.metrics import BinaryClassifierQuality, ClassifierQuality, ModelExplanation, RegressorQuality
 from sklearn2pmml.pipeline import PMMLPipeline
-from sklearn2pmml.preprocessing import AggregateTransformer, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SeriesConstructor, StringNormalizer, SubstringTransformer, WordCountTransformer
+from sklearn2pmml.preprocessing import AggregateTransformer, CastTransformer, ConcatTransformer, CutTransformer, DataFrameConstructor, DaysSinceYearTransformer, ExpressionTransformer, FilterLookupTransformer, LookupTransformer, MatchesTransformer, MultiCastTransformer, MultiLookupTransformer, PMMLLabelBinarizer, PMMLLabelEncoder, PowerFunctionTransformer, ReplaceTransformer, SeriesConstructor, StringNormalizer, SubstringTransformer, WordCountTransformer
 from sklearn2pmml.util import Slicer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier
@@ -887,10 +887,10 @@ if "Auto" in datasets:
 def build_hist_auto_na(auto_na_df, regressor, name):
 	auto_na_X, auto_na_y = split_csv(auto_na_df)
 
-	mapper = DataFrameMapper(
-		[([column], ContinuousDomain(with_statistics = True)) for column in ["displacement", "horsepower", "weight", "acceleration"]] +
-		[([column], CategoricalDomain(with_statistics = True, dtype = "category")) for column in ["cylinders", "model_year", "origin"]]
-	, input_df = True, df_out = True)
+	mapper = DataFrameMapper([
+		(["displacement", "horsepower", "weight", "acceleration"], ContinuousDomain(with_statistics = True)),
+		(["cylinders", "model_year", "origin"], [CategoricalDomain(with_statistics = True), MultiCastTransformer(dtypes = ["category", CategoricalDtype(), "category"])])
+	], input_df = True, df_out = True)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
 		("regressor", regressor)
