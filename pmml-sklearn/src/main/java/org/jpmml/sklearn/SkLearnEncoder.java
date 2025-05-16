@@ -278,10 +278,24 @@ public class SkLearnEncoder extends PythonEncoder {
 	public void renameFeature(Feature feature, String renamedName){
 		String name = feature.getName();
 
+		if(Objects.equals(name, renamedName)){
+			return;
+		}
+
 		org.dmg.pmml.Field<?> pmmlField = getField(name);
 
 		if(pmmlField instanceof DataField){
 			throw new SkLearnException("User input field " + name + " cannot be renamed");
+		}
+
+		org.dmg.pmml.Field renamedPmmlField;
+
+		try {
+			renamedPmmlField = getField(renamedName);
+
+			throw new SkLearnException("Field " + renamedName + " is already defined. Please choose a different name");
+		} catch(IllegalArgumentException iae){
+			// Ignored
 		}
 
 		DerivedField derivedField = removeDerivedField(name);
