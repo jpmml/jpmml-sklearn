@@ -9,6 +9,6 @@ interpret==0.6.11
 mlxtend==0.23.4
 optbinning==0.20.1
 pycaret==3.3.2
-scikit-lego==0.9.4
+scikit-lego==0.9.5
 tpot==0.12.2
 treeple==0.10.3
