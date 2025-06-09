@@ -41,6 +41,17 @@ public class RidgeClassifier extends LinearClassifier {
 		return false;
 	}
 
+	@Override
+	public int[] getCoefShape(){
+		int[] shape = getArrayShape("coef_");
+
+		// SkLearn 1.6.0+
+		if(shape.length == 1){
+			return new int[]{1, shape[0]};
+		}
+
+		return super.getCoefShape();
+	}
 
 	public LabelBinarizer getLabelBinarizer(){
 		return get("_label_binarizer", LabelBinarizer.class);

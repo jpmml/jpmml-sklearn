@@ -18,7 +18,9 @@
  */
 package sklearn.linear_model.stochastic_gradient;
 
+import org.jpmml.python.PythonObject;
 import sklearn.linear_model.LinearClassifier;
+import sklearn.loss.CyLossFunction;
 
 public class SGDClassifier extends LinearClassifier {
 
@@ -28,16 +30,28 @@ public class SGDClassifier extends LinearClassifier {
 
 	@Override
 	public boolean hasProbabilityDistribution(){
-		LossFunction lossFunction = getLossFunction();
+		PythonObject lossFunction = getLossFunction();
 
 		if(lossFunction instanceof Log){
 			return true;
+		} else
+
+		if(lossFunction instanceof CyLossFunction){
+			String pythonName = lossFunction.getPythonName();
+
+			// XXX
+			switch(pythonName){
+				case "CyHalfBinomialLoss":
+					return true;
+				default:
+					return false;
+			}
 		}
 
 		return false;
 	}
 
-	public LossFunction getLossFunction(){
+	public PythonObject getLossFunction(){
 
 		// SkLearn 0.18
 		if(hasattr("loss_function")){
@@ -49,7 +63,16 @@ public class SGDClassifier extends LinearClassifier {
 			return get("loss_function_", LossFunction.class);
 		}
 
+		Object lossFunction = get("_loss_function_");
+
 		// SkLearn 1.4.0+
-		return get("_loss_function_", LossFunction.class);
+		if(lossFunction instanceof LossFunction){
+			return get("_loss_function_", LossFunction.class);
+		} else
+
+		// SkLearn 1.6.0+
+		{
+			return get("_loss_function_", CyLossFunction.class);
+		}
 	}
 }

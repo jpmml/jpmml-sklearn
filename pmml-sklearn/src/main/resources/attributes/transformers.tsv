@@ -40,3 +40,5 @@ sklearn.preprocessing._function_transformer.FunctionTransformer	+
 sklearn.preprocessing._label.LabelBinarizer	+
 sklearn.preprocessing._label.LabelEncoder	+
 sklearn.preprocessing._polynomial.PolynomialFeatures	+
+sklearn.preprocessing._polynomial.SplineTransformer	+
+sklearn.preprocessing._target_encoder.TargetEncoder	+
