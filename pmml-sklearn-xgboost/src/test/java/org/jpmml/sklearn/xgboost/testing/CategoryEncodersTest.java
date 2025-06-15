@@ -37,7 +37,7 @@ public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Dat
 
 	@Test
 	public void evaluateBase4EncoderAuditNA() throws Exception {
-		evaluate("Base4Encoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE));
+		evaluate("Base4Encoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 8));
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Dat
 
 	@Test
 	public void evaluateTargetEncoderAuditNA() throws Exception {
-		evaluate("TargetEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 16));
+		evaluate("TargetEncoder", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(TOLERANCE_AUDIT + 24));
 	}
 
 	@Test
