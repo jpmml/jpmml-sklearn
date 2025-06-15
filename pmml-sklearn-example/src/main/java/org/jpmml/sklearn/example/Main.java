@@ -19,7 +19,9 @@
 package org.jpmml.sklearn.example;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,6 +41,8 @@ import org.jpmml.python.StorageUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUtil;
+import org.jpmml.telemetry.Incident;
+import org.jpmml.telemetry.TelemetryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.tree.HasTreeOptions;
@@ -177,7 +181,29 @@ public class Main {
 			System.exit(0);
 		}
 
-		main.run();
+		try {
+			main.run();
+		} catch(FileNotFoundException fnfe){
+			throw fnfe;
+		} catch(Exception e){
+			Package _package = Main.class.getPackage();
+
+			Map<String, String> environment = new LinkedHashMap<>();
+			environment.put("jpmml-sklearn", _package.getImplementationVersion());
+
+			Incident incident = new Incident()
+				.setProject("jpmml-sklearn")
+				.setEnvironment(environment)
+				.setException(e);
+
+			try {
+				TelemetryClient.report("https://telemetry.jpmml.org/v1/incidents", incident);
+			} catch(IOException ioe){
+				// Ignored
+			}
+
+			throw e;
+		}
 	}
 
 	public void run() throws Exception {

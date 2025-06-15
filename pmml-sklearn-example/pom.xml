@@ -50,6 +50,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>telemetry-client</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.beust</groupId>
 			<artifactId>jcommander</artifactId>
 		</dependency>
