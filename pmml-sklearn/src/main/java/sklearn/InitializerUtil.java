@@ -18,6 +18,7 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,6 +48,23 @@ public class InitializerUtil {
 
 	static
 	public List<Feature> selectFeatures(List<?> columns, List<Feature> features, SkLearnEncoder encoder){
+
+		// SkLearn 1.7.0+
+		if(columns.size() == features.size() && isMask(columns)){
+			List<Feature> result = new ArrayList<>();
+
+			for(int i = 0; i < features.size(); i++){
+				Feature feature = features.get(i);
+				Boolean mask = (Boolean)columns.get(i);
+
+				if(mask){
+					result.add(feature);
+				}
+			}
+
+			return result;
+		}
+
 		Function<Object, Feature> castFunction = new Function<Object, Feature>(){
 
 			@Override
@@ -97,5 +115,18 @@ public class InitializerUtil {
 		}
 
 		return new WildcardFeature(encoder, dataField);
+	}
+
+	static
+	private boolean isMask(List<?> columns){
+
+		if(columns.isEmpty()){
+			return false;
+		}
+
+		return columns.stream()
+			.allMatch(column -> {
+				return (column instanceof Boolean);
+			});
 	}
 }
