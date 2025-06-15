@@ -99,6 +99,11 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 	}
 
 	static
+	protected String getName(Object[] fittedTransformer){
+		return TupleUtil.extractElement(fittedTransformer, 0, String.class);
+	}
+
+	static
 	protected Transformer getTransformer(Object[] fittedTransformer){
 		Object transformer = TupleUtil.extractElement(fittedTransformer, 1);
 

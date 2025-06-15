@@ -20,7 +20,9 @@ package sklearn.ensemble.hist_gradient_boosting;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.dmg.pmml.DataType;
@@ -39,6 +41,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Transformer;
 import sklearn.compose.ColumnTransformer;
 import sklearn.preprocessing.OrdinalEncoder;
@@ -64,7 +67,23 @@ public class HistGradientBoostingUtil {
 			public List<Object[]> getFittedTransformers(){
 				List<Object[]> fittedTransformers = super.getFittedTransformers();
 
-				ClassDictUtil.checkSize(2, fittedTransformers);
+				List<String> names = fittedTransformers.stream()
+					.map(fittedTransformer -> ColumnTransformer.getName(fittedTransformer))
+					.collect(Collectors.toList());
+
+				// SkLearn 1.6.0
+				if(Objects.equals(names, Arrays.asList("encoder", "numerical"))){
+					// Ignored
+				} else
+
+				// SkLearn 1.7.0+
+				if(Objects.equals(names, Arrays.asList("encoder", "numerical", "remainder"))){
+					// Ignored
+				} else
+
+				{
+					throw new SkLearnException("Expected [encoder, numerical, remainder] as transformer names, got " + names + " as transformer names");
+				}
 
 				List<Object[]> result = new AbstractList<Object[]>(){
 
