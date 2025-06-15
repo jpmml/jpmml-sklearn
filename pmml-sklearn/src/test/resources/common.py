@@ -1,3 +1,7 @@
+from sklearn2pmml.sklearn_pandas import patch_sklearn
+
+patch_sklearn()
+
 import dill
 import joblib
 import os
