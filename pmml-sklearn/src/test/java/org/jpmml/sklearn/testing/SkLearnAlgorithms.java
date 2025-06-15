@@ -82,6 +82,7 @@ public interface SkLearnAlgorithms {
 	String SVC = "SVC";
 	String SVR = "SVR";
 	String THEIL_SEN = "TheilSen";
+	String TWEEDIE_REGRESSION = "TweedieRegression";
 	String VOTING = "Voting";
 	String VOTING_ENSEMBLE = VOTING + "Ensemble";
 }
