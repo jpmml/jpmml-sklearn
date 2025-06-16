@@ -70,6 +70,7 @@ public interface SkLearnAlgorithms {
 	String OMP = "OMP";
 	String ONE_CLASS_SVM = "OneClassSVM";
 	String ONE_VS_REST = "OneVsRest";
+	String PERCEPTRON = "Perceptron";
 	String POISSON_REGRESSION = "PoissonRegression";
 	String RANDOM_FOREST = "RandomForest";
 	String RIDGE = "Ridge";

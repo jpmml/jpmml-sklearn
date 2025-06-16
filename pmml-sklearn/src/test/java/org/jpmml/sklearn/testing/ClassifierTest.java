@@ -426,6 +426,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluatePerceptronIris() throws Exception {
+		evaluate(PERCEPTRON, IRIS);
+	}
+
+	@Test
 	public void evaluateRandomForestIris() throws Exception {
 		evaluate(RANDOM_FOREST, IRIS);
 	}
@@ -523,6 +528,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateMLPVersicolor() throws Exception {
 		evaluate(MLP, VERSICOLOR);
+	}
+
+	@Test
+	public void evaluatePerceptronVersicolor() throws Exception {
+		evaluate(PERCEPTRON, VERSICOLOR);
 	}
 
 	@Test
