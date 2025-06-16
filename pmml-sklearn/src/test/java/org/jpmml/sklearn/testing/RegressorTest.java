@@ -177,6 +177,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateExtraTreesAutoNA() throws Exception {
+		evaluate(EXTRA_TREES, AUTO_NA);
+	}
+
+	@Test
 	public void evaluateGradientBoostingAuto() throws Exception {
 		evaluate(GRADIENT_BOOSTING, AUTO);
 	}

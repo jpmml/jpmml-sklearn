@@ -937,6 +937,7 @@ if "Auto" in datasets:
 	auto_na_df = load_auto("AutoNA")
 
 	build_tree_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True)
+	build_tree_auto_na(auto_na_df, ExtraTreesRegressor(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesAutoNA", allow_missing = True)
 	build_tree_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAutoNA", allow_missing = True)
 
 def build_encoder_auto_na(auto_na_df, regressor, name, cont_transformer = None, cat_transformer = None, with_invalid = False, **pmml_options):
@@ -1060,7 +1061,7 @@ if "Housing" in datasets:
 	build_housing(housing_df, HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingHousing")
 	build_housing(housing_df, KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 	build_housing(housing_df, MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", tol = 0.001, max_iter = 1000, random_state = 13), "MLPHousing")
-	build_housing(housing_df, SGDRegressor(random_state = 13), "SGDHousing")
+	build_housing(housing_df, SGDRegressor(loss = "huber", random_state = 13), "SGDHousing")
 	build_housing(housing_df, SVR(gamma = "auto"), "SVRHousing")
 	build_housing(housing_df, LinearSVR(random_state = 13), "LinearSVRHousing")
 	build_housing(housing_df, NuSVR(gamma = "auto"), "NuSVRHousing")
