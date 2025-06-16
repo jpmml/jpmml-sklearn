@@ -382,4 +382,9 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	public void evaluateTweedieRegressionVisit() throws Exception {
 		evaluate(TWEEDIE_REGRESSION, VISIT);
 	}
+
+	@Test
+	public void evaluateTweedieRegressionLogVisit() throws Exception {
+		evaluate(TWEEDIE_REGRESSION + "Log", VISIT);
+	}
 }

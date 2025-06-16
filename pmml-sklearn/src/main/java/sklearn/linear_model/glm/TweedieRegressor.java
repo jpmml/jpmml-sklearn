@@ -16,24 +16,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.loss;
+package sklearn.linear_model.glm;
 
-public class CyTweedieLoss extends CyLossFunction {
+import java.util.List;
 
-	public CyTweedieLoss(String module, String name){
+import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.Schema;
+import org.jpmml.converter.regression.RegressionModelUtil;
+import sklearn.linear_model.LinearRegressor;
+
+public class TweedieRegressor extends LinearRegressor {
+
+	public TweedieRegressor(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public void __init__(Object[] args){
-		super.__setstate__(INIT_ATTRIBUTES, args);
+	protected RegressionModel createRegression(List<? extends Number> coef, Number intercept, Schema schema){
+		Number power = getPower();
+
+		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, (power.doubleValue() > 0d ? RegressionModel.NormalizationMethod.EXP : null), schema);
 	}
 
 	public Number getPower(){
 		return getNumber("power");
 	}
-
-	private static final String[] INIT_ATTRIBUTES = {
-		"power"
-	};
 }

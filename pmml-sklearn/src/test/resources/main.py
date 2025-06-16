@@ -1090,7 +1090,8 @@ if "Visit" in datasets:
 
 	build_visit(visit_df, GammaRegressor(), "GammaRegressionVisit")
 	build_visit(visit_df, PoissonRegressor(), "PoissonRegressionVisit")
-	build_visit(visit_df, TweedieRegressor(power = 1.5), "TweedieRegressionVisit")
+	build_visit(visit_df, TweedieRegressor(power = 0), "TweedieRegressionVisit")
+	build_visit(visit_df, TweedieRegressor(power = 1.5), "TweedieRegressionLogVisit")
 
 #
 # Outlier detection
