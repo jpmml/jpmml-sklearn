@@ -97,6 +97,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 					switch(algorithm){
 						case DUMMY:
+						case "Frozen":
 							break;
 						default:
 							visitorBattery.add(ModelStatsInspector.class);
@@ -363,6 +364,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateExtraTreesIris() throws Exception {
 		evaluate(EXTRA_TREES, IRIS);
+	}
+
+	@Test
+	public void evaluateFrozenIris() throws Exception {
+		evaluate("Frozen", IRIS);
 	}
 
 	@Test

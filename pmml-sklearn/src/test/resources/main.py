@@ -13,6 +13,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
+from sklearn.frozen import FrozenEstimator
 from sklearn.impute import MissingIndicator, SimpleImputer
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, Perceptron, PoissonRegressor, QuantileRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDOneClassSVM, SGDRegressor, TheilSenRegressor, TweedieRegressor
@@ -576,6 +577,34 @@ if "Iris" in datasets:
 	build_iris(iris_df, SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(iris_df, NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
 	build_iris(iris_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)
+
+def build_iris_frozen(iris_df):
+	iris_X, iris_y = split_csv(iris_df)
+
+	scaler = StandardScaler()
+	iris_Xt = scaler.fit_transform(iris_X)
+
+	classifier = LogisticRegression()
+	classifier.fit(iris_Xt, iris_y)
+
+	pipeline = Pipeline([
+		("scaler", FrozenEstimator(scaler)),
+		("classifier", FrozenEstimator(classifier))
+	])
+	pipeline.fit(iris_X, iris_y)
+
+	pipeline = FrozenEstimator(pipeline)
+
+	store_pkl(pipeline, "FrozenIris")
+	species = DataFrame(pipeline.predict(iris_X), columns = ["y"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, "FrozenIris")
+
+if "Iris" in datasets:
+	iris_df = load_iris("Iris")
+
+	build_iris_frozen(iris_df)
 
 def build_iris_cat(iris_df, classifier, name, **pmml_options):
 	iris_X, iris_y = split_csv(iris_df)
