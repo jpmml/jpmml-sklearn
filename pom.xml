@@ -58,8 +58,8 @@
 		<jpmml-evaluator.version>1.7.3</jpmml-evaluator.version>
 		<jpmml-h2o.version>1.3.1</jpmml-h2o.version>
 		<jpmml-lightgbm.version>1.6.1</jpmml-lightgbm.version>
-		<jpmml-python.version>1.3.4</jpmml-python.version>
-		<jpmml-statsmodels.version>1.3.1</jpmml-statsmodels.version>
+		<jpmml-python.version>1.3.5</jpmml-python.version>
+		<jpmml-statsmodels.version>1.3.2</jpmml-statsmodels.version>
 		<jpmml-xgboost.version>1.9.1</jpmml-xgboost.version>
 		<project.build.outputTimestamp>2025-06-20T07:16:13Z</project.build.outputTimestamp>
 	</properties>
