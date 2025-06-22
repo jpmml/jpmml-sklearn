@@ -22,11 +22,13 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
+import net.razorvine.pickle.Unpickler;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
+import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Step;
 import sklearn2pmml.HasPMMLOptions;
@@ -67,6 +69,11 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		} finally {
 			deactivate(step);
 		}
+	}
+
+	@Override
+	public Unpickler getUnpickler(){
+		return new SkLearnUnpickler();
 	}
 
 	protected void activate(Object object) throws Exception {

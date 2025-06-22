@@ -35,12 +35,12 @@ import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.JAXBSerializer;
 import org.jpmml.model.metro.MetroJAXBSerializer;
-import org.jpmml.python.JoblibUnpickler;
 import org.jpmml.python.PythonUnpickler;
 import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
+import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
 import org.jpmml.telemetry.Incident;
 import org.jpmml.telemetry.TelemetryClient;
@@ -213,7 +213,7 @@ public class Main {
 		try(Storage storage = StorageUtil.createStorage(this.input)){
 			logger.info("Parsing PKL..");
 
-			PythonUnpickler pythonUnpickler = new JoblibUnpickler();
+			PythonUnpickler pythonUnpickler = new SkLearnUnpickler();
 
 			long begin = System.currentTimeMillis();
 			object = pythonUnpickler.load(storage);
