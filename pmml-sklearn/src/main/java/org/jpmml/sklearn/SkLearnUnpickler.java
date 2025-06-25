@@ -19,13 +19,34 @@
 package org.jpmml.sklearn;
 
 import java.io.IOException;
+import java.util.Objects;
 
+import net.razorvine.pickle.Opcodes;
+import net.razorvine.pickle.objects.ClassDict;
 import org.jpmml.python.JoblibUnpickler;
+import sklearn2pmml.SkLearn2PMMLFields;
 
 public class SkLearnUnpickler extends JoblibUnpickler {
 
 	@Override
 	protected Object dispatch(short key) throws IOException {
-		return super.dispatch(key);
+		Object result = super.dispatch(key);
+
+		if(key == Opcodes.BUILD){
+			Object head = peekHead();
+
+			if(Objects.equals(ClassDict.class, head.getClass())){
+				ClassDict dict = (ClassDict)head;
+
+				if(dict.containsKey(SkLearn2PMMLFields.PMML_BASE_CLASS)){
+					ExtendedClassDict object = ExtendedClassDict.build(dict.getClassName());
+					object.__setstate__(dict);
+
+					replaceHead(object);
+				}
+			}
+		}
+
+		return result;
 	}
 }

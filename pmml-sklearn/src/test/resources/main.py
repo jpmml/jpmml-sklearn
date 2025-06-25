@@ -578,13 +578,25 @@ if "Iris" in datasets:
 	build_iris(iris_df, NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
 	build_iris(iris_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)
 
+class IrisStandardScaler(StandardScaler):
+	
+	def __init__(self):
+		super().__init__()
+		self.pmml_base_class_ = StandardScaler
+
+class IrisLogisticRegression(LogisticRegression):
+
+	def __init__(self):
+		super().__init__(multi_class = "multinomial")
+		self.pmml_base_class_ = "{}.{}".format(LogisticRegression.__module__, LogisticRegression.__name__)
+
 def build_iris_frozen(iris_df):
 	iris_X, iris_y = split_csv(iris_df)
 
-	scaler = StandardScaler()
+	scaler = IrisStandardScaler()
 	iris_Xt = scaler.fit_transform(iris_X)
 
-	classifier = LogisticRegression()
+	classifier = IrisLogisticRegression()
 	classifier.fit(iris_Xt, iris_y)
 
 	pipeline = Pipeline([

@@ -20,6 +20,7 @@ package sklearn2pmml;
 
 public interface SkLearn2PMMLFields {
 
+	String PMML_BASE_CLASS = "pmml_base_class_";
 	String PMML_CLASSES = "pmml_classes_";
 	String PMML_FEATURE_IMPORTANCES = "pmml_feature_importances_";
 	String PMML_NAME = "pmml_name_";
