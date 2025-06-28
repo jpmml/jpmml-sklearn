@@ -203,7 +203,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, LogisticRegression(multi_class = "multinomial", solver = "newton-cg", max_iter = 500), "MultinomialLogisticRegressionAudit")
 	build_audit(audit_df, LogisticRegressionCV(cv = 3, multi_class = "ovr"), "OvRLogisticRegressionAudit")
 	build_audit(audit_df, BaggingClassifier(LogisticRegression(), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleAudit")
-	build_audit(audit_df, GaussianNB(), "NaiveBayesAudit")
+	build_audit(audit_df, GaussianNB(), "GaussianNBAudit")
 	build_audit(audit_df, OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
 	build_audit(audit_df, EstimatorProxy(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)), "RandomForestAudit", flat = True)
 	build_audit(audit_df, CalibratedClassifierCV(RandomForestClassifier(n_estimators = 3, min_samples_leaf = 15, random_state = 13), ensemble = False, method = "sigmoid"), "RandomForestSigmoidAudit")
@@ -563,7 +563,7 @@ if "Iris" in datasets:
 	build_iris(iris_df, LogisticRegressionCV(cv = 3, multi_class = "ovr"), "OvRLogisticRegressionIris")
 	build_iris(iris_df, BaggingClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear"), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleIris")
 	build_iris(iris_df, MLPClassifier(hidden_layer_sizes = (6,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPIris")
-	build_iris(iris_df, GaussianNB(), "NaiveBayesIris")
+	build_iris(iris_df, GaussianNB(), "GaussianNBIris")
 	build_iris(iris_df, OneVsRestClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear")), "OneVsRestIris")
 	build_iris(iris_df, Perceptron(random_state = 13), "PerceptronIris", with_proba = False)
 	build_iris(iris_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIris", flat = True)
@@ -745,7 +745,7 @@ def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
 if "Sentiment" in datasets:
 	sentiment_df = load_sentiment("Sentiment")
 
-	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "NaiveBayesSentiment")
+	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment")
 
 #
 # Ordinal classification

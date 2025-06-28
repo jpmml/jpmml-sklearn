@@ -23,6 +23,7 @@ public interface SkLearnAlgorithms {
 	String ADA_BOOST = "AdaBoost";
 	String ARD = "ARD";
 	String BAYESIAN_ARD = "Bayesian" + ARD;
+	String BERNOULLI_NB = "BernoulliNB";
 	String CQR = "CQR";
 	String DECISION_TREE = "DecisionTree";
 	String TRANSFORMED_DECISION_TREE = "Transformed" + DECISION_TREE;
@@ -31,6 +32,7 @@ public interface SkLearnAlgorithms {
 	String ELASTIC_NET = "ElasticNet";
 	String EXTRA_TREES = "ExtraTrees";
 	String GAMMA_REGRESSION = "GammaRegression";
+	String GAUSSIAN_NB = "GaussianNB";
 	String GRADIENT_BOOSTING = "GradientBoosting";
 	String HIST_GRADIENT_BOOSTING = "HistGradientBoosting";
 	String HUBER = "Huber";
@@ -62,7 +64,6 @@ public interface SkLearnAlgorithms {
 	String LOGISTIC_REGRESSION_ENSEMBLE = LOGISTIC_REGRESSION + "Ensemble";
 	String MLP = "MLP";
 	String MULTI_MLP = "Multi" + MLP;
-	String NAIVE_BAYES = "NaiveBayes";
 	String NEAREST_CENTROID = "NearestCentroid";
 	String NEAREST_NEIGHBORS = "NearestNeighbors";
 	String NU_SVC = "NuSVC";

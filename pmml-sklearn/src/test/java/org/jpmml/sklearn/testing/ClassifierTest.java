@@ -263,7 +263,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateNaiveBayesAudit() throws Exception {
-		evaluate(NAIVE_BAYES, AUDIT, new PMMLEquivalence(1e-12, 1e-12));
+		evaluate(GAUSSIAN_NB, AUDIT, new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
@@ -423,7 +423,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateNaiveBayesIris() throws Exception {
-		evaluate(NAIVE_BAYES, IRIS);
+		evaluate(GAUSSIAN_NB, IRIS);
 	}
 
 	@Test
@@ -508,7 +508,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateNaiveBayesSentiment() throws Exception {
-		evaluate(NAIVE_BAYES, SENTIMENT);
+		evaluate(BERNOULLI_NB, SENTIMENT);
 	}
 
 	@Test
