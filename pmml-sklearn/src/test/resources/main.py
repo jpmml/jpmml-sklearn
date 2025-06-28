@@ -746,6 +746,7 @@ if "Sentiment" in datasets:
 	sentiment_df = load_sentiment("Sentiment")
 
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment")
+	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0.75), "BernoulliNBSmoothSentiment")
 
 #
 # Ordinal classification

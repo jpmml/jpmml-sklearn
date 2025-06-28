@@ -180,6 +180,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateGaussianNBAudit() throws Exception {
+		evaluate(GAUSSIAN_NB, AUDIT, new PMMLEquivalence(1e-12, 1e-12));
+	}
+
+	@Test
 	public void evaluateGradientBoostingSigmoidAudit() throws Exception {
 		evaluate(GRADIENT_BOOSTING + "Sigmoid", AUDIT);
 	}
@@ -259,11 +264,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateLogisticRegressionEnsembleAudit() throws Exception {
 		evaluate(LOGISTIC_REGRESSION_ENSEMBLE, AUDIT);
-	}
-
-	@Test
-	public void evaluateNaiveBayesAudit() throws Exception {
-		evaluate(GAUSSIAN_NB, AUDIT, new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
@@ -372,6 +372,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateGaussianNBIris() throws Exception {
+		evaluate(GAUSSIAN_NB, IRIS);
+	}
+
+	@Test
 	public void evaluateGradientBoostingIris() throws Exception {
 		evaluate(GRADIENT_BOOSTING, IRIS);
 	}
@@ -419,11 +424,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateMLPIris() throws Exception {
 		evaluate(MLP, IRIS);
-	}
-
-	@Test
-	public void evaluateNaiveBayesIris() throws Exception {
-		evaluate(GAUSSIAN_NB, IRIS);
 	}
 
 	@Test
@@ -497,6 +497,16 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateBernoulliNBSentiment() throws Exception {
+		evaluate(BERNOULLI_NB, SENTIMENT);
+	}
+
+	@Test
+	public void evaluateBernoulliNBSmoothSentiment() throws Exception {
+		evaluate(BERNOULLI_NB + "Smooth", SENTIMENT);
+	}
+
+	@Test
 	public void evaluateLinearSVCSentiment() throws Exception {
 		evaluate(LINEAR_SVC, SENTIMENT);
 	}
@@ -504,11 +514,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateLogisticRegressionSentiment() throws Exception {
 		evaluate(LOGISTIC_REGRESSION, SENTIMENT);
-	}
-
-	@Test
-	public void evaluateNaiveBayesSentiment() throws Exception {
-		evaluate(BERNOULLI_NB, SENTIMENT);
 	}
 
 	@Test

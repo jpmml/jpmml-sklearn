@@ -19,6 +19,7 @@
 package sklearn.naive_bayes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -59,6 +60,7 @@ public class BernoulliNB extends SkLearnClassifier {
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
+		Number alpha = getAlpha();
 		List<Integer> classCount = getClassCount();
 		List<Integer> featureCount = getFeatureCount();
 
@@ -67,6 +69,9 @@ public class BernoulliNB extends SkLearnClassifier {
 		SchemaUtil.checkSize(2, categoricalLabel);
 
 		List<?> values = categoricalLabel.getValues();
+
+		// XXX
+		List<Integer> featureValues = Arrays.asList(0, 1);
 
 		BayesInputs bayesInputs = new BayesInputs();
 
@@ -77,18 +82,25 @@ public class BernoulliNB extends SkLearnClassifier {
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-			List<Integer> nonEventCounts = new ArrayList<>();
+			List<Number> nonEventCounts = new ArrayList<>();
+			List<Number> eventCounts = new ArrayList<>();
 
 			for(int j = 0; j < numberOfClasses; j++){
-				nonEventCounts.add(classCount.get(j) - featureClassCount.get(j));
+				Number nonEventCount = classCount.get(j) - featureClassCount.get(j);
+				Number eventCount = featureClassCount.get(j);
+
+				if(alpha.doubleValue() != 0d){
+					nonEventCount = nonEventCount.intValue() + alpha.doubleValue();
+					eventCount = eventCount.intValue() + alpha.doubleValue();
+				}
+
+				nonEventCounts.add(nonEventCount);
+				eventCounts.add(eventCount);
 			}
 
-			List<Integer> eventCounts = new ArrayList<>();
-			eventCounts.addAll(featureClassCount);
-
 			List<PairCounts> pairCounts = new ArrayList<>();
-			pairCounts.add(encodePairCounts(values.get(0), values, nonEventCounts));
-			pairCounts.add(encodePairCounts(values.get(1), values, eventCounts));
+			pairCounts.add(encodePairCounts(values.get(0), featureValues, nonEventCounts));
+			pairCounts.add(encodePairCounts(values.get(1), featureValues, eventCounts));
 
 			BayesInput bayesInput = new BayesInput(continuousFeature.getName(), null, pairCounts);
 
@@ -106,6 +118,10 @@ public class BernoulliNB extends SkLearnClassifier {
 		return naiveBayesModel;
 	}
 
+	public Number getAlpha(){
+		return getNumber("alpha");
+	}
+
 	public List<Integer> getClassCount(){
 		return getIntegerArray("class_count_");
 	}
@@ -119,7 +135,7 @@ public class BernoulliNB extends SkLearnClassifier {
 	}
 
 	static
-	private PairCounts encodePairCounts(Object value, List<?> values, List<Integer> counts){
+	private PairCounts encodePairCounts(Object value, List<?> values, List<? extends Number> counts){
 		PairCounts pairCounts = new PairCounts()
 			.setValue(value)
 			.setTargetValueCounts(encodeTargetValueCounts(values, counts));
@@ -128,12 +144,12 @@ public class BernoulliNB extends SkLearnClassifier {
 	}
 
 	static
-	private TargetValueCounts encodeTargetValueCounts(List<?> values, List<Integer> counts){
+	private TargetValueCounts encodeTargetValueCounts(List<?> values, List<? extends Number> counts){
 		TargetValueCounts targetValueCounts = new TargetValueCounts();
 
 		for(int i = 0; i < values.size(); i++){
 			Object value = values.get(i);
-			Integer count = counts.get(i);
+			Number count = counts.get(i);
 
 			TargetValueCount targetValueCount = new TargetValueCount(value, count);
 
