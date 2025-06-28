@@ -10,7 +10,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingClassifier, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.feature_selection import f_classif, f_regression
 from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercentile
 from sklearn.frozen import FrozenEstimator
@@ -20,7 +20,7 @@ from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, Elast
 from sklearn.model_selection import FixedThresholdClassifier, GridSearchCV, RandomizedSearchCV, TunedThresholdClassifierCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOutputRegressor, RegressorChain
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import BernoulliNB, GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, NearestCentroid, NearestNeighbors
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import make_pipeline
@@ -725,6 +725,27 @@ if "Sentiment" in datasets:
 	build_sentiment(sentiment_df, LinearSVC(random_state = 13), Splitter(), "LinearSVCSentiment", with_proba = False)
 	build_sentiment(sentiment_df, LogisticRegressionCV(cv = 3), None, "LogisticRegressionSentiment")
 	build_sentiment(sentiment_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), Matcher(), "RandomForestSentiment", compact = False)
+
+def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
+	sentiment_X = sentiment_df["Sentence"]
+	sentiment_y = sentiment_df["Score"]
+
+	pipeline = PMMLPipeline([
+		("vectorizer", CountVectorizer(max_features = 100, binary = isinstance(classifier, BernoulliNB))),
+		("classifier", classifier)
+	])
+	pipeline.fit(sentiment_X, sentiment_y)
+	store_pkl(pipeline, name)
+	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
+	if with_proba:
+		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability(0)", "probability(1)"])
+		score = pandas.concat((score, score_proba), axis = 1)
+	store_csv(score, name)
+
+if "Sentiment" in datasets:
+	sentiment_df = load_sentiment("Sentiment")
+
+	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "NaiveBayesSentiment")
 
 #
 # Ordinal classification

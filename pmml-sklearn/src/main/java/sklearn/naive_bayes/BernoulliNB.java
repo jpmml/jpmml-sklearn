@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2025 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,52 +18,53 @@
  */
 package sklearn.naive_bayes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.GaussianDistribution;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.naive_bayes.BayesInput;
 import org.dmg.pmml.naive_bayes.BayesInputs;
 import org.dmg.pmml.naive_bayes.BayesOutput;
 import org.dmg.pmml.naive_bayes.NaiveBayesModel;
+import org.dmg.pmml.naive_bayes.PairCounts;
 import org.dmg.pmml.naive_bayes.TargetValueCount;
 import org.dmg.pmml.naive_bayes.TargetValueCounts;
-import org.dmg.pmml.naive_bayes.TargetValueStat;
-import org.dmg.pmml.naive_bayes.TargetValueStats;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.converter.SchemaUtil;
 import sklearn.SkLearnClassifier;
 
-public class GaussianNB extends SkLearnClassifier {
+public class BernoulliNB extends SkLearnClassifier {
 
-	public GaussianNB(String module, String name){
+	public BernoulliNB(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public int getNumberOfFeatures(){
-		int[] shape = getThetaShape();
+		int[] shape = getFeatureCountShape();
 
 		return shape[1];
 	}
 
 	@Override
 	public NaiveBayesModel encodeModel(Schema schema){
-		int[] shape = getThetaShape();
+		int[] shape = getFeatureCountShape();
 
 		int numberOfClasses = shape[0];
 		int numberOfFeatures = shape[1];
 
-		List<Number> theta = getTheta();
-		List<Number> sigma = getSigma();
+		List<Integer> classCount = getClassCount();
+		List<Integer> featureCount = getFeatureCount();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+
+		SchemaUtil.checkSize(2, categoricalLabel);
 
 		List<?> values = categoricalLabel.getValues();
 
@@ -72,17 +73,27 @@ public class GaussianNB extends SkLearnClassifier {
 		for(int i = 0; i < numberOfFeatures; i++){
 			Feature feature = schema.getFeature(i);
 
-			List<Number> means = CMatrixUtil.getColumn(theta, numberOfClasses, numberOfFeatures, i);
-			List<Number> variances = CMatrixUtil.getColumn(sigma, numberOfClasses, numberOfFeatures, i);
+			List<Integer> featureClassCount = CMatrixUtil.getColumn(featureCount, numberOfClasses, numberOfFeatures, i);
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-			BayesInput bayesInput = new BayesInput(continuousFeature.getName(), encodeTargetValueStats(values, means, variances), null);
+			List<Integer> nonEventCounts = new ArrayList<>();
+
+			for(int j = 0; j < numberOfClasses; j++){
+				nonEventCounts.add(classCount.get(j) - featureClassCount.get(j));
+			}
+
+			List<Integer> eventCounts = new ArrayList<>();
+			eventCounts.addAll(featureClassCount);
+
+			List<PairCounts> pairCounts = new ArrayList<>();
+			pairCounts.add(encodePairCounts(values.get(0), values, nonEventCounts));
+			pairCounts.add(encodePairCounts(values.get(1), values, eventCounts));
+
+			BayesInput bayesInput = new BayesInput(continuousFeature.getName(), null, pairCounts);
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}
-
-		List<Integer> classCount = getClassCount();
 
 		BayesOutput bayesOutput = new BayesOutput(null)
 			.setTargetField(categoricalLabel.getName())
@@ -99,50 +110,32 @@ public class GaussianNB extends SkLearnClassifier {
 		return getIntegerArray("class_count_");
 	}
 
-	public List<Number> getTheta(){
-		return getNumberArray("theta_");
+	public List<Integer> getFeatureCount(){
+		return getIntegerArray("feature_count_");
 	}
 
-	public int[] getThetaShape(){
-		return getArrayShape("theta_", 2);
-	}
-
-	public List<Number> getSigma(){
-
-		// SkLearn 1.0+
-		if(hasattr("var_")){
-			return getNumberArray("var_");
-		}
-
-		// SkLearn 0.24
-		return getNumberArray("sigma_");
+	public int[] getFeatureCountShape(){
+		return getArrayShape("feature_count_", 2);
 	}
 
 	static
-	private TargetValueStats encodeTargetValueStats(List<?> values, List<? extends Number> means, List<? extends Number> variances){
-		TargetValueStats targetValueStats = new TargetValueStats();
+	private PairCounts encodePairCounts(Object value, List<?> values, List<Integer> counts){
+		PairCounts pairCounts = new PairCounts()
+			.setValue(value)
+			.setTargetValueCounts(encodeTargetValueCounts(values, counts));
 
-		ClassDictUtil.checkSize(values, means, variances);
-
-		for(int i = 0; i < values.size(); i++){
-			GaussianDistribution gaussianDistribution = new GaussianDistribution(means.get(i), variances.get(i));
-
-			TargetValueStat targetValueStat = new TargetValueStat(values.get(i), gaussianDistribution);
-
-			targetValueStats.addTargetValueStats(targetValueStat);
-		}
-
-		return targetValueStats;
+		return pairCounts;
 	}
 
 	static
 	private TargetValueCounts encodeTargetValueCounts(List<?> values, List<Integer> counts){
 		TargetValueCounts targetValueCounts = new TargetValueCounts();
 
-		ClassDictUtil.checkSize(values, counts);
-
 		for(int i = 0; i < values.size(); i++){
-			TargetValueCount targetValueCount = new TargetValueCount(values.get(i), counts.get(i));
+			Object value = values.get(i);
+			Integer count = counts.get(i);
+
+			TargetValueCount targetValueCount = new TargetValueCount(value, count);
 
 			targetValueCounts.addTargetValueCounts(targetValueCount);
 		}

@@ -507,6 +507,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateNaiveBayesSentiment() throws Exception {
+		evaluate(NAIVE_BAYES, SENTIMENT);
+	}
+
+	@Test
 	public void evaluateRandomForestSentiment() throws Exception {
 		evaluate(RANDOM_FOREST, SENTIMENT);
 	}
