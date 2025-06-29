@@ -517,6 +517,16 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateMultinomialNBSentiment() throws Exception {
+		evaluate(MULTINOMIAL_NB, SENTIMENT);
+	}
+
+	@Test
+	public void evaluateMultinomialNBSMoothSentiment() throws Exception {
+		evaluate(MULTINOMIAL_NB + "Smooth", SENTIMENT);
+	}
+
+	@Test
 	public void evaluateRandomForestSentiment() throws Exception {
 		evaluate(RANDOM_FOREST, SENTIMENT);
 	}
