@@ -2,6 +2,8 @@ from sklearn2pmml.sklearn_pandas import patch_sklearn
 
 patch_sklearn()
 
+from sklearn2pmml import _escape
+
 import dill
 import joblib
 import os
@@ -34,7 +36,9 @@ def embed_stored_mojo(estimator, maxsize = None):
 			estimator._mojo_bytes = mojo_file.read()
 
 # Joblib dump
-def store_pkl(obj, name, flavour = "joblib"):
+def store_pkl(obj, name, flavour = "joblib", escape_func = _escape):
+	if escape_func:
+		obj = escape_func(obj, escape_func = escape_func)
 	path = "pkl/" + name + ".pkl"
 	if flavour == "joblib":
 		joblib.dump(obj, path, compress = 9)

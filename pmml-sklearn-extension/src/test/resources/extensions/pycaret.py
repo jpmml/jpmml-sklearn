@@ -64,10 +64,9 @@ def make_classification(df, estimator, name, **setup_params):
 	pipeline = exp.finalize_model(calibrated_model)
 
 	if name.endswith("NA"):
-		pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
-	else:
-		pmml_pipeline = _escape(pipeline, escape_func = _escape)
-	store_pkl(pmml_pipeline, name)
+		pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name])
+
+	store_pkl(pipeline, name, escape_func = _escape)
 
 	yt = Series(pipeline.predict(X), name = y.name)
 	yt_proba = DataFrame(pipeline.predict_proba(X), columns = ["probability(" + str(category) + ")" for category in categories])
@@ -81,7 +80,7 @@ def make_classification(df, estimator, name, **setup_params):
 		yt[mask == -1] = None
 		yt_proba.loc[mask == -1, :] = numpy.NaN
 
-		store_pkl(pmml_pipeline, name)
+		store_pkl(pipeline, name, escape_func = None)
 
 		store_csv(pandas.concat((yt, yt_proba), axis = 1), name)
 
@@ -96,10 +95,11 @@ def make_clustering(df, estimator, name, **setup_params):
 	# XXX
 	model.cluster_centers_ = model.cluster_centers_.astype(float)
 
-	pmml_pipeline = make_pmml_pipeline(model, escape_func = _escape)
-	store_pkl(pmml_pipeline, name)
+	pipeline = make_pmml_pipeline(model)
 
-	yt = Series(pmml_pipeline.predict(X), name = "cluster")
+	store_pkl(pipeline, name, escape_func = _escape)
+
+	yt = Series(pipeline.predict(X), name = "cluster")
 	store_csv(yt, name)
 
 def make_regression(df, estimator, name, **setup_params):
@@ -116,10 +116,9 @@ def make_regression(df, estimator, name, **setup_params):
 	pipeline = exp.finalize_model(model)
 
 	if name.endswith("NA"):
-		pmml_pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name], escape_func = _escape)
-	else:
-		pmml_pipeline = _escape(pipeline, escape_func = _escape)
-	store_pkl(pmml_pipeline, name)
+		pipeline = make_pmml_pipeline(pipeline, target_fields = [y.name])
+
+	store_pkl(pipeline, name, escape_func = _escape)
 
 	yt = Series(pipeline.predict(X), name = y.name)
 	store_csv(yt, name)
@@ -131,7 +130,7 @@ def make_regression(df, estimator, name, **setup_params):
 
 		yt[mask == -1] = numpy.NaN
 
-		store_pkl(pmml_pipeline, name)
+		store_pkl(pipeline, name, escape_func = None)
 
 		store_csv(yt, name)
 
