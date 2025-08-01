@@ -19,7 +19,6 @@
 package sklearn.naive_bayes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -30,82 +29,58 @@ import org.dmg.pmml.naive_bayes.BayesOutput;
 import org.dmg.pmml.naive_bayes.NaiveBayesModel;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
+import org.jpmml.python.HasArray;
 import sklearn.SkLearnClassifier;
 
-public class BernoulliNB extends SkLearnClassifier {
+public class CategoricalNB extends SkLearnClassifier {
 
-	public BernoulliNB(String module, String name){
+	public CategoricalNB(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getFeatureCountShape();
-
-		return shape[1];
-	}
-
-	@Override
 	public NaiveBayesModel encodeModel(Schema schema){
-		int[] shape = getFeatureCountShape();
-
-		int numberOfClasses = shape[0];
-		int numberOfFeatures = shape[1];
-
-		Number alpha = getAlpha();
 		List<Integer> classCount = getClassCount();
-		List<Integer> featureCount = getFeatureCount();
+		List<HasArray> categoryCount = getCategoryCount();
+		List<Integer> numberOfCategories = getNumberOfCategories();
 
 		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-
-		SchemaUtil.checkSize(2, categoricalLabel);
+		List<? extends Feature> features = schema.getFeatures();
 
 		List<?> values = categoricalLabel.getValues();
 
-		// XXX
-		List<Integer> featureValues = Arrays.asList(0, 1);
-
 		BayesInputs bayesInputs = new BayesInputs();
 
-		for(int i = 0; i < numberOfFeatures; i++){
-			Feature feature = schema.getFeature(i);
+		for(int i = 0; i < features.size(); i++){
+			Feature feature = features.get(i);
+			int numberOfFeatureCategories = numberOfCategories.get(i);
 
-			List<Integer> featureClassCount = CMatrixUtil.getColumn(featureCount, numberOfClasses, numberOfFeatures, i);
+			CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+			SchemaUtil.checkSize(numberOfFeatureCategories, categoricalFeature);
 
-			List<Number> nonEventCounts = new ArrayList<>();
-			List<Number> eventCounts = new ArrayList<>();
-
-			for(int j = 0; j < numberOfClasses; j++){
-				Number nonEventCount = classCount.get(j) - featureClassCount.get(j);
-				Number eventCount = featureClassCount.get(j);
-
-				if(alpha.doubleValue() != 0d){
-					nonEventCount = nonEventCount.intValue() + alpha.doubleValue();
-					eventCount = eventCount.intValue() + alpha.doubleValue();
-				}
-
-				nonEventCounts.add(nonEventCount);
-				eventCounts.add(eventCount);
-			}
+			HasArray featureCategoryCount = categoryCount.get(i);
 
 			List<PairCounts> pairCounts = new ArrayList<>();
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(values.get(0), featureValues, nonEventCounts));
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(values.get(1), featureValues, eventCounts));
 
-			BayesInput bayesInput = new BayesInput(continuousFeature.getName(), null, pairCounts);
+			for(int j = 0; j < numberOfFeatureCategories; j++){
+				List<Number> featureValueCounts = (List<Number>)CMatrixUtil.getColumn(featureCategoryCount.getArrayContent(), values.size(), numberOfFeatureCategories, j);
+
+				pairCounts.add(DiscreteNBUtil.encodePairCounts(categoricalFeature.getValue(j), values, featureValueCounts));
+			}
+
+			BayesInput bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}
 
-		BayesOutput bayesOutput = new BayesOutput(null)
+		BayesOutput bayesOutput = new BayesOutput()
 			.setTargetField(categoricalLabel.getName())
 			.setTargetValueCounts(DiscreteNBUtil.encodeTargetValueCounts(values, classCount));
 
@@ -116,19 +91,15 @@ public class BernoulliNB extends SkLearnClassifier {
 		return naiveBayesModel;
 	}
 
-	public Number getAlpha(){
-		return getNumber("alpha");
-	}
-
 	public List<Integer> getClassCount(){
 		return getIntegerArray("class_count_");
 	}
 
-	public List<Integer> getFeatureCount(){
-		return getIntegerArray("feature_count_");
+	public List<HasArray> getCategoryCount(){
+		return getArrayList("category_count_");
 	}
 
-	public int[] getFeatureCountShape(){
-		return getArrayShape("feature_count_", 2);
+	public List<Integer> getNumberOfCategories(){
+		return getIntegerArray("n_categories_");
 	}
 }

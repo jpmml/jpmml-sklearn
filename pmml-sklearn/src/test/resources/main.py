@@ -20,7 +20,7 @@ from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, Elast
 from sklearn.model_selection import FixedThresholdClassifier, GridSearchCV, RandomizedSearchCV, TunedThresholdClassifierCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOutputRegressor, RegressorChain
-from sklearn.naive_bayes import BernoulliNB, GaussianNB, MultinomialNB
+from sklearn.naive_bayes import CategoricalNB, BernoulliNB, GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, NearestCentroid, NearestNeighbors
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import make_pipeline
@@ -730,21 +730,34 @@ def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
 	sentiment_X = sentiment_df["Sentence"]
 	sentiment_y = sentiment_df["Score"]
 
-	pipeline = PMMLPipeline([
-		("vectorizer", CountVectorizer(max_features = 100, binary = isinstance(classifier, BernoulliNB))),
-		("classifier", classifier)
-	])
+	steps = []
+
+	steps.append(("vectorizer", CountVectorizer(max_features = 100, binary = isinstance(classifier, BernoulliNB))))
+	if isinstance(classifier, CategoricalNB):
+		steps.append(("densifier", FunctionTransformer(lambda x: x.toarray(), accept_sparse = True)))
+		steps.append(("discretizer", KBinsDiscretizer(n_bins = 3, encode = "ordinal", strategy = "uniform")))
+	steps.append(("classifier", classifier))
+
+	pipeline = PMMLPipeline(steps)
 	pipeline.fit(sentiment_X, sentiment_y)
-	store_pkl(pipeline, name)
+	if not isinstance(classifier, CategoricalNB):
+		store_pkl(pipeline, name)
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
 	if with_proba:
 		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability(0)", "probability(1)"])
 		score = pandas.concat((score, score_proba), axis = 1)
+	if isinstance(classifier, CategoricalNB):
+		fitted_steps = pipeline.steps
+		pipeline = PMMLPipeline(fitted_steps[:1] + fitted_steps[2:])
+		pipeline.active_fields = numpy.asarray([sentiment_X.name])
+		pipeline.target_fields = numpy.asarray([sentiment_y.name])
+		store_pkl(pipeline, name)
 	store_csv(score, name)
 
 if "Sentiment" in datasets:
 	sentiment_df = load_sentiment("Sentiment")
 
+	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0, force_alpha = True), "CategoricalNBSentiment")
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment")
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0.75), "BernoulliNBSmoothSentiment")
 	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 1e-5, force_alpha = True), "MultinomialNBSentiment")
