@@ -68,9 +68,6 @@ public class BernoulliNB extends SkLearnClassifier {
 
 		List<?> values = categoricalLabel.getValues();
 
-		// XXX
-		List<Integer> featureValues = Arrays.asList(0, 1);
-
 		BayesInputs bayesInputs = new BayesInputs();
 
 		for(int i = 0; i < numberOfFeatures; i++){
@@ -79,6 +76,9 @@ public class BernoulliNB extends SkLearnClassifier {
 			List<Integer> featureClassCount = CMatrixUtil.getColumn(featureCount, numberOfClasses, numberOfFeatures, i);
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+			// XXX
+			List<Integer> featureValues = Arrays.asList(0, 1);
 
 			List<Number> nonEventCounts = new ArrayList<>();
 			List<Number> eventCounts = new ArrayList<>();
@@ -97,8 +97,8 @@ public class BernoulliNB extends SkLearnClassifier {
 			}
 
 			List<PairCounts> pairCounts = new ArrayList<>();
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(values.get(0), featureValues, nonEventCounts));
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(values.get(1), featureValues, eventCounts));
+			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(0), values, nonEventCounts));
+			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(1), values, eventCounts));
 
 			BayesInput bayesInput = new BayesInput(continuousFeature.getName(), null, pairCounts);
 
