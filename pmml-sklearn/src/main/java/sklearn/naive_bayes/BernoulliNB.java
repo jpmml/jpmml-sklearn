@@ -19,7 +19,6 @@
 package sklearn.naive_bayes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -30,8 +29,8 @@ import org.dmg.pmml.naive_bayes.BayesOutput;
 import org.dmg.pmml.naive_bayes.NaiveBayesModel;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -75,10 +74,11 @@ public class BernoulliNB extends SkLearnClassifier {
 
 			List<Integer> featureClassCount = CMatrixUtil.getColumn(featureCount, numberOfClasses, numberOfFeatures, i);
 
-			ContinuousFeature continuousFeature = feature.toContinuousFeature();
+			CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-			// XXX
-			List<Integer> featureValues = Arrays.asList(0, 1);
+			SchemaUtil.checkSize(2, categoricalFeature);
+
+			List<?> featureValues = categoricalFeature.getValues();
 
 			List<Number> nonEventCounts = new ArrayList<>();
 			List<Number> eventCounts = new ArrayList<>();
@@ -100,7 +100,7 @@ public class BernoulliNB extends SkLearnClassifier {
 			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(0), values, nonEventCounts));
 			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(1), values, eventCounts));
 
-			BayesInput bayesInput = new BayesInput(continuousFeature.getName(), null, pairCounts);
+			BayesInput bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}
