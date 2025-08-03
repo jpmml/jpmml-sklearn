@@ -44,6 +44,7 @@ import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
+import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
@@ -51,6 +52,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
+import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
@@ -85,6 +87,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		Boolean binary = getBinary();
 		Boolean lowercase = getLowercase();
 		Map<String, ?> vocabulary = getVocabulary();
 
@@ -104,6 +107,11 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		TypeInfo dtype = getDType();
 
 		DataType dataType = (dtype != null ? dtype.getDataType() : DataType.DOUBLE);
+		OpType opType = TypeUtil.getOpType(dataType);
+
+		if(binary){
+			opType = OpType.CATEGORICAL;
+		} // End if
 
 		if(lowercase){
 			Apply apply = ExpressionUtil.createApply(PMMLFunctions.LOWERCASE, feature.ref());
@@ -124,13 +132,23 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 
 			Apply apply = encodeApply(defineFunction, feature, i, term);
 
-			Feature termFeature = new ObjectFeature(encoder, FieldNameUtil.create(functionName(), feature, term), dataType){
+			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create(functionName(), feature, term), opType, dataType, apply);
 
-				@Override
-				public ContinuousFeature toContinuousFeature(){
-					return toContinuousFeature(getName(), getDataType(), () -> apply);
-				}
-			};
+			Feature termFeature;
+
+			if(binary){
+				termFeature = new CategoricalFeature(encoder, derivedField, Arrays.asList(0, 1));
+			} else
+
+			{
+				termFeature = new ObjectFeature(encoder, derivedField){
+
+					@Override
+					public ContinuousFeature toContinuousFeature(){
+						return new ContinuousFeature(encoder, this);
+					}
+				};
+			}
 
 			result.add(termFeature);
 		}
