@@ -20,6 +20,8 @@ package sklearn.naive_bayes;
 
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.dmg.pmml.naive_bayes.TargetValueCount;
 import org.dmg.pmml.naive_bayes.TargetValueCounts;
@@ -30,7 +32,20 @@ public class DiscreteNBUtil {
 	}
 
 	static
-	public PairCounts encodePairCounts(Object value, List<?> values, List<? extends Number> counts){
+	public PairCounts encodePairCounts(Object value, List<?> values, Number alpha, List<? extends Number> counts){
+
+		if(alpha.doubleValue() != 0d){
+			Function<Number, Number> function = new Function<Number, Number>(){
+
+				@Override
+				public Number apply(Number count){
+					return count.doubleValue() + alpha.doubleValue();
+				}
+			};
+
+			counts = Lists.transform(counts, function);
+		}
+
 		PairCounts pairCounts = new PairCounts()
 			.setValue(value)
 			.setTargetValueCounts(encodeTargetValueCounts(values, counts));

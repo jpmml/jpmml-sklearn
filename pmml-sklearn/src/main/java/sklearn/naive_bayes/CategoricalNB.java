@@ -46,6 +46,7 @@ public class CategoricalNB extends SkLearnClassifier {
 
 	@Override
 	public NaiveBayesModel encodeModel(Schema schema){
+		Number alpha = getAlpha();
 		List<Integer> classCount = getClassCount();
 		List<HasArray> categoryCount = getCategoryCount();
 		List<Integer> numberOfCategories = getNumberOfCategories();
@@ -72,7 +73,7 @@ public class CategoricalNB extends SkLearnClassifier {
 			for(int j = 0; j < numberOfFeatureCategories; j++){
 				List<Number> featureValueCounts = (List<Number>)CMatrixUtil.getColumn(featureCategoryCount.getArrayContent(), values.size(), numberOfFeatureCategories, j);
 
-				pairCounts.add(DiscreteNBUtil.encodePairCounts(categoricalFeature.getValue(j), values, featureValueCounts));
+				pairCounts.add(DiscreteNBUtil.encodePairCounts(categoricalFeature.getValue(j), values, alpha, featureValueCounts));
 			}
 
 			BayesInput bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
@@ -89,6 +90,10 @@ public class CategoricalNB extends SkLearnClassifier {
 		encodePredictProbaOutput(naiveBayesModel, DataType.DOUBLE, categoricalLabel);
 
 		return naiveBayesModel;
+	}
+
+	public Number getAlpha(){
+		return getNumber("alpha");
 	}
 
 	public List<Integer> getClassCount(){

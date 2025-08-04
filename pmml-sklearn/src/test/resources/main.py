@@ -758,6 +758,7 @@ if "Sentiment" in datasets:
 	sentiment_df = load_sentiment("Sentiment")
 
 	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0, force_alpha = True), "CategoricalNBSentiment")
+	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0.75), "CategoricalNBSmoothSentiment")
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment")
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0.75), "BernoulliNBSmoothSentiment")
 	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 1e-5, force_alpha = True), "MultinomialNBSentiment")

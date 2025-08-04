@@ -512,6 +512,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateCategoricalNBSmoothSentiment() throws Exception {
+		evaluate(CATEGORICAL_NB + "Smooth", SENTIMENT);
+	}
+
+	@Test
 	public void evaluateLinearSVCSentiment() throws Exception {
 		evaluate(LINEAR_SVC, SENTIMENT);
 	}

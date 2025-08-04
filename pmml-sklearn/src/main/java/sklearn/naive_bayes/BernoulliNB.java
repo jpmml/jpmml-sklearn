@@ -87,18 +87,13 @@ public class BernoulliNB extends SkLearnClassifier {
 				Number nonEventCount = classCount.get(j) - featureClassCount.get(j);
 				Number eventCount = featureClassCount.get(j);
 
-				if(alpha.doubleValue() != 0d){
-					nonEventCount = nonEventCount.intValue() + alpha.doubleValue();
-					eventCount = eventCount.intValue() + alpha.doubleValue();
-				}
-
 				nonEventCounts.add(nonEventCount);
 				eventCounts.add(eventCount);
 			}
 
 			List<PairCounts> pairCounts = new ArrayList<>();
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(0), values, nonEventCounts));
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(1), values, eventCounts));
+			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(0), values, alpha, nonEventCounts));
+			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(1), values, alpha, eventCounts));
 
 			BayesInput bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
 
