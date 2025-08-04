@@ -21,23 +21,18 @@ package sklearn.naive_bayes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.naive_bayes.BayesInput;
 import org.dmg.pmml.naive_bayes.BayesInputs;
-import org.dmg.pmml.naive_bayes.BayesOutput;
 import org.dmg.pmml.naive_bayes.NaiveBayesModel;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
-import sklearn.SkLearnClassifier;
 
-public class BernoulliNB extends SkLearnClassifier {
+public class BernoulliNB extends DiscreteNB {
 
 	public BernoulliNB(String module, String name){
 		super(module, name);
@@ -51,7 +46,7 @@ public class BernoulliNB extends SkLearnClassifier {
 	}
 
 	@Override
-	public NaiveBayesModel encodeModel(Schema schema){
+	public BayesInputs encodeBayesInputs(List<?> values, List<? extends Feature> features){
 		int[] shape = getFeatureCountShape();
 
 		int numberOfClasses = shape[0];
@@ -61,16 +56,10 @@ public class BernoulliNB extends SkLearnClassifier {
 		List<Integer> classCount = getClassCount();
 		List<Integer> featureCount = getFeatureCount();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-
-		SchemaUtil.checkSize(2, categoricalLabel);
-
-		List<?> values = categoricalLabel.getValues();
-
 		BayesInputs bayesInputs = new BayesInputs();
 
 		for(int i = 0; i < numberOfFeatures; i++){
-			Feature feature = schema.getFeature(i);
+			Feature feature = features.get(i);
 
 			List<Integer> featureClassCount = CMatrixUtil.getColumn(featureCount, numberOfClasses, numberOfFeatures, i);
 
@@ -100,23 +89,16 @@ public class BernoulliNB extends SkLearnClassifier {
 			bayesInputs.addBayesInputs(bayesInput);
 		}
 
-		BayesOutput bayesOutput = new BayesOutput(null)
-			.setTargetField(categoricalLabel.getName())
-			.setTargetValueCounts(DiscreteNBUtil.encodeTargetValueCounts(values, classCount));
-
-		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), bayesInputs, bayesOutput);
-
-		encodePredictProbaOutput(naiveBayesModel, DataType.DOUBLE, categoricalLabel);
-
-		return naiveBayesModel;
+		return bayesInputs;
 	}
 
-	public Number getAlpha(){
-		return getNumber("alpha");
-	}
+	@Override
+	public NaiveBayesModel encodeModel(Schema schema){
+		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
 
-	public List<Integer> getClassCount(){
-		return getIntegerArray("class_count_");
+		SchemaUtil.checkSize(2, categoricalLabel);
+
+		return super.encodeModel(schema);
 	}
 
 	public List<Integer> getFeatureCount(){

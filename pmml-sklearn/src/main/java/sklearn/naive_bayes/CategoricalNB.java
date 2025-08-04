@@ -21,40 +21,26 @@ package sklearn.naive_bayes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.naive_bayes.BayesInput;
 import org.dmg.pmml.naive_bayes.BayesInputs;
-import org.dmg.pmml.naive_bayes.BayesOutput;
-import org.dmg.pmml.naive_bayes.NaiveBayesModel;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalFeature;
-import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.HasArray;
-import sklearn.SkLearnClassifier;
 
-public class CategoricalNB extends SkLearnClassifier {
+public class CategoricalNB extends DiscreteNB {
 
 	public CategoricalNB(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public NaiveBayesModel encodeModel(Schema schema){
+	public BayesInputs encodeBayesInputs(List<?> values, List<? extends Feature> features){
 		Number alpha = getAlpha();
-		List<Integer> classCount = getClassCount();
 		List<HasArray> categoryCount = getCategoryCount();
 		List<Integer> numberOfCategories = getNumberOfCategories();
-
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
-		List<? extends Feature> features = schema.getFeatures();
-
-		List<?> values = categoricalLabel.getValues();
 
 		BayesInputs bayesInputs = new BayesInputs();
 
@@ -81,23 +67,7 @@ public class CategoricalNB extends SkLearnClassifier {
 			bayesInputs.addBayesInputs(bayesInput);
 		}
 
-		BayesOutput bayesOutput = new BayesOutput()
-			.setTargetField(categoricalLabel.getName())
-			.setTargetValueCounts(DiscreteNBUtil.encodeTargetValueCounts(values, classCount));
-
-		NaiveBayesModel naiveBayesModel = new NaiveBayesModel(0d, MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), bayesInputs, bayesOutput);
-
-		encodePredictProbaOutput(naiveBayesModel, DataType.DOUBLE, categoricalLabel);
-
-		return naiveBayesModel;
-	}
-
-	public Number getAlpha(){
-		return getNumber("alpha");
-	}
-
-	public List<Integer> getClassCount(){
-		return getIntegerArray("class_count_");
+		return bayesInputs;
 	}
 
 	public List<HasArray> getCategoryCount(){
