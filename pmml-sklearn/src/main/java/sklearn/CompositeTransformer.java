@@ -25,7 +25,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
-public class CompositeTransformer extends Transformer implements HasHead {
+public class CompositeTransformer extends Transformer implements HasHead, Proxy {
 
 	private Composite composite = null;
 
