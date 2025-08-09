@@ -18,10 +18,32 @@
  */
 package sklearn;
 
-public class PassThrough extends IdentityTransformer {
+import java.util.List;
+
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
+import org.jpmml.converter.Feature;
+import org.jpmml.sklearn.SkLearnEncoder;
+
+public class PassThrough extends Transformer {
 
 	private PassThrough(){
 		super(null, "_passthrough");
+	}
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		return features;
 	}
 
 	public static final PassThrough INSTANCE = new PassThrough();
