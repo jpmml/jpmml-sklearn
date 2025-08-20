@@ -27,5 +27,6 @@ public interface SkLearnFields {
 	String N_FEATURES = "n_features_";
 	String N_FEATURES_IN = "n_features_in_";
 	String N_OUTPUTS = "n_outputs_";
+	String SKLEARN_TAGS = "_sklearn_tags";
 	String SKLEARN_VERSION = "_sklearn_version";
 }

@@ -19,6 +19,7 @@
 package sklearn;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnException;
@@ -63,6 +64,10 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		setattr(SkLearn2PMMLFields.PMML_NAME, pmmlName);
 
 		return this;
+	}
+
+	public Map<String, ?> getSkLearnTags(){
+		return getOptionalDict(SkLearnFields.SKLEARN_TAGS);
 	}
 
 	public String getSkLearnVersion(){
