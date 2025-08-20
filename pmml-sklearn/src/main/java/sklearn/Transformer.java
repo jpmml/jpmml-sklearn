@@ -21,6 +21,7 @@ package sklearn;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import builtins.TypeConstructor;
 import com.google.common.collect.Lists;
@@ -66,6 +67,10 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	@Override
 	public DataType getDataType(){
 		return DataType.DOUBLE;
+	}
+
+	public Map<String, ?> getTransformerTags(){
+		return (Map)StepUtil.getTag(getSkLearnTags(), "transformer_tags");
 	}
 
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){

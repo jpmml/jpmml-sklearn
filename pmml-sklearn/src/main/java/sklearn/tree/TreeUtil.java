@@ -71,6 +71,7 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
+import sklearn.StepUtil;
 import sklearn.VersionUtil;
 import sklearn.tree.visitors.TreeModelCompactor;
 import sklearn.tree.visitors.TreeModelFlattener;
@@ -83,8 +84,12 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasTree> boolean hasMissingValueSupport(E estimator){
-		String sklearnVersion = estimator.getSkLearnVersion();
+		Boolean sklearnAllowNaN = (Boolean)StepUtil.getTag(estimator.getInputTags(), "allow_nan");
+		if(sklearnAllowNaN != null){
+			return sklearnAllowNaN;
+		}
 
+		String sklearnVersion = estimator.getSkLearnVersion();
 		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.3.0") >= 0){
 			return true;
 		}

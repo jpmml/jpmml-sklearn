@@ -19,6 +19,7 @@
 package sklearn;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -59,6 +60,21 @@ public class StepUtil {
 		if((numberOfFeatures != HasNumberOfFeatures.UNKNOWN) && (numberOfFeatures != features.size())){
 			throw new IllegalArgumentException("Expected " + numberOfFeatures + " feature(s) (" + ClassDictUtil.formatClass(step)  + "), got " + features.size() + " feature(s)");
 		}
+	}
+
+	static
+	public Object getTag(Map<String, ?> tags, String name){
+		return getTag(tags, name, null);
+	}
+
+	static
+	public Object getTag(Map<String, ?> tags, String name, Object defaultValue){
+
+		if(tags != null){
+			return ((Map)tags).getOrDefault(name, defaultValue);
+		}
+
+		return defaultValue;
 	}
 
 	static

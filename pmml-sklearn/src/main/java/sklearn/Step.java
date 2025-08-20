@@ -56,6 +56,10 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		return null;
 	}
 
+	public Map<String, ?> getInputTags(){
+		return (Map)StepUtil.getTag(getSkLearnTags(), "input_tags");
+	}
+
 	public String getPMMLName(){
 		return getOptionalString(SkLearn2PMMLFields.PMML_NAME);
 	}

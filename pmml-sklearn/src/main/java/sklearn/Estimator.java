@@ -111,6 +111,18 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		return HasNumberOfOutputs.UNKNOWN;
 	}
 
+	public Map<String, ?> getClassifierTags(){
+		return (Map)StepUtil.getTag(getSkLearnTags(), "classifier_tags");
+	}
+
+	public Map<String, ?> getRegressorTags(){
+		return (Map)StepUtil.getTag(getSkLearnTags(), "regressor_tags");
+	}
+
+	public Map<String, ?> getTargetTags(){
+		return (Map)StepUtil.getTag(getSkLearnTags(), "target_tags");
+	}
+
 	public String getAlgorithmName(){
 		return getClassName();
 	}
