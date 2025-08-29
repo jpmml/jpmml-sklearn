@@ -30,7 +30,7 @@ import sklearn.HasNumberOfFeatures;
 import sklearn.HasNumberOfOutputs;
 import sklearn.SkLearnFields;
 import sklearn.Step;
-import sklearn2pmml.pipeline.PMMLPipeline;
+import sklearn.pipeline.SkLearnPipeline;
 
 public class EncodableUtil {
 
@@ -56,13 +56,21 @@ public class EncodableUtil {
 
 		Step step = castFunction.apply(object);
 
-		PMMLPipeline pipeline = new PMMLPipeline()
-			.setSteps(Collections.singletonList(new Object[]{"estimator", step}));
+		// A Castable non-Step class may turn into a Step subclass during "deep casting"
+		if(step instanceof Encodable){
+			Encodable encodable = (Encodable)step;
 
-		String repr = step.getOptionalString("repr_");
-		if(repr != null){
-			pipeline.setRepr(repr);
+			return encodable;
 		}
+
+		SkLearnPipeline pipeline = new SkLearnPipeline(){
+
+			{
+				List<Object[]> steps = Collections.singletonList(new Object[]{"estimator", step});
+
+				setSteps(steps);
+			}
+		};
 
 		return pipeline;
 	}
