@@ -23,13 +23,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jpmml.python.AttributeException;
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.HasNumberOfOutputs;
 import sklearn.SkLearnFields;
 import sklearn.Step;
-import sklearn2pmml.pipeline.PMMLPipelineUtil;
+import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class EncodableUtil {
 
@@ -45,7 +46,25 @@ public class EncodableUtil {
 			return encodable;
 		}
 
-		return PMMLPipelineUtil.toPMMLPipeline(object);
+		CastFunction<Step> castFunction = new CastFunction<Step>(Step.class){
+
+			@Override
+			protected String formatMessage(Object object){
+				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
+			}
+		};
+
+		Step step = castFunction.apply(object);
+
+		PMMLPipeline pipeline = new PMMLPipeline()
+			.setSteps(Collections.singletonList(new Object[]{"estimator", step}));
+
+		String repr = step.getOptionalString("repr_");
+		if(repr != null){
+			pipeline.setRepr(repr);
+		}
+
+		return pipeline;
 	}
 
 	static
