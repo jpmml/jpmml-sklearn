@@ -21,6 +21,7 @@ package sklearn.model_selection;
 import org.jpmml.python.Castable;
 import org.jpmml.python.PythonObject;
 import sklearn.Estimator;
+import sklearn.Step;
 
 public class EstimatorSearcher extends PythonObject implements Castable {
 
@@ -35,6 +36,12 @@ public class EstimatorSearcher extends PythonObject implements Castable {
 			Class<? extends Estimator> estimatorClazz = clazz.asSubclass(Estimator.class);
 
 			return getBestEstimator(estimatorClazz);
+		} else
+
+		if((Step.class).isAssignableFrom(clazz)){
+			Class<? extends Step> stepClazz = clazz.asSubclass(Step.class);
+
+			return getBestEstimator();
 		}
 
 		return this;
