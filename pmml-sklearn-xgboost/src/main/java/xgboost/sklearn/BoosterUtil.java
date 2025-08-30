@@ -28,7 +28,9 @@ import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
+import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.ByteOrderUtil;
 import org.jpmml.xgboost.FeatureMap;
 import org.jpmml.xgboost.GBTree;
@@ -112,6 +114,17 @@ public class BoosterUtil {
 		}
 
 		Learner learner = booster.getLearner(ByteOrder.nativeOrder(), null);
+
+		if(featureMap == null){
+			FeatureMap embeddedFeatureMap = learner.encodeFeatureMap();
+
+			if(embeddedFeatureMap == null || embeddedFeatureMap.isEmpty()){
+				String message = "The booster object does not specify feature information. " +
+					"Please set the '" + ClassDictUtil.formatMember(booster, "fmap") + "' attribute, or re-train the booster with a DMatrix that has both feature names and feature types set";
+
+				throw new SkLearnException(message);
+			}
+		}
 
 		Map<String, ?> options = getOptions(booster, learner);
 
