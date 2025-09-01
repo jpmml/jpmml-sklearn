@@ -22,9 +22,10 @@ import java.util.List;
 
 import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
+import sklearn.HasSteps;
 import sklearn.Transformer;
 
-public interface HasEstimatorSteps {
+public interface HasEstimatorSteps extends HasSteps {
 
 	default
 	List<? extends Estimator> getEstimators(){
@@ -38,6 +39,4 @@ public interface HasEstimatorSteps {
 	}
 
 	Transformer getController();
-
-	List<Object[]> getSteps();
 }

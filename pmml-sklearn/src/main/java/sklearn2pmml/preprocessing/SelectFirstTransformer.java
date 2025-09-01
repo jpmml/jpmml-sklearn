@@ -38,10 +38,11 @@ import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.HasSteps;
 import sklearn.Transformer;
 import sklearn2pmml.util.EvaluatableUtil;
 
-public class SelectFirstTransformer extends Transformer {
+public class SelectFirstTransformer extends Transformer implements HasSteps {
 
 	public SelectFirstTransformer(String module, String name){
 		super(module, name);
@@ -106,6 +107,7 @@ public class SelectFirstTransformer extends Transformer {
 		return getOptional("controller", Transformer.class);
 	}
 
+	@Override
 	public List<Object[]> getSteps(){
 		return getTupleList("steps");
 	}

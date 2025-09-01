@@ -35,6 +35,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Composite;
 import sklearn.Estimator;
+import sklearn.HasSteps;
 import sklearn.PassThrough;
 import sklearn.SkLearnFields;
 import sklearn.SkLearnSteps;
@@ -42,7 +43,7 @@ import sklearn.Step;
 import sklearn.StepUtil;
 import sklearn.Transformer;
 
-public class SkLearnPipeline extends Composite implements Encodable {
+public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 	public SkLearnPipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -241,6 +242,7 @@ public class SkLearnPipeline extends Composite implements Encodable {
 		return encoder.encodePMML(model);
 	}
 
+	@Override
 	public List<Object[]> getSteps(){
 		return getTupleList("steps");
 	}

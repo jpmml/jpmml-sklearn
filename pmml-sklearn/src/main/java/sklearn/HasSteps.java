@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Villu Ruusmann
+ * Copyright (c) 2025 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,21 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn_pandas;
+package sklearn;
 
 import java.util.List;
 
-import org.jpmml.python.PythonObject;
-import sklearn.HasSteps;
+public interface HasSteps {
 
-public class TransformerPipeline extends PythonObject implements HasSteps {
-
-	public TransformerPipeline(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public List<Object[]> getSteps(){
-		return getTupleList("steps");
-	}
+	List<Object[]> getSteps();
 }
