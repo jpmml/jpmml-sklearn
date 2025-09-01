@@ -37,6 +37,7 @@ import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
 import sklearn.Transformer;
+import sklearn2pmml.HasController;
 import sklearn2pmml.util.EvaluatableUtil;
 
 public class SelectFirstUtil {
@@ -45,7 +46,7 @@ public class SelectFirstUtil {
 	}
 
 	static
-	public <E extends Estimator & HasEstimatorSteps> MiningModel encodeSelectFirstEstimator(E ensembleEstimator, Schema schema){
+	public <E extends Estimator & HasController & HasEstimatorSteps> MiningModel encodeSelectFirstEstimator(E ensembleEstimator, Schema schema){
 		Transformer controller = ensembleEstimator.getController();
 		List<Object[]> steps = ensembleEstimator.getSteps();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Villu Ruusmann
+ * Copyright (c) 2025 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,34 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.ensemble;
+package sklearn2pmml;
 
-import java.util.List;
-
-import org.dmg.pmml.mining.MiningModel;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
 import sklearn.Transformer;
-import sklearn2pmml.HasController;
 
-public class SelectFirstRegressor extends Regressor implements HasController, HasEstimatorSteps {
+public interface HasController {
 
-	public SelectFirstRegressor(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public MiningModel encodeModel(Schema schema){
-		return SelectFirstUtil.encodeSelectFirstEstimator(this, schema);
-	}
-
-	@Override
-	public Transformer getController(){
-		return getOptional("controller", Transformer.class);
-	}
-
-	@Override
-	public List<Object[]> getSteps(){
-		return getTupleList("steps");
-	}
+	Transformer getController();
 }

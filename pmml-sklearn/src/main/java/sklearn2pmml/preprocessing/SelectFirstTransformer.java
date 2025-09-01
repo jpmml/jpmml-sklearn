@@ -40,9 +40,10 @@ import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasSteps;
 import sklearn.Transformer;
+import sklearn2pmml.HasController;
 import sklearn2pmml.util.EvaluatableUtil;
 
-public class SelectFirstTransformer extends Transformer implements HasSteps {
+public class SelectFirstTransformer extends Transformer implements HasController, HasSteps {
 
 	public SelectFirstTransformer(String module, String name){
 		super(module, name);
@@ -103,6 +104,7 @@ public class SelectFirstTransformer extends Transformer implements HasSteps {
 		return Collections.singletonList(FeatureUtil.createFeature(derivedField, encoder));
 	}
 
+	@Override
 	public Transformer getController(){
 		return getOptional("controller", Transformer.class);
 	}

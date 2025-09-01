@@ -27,8 +27,9 @@ import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.Transformer;
+import sklearn2pmml.HasController;
 
-public class SelectFirstClassifier extends Classifier implements HasEstimatorSteps {
+public class SelectFirstClassifier extends Classifier implements HasController, HasEstimatorSteps {
 
 	public SelectFirstClassifier(String module, String name){
 		super(module, name);

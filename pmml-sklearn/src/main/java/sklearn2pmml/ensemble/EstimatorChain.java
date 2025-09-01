@@ -45,9 +45,10 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.Transformer;
+import sklearn2pmml.HasController;
 import sklearn2pmml.util.EvaluatableUtil;
 
-public class EstimatorChain extends Estimator implements HasClasses, HasEstimatorSteps {
+public class EstimatorChain extends Estimator implements HasClasses, HasController, HasEstimatorSteps {
 
 	public EstimatorChain(String module, String name){
 		super(module, name);
