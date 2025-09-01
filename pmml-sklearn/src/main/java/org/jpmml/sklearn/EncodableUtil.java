@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.PMML;
 import org.jpmml.python.AttributeException;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
@@ -69,6 +70,12 @@ public class EncodableUtil {
 				List<Object[]> steps = Collections.singletonList(new Object[]{"estimator", step});
 
 				setSteps(steps);
+			}
+
+			@Override
+			// No-op, to leave an identification mark into exception stack traces
+			public PMML encodePMML(){
+				return super.encodePMML();
 			}
 		};
 
