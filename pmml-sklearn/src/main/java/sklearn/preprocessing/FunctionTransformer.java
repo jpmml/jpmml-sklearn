@@ -22,17 +22,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.AttributeException;
+import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.FunctionUtil;
 import org.jpmml.python.Identifiable;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.IdentifiableUtil;
 import sklearn.SkLearnTransformer;
+import sklearn2pmml.preprocessing.ExpressionTransformer;
 
 public class FunctionTransformer extends SkLearnTransformer {
 
@@ -66,10 +71,43 @@ public class FunctionTransformer extends SkLearnTransformer {
 	}
 
 	public Identifiable getFunc(){
-		return IdentifiableUtil.filter(getOptionalIdentifiable("func"));
+		Identifiable func;
+
+		try {
+			func = getOptionalIdentifiable("func");
+		} catch(AttributeException ae){
+			String name = getFunctionName("func");
+
+			if(name != null && name.startsWith("__main__" + ".")){
+				name = name.substring(("__main__" + ".").length());
+
+				String message = "The function \'" + name + " \' does not have a persistent state. " +
+					"Please use the " + (ExpressionTransformer.class).getName() + " transformer class to give the function a persistent state (eg. " + ExpressionTransformer.formatExpressionExample(name) + ")";
+
+				throw new SkLearnException(message, ae);
+			}
+
+			throw ae;
+		}
+
+		return IdentifiableUtil.filter(func);
 	}
 
 	public Identifiable getInverseFunc(){
-		return IdentifiableUtil.filter(getOptionalIdentifiable("inverse_func"));
+		Identifiable inverseFunc = getOptionalIdentifiable("inverse_func");
+
+		return IdentifiableUtil.filter(inverseFunc);
+	}
+
+	private String getFunctionName(String name){
+		Object object = getOptionalObject(name);
+
+		if(object instanceof ClassDictConstructor){
+			ClassDictConstructor dictConstructor = (ClassDictConstructor)object;
+
+			return ClassDictConstructorUtil.getClassName(dictConstructor);
+		}
+
+		return null;
 	}
 }

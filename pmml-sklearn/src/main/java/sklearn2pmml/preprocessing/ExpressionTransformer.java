@@ -309,6 +309,11 @@ public class ExpressionTransformer extends Transformer {
 		return true;
 	}
 
+	static
+	public String formatExpressionExample(String name){
+		return "ExpressionTransformer(Expression(\"" + name + "(...)\", function_defs = [" + name + "]))";
+	}
+
 	private static final String INVALIDVALUETREATMENT_AS_MISSING = "as_missing";
 	private static final String INVALIDVALUETREATMENT_RETURN_INVALID = "return_invalid";
 }
