@@ -93,6 +93,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 					}
 					break;
 				case MultiOneHotEncoder.HANDLEUNKNOWN_INFREQUENT_IF_EXIST:
+				case MultiOneHotEncoder.HANDLEUNKNOWN_WARN:
 					{
 						if(featureInfrequentEnabled){
 							invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_VALUE, infrequentCategory);
@@ -244,7 +245,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 	}
 
 	public String getHandleUnknown(){
-		return getEnum("handle_unknown", this::getString, Arrays.asList(MultiOneHotEncoder.HANDLEUNKNOWN_ERROR, MultiOneHotEncoder.HANDLEUNKNOWN_IGNORE, MultiOneHotEncoder.HANDLEUNKNOWN_INFREQUENT_IF_EXIST));
+		return getEnum("handle_unknown", this::getString, Arrays.asList(MultiOneHotEncoder.HANDLEUNKNOWN_ERROR, MultiOneHotEncoder.HANDLEUNKNOWN_IGNORE, MultiOneHotEncoder.HANDLEUNKNOWN_INFREQUENT_IF_EXIST, MultiOneHotEncoder.HANDLEUNKNOWN_WARN));
 	}
 
 	public Boolean getInfrequentEnabled(){
@@ -314,4 +315,5 @@ public class MultiOneHotEncoder extends BaseEncoder {
 	private static final String HANDLEUNKNOWN_ERROR = "error";
 	private static final String HANDLEUNKNOWN_IGNORE = "ignore";
 	private static final String HANDLEUNKNOWN_INFREQUENT_IF_EXIST = "infrequent_if_exist";
+	private static final String HANDLEUNKNOWN_WARN = "warn";
 }
