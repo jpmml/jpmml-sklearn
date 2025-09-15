@@ -43,7 +43,7 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 	}
 
 	private String formatMessage(){
-		return "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have persistent state. " +
-			"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give the selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")";
+		return "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent state. " +
+			"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")";
 	}
 }
