@@ -52,20 +52,7 @@ For a full list of supported transformer and estimator classes see the [`feature
 ### The Python side of operations
 
 * Python 2.7, 3.4 or newer.
-* [`scikit-learn`](https://pypi.python.org/pypi/scikit-learn) 0.16.0 or newer.
-* [`sklearn-pandas`](https://pypi.python.org/pypi/sklearn-pandas) 0.0.10 or newer.
-* [`sklearn2pmml`](https://github.com/jpmml/sklearn2pmml) 0.14.0 or newer.
-
-Validating Python installation:
-
-```python
-import joblib, sklearn, sklearn_pandas, sklearn2pmml
-
-print(joblib.__version__)
-print(sklearn.__version__)
-print(sklearn_pandas.__version__)
-print(sklearn2pmml.__version__)
-```
+* Scikit-Learn 0.16.0 or newer. This is not a typo - all Scikit-Learn version from the past 10 years (2015 or newer) should work equally fine.
 
 ### The JPMML-SkLearn side of operations
 
@@ -74,7 +61,8 @@ print(sklearn2pmml.__version__)
 # Installation #
 
 Enter the project root directory and build using [Apache Maven](https://maven.apache.org/):
-```
+
+```bash
 mvn clean install
 ```
 
@@ -84,103 +72,59 @@ The build produces a library JAR file `pmml-sklearn/target/pmml-sklearn-1.9-SNAP
 
 A typical workflow can be summarized as follows:
 
-1. Use Python to train a model.
-2. Serialize the model in `pickle` data format to a file in a local filesystem.
-3. Use the JPMML-SkLearn command-line converter application to turn the pickle file to a PMML file.
+1. Use Scikit-Learn to assemble and fit a pipeline.
+2. Serialize this pipeline in `pickle` data format to a file in a local filesystem.
+3. Use the JPMML-SkLearn command-line application to convert this pickle file to a PMML file.
 
 ### The Python side of operations
 
-Loading data to a `pandas.DataFrame` object:
+Assembling and fitting a pipeline:
 
 ```python
-import pandas
-
-df = pandas.read_csv("Iris.csv")
-
-iris_X = df[df.columns.difference(["Species"])]
-iris_y = df["Species"]
-```
-
-First, creating a `sklearn_pandas.DataFrameMapper` object, which performs **column-oriented** feature engineering and selection work:
-
-```python
-from sklearn_pandas import DataFrameMapper
-from sklearn.preprocessing import StandardScaler
-from sklearn2pmml.decoration import ContinuousDomain
-
-column_preprocessor = DataFrameMapper([
-    (["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"], [ContinuousDomain(), StandardScaler()])
-])
-```
-
-Second, creating `Transformer` and `Selector` objects, which perform **table-oriented** feature engineering and selection work:
-
-```python
-from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest
+from sklearn.compose import ColumnTransformer
+from sklearn.datasets import load_iris
+#from sklearn.decomposition import PCA
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn2pmml import SelectorProxy
+from sklearn.preprocessing import StandardScaler
 
-table_preprocessor = Pipeline([
-    ("pca", PCA(n_components = 3)),
-    ("selector", SelectorProxy(SelectKBest(k = 2)))
-])
-```
+iris_X, iris_y = load_iris(return_X_y = True, as_frame = True)
+iris_X.columns = [col.rstrip(" (cm)") for col in iris_X.columns]
 
-Please note that stateless Scikit-Learn selector objects need to be wrapped into an `sklearn2pmml.SelectprProxy` object.
-
-Third, creating an `Estimator` object:
-
-```python
-from sklearn.tree import DecisionTreeClassifier
-
-classifier = DecisionTreeClassifier(min_samples_leaf = 5)
-```
-
-Combining the above objects into a `sklearn2pmml.pipeline.PMMLPipeline` object, and running the experiment:
-
-```python
-from sklearn2pmml.pipeline import PMMLPipeline
-
-pipeline = PMMLPipeline([
-    ("columns", column_preprocessor),
-    ("table", table_preprocessor),
-    ("classifier", classifier)
+pipeline = Pipeline([
+    # Column-oriented feature engineering
+    ("transformer", ColumnTransformer([
+        ("scaler", StandardScaler(), [0, 1, 2, 3])
+    ], remainder = "drop")),
+    # Table-oriented feature engineering
+    #("pca", PCA(n_components = 3)),
+    # Final model
+    ("classifier", LogisticRegression())
 ])
 pipeline.fit(iris_X, iris_y)
 ```
 
-Recording feature importance information in a `pickle` data format-compatible manner:
-
-```python
-classifier.pmml_feature_importances_ = classifier.feature_importances_
-```
-
-Embedding model verification data:
-
-```python
-pipeline.verify(iris_X.sample(n = 15))
-```
-
-Storing the fitted `PMMLPipeline` object in `pickle` data format:
+Serializing the pipeline in Joblib-flavoured `pickle` data format:
 
 ```python
 import joblib
 
-joblib.dump(pipeline, "pipeline.pkl.z", compress = 9)
+joblib.dump(pipeline, "pipeline.pkl")
 ```
 
 Please see the test script file [main.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn/src/test/resources/main.py) for more classification (binary and multi-class) and regression workflows.
 
 ### The JPMML-SkLearn side of operations
 
-Converting the pipeline pickle file `pipeline.pkl.z` to a PMML file `pipeline.pmml`:
-```
-java -jar pmml-sklearn-example/target/pmml-sklearn-example-executable-1.9-SNAPSHOT.jar --pkl-input pipeline.pkl.z --pmml-output pipeline.pmml
+Converting a pickle file to a PMML file:
+
+```bash
+java -jar pmml-sklearn-example/target/pmml-sklearn-example-executable-1.9-SNAPSHOT.jar --pkl-input pipeline.pkl --pmml-output pipeline.pmml
 ```
 
 Getting help:
-```
+
+```bash
 java -jar pmml-sklearn-example/target/pmml-sklearn-example-executable-1.9-SNAPSHOT.jar --help
 ```
 
