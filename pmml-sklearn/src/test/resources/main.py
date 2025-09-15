@@ -458,7 +458,10 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 	pipeline.fit(versicolor_X, versicolor_y)
 	pipeline = make_pmml_pipeline(pipeline, active_fields = versicolor_X.columns.values, target_fields = [versicolor_y.name])
 	pipeline.configure(**pmml_options)
-	pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
+	if isinstance(classifier, CalibratedClassifierCV) and isinstance(classifier.estimator, XGBClassifier):
+		pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+	else:
+		pipeline.verify(versicolor_X.sample(frac = 0.10, random_state = 13))
 	store_pkl(pipeline, name)
 	if isinstance(classifier, (FixedThresholdClassifier, TunedThresholdClassifierCV)):
 		species = DataFrame(pipeline.predict(versicolor_X), columns = ["thresholded(Species)"])

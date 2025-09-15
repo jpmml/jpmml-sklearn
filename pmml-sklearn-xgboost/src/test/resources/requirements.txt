@@ -1,2 +1,2 @@
 category_encoders==2.8.1
-xgboost==2.1.4
+xgboost==3.0.5
