@@ -28,9 +28,7 @@ def build_audit_na_direct(audit_na_df, classifier, name):
 
 	mapper = DataFrameMapper([
 		(["Age", "Hours", "Income"], None),
-		(["Education", "Employment"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OrdinalEncoder(), OneHotEncoder()]),
-		(["Gender"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OrdinalEncoder(handle_unknown = "use_encoded_value", unknown_value = 11), OneHotEncoder()]),
-		(["Marital", "Occupation"], [SimpleImputer(strategy = "constant", fill_value = "Unknown"), OneHotEncoder()])
+		(["Education", "Employment", "Gender", "Marital", "Occupation"], OrdinalEncoder())
 	])
 	pipeline = PMMLPipeline([
 		("mapper", mapper),
@@ -47,7 +45,10 @@ def build_audit_na_direct(audit_na_df, classifier, name):
 if "Audit" in datasets:
 	audit_na_df = load_audit("AuditNA")
 
-	build_audit_na_direct(audit_na_df, XGBClassifier(objective = "binary:logistic", use_label_encoder = False, random_state = 13), "XGBAuditNA")
+	# XXX
+	feature_types = 3 * ["q"] + 5 * ["c"]
+
+	build_audit_na_direct(audit_na_df, XGBClassifier(objective = "binary:logistic", feature_types = feature_types, use_label_encoder = False, random_state = 13), "XGBAuditNA")
 
 if "Versicolor" in datasets:
 	versicolor_df = load_versicolor("Versicolor")

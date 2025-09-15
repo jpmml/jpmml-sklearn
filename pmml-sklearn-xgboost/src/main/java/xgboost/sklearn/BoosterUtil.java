@@ -23,11 +23,16 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CMatrixUtil;
+import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnException;
@@ -79,10 +84,41 @@ public class BoosterUtil {
 	static
 	public <E extends Estimator & HasBooster & HasXGBoostOptions> Schema configureSchema(E estimator, Schema schema){
 		Booster booster = estimator.getBooster();
+		Object missing = estimator.getOptionalObject("missing");
 
 		Learner learner = getLearner(estimator);
 
 		Map<String, ?> options = getOptions(booster, learner, estimator);
+
+		Function<Feature, Feature> function = new Function<Feature, Feature>(){
+
+			@Override
+			public Feature apply(Feature feature){
+
+				if(feature instanceof CategoricalFeature){
+					CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+
+					List<?> categories = categoricalFeature.getValues();
+					if(!categories.isEmpty()){
+						Object lastCategory = categories.get(categories.size() - 1);
+
+						if(ValueUtil.isNaN(missing) && ValueUtil.isNaN(lastCategory)){
+							feature = new CategoricalFeature(categoricalFeature.getEncoder(), categoricalFeature, categories.subList(0, categories.size() - 1)){
+
+								@Override
+								public ContinuousFeature toContinuousFeature(){
+									throw new UnsupportedOperationException();
+								}
+							};
+						}
+					}
+				}
+
+				return feature;
+			}
+		};
+
+		schema = schema.toTransformedSchema(function);
 
 		Schema xgbSchema = learner.toXGBoostSchema(schema);
 
