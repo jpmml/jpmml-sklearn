@@ -31,8 +31,6 @@ import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
-import org.jpmml.converter.CategoricalFeature;
-import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
@@ -120,13 +118,13 @@ public class EncoderUtil {
 
 		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("encoder", feature), OpType.CATEGORICAL, dataType, mapValues);
 
-		Feature encodedFeature = new IndexFeature(encoder, derivedField, indexCategories);
+		IndexFeature encodedFeature = new IndexFeature(encoder, derivedField, indexCategories);
 
-		Feature result = new CategoricalFeature(encoder, feature, categories){
+		Feature result = new OrdinalFeature(encoder, feature, categories){
 
 			@Override
-			public ContinuousFeature toContinuousFeature(){
-				return encodedFeature.toContinuousFeature();
+			public IndexFeature getEncodedFeature(){
+				return encodedFeature;
 			}
 		};
 

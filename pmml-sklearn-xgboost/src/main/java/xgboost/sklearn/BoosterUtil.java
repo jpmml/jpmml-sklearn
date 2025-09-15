@@ -46,6 +46,7 @@ import pandas.core.BlockManager;
 import pandas.core.DataFrame;
 import pandas.core.Index;
 import sklearn.Estimator;
+import sklearn.preprocessing.OrdinalFeature;
 
 public class BoosterUtil {
 
@@ -95,15 +96,15 @@ public class BoosterUtil {
 			@Override
 			public Feature apply(Feature feature){
 
-				if(feature instanceof CategoricalFeature){
-					CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+				if(feature instanceof OrdinalFeature){
+					OrdinalFeature ordinalFeature = (OrdinalFeature)feature;
 
-					List<?> categories = categoricalFeature.getValues();
+					List<?> categories = ordinalFeature.getValues();
 					if(!categories.isEmpty()){
 						Object lastCategory = categories.get(categories.size() - 1);
 
 						if(ValueUtil.isNaN(missing) && ValueUtil.isNaN(lastCategory)){
-							feature = new CategoricalFeature(categoricalFeature.getEncoder(), categoricalFeature, categories.subList(0, categories.size() - 1)){
+							feature = new CategoricalFeature(ordinalFeature.getEncoder(), ordinalFeature, categories.subList(0, categories.size() - 1)){
 
 								@Override
 								public ContinuousFeature toContinuousFeature(){
