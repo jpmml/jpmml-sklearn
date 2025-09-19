@@ -21,7 +21,7 @@ package sklearn.svm;
 import java.util.Arrays;
 import java.util.List;
 
-interface LibSVMConstants {
+public interface LibSVMConstants {
 
 	String KERNEL_LINEAR = "linear";
 	String KERNEL_POLY = "poly";

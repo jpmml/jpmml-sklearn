@@ -29,6 +29,7 @@ import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
@@ -209,6 +210,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluateIsotonicRegressionIncrAuto() throws Exception {
 		evaluate(ISOTONIC_REGRESSION_INCR, AUTO);
+	}
+
+	@Test
+	public void evaluateKernelRidgeAuto() throws Exception {
+		evaluate(KERNEL_RIDGE, AUTO, new PMMLEquivalence(5e-12, 5e-12));
 	}
 
 	@Test

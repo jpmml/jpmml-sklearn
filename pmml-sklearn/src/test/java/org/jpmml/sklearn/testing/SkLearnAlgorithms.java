@@ -43,6 +43,7 @@ public interface SkLearnAlgorithms {
 	String ISOTONIC_REGRESSION_INCR = ISOTONIC_REGRESSON + "Incr";
 	String K_MEANS = "KMeans";
 	String MINIBATCH_K_MEANS = "MiniBatch" + K_MEANS;
+	String KERNEL_RIDGE = "KernelRidge";
 	String KNN = "KNN";
 	String MULTI_KNN = "Multi" + KNN;
 	String LARS = "Lars";

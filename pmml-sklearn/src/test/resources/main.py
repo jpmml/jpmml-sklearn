@@ -16,6 +16,7 @@ from sklearn.feature_selection import SelectFromModel, SelectKBest, SelectPercen
 from sklearn.frozen import FrozenEstimator
 from sklearn.impute import MissingIndicator, SimpleImputer
 from sklearn.isotonic import IsotonicRegression
+from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, ElasticNetCV, GammaRegressor, HuberRegressor, LarsCV, Lasso, LassoCV, LassoLarsCV, LinearRegression, LogisticRegression, LogisticRegressionCV, OrthogonalMatchingPursuitCV, Perceptron, PoissonRegressor, QuantileRegressor, Ridge, RidgeCV, RidgeClassifier, RidgeClassifierCV, SGDClassifier, SGDOneClassSVM, SGDRegressor, TheilSenRegressor, TweedieRegressor
 from sklearn.model_selection import FixedThresholdClassifier, GridSearchCV, RandomizedSearchCV, TunedThresholdClassifierCV
 from sklearn.multiclass import OneVsRestClassifier
@@ -842,6 +843,8 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 	pipeline.configure(**pmml_options)
 	if isinstance(regressor, XGBRegressor):
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, precision = 1e-5, zeroThreshold = 1e-5)
+	elif isinstance(regressor, KernelRidge):
+		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params, precision = 1e-11, zeroThreshold = 1e-11)
 	else:
 		pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13), predict_params = predict_params)
 	pipeline.customize(command = "insert", pmml_element = make_model_explanation(pipeline, RegressorQuality, auto_X, auto_y))
@@ -866,6 +869,7 @@ if "Auto" in datasets:
 	build_auto(auto_df, ExtraTreesRegressor(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesAuto")
 	build_auto(auto_df, GradientBoostingRegressor(init = None, random_state = 13), "GradientBoostingAuto")
 	build_auto(auto_df, HuberRegressor(), "HuberAuto")
+	build_auto(auto_df, KernelRidge(), "KernelRidgeAuto")
 	build_auto(auto_df, LarsCV(cv = 3), "LarsAuto")
 	build_auto(auto_df, LassoCV(cv = 3, random_state = 13), "LassoAuto")
 	build_auto(auto_df, LassoLarsCV(cv = 3), "LassoLarsAuto")
