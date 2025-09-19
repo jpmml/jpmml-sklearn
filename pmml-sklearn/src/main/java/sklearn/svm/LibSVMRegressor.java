@@ -28,7 +28,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.SkLearnRegressor;
 
-public class LibSVMRegressor extends SkLearnRegressor implements LibSVMConstants {
+public class LibSVMRegressor extends SkLearnRegressor implements HasLibSVMKernel {
 
 	public LibSVMRegressor(String module, String name){
 		super(module, name);
@@ -53,23 +53,27 @@ public class LibSVMRegressor extends SkLearnRegressor implements LibSVMConstants
 		List<Number> dualCoef = getDualCoef();
 		List<Number> intercept = getIntercept();
 
-		Kernel kernel = SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0());
+		Kernel kernel = SupportVectorMachineUtil.createKernel(this);
 
 		return LibSVMUtil.createRegression(kernel, new CMatrix<>(supportVectors, numberOfVectors, numberOfFeatures), SupportVectorMachineUtil.formatIds(support), Iterables.getOnlyElement(intercept), dualCoef, schema);
 	}
 
+	@Override
 	public String getKernel(){
 		return getEnum("kernel", this::getString, LibSVMRegressor.ENUM_KERNEL);
 	}
 
+	@Override
 	public Integer getDegree(){
 		return getInteger("degree");
 	}
 
+	@Override
 	public Number getGamma(){
 		return getNumber("_gamma");
 	}
 
+	@Override
 	public Number getCoef0(){
 		return getNumber("coef0");
 	}

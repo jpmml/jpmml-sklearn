@@ -47,23 +47,41 @@ public class SupportVectorMachineUtil {
 	}
 
 	static
-	public Kernel createKernel(String kernel, Number degree, Number gamma, Number coef0){
+	public Kernel createKernel(HasLibSVMKernel hasLibSVMKernel){
+		String kernel = hasLibSVMKernel.getKernel();
 
 		switch(kernel){
 			case LibSVMConstants.KERNEL_LINEAR:
-				return new LinearKernel();
+				{
+					return new LinearKernel();
+				}
 			case LibSVMConstants.KERNEL_POLY:
-				return new PolynomialKernel()
-					.setGamma(gamma)
-					.setCoef0(coef0)
-					.setDegree(degree);
+				{
+					Integer degree = hasLibSVMKernel.getDegree();
+					Number gamma = hasLibSVMKernel.getGamma();
+					Number coef0 = hasLibSVMKernel.getCoef0();
+
+					return new PolynomialKernel()
+						.setGamma(gamma)
+						.setCoef0(coef0)
+						.setDegree(degree);
+				}
 			case LibSVMConstants.KERNEL_RBF:
-				return new RadialBasisKernel()
-					.setGamma(gamma);
+				{
+					Number gamma = hasLibSVMKernel.getGamma();
+
+					return new RadialBasisKernel()
+						.setGamma(gamma);
+				}
 			case LibSVMConstants.KERNEL_SIGMOID:
-				return new SigmoidKernel()
-					.setGamma(gamma)
-					.setCoef0(coef0);
+				{
+					Number gamma = hasLibSVMKernel.getGamma();
+					Number coef0 = hasLibSVMKernel.getCoef0();
+
+					return new SigmoidKernel()
+						.setGamma(gamma)
+						.setCoef0(coef0);
+				}
 			default:
 				throw new IllegalArgumentException(kernel);
 		}

@@ -28,7 +28,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.SkLearnClassifier;
 
-public class LibSVMClassifier extends SkLearnClassifier implements LibSVMConstants {
+public class LibSVMClassifier extends SkLearnClassifier implements HasLibSVMKernel {
 
 	public LibSVMClassifier(String module, String name){
 		super(module, name);
@@ -59,7 +59,7 @@ public class LibSVMClassifier extends SkLearnClassifier implements LibSVMConstan
 		List<Number> dualCoef = getDualCoef();
 		List<Number> intercept = getIntercept();
 
-		Kernel kernel = SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0());
+		Kernel kernel = SupportVectorMachineUtil.createKernel(this);
 
 		SupportVectorMachineModel supportVectorMachineModel = LibSVMUtil.createClassification(kernel, new CMatrix<>(supportVectors, numberOfVectors, numberOfFeatures), supportSizes, SupportVectorMachineUtil.formatIds(support), intercept, dualCoef, schema);
 
@@ -77,18 +77,22 @@ public class LibSVMClassifier extends SkLearnClassifier implements LibSVMConstan
 		return supportVectorMachineModel;
 	}
 
+	@Override
 	public String getKernel(){
 		return getEnum("kernel", this::getString, LibSVMClassifier.ENUM_KERNEL);
 	}
 
+	@Override
 	public Integer getDegree(){
 		return getInteger("degree");
 	}
 
+	@Override
 	public Number getGamma(){
 		return getNumber("_gamma");
 	}
 
+	@Override
 	public Number getCoef0(){
 		return getNumber("coef0");
 	}

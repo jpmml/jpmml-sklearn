@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Villu Ruusmann
+ * Copyright (c) 2025 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,15 +18,13 @@
  */
 package sklearn.svm;
 
-import java.util.Arrays;
-import java.util.List;
+public interface HasLibSVMKernel extends LibSVMConstants {
 
-interface LibSVMConstants {
+	String getKernel();
 
-	String KERNEL_LINEAR = "linear";
-	String KERNEL_POLY = "poly";
-	String KERNEL_RBF = "rbf";
-	String KERNEL_SIGMOID = "sigmoid";
+	Integer getDegree();
 
-	List<String> ENUM_KERNEL = Arrays.asList(KERNEL_LINEAR, KERNEL_POLY, KERNEL_RBF, KERNEL_SIGMOID);
+	Number getGamma();
+
+	Number getCoef0();
 }

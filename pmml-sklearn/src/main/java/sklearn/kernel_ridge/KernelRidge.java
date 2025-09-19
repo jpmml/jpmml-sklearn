@@ -28,10 +28,10 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.support_vector_machine.LibSVMUtil;
 import sklearn.SkLearnRegressor;
-import sklearn.svm.LibSVMConstants;
+import sklearn.svm.HasLibSVMKernel;
 import sklearn.svm.SupportVectorMachineUtil;
 
-public class KernelRidge extends SkLearnRegressor implements LibSVMConstants {
+public class KernelRidge extends SkLearnRegressor implements HasLibSVMKernel {
 
 	public KernelRidge(String module, String name){
 		super(module, name);
@@ -47,7 +47,7 @@ public class KernelRidge extends SkLearnRegressor implements LibSVMConstants {
 		int numberOfFeatures = features.size();
 		int numberOfVectors = xFit.size() / numberOfFeatures;
 
-		Kernel kernel = SupportVectorMachineUtil.createKernel(getKernel(), getDegree(), getGamma(), getCoef0());
+		Kernel kernel = SupportVectorMachineUtil.createKernel(this);
 
 		List<String> ids = new AbstractList<String>(){
 
@@ -66,18 +66,22 @@ public class KernelRidge extends SkLearnRegressor implements LibSVMConstants {
 
 	}
 
+	@Override
 	public String getKernel(){
 		return getEnum("kernel", this::getString, KernelRidge.ENUM_KERNEL);
 	}
 
+	@Override
 	public Integer getDegree(){
 		return getInteger("degree");
 	}
 
+	@Override
 	public Number getGamma(){
 		return getOptionalNumber("gamma");
 	}
 
+	@Override
 	public Number getCoef0(){
 		return getNumber("coef0");
 	}
