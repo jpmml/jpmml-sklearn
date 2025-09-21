@@ -251,9 +251,10 @@
 
   Examples: [main-lightgbm.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-lightgbm/src/test/resources/main-lightgbm.py)
 
-  * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMClassifier)
-  * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRanker)
-  * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/latest/Python-API.html#lightgbm.LGBMRegressor)
+  * [`lightgbm.Booster`](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.Booster.html)
+  * [`lightgbm.LGBMClassifier`](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMClassifier.html)
+  * [`lightgbm.LGBMRanker`](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMRanker.html)
+  * [`lightgbm.LGBMRegressor`](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMRegressor.html)
 </details>
 
 <details>
@@ -296,23 +297,11 @@
 
   Examples: [extensions/sklego.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/sklego.py)
 
-  * `sklego.meta.EstimatorTransformer`
+  * [`sklego.meta.EstimatorTransformer`](https://koaning.github.io/scikit-lego/api/meta/#sklego.meta.estimator_transformer.EstimatorTransformer)
     * Predict functions `apply`, `decision_function`, `predict` and `predict_proba`.
-  * `sklego.meta.OrdinalClassifier`
-  * `sklego.pipeline.DebugPipeline`
-  * `sklego.preprocessing.IdentityTransformer`
-</details>
-
-<details>
-  <summary>Scikit-Tree</summary>
-
-  Examples: [extensions/sktree.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/sktree.py)
-
-  * [`sktree.ensemble.ExtendedIsolationForest`](https://docs.neurodata.io/scikit-tree/dev/generated/sktree.ExtendedIsolationForest.html)
-  * [`sktree.ensemble.ObliqueRandomForestClassifier`](https://docs.neurodata.io/scikit-tree/dev/generated/sktree.ObliqueRandomForestClassifier.html)
-  * [`sktree.ensemble.ObliqueRandomForestRegressor`](https://docs.neurodata.io/scikit-tree/dev/generated/sktree.ObliqueRandomForestRegressor.html)
-  * [`sktree.tree.ObliqueDecisionTreeClassifier`](https://docs.neurodata.io/scikit-tree/dev/generated/sktree.tree.ObliqueDecisionTreeClassifier.html)
-  * [`sktree.tree.ObliqueDecisionTreeRegressor`](https://docs.neurodata.io/scikit-tree/dev/generated/sktree.tree.ObliqueDecisionTreeRegressor.html)
+  * [`sklego.meta.OrdinalClassifier`](https://koaning.github.io/scikit-lego/api/meta/#sklego.meta.ordinal_classification.OrdinalClassifier)
+  * [`sklego.pipeline.DebugPipeline`](https://koaning.github.io/scikit-lego/api/pipeline/#sklego.pipeline.DebugPipeline)
+  * [`sklego.preprocessing.IdentityTransformer`](https://koaning.github.io/scikit-lego/api/preprocessing/#sklego.preprocessing.identitytransformer.IdentityTransformer)
 </details>
 
 <details>
@@ -459,10 +448,23 @@
 </details>
 
 <details>
+  <summary>Treeple (formerly Scikit-Tree)</summary>
+
+  Examples: [extensions/treeple.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/treeple.py)
+
+  * [`treeple.ExtendedIsolationForest`](https://docs.neurodata.io/treeple/dev/generated/treeple.ExtendedIsolationForest.html)
+  * [`treeple.ObliqueRandomForestClassifier`](https://docs.neurodata.io/treeple/dev/generated/treeple.ObliqueRandomForestClassifier.html)
+  * [`treeple.ObliqueRandomForestRegressor`](https://docs.neurodata.io/treeple/dev/generated/treeple.ObliqueRandomForestRegressor.html)
+  * [`treeple.tree.ObliqueDecisionTreeClassifier`](https://docs.neurodata.io/treeple/dev/generated/treeple.tree.ObliqueDecisionTreeClassifier.html)
+  * [`treeple.tree.ObliqueDecisionTreeRegressor`](https://docs.neurodata.io/treeple/dev/generated/treeple.tree.ObliqueDecisionTreeRegressor.html)
+</details>
+
+<details>
   <summary>XGBoost</summary>
 
   Examples: [main-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/main-xgboost.py), [extensions/category_encoders-xgboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/extensions/category_encoders-xgboost.py) and [extensions/categorical.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-xgboost/src/test/resources/extensions/categorical.py)
 
+  * [`gbboost.Booster`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.Booster)
   * [`xgboost.XGBClassifier`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier)
   * [`xgboost.XGBRanker`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRanker)
   * [`xgboost.XGBRegressor`](https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBRegressor)
