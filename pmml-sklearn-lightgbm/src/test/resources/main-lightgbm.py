@@ -1,12 +1,12 @@
 import sys
 
-from lightgbm import early_stopping
-from lightgbm import LGBMClassifier, LGBMRegressor
-from sklearn2pmml.ensemble import GBDTLRClassifier
-
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from main import *
+
+from lightgbm import early_stopping
+from lightgbm import LGBMClassifier, LGBMRegressor
+from sklearn2pmml.ensemble import GBDTLRClassifier
 
 datasets = []
 

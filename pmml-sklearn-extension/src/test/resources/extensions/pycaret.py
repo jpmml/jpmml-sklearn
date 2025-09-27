@@ -1,5 +1,8 @@
-import os
 import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from common import *
 
 from pandas import DataFrame, Int64Dtype, Series
 from pycaret.classification import ClassificationExperiment
@@ -10,10 +13,6 @@ from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml.pycaret import _escape
 
 import numpy
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
 
 datasets = []
 

@@ -1,22 +1,13 @@
-from sklearn2pmml.sklearn_pandas import patch_sklearn
-
-patch_sklearn()
-
 import sys
 
-from pandas import DataFrame
-from sklearn_pandas import DataFrameMapper
-from sklearn.preprocessing import OneHotEncoder
-from sklearn2pmml.pipeline import PMMLPipeline
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from main import *
+
 from sklearn2pmml.statsmodels import StatsModelsClassifier, StatsModelsOrdinalClassifier, StatsModelsRegressor
 from statsmodels.api import GLM, Logit, MNLogit, OLS, Poisson, WLS
 from statsmodels.genmod import families
 from statsmodels.miscmodels.ordinal_model import OrderedModel
-
-sys.path.append("../../../../pmml-sklearn/src/test/resources/")
-
-from common import *
-from main import *
 
 def make_mapper(cont_cols, cat_cols):
 	features = []

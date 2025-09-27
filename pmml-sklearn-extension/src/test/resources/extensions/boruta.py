@@ -1,5 +1,8 @@
-import os
 import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from common import *
 
 from boruta import BorutaPy
 from pandas import DataFrame
@@ -8,10 +11,6 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn2pmml.pipeline import PMMLPipeline
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
 
 def build_auto(auto_df, name):
 	auto_X, auto_y = split_csv(auto_df)

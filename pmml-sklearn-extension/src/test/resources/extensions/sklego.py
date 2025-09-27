@@ -1,29 +1,16 @@
-import os
 import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from main import *
 
 from mlxtend.preprocessing import DenseTransformer
 from pandas import DataFrame
-from sklearn.cluster import KMeans
-from sklearn.compose import ColumnTransformer
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble import IsolationForest, RandomForestRegressor
-from sklearn.linear_model import LinearRegression, LogisticRegression, PoissonRegressor
 from sklearn.pipeline import _name_estimators
-from sklearn.pipeline import FeatureUnion, Pipeline
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.svm import LinearSVC, OneClassSVM
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
-from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.util import Reshaper
 from sklego.meta import EstimatorTransformer, OrdinalClassifier
 from sklego.pipeline import DebugPipeline
 from sklego.preprocessing import IdentityTransformer
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
-from main import *
 
 def make_debug_pipeline(*steps):
 	return DebugPipeline(_name_estimators(steps))

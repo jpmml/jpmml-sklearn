@@ -1,14 +1,10 @@
-from xgboost import XGBClassifier
-
-import os
 import sys
 
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn-extension/src/test/resources/"))
-sys.path.append(os.path.abspath("../../../../pmml-sklearn-extension/src/test/resources/extensions/"))
+sys.path.append("../../../../pmml-sklearn-extension/src/test/resources/")
 
 from extensions.category_encoders import *
+
+from xgboost import XGBClassifier
 
 xgb_pmml_options = {"compact": False, "numeric": False}
 

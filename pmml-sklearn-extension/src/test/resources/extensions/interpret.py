@@ -1,13 +1,12 @@
-import os
 import sys
 
-from pandas import DataFrame
-from interpret.glassbox import ClassificationTree, LinearRegression, ExplainableBoostingClassifier, ExplainableBoostingRegressor, LogisticRegression, RegressionTree
-from sklearn2pmml.pipeline import PMMLPipeline
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
+
+from interpret.glassbox import ClassificationTree, LinearRegression, ExplainableBoostingClassifier, ExplainableBoostingRegressor, LogisticRegression, RegressionTree
+from pandas import DataFrame
+from sklearn2pmml.pipeline import PMMLPipeline
 
 datasets = []
 

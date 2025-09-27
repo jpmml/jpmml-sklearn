@@ -1,5 +1,8 @@
-import os
 import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from common import *
 
 from category_encoders import BaseNEncoder, BinaryEncoder, CatBoostEncoder, CountEncoder, LeaveOneOutEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder, WOEEncoder
 from mlxtend.preprocessing import DenseTransformer
@@ -14,10 +17,6 @@ from sklearn.preprocessing import OneHotEncoder as SkLearnOneHotEncoder
 from sklearn2pmml.pipeline import PMMLPipeline
 
 import numpy
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
 
 datasets = []
 

@@ -1,5 +1,8 @@
-import os
 import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from common import *
 
 from imblearn.combine import SMOTEENN, SMOTETomek
 from imblearn.ensemble import BalancedBaggingClassifier, BalancedRandomForestClassifier
@@ -14,10 +17,6 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
 
 def build_audit(audit_df, classifier, name):
 	audit_X, audit_y = split_csv(audit_df)

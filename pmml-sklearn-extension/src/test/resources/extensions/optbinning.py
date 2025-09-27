@@ -1,5 +1,8 @@
-import os
 import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from common import *
 
 from optbinning import BinningProcess, Scorecard
 from pandas import DataFrame
@@ -9,10 +12,6 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.decoration import Alias
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
 
 datasets = []
 

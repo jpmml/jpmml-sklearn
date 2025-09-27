@@ -1,11 +1,11 @@
 import sys
 
-from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier
-from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
-
 sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from main import *
+
+from sklearn2pmml.ensemble import GBDTLMRegressor, GBDTLRClassifier
+from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
 
 datasets = []
 

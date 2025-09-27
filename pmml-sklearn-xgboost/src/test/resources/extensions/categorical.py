@@ -1,15 +1,14 @@
+import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from common import *
+
 from pandas import CategoricalDtype, DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier, XGBRFRegressor
-
-import os
-import sys
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
 
 datasets = ["Audit", "Auto"]
 

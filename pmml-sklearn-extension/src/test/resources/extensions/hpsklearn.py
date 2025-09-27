@@ -1,5 +1,8 @@
-import os
 import sys
+
+sys.path.append("../../../../pmml-sklearn/src/test/resources/")
+
+from common import *
 
 from hpsklearn import hist_gradient_boosting_classifier, linear_regression, logistic_regression, pca
 from hpsklearn import HyperoptEstimator
@@ -7,10 +10,6 @@ from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
-
-sys.path.append(os.path.abspath("../../../../pmml-sklearn/src/test/resources/"))
-
-from common import *
 
 datasets = []
 
