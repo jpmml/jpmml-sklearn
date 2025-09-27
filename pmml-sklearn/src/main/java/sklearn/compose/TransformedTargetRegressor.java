@@ -28,6 +28,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel.NormalizationMethod;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.Transformation;
@@ -57,6 +58,7 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 			return regressor.encode(schema);
 		}
 
+		PMMLEncoder encoder = schema.getEncoder();
 		ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
 
 		Transformation transformation = new AbstractTransformation(){
@@ -68,7 +70,7 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 
 			@Override
 			public Expression createExpression(FieldRef fieldRef){
-				return FunctionUtil.encodeFunction(inverseFunc, Collections.singletonList(fieldRef));
+				return FunctionUtil.encodeFunction(inverseFunc, Collections.singletonList(fieldRef), encoder);
 			}
 		};
 

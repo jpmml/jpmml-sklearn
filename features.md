@@ -371,6 +371,7 @@
       * Identity comparison operators `is None` and `is not None`.
       * Comparison operators `in <list>`, `not in <list>`, `<=`, `<`, `==`, `!=`, `>` and `>=`.
       * Logical operators `and`, `or` and `not`.
+      * Built-in functions `bool`, `float`, `int` and `str`.
       * Math constants `math.e`, `math.nan`, `math.pi` and `math.tau`.
       * Math functions (too numerous to list).
       * Numpy constants `numpy.e`, `numpy.NaN`. `numpy.NZERO`, `numpy.pi` and `numpy.PZERO`.

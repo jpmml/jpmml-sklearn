@@ -24,8 +24,8 @@ import java.util.Objects;
 
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.InvalidAttributeException;
 import sklearn.Classifier;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
@@ -66,7 +66,7 @@ public class FixedThresholdClassifier extends SkLearnClassifier implements HasEs
 		Object threshold = getObject("threshold");
 
 		if(Objects.equals(FixedThresholdClassifier.THRESHOLD_AUTO, threshold)){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "threshold") + "\' must be set to a numeric value");
+			throw new InvalidAttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "threshold") + "\' must be set to a numeric value");
 		}
 
 		return getNumber("threshold");

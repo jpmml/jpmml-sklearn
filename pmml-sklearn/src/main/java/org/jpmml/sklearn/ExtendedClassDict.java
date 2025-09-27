@@ -23,10 +23,10 @@ import java.util.Map;
 import net.razorvine.pickle.IObjectConstructor;
 import net.razorvine.pickle.objects.ClassDict;
 import net.razorvine.pickle.objects.ClassDictConstructor;
-import org.jpmml.python.AttributeException;
 import org.jpmml.python.CastUtil;
 import org.jpmml.python.Castable;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.InvalidAttributeException;
 import org.jpmml.python.PickleUtil;
 import sklearn2pmml.SkLearn2PMMLFields;
 
@@ -61,7 +61,7 @@ public class ExtendedClassDict extends ClassDict implements Castable {
 
 		IObjectConstructor objectConstructor = objectConstructors.get(pmmlBaseClass);
 		if(objectConstructor == null){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, SkLearn2PMMLFields.PMML_BASE_CLASS) + "\' refers to an unknown Python class " + pmmlBaseClass);
+			throw new InvalidAttributeException("Attribute \'" + ClassDictUtil.formatMember(this, SkLearn2PMMLFields.PMML_BASE_CLASS) + "\' refers to an unknown Python class " + pmmlBaseClass);
 		}
 
 		return objectConstructor;

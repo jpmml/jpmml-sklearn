@@ -42,8 +42,8 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.InvalidAttributeException;
 import org.jpmml.python.PythonFormatterUtil;
 import sklearn.Estimator;
 import sklearn.VersionUtil;
@@ -86,7 +86,7 @@ public class LogisticRegression extends LinearClassifier {
 		} // End if
 
 		if(multiClass == null){
-			throw new AttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be set to one of " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_OVR) + " or " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_MULTINOMIAL) + " values");
+			throw new InvalidAttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be set to one of " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_OVR) + " or " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_MULTINOMIAL) + " values");
 		}
 
 		switch(multiClass){

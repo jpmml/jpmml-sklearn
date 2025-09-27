@@ -60,7 +60,7 @@ public class FunctionTransformer extends SkLearnTransformer {
 
 			ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-			Expression expression = FunctionUtil.encodeFunction(func, Collections.singletonList(continuousFeature.ref()));
+			Expression expression = FunctionUtil.encodeFunction(func, Collections.singletonList(continuousFeature.ref()), encoder);
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName(func.getName(), continuousFeature), OpType.CONTINUOUS, DataType.DOUBLE, expression);
 
