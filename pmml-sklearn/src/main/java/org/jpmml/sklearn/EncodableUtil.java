@@ -118,15 +118,11 @@ public class EncodableUtil {
 	static
 	private List<String> generateNames(String name, int count, boolean indexed){
 
-		if(count <= 0){
-			throw new IllegalArgumentException();
-		} else
-
 		if(count == 1){
 			return Collections.singletonList(name + (indexed ? "1" : ""));
 		} else
 
-		{
+		if(count >= 2){
 			List<String> result = new ArrayList<>(count);
 
 			for(int i = 0; i < count; i++){
@@ -134,6 +130,10 @@ public class EncodableUtil {
 			}
 
 			return result;
+		} else
+
+		{
+			throw new IllegalArgumentException();
 		}
 	}
 }

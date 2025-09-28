@@ -42,6 +42,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
+import org.jpmml.sklearn.SkLearnTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn2pmml.Customization;
@@ -338,7 +339,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SkLearnTypeException(this, HasClasses.class);
 		}
 
 		List<?> values = discreteLabel.getValues();
@@ -372,7 +373,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SkLearnTypeException(this, HasApplyField.class);
 		} // End if
 
 		if(pmmlSegmentId != null){
@@ -404,7 +405,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SkLearnTypeException(this, HasMultiApplyField.class);
 		} // End if
 
 		if(pmmlSegmentId != null){
