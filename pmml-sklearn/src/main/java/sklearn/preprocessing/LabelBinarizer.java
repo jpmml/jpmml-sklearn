@@ -108,16 +108,18 @@ public class LabelBinarizer extends SkLearnTransformer implements HasSparseOutpu
 
 	protected List<?> prepareClasses(List<?> classes){
 
-		if(classes.size() < 2){
-			throw new IllegalArgumentException();
-		} else
-
 		// [negValue, posValue] -> [posValue]
 		if(classes.size() == 2){
-			classes = classes.subList(1, 2);
-		}
+			return classes.subList(1, 2);
+		} else
 
-		return classes;
+		if(classes.size() >= 3){
+			return classes;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public List<Object> getClasses(){

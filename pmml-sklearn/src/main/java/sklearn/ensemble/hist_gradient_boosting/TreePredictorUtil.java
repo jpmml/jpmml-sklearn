@@ -145,7 +145,7 @@ public class TreePredictorUtil {
 				} else
 
 				{
-					throw new IllegalArgumentException();
+					throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
 				}
 			} else
 

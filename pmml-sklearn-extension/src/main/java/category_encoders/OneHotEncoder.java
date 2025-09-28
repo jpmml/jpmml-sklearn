@@ -78,7 +78,7 @@ public class OneHotEncoder extends BaseEncoder {
 			} else
 
 			{
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
 			}
 		}
 

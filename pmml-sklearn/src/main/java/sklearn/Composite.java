@@ -267,7 +267,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 			} else
 
 			{
-				throw new IllegalArgumentException();
+				throw new SkLearnException("The head object (" + ClassDictUtil.formatClass(head)  + ") is not a supported Transformer or Estimator");
 			}
 		} catch(UnsupportedOperationException uoe){
 			throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information");

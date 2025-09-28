@@ -48,21 +48,29 @@ public class CategoricalNB extends DiscreteNB {
 			Feature feature = features.get(i);
 			int numberOfFeatureCategories = numberOfCategories.get(i);
 
-			CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+			BayesInput bayesInput;
 
-			SchemaUtil.checkSize(numberOfFeatureCategories, categoricalFeature);
+			if(feature instanceof CategoricalFeature){
+				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-			HasArray featureCategoryCount = categoryCount.get(i);
+				SchemaUtil.checkSize(numberOfFeatureCategories, categoricalFeature);
 
-			List<PairCounts> pairCounts = new ArrayList<>();
+				HasArray featureCategoryCount = categoryCount.get(i);
 
-			for(int j = 0; j < numberOfFeatureCategories; j++){
-				List<Number> featureValueCounts = (List<Number>)CMatrixUtil.getColumn(featureCategoryCount.getArrayContent(), values.size(), numberOfFeatureCategories, j);
+				List<PairCounts> pairCounts = new ArrayList<>();
 
-				pairCounts.add(DiscreteNBUtil.encodePairCounts(categoricalFeature.getValue(j), values, alpha, featureValueCounts));
+				for(int j = 0; j < numberOfFeatureCategories; j++){
+					List<Number> featureValueCounts = (List<Number>)CMatrixUtil.getColumn(featureCategoryCount.getArrayContent(), values.size(), numberOfFeatureCategories, j);
+
+					pairCounts.add(DiscreteNBUtil.encodePairCounts(categoricalFeature.getValue(j), values, alpha, featureValueCounts));
+				}
+
+				bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
+			} else
+
+			{
+				throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
 			}
-
-			BayesInput bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}

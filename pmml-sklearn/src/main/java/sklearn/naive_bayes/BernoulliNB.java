@@ -63,28 +63,36 @@ public class BernoulliNB extends DiscreteNB {
 
 			List<Integer> featureClassCount = CMatrixUtil.getColumn(featureCount, numberOfClasses, numberOfFeatures, i);
 
-			CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+			BayesInput bayesInput;
 
-			SchemaUtil.checkSize(2, categoricalFeature);
+			if(feature instanceof CategoricalFeature){
+				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-			List<?> featureValues = categoricalFeature.getValues();
+				SchemaUtil.checkSize(2, categoricalFeature);
 
-			List<Number> nonEventCounts = new ArrayList<>();
-			List<Number> eventCounts = new ArrayList<>();
+				List<?> featureValues = categoricalFeature.getValues();
 
-			for(int j = 0; j < numberOfClasses; j++){
-				Number nonEventCount = classCount.get(j) - featureClassCount.get(j);
-				Number eventCount = featureClassCount.get(j);
+				List<Number> nonEventCounts = new ArrayList<>();
+				List<Number> eventCounts = new ArrayList<>();
 
-				nonEventCounts.add(nonEventCount);
-				eventCounts.add(eventCount);
+				for(int j = 0; j < numberOfClasses; j++){
+					Number nonEventCount = classCount.get(j) - featureClassCount.get(j);
+					Number eventCount = featureClassCount.get(j);
+
+					nonEventCounts.add(nonEventCount);
+					eventCounts.add(eventCount);
+				}
+
+				List<PairCounts> pairCounts = new ArrayList<>();
+				pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(0), values, alpha, nonEventCounts));
+				pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(1), values, alpha, eventCounts));
+
+				bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
+			} else
+
+			{
+				throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
 			}
-
-			List<PairCounts> pairCounts = new ArrayList<>();
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(0), values, alpha, nonEventCounts));
-			pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(1), values, alpha, eventCounts));
-
-			BayesInput bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
 
 			bayesInputs.addBayesInputs(bayesInput);
 		}

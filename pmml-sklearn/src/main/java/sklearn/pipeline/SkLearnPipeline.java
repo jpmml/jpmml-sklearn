@@ -206,7 +206,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 			@Override
 			public String formatMessage(Object object){
-				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
+				return "The step object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
 			}
 		};
 

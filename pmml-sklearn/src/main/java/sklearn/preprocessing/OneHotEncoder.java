@@ -95,7 +95,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
 		}
 
 		return result;

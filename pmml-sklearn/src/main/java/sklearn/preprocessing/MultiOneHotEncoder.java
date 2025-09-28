@@ -183,7 +183,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			} else
 
 			{
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("Expected a categorical or categorical-like feature, got " + feature);
 			} // End if
 
 			if(featureInfrequentEnabled){
