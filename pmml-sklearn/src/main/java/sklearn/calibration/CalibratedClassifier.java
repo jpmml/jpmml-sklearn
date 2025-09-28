@@ -47,6 +47,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnTypeException;
 import sklearn.Calibrator;
 import sklearn.Classifier;
 import sklearn.Estimator;
@@ -132,7 +133,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 					} else
 
 					{
-						throw new IllegalArgumentException();
+						throw new SkLearnTypeException(estimator, LinearClassifier.class, GradientBoostingClassifier.class);
 					} // End if
 
 					if(outputField.getResultFeature() != ResultFeature.PREDICTED_VALUE){

@@ -107,8 +107,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						// XXX
-						throw new SkLearnTypeException(estimator, HasApplyField.class);
+						throw new SkLearnTypeException(estimator, HasApplyField.class, HasMultiApplyField.class);
 					}
 				}
 			case SkLearnMethods.DECISION_FUNCTION:

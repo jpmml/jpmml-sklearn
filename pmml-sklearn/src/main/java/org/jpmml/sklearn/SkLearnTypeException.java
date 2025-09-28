@@ -18,12 +18,31 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 
 public class SkLearnTypeException extends SkLearnException {
 
-	public SkLearnTypeException(Estimator estimator, Class<?> clazz){
-		super("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not implement " + clazz.getName());
+	public SkLearnTypeException(Estimator estimator, Class<?>... clazzes){
+		super("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not an instance of " + formatClasses(clazzes));
+	}
+
+	static
+	private Object formatClasses(Class<?>... clazzes){
+
+		if(clazzes.length == 1){
+			Class<?> clazz = clazzes[0];
+
+			return clazz.getName();
+		} else
+
+		{
+			return Arrays.stream(clazzes)
+				.map(clazz -> clazz.getName())
+				.collect(Collectors.toList());
+		}
 	}
 }

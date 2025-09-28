@@ -70,7 +70,10 @@ import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
+import org.jpmml.sklearn.SkLearnTypeException;
 import sklearn.Estimator;
+import sklearn.HasApplyField;
+import sklearn.HasMultiApplyField;
 import sklearn.StepUtil;
 import sklearn.VersionUtil;
 import sklearn.tree.visitors.TreeModelCompactor;
@@ -665,7 +668,7 @@ public class TreeUtil {
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SkLearnTypeException(estimator, HasApplyField.class, HasMultiApplyField.class);
 		}
 	}
 }
