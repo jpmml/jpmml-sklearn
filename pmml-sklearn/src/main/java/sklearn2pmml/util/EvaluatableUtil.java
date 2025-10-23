@@ -21,6 +21,7 @@ package sklearn2pmml.util;
 import java.util.Collections;
 import java.util.List;
 
+import org.jpmml.python.AbstractTranslator;
 import org.jpmml.python.ExpressionTranslator;
 import org.jpmml.python.PredicateTranslator;
 import org.jpmml.python.Scope;
@@ -57,10 +58,7 @@ public class EvaluatableUtil {
 	static
 	public org.dmg.pmml.Expression translateExpression(String expr, List<String> functionDefs, Scope scope){
 		ExpressionTranslator expressionTranslator = new ExpressionTranslator(scope);
-
-		for(String functionDef : functionDefs){
-			expressionTranslator.addFunctionDef(functionDef);
-		}
+		init(expressionTranslator, functionDefs);
 
 		return expressionTranslator.translateExpression(expr);
 	}
@@ -80,11 +78,17 @@ public class EvaluatableUtil {
 	static
 	public org.dmg.pmml.Predicate translatePredicate(String expr, List<String> functionDefs, Scope scope){
 		PredicateTranslator predicateTranslator = new PredicateTranslator(scope);
-
-		for(String functionDef : functionDefs){
-			predicateTranslator.addFunctionDef(functionDef);
-		}
+		init(predicateTranslator, functionDefs);
 
 		return predicateTranslator.translatePredicate(expr);
+	}
+
+	static
+	private <T extends AbstractTranslator> void init(T translator, List<String> functionDefs){
+		translator.registerModuleAliases();
+
+		for(String functionDef : functionDefs){
+			translator.addFunctionDef(functionDef);
+		}
 	}
 }
