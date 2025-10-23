@@ -139,9 +139,7 @@ public class ContinuousDomain extends Domain {
 			} // End if
 
 			if(withData){
-				Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED)
-					.setLeftMargin(dataMin.get(i))
-					.setRightMargin(dataMax.get(i));
+				Interval interval = new Interval(Interval.Closure.CLOSED_CLOSED, dataMin.get(i), dataMax.get(i));
 
 				dataField.addIntervals(interval);
 
@@ -149,8 +147,7 @@ public class ContinuousDomain extends Domain {
 			} // End if
 
 			if(withStatistics){
-				UnivariateStats univariateStats = new UnivariateStats()
-					.setField(dataField)
+				UnivariateStats univariateStats = new UnivariateStats(dataField)
 					.setCounts(createCounts(extractMap(counts, i)))
 					.setNumericInfo(createNumericInfo(wildcardFeature.getDataType(), extractMap(numericInfo, i)));
 

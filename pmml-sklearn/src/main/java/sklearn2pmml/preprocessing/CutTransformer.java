@@ -83,9 +83,7 @@ public class CutTransformer extends Transformer {
 			Number leftMargin = bins.get(i);
 			Number rightMargin = bins.get(i + 1);
 
-			Interval interval = new Interval(closure)
-				.setLeftMargin(formatMargin(leftMargin))
-				.setRightMargin(formatMargin(rightMargin));
+			Interval interval = new Interval(closure, formatMargin(leftMargin), formatMargin(rightMargin));
 
 			if(i == 0 && includeLowest && (interval.requireClosure() == Interval.Closure.OPEN_CLOSED)){
 				interval.setClosure(Interval.Closure.CLOSED_CLOSED);

@@ -83,9 +83,7 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 				Number leftMargin = (j > 0 ? bins.get(j) : null);
 				Number rightMargin = (j < (bins.size() - 1) - 1 ? bins.get(j + 1) : null);
 
-				Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
-					.setLeftMargin(leftMargin)
-					.setRightMargin(rightMargin);
+				Interval interval = new Interval(Interval.Closure.CLOSED_OPEN, leftMargin, rightMargin);
 
 				Integer label = j;
 

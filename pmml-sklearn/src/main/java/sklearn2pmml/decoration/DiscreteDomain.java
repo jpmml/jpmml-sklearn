@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
 import org.dmg.pmml.UnivariateStats;
@@ -106,6 +107,8 @@ public class DiscreteDomain extends Domain implements HasMultiType {
 
 			WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
+			DataField dataField = wildcardFeature.getField();
+
 			List<?> values = Collections.emptyList();
 
 			if(withData){
@@ -123,8 +126,7 @@ public class DiscreteDomain extends Domain implements HasMultiType {
 			feature = encodeFeature(wildcardFeature, values);
 
 			if(withStatistics){
-				UnivariateStats univariateStats = new UnivariateStats()
-					.setField(wildcardFeature.getName())
+				UnivariateStats univariateStats = new UnivariateStats(dataField)
 					.setCounts(createCounts(extractMap(counts, i)))
 					.setDiscrStats(createDiscrStats(wildcardFeature.getDataType(), discrStats.get(i)));
 

@@ -155,9 +155,7 @@ public class ExplainableBoostingUtil {
 
 			labelCategories.add(label);
 
-			Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
-				.setLeftMargin(leftMargin)
-				.setRightMargin(rightMargin);
+			Interval interval = new Interval(Interval.Closure.CLOSED_OPEN, leftMargin, rightMargin);
 
 			DiscretizeBin discretizeBin = new DiscretizeBin(label, interval);
 

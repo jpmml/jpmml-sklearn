@@ -194,9 +194,7 @@ public class OptimalBinning extends Transformer {
 				rightMargin = splits.get(i);
 			}
 
-			Interval interval = new Interval(Interval.Closure.CLOSED_OPEN)
-				.setLeftMargin(leftMargin)
-				.setRightMargin(rightMargin);
+			Interval interval = new Interval(Interval.Closure.CLOSED_OPEN, leftMargin, rightMargin);
 
 			DiscretizeBin discretizeBin = new DiscretizeBin(categoriesOut.get(i), interval);
 
