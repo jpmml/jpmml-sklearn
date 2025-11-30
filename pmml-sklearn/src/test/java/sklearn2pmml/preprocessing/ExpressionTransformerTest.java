@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
@@ -40,57 +41,55 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class ExpressionTransformerTest {
 
 	@Test
-	public void encode(){
+	public void encodeFieldRef(){
 		String expr = "X[0]";
+
+		FieldRef expected = new FieldRef("x");
 
 		assertNull(encode(expr, null, null, null));
 
-		Expression expected = new FieldRef("x");
-
-		expected = ((FieldRef)expected)
+		expected = expected
 			.setMapMissingTo(-1d);
 
 		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, null, null)));
 
-		try {
-			encode(expr, null, -1d, null);
+		assertThrows(ClassCastException.class, () -> encode(expr, null, -1d, null));
+	}
 
-			fail();
-		} catch(ClassCastException cce){
-			// Ignored
-		}
+	@Test
+	public void encodeConstant(){
+		String expr = "1.0";
 
-		expr = "1.0";
+		Constant expected = ExpressionUtil.createConstant(DataType.DOUBLE, 1d);
 
-		expected = ExpressionUtil.createConstant(DataType.DOUBLE, 1d);
+		assertTrue(ReflectionUtil.equals(expected, encode(expr, null, null, null)));
 
-		try {
-			encode(expr, null, null, "as_missing");
+		assertThrows(ClassCastException.class, () -> encode(expr, null, null, "as_missing"));
+	}
 
-			fail();
-		} catch(ClassCastException cce){
-			// Ignored
-		}
+	@Test
+	public void encodeApply(){
+		String expr = "X[0] + 1.0";
 
-		expr = "X[0] + 1.0";
-
-		expected = new Apply(PMMLFunctions.ADD)
+		Apply expected = new Apply(PMMLFunctions.ADD)
 			.addExpressions(new FieldRef("x"), ExpressionUtil.createConstant(DataType.DOUBLE, 1d));
 
-		expected = ((Apply)expected)
+		assertTrue(ReflectionUtil.equals(expected, encode(expr, null, null, null)));
+
+		expected = expected
 			.setMapMissingTo(-1d)
 			.setDefaultValue(null)
 			.setInvalidValueTreatment(InvalidValueTreatmentMethod.RETURN_INVALID);
 
 		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, Double.NaN, "return_invalid")));
 
-		expected = ((Apply)expected)
+		expected = expected
 			.setMapMissingTo(null)
 			.setDefaultValue(-1d)
 			.setInvalidValueTreatment(InvalidValueTreatmentMethod.AS_MISSING);

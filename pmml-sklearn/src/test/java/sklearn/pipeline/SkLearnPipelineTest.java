@@ -37,8 +37,8 @@ import sklearn.dummy.DummyRegressor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class SkLearnPipelineTest {
 
@@ -50,23 +50,10 @@ public class SkLearnPipelineTest {
 		assertFalse(pipeline.hasTransformers());
 		assertEquals(Collections.emptyList(), pipeline.getTransformers());
 
-		try {
-			pipeline.getHead();
-
-			fail();
-		} catch(SkLearnException se){
-			// Ignored
-		}
+		assertThrows(SkLearnException.class, () -> pipeline.getHead());
 
 		assertFalse(pipeline.hasFinalEstimator());
-
-		try {
-			pipeline.getFinalEstimator();
-
-			fail();
-		} catch(SkLearnException se){
-			// Ignored
-		}
+		assertThrows(SkLearnException.class, () -> pipeline.getFinalEstimator());
 	}
 
 	@Test
@@ -111,14 +98,7 @@ public class SkLearnPipelineTest {
 		assertNull(pipeline.getHead());
 
 		assertFalse(pipeline.hasFinalEstimator());
-
-		try {
-			pipeline.getFinalEstimator();
-
-			fail();
-		} catch(SkLearnException se){
-			// Ignored
-		}
+		assertThrows(SkLearnException.class, () -> pipeline.getFinalEstimator());
 	}
 
 	static
