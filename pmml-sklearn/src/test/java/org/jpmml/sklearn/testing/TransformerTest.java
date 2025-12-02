@@ -25,6 +25,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.EvaluatorBuilder;
 import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.evaluator.visitors.UnsupportedMarkupInspector;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
@@ -123,7 +124,8 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 
 	@Test
 	public void evaluateNormalQuantile() throws Exception {
-		evaluate("Normal", "Quantile", excludeFields(TransformerTest.predictedValue));
+		// XXX: loss of precision with clipped values
+		evaluate("Normal", "Quantile", excludeFields(TransformerTest.predictedValue), new PMMLEquivalence(1e-10, 1e-10));
 	}
 
 	@Test

@@ -22,18 +22,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dmg.pmml.Apply;
+import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
+import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.LinearNorm;
 import org.dmg.pmml.NormContinuous;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.OutlierTreatmentMethod;
 import org.dmg.pmml.PMMLFunctions;
+import org.dmg.pmml.ParameterField;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.FunctionUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.SkLearnTransformer;
 
@@ -69,7 +75,19 @@ public class QuantileTransformer extends SkLearnTransformer {
 				case QuantileTransformer.OUTPUTDISTRIBUTION_UNIFORM:
 					break;
 				case QuantileTransformer.OUTPUTDISTRIBUTION_NORMAL:
-					expression = ExpressionUtil.createApply(PMMLFunctions.STDNORMALIDF, expression);
+					{
+						String name = "clipQuantile";
+
+						DefineFunction defineFunction = encoder.getDefineFunction(name);
+						if(defineFunction == null){
+							defineFunction = encodeDefineFunction(name, encoder);
+
+							encoder.addDefineFunction(defineFunction);
+						}
+
+						expression = ExpressionUtil.createApply(PMMLFunctions.STDNORMALIDF)
+							.addExpressions(ExpressionUtil.createApply(defineFunction, expression));
+					}
 					break;
 				default:
 					throw new IllegalArgumentException();
@@ -112,6 +130,23 @@ public class QuantileTransformer extends SkLearnTransformer {
 		}
 
 		return normContinupus;
+	}
+
+	static
+	private DefineFunction encodeDefineFunction(String name, SkLearnEncoder encoder){
+		ParameterField valueField = new ParameterField("x");
+
+		double boundsThreshold = 1e-7;
+
+		Constant lowerBound = ExpressionUtil.createConstant(0d + boundsThreshold);
+		Constant upperBound = ExpressionUtil.createConstant(1d - boundsThreshold);
+
+		Apply apply = FunctionUtil.encodeFunction("numpy", "clip", Arrays.asList(new FieldRef(valueField), lowerBound, upperBound), encoder);
+
+		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
+			.addParameterFields(valueField);
+
+		return defineFunction;
 	}
 
 	private static final String OUTPUTDISTRIBUTION_UNIFORM = "uniform";
