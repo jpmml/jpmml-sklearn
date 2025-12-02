@@ -439,7 +439,7 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
 
 	scaler = ColumnTransformer([
-		("robust", RobustScaler(), [0, 2])
+		("robust", RobustScaler(), numpy.asarray([0, 2]))
 	], remainder = MinMaxScaler())
 
 	transformer = ColumnTransformer([
@@ -490,7 +490,7 @@ def build_versicolor_direct(versicolor_df, classifier, name, with_proba = True, 
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
 
 	transformer = ColumnTransformer([
-		("all", "passthrough", ["Sepal.Length", "Petal.Length", "Petal.Width"])
+		("all", "passthrough", numpy.asarray(["Sepal.Length", "Petal.Length", "Petal.Width"]))
 	], remainder = "drop")
 	pipeline = PMMLPipeline([
 		("transformer", transformer),

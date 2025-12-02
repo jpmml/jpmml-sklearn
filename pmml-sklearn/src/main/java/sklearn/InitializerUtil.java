@@ -25,9 +25,11 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PythonException;
@@ -69,6 +71,7 @@ public class InitializerUtil {
 
 			@Override
 			public Feature apply(Object object){
+				object = ScalarUtil.decode(object);
 
 				if(object instanceof String){
 					String column = (String)object;
@@ -86,8 +89,8 @@ public class InitializerUtil {
 					return createWildcardFeature(column, encoder);
 				} else
 
-				if(object instanceof Integer){
-					Integer index = (Integer)object;
+				if(object instanceof Number){
+					Integer index = ValueUtil.asInteger((Number)object);
 
 					if(!features.isEmpty()){
 						Feature feature = features.get(index);
