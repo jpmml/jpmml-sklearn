@@ -35,6 +35,8 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 
 	@Override
 	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		columnFilter = columnFilter.and(excludeFields(TransformerTest.predictedValue));
+
 		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
 
 			@Override
@@ -74,78 +76,78 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 
 	@Test
 	public void evaluateCubic2Spline() throws Exception {
-		evaluate("Cubic2", "Spline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Cubic2", "Spline");
 	}
 
 	@Test
 	public void evaluateCubic3Spline() throws Exception {
-		evaluate("Cubic3", "Spline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Cubic3", "Spline");
 	}
 
 	@Test
 	public void evaluateQuadratic2Spline() throws Exception {
-		evaluate("Quadratic2", "Spline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Quadratic2", "Spline");
 	}
 
 	@Test
 	public void evaluateQuadratic3Spline() throws Exception {
-		evaluate("Quadratic3", "Spline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Quadratic3", "Spline");
 	}
 
 	@Test
 	public void evaluateQuadratic4Spline() throws Exception {
-		evaluate("Quadratic4", "Spline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Quadratic4", "Spline");
 	}
 
 	@Test
 	public void evaluateQuadratic5Spline() throws Exception {
-		evaluate("Quadratic5", "Spline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Quadratic5", "Spline");
 	}
 
 	@Test
 	public void evaluateSimpleBoxCox() throws Exception {
-		evaluate("Plain", "BoxCox", excludeFields(TransformerTest.predictedValue));
+		evaluate("Plain", "BoxCox");
 	}
 
 	@Test
 	public void evaluateStandardizedBoxCox() throws Exception {
-		evaluate("Standardized", "BoxCox", excludeFields(TransformerTest.predictedValue, FieldNameUtil.create("power", TransformerTest.predictedValue)));
+		evaluate("Standardized", "BoxCox", excludeFields(FieldNameUtil.create("power", TransformerTest.predictedValue)));
 	}
 
 	@Test
 	public void evaluateSimpleYeoJohnson() throws Exception {
-		evaluate("Plain", "YeoJohnson", excludeFields(TransformerTest.predictedValue));
+		evaluate("Plain", "YeoJohnson");
 	}
 
 	@Test
 	public void evaluateStandardizedYeoJohnson() throws Exception {
-		evaluate("Standardized", "YeoJohnson", excludeFields(TransformerTest.predictedValue, FieldNameUtil.create("power", TransformerTest.predictedValue)));
+		evaluate("Standardized", "YeoJohnson", excludeFields(FieldNameUtil.create("power", TransformerTest.predictedValue)));
 	}
 
 	@Test
 	public void evaluateNormalQuantile() throws Exception {
 		// XXX: loss of precision with clipped values
-		evaluate("Normal", "Quantile", excludeFields(TransformerTest.predictedValue), new PMMLEquivalence(1e-10, 1e-10));
+		evaluate("Normal", "Quantile", new PMMLEquivalence(1e-10, 1e-10));
 	}
 
 	@Test
 	public void evaluateUniformQuantile() throws Exception {
-		evaluate("Uniform", "Quantile", excludeFields(TransformerTest.predictedValue));
+		evaluate("Uniform", "Quantile");
 	}
 
 	@Test
 	public void evaluateGaussianBSpline() throws Exception {
-		evaluate("Gaussian", "BSpline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Gaussian", "BSpline");
 	}
 
 	@Test
 	public void evaluateSinBSpline() throws Exception {
-		evaluate("Sin", "BSpline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Sin", "BSpline");
 	}
 
 	@Test
 	public void evaluateTanhBSpline() throws Exception {
-		evaluate("Tanh", "BSpline", excludeFields(TransformerTest.predictedValue));
+		evaluate("Tanh", "BSpline");
 	}
 
 	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "y");
