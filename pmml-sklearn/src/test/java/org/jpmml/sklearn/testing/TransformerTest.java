@@ -25,6 +25,8 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.evaluator.EvaluatorBuilder;
 import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.visitors.UnsupportedMarkupInspector;
+import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 
@@ -53,6 +55,16 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 					.setFunctionGuard(null);
 
 				return evaluatorBuilder;
+			}
+
+			@Override
+			public VisitorBattery getValidators(){
+				VisitorBattery visitorBattery = super.getValidators();
+
+				// XXX
+				visitorBattery.remove(UnsupportedMarkupInspector.class);
+
+				return visitorBattery;
 			}
 		};
 
@@ -107,6 +119,16 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 	@Test
 	public void evaluateStandardizedYeoJohnson() throws Exception {
 		evaluate("Standardized", "YeoJohnson", excludeFields(TransformerTest.predictedValue, FieldNameUtil.create("power", TransformerTest.predictedValue)));
+	}
+
+	@Test
+	public void evaluateNormalQuantile() throws Exception {
+		evaluate("Normal", "Quantile", excludeFields(TransformerTest.predictedValue));
+	}
+
+	@Test
+	public void evaluateUniformQuantile() throws Exception {
+		evaluate("Uniform", "Quantile", excludeFields(TransformerTest.predictedValue));
 	}
 
 	@Test

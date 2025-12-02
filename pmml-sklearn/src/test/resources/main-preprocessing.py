@@ -1,6 +1,6 @@
 from pandas import DataFrame
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PowerTransformer, SplineTransformer
+from sklearn.preprocessing import PowerTransformer, QuantileTransformer, SplineTransformer
 from sklearn2pmml.pipeline import PMMLPipeline
 
 import numpy
@@ -71,3 +71,22 @@ test = load_csv("YeoJohnson")
 
 build_power("PlainYeoJohnson", method = "yeo-johnson", standardize = False)
 build_power("StandardizedYeoJohnson", method = "yeo-johnson", standardize = True)
+
+def build_quantile(name, output_distribution):
+	transformer = QuantileTransformer(output_distribution = output_distribution, n_quantiles = 100, subsample = None)
+	transformer.fit(train)
+
+	pipeline = make_dummy_pipeline(transformer)
+	store_pkl(pipeline, name)
+
+	y = DataFrame(pipeline.predict_transform(test), columns = ["y", "quantile(predict(y))"])
+	y.to_csv("csv/" + name + ".csv", index = False, sep = "\t")
+
+train = numpy.random.lognormal(mean = 0, sigma = 1, size = 1000).reshape(-1, 1)
+train = DataFrame(train, columns = ["x1"])
+store_csv(train, "Quantile")
+
+test = load_csv("Quantile")
+
+build_quantile("UniformQuantile", output_distribution = "uniform")
+build_quantile("NormalQuantile", output_distribution = "normal")
