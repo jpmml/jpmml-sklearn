@@ -5,7 +5,7 @@ category_encoders==2.9.0
 hyperopt==0.2.7
 imbalanced-learn==0.12.4; python_version == '3.9'
 imbalanced-learn==0.14.0; python_version >= '3.10'
-interpret==0.6.11
+interpret==0.7.3
 mlxtend==0.23.4
 optbinning==0.20.1
 pycaret==3.3.2
