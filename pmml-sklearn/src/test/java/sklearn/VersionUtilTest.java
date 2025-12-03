@@ -46,6 +46,8 @@ public class VersionUtilTest {
 		assertTrue(VersionUtil.compareVersion("0.20", "0.19") > 0);
 
 		assertTrue(VersionUtil.compareVersion("0.22.2", "0.22.2.post1") == 0);
+
+		assertTrue(VersionUtil.compareVersion("1.2.0", "1.2") == 0);
 	}
 
 	@Test
@@ -54,14 +56,19 @@ public class VersionUtilTest {
 		assertEquals(Arrays.asList(0, 19), VersionUtil.parseVersion("0.19a1"));
 		assertEquals(Arrays.asList(0, 19), VersionUtil.parseVersion("0.19b1"));
 		assertEquals(Arrays.asList(0, 19), VersionUtil.parseVersion("0.19rc1"));
-		assertEquals(Arrays.asList(0, 19), VersionUtil.parseVersion("0.19.dev"));
 		assertEquals(Arrays.asList(0, 19), VersionUtil.parseVersion("0.19.dev1"));
+		assertEquals(Arrays.asList(0, 19), VersionUtil.parseVersion("0.19.post1"));
 		assertEquals(Arrays.asList(0, 19, 1), VersionUtil.parseVersion("0.19.1"));
 
-		assertEquals(Arrays.asList(0, 22), VersionUtil.parseVersion("0.22.post1"));
+		assertEquals(Arrays.asList(0, 22), VersionUtil.parseVersion("0.22"));
 		assertEquals(Arrays.asList(0, 22), VersionUtil.parseVersion("0.22rc1.post1.dev1"));
 		assertEquals(Arrays.asList(0, 22, 2), VersionUtil.parseVersion("0.22.2"));
 		assertEquals(Arrays.asList(0, 22, 2), VersionUtil.parseVersion("0.22.2.post1"));
 		assertEquals(Arrays.asList(0, 22, 2), VersionUtil.parseVersion("0.22.2.post1.dev1"));
+
+		assertEquals(Arrays.asList(1, 2, 0), VersionUtil.parseVersion("1.2.0"));
+		assertEquals(Arrays.asList(1, 2, 0), VersionUtil.parseVersion("1.2.0rc1"));
+
+		assertEquals(Arrays.asList(1, 4, 1), VersionUtil.parseVersion("1.4.1.post1"));
 	}
 }

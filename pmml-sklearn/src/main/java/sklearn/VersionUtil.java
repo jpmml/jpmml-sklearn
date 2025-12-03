@@ -72,9 +72,16 @@ public class VersionUtil {
 	}
 
 	private static final String PEP440_REGEX =
-		"(\\d+)" +
-		"\\.(\\d+)" + "(?:(?:a|b|rc)\\d)?" +
-		"(?:\\.(?:(\\d)|(?:(?:post|dev)?\\d?)))*";
+		// Must spell out all capturable version number components (ie. major, minor, patch) using independent capturing groups,
+		// because Java overwrites the captures of a repeated capturing group
+		"^" +
+		"(\\d+)" + // major
+		"\\.(\\d+)" + // minor
+		"(?:\\.(\\d+))?" + // patch (missing in 0.X versions, present in 1.X versions)
+		"(?:(?:a|b|rc)\\d+)?" +
+		"(?:\\.post\\d+)?" +
+		"(?:\\.dev\\d+)?" +
+		"$";
 
 	private static final Pattern PEP440_VERSION = Pattern.compile(PEP440_REGEX);
 }
