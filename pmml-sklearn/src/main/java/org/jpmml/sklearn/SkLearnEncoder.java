@@ -269,7 +269,7 @@ public class SkLearnEncoder extends PythonEncoder {
 
 			String problem = "Field " + name + " is already defined";
 			String solution =
-				"Please refactor the pipeline so that it would not contain duplicate field declarations, " +
+				"Refactor the pipeline so that it would not contain duplicate field declarations, " +
 				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + Alias.formatAliasExample() + ")";
 
 			throw new SkLearnException(problem, solution, iae);
@@ -286,7 +286,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		org.dmg.pmml.Field<?> pmmlField = getField(name);
 
 		if(pmmlField instanceof DataField){
-			throw new SkLearnException("User input field " + name + " cannot be renamed");
+			throw new SkLearnException("Field " + name + " cannot be renamed", "Rename input fields in Python beforehand (eg. as DataFrame columns)");
 		}
 
 		org.dmg.pmml.Field renamedPmmlField;
@@ -294,7 +294,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		try {
 			renamedPmmlField = getField(renamedName);
 
-			throw new SkLearnException("Field " + renamedName + " is already defined", "Please choose a different name");
+			throw new SkLearnException("Field " + renamedName + " is already defined", "Choose a different name");
 		} catch(IllegalArgumentException iae){
 			// Ignored
 		}

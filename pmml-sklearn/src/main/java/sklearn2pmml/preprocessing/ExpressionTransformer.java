@@ -121,7 +121,7 @@ public class ExpressionTransformer extends Transformer {
 					.map(name -> "\'" + name + "\'")
 					.collect(Collectors.toList());
 
-				throw new SkLearnException("The target PMML element for " + String.join(", ", quotedAttributes) + " attribute(s) is unclear", "Please refactor the expression from inline string representation to UDF representation");
+				throw new SkLearnException("The target PMML element for " + String.join(", ", quotedAttributes) + " attribute(s) is unclear", "Refactor the expression from inline string representation to UDF representation");
 			}
 		} // End if
 

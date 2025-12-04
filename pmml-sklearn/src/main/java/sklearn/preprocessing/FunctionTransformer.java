@@ -82,7 +82,7 @@ public class FunctionTransformer extends SkLearnTransformer {
 				name = name.substring(("__main__" + ".").length());
 
 				String problem = "The function \'" + name + " \' does not have a persistent state";
-				String solution = "Please use the " + (ExpressionTransformer.class).getName() + " transformer class to give this function a persistent state (eg. " + ExpressionTransformer.formatExpressionExample(name) + ")";
+				String solution = "Use the " + (ExpressionTransformer.class).getName() + " transformer class to give this function a persistent state (eg. " + ExpressionTransformer.formatExpressionExample(name) + ")";
 
 				throw new SkLearnException(problem, solution, ae);
 			}

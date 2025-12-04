@@ -49,6 +49,6 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 
 	static
 	private String formatSolution(Selector selector){
-		return "Please use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(selector) + ")";
+		return "Use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(selector) + ")";
 	}
 }

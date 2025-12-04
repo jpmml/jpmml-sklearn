@@ -179,7 +179,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 			Estimator estimator = getFinalEstimator();
 
 			if(estimator != null){
-				throw new SkLearnException("The pipeline ends with an estimator object");
+				throw new SkLearnException("The pipeline ends with an estimator object (" + ClassDictUtil.formatClass(estimator)  + ")");
 			}
 		}
 

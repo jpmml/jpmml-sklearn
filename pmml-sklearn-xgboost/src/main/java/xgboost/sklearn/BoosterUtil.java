@@ -157,7 +157,7 @@ public class BoosterUtil {
 
 			if(embeddedFeatureMap == null || embeddedFeatureMap.isEmpty()){
 				String problem = "The booster object does not specify feature information";
-				String solution = "Please set the '" + ClassDictUtil.formatMember(booster, "fmap") + "' attribute, or re-train the booster with a DMatrix that has both feature names and feature types set";
+				String solution = "Set the '" + ClassDictUtil.formatMember(booster, "fmap") + "' attribute, or re-train the booster with a DMatrix that has both feature names and feature types set";
 
 				throw new SkLearnException(problem, solution);
 			}
