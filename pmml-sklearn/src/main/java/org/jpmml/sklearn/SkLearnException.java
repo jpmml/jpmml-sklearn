@@ -29,4 +29,17 @@ public class SkLearnException extends PythonException {
 	public SkLearnException(String message, Throwable cause){
 		super(message, cause);
 	}
+
+	public SkLearnException(String problem, String solution){
+		super(formatMessage(problem, solution));
+	}
+
+	public SkLearnException(String problem, String solution, Throwable cause){
+		super(formatMessage(problem, solution), cause);
+	}
+
+	static
+	public String formatMessage(String problem, String solution){
+		return (problem + ". " + solution);
+	}
 }

@@ -34,16 +34,21 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 
 	@Override
 	public int getNumberOfFeatures(){
-		throw new SkLearnException(formatMessage());
+		throw new SkLearnException(formatProblem(this), formatSolution(this));
 	}
 
 	@Override
 	public List<Boolean> getSupportMask(){
-		throw new SkLearnException(formatMessage());
+		throw new SkLearnException(formatProblem(this), formatSolution(this));
 	}
 
-	private String formatMessage(){
-		return "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent state. " +
-			"Please use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")";
+	static
+	private String formatProblem(Selector selector){
+		return "The selector object (" + ClassDictUtil.formatClass(selector) + ") does not have a persistent state";
+	}
+
+	static
+	private String formatSolution(Selector selector){
+		return "Please use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(selector) + ")";
 	}
 }

@@ -81,10 +81,10 @@ public class FunctionTransformer extends SkLearnTransformer {
 			if(name != null && name.startsWith("__main__" + ".")){
 				name = name.substring(("__main__" + ".").length());
 
-				String message = "The function \'" + name + " \' does not have a persistent state. " +
-					"Please use the " + (ExpressionTransformer.class).getName() + " transformer class to give this function a persistent state (eg. " + ExpressionTransformer.formatExpressionExample(name) + ")";
+				String problem = "The function \'" + name + " \' does not have a persistent state";
+				String solution = "Please use the " + (ExpressionTransformer.class).getName() + " transformer class to give this function a persistent state (eg. " + ExpressionTransformer.formatExpressionExample(name) + ")";
 
-				throw new SkLearnException(message, ae);
+				throw new SkLearnException(problem, solution, ae);
 			}
 
 			throw ae;

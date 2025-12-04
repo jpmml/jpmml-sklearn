@@ -38,12 +38,13 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public void checkSkLearnVersion(){
 		String sklearnVersion = getSkLearnVersion();
+		String supportedSklearnVersion = "1.7.2";
 
-		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "1.7.2") > 0){
-			String message = "This converter version does not know about Scikit-Learn version " + sklearnVersion + " artifacts. " +
-				"Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version " + "1.7.2";
+		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, supportedSklearnVersion) > 0){
+			String problem = "This converter version does not know about Scikit-Learn version " + sklearnVersion + " artifacts";
+			String solution = "Please upgrade the converter to the latest version, or downgrade Scikit-Learn to version " + supportedSklearnVersion;
 
-			throw new SkLearnException(message);
+			throw new SkLearnException(problem, solution);
 		}
 	}
 
