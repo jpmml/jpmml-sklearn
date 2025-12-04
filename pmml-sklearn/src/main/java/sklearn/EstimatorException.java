@@ -16,17 +16,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jpmml.sklearn;
+package sklearn;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import org.jpmml.python.ClassDictUtil;
-import sklearn.Estimator;
+import org.jpmml.sklearn.SkLearnException;
 
-public class SkLearnTypeException extends SkLearnException {
+public class EstimatorException extends SkLearnException {
 
-	public SkLearnTypeException(Estimator estimator, Class<?>... clazzes){
+	public EstimatorException(Estimator estimator, Class<?>... clazzes){
 		super("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not an instance of " + formatClasses(clazzes));
 	}
 

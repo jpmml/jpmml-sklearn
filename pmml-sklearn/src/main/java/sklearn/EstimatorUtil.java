@@ -40,7 +40,6 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.SkLearnTypeException;
 
 public class EstimatorUtil {
 
@@ -70,7 +69,7 @@ public class EstimatorUtil {
 		} else
 
 		{
-			throw new SkLearnTypeException(estimator, HasClasses.class);
+			throw new EstimatorException(estimator, HasClasses.class);
 		}
 	}
 
@@ -84,7 +83,7 @@ public class EstimatorUtil {
 		} else
 
 		{
-			throw new SkLearnTypeException(estimator, HasClasses.class);
+			throw new EstimatorException(estimator, HasClasses.class);
 		}
 	}
 
@@ -107,7 +106,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new SkLearnTypeException(estimator, HasApplyField.class, HasMultiApplyField.class);
+						throw new EstimatorException(estimator, HasApplyField.class, HasMultiApplyField.class);
 					}
 				}
 			case SkLearnMethods.DECISION_FUNCTION:
@@ -119,7 +118,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new SkLearnTypeException(estimator, HasDecisionFunctionField.class);
+						throw new EstimatorException(estimator, HasDecisionFunctionField.class);
 					}
 				}
 			case SkLearnMethods.PREDICT:
@@ -179,7 +178,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new SkLearnTypeException(estimator, HasClasses.class);
+						throw new EstimatorException(estimator, HasClasses.class);
 					}
 				}
 			default:

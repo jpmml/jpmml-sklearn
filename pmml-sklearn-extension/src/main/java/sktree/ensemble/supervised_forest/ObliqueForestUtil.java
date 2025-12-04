@@ -31,9 +31,9 @@ import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.SkLearnTypeException;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
+import sklearn.EstimatorException;
 import sklearn.tree.HasTree;
 import sktree.tree.ObliqueDecisionTreeClassifier;
 import sktree.tree.ObliqueDecisionTreeRegressor;
@@ -82,7 +82,7 @@ public class ObliqueForestUtil {
 					} else
 
 					{
-						throw new SkLearnTypeException(estimator, ObliqueDecisionTreeClassifier.class, ObliqueDecisionTreeRegressor.class);
+						throw new EstimatorException(estimator, ObliqueDecisionTreeClassifier.class, ObliqueDecisionTreeRegressor.class);
 					}
 				} finally {
 					estimator.setPMMLSegmentId(null);

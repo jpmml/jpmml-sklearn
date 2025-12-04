@@ -47,13 +47,13 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.SkLearnTypeException;
 import sklearn.Calibrator;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
+import sklearn.EstimatorException;
 import sklearn.ensemble.gradient_boosting.GradientBoostingClassifier;
 import sklearn.linear_model.LinearClassifier;
 
@@ -133,7 +133,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 					} else
 
 					{
-						throw new SkLearnTypeException(estimator, LinearClassifier.class, GradientBoostingClassifier.class);
+						throw new EstimatorException(estimator, LinearClassifier.class, GradientBoostingClassifier.class);
 					} // End if
 
 					if(outputField.getResultFeature() != ResultFeature.PREDICTED_VALUE){
