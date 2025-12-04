@@ -18,9 +18,7 @@
  */
 package org.jpmml.sklearn;
 
-import org.jpmml.python.PythonException;
-
-public class SkLearnException extends PythonException {
+public class SkLearnException extends RuntimeException {
 
 	public SkLearnException(String message){
 		super(message);
@@ -36,6 +34,18 @@ public class SkLearnException extends PythonException {
 
 	public SkLearnException(String problem, String solution, Throwable cause){
 		super(formatMessage(problem, solution), cause);
+	}
+
+	@Override
+	synchronized
+	public SkLearnException initCause(Throwable cause){
+		return (SkLearnException)super.initCause(cause);
+	}
+
+	@Override
+	synchronized
+	public SkLearnException fillInStackTrace(){
+		return (SkLearnException)super.fillInStackTrace();
 	}
 
 	static
