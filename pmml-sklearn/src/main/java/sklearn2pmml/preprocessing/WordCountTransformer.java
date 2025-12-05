@@ -44,6 +44,6 @@ public class WordCountTransformer extends StringTransformer {
 	}
 
 	public SkLearnPipeline getPipeline(){
-		return get("pipeline_", SkLearnPipeline.class);
+		return getStep("pipeline_", SkLearnPipeline.class);
 	}
 }

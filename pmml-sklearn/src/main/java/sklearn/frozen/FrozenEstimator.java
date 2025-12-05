@@ -63,11 +63,11 @@ public class FrozenEstimator extends Step implements Castable {
 		return this;
 	}
 
-	public Step getEstimator(){
-		return getEstimator(Estimator.class);
+	public Estimator getEstimator(){
+		return (Estimator)getEstimator(Estimator.class);
 	}
 
 	public Step getEstimator(Class<? extends Step> stepClazz){
-		return get("estimator", stepClazz);
+		return getStep("estimator", stepClazz);
 	}
 }
