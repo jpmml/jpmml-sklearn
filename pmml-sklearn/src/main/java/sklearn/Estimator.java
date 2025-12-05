@@ -338,7 +338,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} else
 
 		{
-			throw new EstimatorException(this, HasClasses.class);
+			throw new EstimatorCheckException(this, HasClasses.class);
 		}
 
 		List<?> values = discreteLabel.getValues();
@@ -372,7 +372,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} else
 
 		{
-			throw new EstimatorException(this, HasApplyField.class);
+			throw new EstimatorCheckException(this, HasApplyField.class);
 		} // End if
 
 		if(pmmlSegmentId != null){
@@ -404,7 +404,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} else
 
 		{
-			throw new EstimatorException(this, HasMultiApplyField.class);
+			throw new EstimatorCheckException(this, HasMultiApplyField.class);
 		} // End if
 
 		if(pmmlSegmentId != null){

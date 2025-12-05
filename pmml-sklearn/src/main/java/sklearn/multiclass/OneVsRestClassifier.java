@@ -33,7 +33,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
-import sklearn.EstimatorException;
+import sklearn.EstimatorCheckException;
 import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiDecisionFunctionField;
@@ -77,7 +77,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 			Classifier estimator = estimators.get(0);
 
 			if(!estimator.hasProbabilityDistribution()){
-				throw new EstimatorException(estimator, HasClasses.class);
+				throw new EstimatorCheckException(estimator, HasClasses.class);
 			}
 
 			return estimator.encode(schema);
@@ -92,7 +92,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 				Classifier estimator = estimators.get(i);
 
 				if(!estimator.hasProbabilityDistribution()){
-					throw new EstimatorException(estimator, HasClasses.class);
+					throw new EstimatorCheckException(estimator, HasClasses.class);
 				}
 
 				Output output = new Output()

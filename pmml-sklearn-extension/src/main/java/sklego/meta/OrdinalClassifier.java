@@ -50,7 +50,7 @@ import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
-import sklearn.EstimatorException;
+import sklearn.EstimatorCheckException;
 import sklearn.HasClasses;
 import sklearn.SkLearnFields;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -100,7 +100,7 @@ public class OrdinalClassifier extends Classifier {
 			} // End if
 
 			if(!estimator.hasProbabilityDistribution()){
-				throw new EstimatorException(estimator, HasClasses.class);
+				throw new EstimatorCheckException(estimator, HasClasses.class);
 			}
 
 			CategoricalLabel segmentLabel = new CategoricalLabel(DataType.DOUBLE, Arrays.asList("<=" + ValueUtil.asString(category), ">" + ValueUtil.asString(category)));

@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 
-public class EstimatorException extends SkLearnException {
+public class EstimatorCheckException extends SkLearnException {
 
-	public EstimatorException(Estimator estimator, Class<?>... clazzes){
+	public EstimatorCheckException(Estimator estimator, Class<?>... clazzes){
 		super("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not an instance of " + formatClasses(clazzes));
 	}
 

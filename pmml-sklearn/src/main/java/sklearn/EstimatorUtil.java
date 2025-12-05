@@ -69,7 +69,7 @@ public class EstimatorUtil {
 		} else
 
 		{
-			throw new EstimatorException(estimator, HasClasses.class);
+			throw new EstimatorCheckException(estimator, HasClasses.class);
 		}
 	}
 
@@ -83,7 +83,7 @@ public class EstimatorUtil {
 		} else
 
 		{
-			throw new EstimatorException(estimator, HasClasses.class);
+			throw new EstimatorCheckException(estimator, HasClasses.class);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new EstimatorException(estimator, HasApplyField.class, HasMultiApplyField.class);
+						throw new EstimatorCheckException(estimator, HasApplyField.class, HasMultiApplyField.class);
 					}
 				}
 			case SkLearnMethods.DECISION_FUNCTION:
@@ -118,7 +118,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new EstimatorException(estimator, HasDecisionFunctionField.class);
+						throw new EstimatorCheckException(estimator, HasDecisionFunctionField.class);
 					}
 				}
 			case SkLearnMethods.PREDICT:
@@ -178,7 +178,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new EstimatorException(estimator, HasClasses.class);
+						throw new EstimatorCheckException(estimator, HasClasses.class);
 					}
 				}
 			default:

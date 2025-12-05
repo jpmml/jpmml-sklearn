@@ -73,7 +73,7 @@ import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
 import sklearn.HasApplyField;
 import sklearn.HasMultiApplyField;
-import sklearn.EstimatorException;
+import sklearn.EstimatorCheckException;
 import sklearn.StepUtil;
 import sklearn.VersionUtil;
 import sklearn.tree.visitors.TreeModelCompactor;
@@ -668,7 +668,7 @@ public class TreeUtil {
 		} else
 
 		{
-			throw new EstimatorException(estimator, HasApplyField.class, HasMultiApplyField.class);
+			throw new EstimatorCheckException(estimator, HasApplyField.class, HasMultiApplyField.class);
 		}
 	}
 }
