@@ -50,9 +50,9 @@ import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
+import sklearn.EstimatorException;
 import sklearn.HasClasses;
 import sklearn.SkLearnFields;
-import sklearn.EstimatorException;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 public class OrdinalClassifier extends Classifier {
@@ -158,7 +158,7 @@ public class OrdinalClassifier extends Classifier {
 	}
 
 	public Classifier getEstimator(){
-		return get("estimator", Classifier.class);
+		return getClassifier("estimator");
 	}
 
 	public Map<?, ? extends Classifier> getEstimators(){

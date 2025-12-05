@@ -163,12 +163,12 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 
 		// SkLearn2PMML 0.54.0
 		if(hasattr("estimator_")){
-			return get("estimator_", Estimator.class);
+			return getEstimator("estimator_");
 		} else
 
 		// SkLearn2PMML 0.55.0+
 		{
-			return get("estimator", Estimator.class);
+			return getEstimator("estimator");
 		}
 	}
 

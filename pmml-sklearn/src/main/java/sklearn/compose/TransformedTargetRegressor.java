@@ -85,7 +85,7 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 	}
 
 	public Regressor getRegressor(){
-		return get("regressor_", Regressor.class);
+		return getRegressor("regressor_");
 	}
 
 	public FunctionTransformer getTransformer(){

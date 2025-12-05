@@ -46,11 +46,11 @@ public class GBDTLMRegressor extends Regressor {
 	}
 
 	public Regressor getGBDT(){
-		return get("gbdt_", Regressor.class);
+		return getRegressor("gbdt_");
 	}
 
 	public LinearRegressor getLM(){
-		return get("lm_", LinearRegressor.class);
+		return getEstimator("lm_", LinearRegressor.class);
 	}
 
 	public MultiOneHotEncoder getOHE(){

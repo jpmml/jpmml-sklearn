@@ -55,7 +55,7 @@ public class FixedThresholdClassifier extends SkLearnClassifier implements HasEs
 
 	@Override
 	public Classifier getEstimator(){
-		return get("estimator_", Classifier.class);
+		return getClassifier("estimator_");
 	}
 
 	public String getResponseMethod(){

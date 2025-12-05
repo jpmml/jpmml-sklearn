@@ -202,7 +202,7 @@ public class Scorecard extends Estimator implements HasClasses {
 	}
 
 	public Estimator getEstimator(){
-		return get("estimator_", Estimator.class);
+		return getEstimator("estimator_");
 	}
 
 	public Number getIntercept(){

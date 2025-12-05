@@ -85,7 +85,7 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 	}
 
 	public Regressor getFinalEstimator(){
-		return get("final_estimator_", Regressor.class);
+		return getRegressor("final_estimator_");
 	}
 
 	public Boolean getPassthrough(){

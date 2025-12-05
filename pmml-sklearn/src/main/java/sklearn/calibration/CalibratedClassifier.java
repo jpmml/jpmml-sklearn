@@ -50,10 +50,10 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Calibrator;
 import sklearn.Classifier;
 import sklearn.Estimator;
+import sklearn.EstimatorException;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
-import sklearn.EstimatorException;
 import sklearn.ensemble.gradient_boosting.GradientBoostingClassifier;
 import sklearn.linear_model.LinearClassifier;
 
@@ -286,7 +286,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 
 	@Override
 	public Classifier getEstimator(){
-		return get("estimator", Classifier.class);
+		return getClassifier("estimator");
 	}
 
 	public String getMethod(){

@@ -120,7 +120,7 @@ public class HyperoptEstimator extends Composite implements Encodable {
 	}
 
 	public <E extends Estimator> E getBestLearner(Class<? extends E> clazz){
-		return get("_best_learner", clazz);
+		return getEstimator("_best_learner", clazz);
 	}
 
 	public Object[] getBestPreprocs(){

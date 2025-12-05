@@ -71,7 +71,7 @@ public class SelectFromModel extends SkLearnSelector implements HasEstimator<Est
 
 	@Override
 	public Estimator getEstimator(){
-		return get("estimator_", Estimator.class);
+		return getEstimator("estimator_");
 	}
 
 	public Number getThreshold(){

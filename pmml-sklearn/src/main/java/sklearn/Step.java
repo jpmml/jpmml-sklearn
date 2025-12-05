@@ -78,4 +78,20 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	public String getSkLearnVersion(){
 		return getOptionalString(SkLearnFields.SKLEARN_VERSION);
 	}
+
+	public Classifier getClassifier(String name){
+		return getEstimator(name, Classifier.class);
+	}
+
+	public Regressor getRegressor(String name){
+		return getEstimator(name, Regressor.class);
+	}
+
+	public Estimator getEstimator(String name){
+		return getEstimator(name, Estimator.class);
+	}
+
+	public <E extends Estimator> E getEstimator(String name, Class<? extends E> clazz){
+		return get(name, clazz);
+	}
 }

@@ -84,11 +84,11 @@ public class GBDTLRClassifier extends Classifier implements HasMultiDecisionFunc
 	}
 
 	public Classifier getGBDT(){
-		return get("gbdt_", Classifier.class);
+		return getClassifier("gbdt_");
 	}
 
 	public LinearClassifier getLR(){
-		return get("lr_", LinearClassifier.class);
+		return getEstimator("lr_", LinearClassifier.class);
 	}
 
 	public MultiOneHotEncoder getOHE(){

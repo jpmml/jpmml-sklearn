@@ -100,6 +100,6 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 
 	@Override
 	public Estimator getEstimator(){
-		return get("estimator", Estimator.class);
+		return getEstimator("estimator");
 	}
 }

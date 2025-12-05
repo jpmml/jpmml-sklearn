@@ -50,6 +50,6 @@ public class GlassboxClassifier extends Classifier {
 	}
 
 	public Classifier getSkModel(){
-		return get("sk_model_", Classifier.class);
+		return getClassifier("sk_model_");
 	}
 }

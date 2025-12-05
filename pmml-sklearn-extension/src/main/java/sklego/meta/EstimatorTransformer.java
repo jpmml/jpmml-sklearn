@@ -137,7 +137,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 	}
 
 	public <E extends Estimator> E getEstimator(Class<? extends E> clazz){
-		return get("estimator_", clazz);
+		return getEstimator("estimator_", clazz);
 	}
 
 	public String getPredictFunc(){

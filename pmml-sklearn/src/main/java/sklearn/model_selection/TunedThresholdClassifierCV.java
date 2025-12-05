@@ -52,7 +52,7 @@ public class TunedThresholdClassifierCV extends SkLearnClassifier implements Has
 
 	@Override
 	public Classifier getEstimator(){
-		return get("estimator_", Classifier.class);
+		return getClassifier("estimator_");
 	}
 
 	public Number getBestThreshold(){

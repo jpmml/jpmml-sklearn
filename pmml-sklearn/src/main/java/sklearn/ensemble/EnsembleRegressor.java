@@ -51,11 +51,11 @@ public class EnsembleRegressor extends SkLearnRegressor implements HasEstimatorE
 
 		// SkLearn 1.1
 		if(hasattr("base_estimator_")){
-			return get("base_estimator_", Regressor.class);
+			return getRegressor("base_estimator_");
 		}
 
 		// SkLearn 1.2+
-		return get("estimator_", Regressor.class);
+		return getRegressor("estimator_");
 	}
 
 	@Override

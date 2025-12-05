@@ -101,7 +101,7 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 	}
 
 	public Classifier getFinalEstimator(){
-		return get("final_estimator_", Classifier.class);
+		return getClassifier("final_estimator_");
 	}
 
 	public Boolean getPassthrough(){

@@ -71,6 +71,6 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 
 	@Override
 	public Estimator getEstimator(){
-		return get("_estimator", Estimator.class);
+		return getEstimator("_estimator");
 	}
 }

@@ -36,6 +36,6 @@ public class GlassboxRegressor extends Regressor {
 	}
 
 	public Regressor getSkModel(){
-		return get("sk_model_", Regressor.class);
+		return getRegressor("sk_model_");
 	}
 }
