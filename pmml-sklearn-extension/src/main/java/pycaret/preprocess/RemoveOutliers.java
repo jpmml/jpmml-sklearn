@@ -28,7 +28,6 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
-import sklearn.EstimatorCheckException;
 import sklearn.HasEstimator;
 import sklearn.IdentityTransformer;
 import sklearn.OutlierDetector;
@@ -43,15 +42,7 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
-		OutlierDetector outlierDetector;
-
-		if(estimator instanceof OutlierDetector){
-			outlierDetector = (OutlierDetector)estimator;
-		} else
-
-		{
-			throw new EstimatorCheckException(estimator, OutlierDetector.class);
-		}
+		OutlierDetector outlierDetector = estimator.asInstance(OutlierDetector.class);
 
 		Schema schema = new Schema(encoder, null, features);
 

@@ -61,30 +61,16 @@ public class EstimatorUtil {
 
 	static
 	public List<?> getClasses(Estimator estimator){
+		HasClasses hasClasses = estimator.asInstance(HasClasses.class);
 
-		if(estimator instanceof HasClasses){
-			HasClasses hasClasses = (HasClasses)estimator;
-
-			return hasClasses.getClasses();
-		} else
-
-		{
-			throw new EstimatorCheckException(estimator, HasClasses.class);
-		}
+		return hasClasses.getClasses();
 	}
 
 	static
 	public boolean hasProbabilityDistribution(Estimator estimator){
+		HasClasses hasClasses = estimator.asInstance(HasClasses.class);
 
-		if(estimator instanceof HasClasses){
-			HasClasses hasClasses = (HasClasses)estimator;
-
-			return hasClasses.hasProbabilityDistribution();
-		} else
-
-		{
-			throw new EstimatorCheckException(estimator, HasClasses.class);
-		}
+		return hasClasses.hasProbabilityDistribution();
 	}
 
 	static

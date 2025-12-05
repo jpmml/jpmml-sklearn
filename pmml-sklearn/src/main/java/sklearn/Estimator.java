@@ -330,16 +330,20 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		return this;
 	}
 
+	public <E> E asInstance(Class<? extends E> clazz){
+
+		if(clazz.isInstance(this)){
+			return clazz.cast(this);
+		}
+
+		throw new EstimatorCheckException(this, clazz);
+	}
+
 	public List<OutputField> createPredictProbaFields(DataType dataType, DiscreteLabel discreteLabel){
 		Object pmmlSegmentId = getPMMLSegmentId();
 
-		if(this instanceof HasClasses){
-			HasClasses hasClasses = (HasClasses)this;
-		} else
-
-		{
-			throw new EstimatorCheckException(this, HasClasses.class);
-		}
+		@SuppressWarnings("unused")
+		HasClasses hasClasses = asInstance(HasClasses.class);
 
 		List<?> values = discreteLabel.getValues();
 
@@ -363,17 +367,9 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	public OutputField createApplyField(DataType dataType){
 		Object pmmlSegmentId = getPMMLSegmentId();
 
-		String name;
+		HasApplyField hasApplyField = asInstance(HasApplyField.class);
 
-		if(this instanceof HasApplyField){
-			HasApplyField hasApplyField = (HasApplyField)this;
-
-			name = hasApplyField.getApplyField();
-		} else
-
-		{
-			throw new EstimatorCheckException(this, HasApplyField.class);
-		} // End if
+		String name = hasApplyField.getApplyField();
 
 		if(pmmlSegmentId != null){
 			name = FieldNameUtil.create(name, pmmlSegmentId);
@@ -395,17 +391,9 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	public OutputField createMultiApplyField(DataType dataType, String segmentId){
 		Object pmmlSegmentId = getPMMLSegmentId();
 
-		String name;
+		HasMultiApplyField hasMultiApplyField = asInstance(HasMultiApplyField.class);
 
-		if(this instanceof HasMultiApplyField){
-			HasMultiApplyField hasMultiApplyField = (HasMultiApplyField)this;
-
-			name = hasMultiApplyField.getMultiApplyField(segmentId);
-		} else
-
-		{
-			throw new EstimatorCheckException(this, HasMultiApplyField.class);
-		} // End if
+		String name = hasMultiApplyField.getMultiApplyField(segmentId);
 
 		if(pmmlSegmentId != null){
 			name = FieldNameUtil.create(name, pmmlSegmentId);
