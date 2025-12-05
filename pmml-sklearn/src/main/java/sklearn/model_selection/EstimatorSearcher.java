@@ -18,15 +18,32 @@
  */
 package sklearn.model_selection;
 
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.OpType;
 import org.jpmml.python.Castable;
-import org.jpmml.python.PythonObject;
 import sklearn.Estimator;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Step;
 
-public class EstimatorSearcher extends PythonObject implements Castable {
+public class EstimatorSearcher extends Step implements Castable {
 
 	public EstimatorSearcher(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		return HasNumberOfFeatures.UNKNOWN;
+	}
+
+	@Override
+	public OpType getOpType(){
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DataType getDataType(){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -41,17 +58,13 @@ public class EstimatorSearcher extends PythonObject implements Castable {
 		if((Step.class).isAssignableFrom(clazz)){
 			Class<? extends Step> stepClazz = clazz.asSubclass(Step.class);
 
-			return getBestEstimator();
+			return getBestEstimator(stepClazz);
 		}
 
 		return this;
 	}
 
-	public Estimator getBestEstimator(){
-		return getBestEstimator(Estimator.class);
-	}
-
-	public Estimator getBestEstimator(Class<? extends Estimator> clazz){
-		return get("best_estimator_", clazz);
+	public <E extends Step> E getBestEstimator(Class<? extends E> clazz){
+		return getStep("best_estimator_", clazz);
 	}
 }
