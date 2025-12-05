@@ -74,7 +74,7 @@ public class GradientBoostingRegressor extends SkLearnRegressor implements HasEs
 
 	@Override
 	public List<TreeRegressor> getEstimators(){
-		return getArray("estimators_", TreeRegressor.class);
+		return getEstimatorArray("estimators_", TreeRegressor.class);
 	}
 
 	public HasDefaultValue getInit(){

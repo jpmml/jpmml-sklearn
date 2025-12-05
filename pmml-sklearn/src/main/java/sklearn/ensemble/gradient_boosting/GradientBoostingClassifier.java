@@ -200,7 +200,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 
 	@Override
 	public List<TreeRegressor> getEstimators(){
-		return getArray("estimators_", TreeRegressor.class);
+		return getEstimatorArray("estimators_", TreeRegressor.class);
 	}
 
 	public HasPriorProbability getInit(){
