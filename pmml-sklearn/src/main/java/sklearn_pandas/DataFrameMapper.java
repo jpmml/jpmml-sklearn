@@ -36,6 +36,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
 import sklearn.Transformer;
+import sklearn.TransformerCastFunction;
 
 public class DataFrameMapper extends Initializer {
 
@@ -154,7 +155,7 @@ public class DataFrameMapper extends Initializer {
 			value = TupleUtil.extractElementList(steps, 1);
 		}
 
-		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
+		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class){
 
 			@Override
 			protected String formatMessage(Object object){

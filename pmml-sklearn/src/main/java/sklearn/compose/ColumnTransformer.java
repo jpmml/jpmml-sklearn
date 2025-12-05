@@ -39,6 +39,7 @@ import sklearn.InitializerUtil;
 import sklearn.PassThrough;
 import sklearn.SkLearnSteps;
 import sklearn.Transformer;
+import sklearn.TransformerCastFunction;
 import sklearn.TransformerUtil;
 
 public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, HasSparseOutput, Encodable {
@@ -107,7 +108,7 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 	protected Transformer getTransformer(Object[] fittedTransformer){
 		Object transformer = TupleUtil.extractElement(fittedTransformer, 1);
 
-		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
+		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class){
 
 			@Override
 			public Transformer apply(Object object){

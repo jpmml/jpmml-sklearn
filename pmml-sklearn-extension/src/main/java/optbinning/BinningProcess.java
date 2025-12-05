@@ -32,6 +32,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
+import sklearn.TransformerCastFunction;
 
 public class BinningProcess extends Initializer {
 
@@ -101,11 +102,11 @@ public class BinningProcess extends Initializer {
 	public Map<String, OptimalBinning> getBinnedVariables(){
 		Map<String, ?> binnedVariables = getDict("_binned_variables");
 
-		CastFunction<OptimalBinning> castFunction = new CastFunction<OptimalBinning>(OptimalBinning.class){
+		CastFunction<OptimalBinning> castFunction = new TransformerCastFunction<OptimalBinning>(OptimalBinning.class){
 
 			@Override
 			protected String formatMessage(Object object){
-				return "The binning object (" + ClassDictUtil.formatClass(object) + ") is not supported";
+				return "The binning object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
 			}
 		};
 

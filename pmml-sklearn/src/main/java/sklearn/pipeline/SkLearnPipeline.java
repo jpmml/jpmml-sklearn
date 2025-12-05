@@ -43,6 +43,7 @@ import sklearn.SkLearnSteps;
 import sklearn.Step;
 import sklearn.StepUtil;
 import sklearn.Transformer;
+import sklearn.TransformerCastFunction;
 
 public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
@@ -128,7 +129,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 		List<?> transformers = TupleUtil.extractElementList(steps, 1);
 
-		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
+		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class){
 
 			@Override
 			public Transformer apply(Object object){
@@ -138,11 +139,6 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 				}
 
 				return super.apply(object);
-			}
-
-			@Override
-			public String formatMessage(Object object){
-				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
 			}
 		};
 

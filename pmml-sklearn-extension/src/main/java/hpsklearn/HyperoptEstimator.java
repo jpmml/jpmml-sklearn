@@ -34,6 +34,7 @@ import sklearn.Estimator;
 import sklearn.Step;
 import sklearn.StepUtil;
 import sklearn.Transformer;
+import sklearn.TransformerCastFunction;
 
 public class HyperoptEstimator extends Composite implements Encodable {
 
@@ -57,7 +58,7 @@ public class HyperoptEstimator extends Composite implements Encodable {
 	public List<? extends Transformer> getTransformers(){
 		Object[] bestPreprocs = getBestPreprocs();
 
-		CastFunction<Transformer> castFunction = new CastFunction<Transformer>(Transformer.class){
+		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class){
 
 			@Override
 			public String formatMessage(Object object){
