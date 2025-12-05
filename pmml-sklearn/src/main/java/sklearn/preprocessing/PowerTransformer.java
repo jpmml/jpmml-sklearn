@@ -93,7 +93,7 @@ public class PowerTransformer extends SkLearnTransformer {
 	}
 
 	public StandardScaler getScaler(){
-		return get("_scaler", StandardScaler.class);
+		return getTransformer("_scaler", StandardScaler.class);
 	}
 
 	public Boolean getStandardize(){

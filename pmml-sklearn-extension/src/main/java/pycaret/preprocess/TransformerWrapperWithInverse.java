@@ -99,6 +99,6 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 	@Override
 	public LabelEncoder getTransformer(){
-		return get("transformer", LabelEncoder.class);
+		return getTransformer("transformer", LabelEncoder.class);
 	}
 }

@@ -201,7 +201,7 @@ public class TransformerWrapper extends Initializer {
 	}
 
 	public Transformer getTransformer(){
-		return get("transformer", Transformer.class);
+		return getTransformer("transformer");
 	}
 
 	static

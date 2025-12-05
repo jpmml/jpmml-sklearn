@@ -44,7 +44,7 @@ public class BinaryEncoder extends BaseNEncoder {
 
 		// CategoryEncoders 2.3
 		if(hasattr("base_n_encoder")){
-			return get("base_n_encoder", BaseNEncoder.class);
+			return getTransformer("base_n_encoder", BaseNEncoder.class);
 		}
 
 		// CategoryEncoders 2.5+

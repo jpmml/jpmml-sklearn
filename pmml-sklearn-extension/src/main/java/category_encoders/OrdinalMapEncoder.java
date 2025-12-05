@@ -133,7 +133,7 @@ public class OrdinalMapEncoder extends MapEncoder {
 	}
 
 	public OrdinalEncoder getOrdinalEncoder(){
-		return get("ordinal_encoder", OrdinalEncoder.class);
+		return getTransformer("ordinal_encoder", OrdinalEncoder.class);
 	}
 
 	static

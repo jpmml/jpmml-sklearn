@@ -91,7 +91,7 @@ public class OneHotEncoder extends BaseEncoder {
 	}
 
 	public OrdinalEncoder getOrdinalEncoder(){
-		return get("ordinal_encoder", OrdinalEncoder.class);
+		return getTransformer("ordinal_encoder", OrdinalEncoder.class);
 	}
 
 	private static final String HANDLEMISSING_INDICATOR = "indicator";

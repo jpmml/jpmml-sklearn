@@ -54,6 +54,6 @@ public class GBDTLMRegressor extends Regressor {
 	}
 
 	public MultiOneHotEncoder getOHE(){
-		return get("ohe_", MultiOneHotEncoder.class);
+		return getTransformer("ohe_", MultiOneHotEncoder.class);
 	}
 }

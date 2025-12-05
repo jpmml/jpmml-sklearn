@@ -477,18 +477,18 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	public Transformer getPredictTransformer(){
-		return getTransformer("predict_transformer");
+		return getOptionalTransformer("predict_transformer");
 	}
 
 	public Transformer getPredictProbaTransformer(){
-		return getTransformer("predict_proba_transformer");
+		return getOptionalTransformer("predict_proba_transformer");
 	}
 
 	public Transformer getApplyTransformer(){
-		return getTransformer("apply_transformer");
+		return getOptionalTransformer("apply_transformer");
 	}
 
-	private Transformer getTransformer(String key){
+	private Transformer getOptionalTransformer(String key){
 		return getOptional(key, Transformer.class);
 	}
 

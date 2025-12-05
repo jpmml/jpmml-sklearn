@@ -62,6 +62,6 @@ public class TransformerWrapper extends Transformer {
 	}
 
 	public Transformer getTransformer(){
-		return get("transformer_", Transformer.class);
+		return getTransformer("transformer_");
 	}
 }

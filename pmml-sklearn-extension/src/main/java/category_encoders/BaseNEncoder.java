@@ -171,7 +171,7 @@ public class BaseNEncoder extends BaseEncoder {
 	}
 
 	public OrdinalEncoder getOrdinalEncoder(){
-		return get("ordinal_encoder", OrdinalEncoder.class);
+		return getTransformer("ordinal_encoder", OrdinalEncoder.class);
 	}
 
 	static

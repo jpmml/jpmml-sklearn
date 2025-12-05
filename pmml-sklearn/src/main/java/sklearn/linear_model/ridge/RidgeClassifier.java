@@ -54,6 +54,6 @@ public class RidgeClassifier extends LinearClassifier {
 	}
 
 	public LabelBinarizer getLabelBinarizer(){
-		return get("_label_binarizer", LabelBinarizer.class);
+		return getTransformer("_label_binarizer", LabelBinarizer.class);
 	}
 }

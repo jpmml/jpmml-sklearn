@@ -194,7 +194,7 @@ public class Scorecard extends Estimator implements HasClasses {
 	}
 
 	public BinningProcess getBinningProcess(){
-		return get("binning_process_", BinningProcess.class);
+		return getTransformer("binning_process_", BinningProcess.class);
 	}
 
 	public DataFrame getDFScorecard(){

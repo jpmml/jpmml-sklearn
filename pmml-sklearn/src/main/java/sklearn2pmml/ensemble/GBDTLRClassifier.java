@@ -92,6 +92,6 @@ public class GBDTLRClassifier extends Classifier implements HasMultiDecisionFunc
 	}
 
 	public MultiOneHotEncoder getOHE(){
-		return get("ohe_", MultiOneHotEncoder.class);
+		return getTransformer("ohe_", MultiOneHotEncoder.class);
 	}
 }
