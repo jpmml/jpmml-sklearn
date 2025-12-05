@@ -18,10 +18,9 @@
  */
 package sklearn;
 
-import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 
-public class TransformerCastFunction<E extends Transformer> extends CastFunction<E> {
+public class TransformerCastFunction<E extends Transformer> extends StepCastFunction<E> {
 
 	public TransformerCastFunction(Class<? extends E> clazz){
 		super(clazz);

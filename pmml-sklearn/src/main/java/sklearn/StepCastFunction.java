@@ -18,16 +18,17 @@
  */
 package sklearn;
 
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 
-public class EstimatorCastFunction<E extends Estimator> extends StepCastFunction<E> {
+public class StepCastFunction<E extends Step> extends CastFunction<E> {
 
-	public EstimatorCastFunction(Class<? extends E> clazz){
+	public StepCastFunction(Class<? extends E> clazz){
 		super(clazz);
 	}
 
 	@Override
 	protected String formatMessage(Object object){
-		return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Estimator";
+		return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
 	}
 }

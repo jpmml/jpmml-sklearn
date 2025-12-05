@@ -24,13 +24,13 @@ import java.util.List;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.python.CastFunction;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.MissingAttributeException;
 import sklearn.Estimator;
 import sklearn.HasNumberOfFeatures;
 import sklearn.HasNumberOfOutputs;
 import sklearn.SkLearnFields;
 import sklearn.Step;
+import sklearn.StepCastFunction;
 import sklearn.pipeline.SkLearnPipeline;
 
 public class EncodableUtil {
@@ -47,13 +47,7 @@ public class EncodableUtil {
 			return encodable;
 		}
 
-		CastFunction<Step> castFunction = new CastFunction<Step>(Step.class){
-
-			@Override
-			protected String formatMessage(Object object){
-				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
-			}
-		};
+		CastFunction<Step> castFunction = new StepCastFunction<>(Step.class);
 
 		Step step = castFunction.apply(object);
 

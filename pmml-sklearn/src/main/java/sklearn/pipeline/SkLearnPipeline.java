@@ -41,6 +41,7 @@ import sklearn.PassThrough;
 import sklearn.SkLearnFields;
 import sklearn.SkLearnSteps;
 import sklearn.Step;
+import sklearn.StepCastFunction;
 import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.TransformerCastFunction;
@@ -183,7 +184,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 		Object step = TupleUtil.extractElement(headStep, 1);
 
-		CastFunction<Step> castFunction = new CastFunction<Step>(Step.class){
+		CastFunction<Step> castFunction = new StepCastFunction<Step>(Step.class){
 
 			@Override
 			public Step apply(Object object){
