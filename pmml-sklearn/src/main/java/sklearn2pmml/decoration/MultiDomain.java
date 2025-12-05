@@ -57,6 +57,6 @@ public class MultiDomain extends Decorator {
 	}
 
 	public List<Domain> getDomains(){
-		return getList("domains", Domain.class);
+		return getTransformerList("domains", Domain.class);
 	}
 }

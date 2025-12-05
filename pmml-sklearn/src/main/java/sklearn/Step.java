@@ -126,4 +126,8 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	public <E extends Estimator> List<E> getEstimatorList(String name, Class<? extends E> clazz){
 		return getList(name, clazz);
 	}
+
+	public <E extends Transformer> List<E> getTransformerList(String name, Class<? extends E> clazz){
+		return getList(name, clazz);
+	}
 }
