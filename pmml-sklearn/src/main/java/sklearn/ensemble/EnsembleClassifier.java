@@ -60,6 +60,6 @@ public class EnsembleClassifier extends SkLearnClassifier implements HasEstimato
 
 	@Override
 	public List<Classifier> getEstimators(){
-		return getList("estimators_", Classifier.class);
+		return getClassifierList("estimators_");
 	}
 }

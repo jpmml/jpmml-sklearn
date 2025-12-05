@@ -77,6 +77,6 @@ public class CalibratedClassifierCV extends SkLearnClassifier {
 	}
 
 	public List<CalibratedClassifier> getCalibratedClassifiers(){
-		return getList("calibrated_classifiers_", CalibratedClassifier.class);
+		return getEstimatorList("calibrated_classifiers_", CalibratedClassifier.class);
 	}
 }

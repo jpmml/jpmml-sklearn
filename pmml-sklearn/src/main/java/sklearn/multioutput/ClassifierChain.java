@@ -47,7 +47,7 @@ public class ClassifierChain extends SkLearnClassifier {
 	}
 
 	public List<Classifier> getEstimators(){
-		return getList("estimators_", Classifier.class);
+		return getClassifierList("estimators_");
 	}
 
 	public List<Integer> getOrder(){

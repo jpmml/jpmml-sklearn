@@ -136,7 +136,7 @@ public class IsolationForest extends EnsembleRegressor implements HasIsolationFo
 
 	@Override
 	public List<Regressor> getEstimators(){
-		return getList("estimators_", TreeRegressor.class);
+		return getEstimatorList("estimators_", TreeRegressor.class);
 	}
 
 	@Override

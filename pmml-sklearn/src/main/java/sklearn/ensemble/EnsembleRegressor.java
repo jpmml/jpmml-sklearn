@@ -60,6 +60,6 @@ public class EnsembleRegressor extends SkLearnRegressor implements HasEstimatorE
 
 	@Override
 	public List<Regressor> getEstimators(){
-		return getList("estimators_", Regressor.class);
+		return getRegressorList("estimators_");
 	}
 }

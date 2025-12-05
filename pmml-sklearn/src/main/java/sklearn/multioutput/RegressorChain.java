@@ -47,7 +47,7 @@ public class RegressorChain extends SkLearnRegressor {
 	}
 
 	public List<Regressor> getEstimators(){
-		return getList("estimators_", Regressor.class);
+		return getRegressorList("estimators_");
 	}
 
 	public List<Integer> getOrder(){

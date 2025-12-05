@@ -102,7 +102,7 @@ public class ExtendedIsolationForest extends Regressor implements HasIsolationFo
 
 	@Override
 	public List<Regressor> getEstimators(){
-		return getList("estimators_", ObliqueDecisionTreeRegressor.class);
+		return getEstimatorList("estimators_", ObliqueDecisionTreeRegressor.class);
 	}
 
 	@Override

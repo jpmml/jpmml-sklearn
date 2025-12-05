@@ -46,6 +46,6 @@ public class MultiOutputRegressor extends SkLearnRegressor {
 	}
 
 	public List<Regressor> getEstimators(){
-		return getList("estimators_", Regressor.class);
+		return getRegressorList("estimators_");
 	}
 }

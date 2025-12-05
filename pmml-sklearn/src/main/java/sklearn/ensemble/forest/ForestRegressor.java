@@ -73,6 +73,6 @@ public class ForestRegressor extends SkLearnRegressor implements HasEstimatorEns
 
 	@Override
 	public List<TreeRegressor> getEstimators(){
-		return getList("estimators_", TreeRegressor.class);
+		return getEstimatorList("estimators_", TreeRegressor.class);
 	}
 }

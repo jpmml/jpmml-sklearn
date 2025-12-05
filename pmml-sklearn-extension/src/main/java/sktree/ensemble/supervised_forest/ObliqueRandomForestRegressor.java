@@ -47,6 +47,6 @@ public class ObliqueRandomForestRegressor extends Regressor implements HasEstima
 
 	@Override
 	public List<ObliqueDecisionTreeRegressor> getEstimators(){
-		return getList("estimators_", ObliqueDecisionTreeRegressor.class);
+		return getEstimatorList("estimators_", ObliqueDecisionTreeRegressor.class);
 	}
 }

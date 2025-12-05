@@ -97,7 +97,7 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 
 	@Override
 	public List<Classifier> getEstimators(){
-		return getList("estimators_", Classifier.class);
+		return getClassifierList("estimators_");
 	}
 
 	public Classifier getFinalEstimator(){

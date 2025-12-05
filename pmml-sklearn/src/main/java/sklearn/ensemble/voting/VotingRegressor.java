@@ -69,7 +69,7 @@ public class VotingRegressor extends SkLearnRegressor implements HasEstimatorEns
 
 	@Override
 	public List<Regressor> getEstimators(){
-		return getList("estimators_", Regressor.class);
+		return getRegressorList("estimators_");
 	}
 
 	public List<Number> getWeights(){

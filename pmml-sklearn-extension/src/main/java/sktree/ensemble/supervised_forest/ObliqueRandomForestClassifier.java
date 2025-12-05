@@ -54,6 +54,6 @@ public class ObliqueRandomForestClassifier extends Classifier implements HasEsti
 
 	@Override
 	public List<ObliqueDecisionTreeClassifier> getEstimators(){
-		return getList("estimators_", ObliqueDecisionTreeClassifier.class);
+		return getEstimatorList("estimators_", ObliqueDecisionTreeClassifier.class);
 	}
 }

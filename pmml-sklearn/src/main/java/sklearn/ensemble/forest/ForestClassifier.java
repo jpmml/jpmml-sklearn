@@ -80,6 +80,6 @@ public class ForestClassifier extends SkLearnClassifier implements HasEstimatorE
 
 	@Override
 	public List<TreeClassifier> getEstimators(){
-		return getList("estimators_", TreeClassifier.class);
+		return getEstimatorList("estimators_", TreeClassifier.class);
 	}
 }

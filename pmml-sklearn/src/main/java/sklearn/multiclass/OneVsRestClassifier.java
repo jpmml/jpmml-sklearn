@@ -33,12 +33,12 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
+import sklearn.EstimatorException;
 import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiDecisionFunctionField;
 import sklearn.HasNumberOfFeatures;
 import sklearn.SkLearnClassifier;
-import sklearn.EstimatorException;
 import sklearn.StepUtil;
 
 public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier>, HasMultiDecisionFunctionField {
@@ -118,7 +118,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 
 	@Override
 	public List<Classifier> getEstimators(){
-		return getList("estimators_", Classifier.class);
+		return getClassifierList("estimators_");
 	}
 
 	public Boolean getMultilabel(){

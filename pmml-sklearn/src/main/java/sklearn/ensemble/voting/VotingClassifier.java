@@ -77,7 +77,7 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 
 	@Override
 	public List<Classifier> getEstimators(){
-		return getList("estimators_", Classifier.class);
+		return getClassifierList("estimators_");
 	}
 
 	public String getVoting(){

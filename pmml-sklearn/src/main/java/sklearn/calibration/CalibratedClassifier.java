@@ -281,7 +281,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 	}
 
 	public List<Calibrator> getCalibrators(){
-		return getList("calibrators", Calibrator.class);
+		return getEstimatorList("calibrators", Calibrator.class);
 	}
 
 	@Override
