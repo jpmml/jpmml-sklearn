@@ -26,10 +26,9 @@ import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
-import org.jpmml.python.CastFunction;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
+import sklearn.EstimatorCheckException;
 import sklearn.HasEstimator;
 import sklearn.IdentityTransformer;
 import sklearn.OutlierDetector;
@@ -44,15 +43,15 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
-		CastFunction<OutlierDetector> castFunction = new CastFunction<OutlierDetector>(OutlierDetector.class){
+		OutlierDetector outlierDetector;
 
-			@Override
-			public String formatMessage(Object object){
-				return "The outlier detector object (" + ClassDictUtil.formatClass(object) + ") is not supported";
-			}
-		};
+		if(estimator instanceof OutlierDetector){
+			outlierDetector = (OutlierDetector)estimator;
+		} else
 
-		OutlierDetector outlierDetector = castFunction.apply(estimator);
+		{
+			throw new EstimatorCheckException(estimator, OutlierDetector.class);
+		}
 
 		Schema schema = new Schema(encoder, null, features);
 
