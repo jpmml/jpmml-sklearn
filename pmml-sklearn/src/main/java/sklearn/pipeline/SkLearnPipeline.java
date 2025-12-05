@@ -35,6 +35,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Composite;
 import sklearn.Estimator;
+import sklearn.EstimatorCastFunction;
 import sklearn.HasSteps;
 import sklearn.PassThrough;
 import sklearn.SkLearnFields;
@@ -169,13 +170,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 			throw new SkLearnException("The pipeline ends with a transformer-like object");
 		}
 
-		CastFunction<E> castFunction = new CastFunction<E>(clazz){
-
-			@Override
-			public String formatMessage(Object object){
-				return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Estimator";
-			}
-		};
+		CastFunction<E> castFunction = new EstimatorCastFunction<E>(clazz);
 
 		return castFunction.apply(step);
 	}

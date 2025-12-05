@@ -46,10 +46,10 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
+import sklearn.EstimatorCastFunction;
 import sklearn.EstimatorCheckException;
 import sklearn.HasClasses;
 import sklearn.SkLearnFields;
@@ -174,7 +174,7 @@ public class OrdinalClassifier extends Classifier {
 			}
 		};
 
-		Function<Object, Classifier> valueFunction = new CastFunction<Classifier>(Classifier.class){
+		Function<Object, Classifier> valueFunction = new EstimatorCastFunction<Classifier>(Classifier.class){
 
 			@Override
 			protected String formatMessage(Object object){
