@@ -241,7 +241,7 @@ public class Main {
 			logger.info("Converting PKL to PMML..");
 
 			long begin = System.currentTimeMillis();
-			pmml = encodable.encodePMML();
+			pmml = EncodableUtil.encodePMML(encodable);
 			long end = System.currentTimeMillis();
 
 			logger.info("Converted PKL to PMML in {} ms.", (end - begin));

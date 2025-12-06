@@ -60,7 +60,7 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 				hasPmmlOptions.setPMMLOptions(options);
 			}
 
-			PMML pmml = encodable.encodePMML();
+			PMML pmml = EncodableUtil.encodePMML(encodable);
 
 			validatePMML(pmml);
 

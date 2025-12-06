@@ -26,16 +26,28 @@ import org.dmg.pmml.PMML;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.MissingAttributeException;
 import sklearn.Estimator;
+import sklearn.EstimatorUtil;
 import sklearn.HasNumberOfFeatures;
 import sklearn.HasNumberOfOutputs;
 import sklearn.SkLearnFields;
 import sklearn.Step;
 import sklearn.StepCastFunction;
+import sklearn.Transformer;
+import sklearn.TransformerUtil;
 import sklearn.pipeline.SkLearnPipeline;
 
 public class EncodableUtil {
 
 	private EncodableUtil(){
+	}
+
+	/**
+	 * @see EstimatorUtil#encodePMML(Estimator)
+	 * @see TransformerUtil#encodePMML(Transformer)
+	 */
+	static
+	public PMML encodePMML(Encodable encodable){
+		return encodable.encodePMML();
 	}
 
 	static
