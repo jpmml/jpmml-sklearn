@@ -176,11 +176,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	public Transformer toTransformer(){
 
 		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			if(estimator != null){
-				throw new SkLearnException("The pipeline ends with an estimator object (" + ClassDictUtil.formatClass(estimator)  + ")");
-			}
+			throw new IllegalStateException();
 		}
 
 		return new CompositeTransformer(this);
@@ -267,10 +263,10 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 			} else
 
 			{
-				throw new SkLearnException("The head object (" + ClassDictUtil.formatClass(head)  + ") is not a supported Transformer or Estimator");
+				throw new SkLearnException("The head object (" + ClassDictUtil.formatClass(head)  + ") is not a supported Transformer or Estimator", "Develop and register a custom JPMML-SkLearn converter");
 			}
 		} catch(UnsupportedOperationException uoe){
-			throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information");
+			throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information", "Prepend Domain decorators");
 		}
 
 		return activeFields;

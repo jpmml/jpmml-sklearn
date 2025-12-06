@@ -178,7 +178,7 @@ public class OrdinalClassifier extends Classifier {
 
 			@Override
 			protected String formatMessage(Object object){
-				return "The item value object (" + ClassDictUtil.formatClass(object) + ") is not a supported Classifier";
+				return "The item value object (" + ClassDictUtil.formatClass(object) + ") is not a supported Estimator";
 			}
 		};
 

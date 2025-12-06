@@ -26,7 +26,6 @@ import java.util.Objects;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.CastFunction;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.Encodable;
@@ -122,11 +121,6 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 				}
 
 				return super.apply(object);
-			}
-
-			@Override
-			protected String formatMessage(Object object){
-				return "The estimator object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
 			}
 		};
 

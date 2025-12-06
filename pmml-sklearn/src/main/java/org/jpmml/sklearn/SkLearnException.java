@@ -50,6 +50,11 @@ public class SkLearnException extends RuntimeException {
 
 	static
 	public String formatMessage(String problem, String solution){
-		return (problem + ". " + solution);
+
+		if(solution != null && !solution.isEmpty()){
+			return (problem + ". To fix, " + solution.substring(0, 1).toLowerCase() + solution.substring(1));
+		}
+
+		return problem;
 	}
 }

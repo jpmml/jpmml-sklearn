@@ -20,11 +20,23 @@ package sklearn;
 
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PythonException;
+import org.jpmml.sklearn.SkLearnException;
 
 public class StepCastFunction<E extends Step> extends CastFunction<E> {
 
 	public StepCastFunction(Class<? extends E> clazz){
 		super(clazz);
+	}
+
+	@Override
+	public E apply(Object object){
+
+		try {
+			return super.apply(object);
+		} catch(PythonException pe){
+			throw new SkLearnException(pe.getMessage(), "Develop and register a custom JPMML-SkLearn converter", pe.getCause());
+		}
 	}
 
 	@Override

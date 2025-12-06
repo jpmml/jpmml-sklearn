@@ -28,7 +28,6 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.CastUtil;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -194,11 +193,6 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 				}
 
 				return super.apply(object);
-			}
-
-			@Override
-			public String formatMessage(Object object){
-				return "The step object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
 			}
 		};
 
