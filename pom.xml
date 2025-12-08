@@ -59,7 +59,7 @@
 		<jpmml-h2o.version>1.3.2</jpmml-h2o.version>
 		<jpmml-lightgbm.version>1.6.2</jpmml-lightgbm.version>
 		<jpmml-python.version>1.3.11</jpmml-python.version>
-		<jpmml-statsmodels.version>1.3.4</jpmml-statsmodels.version>
+		<jpmml-statsmodels.version>1.3.5</jpmml-statsmodels.version>
 		<jpmml-xgboost.version>1.9.3</jpmml-xgboost.version>
 		<project.build.outputTimestamp>2025-12-06T10:25:39Z</project.build.outputTimestamp>
 	</properties>
