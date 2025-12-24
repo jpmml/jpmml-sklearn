@@ -59,7 +59,7 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 		super.checkLabel(label);
 
 		if((objFunction != null) && !(objFunction instanceof Regression)){
-			throw new SkLearnException("Expected a regression-type objective function, got '" + objFunction.getName() + "'");
+			throw new SkLearnException("Expected a regression-type objective function, got \'" + objFunction.getName() + "\'");
 		}
 	}
 

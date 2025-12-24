@@ -59,7 +59,7 @@ public class StepUtil {
 		int numberOfFeatures = step.getNumberOfFeatures();
 
 		if((numberOfFeatures != HasNumberOfFeatures.UNKNOWN) && (numberOfFeatures != features.size())){
-			throw new SkLearnException("Expected " + numberOfFeatures + " feature(s) (" + ClassDictUtil.formatClass(step)  + "), got " + features.size() + " feature(s)");
+			throw new SkLearnException("Expected " + numberOfFeatures + " feature(s) (" + ClassDictUtil.formatClass(step)  + "), got " + features.size());
 		}
 	}
 

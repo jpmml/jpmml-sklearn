@@ -48,7 +48,7 @@ public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster
 		super.checkLabel(label);
 
 		if((objectiveFunction != null) && !(objectiveFunction instanceof Classification)){
-			throw new SkLearnException("Expected a classification-type objective function, got '" + objectiveFunction.getName() + "'");
+			throw new SkLearnException("Expected a classification-type objective function, got \'" + objectiveFunction.getName() + "\'");
 		}
 	}
 

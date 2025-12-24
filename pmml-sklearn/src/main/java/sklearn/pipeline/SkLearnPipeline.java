@@ -155,7 +155,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 		List<Object[]> steps = getSteps();
 
 		if(steps.isEmpty()){
-			throw new SkLearnException("Expected one or more steps, got zero steps");
+			throw new SkLearnException("Expected one or more steps, got " + 0);
 		}
 
 		Object[] finalStep = steps.get(steps.size() - 1);
@@ -176,7 +176,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 		List<Object[]> steps = getSteps();
 
 		if(steps.isEmpty()){
-			throw new SkLearnException("Expected one or more steps, got zero steps");
+			throw new SkLearnException("Expected one or more steps, got " + 0);
 		}
 
 		Object[] headStep = steps.get(0);

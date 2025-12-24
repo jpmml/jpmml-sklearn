@@ -625,7 +625,7 @@ public class TreeUtil {
 	private double[] getRow(double[] values, int rows, int columns, int row){
 
 		if(values.length != (rows * columns)){
-			throw new IllegalArgumentException("Expected " + (rows * columns) + " element(s), got " + values.length + " element(s)");
+			throw new IllegalArgumentException("Expected " + (rows * columns) + " element(s), got " + values.length);
 		}
 
 		double[] result = new double[columns];

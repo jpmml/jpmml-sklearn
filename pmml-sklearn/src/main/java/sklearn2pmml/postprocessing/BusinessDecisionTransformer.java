@@ -51,7 +51,7 @@ public class BusinessDecisionTransformer extends Transformer {
 		List<Object[]> decisions = getDecisions();
 
 		if(!encoder.hasModel()){
-			throw new IllegalStateException("Model is undefined");
+			throw new IllegalStateException("Model is not defined");
 		}
 
 		Model model = encoder.getModel();

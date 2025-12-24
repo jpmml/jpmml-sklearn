@@ -125,7 +125,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 		DataField dataField = encoder.getDataField(name);
 		if(dataField == null){
-			throw new ResolutionException("Field " + name + " is undefined");
+			throw new ResolutionException("Field \'" + name + "\' is undefined");
 		} // End if
 
 		if((dataField.requireOpType() != opType) || (dataField.requireDataType() != dataType)){

@@ -124,7 +124,7 @@ public class Domain extends Decorator {
 		String name = dataField.requireName();
 
 		if(encoder.isFrozen(name)){
-			throw new SkLearnException("Field " + name + " is frozen for type information updates")
+			throw new SkLearnException("Field \'" + name + "\' is frozen for type information updates")
 				.setSolution("Decorate a field in one step, not in multiple steps");
 		}
 
@@ -255,7 +255,7 @@ public class Domain extends Decorator {
 			return wildcardFeature;
 		}
 
-		throw new SkLearnException("Field " + feature.getName() + " is not decorable")
+		throw new SkLearnException("Field \'" + feature.getName() + "\' is not decorable")
 			.setSolution("Decorate input fields, not transformed fields");
 	}
 

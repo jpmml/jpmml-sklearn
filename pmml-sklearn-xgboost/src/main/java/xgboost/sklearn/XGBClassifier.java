@@ -73,7 +73,7 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 		super.checkLabel(label);
 
 		if((objFunction != null) && !(objFunction instanceof Classification)){
-			throw new SkLearnException("Expected a classification-type objective function, got '" + objFunction.getName() + "'");
+			throw new SkLearnException("Expected a classification-type objective function, got \'" + objFunction.getName() + "\'");
 		}
 	}
 

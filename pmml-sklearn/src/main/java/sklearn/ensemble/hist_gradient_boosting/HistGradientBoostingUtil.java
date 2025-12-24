@@ -82,7 +82,7 @@ public class HistGradientBoostingUtil {
 				} else
 
 				{
-					throw new SkLearnException("Expected [encoder, numerical, remainder] as transformer names, got " + names + " as transformer names");
+					throw new SkLearnException("Expected [\'encoder\', \'numerical\', \'remainder\'] as transformer names, got " + names);
 				}
 
 				List<Object[]> result = new AbstractList<Object[]>(){
