@@ -61,7 +61,7 @@ public class VotingRegressor extends SkLearnRegressor implements HasEstimatorEns
 
 		Segmentation.MultipleModelMethod multipleModelMethod = ((weights != null && !weights.isEmpty()) ? Segmentation.MultipleModelMethod.WEIGHTED_AVERAGE : Segmentation.MultipleModelMethod.AVERAGE);
 
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
+		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models, weights));
 
 		return miningModel;

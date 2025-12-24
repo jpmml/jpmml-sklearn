@@ -32,8 +32,8 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
-import sklearn.HasEstimatorEnsemble;
 import sklearn.EstimatorCheckException;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTree;
 import sktree.tree.ObliqueDecisionTreeClassifier;
 import sktree.tree.ObliqueDecisionTreeRegressor;
@@ -96,7 +96,7 @@ public class ObliqueForestUtil {
 			.map(function)
 			.collect(Collectors.toList());
 
-		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()))
+		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(multipleModelMethod, Segmentation.MissingPredictionTreatment.RETURN_MISSING, treeModels));
 
 		return miningModel;

@@ -71,9 +71,9 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
+import sklearn.EstimatorCheckException;
 import sklearn.HasApplyField;
 import sklearn.HasMultiApplyField;
-import sklearn.EstimatorCheckException;
 import sklearn.StepUtil;
 import sklearn.VersionUtil;
 import sklearn.tree.visitors.TreeModelCompactor;
@@ -114,7 +114,7 @@ public class TreeUtil {
 
 		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
 
-		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root)
+		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
 			.setMissingValueStrategy(hasMissingValueSupport ? TreeModel.MissingValueStrategy.DEFAULT_CHILD : TreeModel.MissingValueStrategy.NULL_PREDICTION);
 
@@ -260,7 +260,7 @@ public class TreeUtil {
 			Node result;
 
 			if(miningFunction == MiningFunction.CLASSIFICATION){
-				CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+				CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 				double[] leafValues = getRow(values, leftChildren.length, categoricalLabel.size(), index);
 

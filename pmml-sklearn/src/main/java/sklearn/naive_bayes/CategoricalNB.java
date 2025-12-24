@@ -53,7 +53,7 @@ public class CategoricalNB extends DiscreteNB {
 			if(feature instanceof CategoricalFeature){
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-				SchemaUtil.checkSize(numberOfFeatureCategories, categoricalFeature);
+				SchemaUtil.checkCardinality(numberOfFeatureCategories, categoricalFeature);
 
 				HasArray featureCategoryCount = categoryCount.get(i);
 

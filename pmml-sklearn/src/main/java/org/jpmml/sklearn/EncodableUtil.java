@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.PMML;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.MissingAttributeException;
 import sklearn.Estimator;
@@ -104,7 +105,7 @@ public class EncodableUtil {
 		int numberOfFeatures = step.getNumberOfFeatures();
 
 		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
-			throw new MissingAttributeException(step, SkLearnFields.N_FEATURES_IN);
+			throw new MissingAttributeException(new Attribute(step, SkLearnFields.N_FEATURES_IN));
 		}
 
 		return generateNames("x", numberOfFeatures, true);
@@ -115,7 +116,7 @@ public class EncodableUtil {
 		int numberOfOutputs = estimator.getNumberOfOutputs();
 
 		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
-			throw new MissingAttributeException(estimator, SkLearnFields.N_OUTPUTS);
+			throw new MissingAttributeException(new Attribute(estimator, SkLearnFields.N_OUTPUTS));
 		}
 
 		return generateNames("y", numberOfOutputs, false);

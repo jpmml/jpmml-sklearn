@@ -67,10 +67,10 @@ public class OrdinalClassifier extends Classifier {
 		Map<?, ?> estimatorCategories = getEstimatorCategories();
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-		OrdinalLabel ordinalLabel = (OrdinalLabel)schema.getLabel();
+		OrdinalLabel ordinalLabel = schema.requireOrdinalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		SchemaUtil.checkSize(estimators.size() + 1, ordinalLabel);
+		SchemaUtil.checkCardinality(estimators.size() + 1, ordinalLabel);
 
 		List<Model> models = new ArrayList<>();
 

@@ -62,7 +62,7 @@ public class ReplaceTransformer extends RegExTransformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern), ExpressionUtil.createConstant(DataType.STRING, replacement));
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), ExpressionUtil.createConstant(pattern), ExpressionUtil.createConstant(replacement));
 
 		if(reFlavour != null){
 			apply.addExtensions(reFlavour.createExtension());

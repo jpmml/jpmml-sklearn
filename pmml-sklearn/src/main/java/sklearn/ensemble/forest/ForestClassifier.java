@@ -59,7 +59,7 @@ public class ForestClassifier extends SkLearnClassifier implements HasEstimatorE
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		MiningModel miningModel = ForestUtil.encodeForest(this, MiningFunction.CLASSIFICATION, Segmentation.MultipleModelMethod.AVERAGE, schema);
 

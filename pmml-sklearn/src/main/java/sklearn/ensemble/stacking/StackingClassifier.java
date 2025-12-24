@@ -56,7 +56,7 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 		Boolean passthrough = getPassthrough();
 		List<String> stackMethod = getStackMethod();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		List<?> values;
 

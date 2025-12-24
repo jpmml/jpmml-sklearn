@@ -56,7 +56,7 @@ public class SigmoidCalibration extends Calibrator {
 			)
 		);
 
-		apply = FunctionUtil.encodeScipyFunction("scipy.special", "expit", Collections.singletonList(apply), encoder);
+		apply = (Apply)FunctionUtil.encodeFunction("scipy.special", "expit", Collections.singletonList(apply), encoder);
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("sigmoidCalibration", feature), OpType.CONTINUOUS, DataType.DOUBLE, apply);
 

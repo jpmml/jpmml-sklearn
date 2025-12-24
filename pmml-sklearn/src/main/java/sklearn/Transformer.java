@@ -31,6 +31,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.AttributeCastFunction;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
@@ -161,7 +162,9 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	public TypeInfo getDType(String name, boolean extended){
 		Object dtype = getObject(name);
 
-		CastFunction<TypeInfo> castFunction = new AttributeCastFunction<TypeInfo>(TypeInfo.class){
+		Attribute attribute = new Attribute(this, name);
+
+		CastFunction<TypeInfo> castFunction = new AttributeCastFunction<TypeInfo>(attribute, TypeInfo.class){
 
 			@Override
 			public TypeInfo apply(Object object){
@@ -172,7 +175,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 			@Override
 			protected String formatMessage(Object object){
-				return "Data type attribute \'" + ClassDictUtil.formatMember(Transformer.this, name) + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+				return "Data type attribute \'" + attribute.format() + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
 			}
 		};
 
@@ -192,7 +195,9 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	public List<TypeInfo> getDTypeList(String name, boolean extended){
 		List<?> values = getList(name);
 
-		CastFunction<TypeInfo> castFunction = new AttributeCastFunction<TypeInfo>(TypeInfo.class){
+		Attribute attribute = new Attribute(this, name);
+
+		CastFunction<TypeInfo> castFunction = new AttributeCastFunction<TypeInfo>(attribute, TypeInfo.class){
 
 			@Override
 			public TypeInfo apply(Object object){
@@ -203,7 +208,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 			@Override
 			protected String formatMessage(Object object){
-				return "List attribute \'" + ClassDictUtil.formatMember(Transformer.this, name) + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
+				return "List attribute \'" + attribute.format() + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
 			}
 		};
 

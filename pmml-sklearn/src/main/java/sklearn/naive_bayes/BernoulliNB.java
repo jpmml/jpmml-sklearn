@@ -68,7 +68,7 @@ public class BernoulliNB extends DiscreteNB {
 			if(feature instanceof CategoricalFeature){
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
-				SchemaUtil.checkSize(2, categoricalFeature);
+				SchemaUtil.checkCardinality(2, categoricalFeature);
 
 				List<?> featureValues = categoricalFeature.getValues();
 
@@ -102,9 +102,9 @@ public class BernoulliNB extends DiscreteNB {
 
 	@Override
 	public NaiveBayesModel encodeModel(Schema schema){
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		SchemaUtil.checkSize(2, categoricalLabel);
+		SchemaUtil.checkCardinality(2, categoricalLabel);
 
 		return super.encodeModel(schema);
 	}

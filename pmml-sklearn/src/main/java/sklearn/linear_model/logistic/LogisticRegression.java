@@ -42,7 +42,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.InvalidAttributeException;
 import org.jpmml.python.PythonFormatterUtil;
 import sklearn.Estimator;
@@ -86,7 +86,9 @@ public class LogisticRegression extends LinearClassifier {
 		} // End if
 
 		if(multiClass == null){
-			throw new InvalidAttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "multi_class") + "\' must be set to one of " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_OVR) + " or " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_MULTINOMIAL) + " values");
+			Attribute attribute = new Attribute(this, "multi_class");
+
+			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to one of " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_OVR) + " or " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_MULTINOMIAL) + " values", attribute);
 		}
 
 		switch(multiClass){
@@ -110,11 +112,11 @@ public class LogisticRegression extends LinearClassifier {
 		List<Number> intercept = getIntercept();
 
 		ModelEncoder encoder = schema.getEncoder();
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
-			SchemaUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkCardinality(2, categoricalLabel);
 
 			// See https://github.com/scikit-learn/scikit-learn/issues/9889
 			boolean corrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.20") >= 0);
@@ -151,7 +153,7 @@ public class LogisticRegression extends LinearClassifier {
 		} else
 
 		if(numberOfClasses >= 3){
-			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
+			SchemaUtil.checkCardinality(numberOfClasses, categoricalLabel);
 
 			List<RegressionTable> regressionTables = new ArrayList<>();
 

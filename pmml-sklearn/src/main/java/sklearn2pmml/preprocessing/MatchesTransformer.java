@@ -60,7 +60,7 @@ public class MatchesTransformer extends RegExTransformer {
 			throw new IllegalArgumentException();
 		}
 
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.MATCHES, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern));
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.MATCHES, feature.ref(), ExpressionUtil.createConstant(pattern));
 
 		if(reFlavour != null){
 			apply.addExtensions(reFlavour.createExtension());

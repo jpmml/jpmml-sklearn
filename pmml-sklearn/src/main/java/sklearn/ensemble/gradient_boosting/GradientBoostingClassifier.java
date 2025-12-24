@@ -111,7 +111,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 
 		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		Transformation[] transformations = {};
 
@@ -124,7 +124,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		MiningModel miningModel;
 
 		if(categoricalLabel.size() == 2){
-			SchemaUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkCardinality(2, categoricalLabel);
 
 			Model model = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, transformations));

@@ -59,7 +59,7 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 		}
 
 		PMMLEncoder encoder = schema.getEncoder();
-		ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
+		ScalarLabel scalarLabel = schema.requireScalarLabel();
 
 		Transformation transformation = new AbstractTransformation(){
 

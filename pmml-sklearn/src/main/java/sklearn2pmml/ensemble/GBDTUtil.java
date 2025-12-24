@@ -34,9 +34,9 @@ import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -146,12 +146,12 @@ public class GBDTUtil {
 		}
 
 		ModelEncoder encoder = schema.getEncoder();
-		Label label = schema.getLabel();
+		ScalarLabel scalarLabel = schema.requireScalarLabel();
 
 		ContinuousLabel continuousLabel;
 
-		if(label instanceof ContinuousLabel){
-			continuousLabel = (ContinuousLabel)label;
+		if(scalarLabel instanceof ContinuousLabel){
+			continuousLabel = (ContinuousLabel)scalarLabel;
 		} else
 
 		{

@@ -34,16 +34,18 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 
 	@Override
 	public int getNumberOfFeatures(){
-		throw new SkLearnException(formatProblem(this), formatSolution(this));
+		throw new SkLearnException(formatMessage(this))
+			.setSolution(formatSolution(this));
 	}
 
 	@Override
 	public List<Boolean> getSupportMask(){
-		throw new SkLearnException(formatProblem(this), formatSolution(this));
+		throw new SkLearnException(formatMessage(this))
+			.setSolution(formatSolution(this));
 	}
 
 	static
-	private String formatProblem(Selector selector){
+	private String formatMessage(Selector selector){
 		return "The selector object (" + ClassDictUtil.formatClass(selector) + ") does not have a persistent state";
 	}
 

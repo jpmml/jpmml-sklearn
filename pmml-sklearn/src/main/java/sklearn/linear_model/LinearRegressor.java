@@ -27,7 +27,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
@@ -69,7 +69,6 @@ public class LinearRegressor extends SkLearnRegressor {
 		List<Number> coef = getCoef();
 		List<Number> intercept = getIntercept();
 
-		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		int numberOfOutputs = getNumberOfOutputs();
@@ -78,7 +77,9 @@ public class LinearRegressor extends SkLearnRegressor {
 		} else
 
 		if(numberOfOutputs >= 2){
-			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+			MultiLabel multiLabel = schema.requireMultiLabel();
+
+			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(multiLabel);
 
 			ClassDictUtil.checkSize(numberOfOutputs, intercept, scalarLabels);
 

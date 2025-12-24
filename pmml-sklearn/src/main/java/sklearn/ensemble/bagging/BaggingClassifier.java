@@ -40,7 +40,7 @@ public class BaggingClassifier extends EnsembleClassifier {
 		List<Classifier> estimators = getEstimators();
 		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		Segmentation.MultipleModelMethod multipleModelMethod = Segmentation.MultipleModelMethod.AVERAGE;
 

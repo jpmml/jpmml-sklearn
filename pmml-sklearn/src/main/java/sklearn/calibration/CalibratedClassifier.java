@@ -41,6 +41,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaUtil;
@@ -72,7 +73,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		String method = getMethod();
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		Model model = estimator.encode(schema);
@@ -177,7 +178,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 
 					regressionTable.setTargetCategory(null);
 
-					Model decisionFunctionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(null), null)
+					Model decisionFunctionModel = new RegressionModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema((Label)null), null)
 						.setNormalizationMethod(RegressionModel.NormalizationMethod.NONE)
 						.addRegressionTables(regressionTable)
 						.setOutput(output);
@@ -231,7 +232,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		RegressionModel calibratorModel;
 
 		if(calibrators.size() == 1){
-			SchemaUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkCardinality(2, categoricalLabel);
 
 			Calibrator calibrator = calibrators.get(0);
 			Model featureModel = models.get(0);
@@ -243,7 +244,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		} else
 
 		if(calibrators.size() >= 3){
-			SchemaUtil.checkSize(calibrators.size(), categoricalLabel);
+			SchemaUtil.checkCardinality(calibrators.size(), categoricalLabel);
 
 			List<RegressionTable> regressionTables = new ArrayList<>();
 

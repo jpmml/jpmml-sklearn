@@ -77,7 +77,7 @@ public class ObliqueDecisionTreeClassifier extends Classifier implements HasTree
 			return sklearnClassifier.encodeModel(predicateManager, scoreDistributionManager, projectionManager, sklearnSchema);
 		}
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, scoreDistributionManager, schema);
 

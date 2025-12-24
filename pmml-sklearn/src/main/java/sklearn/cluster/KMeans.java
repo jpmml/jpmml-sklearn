@@ -31,6 +31,7 @@ import org.dmg.pmml.SquaredEuclidean;
 import org.dmg.pmml.clustering.Cluster;
 import org.dmg.pmml.clustering.ClusteringModel;
 import org.jpmml.converter.CMatrixUtil;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.Schema;
@@ -79,7 +80,7 @@ public class KMeans extends SkLearnClusterer {
 		ComparisonMeasure comparisonMeasure = new ComparisonMeasure(ComparisonMeasure.Kind.DISTANCE, new SquaredEuclidean())
 			.setCompareFunction(CompareFunction.ABS_DIFF);
 
-		ClusteringModel clusteringModel = new ClusteringModel(MiningFunction.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema(schema.getLabel()), comparisonMeasure, ClusteringModelUtil.createClusteringFields(schema.getFeatures()), clusters)
+		ClusteringModel clusteringModel = new ClusteringModel(MiningFunction.CLUSTERING, ClusteringModel.ModelClass.CENTER_BASED, numberOfClusters, ModelUtil.createMiningSchema((Label)null), comparisonMeasure, ClusteringModelUtil.createClusteringFields(schema.getFeatures()), clusters)
 			.setOutput(ClusteringModelUtil.createOutput(getPredictField(), DataType.DOUBLE, clusters));
 
 		return clusteringModel;

@@ -74,7 +74,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 
 		ClassDictUtil.checkSize(classes, classPrior);
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		int maxIndex;
 

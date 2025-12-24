@@ -56,7 +56,7 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 		Boolean passthrough = getPassthrough();
 		List<String> stackMethod = getStackMethod();
 
-		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
+		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
 		StackingUtil.PredictFunction predictFunction = new StackingUtil.PredictFunction(){
 

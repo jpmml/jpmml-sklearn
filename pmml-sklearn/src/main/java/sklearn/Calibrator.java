@@ -25,7 +25,6 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -47,7 +46,6 @@ public class Calibrator extends SkLearnRegressor implements HasPMMLName<Calibrat
 	@Override
 	public RegressionModel encodeModel(Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		features = encodeFeatures((List)features, encoder);

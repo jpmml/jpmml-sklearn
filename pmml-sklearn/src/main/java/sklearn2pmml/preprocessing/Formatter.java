@@ -51,7 +51,7 @@ public class Formatter extends Transformer {
 
 		Feature feature = features.get(0);
 
-		Apply apply = ExpressionUtil.createApply(function, feature.ref(), ExpressionUtil.createConstant(DataType.STRING, pattern));
+		Apply apply = ExpressionUtil.createApply(function, feature.ref(), ExpressionUtil.createConstant(pattern));
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("format", feature, pattern), OpType.CATEGORICAL, DataType.STRING, apply);
 

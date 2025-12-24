@@ -73,7 +73,7 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 		List<Number> coef = getCoef();
 		List<Number> intercept = getIntercept();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/6848
@@ -84,7 +84,7 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 		} // End if
 
 		if(numberOfClasses >= 3){
-			SchemaUtil.checkSize(numberOfClasses, categoricalLabel);
+			SchemaUtil.checkCardinality(numberOfClasses, categoricalLabel);
 
 			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();
 

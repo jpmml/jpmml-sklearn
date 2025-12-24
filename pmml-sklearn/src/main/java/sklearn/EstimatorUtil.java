@@ -116,7 +116,7 @@ public class EstimatorUtil {
 					} // End if
 
 					if(estimator.isSupervised()){
-						ScalarLabel scalarLabel = (ScalarLabel)schema.getLabel();
+						ScalarLabel scalarLabel = schema.requireScalarLabel();
 
 						Feature feature = encoder.exportPrediction(model, scalarLabel);
 
@@ -152,7 +152,7 @@ public class EstimatorUtil {
 					if(estimator instanceof HasClasses){
 						HasClasses hasClasses = (HasClasses)estimator;
 
-						CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+						CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 						List<OutputField> probabilityOutputFields = estimator.createPredictProbaFields(DataType.DOUBLE, categoricalLabel);
 

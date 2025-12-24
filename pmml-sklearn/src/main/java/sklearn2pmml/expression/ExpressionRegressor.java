@@ -49,7 +49,7 @@ public class ExpressionRegressor extends Regressor {
 		RegressionModel.NormalizationMethod normalizationMethod = parseNormalizationMethod(getNormalizationMethod());
 
 		ModelEncoder encoder = schema.getEncoder();
-		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
+		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		Scope scope = new DataFrameScope("X", features, encoder);

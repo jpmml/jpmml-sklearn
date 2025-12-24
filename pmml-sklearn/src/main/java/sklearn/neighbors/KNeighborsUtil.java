@@ -126,7 +126,11 @@ public class KNeighborsUtil {
 			data.put(instanceField.getColumn(), id);
 		}
 
-		List<ScalarLabel> scalarLabels = (label != null ? ScalarLabelUtil.toScalarLabels(label) : Collections.emptyList());
+		List<ScalarLabel> scalarLabels = Collections.emptyList();
+
+		if(label != null){
+			scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+		}
 
 		ClassDictUtil.checkSize(numberOfOutputs, scalarLabels);
 

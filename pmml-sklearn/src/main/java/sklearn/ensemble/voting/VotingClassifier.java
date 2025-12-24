@@ -55,7 +55,7 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 		String voting = getVoting();
 		List<Number> weights = getWeights();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		List<Model> models = new ArrayList<>();
 

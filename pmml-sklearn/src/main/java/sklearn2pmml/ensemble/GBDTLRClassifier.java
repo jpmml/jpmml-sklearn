@@ -62,9 +62,9 @@ public class GBDTLRClassifier extends Classifier implements HasMultiDecisionFunc
 		MultiOneHotEncoder ohe = getOHE();
 		LinearClassifier lr = getLR();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		SchemaUtil.checkSize(2, categoricalLabel);
+		SchemaUtil.checkCardinality(2, categoricalLabel);
 
 		List<Number> coef = lr.getCoef();
 		List<Number> intercept = lr.getIntercept();

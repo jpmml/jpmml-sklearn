@@ -48,6 +48,8 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.NamingException;
+import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.WildcardFeature;
@@ -264,15 +266,16 @@ public class SkLearnEncoder extends PythonEncoder {
 
 		try {
 			super.addDerivedField(derivedField);
-		} catch(IllegalArgumentException iae){
+		} catch(NamingException ne){
 			String name = derivedField.requireName();
 
-			String problem = "Field " + name + " is already defined";
+			String message = "Field " + name + " is already defined";
 			String solution =
 				"Refactor the pipeline so that it would not contain duplicate field declarations, " +
 				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + Alias.formatAliasExample() + ")";
 
-			throw new SkLearnException(problem, solution, iae);
+			throw new SkLearnException(message, ne)
+				.setSolution(solution);
 		}
 	}
 
@@ -286,7 +289,8 @@ public class SkLearnEncoder extends PythonEncoder {
 		org.dmg.pmml.Field<?> pmmlField = getField(name);
 
 		if(pmmlField instanceof DataField){
-			throw new SkLearnException("Field " + name + " cannot be renamed", "Rename input fields in Python beforehand (eg. as DataFrame columns)");
+			throw new SkLearnException("Field " + name + " cannot be renamed")
+				.setSolution("Rename input fields in Python beforehand (eg. as DataFrame columns)");
 		}
 
 		org.dmg.pmml.Field renamedPmmlField;
@@ -294,8 +298,9 @@ public class SkLearnEncoder extends PythonEncoder {
 		try {
 			renamedPmmlField = getField(renamedName);
 
-			throw new SkLearnException("Field " + renamedName + " is already defined", "Choose a different name");
-		} catch(IllegalArgumentException iae){
+			throw new SkLearnException("Field " + renamedName + " is already defined")
+				.setSolution("Choose a different name");
+		} catch(ResolutionException re){
 			// Ignored
 		}
 

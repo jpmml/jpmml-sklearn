@@ -64,12 +64,12 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 
 		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		MiningModel miningModel;
 
 		if(numberOfTreesPerIteration == 1){
-			SchemaUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkCardinality(2, categoricalLabel);
 
 			Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
@@ -78,7 +78,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 		} else
 
 		if(numberOfTreesPerIteration >= 3){
-			SchemaUtil.checkSize(numberOfTreesPerIteration, categoricalLabel);
+			SchemaUtil.checkCardinality(numberOfTreesPerIteration, categoricalLabel);
 
 			List<Model> models = new ArrayList<>();
 

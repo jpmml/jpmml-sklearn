@@ -51,6 +51,7 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
@@ -134,7 +135,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 					DataField dataField = encoder.getDataField(activeField);
 					if(dataField == null){
-						throw new IllegalArgumentException("Field " + activeField + " is undefined");
+						throw new ResolutionException("Field \'" + activeField + "\' is undefined");
 					}
 
 					Feature feature = new WildcardFeature(encoder, dataField);
@@ -150,12 +151,10 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			// XXX
 			encoder.setModel(finalModel);
 
-			Label label = schema.getLabel();
-
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+				List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(schema.getLabel());
 
 				List<OutputField> predictFields = new ArrayList<>();
 
@@ -172,7 +171,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			} // End if
 
 			if(predictProbaTransformer != null){
-				CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+				CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 				List<OutputField> predictProbaFields = estimator.createPredictProbaFields(DataType.DOUBLE, categoricalLabel);
 
@@ -372,7 +371,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			// XXX
 			try {
 				outputEncoder.getField(field.requireName());
-			} catch(IllegalArgumentException iae){
+			} catch(ResolutionException re){
 				OutputField outputField = new OutputField(FieldNameUtil.create("xref", outputFeature), field.requireOpType(), field.requireDataType())
 					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 					.setFinalResult(true)

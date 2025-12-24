@@ -63,7 +63,7 @@ public class GaussianNB extends SkLearnClassifier {
 		List<Number> theta = getTheta();
 		List<Number> sigma = getSigma();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		List<?> values = categoricalLabel.getValues();
 

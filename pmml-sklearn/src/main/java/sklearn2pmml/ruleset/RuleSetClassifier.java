@@ -31,7 +31,6 @@ import org.dmg.pmml.rule_set.RuleSet;
 import org.dmg.pmml.rule_set.RuleSetModel;
 import org.dmg.pmml.rule_set.SimpleRule;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.DataFrameScope;
@@ -80,7 +79,6 @@ public class RuleSetClassifier extends Classifier {
 		String defaultScore = getDefaultScore();
 		List<Object[]> rules = getRules();
 
-		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		RuleSelectionMethod ruleSelectionMethod = new RuleSelectionMethod(RuleSelectionMethod.Criterion.FIRST_HIT);
@@ -107,7 +105,7 @@ public class RuleSetClassifier extends Classifier {
 			ruleSet.addRules(simpleRule);
 		}
 
-		RuleSetModel ruleSetModel = new RuleSetModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(label), ruleSet);
+		RuleSetModel ruleSetModel = new RuleSetModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), ruleSet);
 
 		return ruleSetModel;
 	}

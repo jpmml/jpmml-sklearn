@@ -42,7 +42,7 @@ public class CalibratedClassifierCV extends SkLearnClassifier {
 	public Model encodeModel(Schema schema){
 		List<CalibratedClassifier> calibratedClassifiers = getCalibratedClassifiers();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		if(calibratedClassifiers.size() == 1){
 			CalibratedClassifier calibratedClassifier = calibratedClassifiers.get(0);

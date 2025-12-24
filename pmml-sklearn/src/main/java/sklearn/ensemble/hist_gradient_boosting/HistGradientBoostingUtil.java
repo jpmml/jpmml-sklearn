@@ -187,7 +187,7 @@ public class HistGradientBoostingUtil {
 
 	static
 	public MiningModel encodeHistGradientBoosting(List<TreePredictor> treePredictors, BinMapper binMapper, Number baselinePrediction, Schema schema){
-		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
+		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
 		PredicateManager predicateManager = new PredicateManager();
 

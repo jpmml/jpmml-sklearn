@@ -54,6 +54,7 @@ import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.InvalidAttributeException;
 import org.jpmml.python.TypeInfo;
@@ -212,7 +213,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public Apply encodeApply(DefineFunction defineFunction, Feature feature, int index, String term){
-		Constant constant = ExpressionUtil.createConstant(DataType.STRING, term);
+		Constant constant = ExpressionUtil.createConstant(term);
 
 		return ExpressionUtil.createApply(defineFunction, feature.ref(), constant);
 	}
@@ -245,7 +246,9 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Object object = getOptionalObject("preprocessor");
 
 		if(object != null){
-			throw new InvalidAttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "preprocessor") + "\' must be set to the missing (None) value");
+			Attribute attribute = new Attribute(this, "preprocessor");
+
+			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to the missing (None) value", attribute);
 		}
 
 		return object;
@@ -274,7 +277,9 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Object object = getOptionalObject("tokenizer");
 
 		if((object != null) && !(Tokenizer.class).isInstance(object)){
-			throw new InvalidAttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "tokenizer") + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +"). Supported Python classes are " + Arrays.asList(Matcher.class.getName(), Splitter.class.getName()));
+			Attribute attribute = new Attribute(this, "tokenizer");
+
+			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +"). Supported Python classes are " + Arrays.asList(Matcher.class.getName(), Splitter.class.getName()), attribute);
 		}
 
 		return getOptional("tokenizer", Tokenizer.class);

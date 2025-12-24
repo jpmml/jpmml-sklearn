@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.Segmentation;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
@@ -45,7 +46,9 @@ public class MultiOutputUtil {
 		} else
 
 		if(estimators.size() >= 2){
-			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(schema.getLabel());
+			MultiLabel multiLabel = schema.requireMultiLabel();
+
+			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(multiLabel);
 
 			ClassDictUtil.checkSize(estimators, scalarLabels);
 

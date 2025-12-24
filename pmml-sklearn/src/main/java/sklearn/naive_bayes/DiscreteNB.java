@@ -45,7 +45,7 @@ public class DiscreteNB extends SkLearnClassifier {
 	public NaiveBayesModel encodeModel(Schema schema){
 		List<Integer> classCount = getClassCount();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		List<?> values = categoricalLabel.getValues();

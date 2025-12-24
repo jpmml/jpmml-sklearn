@@ -27,7 +27,6 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -55,7 +54,6 @@ public class SelectFirstUtil {
 		}
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		MiningFunction miningFunction = ensembleEstimator.getMiningFunction();
@@ -91,7 +89,7 @@ public class SelectFirstUtil {
 			segmentation.addSegments(segment);
 		}
 
-		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(label))
+		MiningModel miningModel = new MiningModel(miningFunction, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(segmentation);
 
 		MiningModelUtil.optimizeOutputFields(miningModel);

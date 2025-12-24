@@ -41,7 +41,7 @@ public class CHAIDClassifier extends Classifier implements HasApplyField, HasTre
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		TreeModel treeModel = CHAIDUtil.encodeModel(this, MiningFunction.CLASSIFICATION, schema);
 

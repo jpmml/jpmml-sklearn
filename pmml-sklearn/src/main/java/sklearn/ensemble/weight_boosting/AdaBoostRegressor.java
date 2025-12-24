@@ -68,7 +68,7 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 			models.add(model);
 		}
 
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema.getLabel()))
+		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.WEIGHTED_MEDIAN, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models, estimatorWeights));
 
 		return miningModel;

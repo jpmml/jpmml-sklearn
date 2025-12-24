@@ -44,7 +44,7 @@ public class ExplainableBoostingClassifier extends Classifier implements HasExpl
 		List<Number> intercept = getIntercept();
 		RegressionModel.NormalizationMethod normalizationMethod = parseLink(getLink());
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		List<Feature> features = ExplainableBoostingUtil.encodeExplainableBooster(this, schema);
 

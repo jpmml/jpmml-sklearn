@@ -41,7 +41,6 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.IndexFeature;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
@@ -68,7 +67,6 @@ public class ExplainableBoostingUtil {
 		ClassDictUtil.checkSize(termFeatures, termScores);
 
 		ModelEncoder encoder = schema.getEncoder();
-		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		List<List<CategoricalFeature>> binLevelFeatures = new ArrayList<>();

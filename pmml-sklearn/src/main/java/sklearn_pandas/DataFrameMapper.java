@@ -26,13 +26,14 @@ import java.util.Objects;
 
 import com.google.common.collect.Lists;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.InvalidAttributeException;
 import org.jpmml.python.PythonFormatterUtil;
+import org.jpmml.python.ScalarCastFunction;
 import org.jpmml.python.TupleUtil;
-import org.jpmml.sklearn.ScalarCastFunction;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
@@ -93,7 +94,9 @@ public class DataFrameMapper extends Initializer {
 		Object object = getOptionalObject("default");
 
 		if(!Objects.equals(Boolean.FALSE, object)){
-			throw new InvalidAttributeException("Attribute \'" + ClassDictUtil.formatMember(this, "default") + "\' must be set to the " + PythonFormatterUtil.formatValue(Boolean.FALSE) + " value");
+			Attribute attribute = new Attribute(this, "default");
+
+			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to the " + PythonFormatterUtil.formatValue(Boolean.FALSE) + " value", attribute);
 		}
 
 		return (Boolean)object;

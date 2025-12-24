@@ -69,10 +69,10 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 			throw new IllegalArgumentException();
 		}
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		if(estimators.size() == 1){
-			SchemaUtil.checkSize(2, categoricalLabel);
+			SchemaUtil.checkCardinality(2, categoricalLabel);
 
 			Classifier estimator = estimators.get(0);
 
@@ -84,7 +84,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 		} else
 
 		if(estimators.size() >= 2){
-			SchemaUtil.checkSize(estimators.size(), categoricalLabel);
+			SchemaUtil.checkCardinality(estimators.size(), categoricalLabel);
 
 			List<Model> models = new ArrayList<>();
 

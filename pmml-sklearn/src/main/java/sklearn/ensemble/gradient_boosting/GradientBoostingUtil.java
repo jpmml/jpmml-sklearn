@@ -41,7 +41,7 @@ public class GradientBoostingUtil {
 
 	static
 	public <E extends Estimator & HasEstimatorEnsemble<TreeRegressor> & HasTreeOptions> MiningModel encodeGradientBoosting(E estimator, Number initialPrediction, Number learningRate, Schema schema){
-		ContinuousLabel continuousLabel = (ContinuousLabel)schema.getLabel();
+		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
 		List<TreeModel> treeModels = TreeEnsembleUtil.encodeTreeModelEnsemble(estimator, MiningFunction.REGRESSION, schema);
 

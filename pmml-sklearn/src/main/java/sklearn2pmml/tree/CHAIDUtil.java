@@ -47,9 +47,9 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
+import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
@@ -67,14 +67,14 @@ public class CHAIDUtil {
 
 		org.dmg.pmml.tree.Node root = encodeNode(True.INSTANCE, tree.selectRoot(), tree, new PredicateManager(), schema);
 
-		return new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema.getLabel()), root);
+		return new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root);
 	}
 
 	static
 	private org.dmg.pmml.tree.Node encodeNode(Predicate predicate, Node node, Tree tree, PredicateManager predicateManager, Schema schema){
 		org.dmg.pmml.tree.Node result;
 
-		Label label = schema.getLabel();
+		ScalarLabel scalarLabel = schema.requireScalarLabel();
 
 		chaid.Node tag = node.getTag(chaid.Node.class);
 
@@ -113,7 +113,7 @@ public class CHAIDUtil {
 
 			Collection<?> categories = categoricalFeature.getValues();
 
-			if(label instanceof CategoricalLabel){
+			if(scalarLabel instanceof CategoricalLabel){
 				result = new ClassifierNode(null, predicate);
 			} else
 
@@ -212,7 +212,7 @@ public class CHAIDUtil {
 		} else
 
 		{
-			if(label instanceof CategoricalLabel){
+			if(scalarLabel instanceof CategoricalLabel){
 				result = new ClassifierNode(null, predicate);
 			} else
 
@@ -225,16 +225,16 @@ public class CHAIDUtil {
 			.setId(node.getIdentifier())
 			.setRecordCount(depVArr.size());
 
-		if(label instanceof ContinuousLabel){
-			ContinuousLabel continuousLabel = (ContinuousLabel)label;
+		if(scalarLabel instanceof ContinuousLabel){
+			ContinuousLabel continuousLabel = (ContinuousLabel)scalarLabel;
 
 			Double score = DoubleMath.mean(depVArr);
 
 			result.setScore(score);
 		} else
 
-		if(label instanceof CategoricalLabel){
-			CategoricalLabel categoricalLabel = (CategoricalLabel)label;
+		if(scalarLabel instanceof CategoricalLabel){
+			CategoricalLabel categoricalLabel = (CategoricalLabel)scalarLabel;
 
 			Map<Integer, Long> countMap = ((List<Integer>)depVArr).stream()
 				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));

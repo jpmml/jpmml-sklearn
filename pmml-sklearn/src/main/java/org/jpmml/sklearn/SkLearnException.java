@@ -18,7 +18,9 @@
  */
 package org.jpmml.sklearn;
 
-public class SkLearnException extends RuntimeException {
+import org.jpmml.converter.ConversionException;
+
+public class SkLearnException extends ConversionException {
 
 	public SkLearnException(String message){
 		super(message);
@@ -26,35 +28,5 @@ public class SkLearnException extends RuntimeException {
 
 	public SkLearnException(String message, Throwable cause){
 		super(message, cause);
-	}
-
-	public SkLearnException(String problem, String solution){
-		super(formatMessage(problem, solution));
-	}
-
-	public SkLearnException(String problem, String solution, Throwable cause){
-		super(formatMessage(problem, solution), cause);
-	}
-
-	@Override
-	synchronized
-	public SkLearnException initCause(Throwable cause){
-		return (SkLearnException)super.initCause(cause);
-	}
-
-	@Override
-	synchronized
-	public SkLearnException fillInStackTrace(){
-		return (SkLearnException)super.fillInStackTrace();
-	}
-
-	static
-	public String formatMessage(String problem, String solution){
-
-		if(solution != null && !solution.isEmpty()){
-			return (problem + ". To fix, " + solution.substring(0, 1).toLowerCase() + solution.substring(1));
-		}
-
-		return problem;
 	}
 }

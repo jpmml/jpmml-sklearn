@@ -52,7 +52,7 @@ public class ConcatTransformer extends Transformer {
 			Feature feature = features.get(i);
 
 			if((i > 0) && !Objects.equals("", separator)){
-				expressions.add(ExpressionUtil.createConstant(DataType.STRING, separator));
+				expressions.add(ExpressionUtil.createConstant(separator));
 			}
 
 			expressions.add(feature.ref());

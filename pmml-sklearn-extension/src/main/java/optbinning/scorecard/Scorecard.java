@@ -146,7 +146,6 @@ public class Scorecard extends Estimator implements HasClasses {
 
 		List<HasArray> blockValues = data.getBlockValues();
 
-		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
 		Characteristics characteristics = new Characteristics();
@@ -186,7 +185,7 @@ public class Scorecard extends Estimator implements HasClasses {
 			throw new IllegalArgumentException();
 		}
 
-		org.dmg.pmml.scorecard.Scorecard scorecard = new org.dmg.pmml.scorecard.Scorecard(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(label), characteristics)
+		org.dmg.pmml.scorecard.Scorecard scorecard = new org.dmg.pmml.scorecard.Scorecard(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), characteristics)
 			.setInitialScore(intercept)
 			.setUseReasonCodes(false);
 

@@ -41,7 +41,7 @@ public class ThresholdClassifierUtil {
 
 	static
 	public Model encodeModel(Classifier estimator, Number threshold, Schema schema){
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		Model model = estimator.encodeModel(schema);
 

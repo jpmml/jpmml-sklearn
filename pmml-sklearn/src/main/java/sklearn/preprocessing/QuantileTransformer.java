@@ -141,7 +141,7 @@ public class QuantileTransformer extends SkLearnTransformer {
 		Constant lowerBound = ExpressionUtil.createConstant(0d + boundsThreshold);
 		Constant upperBound = ExpressionUtil.createConstant(1d - boundsThreshold);
 
-		Apply apply = FunctionUtil.encodeFunction("numpy", "clip", Arrays.asList(new FieldRef(valueField), lowerBound, upperBound), encoder);
+		Apply apply = (Apply)FunctionUtil.encodeFunction("numpy", "clip", Arrays.asList(new FieldRef(valueField), lowerBound, upperBound), encoder);
 
 		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
 			.addParameterFields(valueField);

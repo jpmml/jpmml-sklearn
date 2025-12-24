@@ -53,7 +53,7 @@ public class MLPClassifier extends SkLearnClassifier implements MLPConstants {
 		List<HasArray> coefs = getCoefs();
 		List<HasArray> intercepts = getIntercepts();
 
-		CategoricalLabel categoricalLabel = (CategoricalLabel)schema.getLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		NeuralNetwork neuralNetwork = MultilayerPerceptronUtil.encodeNeuralNetwork(MiningFunction.CLASSIFICATION, activation, coefs, intercepts, schema);
 
