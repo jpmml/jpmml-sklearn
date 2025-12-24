@@ -29,6 +29,7 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -79,7 +80,7 @@ public class Regressor extends Estimator {
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SchemaException("Expected at least one label, got " + names.size());
 		}
 	}
 

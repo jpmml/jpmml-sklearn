@@ -41,6 +41,7 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.OrdinalLabel;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -146,7 +147,7 @@ public class Classifier extends Estimator implements HasClasses {
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SchemaException("Expected at least one label, got " + names.size());
 		}
 	}
 

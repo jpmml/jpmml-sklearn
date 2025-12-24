@@ -40,6 +40,8 @@ import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaException;
+import org.jpmml.sklearn.SkLearnException;
 
 public class TreePredictorUtil {
 
@@ -145,7 +147,7 @@ public class TreePredictorUtil {
 				} else
 
 				{
-					throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
+					throw new SchemaException("Expected a categorical feature, got " + feature);
 				}
 			} else
 
@@ -156,7 +158,7 @@ public class TreePredictorUtil {
 					BinaryFeature binaryFeature = (BinaryFeature)feature;
 
 					if(threshold != 0.5d){
-						throw new IllegalArgumentException();
+						throw new SkLearnException("Expected 0.5 threshold value, got " + threshold);
 					}
 
 					Object value = binaryFeature.getValue();
@@ -172,7 +174,7 @@ public class TreePredictorUtil {
 					MissingValueFeature missingValueFeature = (MissingValueFeature)feature;
 
 					if(threshold != 0.5d){
-						throw new IllegalArgumentException();
+						throw new SkLearnException("Expected 0.5 threshold value, got " + threshold);
 					}
 
 					leftPredicate = predicateManager.createSimplePredicate(missingValueFeature, SimplePredicate.Operator.IS_NOT_MISSING, null);

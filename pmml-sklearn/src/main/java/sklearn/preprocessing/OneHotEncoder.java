@@ -30,6 +30,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -95,7 +96,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 		} else
 
 		{
-			throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
+			throw new SchemaException("Expected a categorical feature, got " + feature);
 		}
 
 		return result;

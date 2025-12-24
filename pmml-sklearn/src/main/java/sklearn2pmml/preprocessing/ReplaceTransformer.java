@@ -28,6 +28,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.RegExFlavour;
@@ -59,7 +60,7 @@ public class ReplaceTransformer extends RegExTransformer {
 		Feature feature = features.get(0);
 
 		if(feature.getDataType() != DataType.STRING){
-			throw new IllegalArgumentException();
+			throw new SchemaException("Expected " + DataType.STRING.value() + " data type for feature \'" + feature.getName() + "\', got " + (feature.getDataType()).value());
 		}
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.REPLACE, feature.ref(), ExpressionUtil.createConstant(pattern), ExpressionUtil.createConstant(replacement));

@@ -28,6 +28,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -52,7 +53,7 @@ public class SubstringTransformer extends StringTransformer {
 		Feature feature = features.get(0);
 
 		if(feature.getDataType() != DataType.STRING){
-			throw new IllegalArgumentException();
+			throw new SchemaException("Expected " + DataType.STRING.value() + " data type for feature \'" + feature.getName() + "\', got " + (feature.getDataType()).value());
 		}
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.SUBSTRING, feature.ref(), ExpressionUtil.createConstant(DataType.INTEGER, begin + 1), ExpressionUtil.createConstant(DataType.INTEGER, (end - begin)));

@@ -27,6 +27,7 @@ import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.HasArray;
 
@@ -69,7 +70,7 @@ public class CategoricalNB extends DiscreteNB {
 			} else
 
 			{
-				throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
+				throw new SchemaException("Expected a categorical feature, got " + feature);
 			}
 
 			bayesInputs.addBayesInputs(bayesInput);

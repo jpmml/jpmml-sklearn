@@ -35,6 +35,7 @@ import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
@@ -157,7 +158,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SchemaException("Expected at least one label, got " + names.size());
 		}
 	}
 

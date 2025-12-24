@@ -151,7 +151,7 @@ public class TreeUtil {
 				BinaryFeature binaryFeature = (BinaryFeature)feature;
 
 				if(threshold < 0 || threshold > 1){
-					throw new IllegalArgumentException();
+					throw new SkLearnException("Expected [0, 1] range threshold value, got " + threshold);
 				}
 
 				Object value = binaryFeature.getValue();
@@ -169,7 +169,7 @@ public class TreeUtil {
 				MissingValueFeature missingValueFeature = (MissingValueFeature)feature;
 
 				if(threshold != 0.5d){
-					throw new IllegalArgumentException();
+					throw new SkLearnException("Expected 0.5 threshold value, got " + threshold);
 				}
 
 				leftPredicate = predicateManager.createSimplePredicate(missingValueFeature, SimplePredicate.Operator.IS_NOT_MISSING, null);

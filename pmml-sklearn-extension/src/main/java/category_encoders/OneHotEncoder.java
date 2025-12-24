@@ -26,6 +26,7 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueFeature;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -78,7 +79,7 @@ public class OneHotEncoder extends BaseEncoder {
 			} else
 
 			{
-				throw new IllegalArgumentException("Expected a categorical feature, got " + feature);
+				throw new SchemaException("Expected a categorical feature, got " + feature);
 			}
 		}
 

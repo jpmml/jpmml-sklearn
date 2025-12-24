@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaException;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -49,7 +50,7 @@ public class SelectFirstClassifier extends Classifier implements HasController, 
 
 			{
 				if(!Objects.equals(result, EstimatorUtil.getClasses(estimator))){
-					throw new IllegalArgumentException();
+					throw new SchemaException("Expected matching target categories, got " + result + " and " + EstimatorUtil.getClasses(estimator));
 				}
 			}
 		}
