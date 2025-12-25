@@ -83,6 +83,14 @@ public class LogisticRegression extends LinearClassifier {
 			{
 				multiClass = null;
 			}
+		} else
+
+		if(Objects.equals(null, multiClass)){
+			int[] shape = getCoefShape();
+
+			if(sklearnVersion == null || VersionUtil.compareVersion(sklearnVersion, "1.8.0") >= 0){
+				multiClass = getAutoMultiClass(null, shape);
+			}
 		} // End if
 
 		if(multiClass == null){
@@ -182,6 +190,12 @@ public class LogisticRegression extends LinearClassifier {
 	}
 
 	public String getMultiClass(){
+
+		// SkLearn 1.8.0+
+		if(!hasattr("multi_class")){
+			return null;
+		}
+
 		String multiClass = getEnum("multi_class", this::getString, Arrays.asList(LogisticRegression.MULTICLASS_AUTO, LogisticRegression.MULTICLASS_DEPRECATED, LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR, LogisticRegression.MULTICLASS_WARN));
 
 		// SkLearn 0.20

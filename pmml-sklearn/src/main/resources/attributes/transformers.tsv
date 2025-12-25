@@ -31,6 +31,7 @@ sklearn.preprocessing._data.Binarizer	+
 sklearn.preprocessing._data.MaxAbsScaler	+
 sklearn.preprocessing._data.MinMaxScaler	+
 sklearn.preprocessing._data.PowerTransformer	+
+sklearn.preprocessing._data.QuantileTransformer	+
 sklearn.preprocessing._data.RobustScaler	+
 sklearn.preprocessing._data.StandardScaler	+
 sklearn.preprocessing._discretization.KBinsDiscretizer	+

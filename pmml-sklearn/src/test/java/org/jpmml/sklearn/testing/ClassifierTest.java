@@ -230,13 +230,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluateMultinomialLogisticRegressionAudit() throws Exception {
-		evaluate(MULTINOMIAL_LOGISTIC_REGRESSION, AUDIT);
-	}
-
-	@Test
-	public void evaluateOvRLogisticRegressionAudit() throws Exception {
-		evaluate(OVR_LOGISTIC_REGRESSION, AUDIT);
+	public void evaluateLogisticRegressionAudit() throws Exception {
+		evaluate(LOGISTIC_REGRESSION, AUDIT);
 	}
 
 	@Test
@@ -407,13 +402,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluateMultinomialLogisticRegressionIris() throws Exception {
-		evaluate(MULTINOMIAL_LOGISTIC_REGRESSION, IRIS);
-	}
-
-	@Test
-	public void evaluateOvRLogisticRegressionIris() throws Exception {
-		evaluate(OVR_LOGISTIC_REGRESSION, IRIS);
+	public void evaluateLogisticRegressionIris() throws Exception {
+		evaluate(LOGISTIC_REGRESSION, IRIS);
 	}
 
 	@Test

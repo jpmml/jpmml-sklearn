@@ -201,8 +201,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, LinearDiscriminantAnalysis(solver = "lsqr"), "LinearDiscriminantAnalysisAudit")
 	build_audit(audit_df, LinearSVC(penalty = "l1", dual = False, random_state = 13), "LinearSVCAudit", with_proba = False)
 	build_audit(audit_df, CalibratedClassifierCV(LinearSVC(dual = False, random_state = 13), ensemble = True, method = "isotonic"), "LinearSVCIsotonicAudit")
-	build_audit(audit_df, LogisticRegression(multi_class = "multinomial", solver = "newton-cg", max_iter = 500), "MultinomialLogisticRegressionAudit")
-	build_audit(audit_df, LogisticRegressionCV(cv = 3, multi_class = "ovr"), "OvRLogisticRegressionAudit")
+	build_audit(audit_df, LogisticRegressionCV(cv = 3, solver = "newton-cg", max_iter = 500), "LogisticRegressionAudit")
 	build_audit(audit_df, BaggingClassifier(LogisticRegression(), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleAudit")
 	build_audit(audit_df, GaussianNB(), "GaussianNBAudit")
 	build_audit(audit_df, OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
@@ -563,12 +562,11 @@ if "Iris" in datasets:
 	build_iris(iris_df, LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 	build_iris(iris_df, LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)
 	build_iris(iris_df, CalibratedClassifierCV(LinearSVC(random_state = 13), ensemble = False, method = "isotonic"), "LinearSVCIsotonicIris")
-	build_iris(iris_df, LogisticRegression(multi_class = "multinomial", solver = "lbfgs"), "MultinomialLogisticRegressionIris")
-	build_iris(iris_df, LogisticRegressionCV(cv = 3, multi_class = "ovr"), "OvRLogisticRegressionIris")
-	build_iris(iris_df, BaggingClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear"), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleIris")
+	build_iris(iris_df, LogisticRegressionCV(cv = 3), "LogisticRegressionIris")
+	build_iris(iris_df, BaggingClassifier(LogisticRegression(), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleIris")
 	build_iris(iris_df, MLPClassifier(hidden_layer_sizes = (6,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPIris")
 	build_iris(iris_df, GaussianNB(), "GaussianNBIris")
-	build_iris(iris_df, OneVsRestClassifier(LogisticRegression(multi_class = "ovr", solver = "liblinear")), "OneVsRestIris")
+	build_iris(iris_df, OneVsRestClassifier(LogisticRegression()), "OneVsRestIris")
 	build_iris(iris_df, Perceptron(random_state = 13), "PerceptronIris", with_proba = False)
 	build_iris(iris_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIris", flat = True)
 	build_iris(iris_df, RidgeClassifierCV(), "RidgeIris", with_proba = False)
@@ -577,10 +575,10 @@ if "Iris" in datasets:
 	build_iris(iris_df, SGDClassifier(max_iter = 100, random_state = 13), "SGDIris", with_proba = False)
 	build_iris(iris_df, SGDClassifier(loss = "log_loss", max_iter = 100, random_state = 13), "SGDLogIris")
 	build_iris(iris_df, CalibratedClassifierCV(SGDClassifier(max_iter = 100, random_state = 13), ensemble = True, method = "sigmoid"), "SGDSigmoidIris")
-	build_iris(iris_df, StackingClassifier([("lda", LinearDiscriminantAnalysis()), ("lr", LogisticRegression(multi_class = "multinomial", solver = "lbfgs"))], final_estimator = GradientBoostingClassifier(n_estimators = 5, random_state = 13), passthrough = True), "StackingEnsembleIris")
+	build_iris(iris_df, StackingClassifier([("lda", LinearDiscriminantAnalysis()), ("lr", LogisticRegression())], final_estimator = GradientBoostingClassifier(n_estimators = 5, random_state = 13), passthrough = True), "StackingEnsembleIris")
 	build_iris(iris_df, SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(iris_df, NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
-	build_iris(iris_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression(multi_class = "ovr", solver = "liblinear"))]), "VotingEnsembleIris", with_proba = False)
+	build_iris(iris_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
 
 class IrisStandardScaler(StandardScaler):
 	
@@ -591,7 +589,7 @@ class IrisStandardScaler(StandardScaler):
 class IrisLogisticRegression(LogisticRegression):
 
 	def __init__(self):
-		super().__init__(multi_class = "multinomial")
+		super().__init__()
 		self.pmml_base_class_ = "{}.{}".format(LogisticRegression.__module__, LogisticRegression.__name__)
 
 def build_iris_frozen(iris_df):
