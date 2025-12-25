@@ -52,12 +52,12 @@ public class CastTransformer extends TypeTransformer {
 
 		// SkLearn2PMML 0.101.0+
 		if(hasattr("dtype_")){
-			return getDType("dtype_", true);
+			return getDType("dtype_");
 		} else
 
 		// SkLearn2PMML 0.100.2
 		{
-			return getDType("dtype", true);
+			return getDType("dtype");
 		}
 	}
 }

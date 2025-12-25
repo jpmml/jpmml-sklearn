@@ -117,7 +117,7 @@ public class KBinsDiscretizer extends SkLearnTransformer {
 	}
 
 	public TypeInfo getDType(){
-		return getOptionalDType("dtype", false);
+		return getOptionalDType("dtype");
 	}
 
 	public String getEncode(){

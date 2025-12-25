@@ -67,7 +67,7 @@ public class SeriesConstructor extends Transformer {
 	}
 
 	public TypeInfo getDType(){
-		return getDType("dtype", true);
+		return getDType("dtype");
 	}
 
 	public String getName(){

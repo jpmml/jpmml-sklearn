@@ -162,7 +162,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 		return dataField;
 	}
 
-	public TypeInfo getDType(String name, boolean extended){
+	public TypeInfo getDType(String name){
 		Object dtype = getObject(name);
 
 		Attribute attribute = new Attribute(this, name);
@@ -171,7 +171,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 			@Override
 			public TypeInfo apply(Object object){
-				object = toTypeInfo(object, extended);
+				object = toTypeInfo(object);
 
 				return super.apply(object);
 			}
@@ -185,17 +185,17 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 		return castFunction.apply(dtype);
 	}
 
-	public TypeInfo getOptionalDType(String name, boolean extended){
+	public TypeInfo getOptionalDType(String name){
 		Object value = getOptionalObject(name);
 
 		if(value == null){
 			return null;
 		}
 
-		return getDType(name, extended);
+		return getDType(name);
 	}
 
-	public List<TypeInfo> getDTypeList(String name, boolean extended){
+	public List<TypeInfo> getDTypeList(String name){
 		List<?> values = getList(name);
 
 		Attribute attribute = new Attribute(this, name);
@@ -204,7 +204,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 			@Override
 			public TypeInfo apply(Object object){
-				object = toTypeInfo(object, extended);
+				object = toTypeInfo(object);
 
 				return super.apply(object);
 			}
@@ -238,7 +238,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	}
 
 	static
-	private Object toTypeInfo(Object object, boolean extended){
+	private Object toTypeInfo(Object object){
 
 		if(object instanceof TypeConstructor){
 			TypeConstructor typeConstructor = (TypeConstructor)object;
@@ -249,9 +249,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 		if(object instanceof String){
 			String string = (String)object;
 
-			if(extended){
-				return Type.forClassName(string);
-			}
+			return Type.forClassName(string);
 		}
 
 		return object;

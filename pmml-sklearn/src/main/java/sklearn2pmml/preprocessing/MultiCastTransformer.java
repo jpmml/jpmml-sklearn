@@ -53,6 +53,6 @@ public class MultiCastTransformer extends TypeTransformer {
 	}
 
 	public List<TypeInfo> getDTypes(){
-		return getDTypeList("dtypes_", true);
+		return getDTypeList("dtypes_");
 	}
 }

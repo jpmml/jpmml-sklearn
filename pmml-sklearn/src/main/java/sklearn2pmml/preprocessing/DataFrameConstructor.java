@@ -111,6 +111,6 @@ public class DataFrameConstructor extends Initializer {
 	}
 
 	public TypeInfo getDType(){
-		return getDType("dtype", true);
+		return getDType("dtype");
 	}
 }

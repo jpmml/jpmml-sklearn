@@ -141,12 +141,12 @@ public class Domain extends Decorator {
 
 		// SkLearn2PMML 0.78.0+
 		if(hasattr("dtype_")){
-			return getDType("dtype_", true);
+			return getDType("dtype_");
 		} else
 
 		// SkLearn2PMML 0.77.2
 		{
-			return getOptionalDType("dtype", true);
+			return getOptionalDType("dtype");
 		}
 	}
 

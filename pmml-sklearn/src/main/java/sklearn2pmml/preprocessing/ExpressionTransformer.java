@@ -216,11 +216,11 @@ public class ExpressionTransformer extends Transformer {
 
 		// SkLearn2PMML 0.103.2+
 		if(hasattr("dtype_")){
-			return super.getOptionalDType("dtype_", true);
+			return super.getOptionalDType("dtype_");
 		}
 
 		// SkLearn2PMML 0.103.1
-		return super.getOptionalDType("dtype", true);
+		return super.getOptionalDType("dtype");
 	}
 
 	public ExpressionTransformer setDType(Object dtype){

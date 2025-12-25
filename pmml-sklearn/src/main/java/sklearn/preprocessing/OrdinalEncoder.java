@@ -93,7 +93,7 @@ public class OrdinalEncoder extends BaseEncoder {
 	}
 
 	public TypeInfo getDType(){
-		return getDType("dtype", false);
+		return getDType("dtype");
 	}
 
 	public String getHandleUnknown(){

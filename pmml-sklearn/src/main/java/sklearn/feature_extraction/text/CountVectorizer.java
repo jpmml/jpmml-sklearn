@@ -231,7 +231,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	}
 
 	public TypeInfo getDType(){
-		return getDType("dtype", false);
+		return getDType("dtype");
 	}
 
 	public Boolean getLowercase(){
