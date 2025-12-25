@@ -293,7 +293,7 @@ public class SkLearnEncoder extends PythonEncoder {
 				.setSolution("Rename input fields in Python beforehand (eg. as DataFrame columns)");
 		}
 
-		org.dmg.pmml.Field renamedPmmlField;
+		org.dmg.pmml.Field<?> renamedPmmlField;
 
 		try {
 			renamedPmmlField = getField(renamedName);

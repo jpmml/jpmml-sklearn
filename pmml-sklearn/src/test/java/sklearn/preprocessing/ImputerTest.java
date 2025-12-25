@@ -164,7 +164,7 @@ public class ImputerTest {
 			.setDefault(Boolean.FALSE)
 			.setFeatures(Collections.singletonList(new Object[]{name, transformers}));
 
-		List<Feature> features = dataFrameMapper.encodeFeatures(new ArrayList<Feature>(), encoder);
+		List<Feature> features = dataFrameMapper.encodeFeatures(new ArrayList<>(), encoder);
 
 		return Iterables.getOnlyElement(features);
 	}

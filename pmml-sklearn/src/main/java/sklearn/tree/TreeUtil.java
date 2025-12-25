@@ -36,6 +36,7 @@ import org.dmg.pmml.HasExtensions;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.PMMLConstants;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
@@ -211,7 +212,7 @@ public class TreeUtil {
 
 				// Happens when missing values are allowed
 				if(threshold == Double.POSITIVE_INFINITY){
-					value = "INF";
+					value = PMMLConstants.POSITIVE_INFINITY;
 				} else
 
 				{

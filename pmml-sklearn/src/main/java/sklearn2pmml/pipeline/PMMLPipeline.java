@@ -207,15 +207,12 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 			Map<VerificationField, List<?>> data = new LinkedHashMap<>();
 
-			if(activeFields != null){
+			for(int i = 0; i < activeFields.size(); i++){
+				VerificationField verificationField = ModelUtil.createVerificationField(activeFields.get(i));
 
-				for(int i = 0; i < activeFields.size(); i++){
-					VerificationField verificationField = ModelUtil.createVerificationField(activeFields.get(i));
+				Domain domain = encoder.getDomain(verificationField.requireField());
 
-					Domain domain = encoder.getDomain(verificationField.requireField());
-
-					data.put(verificationField, CMatrixUtil.getColumn(cleanValues(domain, activeValues), rows, activeFields.size(), i));
-				}
+				data.put(verificationField, CMatrixUtil.getColumn(cleanValues(domain, activeValues), rows, activeFields.size(), i));
 			}
 
 			Number precision = verification.getPrecision();

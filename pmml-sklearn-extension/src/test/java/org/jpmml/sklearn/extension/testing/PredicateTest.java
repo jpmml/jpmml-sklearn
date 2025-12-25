@@ -67,7 +67,7 @@ public class PredicateTest extends SkLearnEncoderBatchTest implements Datasets {
 		Predicate<ResultField> predicate = (resultField) -> true;
 		Equivalence<Object> equivalence = getEquivalence();
 
-		try(SkLearnEncoderBatch batch = (SkLearnEncoderBatch)createBatch(name, dataset, predicate, equivalence)){
+		try(SkLearnEncoderBatch batch = createBatch(name, dataset, predicate, equivalence)){
 			batch.setOptions(options);
 
 			Boolean numeric = (Boolean)options.get(HasTreeOptions.OPTION_NUMERIC);
@@ -95,13 +95,13 @@ public class PredicateTest extends SkLearnEncoderBatchTest implements Datasets {
 					PMML pmml = (PMML)parent;
 
 					if(numeric){
-						assertTrue(simplePredicateCount > 100);
-						assertEquals(0, simpleSetPredicateCount);
+						assertTrue(this.simplePredicateCount > 100);
+						assertEquals(0, this.simpleSetPredicateCount);
 					} else
 
 					{
-						assertTrue(simplePredicateCount > 100);
-						assertTrue(simpleSetPredicateCount > 100);
+						assertTrue(this.simplePredicateCount > 100);
+						assertTrue(this.simpleSetPredicateCount > 100);
 					}
 				}
 

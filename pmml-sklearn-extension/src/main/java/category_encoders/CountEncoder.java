@@ -40,7 +40,7 @@ import pandas.core.Series;
 import pandas.core.SeriesUtil;
 import sklearn.preprocessing.EncoderUtil;
 
-public class CountEncoder extends MapEncoder implements BaseEncoderConstants {
+public class CountEncoder extends MapEncoder {
 
 	public CountEncoder(String module, String name){
 		super(module, name);

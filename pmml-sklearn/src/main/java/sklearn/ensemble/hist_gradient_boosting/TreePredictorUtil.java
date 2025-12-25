@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.False;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.PMMLConstants;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
@@ -187,7 +188,7 @@ public class TreePredictorUtil {
 					Object value;
 
 					if(threshold == Double.POSITIVE_INFINITY){
-						value = "INF";
+						value = PMMLConstants.POSITIVE_INFINITY;
 					} else
 
 					{

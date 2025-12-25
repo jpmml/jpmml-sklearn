@@ -151,6 +151,8 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 					dataType = dataField.requireDataType();
 				}
 				break;
+			default:
+				break;
 		}
 
 		dataField

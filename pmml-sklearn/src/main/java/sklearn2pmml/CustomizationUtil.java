@@ -33,7 +33,6 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -46,9 +45,7 @@ import javax.xml.xpath.XPathFactory;
 import com.google.common.collect.Iterables;
 import jakarta.xml.bind.Binder;
 import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.annotation.XmlRootElement;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
@@ -327,18 +324,6 @@ public class CustomizationUtil {
 		if(!success){
 			throw new IllegalArgumentException();
 		}
-	}
-
-	static
-	private <E extends PMMLObject> JAXBElement<E> createElement(E object){
-		Class<E> objectClazz = (Class<E>)object.getClass();
-
-		XmlRootElement xmlRootElement = objectClazz.getAnnotation(XmlRootElement.class);
-		if(xmlRootElement == null){
-			throw new IllegalArgumentException();
-		}
-
-		return new JAXBElement<>(new QName(xmlRootElement.namespace(), xmlRootElement.name()), objectClazz, object);
 	}
 
 	static

@@ -139,7 +139,7 @@ public class ExpressionTransformer extends Transformer {
 		} // End if
 
 		if(invalidValueTreatment != null){
-			HasInvalidValueTreatment hasInvalidValueTreatment = (HasInvalidValueTreatment)expression;
+			HasInvalidValueTreatment<?> hasInvalidValueTreatment = (HasInvalidValueTreatment<?>)expression;
 
 			hasInvalidValueTreatment.setInvalidValueTreatment(invalidValueTreatment);
 		}
