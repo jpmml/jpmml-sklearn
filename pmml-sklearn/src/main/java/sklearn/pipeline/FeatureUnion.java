@@ -21,9 +21,11 @@ package sklearn.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasHead;
@@ -31,6 +33,7 @@ import sklearn.SkLearnTransformer;
 import sklearn.Step;
 import sklearn.StepUtil;
 import sklearn.Transformer;
+import sklearn.TransformerCastFunction;
 
 public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
@@ -81,7 +84,11 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 	public List<? extends Transformer> getTransformers(){
 		List<Object[]> transformerList = getTransformerList();
 
-		return TupleUtil.extractElementList(transformerList, 1, Transformer.class);
+		List<?> transformers = TupleUtil.extractElementList(transformerList, 1);
+
+		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class);
+
+		return Lists.transform(transformers, castFunction);
 	}
 
 	public List<Object[]> getTransformerList(){

@@ -181,8 +181,6 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 		Object[] headStep = steps.get(0);
 
-		Object step = TupleUtil.extractElement(headStep, 1);
-
 		CastFunction<Step> castFunction = new StepCastFunction<Step>(Step.class){
 
 			@Override
@@ -196,7 +194,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 			}
 		};
 
-		step = castFunction.apply(step);
+		Object step = castFunction.apply(TupleUtil.extractElement(headStep, 1));
 
 		return StepUtil.getHead((Step)step);
 	}

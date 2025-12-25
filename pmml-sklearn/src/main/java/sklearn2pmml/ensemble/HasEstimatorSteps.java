@@ -20,8 +20,11 @@ package sklearn2pmml.ensemble;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.TupleUtil;
 import sklearn.Estimator;
+import sklearn.EstimatorCastFunction;
 import sklearn.HasSteps;
 
 public interface HasEstimatorSteps extends HasSteps {
@@ -34,6 +37,10 @@ public interface HasEstimatorSteps extends HasSteps {
 			throw new IllegalArgumentException();
 		}
 
-		return TupleUtil.extractElementList(steps, 1, Estimator.class);
+		List<?> estimators = TupleUtil.extractElementList(steps, 1);
+
+		CastFunction<Estimator> castFunction = new EstimatorCastFunction<Estimator>(Estimator.class);
+
+		return Lists.transform(estimators, castFunction);
 	}
 }

@@ -33,6 +33,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IfElseBuilder;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
@@ -40,6 +41,7 @@ import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasSteps;
 import sklearn.Transformer;
+import sklearn.TransformerCastFunction;
 import sklearn2pmml.HasController;
 import sklearn2pmml.util.EvaluatableUtil;
 
@@ -68,6 +70,8 @@ public class SelectFirstTransformer extends Transformer implements HasController
 			controlFeatures = controller.encode(controlFeatures, encoder);
 		}
 
+		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class);
+
 		Scope scope = new DataFrameScope("X", controlFeatures);
 
 		IfElseBuilder applyBuilder = new IfElseBuilder();
@@ -78,7 +82,7 @@ public class SelectFirstTransformer extends Transformer implements HasController
 			Object[] step = steps.get(i);
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
-			Transformer transformer = TupleUtil.extractElement(step, 1, Transformer.class);
+			Transformer transformer = castFunction.apply(TupleUtil.extractElement(step, 1));
 			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
 			Expression expression = EvaluatableUtil.translateExpression(expr, scope);

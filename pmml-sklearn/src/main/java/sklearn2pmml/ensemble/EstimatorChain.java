@@ -37,12 +37,14 @@ import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
+import sklearn.EstimatorCastFunction;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.Transformer;
@@ -194,6 +196,8 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 			controlFeatures = controller.encode(controlFeatures, encoder);
 		}
 
+		CastFunction<Estimator> castFunction = new EstimatorCastFunction<Estimator>(Estimator.class);
+
 		Scope scope = new DataFrameScope("X", controlFeatures);
 
 		for(int i = 0; i < steps.size(); i++){
@@ -201,7 +205,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 			ScalarLabel scalarLabel = (multioutput ? scalarLabels.get(i) : scalarLabels.get(0));
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
-			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
+			Estimator estimator = castFunction.apply(TupleUtil.extractElement(step, 1));
 			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
 			estimators.add(estimator);

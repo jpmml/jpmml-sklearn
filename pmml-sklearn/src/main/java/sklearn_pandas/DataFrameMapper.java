@@ -135,11 +135,11 @@ public class DataFrameMapper extends Initializer {
 			}
 		};
 
-		if(key instanceof List){
-			return Lists.transform((List<?>)key, castFunction);
+		if(!(key instanceof List)){
+			return Collections.singletonList(castFunction.apply(key));
 		}
 
-		return Collections.singletonList(castFunction.apply(key));
+		return Lists.transform((List<?>)key, castFunction);
 	}
 
 	static
@@ -166,10 +166,10 @@ public class DataFrameMapper extends Initializer {
 			}
 		};
 
-		if(value instanceof List){
-			return Lists.transform((List<?>)value, castFunction);
+		if(!(value instanceof List)){
+			return Collections.singletonList(castFunction.apply(value));
 		}
 
-		return Collections.singletonList(castFunction.apply(value));
+		return Lists.transform((List<?>)value, castFunction);
 	}
 }

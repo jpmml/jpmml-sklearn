@@ -30,11 +30,13 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.CastFunction;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
+import sklearn.EstimatorCastFunction;
 import sklearn.Transformer;
 import sklearn2pmml.HasController;
 import sklearn2pmml.util.EvaluatableUtil;
@@ -66,13 +68,15 @@ public class SelectFirstUtil {
 			controlFeatures = controller.encode(controlFeatures, encoder);
 		}
 
+		CastFunction<Estimator> castFunction = new EstimatorCastFunction<Estimator>(Estimator.class);
+
 		Scope scope = new DataFrameScope("X", controlFeatures);
 
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
 
 			String name = TupleUtil.extractElement(step, 0, String.class);
-			Estimator estimator = TupleUtil.extractElement(step, 1, Estimator.class);
+			Estimator estimator = castFunction.apply(TupleUtil.extractElement(step, 1));
 			Object expr = TupleUtil.extractElement(step, 2, Object.class);
 
 			if(estimator.getMiningFunction() != miningFunction){
