@@ -82,6 +82,6 @@ public class MissingIndicator extends SkLearnTransformer {
 	}
 
 	public Object getMissingValues(){
-		return getOptionalScalar("missing_values");
+		return getOptionalObject("missing_values");
 	}
 }

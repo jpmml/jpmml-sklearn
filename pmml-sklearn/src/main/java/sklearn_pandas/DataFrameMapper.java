@@ -32,7 +32,6 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.InvalidAttributeException;
 import org.jpmml.python.PythonFormatterUtil;
-import org.jpmml.python.ScalarCastFunction;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
@@ -128,7 +127,7 @@ public class DataFrameMapper extends Initializer {
 			key = hasArray.getArrayContent();
 		}
 
-		CastFunction<String> castFunction = new ScalarCastFunction<String>(String.class){
+		CastFunction<String> castFunction = new CastFunction<String>(String.class){
 
 			@Override
 			protected String formatMessage(Object object){

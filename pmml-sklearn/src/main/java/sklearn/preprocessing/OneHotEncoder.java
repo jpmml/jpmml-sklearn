@@ -107,7 +107,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 
 		ClassDictUtil.checkSize(1, featureSizes);
 
-		Object numberOfValues = getOptionalScalar("n_values");
+		Object numberOfValues = getOptionalObject("n_values");
 
 		if(Objects.equals("auto", numberOfValues)){
 			return getActiveFeatures();

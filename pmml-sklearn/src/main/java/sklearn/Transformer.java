@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import builtins.Type;
 import builtins.TypeConstructor;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
@@ -36,7 +37,6 @@ import org.jpmml.python.Attribute;
 import org.jpmml.python.AttributeCastFunction;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PythonTypeUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn2pmml.HasPMMLName;
@@ -248,13 +248,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 			String string = (String)object;
 
 			if(extended){
-				return new TypeInfo(){
-
-					@Override
-					public DataType getDataType(){
-						return PythonTypeUtil.parseDataType(string);
-					}
-				};
+				return Type.forClassName(string);
 			}
 		}
 

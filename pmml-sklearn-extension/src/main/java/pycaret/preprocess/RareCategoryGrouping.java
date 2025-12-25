@@ -84,6 +84,6 @@ public class RareCategoryGrouping extends Transformer {
 	}
 
 	public Object getValue(){
-		return getScalar("value");
+		return getObject("value");
 	}
 }

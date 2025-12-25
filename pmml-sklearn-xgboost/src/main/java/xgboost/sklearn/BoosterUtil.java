@@ -219,7 +219,7 @@ public class BoosterUtil {
 
 		// XGBoost 1.7
 		if(bestNTreeLimit == null){
-			bestNTreeLimit = (Integer)estimator.getOptionalScalar("best_ntree_limit");
+			bestNTreeLimit = estimator.getOptionalInteger("best_ntree_limit");
 		} // End if
 
 		// XGBoost 2.0+
@@ -234,7 +234,7 @@ public class BoosterUtil {
 		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
 		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
-		Number missing = (Number)estimator.getOptionalScalar("missing");
+		Number missing = estimator.getOptionalNumber("missing");
 		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
 
 		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());

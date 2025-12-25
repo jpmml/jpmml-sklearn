@@ -131,7 +131,7 @@ public class BoosterUtil {
 	private <E extends Estimator & HasBooster & HasLightGBMOptions> Map<String, ?> getOptions(GBDT gbdt, E estimator){
 		Map<String, Object> result = new LinkedHashMap<>();
 
-		Integer bestIteration = (Integer)estimator.getOptionalScalar("best_iteration_");
+		Integer bestIteration = estimator.getOptionalInteger("best_iteration_");
 
 		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
 		result.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);

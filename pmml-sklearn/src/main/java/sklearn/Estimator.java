@@ -313,7 +313,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 	@Override
 	public Object getPMMLSegmentId(){
-		return getOptionalScalar(SkLearn2PMMLFields.PMML_SEGMENT_ID);
+		return getOptionalObject(SkLearn2PMMLFields.PMML_SEGMENT_ID);
 	}
 
 	@Override

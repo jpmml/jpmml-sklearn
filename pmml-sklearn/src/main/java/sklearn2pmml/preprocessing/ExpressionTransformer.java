@@ -203,7 +203,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public Object getDefaultValue(){
-		return getOptionalScalar("default_value");
+		return getOptionalObject("default_value");
 	}
 
 	public ExpressionTransformer setDefaultValue(Object defaultValue){
@@ -259,7 +259,7 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	public Object getMapMissingTo(){
-		return getOptionalScalar("map_missing_to");
+		return getOptionalObject("map_missing_to");
 	}
 
 	public ExpressionTransformer setMapMissingTo(Object mapMissingTo){

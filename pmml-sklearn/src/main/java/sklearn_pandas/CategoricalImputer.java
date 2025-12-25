@@ -54,10 +54,10 @@ public class CategoricalImputer extends Transformer {
 	}
 
 	public Object getFill(){
-		return getScalar("fill_");
+		return getObject("fill_");
 	}
 
 	public Object getMissingValues(){
-		return getOptionalScalar("missing_values");
+		return getOptionalObject("missing_values");
 	}
 }

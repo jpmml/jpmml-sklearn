@@ -127,7 +127,7 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 	}
 
 	public Object getConstant(){
-		return getOptionalScalar("constant");
+		return getOptionalObject("constant");
 	}
 
 	@Override

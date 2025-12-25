@@ -155,7 +155,7 @@ public class Domain extends Decorator {
 	}
 
 	public Object getMissingValueReplacement(){
-		return getOptionalScalar("missing_value_replacement");
+		return getOptionalObject("missing_value_replacement");
 	}
 
 	public List<?> getMissingValues(){
@@ -180,7 +180,7 @@ public class Domain extends Decorator {
 	}
 
 	public Object getInvalidValueReplacement(){
-		return getOptionalScalar("invalid_value_replacement");
+		return getOptionalObject("invalid_value_replacement");
 	}
 
 	public Boolean getWithData(){

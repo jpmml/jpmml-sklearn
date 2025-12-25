@@ -129,7 +129,7 @@ public class SimpleImputer extends SkLearnTransformer {
 	}
 
 	public Object getMissingValues(){
-		return getOptionalScalar("missing_values");
+		return getOptionalObject("missing_values");
 	}
 
 	public List<Object> getStatistics(){
