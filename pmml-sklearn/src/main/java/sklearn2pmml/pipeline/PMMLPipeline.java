@@ -494,7 +494,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			return null;
 		}
 
-		return getListLike("active_fields", String.class);
+		return getStringListLike("active_fields");
 	}
 
 	public PMMLPipeline setActiveFields(List<String> activeFields){
@@ -515,7 +515,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			return null;
 		}
 
-		return getListLike("target_fields", String.class);
+		return getStringListLike("target_fields");
 	}
 
 	public PMMLPipeline setTargetFields(List<String> targetFields){

@@ -57,7 +57,7 @@ public class RuleSetClassifier extends Classifier {
 		}
 
 		for(Object[] rule : rules){
-			String score = TupleUtil.extractElement(rule, 1, String.class);
+			String score = TupleUtil.extractStringElement(rule, 1);
 
 			scores.add(score);
 		}
@@ -95,8 +95,8 @@ public class RuleSetClassifier extends Classifier {
 		Scope scope = new DataFrameScope("X", features);
 
 		for(Object[] rule : rules){
-			Object expr = TupleUtil.extractElement(rule, 0, Object.class);
-			String score = TupleUtil.extractElement(rule, 1, String.class);
+			Object expr = TupleUtil.extractObjectElement(rule, 0);
+			String score = TupleUtil.extractStringElement(rule, 1);
 
 			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 

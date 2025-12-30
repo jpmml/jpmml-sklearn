@@ -23,9 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import builtins.Type;
-import builtins.TypeConstructor;
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -33,10 +30,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.python.Attribute;
-import org.jpmml.python.AttributeCastFunction;
-import org.jpmml.python.CastFunction;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.DTypeCastFunction;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn2pmml.HasPMMLName;
@@ -163,59 +157,15 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	}
 
 	public TypeInfo getDType(String name){
-		Object dtype = getObject(name);
-
-		Attribute attribute = new Attribute(this, name);
-
-		CastFunction<TypeInfo> castFunction = new AttributeCastFunction<TypeInfo>(attribute, TypeInfo.class){
-
-			@Override
-			public TypeInfo apply(Object object){
-				object = toTypeInfo(object);
-
-				return super.apply(object);
-			}
-
-			@Override
-			protected String formatMessage(Object object){
-				return "Data type attribute \'" + attribute.format() + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
-			}
-		};
-
-		return castFunction.apply(dtype);
+		return get(name, new DTypeCastFunction<>(TypeInfo.class));
 	}
 
 	public TypeInfo getOptionalDType(String name){
-		Object value = getOptionalObject(name);
-
-		if(value == null){
-			return null;
-		}
-
-		return getDType(name);
+		return getOptional(name, new DTypeCastFunction<>(TypeInfo.class));
 	}
 
 	public List<TypeInfo> getDTypeList(String name){
-		List<?> values = getList(name);
-
-		Attribute attribute = new Attribute(this, name);
-
-		CastFunction<TypeInfo> castFunction = new AttributeCastFunction<TypeInfo>(attribute, TypeInfo.class){
-
-			@Override
-			public TypeInfo apply(Object object){
-				object = toTypeInfo(object);
-
-				return super.apply(object);
-			}
-
-			@Override
-			protected String formatMessage(Object object){
-				return "List attribute \'" + attribute.format() + "\' contains an unsupported value (" + ClassDictUtil.formatClass(object) + ")";
-			}
-		};
-
-		return Lists.transform(values, castFunction);
+		return getList(name, new DTypeCastFunction<>(TypeInfo.class));
 	}
 
 	public String createFieldName(String function, Object... args){
@@ -235,23 +185,5 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	@Override
 	public Transformer setPMMLName(String pmmlName){
 		return (Transformer)super.setPMMLName(pmmlName);
-	}
-
-	static
-	private Object toTypeInfo(Object object){
-
-		if(object instanceof TypeConstructor){
-			TypeConstructor typeConstructor = (TypeConstructor)object;
-
-			return (TypeInfo)typeConstructor.construct();
-		} else
-
-		if(object instanceof String){
-			String string = (String)object;
-
-			return Type.forClassName(string);
-		}
-
-		return object;
 	}
 }

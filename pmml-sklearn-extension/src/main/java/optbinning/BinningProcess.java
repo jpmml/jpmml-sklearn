@@ -136,7 +136,7 @@ public class BinningProcess extends Initializer {
 	}
 
 	public List<String> getVariableNames(){
-		return getListLike("variable_names", String.class);
+		return getStringListLike("variable_names");
 	}
 
 	public Map<String, String> getVariableDTypes(){

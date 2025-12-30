@@ -160,15 +160,20 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 		Object[] finalStep = steps.get(steps.size() - 1);
 
-		Object step = TupleUtil.extractElement(finalStep, 1);
+		CastFunction<E> castFunction = new EstimatorCastFunction<E>(clazz){
 
-		if((step == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, step)){
-			throw new SkLearnException("The pipeline ends with a transformer-like object");
-		}
+			@Override
+			public E apply(Object object){
 
-		CastFunction<E> castFunction = new EstimatorCastFunction<E>(clazz);
+				if((object == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, object)){
+					throw new SkLearnException("The pipeline ends with a transformer-like object");
+				}
 
-		return castFunction.apply(step);
+				return super.apply(object);
+			}
+		};
+
+		return TupleUtil.extractElement(finalStep, 1, castFunction);
 	}
 
 	@Override
@@ -194,9 +199,9 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 			}
 		};
 
-		Object step = castFunction.apply(TupleUtil.extractElement(headStep, 1));
+		Step step = TupleUtil.extractElement(headStep, 1, castFunction);
 
-		return StepUtil.getHead((Step)step);
+		return StepUtil.getHead(step);
 	}
 
 	@Override

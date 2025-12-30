@@ -143,7 +143,7 @@ public class CutTransformer extends Transformer {
 	}
 
 	public List<Number> getBins(){
-		return getListLike("bins", Number.class);
+		return getNumberListLike("bins");
 	}
 
 	public List<Object> getLabels(){

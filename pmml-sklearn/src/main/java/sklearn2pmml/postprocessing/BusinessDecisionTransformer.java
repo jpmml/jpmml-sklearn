@@ -97,8 +97,8 @@ public class BusinessDecisionTransformer extends Transformer {
 
 		for(Object[] decision : decisions){
 			Decision pmmlDecision = new Decision()
-				.setValue(TupleUtil.extractElement(decision, 0, Object.class))
-				.setDescription(TupleUtil.extractElement(decision, 1, String.class));
+				.setValue(TupleUtil.extractObjectElement(decision, 0))
+				.setDescription(TupleUtil.extractStringElement(decision, 1));
 
 			pmmlDecisions.addDecisions(pmmlDecision);
 		}

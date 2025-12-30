@@ -75,9 +75,9 @@ public class SelectFirstUtil {
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
 
-			String name = TupleUtil.extractElement(step, 0, String.class);
-			Estimator estimator = castFunction.apply(TupleUtil.extractElement(step, 1));
-			Object expr = TupleUtil.extractElement(step, 2, Object.class);
+			String name = TupleUtil.extractStringElement(step, 0);
+			Estimator estimator = TupleUtil.extractElement(step, 1, castFunction);
+			Object expr = TupleUtil.extractObjectElement(step, 2);
 
 			if(estimator.getMiningFunction() != miningFunction){
 				throw new IllegalArgumentException();

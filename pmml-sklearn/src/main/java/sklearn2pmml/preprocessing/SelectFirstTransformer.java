@@ -81,9 +81,9 @@ public class SelectFirstTransformer extends Transformer implements HasController
 		for(int i = 0; i < steps.size(); i++){
 			Object[] step = steps.get(i);
 
-			String name = TupleUtil.extractElement(step, 0, String.class);
-			Transformer transformer = castFunction.apply(TupleUtil.extractElement(step, 1));
-			Object expr = TupleUtil.extractElement(step, 2, Object.class);
+			String name = TupleUtil.extractStringElement(step, 0);
+			Transformer transformer = TupleUtil.extractElement(step, 1, castFunction);
+			Object expr = TupleUtil.extractObjectElement(step, 2);
 
 			Expression expression = EvaluatableUtil.translateExpression(expr, scope);
 

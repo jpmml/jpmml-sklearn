@@ -60,7 +60,7 @@ public class H2OFrameConstructor extends Transformer {
 		Object columnNames = getOptionalObject("column_names");
 
 		if(columnNames != null){
-			return getListLike("column_names", String.class);
+			return getStringListLike("column_names");
 		}
 
 		return null;

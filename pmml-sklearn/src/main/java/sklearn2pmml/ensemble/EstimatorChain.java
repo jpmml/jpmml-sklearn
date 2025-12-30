@@ -204,9 +204,9 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 			Object[] step = steps.get(i);
 			ScalarLabel scalarLabel = (multioutput ? scalarLabels.get(i) : scalarLabels.get(0));
 
-			String name = TupleUtil.extractElement(step, 0, String.class);
-			Estimator estimator = castFunction.apply(TupleUtil.extractElement(step, 1));
-			Object expr = TupleUtil.extractElement(step, 2, Object.class);
+			String name = TupleUtil.extractStringElement(step, 0);
+			Estimator estimator = TupleUtil.extractElement(step, 1, castFunction);
+			Object expr = TupleUtil.extractObjectElement(step, 2);
 
 			estimators.add(estimator);
 

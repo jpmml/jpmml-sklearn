@@ -198,7 +198,7 @@ public class Domain extends Decorator {
 			return null;
 		}
 
-		return getListLike("display_name", String.class);
+		return getStringListLike("display_name");
 	}
 
 	public Map<String, ?> getCounts(){

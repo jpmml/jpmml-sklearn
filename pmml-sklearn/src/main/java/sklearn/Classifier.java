@@ -50,6 +50,7 @@ import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
@@ -131,8 +132,13 @@ public class Classifier extends Estimator implements HasClasses {
 				CastFunction<List<?>> castFunction = new CastFunction<List<?>>((Class)List.class){
 
 					@Override
-					public String formatMessage(Object object){
-						return "The categories object of the " + (name != null ? ("\'" + name + "\'" + " ") : "<un-named> ") + " target field (" + ClassDictUtil.formatClass(object) + ") is not supported";
+					public List<?> apply(Object object){
+
+						try {
+							return super.apply(object);
+						} catch(ClassCastException cce){
+							throw new SkLearnException("The categories object of the " + (name != null ? ("\'" + name + "\'" + " ") : "<un-named> ") + " target field (" + ClassDictUtil.formatClass(object) + ") is not supported", cce);
+						}
 					}
 				};
 

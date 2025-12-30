@@ -78,7 +78,7 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 		}
 
 		// CategoryEncoders 2.6+
-		return getListLike("feature_names_out_", String.class);
+		return getStringListLike("feature_names_out_");
 	}
 
 	public String getHandleMissing(){

@@ -19,6 +19,7 @@
 package sklearn;
 
 import org.jpmml.python.CastFunction;
+import org.jpmml.python.CastUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 
@@ -29,13 +30,24 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 	}
 
 	@Override
+	public E apply(Object object){
+		Class<? extends E> clazz = getClazz();
+
+		object = CastUtil.deepCastTo(object, clazz);
+
+		try {
+			return super.apply(object);
+		} catch(ClassCastException cce){
+			throw new SkLearnException(formatMessage(object))
+				.setSolution(formatSolution());
+		}
+	}
+
 	protected String formatMessage(Object object){
 		return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
 	}
 
-	@Override
-	protected SkLearnException createConversionException(String message, ClassCastException cause){
-		return (SkLearnException)new SkLearnException(message, cause)
-			.setSolution("Develop and register a custom JPMML-SkLearn converter");
+	protected String formatSolution(){
+		return "Develop and register a custom JPMML-SkLearn converter";
 	}
 }

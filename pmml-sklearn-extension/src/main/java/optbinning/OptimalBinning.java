@@ -349,7 +349,7 @@ public class OptimalBinning extends Transformer {
 			return Collections.emptyList();
 		}
 
-		return getListLike("special_codes", Number.class);
+		return getNumberListLike("special_codes");
 	}
 
 	public List<Number> getSplitsOptimal(){
