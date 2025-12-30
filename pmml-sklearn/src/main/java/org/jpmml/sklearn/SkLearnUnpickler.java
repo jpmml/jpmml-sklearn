@@ -22,11 +22,23 @@ import java.io.IOException;
 import java.util.Objects;
 
 import net.razorvine.pickle.Opcodes;
+import net.razorvine.pickle.PickleException;
 import net.razorvine.pickle.objects.ClassDict;
 import org.jpmml.python.JoblibUnpickler;
+import org.jpmml.python.Storage;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 public class SkLearnUnpickler extends JoblibUnpickler {
+
+	@Override
+	public Object load(Storage storage){
+
+		try {
+			return super.load(storage);
+		} catch(PickleException | IOException e){
+			throw new SkLearnException("Failed to load Python object", e);
+		}
+	}
 
 	@Override
 	protected Object dispatch(short key) throws IOException {

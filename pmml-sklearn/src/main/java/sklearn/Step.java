@@ -93,7 +93,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Estimator> E getEstimator(String name, Class<? extends E> clazz){
-		return getStep(name, clazz);
+		return getStep(name, new EstimatorCastFunction<>(clazz));
 	}
 
 	public Transformer getTransformer(String name){
@@ -101,7 +101,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Transformer> E getTransformer(String name, Class<? extends E> clazz){
-		return getStep(name, clazz);
+		return getStep(name, new TransformerCastFunction<>(clazz));
 	}
 
 	public Step getStep(String name){
@@ -109,11 +109,23 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Step> E getStep(String name, Class<? extends E> clazz){
-		return get(name, clazz);
+		return getStep(name, new StepCastFunction<>(clazz));
+	}
+
+	public <E extends Step> E getStep(String name, java.util.function.Function<Object, E> castFunction){
+		return get(name, castFunction);
 	}
 
 	public <E extends Estimator> List<E> getEstimatorArray(String name, Class<? extends E> clazz){
-		return getArray(name, clazz);
+		return getStepArray(name, new EstimatorCastFunction<>(clazz));
+	}
+
+	public <E extends Transformer> List<E> getTransformerArray(String name, Class<? extends E> clazz){
+		return getStepArray(name, new TransformerCastFunction<>(clazz));
+	}
+
+	public <E extends Step> List<E> getStepArray(String name, java.util.function.Function<Object, E> castFunction){
+		return getArray(name, castFunction);
 	}
 
 	public List<Classifier> getClassifierList(String name){
@@ -125,14 +137,14 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Estimator> List<E> getEstimatorList(String name, Class<? extends E> clazz){
-		return getStepList(name, clazz);
+		return getStepList(name, new EstimatorCastFunction<>(clazz));
 	}
 
 	public <E extends Transformer> List<E> getTransformerList(String name, Class<? extends E> clazz){
-		return getStepList(name, clazz);
+		return getStepList(name, new TransformerCastFunction<>(clazz));
 	}
 
-	public <E extends Step> List<E> getStepList(String name, Class<? extends E> clazz){
-		return getList(name, clazz);
+	public <E extends Step> List<E> getStepList(String name, java.util.function.Function<Object, E> castFunction){
+		return getList(name, castFunction);
 	}
 }
