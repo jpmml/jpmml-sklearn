@@ -484,10 +484,6 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		return getOptionalTransformer("apply_transformer");
 	}
 
-	private Transformer getOptionalTransformer(String key){
-		return getOptional(key, Transformer.class);
-	}
-
 	public List<String> getActiveFields(){
 
 		if(!hasattr("active_fields")){

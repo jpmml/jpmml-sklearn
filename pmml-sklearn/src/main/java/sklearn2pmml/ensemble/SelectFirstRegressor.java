@@ -39,7 +39,7 @@ public class SelectFirstRegressor extends Regressor implements HasController, Ha
 
 	@Override
 	public Transformer getController(){
-		return getOptional("controller", Transformer.class);
+		return getOptionalTransformer("controller");
 	}
 
 	@Override

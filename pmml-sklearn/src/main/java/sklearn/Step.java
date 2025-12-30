@@ -116,6 +116,18 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		return get(name, castFunction);
 	}
 
+	public Estimator getOptionalEstimator(String name){
+		return getOptionalStep(name, new EstimatorCastFunction<>(Estimator.class));
+	}
+
+	public Transformer getOptionalTransformer(String name){
+		return getOptionalStep(name, new TransformerCastFunction<>(Transformer.class));
+	}
+
+	public <E extends Step> E getOptionalStep(String name, java.util.function.Function<Object, E> castFunction){
+		return getOptional(name, castFunction);
+	}
+
 	public <E extends Estimator> List<E> getEstimatorArray(String name, Class<? extends E> clazz){
 		return getStepArray(name, new EstimatorCastFunction<>(clazz));
 	}

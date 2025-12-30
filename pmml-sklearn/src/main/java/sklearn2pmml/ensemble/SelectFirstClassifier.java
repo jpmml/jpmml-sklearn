@@ -78,7 +78,7 @@ public class SelectFirstClassifier extends Classifier implements HasController, 
 
 	@Override
 	public Transformer getController(){
-		return getOptional("controller", Transformer.class);
+		return getOptionalTransformer("controller");
 	}
 
 	@Override

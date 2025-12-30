@@ -139,7 +139,7 @@ public class BusinessDecisionTransformer extends Transformer {
 		}
 
 		// SkLearn2PMML 0.81.0+
-		return getOptional("transformer_", Transformer.class);
+		return getOptionalTransformer("transformer_");
 	}
 
 	private boolean isEmbedded(){

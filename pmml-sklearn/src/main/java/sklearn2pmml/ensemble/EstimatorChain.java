@@ -248,7 +248,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 
 	@Override
 	public Transformer getController(){
-		return getOptional("controller", Transformer.class);
+		return getOptionalTransformer("controller");
 	}
 
 	public Boolean getMultioutput(){
