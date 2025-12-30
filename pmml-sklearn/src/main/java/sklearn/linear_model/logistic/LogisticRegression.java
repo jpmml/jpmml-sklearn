@@ -44,6 +44,7 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.InvalidAttributeException;
+import org.jpmml.python.MissingAttributeException;
 import org.jpmml.python.PythonFormatterUtil;
 import sklearn.Estimator;
 import sklearn.VersionUtil;
@@ -69,7 +70,10 @@ public class LogisticRegression extends LinearClassifier {
 			} else
 
 			{
-				multiClass = null;
+				Attribute attribute = new Attribute(this, "multi_class");
+
+				throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has unsupported value \'" + LogisticRegression.MULTICLASS_AUTO + "\'", attribute)
+					.setSolution("Use one of the supported values " + PythonFormatterUtil.formatCollection(Arrays.asList(LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR)));
 			}
 		} else
 
@@ -81,7 +85,10 @@ public class LogisticRegression extends LinearClassifier {
 			} else
 
 			{
-				multiClass = null;
+				Attribute attribute = new Attribute(this, "multi_class");
+
+				throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has unsupported value \'" + LogisticRegression.MULTICLASS_DEPRECATED + "\'", attribute)
+					.setSolution("Use one of the supported values " + PythonFormatterUtil.formatCollection(Arrays.asList(LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR)));
 			}
 		} else
 
@@ -96,7 +103,7 @@ public class LogisticRegression extends LinearClassifier {
 		if(multiClass == null){
 			Attribute attribute = new Attribute(this, "multi_class");
 
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to one of " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_OVR) + " or " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_MULTINOMIAL) + " values", attribute);
+			throw new MissingAttributeException(attribute);
 		}
 
 		switch(multiClass){

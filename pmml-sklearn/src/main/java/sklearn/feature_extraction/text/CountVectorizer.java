@@ -57,6 +57,7 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.InvalidAttributeException;
+import org.jpmml.python.PythonFormatterUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
@@ -248,7 +249,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		if(object != null){
 			Attribute attribute = new Attribute(this, "preprocessor");
 
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to the missing (None) value", attribute);
+			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to the missing (" + PythonFormatterUtil.formatValue(null) + ") value", attribute);
 		}
 
 		return object;
@@ -279,7 +280,10 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		if((object != null) && !(Tokenizer.class).isInstance(object)){
 			Attribute attribute = new Attribute(this, "tokenizer");
 
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +"). Supported Python classes are " + Arrays.asList(Matcher.class.getName(), Splitter.class.getName()), attribute);
+			List<String> supportedClasses = Arrays.asList(Matcher.class.getName(), Splitter.class.getName());
+
+			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +")", attribute)
+				.setSolution("Use one of the supported Python classes " + PythonFormatterUtil.formatCollection(supportedClasses));
 		}
 
 		return getOptional("tokenizer", Tokenizer.class);

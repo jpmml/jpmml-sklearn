@@ -63,7 +63,7 @@ public class ExtendedClassDict extends ClassDict implements Castable {
 		if(objectConstructor == null){
 			Attribute attribute = new Attribute(this, SkLearn2PMMLFields.PMML_BASE_CLASS);
 
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' refers to an unknown Python class " + pmmlBaseClass, attribute);
+			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has an unsupported value (Python class " + pmmlBaseClass + ")", attribute);
 		}
 
 		return objectConstructor;

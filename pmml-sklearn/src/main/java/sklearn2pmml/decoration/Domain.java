@@ -330,7 +330,7 @@ public class Domain extends Decorator {
 		if(object instanceof ClassDict){
 			ClassDict classDict = (ClassDict)object;
 
-			throw new SkLearnException("List contains an unsupported value (" + ClassDictUtil.formatClass(classDict) + ")");
+			throw new SkLearnException("The value object (" + ClassDictUtil.formatClass(classDict) + ") is not supported");
 		}
 
 		return object;
