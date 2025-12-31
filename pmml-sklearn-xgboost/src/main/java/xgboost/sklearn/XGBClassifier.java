@@ -28,10 +28,10 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.LabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.Classification;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
+import org.jpmml.xgboost.XGBoostException;
 import sklearn.LabelEncoderClassifier;
 import sklearn.SkLearnFields;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -73,7 +73,7 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 		super.checkLabel(label);
 
 		if((objFunction != null) && !(objFunction instanceof Classification)){
-			throw new SkLearnException("Expected a classification-type objective function, got \'" + objFunction.getName() + "\'");
+			throw new XGBoostException("Expected a classification-type objective function, got \'" + objFunction.getName() + "\'");
 		}
 	}
 

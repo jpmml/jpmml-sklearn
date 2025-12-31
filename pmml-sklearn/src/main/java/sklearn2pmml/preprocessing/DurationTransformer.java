@@ -31,6 +31,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.CalendarUtil;
 import org.jpmml.python.InvalidAttributeException;
@@ -77,7 +78,13 @@ public class DurationTransformer extends Transformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			ObjectFeature objectFeature = (ObjectFeature)features.get(i);
+			Feature feature = features.get(i);
+
+			if(!(feature instanceof ObjectFeature)){
+				throw new SchemaException("Expected a date-type object feature, got " + feature);
+			}
+
+			ObjectFeature objectFeature = (ObjectFeature)feature;
 
 			DerivedField derivedField = encoder.ensureDerivedField(createFieldName(function, objectFeature, year), OpType.CONTINUOUS, DataType.INTEGER, () -> ExpressionUtil.createApply(pmmlFunction, objectFeature.ref(), ExpressionUtil.createConstant(DataType.INTEGER, year)));
 

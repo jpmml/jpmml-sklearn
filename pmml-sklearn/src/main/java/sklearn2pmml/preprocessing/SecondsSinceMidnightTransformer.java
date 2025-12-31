@@ -29,6 +29,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -48,7 +49,13 @@ public class SecondsSinceMidnightTransformer extends Transformer {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			ObjectFeature objectFeature = (ObjectFeature)features.get(i);
+			Feature feature = features.get(i);
+
+			if(!(feature instanceof ObjectFeature)){
+				throw new SchemaException("Expected a time-type object feature, got " + feature);
+			}
+
+			ObjectFeature objectFeature = (ObjectFeature)feature;
 
 			DerivedField derivedField = encoder.ensureDerivedField(createFieldName("secondsSinceMidnight", objectFeature), OpType.CONTINUOUS, DataType.INTEGER, () -> ExpressionUtil.createApply(PMMLFunctions.DATESECONDSSINCEMIDNIGHT, objectFeature.ref()));
 

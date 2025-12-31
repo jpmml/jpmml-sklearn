@@ -24,10 +24,10 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.HasLightGBMOptions;
+import org.jpmml.lightgbm.LightGBMException;
 import org.jpmml.lightgbm.ObjectiveFunction;
 import org.jpmml.lightgbm.Regression;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnException;
 import sklearn.Regressor;
 
 public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMOptions, Encodable {
@@ -48,7 +48,7 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 		super.checkLabel(label);
 
 		if((objectiveFunction != null) && !(objectiveFunction instanceof Regression)){
-			throw new SkLearnException("Expected a regression-type objective function, got \'" + objectiveFunction.getName() + "\'");
+			throw new LightGBMException("Expected a regression-type objective function, got \'" + objectiveFunction.getName() + "\'");
 		}
 	}
 

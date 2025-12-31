@@ -29,10 +29,10 @@ import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PythonException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 
@@ -83,7 +83,7 @@ public class InitializerUtil {
 							return feature;
 						}
 
-						throw new SkLearnException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
+						throw new ResolutionException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
 					}
 
 					return createWildcardFeature(column, encoder);
@@ -102,7 +102,7 @@ public class InitializerUtil {
 				} else
 
 				{
-					throw new PythonException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string nor integer");
+					throw new SkLearnException("The column object (" + ClassDictUtil.formatClass(object) + ") is not a string nor integer");
 				}
 			}
 		};

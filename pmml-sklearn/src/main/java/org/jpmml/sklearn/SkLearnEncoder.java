@@ -267,14 +267,11 @@ public class SkLearnEncoder extends PythonEncoder {
 		try {
 			super.addDerivedField(derivedField);
 		} catch(NamingException ne){
-			String name = derivedField.requireName();
-
-			String message = "Field \'" + name + "\' is already defined";
 			String solution =
 				"Refactor the pipeline so that it would not contain duplicate field declarations, " +
 				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + Alias.formatAliasExample() + ")";
 
-			throw new SkLearnException(message, ne)
+			throw ne
 				.setSolution(solution);
 		}
 	}
@@ -298,7 +295,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		try {
 			renamedPmmlField = getField(renamedName);
 
-			throw new SkLearnException("Field \'" + renamedName + "\' is already defined")
+			throw new NamingException("Field \'" + renamedName + "\' is already defined")
 				.setSolution("Choose a different name");
 		} catch(ResolutionException re){
 			// Ignored

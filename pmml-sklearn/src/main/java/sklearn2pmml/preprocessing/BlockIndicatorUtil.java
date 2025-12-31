@@ -25,8 +25,8 @@ import com.google.common.collect.Lists;
 import org.dmg.pmml.BlockIndicator;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
+import org.jpmml.converter.ResolutionException;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.PythonException;
 import org.jpmml.sklearn.SkLearnException;
 
 public class BlockIndicatorUtil {
@@ -49,7 +49,7 @@ public class BlockIndicatorUtil {
 						return feature;
 					}
 
-					throw new SkLearnException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
+					throw new ResolutionException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
 				} else
 
 				if(object instanceof Integer){
@@ -59,7 +59,7 @@ public class BlockIndicatorUtil {
 				} else
 
 				{
-					throw new PythonException("The block indicator object (" + ClassDictUtil.formatClass(object) + ") is not a string nor integer");
+					throw new SkLearnException("The block indicator object (" + ClassDictUtil.formatClass(object) + ") is not a string nor integer");
 				}
 			}
 		};

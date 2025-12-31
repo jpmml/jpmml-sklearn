@@ -25,9 +25,9 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.Classification;
 import org.jpmml.lightgbm.HasLightGBMOptions;
+import org.jpmml.lightgbm.LightGBMException;
 import org.jpmml.lightgbm.ObjectiveFunction;
 import org.jpmml.sklearn.Encodable;
-import org.jpmml.sklearn.SkLearnException;
 import sklearn.LabelEncoderClassifier;
 
 public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster, HasLightGBMOptions, Encodable {
@@ -48,7 +48,7 @@ public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster
 		super.checkLabel(label);
 
 		if((objectiveFunction != null) && !(objectiveFunction instanceof Classification)){
-			throw new SkLearnException("Expected a classification-type objective function, got \'" + objectiveFunction.getName() + "\'");
+			throw new LightGBMException("Expected a classification-type objective function, got \'" + objectiveFunction.getName() + "\'");
 		}
 	}
 

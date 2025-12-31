@@ -29,12 +29,12 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.SkLearnException;
 import sklearn.InitializerUtil;
 import sklearn.preprocessing.LabelEncoder;
 
@@ -69,7 +69,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 		Feature labelFeature = FeatureUtil.findLabelFeature(result, scalarLabel);
 		if(labelFeature == null){
-			throw new SkLearnException("Column \'" + scalarLabel.getName() + "\' not found in " + FeatureUtil.formatNames(result, '\''));
+			throw new ResolutionException("Column \'" + scalarLabel.getName() + "\' not found in " + FeatureUtil.formatNames(result, '\''));
 		}
 
 		int labelFeatureIndex = result.indexOf(labelFeature);

@@ -46,7 +46,6 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.CalendarUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
-import org.jpmml.python.PythonException;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
@@ -331,7 +330,7 @@ public class Domain extends Decorator {
 		if(object instanceof ClassDict){
 			ClassDict classDict = (ClassDict)object;
 
-			throw new PythonException("List contains an unsupported value (" + ClassDictUtil.formatClass(classDict) + ")");
+			throw new SkLearnException("List contains an unsupported value (" + ClassDictUtil.formatClass(classDict) + ")");
 		}
 
 		return object;

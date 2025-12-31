@@ -30,10 +30,10 @@ import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
-import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
 import org.jpmml.xgboost.Regression;
+import org.jpmml.xgboost.XGBoostException;
 import sklearn.Regressor;
 
 public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOptions, Encodable {
@@ -59,7 +59,7 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 		super.checkLabel(label);
 
 		if((objFunction != null) && !(objFunction instanceof Regression)){
-			throw new SkLearnException("Expected a regression-type objective function, got \'" + objFunction.getName() + "\'");
+			throw new XGBoostException("Expected a regression-type objective function, got \'" + objFunction.getName() + "\'");
 		}
 	}
 
