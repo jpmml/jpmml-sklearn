@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -53,12 +54,16 @@ public class Initializer extends Transformer {
 	@Override
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 
-		if(features.isEmpty()){
-			checkVersion();
+		try {
+			if(features.isEmpty()){
+				checkVersion();
 
-			return initializeFeatures(encoder);
+				return initializeFeatures(encoder);
+			}
+
+			return super.encode(features, encoder);
+		} catch(ConversionException ce){
+			throw ensureContext(ce);
 		}
-
-		return super.encode(features, encoder);
 	}
 }

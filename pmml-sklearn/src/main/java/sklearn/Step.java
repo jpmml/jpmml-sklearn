@@ -21,6 +21,8 @@ package sklearn;
 import java.util.List;
 import java.util.Map;
 
+import org.jpmml.converter.ConversionException;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -113,7 +115,14 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Step> E getStep(String name, java.util.function.Function<Object, E> castFunction){
-		return get(name, castFunction);
+
+		try {
+			return get(name, castFunction);
+		} catch(SkLearnException se){
+			Attribute attribute = new Attribute(this, name);
+
+			throw ensureContext(se, attribute);
+		}
 	}
 
 	public Estimator getOptionalEstimator(String name){
@@ -125,7 +134,14 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Step> E getOptionalStep(String name, java.util.function.Function<Object, E> castFunction){
-		return getOptional(name, castFunction);
+
+		try {
+			return getOptional(name, castFunction);
+		} catch(SkLearnException se){
+			Attribute attribute = new Attribute(this, name);
+
+			throw ensureContext(se, attribute);
+		}
 	}
 
 	public <E extends Estimator> List<E> getEstimatorArray(String name, Class<? extends E> clazz){
@@ -137,7 +153,14 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Step> List<E> getStepArray(String name, java.util.function.Function<Object, E> castFunction){
-		return getArray(name, castFunction);
+
+		try {
+			return getArray(name, castFunction);
+		} catch(SkLearnException se){
+			Attribute attribute = new Attribute(this, name);
+
+			throw ensureContext(se, attribute);
+		}
 	}
 
 	public List<Classifier> getClassifierList(String name){
@@ -157,6 +180,27 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	}
 
 	public <E extends Step> List<E> getStepList(String name, java.util.function.Function<Object, E> castFunction){
-		return getList(name, castFunction);
+
+		try {
+			return getList(name, castFunction);
+		} catch(SkLearnException se){
+			Attribute attribute = new Attribute(this, name);
+
+			throw ensureContext(se, attribute);
+		}
+	}
+
+	protected <E extends ConversionException> E ensureContext(E exception){
+		return ensureContext(exception, this);
+	}
+
+	protected <E extends ConversionException> E ensureContext(E exception, Object parentContext){
+		Object context = exception.getContext();
+
+		if(context == null){
+			exception.setContext(parentContext);
+		}
+
+		return exception;
 	}
 }

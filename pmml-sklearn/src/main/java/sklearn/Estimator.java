@@ -32,6 +32,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
@@ -128,36 +129,41 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	}
 
 	public Model encode(Schema schema){
-		checkVersion();
 
-		checkLabel(schema.getLabel());
-		checkFeatures(schema.getFeatures());
+		try {
+			checkVersion();
 
-		schema = configureSchema(schema);
+			checkLabel(schema.getLabel());
+			checkFeatures(schema.getFeatures());
 
-		Model model = encodeModel(schema);
+			schema = configureSchema(schema);
 
-		String modelName = model.getModelName();
-		if(modelName == null){
-			String pmmlName = getPMMLName();
+			Model model = encodeModel(schema);
 
-			if(pmmlName != null){
-				model.setModelName(pmmlName);
+			String modelName = model.getModelName();
+			if(modelName == null){
+				String pmmlName = getPMMLName();
+
+				if(pmmlName != null){
+					model.setModelName(pmmlName);
+				}
 			}
+
+			String algorithmName = model.getAlgorithmName();
+			if(algorithmName == null){
+				String pyClassName = getAlgorithmName();
+
+				model.setAlgorithmName(pyClassName);
+			}
+
+			addFeatureImportances(model, schema);
+
+			model = configureModel(model);
+
+			return model;
+		} catch(ConversionException ce){
+			throw ensureContext(ce);
 		}
-
-		String algorithmName = model.getAlgorithmName();
-		if(algorithmName == null){
-			String pyClassName = getAlgorithmName();
-
-			model.setAlgorithmName(pyClassName);
-		}
-
-		addFeatureImportances(model, schema);
-
-		model = configureModel(model);
-
-		return model;
 	}
 
 	public Model encode(Object segmentId, Schema schema){

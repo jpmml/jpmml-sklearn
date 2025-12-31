@@ -20,6 +20,7 @@ package category_encoders;
 
 import java.util.List;
 
+import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -31,13 +32,18 @@ public class BinaryEncoder extends BaseNEncoder {
 
 	@Override
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
-		BaseNEncoder baseNEncoder = getBaseNEncoder();
 
-		if(baseNEncoder != this){
-			return baseNEncoder.encode(features, encoder);
+		try {
+			BaseNEncoder baseNEncoder = getBaseNEncoder();
+
+			if(baseNEncoder != this){
+				return baseNEncoder.encode(features, encoder);
+			}
+
+			return super.encode(features, encoder);
+		} catch(ConversionException ce){
+			throw ensureContext(ce);
 		}
-
-		return super.encode(features, encoder);
 	}
 
 	public BaseNEncoder getBaseNEncoder(){

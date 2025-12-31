@@ -26,6 +26,7 @@ import java.util.Map;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ResolutionException;
@@ -70,13 +71,18 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	}
 
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
-		checkVersion();
 
-		checkFeatures(features);
+		try {
+			checkVersion();
 
-		features = updateFeatures(features, encoder);
+			checkFeatures(features);
 
-		return encodeFeatures(features, encoder);
+			features = updateFeatures(features, encoder);
+
+			return encodeFeatures(features, encoder);
+		} catch(ConversionException ce){
+			throw ensureContext(ce);
+		}
 	}
 
 	public void checkFeatures(List<? extends Feature> features){

@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.ConversionException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.MissingAttributeException;
@@ -48,7 +50,14 @@ public class EncodableUtil {
 	 */
 	static
 	public PMML encodePMML(Encodable encodable){
-		return encodable.encodePMML();
+
+		try {
+			return encodable.encodePMML();
+		} catch(ConversionException ce){
+			ce.setContext(format(ce.getContext()));
+
+			throw ce;
+		}
 	}
 
 	static
@@ -142,5 +151,26 @@ public class EncodableUtil {
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	static
+	private Object format(Object object){
+
+		if(object instanceof Attribute){
+			Attribute attribute = (Attribute)object;
+
+			ClassDict dict = attribute.getClassDict();
+			String name = attribute.getName();
+
+			return dict.getClassName() + "." + name;
+		} else
+
+		if(object instanceof ClassDict){
+			ClassDict dict = (ClassDict)object;
+
+			return dict.getClassName();
+		}
+
+		return object;
 	}
 }
