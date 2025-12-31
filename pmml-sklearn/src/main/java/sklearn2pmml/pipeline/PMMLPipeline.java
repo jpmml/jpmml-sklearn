@@ -58,6 +58,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
@@ -544,7 +545,9 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	protected List<String> initTargetFields(Estimator estimator){
 		List<String> targetFields = super.initTargetFields(estimator);
 
-		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "target_fields") + "\' is not set. Assuming {} as the name(s) of the target field(s)", targetFields);
+		Attribute attribute = new Attribute(this, "target_fields");
+
+		logger.warn("Attribute \'" + attribute.format() + "\' is not set. Assuming {} as the name(s) of the target field(s)", targetFields);
 
 		return targetFields;
 	}
@@ -553,7 +556,9 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	protected List<String> initActiveFields(Step step){
 		List<String> activeFields = super.initActiveFields(step);
 
-		logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, "active_fields") + "\' is not set. Assuming {} as the names of active fields", activeFields);
+		Attribute attribute = new Attribute(this, "active_fields");
+
+		logger.warn("Attribute \'" + attribute.format() + "\' is not set. Assuming {} as the names of active fields", activeFields);
 
 		return activeFields;
 	}

@@ -41,6 +41,7 @@ import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaException;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.slf4j.Logger;
@@ -237,7 +238,10 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		// XXX
 		if(hasattr(key)){
-			logger.warn("Attribute \'" + ClassDictUtil.formatMember(this, SkLearn2PMMLFields.PMML_OPTIONS) + "\' is not set. Falling back to the surrogate attribute \'" + ClassDictUtil.formatMember(this, key) + "\'");
+			Attribute attribute = new Attribute(this, SkLearn2PMMLFields.PMML_OPTIONS);
+			Attribute surrogateAttribute = new Attribute(this, key);
+
+			logger.warn("Attribute \'" + attribute.format() + "\' is not set. Falling back to the surrogate attribute \'" + surrogateAttribute.format() + "\'");
 
 			return getattr(key);
 		}

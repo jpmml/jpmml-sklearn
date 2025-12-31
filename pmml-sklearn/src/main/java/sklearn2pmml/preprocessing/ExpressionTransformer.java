@@ -41,7 +41,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TypeInfo;
@@ -102,23 +102,23 @@ public class ExpressionTransformer extends Transformer {
 				break udf;
 			}
 
-			List<String> attributes = new ArrayList<>();
+			List<Attribute> attributes = new ArrayList<>();
 
 			if(mapMissingTo != null){
-				attributes.add(ClassDictUtil.formatMember(this, "map_missing_to"));
+				attributes.add(new Attribute(this, "map_missing_to"));
 			} // End if
 
 			if(defaultValue != null){
-				attributes.add(ClassDictUtil.formatMember(this, "default_value"));
+				attributes.add(new Attribute(this, "default_value"));
 			} // End if
 
 			if(invalidValueTreatment != null){
-				attributes.add(ClassDictUtil.formatMember(this, "invalid_value_treatment"));
+				attributes.add(new Attribute(this, "invalid_value_treatment"));
 			} // End if
 
 			if(!attributes.isEmpty()){
 				List<String> quotedAttributes = attributes.stream()
-					.map(name -> "\'" + name + "\'")
+					.map(attribute -> "\'" + attribute.format() + "\'")
 					.collect(Collectors.toList());
 
 				throw new SkLearnException("The target PMML element for " + String.join(", ", quotedAttributes) + " attribute(s) is unclear")
