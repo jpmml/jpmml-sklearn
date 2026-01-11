@@ -232,7 +232,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		RegressionModel calibratorModel;
 
 		if(calibrators.size() == 1){
-			SchemaUtil.checkCardinality(2, categoricalLabel);
+			categoricalLabel.expectCardinality(2);
 
 			Calibrator calibrator = calibrators.get(0);
 			Model featureModel = models.get(0);
@@ -244,7 +244,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		} else
 
 		if(calibrators.size() >= 3){
-			SchemaUtil.checkCardinality(calibrators.size(), categoricalLabel);
+			categoricalLabel.expectCardinality(calibrators.size());
 
 			List<RegressionTable> regressionTables = new ArrayList<>();
 

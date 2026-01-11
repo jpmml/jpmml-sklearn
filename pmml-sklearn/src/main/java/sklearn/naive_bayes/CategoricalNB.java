@@ -25,10 +25,9 @@ import org.dmg.pmml.naive_bayes.BayesInput;
 import org.dmg.pmml.naive_bayes.BayesInputs;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
-import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.SchemaException;
-import org.jpmml.converter.SchemaUtil;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.python.HasArray;
 
 public class CategoricalNB extends DiscreteNB {
@@ -51,10 +50,9 @@ public class CategoricalNB extends DiscreteNB {
 
 			BayesInput bayesInput;
 
-			if(feature instanceof CategoricalFeature){
-				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
-
-				SchemaUtil.checkCardinality(numberOfFeatureCategories, categoricalFeature);
+			if(feature instanceof DiscreteFeature){
+				DiscreteFeature discreteFeature = ((DiscreteFeature)feature)
+					.expectCardinality(numberOfFeatureCategories);
 
 				HasArray featureCategoryCount = categoryCount.get(i);
 
@@ -63,14 +61,14 @@ public class CategoricalNB extends DiscreteNB {
 				for(int j = 0; j < numberOfFeatureCategories; j++){
 					List<Number> featureValueCounts = (List<Number>)CMatrixUtil.getColumn(featureCategoryCount.getArrayContent(), values.size(), numberOfFeatureCategories, j);
 
-					pairCounts.add(DiscreteNBUtil.encodePairCounts(categoricalFeature.getValue(j), values, alpha, featureValueCounts));
+					pairCounts.add(DiscreteNBUtil.encodePairCounts(discreteFeature.getValue(j), values, alpha, featureValueCounts));
 				}
 
-				bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
+				bayesInput = new BayesInput(discreteFeature.getName(), null, pairCounts);
 			} else
 
 			{
-				throw new SchemaException("Expected a categorical feature, got " + feature);
+				throw new UnsupportedFeatureException("Expected a categorical feature, got " + feature.typeString());
 			}
 
 			bayesInputs.addBayesInputs(bayesInput);

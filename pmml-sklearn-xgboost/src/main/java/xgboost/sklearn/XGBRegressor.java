@@ -25,6 +25,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
@@ -59,7 +60,7 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 		super.checkLabel(label);
 
 		if((objFunction != null) && !(objFunction instanceof Regression)){
-			throw new XGBoostException("Expected a regression-type objective function, got \'" + objFunction.getName() + "\'");
+			throw new XGBoostException("Expected a regression-type objective function, got " + ExceptionUtil.formatParameter(objFunction.getName()));
 		}
 	}
 

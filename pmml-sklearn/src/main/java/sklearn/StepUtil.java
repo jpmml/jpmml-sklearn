@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.SchemaException;
 
@@ -58,7 +59,7 @@ public class StepUtil {
 		int numberOfFeatures = step.getNumberOfFeatures();
 
 		if((numberOfFeatures != HasNumberOfFeatures.UNKNOWN) && (numberOfFeatures != features.size())){
-			throw new SchemaException("Expected " + numberOfFeatures + " feature(s), got " + features.size());
+			throw new SchemaException("Expected " + ExceptionUtil.formatCount(numberOfFeatures, "feature") + ", got " + features.size());
 		}
 	}
 

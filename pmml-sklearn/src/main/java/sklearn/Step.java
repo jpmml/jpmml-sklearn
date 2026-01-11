@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jpmml.converter.ConversionException;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnException;
@@ -43,8 +44,8 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		String supportedSklearnVersion = "1.8.0";
 
 		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, supportedSklearnVersion) > 0){
-			String message = "Scikit-Learn version \'" + sklearnVersion + "\' is not supported";
-			String solution = "Upgrade the converter to the latest version, or downgrade Scikit-Learn to version \'" + supportedSklearnVersion + "\'";
+			String message = "Scikit-Learn version " + ExceptionUtil.formatVersion(sklearnVersion) + " is not supported";
+			String solution = "Upgrade the converter to the latest version, or downgrade Scikit-Learn to version " + ExceptionUtil.formatVersion(supportedSklearnVersion);
 
 			throw new SkLearnException(message)
 				.setSolution(solution);

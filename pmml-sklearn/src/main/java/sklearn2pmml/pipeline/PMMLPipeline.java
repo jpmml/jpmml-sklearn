@@ -46,15 +46,16 @@ import org.dmg.pmml.VerificationField;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.DerivedOutputField;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
-import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -136,7 +137,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 					DataField dataField = encoder.getDataField(activeField);
 					if(dataField == null){
-						throw new ResolutionException("Field \'" + activeField + "\' is undefined");
+						throw new SchemaException("Field " + ExceptionUtil.formatName(activeField) + " is not defined");
 					}
 
 					Feature feature = new WildcardFeature(encoder, dataField);
@@ -192,7 +193,9 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		if(estimator.isSupervised()){
 
 			if(verification == null){
-				logger.warn("Model verification data is not set. Use the \'" + ClassDictUtil.formatMember(this, "verify(X)") + "\' method to correct this deficiency");
+				Attribute attribute = new Attribute(this, "verify(X)");
+
+				logger.warn("Model verification data is not set. Use the " + ExceptionUtil.formatName(attribute.format()) + " method to correct this deficiency");
 
 				break verification;
 			}
@@ -369,7 +372,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			// XXX
 			try {
 				outputEncoder.getField(field.requireName());
-			} catch(ResolutionException re){
+			} catch(SchemaException se){
 				OutputField outputField = new OutputField(FieldNameUtil.create("xref", outputFeature), field.requireOpType(), field.requireDataType())
 					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 					.setFinalResult(true)
@@ -547,7 +550,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 		Attribute attribute = new Attribute(this, "target_fields");
 
-		logger.warn("Attribute \'" + attribute.format() + "\' is not set. Assuming {} as the name(s) of the target field(s)", targetFields);
+		logger.warn("Attribute " + ExceptionUtil.formatName(attribute.format()) + " is not set. Assuming {} as the name(s) of the target field(s)", targetFields);
 
 		return targetFields;
 	}
@@ -558,7 +561,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 		Attribute attribute = new Attribute(this, "active_fields");
 
-		logger.warn("Attribute \'" + attribute.format() + "\' is not set. Assuming {} as the names of active fields", activeFields);
+		logger.warn("Attribute " + ExceptionUtil.formatName(attribute.format()) + " is not set. Assuming {} as the names of active fields", activeFields);
 
 		return activeFields;
 	}

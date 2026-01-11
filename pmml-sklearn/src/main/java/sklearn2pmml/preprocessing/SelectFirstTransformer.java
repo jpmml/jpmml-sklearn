@@ -32,9 +32,9 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IfElseBuilder;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.CastFunction;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TupleUtil;
@@ -60,9 +60,7 @@ public class SelectFirstTransformer extends Transformer implements HasController
 			throw new IllegalArgumentException();
 		}
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = Iterables.getOnlyElement(features);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		List<Feature> controlFeatures = features;
 
@@ -89,9 +87,7 @@ public class SelectFirstTransformer extends Transformer implements HasController
 
 			List<Feature> stepFeatures = transformer.encode(Collections.singletonList(feature), encoder);
 
-			ClassDictUtil.checkSize(1, stepFeatures);
-
-			Feature stepFeature = Iterables.getOnlyElement(stepFeatures);
+			Feature stepFeature = SchemaUtil.getOnlyFeature(stepFeatures);
 
 			applyBuilder.add(expression, stepFeature.ref());
 

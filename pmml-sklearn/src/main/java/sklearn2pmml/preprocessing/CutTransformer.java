@@ -36,6 +36,7 @@ import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -54,7 +55,7 @@ public class CutTransformer extends Transformer {
 		Boolean right = getRight();
 		Boolean includeLowest = getIncludeLowest();
 
-		ClassDictUtil.checkSize(1, features);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		DataType dataType;
 
@@ -67,8 +68,6 @@ public class CutTransformer extends Transformer {
 		{
 			dataType = DataType.INTEGER;
 		}
-
-		Feature feature = features.get(0);
 
 		Interval.Closure closure = (right ? Interval.Closure.OPEN_CLOSED : Interval.Closure.CLOSED_OPEN);
 

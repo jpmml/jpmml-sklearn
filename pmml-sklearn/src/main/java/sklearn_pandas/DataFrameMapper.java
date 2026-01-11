@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.google.common.collect.Lists;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
@@ -95,9 +96,7 @@ public class DataFrameMapper extends Initializer {
 		Object object = getOptionalObject("default");
 
 		if(!Objects.equals(Boolean.FALSE, object)){
-			Attribute attribute = new Attribute(this, "default");
-
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to the " + PythonFormatterUtil.formatValue(Boolean.FALSE) + " value", attribute);
+			throw new InvalidAttributeException("Attribute " + ExceptionUtil.formatName("default") + " must be set to the " + PythonFormatterUtil.formatValue(Boolean.FALSE) + " value", new Attribute(this, "default"));
 		}
 
 		return (Boolean)object;

@@ -24,6 +24,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.LabelUtil;
 import org.jpmml.converter.Schema;
@@ -73,7 +74,7 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 		super.checkLabel(label);
 
 		if((objFunction != null) && !(objFunction instanceof Classification)){
-			throw new XGBoostException("Expected a classification-type objective function, got \'" + objFunction.getName() + "\'");
+			throw new XGBoostException("Expected a classification-type objective function, got " + ExceptionUtil.formatParameter(objFunction.getName()));
 		}
 	}
 

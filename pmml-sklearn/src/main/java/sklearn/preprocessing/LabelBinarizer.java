@@ -30,9 +30,9 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasSparseOutput;
 import sklearn.SkLearnFields;
@@ -63,9 +63,7 @@ public class LabelBinarizer extends SkLearnTransformer implements HasSparseOutpu
 		Number negLabel = getNegLabel();
 		Number posLabel = getPosLabel();
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		List<Object> categories = new ArrayList<>();
 		categories.addAll(classes);

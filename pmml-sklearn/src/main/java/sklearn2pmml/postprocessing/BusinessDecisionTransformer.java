@@ -60,9 +60,7 @@ public class BusinessDecisionTransformer extends Transformer {
 			features = transformer.encode(features, encoder);
 		}
 
-		SchemaUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		DerivedField derivedField = (DerivedField)feature.getField();
 

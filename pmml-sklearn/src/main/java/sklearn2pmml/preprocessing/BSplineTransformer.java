@@ -28,7 +28,7 @@ import org.dmg.pmml.DerivedField;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import scipy.interpolate.BSpline;
 import scipy.interpolate.BSplineUtil;
@@ -44,9 +44,7 @@ public class BSplineTransformer extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		BSpline bspline = getBSpline();
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 

@@ -38,6 +38,7 @@ import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Value;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.InvalidValueDecorator;
@@ -123,7 +124,7 @@ public class Domain extends Decorator {
 		String name = dataField.requireName();
 
 		if(encoder.isFrozen(name)){
-			throw new SkLearnException("Field \'" + name + "\' is frozen for type information updates")
+			throw new SkLearnException("Field " + ExceptionUtil.formatName(name) + " is frozen for type information updates")
 				.setSolution("Decorate a field in one step, not in multiple steps");
 		}
 
@@ -254,7 +255,7 @@ public class Domain extends Decorator {
 			return wildcardFeature;
 		}
 
-		throw new SkLearnException("Field \'" + feature.getName() + "\' is not decorable")
+		throw new SkLearnException("Field " + ExceptionUtil.formatName(feature) + " is not decorable")
 			.setSolution("Decorate input fields, not transformed fields");
 	}
 

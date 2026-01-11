@@ -26,12 +26,11 @@ import org.dmg.pmml.naive_bayes.BayesInputs;
 import org.dmg.pmml.naive_bayes.NaiveBayesModel;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
-import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaException;
-import org.jpmml.converter.SchemaUtil;
+import org.jpmml.converter.UnsupportedFeatureException;
 
 public class BernoulliNB extends DiscreteNB {
 
@@ -66,12 +65,11 @@ public class BernoulliNB extends DiscreteNB {
 
 			BayesInput bayesInput;
 
-			if(feature instanceof CategoricalFeature){
-				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+			if(feature instanceof DiscreteFeature){
+				DiscreteFeature discreteFeature = ((DiscreteFeature)feature)
+					.expectCardinality(2);
 
-				SchemaUtil.checkCardinality(2, categoricalFeature);
-
-				List<?> featureValues = categoricalFeature.getValues();
+				List<?> featureValues = discreteFeature.getValues();
 
 				List<Number> nonEventCounts = new ArrayList<>();
 				List<Number> eventCounts = new ArrayList<>();
@@ -88,11 +86,11 @@ public class BernoulliNB extends DiscreteNB {
 				pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(0), values, alpha, nonEventCounts));
 				pairCounts.add(DiscreteNBUtil.encodePairCounts(featureValues.get(1), values, alpha, eventCounts));
 
-				bayesInput = new BayesInput(categoricalFeature.getName(), null, pairCounts);
+				bayesInput = new BayesInput(discreteFeature.getName(), null, pairCounts);
 			} else
 
 			{
-				throw new SchemaException("Expected a categorical feature, got " + feature);
+				throw new UnsupportedFeatureException("Expected a categorical feature, got " + feature.typeString());
 			}
 
 			bayesInputs.addBayesInputs(bayesInput);
@@ -103,9 +101,8 @@ public class BernoulliNB extends DiscreteNB {
 
 	@Override
 	public NaiveBayesModel encodeModel(Schema schema){
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
-
-		SchemaUtil.checkCardinality(2, categoricalLabel);
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
+			.expectCardinality(2);
 
 		return super.encodeModel(schema);
 	}

@@ -37,6 +37,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.ModelEncoder;
+import org.jpmml.converter.OrdinalFeature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -123,7 +124,7 @@ public class EncoderUtil {
 		Feature result = new OrdinalFeature(encoder, feature, categories){
 
 			@Override
-			public IndexFeature getEncodedFeature(){
+			public IndexFeature toCategoricalFeature(){
 				return encodedFeature;
 			}
 		};

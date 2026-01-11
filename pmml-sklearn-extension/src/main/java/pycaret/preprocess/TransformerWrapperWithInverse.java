@@ -25,15 +25,16 @@ import java.util.List;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.Value;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.ResolutionException;
+import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
-import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.python.ResolutionException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.InitializerUtil;
 import sklearn.preprocessing.LabelEncoder;
@@ -52,7 +53,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 		Label label = encoder.getLabel();
 		if(label == null){
-			throw new SchemaException("Expected a label, got no label");
+			throw new MissingLabelException();
 		}
 
 		List<Feature> result;
@@ -69,7 +70,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 		Feature labelFeature = FeatureUtil.findLabelFeature(result, scalarLabel);
 		if(labelFeature == null){
-			throw new ResolutionException("Column \'" + scalarLabel.getName() + "\' not found in " + FeatureUtil.formatNames(result, '\''));
+			throw new ResolutionException("Column " + ExceptionUtil.formatName(scalarLabel.getName()) + " not in " + ExceptionUtil.formatNameList(result));
 		}
 
 		int labelFeatureIndex = result.indexOf(labelFeature);

@@ -28,10 +28,11 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.SchemaException;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.CalendarUtil;
 import org.jpmml.python.InvalidAttributeException;
@@ -60,9 +61,7 @@ public class DurationTransformer extends Transformer {
 
 		LocalDateTime epochDateTime = CalendarUtil.toLocalDateTime(epoch);
 		if(epochDateTime.getDayOfMonth() != 1 || epochDateTime.getMonthValue() != 1){
-			Attribute attribute = new Attribute(this, "epoch");
-
-			throw new InvalidAttributeException("Date attribute \'" + attribute.format() + "\' must be set to the 1st of January of some year", attribute);
+			throw new InvalidAttributeException("Date attribute " + ExceptionUtil.formatName("epoch") + " must be set to the 1st of January of some year", new Attribute(this, "epoch"));
 		}
 
 		int year = epochDateTime.getYear();
@@ -81,7 +80,7 @@ public class DurationTransformer extends Transformer {
 			Feature feature = features.get(i);
 
 			if(!(feature instanceof ObjectFeature)){
-				throw new SchemaException("Expected a date-type object feature, got " + feature);
+				throw new UnsupportedFeatureException("Expected a date-type object feature, got " + feature.typeString());
 			}
 
 			ObjectFeature objectFeature = (ObjectFeature)feature;

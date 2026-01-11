@@ -33,15 +33,15 @@ import org.dmg.pmml.tree.LeafNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaException;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.sklearn.SkLearnException;
 
 public class TreePredictorUtil {
@@ -96,10 +96,10 @@ public class TreePredictorUtil {
 			boolean categorical = ((isCategorical != null) && (isCategorical[index] == 1));
 			if(categorical){
 
-				if(feature instanceof CategoricalFeature){
-					CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+				if(feature instanceof DiscreteFeature){
+					DiscreteFeature discreteFeature = (DiscreteFeature)feature;
 
-					String name = categoricalFeature.getName();
+					String name = discreteFeature.getName();
 
 					java.util.function.Predicate<Object> valueFilter = categoryManager.getValueFilter(name);
 
@@ -111,8 +111,8 @@ public class TreePredictorUtil {
 					List<Object> leftValues = new ArrayList<>();
 					List<Object> rightValues = new ArrayList<>();
 
-					for(int i = 0; i < categoricalFeature.size(); i++){
-						Object value = categoricalFeature.getValue(i);
+					for(int i = 0; i < discreteFeature.size(); i++){
+						Object value = discreteFeature.getValue(i);
 
 						if(!valueFilter.test(value)){
 							continue;
@@ -131,7 +131,7 @@ public class TreePredictorUtil {
 					rightCategoryManager = categoryManager.fork(name, rightValues);
 
 					if(!leftValues.isEmpty()){
-						leftPredicate = predicateManager.createPredicate(categoricalFeature, leftValues);
+						leftPredicate = predicateManager.createPredicate(discreteFeature, leftValues);
 					} else
 
 					{
@@ -139,7 +139,7 @@ public class TreePredictorUtil {
 					} // End if
 
 					if(!rightValues.isEmpty()){
-						rightPredicate = predicateManager.createPredicate(categoricalFeature, rightValues);
+						rightPredicate = predicateManager.createPredicate(discreteFeature, rightValues);
 					} else
 
 					{
@@ -148,7 +148,7 @@ public class TreePredictorUtil {
 				} else
 
 				{
-					throw new SchemaException("Expected a categorical feature, got " + feature);
+					throw new UnsupportedFeatureException("Expected a categorical feature, got " + feature.typeString());
 				}
 			} else
 

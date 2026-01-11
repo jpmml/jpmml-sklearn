@@ -30,8 +30,8 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class TruncatedSVD extends BasePCA {
@@ -49,7 +49,7 @@ public class TruncatedSVD extends BasePCA {
 
 		List<Number> components = getComponents();
 
-		ClassDictUtil.checkSize(numberOfFeatures, features);
+		SchemaUtil.checkSize(numberOfFeatures, features);
 
 		String name = createFieldName("svd", features);
 

@@ -30,8 +30,9 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.DiscreteFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
@@ -82,7 +83,7 @@ public class HistGradientBoostingUtil {
 				} else
 
 				{
-					throw new SkLearnException("Expected [\'encoder\', \'numerical\', \'remainder\'] as transformer names, got " + names);
+					throw new SkLearnException("Expected " + ExceptionUtil.formatNameList(Arrays.asList("encoder", "numerical", "remainder")) + " as transformer names, got " + ExceptionUtil.formatNameList(names));
 				}
 
 				List<Object[]> result = new AbstractList<Object[]>(){
@@ -126,10 +127,10 @@ public class HistGradientBoostingUtil {
 										public List<Object> get(int index){
 											Feature rowFeature = rowFeatures.get(index);
 
-											if(rowFeature instanceof CategoricalFeature){
-												CategoricalFeature categoricalFeature = (CategoricalFeature)rowFeature;
+											if(rowFeature instanceof DiscreteFeature){
+												DiscreteFeature discreteFeature = (DiscreteFeature)rowFeature;
 
-												return (List)categoricalFeature.getValues();
+												return (List)discreteFeature.getValues();
 											}
 
 											return categories.get(index);

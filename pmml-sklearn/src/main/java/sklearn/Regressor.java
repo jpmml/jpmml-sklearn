@@ -27,9 +27,9 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
-import org.jpmml.converter.SchemaException;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -80,7 +80,7 @@ public class Regressor extends Estimator {
 		} else
 
 		{
-			throw new SchemaException("Expected at least one label, got " + names.size());
+			throw new MissingLabelException();
 		}
 	}
 

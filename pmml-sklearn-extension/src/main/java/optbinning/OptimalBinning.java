@@ -70,9 +70,7 @@ public class OptimalBinning extends Transformer {
 		// Drop the last two elements, which correspond to "special" and "missing" categories
 		categoriesOut = categoriesOut.subList(0, categoriesOut.size() - 2);
 
-		SchemaUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		Expression expression;
 

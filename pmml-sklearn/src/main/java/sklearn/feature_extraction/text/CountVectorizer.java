@@ -46,11 +46,13 @@ import org.dmg.pmml.TextIndex;
 import org.dmg.pmml.TextIndexNormalization;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.StringFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
@@ -93,9 +95,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Boolean lowercase = getLowercase();
 		Map<String, ?> vocabulary = getVocabulary();
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		BiMap<String, Integer> termIndexMap = HashBiMap.create(vocabulary.size());
 
@@ -247,9 +247,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Object object = getOptionalObject("preprocessor");
 
 		if(object != null){
-			Attribute attribute = new Attribute(this, "preprocessor");
-
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to the missing (" + PythonFormatterUtil.formatValue(null) + ") value", attribute);
+			throw new InvalidAttributeException("Attribute " + ExceptionUtil.formatName("preprocessor") + " must be set to the missing (" + PythonFormatterUtil.formatValue(null) + ") value", new Attribute(this, "preprocessor"));
 		}
 
 		return object;
@@ -278,12 +276,10 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Object object = getOptionalObject("tokenizer");
 
 		if((object != null) && !(Tokenizer.class).isInstance(object)){
-			Attribute attribute = new Attribute(this, "tokenizer");
-
 			List<String> supportedClasses = Arrays.asList(Matcher.class.getName(), Splitter.class.getName());
 
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has an unsupported value (" + ClassDictUtil.formatClass(object) +")", attribute)
-				.setSolution("Use one of the supported Python classes " + PythonFormatterUtil.formatCollection(supportedClasses));
+			throw new InvalidAttributeException("Attribute " + ExceptionUtil.formatName("tokenizer") + " has an unsupported value (" + ClassDictUtil.formatClass(object) +")", new Attribute(this, "tokenizer"))
+				.setSolution("Use one of the supported Python classes " + PythonFormatterUtil.formatValues(supportedClasses));
 		}
 
 		return getOptional("tokenizer", Tokenizer.class);
@@ -305,7 +301,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		InputStream is = (CountVectorizer.class).getResourceAsStream("/stop_words/" + stopWords + ".txt");
 
 		if(is == null){
-			throw new SkLearnException("Failed to locate the stop words list resource \'" + stopWords + "\'");
+			throw new SkLearnException("Failed to locate the stop words list resource " + ExceptionUtil.formatLiteral(stopWords));
 		}
 
 		try(Reader reader = new InputStreamReader(is, "UTF-8")){

@@ -50,6 +50,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLObject;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.model.JAXBSerializer;
 import org.jpmml.model.JAXBUtil;
 import org.jpmml.model.ReflectionUtil;
@@ -116,7 +117,7 @@ public class CustomizationUtil {
 
 						xPathExprObject = (PMMLObject)binder.getJAXBNode(node);
 						if(xPathExprObject == null){
-							throw new SkLearnException("XPath expression \'" + xPathExpr + "\' is not associated with a PMML object");
+							throw new SkLearnException("XPath expression " + ExceptionUtil.formatLiteral(xPathExpr) + " is not associated with a PMML object");
 						}
 					}
 					break;

@@ -44,18 +44,19 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.DerivedOutputField;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.NamingException;
-import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.SchemaException;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.UnsupportedAttributeException;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
 import sklearn.Classifier;
@@ -286,7 +287,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		org.dmg.pmml.Field<?> pmmlField = getField(name);
 
 		if(pmmlField instanceof DataField){
-			throw new SkLearnException("Field \'" + name + "\' cannot be renamed")
+			throw new SkLearnException("Field " + ExceptionUtil.formatName(name) + " cannot be renamed")
 				.setSolution("Rename input fields in Python beforehand (eg. as DataFrame columns)");
 		}
 
@@ -294,11 +295,13 @@ public class SkLearnEncoder extends PythonEncoder {
 
 		try {
 			renamedPmmlField = getField(renamedName);
+		} catch(SchemaException se){
+			renamedPmmlField = null;
+		}
 
-			throw new NamingException("Field \'" + renamedName + "\' is already defined")
+		if(renamedPmmlField != null){
+			throw new NamingException("Field " + ExceptionUtil.formatName(renamedName) + " is already defined")
 				.setSolution("Choose a different name");
-		} catch(ResolutionException re){
-			// Ignored
 		}
 
 		DerivedField derivedField = removeDerivedField(name);
@@ -317,7 +320,7 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	public void renameFeatures(List<Feature> features, List<String> renamedNames){
-		ClassDictUtil.checkSize(renamedNames.size(), features);
+		SchemaUtil.checkSize(renamedNames.size(), features);
 
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);

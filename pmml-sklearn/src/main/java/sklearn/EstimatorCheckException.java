@@ -19,30 +19,14 @@
 package sklearn;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 
 public class EstimatorCheckException extends SkLearnException {
 
 	public EstimatorCheckException(Estimator estimator, Class<?>... clazzes){
-		super("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not an instance of " + formatClasses(clazzes));
-	}
-
-	static
-	private Object formatClasses(Class<?>... clazzes){
-
-		if(clazzes.length == 1){
-			Class<?> clazz = clazzes[0];
-
-			return clazz.getName();
-		} else
-
-		{
-			return Arrays.stream(clazzes)
-				.map(clazz -> clazz.getName())
-				.collect(Collectors.toList());
-		}
+		super("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") is not an instance of " + ExceptionUtil.formatClasses(Arrays.asList(clazzes)));
 	}
 }

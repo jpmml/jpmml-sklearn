@@ -28,10 +28,11 @@ import com.google.common.collect.Range;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.SchemaException;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
@@ -61,19 +62,17 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Number> values = getValues();
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		List<Feature> result = new ArrayList<>();
 
-		if(feature instanceof CategoricalFeature){
-			CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+		if(feature instanceof DiscreteFeature){
+			DiscreteFeature discreteFeature = (DiscreteFeature)feature;
 
-			ClassDictUtil.checkSize(values, categoricalFeature.getValues());
+			ClassDictUtil.checkSize(values, discreteFeature.getValues());
 
 			for(int i = 0; i < values.size(); i++){
-				result.add(new BinaryFeature(encoder, categoricalFeature, categoricalFeature.getValue(i)));
+				result.add(new BinaryFeature(encoder, discreteFeature, discreteFeature.getValue(i)));
 			}
 		} else
 
@@ -96,7 +95,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 		} else
 
 		{
-			throw new SchemaException("Expected a categorical feature, got " + feature);
+			throw new UnsupportedFeatureException("Expected a categorical feature, got " + feature.typeString());
 		}
 
 		return result;

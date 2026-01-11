@@ -70,7 +70,7 @@ public class OrdinalClassifier extends Classifier {
 		OrdinalLabel ordinalLabel = schema.requireOrdinalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		SchemaUtil.checkCardinality(estimators.size() + 1, ordinalLabel);
+		ordinalLabel.expectCardinality(estimators.size() + 1);
 
 		List<Model> models = new ArrayList<>();
 

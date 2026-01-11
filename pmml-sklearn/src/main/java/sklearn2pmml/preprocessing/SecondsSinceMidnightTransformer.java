@@ -29,7 +29,7 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.SchemaException;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 
@@ -52,7 +52,7 @@ public class SecondsSinceMidnightTransformer extends Transformer {
 			Feature feature = features.get(i);
 
 			if(!(feature instanceof ObjectFeature)){
-				throw new SchemaException("Expected a time-type object feature, got " + feature);
+				throw new UnsupportedFeatureException("Expected a time-type object feature, got " + feature.typeString());
 			}
 
 			ObjectFeature objectFeature = (ObjectFeature)feature;

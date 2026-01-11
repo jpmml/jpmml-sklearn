@@ -50,7 +50,7 @@ public class PCA extends BasePCA {
 		List<Number> components = getComponents();
 		List<Number> mean = getMean();
 
-		ClassDictUtil.checkSize(numberOfFeatures, features, mean);
+		ClassDictUtil.checkSize(numberOfFeatures, mean);
 
 		Boolean whiten = getWhiten();
 

@@ -24,8 +24,8 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
-import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.SkLearnFields;
 import sklearn.SkLearnTransformer;
@@ -52,9 +52,7 @@ public class LabelEncoder extends SkLearnTransformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<?> classes = getClasses();
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		encoder.toCategorical(feature.getName(), classes);
 

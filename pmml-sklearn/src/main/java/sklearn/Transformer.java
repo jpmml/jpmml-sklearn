@@ -27,9 +27,10 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ConversionException;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.ResolutionException;
+import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.DTypeCastFunction;
 import org.jpmml.python.TypeInfo;
@@ -125,7 +126,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 		DataField dataField = encoder.getDataField(name);
 		if(dataField == null){
-			throw new ResolutionException("Field \'" + name + "\' is undefined");
+			throw new SchemaException("Field " + ExceptionUtil.formatName(name) + " is not defined");
 		} // End if
 
 		if((dataField.requireOpType() != opType) || (dataField.requireDataType() != dataType)){

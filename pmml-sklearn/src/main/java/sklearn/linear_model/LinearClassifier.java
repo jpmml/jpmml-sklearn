@@ -31,7 +31,6 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.HasMultiDecisionFunctionField;
@@ -66,7 +65,7 @@ public class LinearClassifier extends SkLearnClassifier implements HasMultiDecis
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
-			SchemaUtil.checkCardinality(2, categoricalLabel);
+			categoricalLabel.expectCardinality(2);
 
 			RegressionModel regressionModel = RegressionModelUtil.createBinaryLogisticClassification(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0), intercept.get(0), RegressionModel.NormalizationMethod.LOGIT, false, schema);
 
@@ -78,7 +77,7 @@ public class LinearClassifier extends SkLearnClassifier implements HasMultiDecis
 		} else
 
 		if(numberOfClasses >= 3){
-			SchemaUtil.checkCardinality(numberOfClasses, categoricalLabel);
+			categoricalLabel.expectCardinality(numberOfClasses);
 
 			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();
 

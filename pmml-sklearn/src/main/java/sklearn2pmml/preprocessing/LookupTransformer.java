@@ -34,6 +34,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.PMMLUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -101,7 +102,7 @@ public class LookupTransformer extends Transformer {
 	}
 
 	protected List<String> formatColumns(List<Feature> features){
-		ClassDictUtil.checkSize(1, features);
+		SchemaUtil.checkSize(1, features);
 
 		return Arrays.asList("data:input", "data:output");
 	}

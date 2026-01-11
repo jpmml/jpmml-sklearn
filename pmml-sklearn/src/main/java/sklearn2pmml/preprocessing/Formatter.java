@@ -47,9 +47,7 @@ public class Formatter extends Transformer {
 		String function = getFunction();
 		String pattern = getPattern();
 
-		SchemaUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		Apply apply = ExpressionUtil.createApply(function, feature.ref(), ExpressionUtil.createConstant(pattern));
 

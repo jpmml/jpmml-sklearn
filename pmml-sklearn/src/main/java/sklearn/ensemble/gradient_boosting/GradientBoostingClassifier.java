@@ -31,7 +31,6 @@ import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.Transformation;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.AttributeException;
@@ -124,7 +123,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		MiningModel miningModel;
 
 		if(categoricalLabel.size() == 2){
-			SchemaUtil.checkCardinality(2, categoricalLabel);
+			categoricalLabel.expectCardinality(2);
 
 			Model model = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, transformations));

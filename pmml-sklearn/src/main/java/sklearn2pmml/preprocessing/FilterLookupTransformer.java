@@ -28,7 +28,7 @@ import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class FilterLookupTransformer extends LookupTransformer {
@@ -39,15 +39,11 @@ public class FilterLookupTransformer extends LookupTransformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		List<Feature> mappedFeatures = super.encodeFeatures(features, encoder);
 
-		ClassDictUtil.checkSize(1, mappedFeatures);
-
-		Feature mappedFeature = mappedFeatures.get(0);
+		Feature mappedFeature = SchemaUtil.getOnlyFeature(mappedFeatures);
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
 			ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, mappedFeature.ref()),

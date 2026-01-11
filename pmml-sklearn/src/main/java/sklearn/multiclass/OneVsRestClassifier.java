@@ -29,7 +29,6 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
@@ -72,7 +71,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		if(estimators.size() == 1){
-			SchemaUtil.checkCardinality(2, categoricalLabel);
+			categoricalLabel.expectCardinality(2);
 
 			Classifier estimator = estimators.get(0);
 
@@ -84,7 +83,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 		} else
 
 		if(estimators.size() >= 2){
-			SchemaUtil.checkCardinality(estimators.size(), categoricalLabel);
+			categoricalLabel.expectCardinality(estimators.size());
 
 			List<Model> models = new ArrayList<>();
 

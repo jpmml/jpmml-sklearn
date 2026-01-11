@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -45,13 +44,8 @@ public class SeriesConstructor extends Transformer {
 
 		DataType dataType = dtype.getDataType();
 
-		SchemaUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
-
-		if(feature.getDataType() != dataType){
-			throw new SchemaException("Expected " + dataType.value() + " data type for feature \'" + feature.getName() + "\', got " + (feature.getDataType()).value());
-		} // End if
+		Feature feature = SchemaUtil.getOnlyFeature(features)
+			.expectDataType(dataType);
 
 		if(dtype instanceof CategoricalDtype){
 			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;

@@ -29,7 +29,6 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
@@ -69,7 +68,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 		MiningModel miningModel;
 
 		if(numberOfTreesPerIteration == 1){
-			SchemaUtil.checkCardinality(2, categoricalLabel);
+			categoricalLabel.expectCardinality(2);
 
 			Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
@@ -78,7 +77,7 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 		} else
 
 		if(numberOfTreesPerIteration >= 3){
-			SchemaUtil.checkCardinality(numberOfTreesPerIteration, categoricalLabel);
+			categoricalLabel.expectCardinality(numberOfTreesPerIteration);
 
 			List<Model> models = new ArrayList<>();
 

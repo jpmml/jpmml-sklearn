@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.dmg.pmml.Model;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.InvalidAttributeException;
@@ -66,9 +67,7 @@ public class FixedThresholdClassifier extends SkLearnClassifier implements HasEs
 		Object threshold = getObject("threshold");
 
 		if(Objects.equals(FixedThresholdClassifier.THRESHOLD_AUTO, threshold)){
-			Attribute attribute = new Attribute(this, "threshold");
-
-			throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' must be set to a numeric value", attribute);
+			throw new InvalidAttributeException("Attribute " + ExceptionUtil.formatName("threshold") + " must be set to a numeric value", new Attribute(this, "threshold"));
 		}
 
 		return getNumber("threshold");

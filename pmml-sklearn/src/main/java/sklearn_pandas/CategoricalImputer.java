@@ -24,7 +24,7 @@ import java.util.Objects;
 
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.jpmml.converter.Feature;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 import sklearn.impute.ImputerUtil;
@@ -40,13 +40,11 @@ public class CategoricalImputer extends Transformer {
 		Object fill = getFill();
 		Object missingValues = getMissingValues();
 
-		ClassDictUtil.checkSize(1, features);
-
 		if(Objects.equals("NaN", missingValues)){
 			missingValues = null;
 		}
 
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		feature = ImputerUtil.encodeFeature(this, feature, false, missingValues, fill, MissingValueTreatmentMethod.AS_MODE, encoder);
 

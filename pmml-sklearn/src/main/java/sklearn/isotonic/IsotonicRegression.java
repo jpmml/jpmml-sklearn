@@ -49,9 +49,7 @@ public class IsotonicRegression extends Calibrator {
 
 		ClassDictUtil.checkSize(xThresholds, yThresholds);
 
-		SchemaUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		OutlierTreatmentMethod outlierTreatment = parseOutlierTreatment(outOfBounds);
 

@@ -21,6 +21,7 @@ package lightgbm.sklearn;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.Classification;
@@ -48,7 +49,7 @@ public class LGBMClassifier extends LabelEncoderClassifier implements HasBooster
 		super.checkLabel(label);
 
 		if((objectiveFunction != null) && !(objectiveFunction instanceof Classification)){
-			throw new LightGBMException("Expected a classification-type objective function, got \'" + objectiveFunction.getName() + "\'");
+			throw new LightGBMException("Expected a classification-type objective function, got " + ExceptionUtil.formatParameter(objectiveFunction.getName()));
 		}
 	}
 

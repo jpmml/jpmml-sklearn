@@ -57,6 +57,8 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ConversionException;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ModelUtil;
@@ -626,7 +628,7 @@ public class TreeUtil {
 	private double[] getRow(double[] values, int rows, int columns, int row){
 
 		if(values.length != (rows * columns)){
-			throw new IllegalArgumentException("Expected " + (rows * columns) + " element(s), got " + values.length);
+			throw new ConversionException("Expected " + ExceptionUtil.formatCount(rows * columns, "element") + ", got " + values.length);
 		}
 
 		double[] result = new double[columns];

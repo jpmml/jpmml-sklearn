@@ -21,6 +21,7 @@ package sklearn.feature_selection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
@@ -52,7 +53,7 @@ public class SelectFromModel extends SkLearnSelector implements HasEstimator<Est
 		try {
 			featureImportances = estimator.getNumberArray("feature_importances_");
 		} catch(AttributeException ae){
-			String message = "The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent \'feature_importances_\' attribute";
+			String message = "The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent " + ExceptionUtil.formatName("feature_importances_") + " attribute";
 			String solution = "Use the " + (EstimatorProxy.class).getName() + " wrapper class to give this estimator object a persistent state (eg. " + EstimatorProxy.formatProxyExample(estimator) +")";
 
 			throw new SkLearnException(message, ae)
@@ -82,7 +83,7 @@ public class SelectFromModel extends SkLearnSelector implements HasEstimator<Est
 		try {
 			threshold = getNumber("threshold_");
 		} catch(AttributeException ae){
-			String message = "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent \'threshold_\' attribute";
+			String message = "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent " + ExceptionUtil.formatName("threshold_") + " attribute";
 			String solution = "Use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")";
 
 			throw new SkLearnException(message, ae)

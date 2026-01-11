@@ -31,11 +31,11 @@ import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
@@ -160,7 +160,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 		} else
 
 		{
-			throw new SchemaException("Expected at least one label, got " + names.size());
+			throw new MissingLabelException();
 		}
 	}
 

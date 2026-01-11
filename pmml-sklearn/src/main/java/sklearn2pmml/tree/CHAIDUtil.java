@@ -44,9 +44,9 @@ import org.dmg.pmml.tree.ClassifierNode;
 import org.dmg.pmml.tree.CountingBranchNode;
 import org.dmg.pmml.tree.CountingLeafNode;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.ScalarLabel;
@@ -109,9 +109,9 @@ public class CHAIDUtil {
 		};
 
 		if(!successors.isEmpty()){
-			CategoricalFeature categoricalFeature = (CategoricalFeature)schema.getFeature(columnId);
+			DiscreteFeature discreteFeatue = (DiscreteFeature)schema.getFeature(columnId);
 
-			Collection<?> categories = categoricalFeature.getValues();
+			Collection<?> categories = discreteFeatue.getValues();
 
 			if(scalarLabel instanceof CategoricalLabel){
 				result = new ClassifierNode(null, predicate);
@@ -189,12 +189,12 @@ public class CHAIDUtil {
 				Predicate successorPredicate;
 
 				if(!values.isEmpty()){
-					successorPredicate = predicateManager.createPredicate(categoricalFeature, values);
+					successorPredicate = predicateManager.createPredicate(discreteFeatue, values);
 
 					if(withMissing){
 						successorPredicate = predicateManager.createCompoundPredicate(CompoundPredicate.BooleanOperator.SURROGATE,
 							successorPredicate,
-							predicateManager.createSimplePredicate(categoricalFeature, SimplePredicate.Operator.IS_MISSING, null)
+							predicateManager.createSimplePredicate(discreteFeatue, SimplePredicate.Operator.IS_MISSING, null)
 						);
 					}
 				} else
@@ -203,7 +203,7 @@ public class CHAIDUtil {
 					successorPredicate = False.INSTANCE;
 
 					if(withMissing){
-						successorPredicate = predicateManager.createSimplePredicate(categoricalFeature, SimplePredicate.Operator.IS_MISSING, null);
+						successorPredicate = predicateManager.createSimplePredicate(discreteFeatue, SimplePredicate.Operator.IS_MISSING, null);
 					}
 				}
 

@@ -27,12 +27,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataField;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
-import org.jpmml.converter.ResolutionException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.ResolutionException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 
@@ -83,7 +84,7 @@ public class InitializerUtil {
 							return feature;
 						}
 
-						throw new ResolutionException("Column \'" + column + "\' not found in " + FeatureUtil.formatNames(features, '\''));
+						throw new ResolutionException("Column " + ExceptionUtil.formatName(column) + " not in " + ExceptionUtil.formatNameList(features));
 					}
 
 					return createWildcardFeature(column, encoder);

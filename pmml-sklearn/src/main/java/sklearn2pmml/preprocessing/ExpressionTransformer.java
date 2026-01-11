@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataType;
@@ -36,12 +36,12 @@ import org.dmg.pmml.HasInvalidValueTreatment;
 import org.dmg.pmml.HasMapMissingTo;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.OpType;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.python.Attribute;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TypeInfo;
@@ -102,26 +102,34 @@ public class ExpressionTransformer extends Transformer {
 				break udf;
 			}
 
-			List<Attribute> attributes = new ArrayList<>();
+			List<String> names = new ArrayList<>();
 
 			if(mapMissingTo != null){
-				attributes.add(new Attribute(this, "map_missing_to"));
+				names.add("map_missing_to");
 			} // End if
 
 			if(defaultValue != null){
-				attributes.add(new Attribute(this, "default_value"));
+				names.add("default_value");
 			} // End if
 
 			if(invalidValueTreatment != null){
-				attributes.add(new Attribute(this, "invalid_value_treatment"));
+				names.add("invalid_value_treatment");
 			} // End if
 
-			if(!attributes.isEmpty()){
-				List<String> quotedAttributes = attributes.stream()
-					.map(attribute -> "\'" + attribute.format() + "\'")
-					.collect(Collectors.toList());
+			if(!names.isEmpty()){
+				String attributeClause;
 
-				throw new SkLearnException("The target PMML element for " + String.join(", ", quotedAttributes) + " attribute(s) is unclear")
+				if(names.size() == 1){
+					String name = Iterables.getOnlyElement(names);
+
+					attributeClause = ExceptionUtil.formatName(name) + " attribute";
+				} else
+
+				{
+					attributeClause = ExceptionUtil.formatNames(names) + " attributes";
+				}
+
+				throw new SkLearnException("The target PMML element for " + attributeClause + " is unclear")
 					.setSolution("Refactor the expression from inline string representation to UDF representation");
 			}
 		} // End if

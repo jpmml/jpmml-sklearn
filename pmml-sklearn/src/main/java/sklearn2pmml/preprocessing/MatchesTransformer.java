@@ -29,8 +29,7 @@ import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BooleanFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.SchemaException;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.RegExFlavour;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -53,13 +52,8 @@ public class MatchesTransformer extends RegExTransformer {
 			pattern = reFlavour.translatePattern(pattern);
 		}
 
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
-
-		if(feature.getDataType() != DataType.STRING){
-			throw new SchemaException("Expected " + DataType.STRING.value() + " data type for feature \'" + feature.getName() + "\', got " + (feature.getDataType()).value());
-		}
+		Feature feature = SchemaUtil.getOnlyFeature(features)
+			.expectDataType(DataType.STRING);
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.MATCHES, feature.ref(), ExpressionUtil.createConstant(pattern));
 

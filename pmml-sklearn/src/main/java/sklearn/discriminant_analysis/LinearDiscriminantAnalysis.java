@@ -31,7 +31,6 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.VersionUtil;
@@ -84,7 +83,7 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 		} // End if
 
 		if(numberOfClasses >= 3){
-			SchemaUtil.checkCardinality(numberOfClasses, categoricalLabel);
+			categoricalLabel.expectCardinality(numberOfClasses);
 
 			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();
 

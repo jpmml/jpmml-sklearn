@@ -23,10 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jpmml.converter.BinaryFeature;
-import org.jpmml.converter.CategoricalFeature;
+import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueFeature;
-import org.jpmml.converter.SchemaException;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -52,10 +52,10 @@ public class OneHotEncoder extends BaseEncoder {
 		for(int i = 0; i < features.size(); i++){
 			Feature feature = features.get(i);
 
-			if(feature instanceof CategoricalFeature){
-				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+			if(feature instanceof DiscreteFeature){
+				DiscreteFeature discreteFeature = (DiscreteFeature)feature;
 
-				List<?> categories = categoricalFeature.getValues();
+				List<?> categories = discreteFeature.getValues();
 
 				for(int j = 0; j < categories.size(); j++){
 					Object category = categories.get(j);
@@ -65,7 +65,7 @@ public class OneHotEncoder extends BaseEncoder {
 						switch(handleMissing){
 							case OneHotEncoder.HANDLEMISSING_INDICATOR:
 							case OneHotEncoder.HANDLEMISSING_VALUE:
-								result.add(new MissingValueFeature(encoder, categoricalFeature));
+								result.add(new MissingValueFeature(encoder, discreteFeature));
 								break;
 							default:
 								break;
@@ -73,13 +73,13 @@ public class OneHotEncoder extends BaseEncoder {
 					} else
 
 					{
-						result.add(new BinaryFeature(encoder, categoricalFeature, category));
+						result.add(new BinaryFeature(encoder, discreteFeature, category));
 					}
 				}
 			} else
 
 			{
-				throw new SchemaException("Expected a categorical feature, got " + feature);
+				throw new UnsupportedFeatureException("Expected a categorical feature, got " + feature.typeString());
 			}
 		}
 

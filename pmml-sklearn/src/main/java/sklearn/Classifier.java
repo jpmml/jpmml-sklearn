@@ -37,11 +37,12 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.DiscreteLabel;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.OrdinalLabel;
-import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
@@ -137,7 +138,7 @@ public class Classifier extends Estimator implements HasClasses {
 						try {
 							return super.apply(object);
 						} catch(ClassCastException cce){
-							throw new SkLearnException("The categories object of the " + (name != null ? ("\'" + name + "\'" + " ") : "<un-named> ") + " target field (" + ClassDictUtil.formatClass(object) + ") is not supported", cce);
+							throw new SkLearnException("The categories object of the " + (name != null ? ExceptionUtil.formatName(name) : "<un-named> ") + " target field (" + ClassDictUtil.formatClass(object) + ") is not supported", cce);
 						}
 					}
 				};
@@ -153,7 +154,7 @@ public class Classifier extends Estimator implements HasClasses {
 		} else
 
 		{
-			throw new SchemaException("Expected at least one label, got " + names.size());
+			throw new MissingLabelException();
 		}
 	}
 

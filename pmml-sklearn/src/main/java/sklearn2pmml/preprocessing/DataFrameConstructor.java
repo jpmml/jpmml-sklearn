@@ -25,7 +25,6 @@ import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
@@ -85,12 +84,10 @@ public class DataFrameConstructor extends Initializer {
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < features.size(); i++){
-			Feature feature = features.get(i);
-			String column = columns.get(i);
+			Feature feature = features.get(i)
+				.expectDataType(dataType);
 
-			if(feature.getDataType() != dataType){
-				throw new SchemaException("Expected " + dataType.value() + " data type for feature \'" + feature.getName() + "\', got " + (feature.getDataType()).value());
-			} // End if
+			String column = columns.get(i);
 
 			if(dtype instanceof CategoricalDtype){
 				CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;

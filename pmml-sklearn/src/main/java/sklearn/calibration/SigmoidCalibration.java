@@ -45,9 +45,7 @@ public class SigmoidCalibration extends Calibrator {
 		Number a = getA();
 		Number b = getB();
 
-		SchemaUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		Apply apply = (Apply)ExpressionUtil.toNegative(
 			ExpressionUtil.createApply(PMMLFunctions.ADD,

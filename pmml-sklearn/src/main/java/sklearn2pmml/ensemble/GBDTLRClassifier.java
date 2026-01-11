@@ -29,7 +29,6 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
 import sklearn.HasMultiDecisionFunctionField;
@@ -62,9 +61,8 @@ public class GBDTLRClassifier extends Classifier implements HasMultiDecisionFunc
 		MultiOneHotEncoder ohe = getOHE();
 		LinearClassifier lr = getLR();
 
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
-
-		SchemaUtil.checkCardinality(2, categoricalLabel);
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
+			.expectCardinality(2);
 
 		List<Number> coef = lr.getCoef();
 		List<Number> intercept = lr.getIntercept();

@@ -34,13 +34,15 @@ import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.DiscreteLabel;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaException;
+import org.jpmml.converter.UnsupportedLabelException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -193,13 +195,13 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		if(supervised){
 
 			if(label == null){
-				throw new SchemaException("Expected a label, got no label");
+				throw new MissingLabelException();
 			}
 		} else
 
 		{
 			if(label != null){
-				throw new SchemaException("Expected no label, got " + label);
+				throw new UnsupportedLabelException("Expected no label, got " + label.typeString());
 			}
 		}
 	}
@@ -241,7 +243,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			Attribute attribute = new Attribute(this, SkLearn2PMMLFields.PMML_OPTIONS);
 			Attribute surrogateAttribute = new Attribute(this, key);
 
-			logger.warn("Attribute \'" + attribute.format() + "\' is not set. Falling back to the surrogate attribute \'" + surrogateAttribute.format() + "\'");
+			logger.warn("Attribute " + ExceptionUtil.formatName(attribute.format()) + " is not set. Falling back to the surrogate attribute " + ExceptionUtil.formatName(surrogateAttribute.format()));
 
 			return getattr(key);
 		}

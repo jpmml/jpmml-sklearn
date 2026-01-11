@@ -28,6 +28,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.AttributeException;
 import org.jpmml.python.ClassDictConstructorUtil;
@@ -81,7 +82,7 @@ public class FunctionTransformer extends SkLearnTransformer {
 			if(name != null && name.startsWith("__main__" + ".")){
 				name = name.substring(("__main__" + ".").length());
 
-				String message = "The function \'" + name + " \' does not have a persistent state";
+				String message = "The function " + ExceptionUtil.formatName(name) + " does not have a persistent state";
 				String solution = "Use the " + (ExpressionTransformer.class).getName() + " transformer class to give this function a persistent state (eg. " + ExpressionTransformer.formatExpressionExample(name) + ")";
 
 				throw new SkLearnException(message, ae)

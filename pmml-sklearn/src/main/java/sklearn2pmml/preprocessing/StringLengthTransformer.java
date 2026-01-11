@@ -29,7 +29,7 @@ import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.python.ClassDictUtil;
+import org.jpmml.converter.SchemaUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class StringLengthTransformer extends StringTransformer {
@@ -40,9 +40,7 @@ public class StringLengthTransformer extends StringTransformer {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		ClassDictUtil.checkSize(1, features);
-
-		Feature feature = features.get(0);
+		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.STRINGLENGTH, feature.ref());
 

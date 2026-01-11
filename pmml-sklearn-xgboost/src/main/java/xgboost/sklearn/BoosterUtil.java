@@ -30,10 +30,11 @@ import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.OrdinalFeature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
-import org.jpmml.python.Attribute;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.ByteOrderUtil;
@@ -46,7 +47,6 @@ import pandas.core.BlockManager;
 import pandas.core.DataFrame;
 import pandas.core.Index;
 import sklearn.Estimator;
-import sklearn.preprocessing.OrdinalFeature;
 
 public class BoosterUtil {
 
@@ -156,10 +156,8 @@ public class BoosterUtil {
 			FeatureMap embeddedFeatureMap = learner.encodeFeatureMap();
 
 			if(embeddedFeatureMap == null || embeddedFeatureMap.isEmpty()){
-				Attribute attribute = new Attribute(booster, "fmap");
-
 				String message = "The booster object does not specify feature information";
-				String solution = "Set the \'" + attribute.format() + "\' attribute, or re-train the booster with a DMatrix that has both feature names and feature types set";
+				String solution = "Set the " + ExceptionUtil.formatName("fmap") + " attribute, or re-train the booster with a DMatrix that has both feature names and feature types set";
 
 				throw new SkLearnException(message)
 					.setSolution(solution);

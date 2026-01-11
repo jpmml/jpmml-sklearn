@@ -35,11 +35,11 @@ import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.Attribute;
@@ -70,10 +70,8 @@ public class LogisticRegression extends LinearClassifier {
 			} else
 
 			{
-				Attribute attribute = new Attribute(this, "multi_class");
-
-				throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has unsupported value \'" + LogisticRegression.MULTICLASS_AUTO + "\'", attribute)
-					.setSolution("Use one of the supported values " + PythonFormatterUtil.formatCollection(Arrays.asList(LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR)));
+				throw new InvalidAttributeException("Attribute " + ExceptionUtil.formatName("multi_class") + " has unsupported value " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_AUTO), new Attribute(this, "multi_class"))
+					.setSolution(formatEnumChoice(Arrays.asList(LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR)));
 			}
 		} else
 
@@ -85,10 +83,8 @@ public class LogisticRegression extends LinearClassifier {
 			} else
 
 			{
-				Attribute attribute = new Attribute(this, "multi_class");
-
-				throw new InvalidAttributeException("Attribute \'" + attribute.format() + "\' has unsupported value \'" + LogisticRegression.MULTICLASS_DEPRECATED + "\'", attribute)
-					.setSolution("Use one of the supported values " + PythonFormatterUtil.formatCollection(Arrays.asList(LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR)));
+				throw new InvalidAttributeException("Attribute " + ExceptionUtil.formatName("multi_class") + " has unsupported value " + PythonFormatterUtil.formatValue(LogisticRegression.MULTICLASS_DEPRECATED), new Attribute(this, "multi_class"))
+					.setSolution(formatEnumChoice(Arrays.asList(LogisticRegression.MULTICLASS_MULTINOMIAL, LogisticRegression.MULTICLASS_OVR)));
 			}
 		} else
 
@@ -101,9 +97,7 @@ public class LogisticRegression extends LinearClassifier {
 		} // End if
 
 		if(multiClass == null){
-			Attribute attribute = new Attribute(this, "multi_class");
-
-			throw new MissingAttributeException(attribute);
+			throw new MissingAttributeException(new Attribute(this, "multi_class"));
 		}
 
 		switch(multiClass){
@@ -131,7 +125,7 @@ public class LogisticRegression extends LinearClassifier {
 		List<? extends Feature> features = schema.getFeatures();
 
 		if(numberOfClasses == 1){
-			SchemaUtil.checkCardinality(2, categoricalLabel);
+			categoricalLabel.expectCardinality(2);
 
 			// See https://github.com/scikit-learn/scikit-learn/issues/9889
 			boolean corrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.20") >= 0);
@@ -168,7 +162,7 @@ public class LogisticRegression extends LinearClassifier {
 		} else
 
 		if(numberOfClasses >= 3){
-			SchemaUtil.checkCardinality(numberOfClasses, categoricalLabel);
+			categoricalLabel.expectCardinality(numberOfClasses);
 
 			List<RegressionTable> regressionTables = new ArrayList<>();
 

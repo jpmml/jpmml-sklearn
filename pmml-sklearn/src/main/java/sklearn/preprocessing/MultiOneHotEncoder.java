@@ -33,11 +33,13 @@ import org.jpmml.converter.BinaryThresholdFeature;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
+import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
@@ -121,23 +123,23 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				feature = continuousFeature;
 			} else
 
-			if(feature instanceof CategoricalFeature){
-				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
+			if(feature instanceof DiscreteFeature){
+				DiscreteFeature discreteFeature = (DiscreteFeature)feature;
 
 				if(hasMissingCategory(featureCategories)){
 
-					if(hasMissingCategory(categoricalFeature.getValues())){
-						ClassDictUtil.checkSize(featureCategories, categoricalFeature.getValues());
+					if(hasMissingCategory(discreteFeature.getValues())){
+						ClassDictUtil.checkSize(featureCategories, discreteFeature.getValues());
 
-						featureCategories = new ArrayList<>(categoricalFeature.getValues());
+						featureCategories = new ArrayList<>(discreteFeature.getValues());
 					} else
 
 					{
-						ClassDictUtil.checkSize(dropMissingCategory(featureCategories), categoricalFeature.getValues());
+						ClassDictUtil.checkSize(dropMissingCategory(featureCategories), discreteFeature.getValues());
 
-						featureCategories = new ArrayList<>(categoricalFeature.getValues());
+						featureCategories = new ArrayList<>(discreteFeature.getValues());
 
-						DataType dataType = categoricalFeature.getDataType();
+						DataType dataType = discreteFeature.getDataType();
 						switch(dataType){
 							case FLOAT:
 							case DOUBLE:
@@ -151,9 +153,9 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				} else
 
 				{
-					ClassDictUtil.checkSize(featureCategories, categoricalFeature.getValues());
+					ClassDictUtil.checkSize(featureCategories, discreteFeature.getValues());
 
-					featureCategories = new ArrayList<>(categoricalFeature.getValues());
+					featureCategories = new ArrayList<>(discreteFeature.getValues());
 				}
 			} else
 
@@ -183,7 +185,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			} else
 
 			{
-				throw new IllegalArgumentException("Expected a categorical or categorical-like feature, got " + feature);
+				throw new UnsupportedFeatureException("Expected a categorical or categorical-like feature, got " + feature.typeString());
 			} // End if
 
 			if(featureInfrequentEnabled){

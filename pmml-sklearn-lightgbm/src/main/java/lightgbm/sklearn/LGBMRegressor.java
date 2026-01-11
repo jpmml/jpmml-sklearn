@@ -21,6 +21,7 @@ package lightgbm.sklearn;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.HasLightGBMOptions;
@@ -48,7 +49,7 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 		super.checkLabel(label);
 
 		if((objectiveFunction != null) && !(objectiveFunction instanceof Regression)){
-			throw new LightGBMException("Expected a regression-type objective function, got \'" + objectiveFunction.getName() + "\'");
+			throw new LightGBMException("Expected a regression-type objective function, got " + ExceptionUtil.formatParameter(objectiveFunction.getName()));
 		}
 	}
 
