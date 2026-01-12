@@ -18,6 +18,8 @@
  */
 package sklearn;
 
+import net.razorvine.pickle.objects.ClassDict;
+import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.CastUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -39,7 +41,7 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 			return super.apply(object);
 		} catch(ClassCastException cce){
 			throw new SkLearnException(formatMessage(object))
-				.setSolution(formatSolution());
+				.setSolution(formatSolution(object));
 		}
 	}
 
@@ -47,7 +49,12 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 		return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer or Estimator";
 	}
 
-	protected String formatSolution(){
-		return "Develop and register a custom JPMML-SkLearn converter";
+	protected String formatSolution(Object object){
+
+		if((object instanceof ClassDict) || (object instanceof ClassDictConstructor)){
+			return "Develop and register a custom JPMML-SkLearn converter";
+		}
+
+		return null;
 	}
 }
