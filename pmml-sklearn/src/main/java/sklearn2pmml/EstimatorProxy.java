@@ -205,7 +205,9 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	static
-	public String formatProxyExample(Estimator estimator){
-		return ((EstimatorProxy.class).getSimpleName() + "(" + estimator.getPythonName() + "(...))");
+	public String formatExample(Estimator estimator){
+		return
+			"from sklearn2pmml import EstimatorProxy" + "\n" +
+			"proxied_estimator = EstimatorProxy(" + estimator.getPythonName() + "(...))";
 	}
 }

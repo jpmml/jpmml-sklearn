@@ -53,11 +53,9 @@ public class SelectFromModel extends SkLearnSelector implements HasEstimator<Est
 		try {
 			featureImportances = estimator.getNumberArray("feature_importances_");
 		} catch(AttributeException ae){
-			String message = "The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent " + ExceptionUtil.formatName("feature_importances_") + " attribute";
-			String solution = "Use the " + (EstimatorProxy.class).getName() + " wrapper class to give this estimator object a persistent state (eg. " + EstimatorProxy.formatProxyExample(estimator) +")";
-
-			throw new SkLearnException(message, ae)
-				.setSolution(solution);
+			throw new SkLearnException("The estimator object (" + ClassDictUtil.formatClass(estimator) + ") does not have a persistent " + ExceptionUtil.formatName("feature_importances_") + " attribute", ae)
+				.setSolution("Use the " + (EstimatorProxy.class).getName() + " meta-estimator to give this estimator object a persistent state")
+				.setExample(EstimatorProxy.formatExample(estimator));
 		}
 
 		List<Boolean> result = new ArrayList<>();
@@ -83,11 +81,9 @@ public class SelectFromModel extends SkLearnSelector implements HasEstimator<Est
 		try {
 			threshold = getNumber("threshold_");
 		} catch(AttributeException ae){
-			String message = "The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent " + ExceptionUtil.formatName("threshold_") + " attribute";
-			String solution = "Use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")";
-
-			throw new SkLearnException(message, ae)
-				.setSolution(solution);
+			throw new SkLearnException("The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent " + ExceptionUtil.formatName("threshold_") + " attribute", ae)
+				.setSolution("Use the " + (SelectorProxy.class).getName() + " meta-selector to give this selector object a persistent state")
+				.setExample(SelectorProxy.formatExample(this));
 		}
 
 		return threshold;

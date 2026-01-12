@@ -46,7 +46,9 @@ public class Alias extends TransformerWrapper {
 	}
 
 	static
-	public String formatAliasExample(){
-		return (Alias.class).getSimpleName() + "(transformer = ..., name = ...)";
+	public String formatExample(){
+		return
+			"from sklearn2pmml.decoration import Alias" + "\n" +
+			"aliased_transformer = Alias(transformer = ..., name = ...)";
 	}
 }

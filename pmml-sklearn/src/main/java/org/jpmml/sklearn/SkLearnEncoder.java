@@ -268,12 +268,10 @@ public class SkLearnEncoder extends PythonEncoder {
 		try {
 			super.addDerivedField(derivedField);
 		} catch(NamingException ne){
-			String solution =
-				"Refactor the pipeline so that it would not contain duplicate field declarations, " +
-				"or use the " + (Alias.class).getName() + " wrapper class to override the default name with a custom name (eg. " + Alias.formatAliasExample() + ")";
-
-			throw ne
-				.setSolution(solution);
+			// XXX
+			throw new SkLearnException("Field " + ExceptionUtil.formatName(derivedField.requireName()) + " is already defined", ne)
+				.setSolution("Refactor the pipeline so that it would not contain duplicate field declarations, or use the " + (Alias.class).getName() + " decorator to override the default name with a custom name")
+				.setExample(Alias.formatExample());
 		}
 	}
 

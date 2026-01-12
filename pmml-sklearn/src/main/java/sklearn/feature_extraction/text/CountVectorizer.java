@@ -276,10 +276,8 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		Object object = getOptionalObject("tokenizer");
 
 		if((object != null) && !(Tokenizer.class).isInstance(object)){
-			List<String> supportedClasses = Arrays.asList(Matcher.class.getName(), Splitter.class.getName());
-
 			throw new InvalidAttributeException("Attribute " + ExceptionUtil.formatName("tokenizer") + " has an unsupported value (" + ClassDictUtil.formatClass(object) +")", new Attribute(this, "tokenizer"))
-				.setSolution("Use one of the supported Python classes " + PythonFormatterUtil.formatValues(supportedClasses));
+				.setSolution("Use one of the supported Python classes " + Matcher.class.getName() + " or " + Splitter.class.getName());
 		}
 
 		return getOptional("tokenizer", Tokenizer.class);

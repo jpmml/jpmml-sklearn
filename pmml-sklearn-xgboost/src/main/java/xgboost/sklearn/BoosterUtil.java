@@ -36,6 +36,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.OrdinalFeature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.ByteOrderUtil;
@@ -158,11 +159,10 @@ public class BoosterUtil {
 			FeatureMap embeddedFeatureMap = learner.encodeFeatureMap();
 
 			if(embeddedFeatureMap == null || embeddedFeatureMap.isEmpty()){
-				String message = "The booster object does not specify feature information";
-				String solution = "Set the " + ExceptionUtil.formatName("fmap") + " attribute, or re-train the booster with a DMatrix that has both feature names and feature types set";
+				Attribute attribute = new Attribute(booster, "fmap");
 
-				throw new SkLearnException(message)
-					.setSolution(solution);
+				throw new SkLearnException("The booster object does not specify feature information")
+					.setSolution("Set the " + ExceptionUtil.formatName(attribute.format()) + " attribute, or re-train the booster with a DMatrix that has both feature names and feature types set");
 			}
 		}
 

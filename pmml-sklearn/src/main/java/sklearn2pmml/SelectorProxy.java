@@ -50,7 +50,9 @@ public class SelectorProxy extends Selector implements Proxy {
 	}
 
 	static
-	public String formatProxyExample(Selector selector){
-		return ((SelectorProxy.class).getSimpleName() + "(" + selector.getPythonName() + "(...))");
+	public String formatExample(Selector selector){
+		return
+			"from sklearn2pmml import SelectorProxy" + "\n" +
+			"proxied_selector = SelectorProxy(" + selector.getPythonName() + "(...))";
 	}
 }

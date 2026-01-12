@@ -319,8 +319,11 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	static
-	public String formatExpressionExample(String name){
-		return "ExpressionTransformer(Expression(\"" + name + "(...)\", function_defs = [" + name + "]))";
+	public String formatExample(String name){
+		return
+			"from sklearn2pmml.preprocessing import ExpressionTransformer" + "\n" +
+			"from sklearn2pmml.util import Expression" + "\n" +
+			"udf_transformer = ExpressionTransformer(Expression(\"" + name + "(...)\", function_defs = [" + name + "]))";
 	}
 
 	private static final String INVALIDVALUETREATMENT_AS_MISSING = "as_missing";

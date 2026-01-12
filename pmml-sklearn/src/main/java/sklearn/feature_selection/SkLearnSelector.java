@@ -41,6 +41,7 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 	@Override
 	public List<Boolean> getSupportMask(){
 		throw new SkLearnException("The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent state")
-			.setSolution("Use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")");
+			.setSolution("Use the " + (SelectorProxy.class).getName() + " meta-selector to give this selector object a persistent state")
+			.setExample(SelectorProxy.formatExample(this));
 	}
 }
