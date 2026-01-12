@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.ConversionException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.MissingAttributeException;
@@ -49,7 +50,19 @@ public class EncodableUtil {
 	 */
 	static
 	public PMML encodePMML(Encodable encodable){
-		return encodable.encodePMML();
+
+		try {
+			return encodable.encodePMML();
+		} catch(ConversionException ce){
+
+			if(encodable instanceof Step){
+				Step step = (Step)encodable;
+
+				throw ce.ensureContext(step);
+			}
+
+			throw ce;
+		}
 	}
 
 	static

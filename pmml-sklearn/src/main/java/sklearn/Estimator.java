@@ -32,7 +32,6 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
-import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
@@ -46,6 +45,7 @@ import org.jpmml.converter.UnsupportedLabelException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn2pmml.Customization;
@@ -164,8 +164,11 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			model = configureModel(model);
 
 			return model;
-		} catch(ConversionException ce){
-			throw ce.ensureContext(this);
+		} catch(SkLearnException se){
+			throw se.ensureContext(this);
+		} catch(Exception e){
+			throw new SkLearnException("Failed to encode SkLearn estimator object (" + ClassDictUtil.formatClass(this)  +") to PMML", e)
+				.setContext(this);
 		}
 	}
 

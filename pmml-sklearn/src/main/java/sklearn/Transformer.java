@@ -26,15 +26,16 @@ import java.util.Map;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DTypeCastFunction;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.HasPMMLName;
 
 abstract
@@ -81,8 +82,11 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 			features = updateFeatures(features, encoder);
 
 			return encodeFeatures(features, encoder);
-		} catch(ConversionException ce){
-			throw ce.ensureContext(this);
+		} catch(SkLearnException se){
+			throw se.ensureContext(this);
+		} catch(Exception e){
+			throw new SkLearnException("Failed to encode SkLearn transformer object (" + ClassDictUtil.formatClass(this) + ") to PMML", e)
+				.setContext(this);
 		}
 	}
 

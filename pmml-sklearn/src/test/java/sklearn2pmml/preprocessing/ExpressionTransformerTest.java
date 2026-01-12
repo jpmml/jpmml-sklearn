@@ -38,8 +38,10 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -59,7 +61,9 @@ public class ExpressionTransformerTest {
 
 		assertTrue(ReflectionUtil.equals(expected, encode(expr, -1d, null, null)));
 
-		assertThrows(ClassCastException.class, () -> encode(expr, null, -1d, null));
+		SkLearnException exception = assertThrows(SkLearnException.class, () -> encode(expr, null, -1d, null));
+
+		assertInstanceOf(ClassCastException.class, exception.getCause());
 	}
 
 	@Test
@@ -70,7 +74,9 @@ public class ExpressionTransformerTest {
 
 		assertTrue(ReflectionUtil.equals(expected, encode(expr, null, null, null)));
 
-		assertThrows(ClassCastException.class, () -> encode(expr, null, null, "as_missing"));
+		SkLearnException exception = assertThrows(SkLearnException.class, () -> encode(expr, null, null, "as_missing"));
+
+		assertInstanceOf(ClassCastException.class, exception.getCause());
 	}
 
 	@Test
