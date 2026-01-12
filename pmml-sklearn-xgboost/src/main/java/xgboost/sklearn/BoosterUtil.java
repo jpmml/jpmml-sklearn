@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
@@ -43,6 +44,7 @@ import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.ObjFunction;
+import org.jpmml.xgboost.XGBoostException;
 import pandas.core.BlockManager;
 import pandas.core.DataFrame;
 import pandas.core.Index;
@@ -257,8 +259,12 @@ public class BoosterUtil {
 		Index columnAxis = data.getColumnAxis();
 		Index rowAxis = data.getRowAxis();
 
-		if(!(Arrays.asList("id", "name", "type")).equals(columnAxis.getValues())){
-			throw new IllegalArgumentException();
+		List<String> columnNames = (columnAxis.getValues()).stream()
+			.map(value -> String.valueOf(value))
+			.collect(Collectors.toList());
+
+		if(!(Arrays.asList("id", "name", "type")).equals(columnNames)){
+			throw new XGBoostException("Expected " + ExceptionUtil.formatNameList(Arrays.asList("id", "name", "type")) + " as column names, got " + ExceptionUtil.formatNameList(columnNames));
 		}
 
 		List<HasArray> blockValues = data.getBlockValues();

@@ -33,9 +33,10 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
+import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.converter.WildcardFeature;
-import org.jpmml.python.ResolutionException;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.InitializerUtil;
 import sklearn.preprocessing.LabelEncoder;
 
@@ -70,7 +71,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 		Feature labelFeature = FeatureUtil.findLabelFeature(result, scalarLabel);
 		if(labelFeature == null){
-			throw new ResolutionException("Column " + ExceptionUtil.formatName(scalarLabel.getName()) + " not in " + ExceptionUtil.formatNameList(result));
+			throw new SkLearnException("Column " + ExceptionUtil.formatName(scalarLabel.getName()) + " not in " + ExceptionUtil.formatNameList(result));
 		}
 
 		int labelFeatureIndex = result.indexOf(labelFeature);
@@ -93,7 +94,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new UnsupportedFeatureException("Expected a wildcard feature, got " + labelFeature.typeString());
 		}
 
 		return result;

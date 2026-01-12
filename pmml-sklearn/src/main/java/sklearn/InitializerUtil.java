@@ -33,7 +33,6 @@ import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.ResolutionException;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 
@@ -84,7 +83,7 @@ public class InitializerUtil {
 							return feature;
 						}
 
-						throw new ResolutionException("Column " + ExceptionUtil.formatName(column) + " not in " + ExceptionUtil.formatNameList(features));
+						throw new SkLearnException("Column " + ExceptionUtil.formatName(column) + " not in " + ExceptionUtil.formatNameList(features));
 					}
 
 					return createWildcardFeature(column, encoder);
