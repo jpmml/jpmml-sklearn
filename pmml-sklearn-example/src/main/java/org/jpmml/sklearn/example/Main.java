@@ -149,7 +149,7 @@ public class Main {
 
 
 	static
-	public void main(String... args) throws Exception {
+	public void main(String... args){
 		Main main = new Main();
 
 		JCommander commander = new JCommander(main);
@@ -185,7 +185,7 @@ public class Main {
 		try {
 			main.run();
 		} catch(FileNotFoundException fnfe){
-			throw fnfe;
+			System.exit(-1);
 		} catch(Exception e){
 			Package _package = Main.class.getPackage();
 
@@ -199,11 +199,13 @@ public class Main {
 
 			try {
 				TelemetryClient.report("https://telemetry.jpmml.org/v1/incidents", incident);
+			} catch(InterruptedException ie){
+				// Ignored
 			} catch(IOException ioe){
 				// Ignored
 			}
 
-			throw e;
+			System.exit(-1);
 		}
 	}
 
@@ -226,13 +228,21 @@ public class Main {
 			throw e;
 		}
 
-		Encodable encodable = EncodableUtil.toEncodable(object);
+		Encodable encodable;
 
-		Map<String, ?> options = getOptions();
-		if(!options.isEmpty()){
-			HasPMMLOptions<?> hasPmmlOptions = (HasPMMLOptions<?>)encodable;
+		try {
+			encodable = EncodableUtil.toEncodable(object);
 
-			hasPmmlOptions.setPMMLOptions(options);
+			Map<String, ?> options = getOptions();
+			if(!options.isEmpty()){
+				HasPMMLOptions<?> hasPmmlOptions = (HasPMMLOptions<?>)encodable;
+
+				hasPmmlOptions.setPMMLOptions(options);
+			}
+		} catch(Exception e){
+			logger.error("Failed to recognize PKL", e);
+
+			throw e;
 		}
 
 		PMML pmml;
