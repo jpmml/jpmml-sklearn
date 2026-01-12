@@ -22,10 +22,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.LogManager;
 
 import com.beust.jcommander.DefaultUsageFormatter;
 import com.beust.jcommander.IUsageFormatter;
@@ -33,6 +35,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.ConversionException;
 import org.jpmml.model.JAXBSerializer;
 import org.jpmml.model.metro.MetroJAXBSerializer;
 import org.jpmml.python.PythonUnpickler;
@@ -311,6 +314,19 @@ public class Main {
 
 	public void setOutput(File output){
 		this.output = output;
+	}
+
+	// XXX
+	static {
+		ConversionException.SECTION_SEPARATOR = "";
+
+		try(InputStream is = Main.class.getResourceAsStream("/logging.properties")){
+			LogManager logManager = LogManager.getLogManager();
+
+			logManager.readConfiguration(is);
+		} catch(Exception e){
+			e.printStackTrace(System.err);
+		}
 	}
 
 	static {
