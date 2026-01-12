@@ -23,6 +23,7 @@ import java.util.List;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.HasFeatureNamesIn;
+import sklearn.HasNumberOfFeatures;
 import sklearn.Selector;
 import sklearn2pmml.SelectorProxy;
 
@@ -34,23 +35,12 @@ public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
 
 	@Override
 	public int getNumberOfFeatures(){
-		throw new SkLearnException(formatMessage(this))
-			.setSolution(formatSolution(this));
+		return HasNumberOfFeatures.UNKNOWN;
 	}
 
 	@Override
 	public List<Boolean> getSupportMask(){
-		throw new SkLearnException(formatMessage(this))
-			.setSolution(formatSolution(this));
-	}
-
-	static
-	private String formatMessage(Selector selector){
-		return "The selector object (" + ClassDictUtil.formatClass(selector) + ") does not have a persistent state";
-	}
-
-	static
-	private String formatSolution(Selector selector){
-		return "Use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(selector) + ")";
+		throw new SkLearnException("The selector object (" + ClassDictUtil.formatClass(this) + ") does not have a persistent state")
+			.setSolution("Use the " + (SelectorProxy.class).getName() + " wrapper class to give this selector object a persistent state (eg. " + SelectorProxy.formatProxyExample(this) + ")");
 	}
 }
