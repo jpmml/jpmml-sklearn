@@ -42,7 +42,7 @@ public class BinaryEncoder extends BaseNEncoder {
 
 			return super.encode(features, encoder);
 		} catch(ConversionException ce){
-			throw ensureContext(ce);
+			throw ce.ensureContext(this);
 		}
 	}
 

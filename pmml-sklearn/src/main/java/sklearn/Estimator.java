@@ -165,7 +165,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 			return model;
 		} catch(ConversionException ce){
-			throw ensureContext(ce);
+			throw ce.ensureContext(this);
 		}
 	}
 

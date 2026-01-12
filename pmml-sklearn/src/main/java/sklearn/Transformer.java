@@ -82,7 +82,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 
 			return encodeFeatures(features, encoder);
 		} catch(ConversionException ce){
-			throw ensureContext(ce);
+			throw ce.ensureContext(this);
 		}
 	}
 

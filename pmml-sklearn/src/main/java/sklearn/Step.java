@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.ExceptionUtil;
-import org.jpmml.python.Attribute;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -119,10 +118,8 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 		try {
 			return get(name, castFunction);
-		} catch(SkLearnException se){
-			Attribute attribute = new Attribute(this, name);
-
-			throw ensureContext(se, attribute);
+		} catch(ConversionException ce){
+			throw ce.ensureContext(this);
 		}
 	}
 
@@ -138,10 +135,8 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 		try {
 			return getOptional(name, castFunction);
-		} catch(SkLearnException se){
-			Attribute attribute = new Attribute(this, name);
-
-			throw ensureContext(se, attribute);
+		} catch(ConversionException ce){
+			throw ce.ensureContext(this);
 		}
 	}
 
@@ -157,10 +152,8 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 		try {
 			return getArray(name, castFunction);
-		} catch(SkLearnException se){
-			Attribute attribute = new Attribute(this, name);
-
-			throw ensureContext(se, attribute);
+		} catch(ConversionException ce){
+			throw ce.ensureContext(this);
 		}
 	}
 
@@ -184,24 +177,8 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 		try {
 			return getList(name, castFunction);
-		} catch(SkLearnException se){
-			Attribute attribute = new Attribute(this, name);
-
-			throw ensureContext(se, attribute);
+		} catch(ConversionException ce){
+			throw ce.ensureContext(this);
 		}
-	}
-
-	protected <E extends ConversionException> E ensureContext(E exception){
-		return ensureContext(exception, this);
-	}
-
-	protected <E extends ConversionException> E ensureContext(E exception, Object parentContext){
-		Object context = exception.getContext();
-
-		if(context == null){
-			exception.setContext(parentContext);
-		}
-
-		return exception;
 	}
 }

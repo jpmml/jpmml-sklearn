@@ -63,7 +63,7 @@ public class Initializer extends Transformer {
 
 			return super.encode(features, encoder);
 		} catch(ConversionException ce){
-			throw ensureContext(ce);
+			throw ce.ensureContext(this);
 		}
 	}
 }
