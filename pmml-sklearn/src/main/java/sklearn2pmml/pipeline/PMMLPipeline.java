@@ -332,6 +332,16 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			}
 
 			@Override
+			public Field<?> getField(String name){
+
+				try {
+					return super.getField(name);
+				} catch(SchemaException se){
+					return encoder.getField(name);
+				}
+			}
+
+			@Override
 			public boolean isFrozen(String name){
 				return true;
 			}
