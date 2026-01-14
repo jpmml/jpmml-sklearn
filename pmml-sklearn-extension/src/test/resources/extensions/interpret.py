@@ -6,7 +6,10 @@ from common import *
 
 from interpret.glassbox import ClassificationTree, LinearRegression, ExplainableBoostingClassifier, ExplainableBoostingRegressor, LogisticRegression, RegressionTree
 from pandas import DataFrame
+from sklearn.pipeline import make_pipeline
+from sklearn2pmml.cross_reference import Recaller
 from sklearn2pmml.pipeline import PMMLPipeline
+from sklearn2pmml.postprocessing import FeatureExporter
 
 datasets = []
 
@@ -16,12 +19,12 @@ if __name__ == "__main__":
 	else:
 		datasets = ["Audit", "Auto", "Iris", "Versicolor"]
 
-def build_audit(audit_df, classifier, name):
+def build_audit(audit_df, classifier, name, predict_transformer = None):
 	audit_X, audit_y = split_csv(audit_df)
 
 	pipeline = PMMLPipeline([
 		("classifier", classifier)
-	])
+	], predict_transformer = predict_transformer)
 	pipeline.fit(audit_X, audit_y)
 	# XXX
 	#pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
@@ -39,7 +42,7 @@ if "Audit" in datasets:
 
 	audit_df = audit_df[cat_cols + cont_cols + ["Adjusted"]]
 
-	build_audit(audit_df, ExplainableBoostingClassifier(max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingClassifierAudit")
+	build_audit(audit_df, ExplainableBoostingClassifier(max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingClassifierAudit", predict_transformer = make_pipeline(Recaller(None, names = ["lookup(Education)", "lookup(bin(Age, 0))"]), FeatureExporter(names = ["ebm(Education)", "ebm(Age)"])))
 
 def build_versicolor(versicolor_df, classifier, name):
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
@@ -82,12 +85,12 @@ if "Iris" in datasets:
 	build_iris(iris_df, ClassificationTree(max_depth = 3, random_state = 13), "ClassificationTreeIris")
 	build_iris(iris_df, LogisticRegression(), "LogisticRegressionIris")
 
-def build_auto(auto_df, regressor, name):
+def build_auto(auto_df, regressor, name, predict_transformer = None):
 	auto_X, auto_y = split_csv(auto_df)
 
 	pipeline = PMMLPipeline([
 		("regressor", regressor)
-	])
+	], predict_transformer = predict_transformer)
 	pipeline.fit(auto_X, auto_y)
 	# XXX
 	#pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
@@ -103,6 +106,6 @@ if "Auto" in datasets:
 
 	auto_df[cat_cols] = auto_df[cat_cols].astype("category")
 
-	build_auto(auto_df, ExplainableBoostingRegressor(objective = "rmse_log", max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingRegressorAuto")
+	build_auto(auto_df, ExplainableBoostingRegressor(objective = "rmse_log", max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingRegressorAuto", predict_transformer = make_pipeline(Recaller(None, names = ["lookup(cylinders)", "lookup(bin(acceleration, 0))"]), FeatureExporter(names = ["ebm(cylinders)", "ebm(acceleration)"])))
 	build_auto(auto_df, LinearRegression(), "LinearRegressionAuto")
 	build_auto(auto_df, RegressionTree(max_depth = 5, random_state = 13), "RegressionTreeAuto")

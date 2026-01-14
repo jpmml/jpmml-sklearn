@@ -27,7 +27,7 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateExplainableBoostingClassifierAudit() throws Exception {
-		evaluate("ExplainableBoostingClassifier", AUDIT);
+		evaluate("ExplainableBoostingClassifier", AUDIT, excludeFields("predict(Adjusted)", "ebm(Age)", "ebm(Education)"));
 	}
 
 	@Test
@@ -37,7 +37,7 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateExplainableBoostingRegressorAuto() throws Exception {
-		evaluate("ExplainableBoostingRegressor", AUTO);
+		evaluate("ExplainableBoostingRegressor", AUTO, excludeFields("predict(mpg)", "ebm(acceleration)", "ebm(cylinders)"));
 	}
 
 	@Test

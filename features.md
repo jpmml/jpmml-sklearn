@@ -353,6 +353,7 @@
     * `sklearn2pmml.pipeline.PMMLPipeline`
   * Postprocessing:
     * `sklearn2pmml.postprocessing.BusinessDecisionTransformer`
+    * `sklearn2pmml.postprocessing.FeatureExporter`
   * Preprocessing:
     * `sklearn2pmml.preprocessing.AggregateTransformer`
     * `sklearn2pmml.preprocessing.BSplineTransformer`
