@@ -51,6 +51,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.NamingException;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.ScalarLabelUtil;
@@ -164,7 +165,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 					OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), scalarLabel.getOpType(), scalarLabel.getDataType())
 						.setFinalResult(false);
 
-					output.addOutputFields(predictField);
+					encoder.createDerivedField(model, predictField, false);
 
 					predictFields.add(predictField);
 				}
@@ -332,6 +333,20 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			}
 
 			@Override
+			public void addDataField(DataField dataField){
+				checkField(dataField.requireName());
+
+				super.addDataField(dataField);
+			}
+
+			@Override
+			public void addDerivedField(DerivedField derivedField){
+				checkField(derivedField.requireName());
+
+				super.addDerivedField(derivedField);
+			}
+
+			@Override
 			public Field<?> getField(String name){
 
 				try {
@@ -355,6 +370,24 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			public Map<String, Feature> getMemory(){
 				return encoder.getMemory();
 			}
+
+			private void checkField(String name){
+				Field<?> field;
+
+				try {
+					field = encoder.getField(name);
+				} catch(SchemaException se){
+					return;
+				}
+
+				if(field instanceof DerivedOutputField){
+					DerivedOutputField derivedOutputField = (DerivedOutputField)field;
+
+					return;
+				}
+
+				throw new NamingException("Field " + ExceptionUtil.formatName(name) + " is already defined");
+			}
 		};
 
 		Model model = encoder.getModel();
@@ -376,20 +409,6 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 		for(Feature outputFeature : outputFeatures){
 			String name = outputFeature.getName();
-
-			Field<?> field = outputFeature.getField();
-
-			// XXX
-			try {
-				outputEncoder.getField(field.requireName());
-			} catch(SchemaException se){
-				OutputField outputField = new OutputField(FieldNameUtil.create("xref", outputFeature), field.requireOpType(), field.requireDataType())
-					.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-					.setFinalResult(true)
-					.setExpression(outputFeature.ref());
-
-				output.addOutputFields(outputField);
-			}
 
 			finalResults.put(name, finalResults.size());
 		}
