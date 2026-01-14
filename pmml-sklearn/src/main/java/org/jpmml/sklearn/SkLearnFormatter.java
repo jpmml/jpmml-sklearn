@@ -40,17 +40,25 @@ public class SkLearnFormatter extends SimpleFormatter {
 	}
 
 	static
-	private String center(String text){
-		int spaces = (HEADER_WIDTH - text.length()) / 2;
+	private String header(String text, char separator){
+		StringBuilder sb = new StringBuilder();
 
-		return (" ").repeat(spaces) + text;
+		int indent = (SkLearnFormatter.HEADER_WIDTH - text.length()) / 2;
+
+		sb.append(System.lineSeparator());
+		sb.append(String.valueOf(separator).repeat(SkLearnFormatter.HEADER_WIDTH));
+		sb.append(System.lineSeparator());
+		sb.append(" ".repeat(indent)).append(text);
+		sb.append(System.lineSeparator());
+		sb.append(String.valueOf(separator).repeat(SkLearnFormatter.HEADER_WIDTH));
+		sb.append(System.lineSeparator());
+
+		return sb.toString();
 	}
 
-	private static final int HEADER_WIDTH = 64;
+	// Identical to Apace Maven line lengths
+	public static int HEADER_WIDTH = 79;
 
-	private static final String THICK_LINE = ("=").repeat(HEADER_WIDTH);
-	private static final String THIN_LINE = ("-").repeat(HEADER_WIDTH);
-
-	public static String EXCEPTION_HEADER = "\n" + THICK_LINE + "\n" + center("EXCEPTION") + "\n" + THICK_LINE + "\n";
-	public static String CAUSED_BY_HEADER = "\n" + THIN_LINE + "\n" + center("Caused by") + "\n" + THIN_LINE + "\n";
+	public static String EXCEPTION_HEADER = header("EXCEPTION", '=');
+	public static String CAUSED_BY_HEADER = header("Caused by", '-');
 }
