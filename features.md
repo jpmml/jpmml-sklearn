@@ -178,6 +178,14 @@
 </details>
 
 <details>
+  <summary>FLAML</summary>
+
+  Examples: [extensions/hpsklearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/flaml.py)
+
+  * `flaml.automl.model.ElasticNetEstimator`
+</details>
+
+<details>
   <summary>H2O.ai</summary>
 
   Examples: [main-h2o.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-h2o/src/test/resources/main-h2o.py)

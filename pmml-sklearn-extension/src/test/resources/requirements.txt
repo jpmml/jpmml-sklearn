@@ -1,5 +1,6 @@
 Boruta==0.4.3
 category_encoders==2.9.0
+flaml==2.4.1
 # python -m pip install git+https://github.com/hyperopt/hyperopt-sklearn
 #hpsklearn==1.0.3
 hyperopt==0.2.7
