@@ -28,4 +28,9 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	public void evaluateElasticNetEstimatorAuto() throws Exception {
 		evaluate("ElasticNetEstimator", AUTO);
 	}
+
+	@Test
+	public void evaluateLassoLarsEstimatorAuto() throws Exception {
+		evaluate("LassoLarsEstimator", AUTO);
+	}
 }

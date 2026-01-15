@@ -183,6 +183,7 @@
   Examples: [extensions/hpsklearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/flaml.py)
 
   * `flaml.automl.model.ElasticNetEstimator`
+  * `flaml.automl.model.LassoLarsEstimator`
 </details>
 
 <details>

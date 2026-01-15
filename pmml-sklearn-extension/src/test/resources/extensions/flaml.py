@@ -41,3 +41,4 @@ if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto")
+	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto")
