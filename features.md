@@ -185,6 +185,7 @@
   * `flaml.automl.model.ElasticNetEstimator`
   * `flaml.automl.model.LassoLarsEstimator`
   * `flaml.automl.model.LRL1Classifier`
+  * `flaml.automl.model.LRL2Classifier`
 </details>
 
 <details>

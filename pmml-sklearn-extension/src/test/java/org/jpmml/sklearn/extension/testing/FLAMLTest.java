@@ -30,6 +30,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateLRL2ClassifierAudit() throws Exception {
+		evaluate("LRL2Classifier", AUDIT);
+	}
+
+	@Test
 	public void evaluateElasticNetEstimatorAuto() throws Exception {
 		evaluate("ElasticNetEstimator", AUTO);
 	}
