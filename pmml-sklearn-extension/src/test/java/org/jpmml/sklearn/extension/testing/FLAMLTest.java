@@ -35,6 +35,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateSVCEstimatorAudit() throws Exception {
+		evaluate("SVCEstimator", AUDIT);
+	}
+
+	@Test
 	public void evaluateElasticNetEstimatorAuto() throws Exception {
 		evaluate("ElasticNetEstimator", AUTO);
 	}

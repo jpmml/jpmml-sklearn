@@ -50,6 +50,7 @@ if "Audit" in datasets:
 
 	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit", binarize = True)
 	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit", binarize = True)
+	build_audit(audit_df, "svc", "SVCEstimatorAudit", binarize = True)
 
 def build_auto(auto_df, regressor, name, binarize = False):
 	auto_X, auto_y = split_csv(auto_df)
