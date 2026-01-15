@@ -186,6 +186,7 @@
   * `flaml.automl.model.ElasticNetEstimator`
   * `flaml.automl.model.ExtraTreesEstimator`
   * `flaml.automl.model.LassoLarsEstimator`
+  * `flaml.automl.model.LGBMEstimator`
   * `flaml.automl.model.LRL1Classifier`
   * `flaml.automl.model.LRL2Classifier`
   * `flaml.automl.model.RandomForestEstimator`

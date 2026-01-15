@@ -35,6 +35,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateLGBMEstimatorAudit() throws Exception {
+		evaluate("LGBMEstimator", AUDIT);
+	}
+
+	@Test
 	public void evaluateLRL1ClassifierAudit() throws Exception {
 		evaluate("LRL1Classifier", AUDIT);
 	}
@@ -72,6 +77,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateLassoLarsEstimatorAuto() throws Exception {
 		evaluate("LassoLarsEstimator", AUTO);
+	}
+
+	@Test
+	public void evaluateLGBMEstimatorAuto() throws Exception {
+		evaluate("LGBMEstimator", AUTO);
 	}
 
 	@Test
