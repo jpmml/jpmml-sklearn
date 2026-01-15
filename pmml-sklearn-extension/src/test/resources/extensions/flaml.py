@@ -22,19 +22,26 @@ if __name__ == "__main__":
 
 def small_forest():
 	return {
-		"n_estimators": {
+		"n_estimators" : {
 			"domain" : tune.randint(lower = 7, upper = 31),
 			"init_value" : 11
 		},
-		"max_leaves": {
+		"max_leaves" : {
 			"domain" : tune.lograndint(lower = 4, upper = 32),
 			"low_cost_init_value" : 4
 		}
 	}
 
-def make_custom_hp():
+def make_custom_hp(cat_cols, cont_cols):
 	return {
 		"extra_tree" : small_forest(),
+		"histgb" : {
+			**small_forest(),
+			"categorical_features" : {
+				"domain" : list(range(len(cat_cols))),
+				"init_value" : list(range(len(cat_cols)))
+			}
+		},
 		"rf" : small_forest()
 	}
 
@@ -60,7 +67,7 @@ def build_audit(audit_df, classifier, name, binarize = False):
 	audit_Xt = transformer.fit_transform(audit_X)
 
 	automl = AutoML()
-	automl.fit(audit_Xt, audit_y, task = "classification", estimator_list = [classifier], custom_hp = make_custom_hp(), time_budget = 10)
+	automl.fit(audit_Xt, audit_y, task = "classification", estimator_list = [classifier], custom_hp = make_custom_hp(cat_cols, cont_cols), time_budget = 10)
 
 	pipeline = make_pmml_pipeline(make_pipeline(transformer, automl.model), target_fields = ["Adjusted"])
 	store_pkl(pipeline, name)
@@ -73,6 +80,7 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
 	build_audit(audit_df, "extra_tree", "ExtraTreesEstimatorAudit", binarize = True)
+	build_audit(audit_df, "histgb", "HistGradientBoostingEstimatorAudit", binarize = False)
 	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit", binarize = True)
 	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit", binarize = True)
 	build_audit(audit_df, "rf", "RandomForestEstimatorAudit", binarize = True)
@@ -94,7 +102,7 @@ def build_auto(auto_df, regressor, name, binarize = False):
 	auto_Xt = transformer.fit_transform(auto_X)
 
 	automl = AutoML()
-	automl.fit(auto_Xt, auto_y, task = "regression", estimator_list = [regressor], custom_hp = make_custom_hp(), time_budget = 10)
+	automl.fit(auto_Xt, auto_y, task = "regression", estimator_list = [regressor], custom_hp = make_custom_hp(cat_cols, cont_cols), time_budget = 10)
 
 	pipeline = make_pmml_pipeline(make_pipeline(transformer, automl.model), target_fields = ["mpg"])
 	store_pkl(pipeline, name)
@@ -106,5 +114,6 @@ if "Auto" in datasets:
 
 	build_auto(auto_df, "extra_tree", "ExtraTreesEstimatorAuto", binarize = True)
 	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto", binarize = True)
+	build_auto(auto_df, "histgb", "HistGradientBoostingEstimatorAuto", binarize = False)
 	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto", binarize = True)
 	build_auto(auto_df, "rf", "RandomForestEstimatorAuto", binarize = True)

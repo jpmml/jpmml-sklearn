@@ -30,6 +30,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateHistGradientBoostingEstimatorAudit() throws Exception {
+		evaluate("HistGradientBoostingEstimator", AUDIT);
+	}
+
+	@Test
 	public void evaluateLRL1ClassifierAudit() throws Exception {
 		evaluate("LRL1Classifier", AUDIT);
 	}
@@ -57,6 +62,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateElasticNetEstimatorAuto() throws Exception {
 		evaluate("ElasticNetEstimator", AUTO);
+	}
+
+	@Test
+	public void evaluateHistGradientBoostingEstimatorAuto() throws Exception {
+		evaluate("HistGradientBoostingEstimator", AUTO);
 	}
 
 	@Test
