@@ -43,6 +43,18 @@ def small_forest():
 def make_custom_hp(cat_cols, cont_cols):
 	xgb_feature_types = ["c"] * len(cat_cols) + ["q"] * len(cont_cols)
 
+	xgb_config = {
+		**small_forest(),
+		"enable_categorical" : {
+			"domain" : True,
+			"init_value" : True
+		},
+		"feature_types" : {
+			"domain" : xgb_feature_types,
+			"init_value" : xgb_feature_types
+		}
+	}
+
 	return {
 		"extra_tree" : small_forest(),
 		"histgb" : {
@@ -54,17 +66,8 @@ def make_custom_hp(cat_cols, cont_cols):
 		},
 		"lgbm" : small_forest(),
 		"rf" : small_forest(),
-		"xgboost" : {
-			**small_forest(),
-			"enable_categorical" : {
-				"domain" : True,
-				"init_value" : True
-			},
-			"feature_types" : {
-				"domain" : xgb_feature_types,
-				"init_value" : xgb_feature_types
-			}
-		}
+		"xgboost" : xgb_config,
+		"xgb_limitdepth" : xgb_config
 	}
 
 def make_transformer(cat_cols, cont_cols, binarize = False):
@@ -110,6 +113,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit", binarize = True)
 	build_audit(audit_df, "rf", "RandomForestEstimatorAudit", binarize = True)
 	build_audit(audit_df, "svc", "SVCEstimatorAudit", binarize = True)
+	build_audit(audit_df, "xgb_limitdepth", "XGBoostLimitDepthEstimatorAudit", binarize = False)
 	build_audit(audit_df, "xgboost", "XGBoostSklearnEstimatorAudit", binarize = False)
 
 def build_auto(auto_df, regressor, name, binarize = False):
@@ -144,4 +148,5 @@ if "Auto" in datasets:
 	build_auto(auto_df, "lgbm", "LGBMEstimatorAuto", binarize = False)
 	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto", binarize = True)
 	build_auto(auto_df, "rf", "RandomForestEstimatorAuto", binarize = True)
+	build_auto(auto_df, "xgb_limitdepth", "XGBoostLimitDepthEstimatorAuto", binarize = False)
 	build_auto(auto_df, "xgboost", "XGBoostSklearnEstimatorAuto", binarize = False)

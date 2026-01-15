@@ -61,6 +61,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateXGBoostLimitDepthEstimatorAudit() throws Exception {
+		evaluate("XGBoostLimitDepthEstimator", AUDIT, new PMMLEquivalence(5e-6, 5e-6));
+	}
+
+	@Test
 	public void evaluateXGBoostSklearnEstimatorAudit() throws Exception {
 		evaluate("XGBoostSklearnEstimator", AUDIT, new PMMLEquivalence(1e-6, 1e-6));
 	}
@@ -93,6 +98,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateRandomForestEstimatorAuto() throws Exception {
 		evaluate("RandomForestEstimator", AUTO);
+	}
+
+	@Test
+	public void evaluateXGBoostLimitDepthEstimatorAuto() throws Exception {
+		evaluate("XGBoostLimitDepthEstimator", AUTO, new PMMLEquivalence(1e-6, 1e-6));
 	}
 
 	@Test
