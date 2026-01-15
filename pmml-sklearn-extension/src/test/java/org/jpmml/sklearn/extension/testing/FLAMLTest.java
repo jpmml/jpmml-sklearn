@@ -19,6 +19,7 @@
 package org.jpmml.sklearn.extension.testing;
 
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +61,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateXGBoostSklearnEstimatorAudit() throws Exception {
+		evaluate("XGBoostSklearnEstimator", AUDIT, new PMMLEquivalence(1e-6, 1e-6));
+	}
+
+	@Test
 	public void evaluateExtraTreesEstimatorAuto() throws Exception {
 		evaluate("ExtraTreesEstimator", AUTO);
 	}
@@ -87,5 +93,10 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateRandomForestEstimatorAuto() throws Exception {
 		evaluate("RandomForestEstimator", AUTO);
+	}
+
+	@Test
+	public void evaluateXGBoostSklearnEstimatorAuto() throws Exception {
+		evaluate("XGBoostSklearnEstimator", AUTO, new PMMLEquivalence(1e-6, 1e-6));
 	}
 }
