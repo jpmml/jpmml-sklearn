@@ -25,6 +25,11 @@ import org.junit.jupiter.api.Test;
 public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
+	public void evaluateLRL1ClassifierAudit() throws Exception {
+		evaluate("LRL1Classifier", AUDIT);
+	}
+
+	@Test
 	public void evaluateElasticNetEstimatorAuto() throws Exception {
 		evaluate("ElasticNetEstimator", AUTO);
 	}

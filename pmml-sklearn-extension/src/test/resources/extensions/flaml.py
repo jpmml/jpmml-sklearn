@@ -17,15 +17,46 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Auto"]
+		datasets = ["Audit", "Auto"]
 
-def build_auto(auto_df, regressor, name):
+def make_transformer(cat_cols, cont_cols, binarize = False):
+	return ColumnTransformer([
+		("cat", OneHotEncoder(sparse_output = False) if binarize else "passthrough", cat_cols),
+		("cont", "passthrough", cont_cols)
+	])
+
+def build_audit(audit_df, classifier, name, binarize = False):
+	audit_X, audit_y = split_csv(audit_df)
+
+	cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
+	cont_cols = ["Age", "Hours", "Income"]
+
+	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize)
+
+	audit_Xt = transformer.fit_transform(audit_X)
+
+	automl = AutoML()
+	automl.fit(audit_Xt, audit_y, task = "classification", estimator_list = [classifier], time_budget = 10)
+
+	pipeline = make_pmml_pipeline(make_pipeline(transformer, automl.model), target_fields = ["Adjusted"])
+	store_pkl(pipeline, name)
+	adjusted = DataFrame(automl.model.predict(audit_Xt), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(automl.model.predict_proba(audit_Xt), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
+if "Audit" in datasets:
+	audit_df = load_audit("Audit")
+
+	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit", binarize = True)
+
+def build_auto(auto_df, regressor, name, binarize = False):
 	auto_X, auto_y = split_csv(auto_df)
 
-	transformer = ColumnTransformer([
-		("cat", OneHotEncoder(sparse_output = False), ["cylinders", "model_year", "origin"]),
-		("cont", "passthrough", ["acceleration", "displacement", "horsepower", "weight"])
-	])
+	cat_cols = ["cylinders", "model_year", "origin"]
+	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
+
+	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize)
 
 	auto_Xt = transformer.fit_transform(auto_X)
 
@@ -40,5 +71,5 @@ def build_auto(auto_df, regressor, name):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
-	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto")
-	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto")
+	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto", binarize = True)
+	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto", binarize = True)
