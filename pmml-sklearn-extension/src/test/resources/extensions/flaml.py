@@ -108,13 +108,10 @@ if "Audit" in datasets:
 
 	build_audit(audit_df, "extra_tree", "ExtraTreesEstimatorAudit", binarize = True)
 	build_audit(audit_df, "histgb", "HistGradientBoostingEstimatorAudit", binarize = False)
-	build_audit(audit_df, "lgbm", "LGBMEstimatorAudit", binarize = False)
 	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit", binarize = True)
 	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit", binarize = True)
 	build_audit(audit_df, "rf", "RandomForestEstimatorAudit", binarize = True)
 	build_audit(audit_df, "svc", "SVCEstimatorAudit", binarize = True)
-	build_audit(audit_df, "xgb_limitdepth", "XGBoostLimitDepthEstimatorAudit", binarize = False)
-	build_audit(audit_df, "xgboost", "XGBoostSklearnEstimatorAudit", binarize = False)
 
 def build_auto(auto_df, regressor, name, binarize = False):
 	auto_X, auto_y = split_csv(auto_df)
@@ -145,8 +142,5 @@ if "Auto" in datasets:
 	build_auto(auto_df, "extra_tree", "ExtraTreesEstimatorAuto", binarize = True)
 	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto", binarize = True)
 	build_auto(auto_df, "histgb", "HistGradientBoostingEstimatorAuto", binarize = False)
-	build_auto(auto_df, "lgbm", "LGBMEstimatorAuto", binarize = False)
 	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto", binarize = True)
 	build_auto(auto_df, "rf", "RandomForestEstimatorAuto", binarize = True)
-	build_auto(auto_df, "xgb_limitdepth", "XGBoostLimitDepthEstimatorAuto", binarize = False)
-	build_auto(auto_df, "xgboost", "XGBoostSklearnEstimatorAuto", binarize = False)

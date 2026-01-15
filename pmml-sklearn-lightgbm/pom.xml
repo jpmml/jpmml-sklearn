@@ -39,5 +39,11 @@
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-lightgbm</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-sklearn-extension</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

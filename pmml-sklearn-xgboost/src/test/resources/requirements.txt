@@ -1,2 +1,3 @@
 category_encoders==2.9.0
+flaml==2.4.1
 xgboost==3.0.5
