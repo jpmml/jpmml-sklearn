@@ -10,6 +10,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn2pmml import make_pmml_pipeline
+from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 
 datasets = []
 
@@ -38,16 +39,21 @@ def make_custom_hp():
 	}
 
 def make_transformer(cat_cols, cont_cols, binarize = False):
-	return ColumnTransformer([
-		("cat", OneHotEncoder(sparse_output = False) if binarize else "passthrough", cat_cols),
-		("cont", "passthrough", cont_cols)
-	])
+	return ColumnTransformer(
+		[(cat_col, make_pipeline(CategoricalDomain(), OneHotEncoder(sparse_output = False)) if binarize else CategoricalDomain(), [cat_col]) for cat_col in cat_cols] +
+		[(cont_col, ContinuousDomain(), [cont_col]) for cont_col in cont_cols]
+	)
 
 def build_audit(audit_df, classifier, name, binarize = False):
 	audit_X, audit_y = split_csv(audit_df)
 
 	cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
 	cont_cols = ["Age", "Hours", "Income"]
+
+	for cat_col in cat_cols:
+		audit_X[cat_col] = audit_X[cat_col].astype(str) if binarize else audit_X[cat_col].astype("category")
+	for cont_col in cont_cols:
+		audit_X[cont_col] = audit_X[cont_col].astype(float)
 
 	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize)
 
@@ -77,6 +83,11 @@ def build_auto(auto_df, regressor, name, binarize = False):
 
 	cat_cols = ["cylinders", "model_year", "origin"]
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
+
+	for cat_col in cat_cols:
+		auto_X[cat_col] = auto_X[cat_col].astype(int) if binarize else auto_X[cat_col].astype("category")
+	for cont_col in cont_cols:
+		auto_X[cont_col] = auto_X[cont_col].astype(float)
 
 	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize)
 
