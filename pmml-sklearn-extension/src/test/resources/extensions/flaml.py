@@ -33,6 +33,7 @@ def small_forest():
 
 def make_custom_hp():
 	return {
+		"extra_tree" : small_forest(),
 		"rf" : small_forest()
 	}
 
@@ -65,6 +66,7 @@ def build_audit(audit_df, classifier, name, binarize = False):
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
+	build_audit(audit_df, "extra_tree", "ExtraTreesEstimatorAudit", binarize = True)
 	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit", binarize = True)
 	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit", binarize = True)
 	build_audit(audit_df, "rf", "RandomForestEstimatorAudit", binarize = True)
@@ -91,6 +93,7 @@ def build_auto(auto_df, regressor, name, binarize = False):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
+	build_auto(auto_df, "extra_tree", "ExtraTreesEstimatorAuto", binarize = True)
 	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto", binarize = True)
 	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto", binarize = True)
 	build_auto(auto_df, "rf", "RandomForestEstimatorAuto", binarize = True)

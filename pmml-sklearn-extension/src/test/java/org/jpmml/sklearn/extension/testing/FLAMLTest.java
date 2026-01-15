@@ -25,6 +25,11 @@ import org.junit.jupiter.api.Test;
 public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
+	public void evaluateExtraTreesEstimatorAudit() throws Exception {
+		evaluate("ExtraTreesEstimator", AUDIT);
+	}
+
+	@Test
 	public void evaluateLRL1ClassifierAudit() throws Exception {
 		evaluate("LRL1Classifier", AUDIT);
 	}
@@ -42,6 +47,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateSVCEstimatorAudit() throws Exception {
 		evaluate("SVCEstimator", AUDIT);
+	}
+
+	@Test
+	public void evaluateExtraTreesEstimatorAuto() throws Exception {
+		evaluate("ExtraTreesEstimator", AUTO);
 	}
 
 	@Test
