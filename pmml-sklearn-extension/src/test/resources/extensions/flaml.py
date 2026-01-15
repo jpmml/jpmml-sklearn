@@ -46,10 +46,12 @@ def make_custom_hp(cat_cols, cont_cols):
 	}
 
 def make_transformer(cat_cols, cont_cols, binarize = False):
-	return ColumnTransformer(
+	transformer = ColumnTransformer(
 		[(cat_col, make_pipeline(CategoricalDomain(), OneHotEncoder(sparse_output = False)) if binarize else CategoricalDomain(), [cat_col]) for cat_col in cat_cols] +
 		[(cont_col, ContinuousDomain(), [cont_col]) for cont_col in cont_cols]
 	)
+	transformer.set_output(transform = "pandas")
+	return transformer
 
 def build_audit(audit_df, classifier, name, binarize = False):
 	audit_X, audit_y = split_csv(audit_df)
