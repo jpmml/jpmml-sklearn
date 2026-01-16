@@ -69,11 +69,11 @@ public class CustomizationTest {
 
 		List<OutputField> outputFields = output.getOutputFields();
 
-		List<String> probabilityNames = outputFields.stream()
+		List<String> outputFieldNames = outputFields.stream()
 			.map(OutputField::requireName)
 			.collect(Collectors.toList());
 
-		assertEquals(Arrays.asList("probability(no)", "probability(yes)"), probabilityNames);
+		assertEquals(Arrays.asList("probability(no)", "probability(yes)"), outputFieldNames);
 
 		OutputField updateNoField = new OutputField()
 			.setName("p(no)")
@@ -83,6 +83,14 @@ public class CustomizationTest {
 			.setName("p(yes)")
 			.setFinalResult(false);
 
+		OutputField insertFirstField = new OutputField()
+			.setName("insertFirst")
+			.setFinalResult(false);
+
+		OutputField insertSecondField = new OutputField()
+			.setName("insertSecond")
+			.setFinalResult(false);
+
 		assertNotNull(regressionModel.getTargets());
 
 		List<Customization> customizations = Arrays.asList(
@@ -90,24 +98,26 @@ public class CustomizationTest {
 			Customization.createUpdate(null, CustomizationUtil.formatPMML(updateRegressionModel)),
 			Customization.createUpdate("//:Output/*[1]", CustomizationUtil.formatPMML(updateNoField)),
 			Customization.createUpdate("//:OutputField[@name='probability(yes)']", CustomizationUtil.formatPMML(updateYesField)),
-			Customization.createDelete("//:Targets")
+			Customization.createDelete("//:Targets"),
+			Customization.createInsert("//:Output", CustomizationUtil.formatPMML(insertFirstField)),
+			Customization.createInsert("//:Output", CustomizationUtil.formatPMML(insertSecondField))
 		);
 
 		CustomizationUtil.customize(regressionModel, customizations);
 
 		List<Extension> extensions = regressionModel.getExtensions();
 
-		checkList(Arrays.asList(insertExtension), extensions);
+		checkList(List.of(insertExtension), extensions);
 
 		List<RegressionTable> regressionTables = regressionModel.getRegressionTables();
 
 		checkList(updateRegressionModel.getRegressionTables(), regressionTables);
 
-		probabilityNames = outputFields.stream()
+		outputFieldNames = outputFields.stream()
 			.map(OutputField::requireName)
 			.collect(Collectors.toList());
 
-		assertEquals(Arrays.asList("p(no)", "p(yes)"), probabilityNames);
+		assertEquals(Arrays.asList("p(no)", "p(yes)", insertFirstField.getName(), insertSecondField.getName()), outputFieldNames);
 
 		assertNull(regressionModel.getTargets());
 	}
