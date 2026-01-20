@@ -19,6 +19,7 @@
 package sklearn;
 
 import org.jpmml.python.ClassDictUtil;
+import sklearn2pmml.preprocessing.ExpressionTransformer;
 
 public class TransformerCastFunction<E extends Transformer> extends StepCastFunction<E> {
 
@@ -29,5 +30,27 @@ public class TransformerCastFunction<E extends Transformer> extends StepCastFunc
 	@Override
 	protected String formatMessage(Object object){
 		return "The object (" + ClassDictUtil.formatClass(object) + ") is not a supported Transformer";
+	}
+
+	@Override
+	protected String formatSolution(Object object){
+		String className = getClassName(object);
+
+		if(className != null){
+			return "Replace this transformer with the " + (ExpressionTransformer.class).getName() + " transformer. Alternatively, develop and register a custom JPMML-SkLearn converter";
+		}
+
+		return super.formatSolution(object);
+	}
+
+	@Override
+	protected String formatExample(Object object){
+		String className = getClassName(object);
+
+		if(className != null){
+			return ExpressionTransformer.formatSimpleExample();
+		}
+
+		return super.formatExample(object);
 	}
 }

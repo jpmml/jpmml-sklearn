@@ -319,7 +319,14 @@ public class ExpressionTransformer extends Transformer {
 	}
 
 	static
-	public String formatExample(String name){
+	public String formatSimpleExample(){
+		return
+			"from sklearn2pmml.preprocessing import ExpressionTransformer" + "\n" +
+			"transformer = ExpressionTransformer(...)";
+	}
+
+	static
+	public String formatComplexExample(String name){
 		return
 			"from sklearn2pmml.preprocessing import ExpressionTransformer" + "\n" +
 			"from sklearn2pmml.util import Expression" + "\n" +

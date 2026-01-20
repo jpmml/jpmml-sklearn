@@ -22,6 +22,7 @@ import net.razorvine.pickle.objects.ClassDict;
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.CastUtil;
+import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 
@@ -41,7 +42,8 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 			return super.apply(object);
 		} catch(ClassCastException cce){
 			throw new SkLearnException(formatMessage(object))
-				.setSolution(formatSolution(object));
+				.setSolution(formatSolution(object))
+				.setExample(formatExample(object));
 		}
 	}
 
@@ -50,9 +52,32 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 	}
 
 	protected String formatSolution(Object object){
+		String className = getClassName(object);
 
-		if((object instanceof ClassDict) || (object instanceof ClassDictConstructor)){
+		if(className != null){
 			return "Develop and register a custom JPMML-SkLearn converter";
+		}
+
+		return null;
+	}
+
+	protected String formatExample(Object object){
+		return null;
+	}
+
+	static
+	protected String getClassName(Object object){
+
+		if(object instanceof ClassDict){
+			ClassDict dict = (ClassDict)object;
+
+			return dict.getClassName();
+		} else
+
+		if(object instanceof ClassDictConstructor){
+			ClassDictConstructor dictConstructor = (ClassDictConstructor)object;
+
+			return ClassDictConstructorUtil.getClassName(dictConstructor);
 		}
 
 		return null;

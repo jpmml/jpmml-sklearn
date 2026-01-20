@@ -84,7 +84,7 @@ public class FunctionTransformer extends SkLearnTransformer {
 
 				throw new SkLearnException("The function " + ExceptionUtil.formatName(name) + " does not have a persistent state", ae)
 					.setSolution("Use the " + (ExpressionTransformer.class).getName() + " transformer to give this function a persistent state")
-					.setExample(ExpressionTransformer.formatExample(name));
+					.setExample(ExpressionTransformer.formatComplexExample(name));
 			}
 
 			throw ae;

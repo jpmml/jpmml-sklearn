@@ -91,7 +91,7 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 		} catch(SkLearnException se){
 			throw se.ensureContext(this);
 		} catch(Exception e){
-			throw new SkLearnException("Failed to encode SkLearn transformer object (" + ClassDictUtil.formatClass(this) + ") to PMML", e)
+			throw new SkLearnException("Failed to convert the transformer object (" + ClassDictUtil.formatClass(this) + ") to PMML", e)
 				.setContext(this);
 		}
 	}

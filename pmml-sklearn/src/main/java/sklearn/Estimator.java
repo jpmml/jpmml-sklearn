@@ -174,7 +174,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} catch(SkLearnException se){
 			throw se.ensureContext(this);
 		} catch(Exception e){
-			throw new SkLearnException("Failed to encode SkLearn estimator object (" + ClassDictUtil.formatClass(this)  +") to PMML", e)
+			throw new SkLearnException("Failed to convert the estimator object (" + ClassDictUtil.formatClass(this)  +") to PMML", e)
 				.setContext(this);
 		}
 	}

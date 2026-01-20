@@ -55,7 +55,7 @@ public class EncodableUtil {
 		} catch(SkLearnException se){
 			throw se.ensureContext(encodable);
 		} catch(Exception e){
-			throw new SkLearnException("Failed to encode the object (" + ClassDictUtil.formatClass(encodable) + ") to PMML", e)
+			throw new SkLearnException("Failed to convert the object (" + ClassDictUtil.formatClass(encodable) + ") to PMML", e)
 				.setContext(encodable);
 		}
 	}
