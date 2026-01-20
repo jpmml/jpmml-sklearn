@@ -8,7 +8,7 @@ from flaml import tune, AutoML
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 
@@ -70,15 +70,15 @@ def make_custom_hp(cat_cols, cont_cols):
 		"xgb_limitdepth" : xgb_config
 	}
 
-def make_transformer(cat_cols, cont_cols, binarize = False):
+def make_transformer(cat_cols, cont_cols, binarize, standardize):
 	transformer = ColumnTransformer(
 		[(cat_col, make_pipeline(CategoricalDomain(), OneHotEncoder(sparse_output = False)) if binarize else CategoricalDomain(), [cat_col]) for cat_col in cat_cols] +
-		[(cont_col, ContinuousDomain(), [cont_col]) for cont_col in cont_cols]
+		[(cont_col, make_pipeline(ContinuousDomain(), StandardScaler()) if standardize else ContinuousDomain(), [cont_col]) for cont_col in cont_cols]
 	)
 	transformer.set_output(transform = "pandas")
 	return transformer
 
-def build_audit(audit_df, classifier, name, binarize = False):
+def build_audit(audit_df, classifier, name, binarize = True, standardize = True):
 	audit_X, audit_y = split_csv(audit_df)
 
 	cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
@@ -89,7 +89,7 @@ def build_audit(audit_df, classifier, name, binarize = False):
 	for cont_col in cont_cols:
 		audit_X[cont_col] = audit_X[cont_col].astype(float)
 
-	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize)
+	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize, standardize = standardize)
 
 	audit_Xt = transformer.fit_transform(audit_X)
 
@@ -106,14 +106,14 @@ def build_audit(audit_df, classifier, name, binarize = False):
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
-	build_audit(audit_df, "extra_tree", "ExtraTreesEstimatorAudit", binarize = True)
-	build_audit(audit_df, "histgb", "HistGradientBoostingEstimatorAudit", binarize = False)
-	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit", binarize = True)
-	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit", binarize = True)
-	build_audit(audit_df, "rf", "RandomForestEstimatorAudit", binarize = True)
-	build_audit(audit_df, "svc", "SVCEstimatorAudit", binarize = True)
+	build_audit(audit_df, "extra_tree", "ExtraTreesEstimatorAudit", standardize = False)
+	build_audit(audit_df, "histgb", "HistGradientBoostingEstimatorAudit", binarize = False, standardize = False)
+	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit")
+	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit")
+	build_audit(audit_df, "rf", "RandomForestEstimatorAudit", standardize = False)
+	build_audit(audit_df, "svc", "SVCEstimatorAudit")
 
-def build_auto(auto_df, regressor, name, binarize = False):
+def build_auto(auto_df, regressor, name, binarize = True, standardize = True):
 	auto_X, auto_y = split_csv(auto_df)
 
 	cat_cols = ["cylinders", "model_year", "origin"]
@@ -124,7 +124,7 @@ def build_auto(auto_df, regressor, name, binarize = False):
 	for cont_col in cont_cols:
 		auto_X[cont_col] = auto_X[cont_col].astype(float)
 
-	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize)
+	transformer = make_transformer(cat_cols, cont_cols, binarize = binarize, standardize = standardize)
 
 	auto_Xt = transformer.fit_transform(auto_X)
 
@@ -139,8 +139,8 @@ def build_auto(auto_df, regressor, name, binarize = False):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
-	build_auto(auto_df, "extra_tree", "ExtraTreesEstimatorAuto", binarize = True)
-	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto", binarize = True)
-	build_auto(auto_df, "histgb", "HistGradientBoostingEstimatorAuto", binarize = False)
-	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto", binarize = True)
-	build_auto(auto_df, "rf", "RandomForestEstimatorAuto", binarize = True)
+	build_auto(auto_df, "extra_tree", "ExtraTreesEstimatorAuto")
+	build_auto(auto_df, "enet", "ElasticNetEstimatorAuto")
+	build_auto(auto_df, "histgb", "HistGradientBoostingEstimatorAuto", binarize = False, standardize = False)
+	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto")
+	build_auto(auto_df, "rf", "RandomForestEstimatorAuto", standardize = False)
