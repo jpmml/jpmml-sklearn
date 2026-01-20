@@ -43,7 +43,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		try {
 			return super.getattr(name);
 		} catch(MissingAttributeException mae){
-			Attribute attribute = new Attribute(this, "fit(X, y)");
+			Attribute attribute = getFitMethod();
 
 			throw new SkLearnException("The object (" + ClassDictUtil.formatClass(this) + ") is not fitted", mae)
 				.setSolution("Call the " + ExceptionUtil.formatName(attribute.format()) + " method before conversion");
@@ -62,6 +62,10 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 			throw new SkLearnException("Scikit-Learn version " + ExceptionUtil.formatVersion(sklearnVersion) + " is not supported")
 				.setSolution("Upgrade the converter to the latest version, or downgrade Scikit-Learn to version " + ExceptionUtil.formatVersion(supportedSklearnVersion));
 		}
+	}
+
+	protected Attribute getFitMethod(){
+		return new Attribute(this, "fit(X, y)");
 	}
 
 	public List<String> getFeatureNamesIn(){

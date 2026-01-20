@@ -115,6 +115,13 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		return HasNumberOfOutputs.UNKNOWN;
 	}
 
+	@Override
+	protected Attribute getFitMethod(){
+		boolean supervised = isSupervised();
+
+		return new Attribute(this, supervised ? "fit(X, y)" : "fit(X)");
+	}
+
 	public Map<String, ?> getClassifierTags(){
 		return (Map)StepUtil.getTag(getSkLearnTags(), "classifier_tags");
 	}

@@ -31,6 +31,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.DTypeCastFunction;
 import org.jpmml.python.TypeInfo;
@@ -66,6 +67,11 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	@Override
 	public DataType getDataType(){
 		return DataType.DOUBLE;
+	}
+
+	@Override
+	protected Attribute getFitMethod(){
+		return new Attribute(this, "fit(X)");
 	}
 
 	public Map<String, ?> getTransformerTags(){

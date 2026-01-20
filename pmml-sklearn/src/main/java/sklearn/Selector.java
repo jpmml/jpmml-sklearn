@@ -24,6 +24,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -45,6 +46,11 @@ public class Selector extends Transformer {
 	@Override
 	public DataType getDataType(){
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	protected Attribute getFitMethod(){
+		return new Attribute(this, "fit(X, y)");
 	}
 
 	@Override
