@@ -438,8 +438,9 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
 
 	scaler = ColumnTransformer([
-		("robust", RobustScaler(), numpy.asarray([0, 2]))
-	], remainder = MinMaxScaler())
+		("robust", RobustScaler(), numpy.asarray([0, 1])),
+		("minmax", MinMaxScaler(), numpy.asarray([-2, -1]))
+	], remainder = "drop")
 
 	transformer = ColumnTransformer([
 		("continuous_columns", Pipeline([

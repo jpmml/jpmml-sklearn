@@ -93,12 +93,30 @@ public class InitializerUtil {
 					Integer index = ValueUtil.asInteger((Number)object);
 
 					if(!features.isEmpty()){
-						Feature feature = features.get(index);
+						Feature feature;
+
+						if(index >= 0){
+							feature = features.get(index);
+						} else
+
+						{
+							feature = features.get(features.size() + index);
+						}
 
 						return feature;
 					}
 
-					return createWildcardFeature(("x" + (index.intValue() + 1)), encoder);
+					String name;
+
+					if(index >= 0){
+						name = "x" + (index.intValue() + 1);
+					} else
+
+					{
+						name = "xn" + Math.abs(index.intValue());
+					}
+
+					return createWildcardFeature(name, encoder);
 				} else
 
 				{
