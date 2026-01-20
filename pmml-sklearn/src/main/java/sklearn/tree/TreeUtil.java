@@ -657,6 +657,7 @@ public class TreeUtil {
 			List<String> segmentIds = new ArrayList<>();
 
 			for(Segment segment : segments){
+				@SuppressWarnings("unused")
 				TreeModel treeModel = segment.requireModel(TreeModel.class);
 
 				String segmentId = segment.getId();

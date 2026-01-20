@@ -101,6 +101,7 @@ public class BernoulliNB extends DiscreteNB {
 
 	@Override
 	public NaiveBayesModel encodeModel(Schema schema){
+		@SuppressWarnings("unused")
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
 			.expectCardinality(2);
 

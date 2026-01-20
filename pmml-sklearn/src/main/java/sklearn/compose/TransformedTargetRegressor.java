@@ -51,9 +51,7 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 		Regressor regressor = getRegressor();
 		FunctionTransformer transformer = getTransformer();
 
-		Identifiable func = transformer.getFunc();
 		Identifiable inverseFunc = transformer.getInverseFunc();
-
 		if(inverseFunc == null){
 			return regressor.encode(schema);
 		}

@@ -67,6 +67,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 	@Override
 	public Model encodeModel(Schema schema){
 		List<? extends Calibrator> calibrators = getCalibrators();
+		@SuppressWarnings("unused")
 		List<?> classes = getClasses();
 		Classifier estimator = getEstimator();
 		@SuppressWarnings("unused")

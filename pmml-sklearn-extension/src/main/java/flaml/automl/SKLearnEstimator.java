@@ -59,6 +59,6 @@ public class SKLearnEstimator extends Step implements Castable {
 	}
 
 	public <E extends Estimator> E getModel(Class<? extends E> clazz){
-		return getStep("_model", clazz);
+		return getEstimator("_model", clazz);
 	}
 }
