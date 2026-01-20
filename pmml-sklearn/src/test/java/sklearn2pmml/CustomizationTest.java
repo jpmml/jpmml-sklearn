@@ -69,6 +69,10 @@ public class CustomizationTest {
 
 		List<OutputField> outputFields = output.getOutputFields();
 
+		for(OutputField outputField : outputFields){
+			assertTrue(outputField.isFinalResult());
+		}
+
 		List<String> probabilityNames = outputFields.stream()
 			.map(OutputField::requireName)
 			.collect(Collectors.toList());
@@ -103,6 +107,10 @@ public class CustomizationTest {
 
 		checkList(updateRegressionModel.getRegressionTables(), regressionTables);
 
+		for(OutputField outputField : outputFields){
+			assertFalse(outputField.isFinalResult());
+		}
+
 		probabilityNames = outputFields.stream()
 			.map(OutputField::requireName)
 			.collect(Collectors.toList());
@@ -110,6 +118,38 @@ public class CustomizationTest {
 		assertEquals(Arrays.asList("p(no)", "p(yes)"), probabilityNames);
 
 		assertNull(regressionModel.getTargets());
+
+		OutputField updateNoFieldStep1 = new OutputField()
+			.setName("probability(NO)");
+
+		OutputField updateNoFieldStep2 = new OutputField()
+			.setFinalResult(true);
+
+		OutputField updateYesFieldStep1 = new OutputField()
+			.setName("probability(YES)");
+
+		OutputField updateYesFieldStep2 = new OutputField()
+			.setFinalResult(true);
+
+		// Touch the same element multiple times during a customization session
+		customizations = Arrays.asList(
+			Customization.createUpdate("//:Output/*[1]", CustomizationUtil.formatPMML(updateNoFieldStep1)),
+			Customization.createUpdate("//:Output/*[1]", CustomizationUtil.formatPMML(updateNoFieldStep2)),
+			Customization.createUpdate("//:Output/*[2]", CustomizationUtil.formatPMML(updateYesFieldStep1)),
+			Customization.createUpdate("//:Output/*[2]", CustomizationUtil.formatPMML(updateYesFieldStep2))
+		);
+
+		CustomizationUtil.customize(regressionModel, customizations);
+
+		for(OutputField outputField : outputFields){
+			assertTrue(outputField.isFinalResult());
+		}
+
+		probabilityNames = outputFields.stream()
+			.map(OutputField::requireName)
+			.collect(Collectors.toList());
+
+		assertEquals(Arrays.asList("probability(NO)", "probability(YES)"), probabilityNames);
 	}
 
 	static

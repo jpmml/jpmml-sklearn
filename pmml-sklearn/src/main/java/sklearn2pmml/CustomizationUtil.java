@@ -192,12 +192,9 @@ public class CustomizationUtil {
 			}
 
 			if(object != null){
-				Node node = binder.getXMLNode(object);
+				document = documentBuilder.newDocument();
 
-				// XXX: The node is always null!?
-				if(node != null){
-					binder.updateXML(object, node);
-				}
+				binder.marshal(model, document);
 			}
 		}
 	}
