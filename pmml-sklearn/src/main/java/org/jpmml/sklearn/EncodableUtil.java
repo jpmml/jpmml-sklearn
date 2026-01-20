@@ -23,9 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.PMML;
-import org.jpmml.converter.ConversionException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.MissingAttributeException;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
@@ -52,15 +52,11 @@ public class EncodableUtil {
 
 		try {
 			return encodable.encodePMML();
-		} catch(ConversionException ce){
-
-			if(encodable instanceof Step){
-				Step step = (Step)encodable;
-
-				throw ce.ensureContext(step);
-			}
-
-			throw ce;
+		} catch(SkLearnException se){
+			throw se.ensureContext(encodable);
+		} catch(Exception e){
+			throw new SkLearnException("Failed to encode the object (" + ClassDictUtil.formatClass(encodable) + ") to PMML", e)
+				.setContext(encodable);
 		}
 	}
 

@@ -23,6 +23,9 @@ import java.util.Map;
 
 import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.ExceptionUtil;
+import org.jpmml.python.Attribute;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.MissingAttributeException;
 import org.jpmml.python.PythonObject;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
@@ -32,6 +35,19 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public Step(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public Object getattr(String name){
+
+		try {
+			return super.getattr(name);
+		} catch(MissingAttributeException mae){
+			Attribute attribute = new Attribute(this, "fit(X, y)");
+
+			throw new SkLearnException("The object (" + ClassDictUtil.formatClass(this) + ") is not fitted", mae)
+				.setSolution("Call the " + ExceptionUtil.formatName(attribute.format()) + " method before conversion");
+		}
 	}
 
 	public void checkVersion(){
