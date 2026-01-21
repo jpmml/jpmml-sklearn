@@ -180,7 +180,7 @@
 <details>
   <summary>FLAML</summary>
 
-  Examples: [extensions/hpsklearn.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/flaml.py)
+  Examples: [extensions/flaml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/flaml.py)
 
   * `flaml.automl.contrib.histgb.HistGradientBoostingEstimator`
   * `flaml.automl.model.ElasticNetEstimator`
