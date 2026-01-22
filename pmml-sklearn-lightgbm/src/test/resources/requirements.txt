@@ -1,2 +1,2 @@
-flaml==2.4.1
+flaml==2.5.0
 lightgbm==4.6.0
