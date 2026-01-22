@@ -111,6 +111,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, "lrl1", "LRL1ClassifierAudit")
 	build_audit(audit_df, "lrl2", "LRL2ClassifierAudit")
 	build_audit(audit_df, "rf", "RandomForestEstimatorAudit", standardize = False)
+	build_audit(audit_df, "sgd", "SGDEstimatorAudit")
 	build_audit(audit_df, "svc", "SVCEstimatorAudit")
 
 def build_auto(auto_df, regressor, name, binarize = True, standardize = True):
@@ -144,3 +145,4 @@ if "Auto" in datasets:
 	build_auto(auto_df, "histgb", "HistGradientBoostingEstimatorAuto", binarize = False, standardize = False)
 	build_auto(auto_df, "lassolars", "LassoLarsEstimatorAuto")
 	build_auto(auto_df, "rf", "RandomForestEstimatorAuto", standardize = False)
+	build_auto(auto_df, "sgd", "SGDEstimatorAuto")

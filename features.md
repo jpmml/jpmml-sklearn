@@ -191,6 +191,7 @@
   * `flaml.automl.model.LRL1Classifier`
   * `flaml.automl.model.LRL2Classifier`
   * `flaml.automl.model.RandomForestEstimator`
+  * `flaml.automl.model.SGDEstimator`
   * `flaml.automl.model.SVCEstimator`
   * `flaml.automl.model.XGBoostLimitDepthEstimator`
   * `flaml.automl.model.XGBoostSklearnEstimator`

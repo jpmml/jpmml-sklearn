@@ -50,6 +50,11 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateSGDEstimatorAudit() throws Exception {
+		evaluate("SGDEstimator", AUDIT);
+	}
+
+	@Test
 	public void evaluateSVCEstimatorAudit() throws Exception {
 		evaluate("SVCEstimator", AUDIT);
 	}
@@ -77,5 +82,10 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateRandomForestEstimatorAuto() throws Exception {
 		evaluate("RandomForestEstimator", AUTO);
+	}
+
+	@Test
+	public void evaluateSGDEstimatorAuto() throws Exception {
+		evaluate("SGDEstimator", AUTO);
 	}
 }
