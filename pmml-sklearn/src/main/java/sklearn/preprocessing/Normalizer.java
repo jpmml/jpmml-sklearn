@@ -21,17 +21,26 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Expression;
+import org.dmg.pmml.Field;
+import org.dmg.pmml.HasDiscreteDomain;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.BinaryFeature;
+import org.jpmml.converter.ConstantFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.FieldUtil;
+import org.jpmml.converter.PMMLEncoder;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.SkLearnTransformer;
 
@@ -45,7 +54,7 @@ public class Normalizer extends SkLearnTransformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		String norm = getNorm();
 
-		Apply normApply = encodeNorm(norm, features);
+		Apply normApply = encodeNorm(norm, features, encoder);
 
 		DerivedField normDerivedField = encoder.createDerivedField(FieldNameUtil.create("norm", norm), OpType.CONTINUOUS, DataType.DOUBLE, normApply);
 
@@ -66,7 +75,8 @@ public class Normalizer extends SkLearnTransformer {
 		return result;
 	}
 
-	private Apply encodeNorm(String norm, List<? extends Feature> features){
+	private Apply encodeNorm(String norm, List<? extends Feature> features, SkLearnEncoder encoder){
+		features = aggregateFeatures(features, encoder);
 
 		switch(norm){
 			case NORM_L1:
@@ -74,6 +84,10 @@ public class Normalizer extends SkLearnTransformer {
 					PMMLFunctions.SUM,
 					(feature) -> {
 						ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+						if(isInvariant(feature)){
+							return continuousFeature.ref();
+						}
 
 						return ExpressionUtil.createApply(PMMLFunctions.ABS, continuousFeature.ref());
 					},
@@ -87,6 +101,10 @@ public class Normalizer extends SkLearnTransformer {
 						(feature) -> {
 							ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
+							if(isInvariant(feature)){
+								return continuousFeature.ref();
+							}
+
 							return ExpressionUtil.createApply(PMMLFunctions.POW, continuousFeature.ref(), ExpressionUtil.createConstant(2d));
 						},
 						features
@@ -97,6 +115,10 @@ public class Normalizer extends SkLearnTransformer {
 					PMMLFunctions.MAX,
 					(feature) -> {
 						ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+						if(isInvariant(feature)){
+							return continuousFeature.ref();
+						}
 
 						return ExpressionUtil.createApply(PMMLFunctions.ABS, continuousFeature.ref());
 					},
@@ -112,7 +134,101 @@ public class Normalizer extends SkLearnTransformer {
 	}
 
 	static
-	private Apply encodeAggregation(String function, Function<Feature, Apply> featureEncoder, List<? extends Feature> features){
+	private boolean isInvariant(Feature feature){
+
+		if(feature instanceof BinaryFeature){
+			BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+			return true;
+		} else
+
+		if(feature instanceof ConstantFeature){
+			ConstantFeature constantFeature = (ConstantFeature)feature;
+
+			Number value = constantFeature.getValue();
+
+			return ValueUtil.isZero(value) || ValueUtil.isOne(value);
+		} else
+
+		{
+			return false;
+		}
+	}
+
+	static
+	private List<Feature> aggregateFeatures(List<? extends Feature> features, PMMLEncoder encoder){
+		List<Feature> result = new ArrayList<>();
+
+		for(int i = 0, max = features.size(); i < max; ){
+			Feature feature = features.get(i);
+
+			if(feature instanceof BinaryFeature){
+				BinaryFeature binaryFeature = (BinaryFeature)feature;
+
+				String name = binaryFeature.getName();
+
+				Field<?> field = encoder.getField(name);
+
+				List<Object> values = new ArrayList<>();
+				values.add(binaryFeature.getValue());
+
+				int j = i + 1;
+
+				while(j < max){
+					Feature nextFeature = features.get(j);
+
+					if(nextFeature instanceof BinaryFeature){
+						BinaryFeature nextBinaryFeature = (BinaryFeature)nextFeature;
+
+						String nextName = nextBinaryFeature.getName();
+
+						if(Objects.equals(name, nextName)){
+							values.add(nextBinaryFeature.getValue());
+
+							j++;
+
+							continue;
+						}
+					}
+
+					break;
+				}
+
+				boolean fullDomain = false;
+
+				if(field instanceof HasDiscreteDomain){
+					List<?> validValues = FieldUtil.getValues((Field & HasDiscreteDomain)field);
+
+					fullDomain = Objects.equals(values, validValues);
+				} // End if
+
+				if(fullDomain){
+					ConstantFeature constantFeature = new ConstantFeature(encoder, 1d);
+
+					result.add(constantFeature);
+
+					i = j;
+				} else
+
+				{
+					result.add(binaryFeature);
+
+					i++;
+				}
+			} else
+
+			{
+				result.add(feature);
+
+				i++;
+			}
+		}
+
+		return result;
+	}
+
+	static
+	private Apply encodeAggregation(String function, Function<Feature, Expression> featureEncoder, List<? extends Feature> features){
 		Apply apply = ExpressionUtil.createApply(function);
 
 		for(Feature feature : features){
