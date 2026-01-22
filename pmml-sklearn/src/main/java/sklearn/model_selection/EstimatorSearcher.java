@@ -49,12 +49,6 @@ public class EstimatorSearcher extends Step implements Castable {
 	@Override
 	public Object castTo(Class<?> clazz){
 
-		if((Estimator.class).isAssignableFrom(clazz)){
-			Class<? extends Estimator> estimatorClazz = clazz.asSubclass(Estimator.class);
-
-			return getBestEstimator(estimatorClazz);
-		} else
-
 		if((Step.class).isAssignableFrom(clazz)){
 			Class<? extends Step> stepClazz = clazz.asSubclass(Step.class);
 
@@ -62,6 +56,10 @@ public class EstimatorSearcher extends Step implements Castable {
 		}
 
 		return this;
+	}
+
+	public Estimator getBestEstimator(){
+		return getBestEstimator(Estimator.class);
 	}
 
 	public <E extends Step> E getBestEstimator(Class<? extends E> clazz){

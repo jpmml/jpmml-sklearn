@@ -49,16 +49,20 @@ public class SKLearnEstimator extends Step implements Castable {
 	@Override
 	public Object castTo(Class<?> clazz){
 
-		if((Estimator.class).isAssignableFrom(clazz)){
-			Class<? extends Estimator> estimatorClazz = clazz.asSubclass(Estimator.class);
+		if((Step.class).isAssignableFrom(clazz)){
+			Class<? extends Step> stepClazz = clazz.asSubclass(Step.class);
 
-			return getModel(estimatorClazz);
+			return getModel(stepClazz);
 		}
 
 		return this;
 	}
 
-	public <E extends Estimator> E getModel(Class<? extends E> clazz){
-		return getEstimator("_model", clazz);
+	public Estimator getModel(){
+		return getModel(Estimator.class);
+	}
+
+	public <E extends Step> E getModel(Class<? extends E> clazz){
+		return getStep("_model", clazz);
 	}
 }
