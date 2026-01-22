@@ -7,6 +7,8 @@ import numpy
 
 from common import *
 
+numpy.random.seed(42)
+
 def make_dummy_pipeline(transformer, n_outputs = 1):
 	regressor = LinearRegression()
 	if n_outputs == 1:

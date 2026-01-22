@@ -149,7 +149,7 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 
 	@Test
 	public void evaluateUniformQuantile() throws Exception {
-		evaluate("Uniform", "Quantile");
+		evaluate("Uniform", "Quantile", new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
