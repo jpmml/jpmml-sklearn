@@ -51,6 +51,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.NamingException;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
@@ -157,13 +158,21 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			Output output = ModelUtil.ensureOutput(finalModel);
 
 			if(predictTransformer != null){
-				List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(schema.getLabel());
+				Label label = schema.getLabel();
 
 				List<OutputField> predictFields = new ArrayList<>();
 
+				List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
 				for(ScalarLabel scalarLabel : scalarLabels){
 					OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), scalarLabel.getOpType(), scalarLabel.getDataType())
 						.setFinalResult(false);
+
+					// Disambiguate target fields
+					if(label instanceof MultiLabel){
+						MultiLabel multiLabel = (MultiLabel)label;
+
+						predictField.setTargetField(scalarLabel.getName());
+					}
 
 					encoder.createDerivedField(model, predictField, false);
 
