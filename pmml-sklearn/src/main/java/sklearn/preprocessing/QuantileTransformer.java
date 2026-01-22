@@ -90,7 +90,7 @@ public class QuantileTransformer extends SkLearnTransformer {
 					}
 					break;
 				default:
-					throw new IllegalArgumentException();
+					throw new IllegalArgumentException(outputDistribution);
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("quantile", continuousFeature.getName()), OpType.CONTINUOUS, DataType.DOUBLE, expression);

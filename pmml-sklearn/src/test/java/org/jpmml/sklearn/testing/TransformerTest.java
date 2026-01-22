@@ -18,6 +18,8 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -125,6 +127,21 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 	}
 
 	@Test
+	public void evaluateL1Norm() throws Exception {
+		evaluate("L1", "Norm", excludeFields(TransformerTest.createNormPredictFields("l1")), new PMMLEquivalence(5e-13, 5e-13));
+	}
+
+	@Test
+	public void evaluateL2Norm() throws Exception {
+		evaluate("L2", "Norm", excludeFields(TransformerTest.createNormPredictFields("l2")), new PMMLEquivalence(5e-13, 5e-13));
+	}
+
+	@Test
+	public void evaluateMaxNorm() throws Exception {
+		evaluate("Max", "Norm", excludeFields(TransformerTest.createNormPredictFields("max")), new PMMLEquivalence(5e-13, 5e-13));
+	}
+
+	@Test
 	public void evaluateNormalQuantile() throws Exception {
 		// XXX: loss of precision with clipped values
 		evaluate("Normal", "Quantile", new PMMLEquivalence(1e-10, 1e-10));
@@ -148,6 +165,18 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 	@Test
 	public void evaluateTanhBSpline() throws Exception {
 		evaluate("Tanh", "BSpline");
+	}
+
+	static
+	private List<String> createNormPredictFields(String norm){
+		List<String> result = new ArrayList<>();
+		result.add(FieldNameUtil.create("norm", norm));
+
+		for(int i = 0; i < 5; i++){
+			result.add(FieldNameUtil.create(Estimator.FIELD_PREDICT, "y" + String.valueOf(i + 1)));
+		}
+
+		return result;
 	}
 
 	private static final String predictedValue = FieldNameUtil.create(Estimator.FIELD_PREDICT, "y");

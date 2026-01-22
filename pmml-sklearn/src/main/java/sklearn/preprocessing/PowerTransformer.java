@@ -67,7 +67,7 @@ public class PowerTransformer extends SkLearnTransformer {
 					apply = encodeYeoJohnsonTransform(continuousFeature, lambda);
 					break;
 				default:
-					throw new IllegalArgumentException();
+					throw new IllegalArgumentException(method);
 			}
 
 			DerivedField derivedField = encoder.createDerivedField(createFieldName("power", continuousFeature.getName()), OpType.CONTINUOUS, DataType.DOUBLE, apply);
