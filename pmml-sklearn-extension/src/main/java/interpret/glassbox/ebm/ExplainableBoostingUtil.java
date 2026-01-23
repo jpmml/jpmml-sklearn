@@ -25,22 +25,25 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import numpy.core.ScalarUtil;
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Discretize;
 import org.dmg.pmml.DiscretizeBin;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.FieldColumnPair;
+import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.InlineTable;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.MapValues;
 import org.dmg.pmml.NamespacePrefixes;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.FieldNameUtil;
-import org.jpmml.converter.IndexFeature;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.PMMLUtil;
@@ -120,10 +123,11 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private IndexFeature binContinuous(Feature feature, HasArray binLevel, Integer binLevelIndex, ModelEncoder encoder){
+	private CategoricalFeature binContinuous(Feature feature, HasArray binLevel, Integer binLevelIndex, ModelEncoder encoder){
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-		Discretize discretize = new Discretize(continuousFeature.getName());
+		Discretize discretize = new Discretize(continuousFeature.getName())
+			.setMapMissingTo(0);
 
 		List<Number> bins = (List<Number>)binLevel.getArrayContent();
 		if(bins.isEmpty()){
@@ -131,6 +135,8 @@ public class ExplainableBoostingUtil {
 		}
 
 		List<Integer> labelCategories = new ArrayList<>();
+
+		labelCategories.add(0);
 
 		for(int j = 0; j <= bins.size(); j++){
 			Number leftMargin = null;
@@ -149,7 +155,7 @@ public class ExplainableBoostingUtil {
 				rightMargin = bins.get(j);
 			}
 
-			Integer label = j;
+			Integer label = (j + 1);
 
 			labelCategories.add(label);
 
@@ -172,7 +178,7 @@ public class ExplainableBoostingUtil {
 
 		DerivedField derivedField = encoder.createDerivedField(name, OpType.CATEGORICAL, DataType.INTEGER, discretize);
 
-		return new IndexFeature(encoder, derivedField, labelCategories);
+		return new CategoricalFeature(encoder, derivedField, labelCategories);
 	}
 
 	static
@@ -203,7 +209,19 @@ public class ExplainableBoostingUtil {
 		// XXX
 		field.setDataType(TypeUtil.getDataType(categories, DataType.STRING));
 
-		return new CategoricalFeature(encoder, field, categories);
+		// XXX
+		String missingCategory = "__missing";
+
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createApply(PMMLFunctions.ISMISSING, new FieldRef(field)),
+			ExpressionUtil.createConstant(missingCategory), new FieldRef(field)
+		);
+
+		categories.add(0, missingCategory);
+
+		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("prepare", feature), OpType.CATEGORICAL, DataType.STRING, apply);
+
+		return new CategoricalFeature(encoder, derivedField, categories);
 	}
 
 	static
@@ -215,13 +233,13 @@ public class ExplainableBoostingUtil {
 		int columns;
 
 		if(termFeature.length == 1){
-			rows = (termScoreShape[0] - 2);
+			rows = (termScoreShape[0] - 1);
 			columns = 1;
 		} else
 
 		if(termFeature.length == 2){
-			rows = (termScoreShape[0] - 2);
-			columns = (termScoreShape[1] - 2);
+			rows = (termScoreShape[0] - 1);
+			columns = (termScoreShape[1] - 1);
 		} else
 
 		{
@@ -233,7 +251,6 @@ public class ExplainableBoostingUtil {
 		String outputColumn = NamespacePrefixes.JPMML_INLINETABLE + ":" + "output";
 
 		MapValues mapValues = new MapValues()
-			.setMapMissingTo(0d)
 			.setOutputColumn(outputColumn);
 
 		Map<String, List<Object>> data = new LinkedHashMap<>();
@@ -294,7 +311,7 @@ public class ExplainableBoostingUtil {
 		List<Object> outputValues;
 
 		if(termFeature.length == 1){
-			outputValues = (List)termScoreContent.subList(1, termScoreContent.size() - 1);
+			outputValues = (List)termScoreContent.subList(0, termScoreContent.size() - 1);
 		} else
 
 		if(termFeature.length == 2){
@@ -303,7 +320,7 @@ public class ExplainableBoostingUtil {
 			for(int row = 0; row < rows; row++){
 
 				for(int column = 0; column < columns; column++){
-					Number value = termScoreContent.get((row + 1) * (columns + 2) + (column + 1));
+					Number value = termScoreContent.get(row * (columns + 1) + column);
 
 					outputValues.add(value);
 				}

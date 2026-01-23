@@ -31,6 +31,11 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateExplainableBoostingClassifierAuditNA() throws Exception {
+		evaluate("ExplainableBoostingClassifier", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateExplainableBoostingClassifierVersicolor() throws Exception {
 		evaluate("ExplainableBoostingClassifier", VERSICOLOR, new PMMLEquivalence(5e-11, 5e-11));
 	}
@@ -38,6 +43,11 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateExplainableBoostingRegressorAuto() throws Exception {
 		evaluate("ExplainableBoostingRegressor", AUTO, excludeFields("ebm(acceleration)", "ebm(cylinders)"));
+	}
+
+	@Test
+	public void evaluateExplainableBoostingRegressorAutoNA() throws Exception {
+		evaluate("ExplainableBoostingRegressor", AUTO_NA);
 	}
 
 	@Test

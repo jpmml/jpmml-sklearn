@@ -11,6 +11,8 @@ from sklearn2pmml.cross_reference import Recaller
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.postprocessing import FeatureExporter
 
+import numpy
+
 datasets = []
 
 if __name__ == "__main__":
@@ -42,7 +44,20 @@ if "Audit" in datasets:
 
 	audit_df = audit_df[cat_cols + cont_cols + ["Adjusted"]]
 
-	build_audit(audit_df, ExplainableBoostingClassifier(max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingClassifierAudit", predict_transformer = make_pipeline(Recaller(None, names = ["lookup(Education)", "lookup(bin(Age, 0))"]), FeatureExporter(names = ["ebm(Education)", "ebm(Age)"])))
+	build_audit(audit_df, ExplainableBoostingClassifier(interactions = "3x", max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingClassifierAudit", predict_transformer = make_pipeline(Recaller(None, names = ["lookup(prepare(Education))", "lookup(bin(Age, 0))"]), FeatureExporter(names = ["ebm(Education)", "ebm(Age)"])))
+
+if "Audit" in datasets:
+	audit_df = load_audit("AuditNA")
+
+	cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
+	cont_cols = ["Age", "Hours", "Income"]
+
+	audit_df = audit_df[cat_cols + cont_cols + ["Adjusted"]]
+
+	for cat_col in cat_cols:
+		audit_df[cat_col] = audit_df[cat_col].replace({numpy.nan: None}).astype("category")
+
+	build_audit(audit_df, ExplainableBoostingClassifier(interactions = "3x", max_bins = 5, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingClassifierAuditNA")
 
 def build_versicolor(versicolor_df, classifier, name):
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
@@ -62,7 +77,7 @@ def build_versicolor(versicolor_df, classifier, name):
 if "Versicolor" in datasets:
 	versicolor_df = load_versicolor("Versicolor")
 
-	build_versicolor(versicolor_df, ExplainableBoostingClassifier(max_bins = 5, max_interaction_bins = 5, random_state = 13), "ExplainableBoostingClassifierVersicolor")
+	build_versicolor(versicolor_df, ExplainableBoostingClassifier(interactions = "2x", max_bins = 5, max_interaction_bins = 5, random_state = 13), "ExplainableBoostingClassifierVersicolor")
 
 def build_iris(iris_df, classifier, name):
 	iris_X, iris_y = split_csv(iris_df)
@@ -106,6 +121,17 @@ if "Auto" in datasets:
 
 	auto_df[cat_cols] = auto_df[cat_cols].astype("category")
 
-	build_auto(auto_df, ExplainableBoostingRegressor(objective = "rmse_log", max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingRegressorAuto", predict_transformer = make_pipeline(Recaller(None, names = ["lookup(cylinders)", "lookup(bin(acceleration, 0))"]), FeatureExporter(names = ["ebm(cylinders)", "ebm(acceleration)"])))
+	build_auto(auto_df, ExplainableBoostingRegressor(objective = "rmse_log", interactions = "5x", max_bins = 11, max_interaction_bins = 7, random_state = 13), "ExplainableBoostingRegressorAuto", predict_transformer = make_pipeline(Recaller(None, names = ["lookup(prepare(cylinders))", "lookup(bin(acceleration, 0))"]), FeatureExporter(names = ["ebm(cylinders)", "ebm(acceleration)"])))
 	build_auto(auto_df, LinearRegression(), "LinearRegressionAuto")
 	build_auto(auto_df, RegressionTree(max_depth = 5, random_state = 13), "RegressionTreeAuto")
+
+if "Auto" in datasets:
+	auto_df = load_auto("AutoNA")
+
+	cat_cols = ["cylinders", "model_year", "origin"]
+	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
+
+	for cat_col in cat_cols:
+		auto_df[cat_col] = auto_df[cat_col].astype(pandas.Int64Dtype()).astype("category")
+
+	build_auto(auto_df, ExplainableBoostingRegressor(objective = "rmse", interactions = "5x", max_bins = 5, max_interaction_bins = 5, random_state = 13), "ExplainableBoostingRegressorAutoNA")
