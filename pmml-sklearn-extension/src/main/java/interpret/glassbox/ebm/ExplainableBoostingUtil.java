@@ -72,6 +72,8 @@ public class ExplainableBoostingUtil {
 		ModelEncoder encoder = schema.getEncoder();
 		List<? extends Feature> features = schema.getFeatures();
 
+		boolean hasInteractions = hasInteractionTerms(termFeatures);
+
 		List<List<CategoricalFeature>> binLevelFeatures = new ArrayList<>();
 
 		for(int i = 0; i < bins.size(); i++){
@@ -79,7 +81,7 @@ public class ExplainableBoostingUtil {
 			List<?> binLevels = bins.get(i);
 			String featureType = featureTypesIn.get(i);
 
-			binLevelFeatures.add(encodeBinLevelFeatures(feature, binLevels, featureType, encoder));
+			binLevelFeatures.add(encodeBinLevelFeatures(feature, binLevels, featureType, hasInteractions, encoder));
 		}
 
 		List<Feature> result = new ArrayList<>();
@@ -88,7 +90,7 @@ public class ExplainableBoostingUtil {
 			Object[] termFeature = termFeatures.get(i);
 			HasArray termScore = termScores.get(i);
 
-			Feature feature = encodeLookupFeature(termFeature, termScore, binLevelFeatures, encoder);
+			Feature feature = encodeLookupFeature(termFeature, termScore, binLevelFeatures, hasInteractions, encoder);
 
 			result.add(feature);
 		}
@@ -97,7 +99,7 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private List<CategoricalFeature> encodeBinLevelFeatures(Feature feature, List<?> binLevels, String featureType, ModelEncoder encoder){
+	private List<CategoricalFeature> encodeBinLevelFeatures(Feature feature, List<?> binLevels, String featureType, boolean hasInteractions, ModelEncoder encoder){
 		List<CategoricalFeature> result = new ArrayList<>();
 
 		for(int i = 0; i < binLevels.size(); i++){
@@ -106,12 +108,12 @@ public class ExplainableBoostingUtil {
 			switch(featureType){
 				case HasExplainableBooster.FEATURETYPE_CONTINUOUS:
 					{
-						result.add(binContinuous(feature, (HasArray)binLevel, (binLevels.size() > 1 ? i : null), encoder));
+						result.add(binContinuous(feature, (HasArray)binLevel, (binLevels.size() > 1 ? i : null), hasInteractions, encoder));
 					}
 					break;
 				case HasExplainableBooster.FEATURETYPE_NOMINAL:
 					{
-						result.add(binNominal(feature, (Map<?, ?>)binLevel, encoder));
+						result.add(binNominal(feature, (Map<?, ?>)binLevel, hasInteractions, encoder));
 					}
 					break;
 				default:
@@ -123,11 +125,10 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private CategoricalFeature binContinuous(Feature feature, HasArray binLevel, Integer binLevelIndex, ModelEncoder encoder){
+	private CategoricalFeature binContinuous(Feature feature, HasArray binLevel, Integer binLevelIndex, boolean hasInteractions, ModelEncoder encoder){
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
-		Discretize discretize = new Discretize(continuousFeature.getName())
-			.setMapMissingTo(0);
+		Discretize discretize = new Discretize(continuousFeature.getName());
 
 		List<Number> bins = (List<Number>)binLevel.getArrayContent();
 		if(bins.isEmpty()){
@@ -136,7 +137,11 @@ public class ExplainableBoostingUtil {
 
 		List<Integer> labelCategories = new ArrayList<>();
 
-		labelCategories.add(0);
+		if(hasInteractions){
+			discretize.setMapMissingTo(0);
+
+			labelCategories.add(0);
+		}
 
 		for(int j = 0; j <= bins.size(); j++){
 			Number leftMargin = null;
@@ -155,7 +160,7 @@ public class ExplainableBoostingUtil {
 				rightMargin = bins.get(j);
 			}
 
-			Integer label = (j + 1);
+			Integer label = hasInteractions ? (j + 1) : j;
 
 			labelCategories.add(label);
 
@@ -182,7 +187,7 @@ public class ExplainableBoostingUtil {
 	}
 
 	static
-	private CategoricalFeature binNominal(Feature feature, Map<?, ?> binLevel, PMMLEncoder encoder){
+	private CategoricalFeature binNominal(Feature feature, Map<?, ?> binLevel, boolean hasInteractions, PMMLEncoder encoder){
 		List<Map.Entry<?, ?>> entries = (binLevel.entrySet()).stream()
 			.sorted((left, right) -> {
 				return ((Comparable)left.getValue()).compareTo((right.getValue()));
@@ -209,23 +214,29 @@ public class ExplainableBoostingUtil {
 		// XXX
 		field.setDataType(TypeUtil.getDataType(categories, DataType.STRING));
 
-		// XXX
-		String missingCategory = "__missing";
+		if(hasInteractions){
+			// XXX
+			String missingCategory = "__missing";
 
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
-			ExpressionUtil.createApply(PMMLFunctions.ISMISSING, new FieldRef(field)),
-			ExpressionUtil.createConstant(missingCategory), new FieldRef(field)
-		);
+			Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+				ExpressionUtil.createApply(PMMLFunctions.ISMISSING, new FieldRef(field)),
+				ExpressionUtil.createConstant(missingCategory), new FieldRef(field)
+			);
 
-		categories.add(0, missingCategory);
+			categories.add(0, missingCategory);
 
-		DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("prepare", feature), OpType.CATEGORICAL, DataType.STRING, apply);
+			DerivedField derivedField = encoder.createDerivedField(FieldNameUtil.create("prepare", feature), OpType.CATEGORICAL, DataType.STRING, apply);
 
-		return new CategoricalFeature(encoder, derivedField, categories);
+			return new CategoricalFeature(encoder, derivedField, categories);
+		} else
+
+		{
+			return new CategoricalFeature(encoder, field, categories);
+		}
 	}
 
 	static
-	private Feature encodeLookupFeature(Object[] termFeature, HasArray termScore, List<List<CategoricalFeature>> binLevelFeatures, PMMLEncoder encoder){
+	private Feature encodeLookupFeature(Object[] termFeature, HasArray termScore, List<List<CategoricalFeature>> binLevelFeatures, boolean hasInteractions, PMMLEncoder encoder){
 		int[] termScoreShape = termScore.getArrayShape();
 		List<Number> termScoreContent = (List<Number>)termScore.getArrayContent();
 
@@ -233,13 +244,29 @@ public class ExplainableBoostingUtil {
 		int columns;
 
 		if(termFeature.length == 1){
-			rows = (termScoreShape[0] - 1);
-			columns = 1;
+
+			if(hasInteractions){
+				rows = (termScoreShape[0] - 1);
+				columns = 1;
+			} else
+
+			{
+				rows = (termScoreShape[0] - 2);
+				columns = 1;
+			}
 		} else
 
 		if(termFeature.length == 2){
-			rows = (termScoreShape[0] - 1);
-			columns = (termScoreShape[1] - 1);
+
+			if(hasInteractions){
+				rows = (termScoreShape[0] - 1);
+				columns = (termScoreShape[1] - 1);
+			} else
+
+			{
+				rows = (termScoreShape[0] - 2);
+				columns = (termScoreShape[1] - 2);
+			}
 		} else
 
 		{
@@ -311,7 +338,16 @@ public class ExplainableBoostingUtil {
 		List<Object> outputValues;
 
 		if(termFeature.length == 1){
-			outputValues = (List)termScoreContent.subList(0, termScoreContent.size() - 1);
+
+			if(hasInteractions){
+				outputValues = (List)termScoreContent.subList(0, termScoreContent.size() - 1);
+			} else
+
+			{
+				mapValues.setMapMissingTo(termScoreContent.get(0));
+
+				outputValues = (List)termScoreContent.subList(1, termScoreContent.size() - 1);
+			}
 		} else
 
 		if(termFeature.length == 2){
@@ -320,7 +356,15 @@ public class ExplainableBoostingUtil {
 			for(int row = 0; row < rows; row++){
 
 				for(int column = 0; column < columns; column++){
-					Number value = termScoreContent.get(row * (columns + 1) + column);
+					Number value;
+
+					if(hasInteractions){
+						value = termScoreContent.get(row * (columns + 1) + column);
+					} else
+
+					{
+						value = termScoreContent.get((row + 1) * (columns + 2) + (column + 1));
+					}
 
 					outputValues.add(value);
 				}
@@ -344,5 +388,19 @@ public class ExplainableBoostingUtil {
 		Feature feature = new ContinuousFeature(encoder, derivedField);
 
 		return feature;
+	}
+
+
+	static
+	private boolean hasInteractionTerms(List<Object[]> termFeatures){
+
+		for(Object[] termFeature : termFeatures){
+
+			if(termFeature.length > 1){
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

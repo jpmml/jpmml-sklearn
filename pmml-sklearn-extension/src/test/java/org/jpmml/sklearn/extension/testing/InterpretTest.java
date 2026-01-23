@@ -36,6 +36,16 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateGeneralizedAdditiveClassifierAudit() throws Exception {
+		evaluate("GeneralizedAdditiveClassifier", AUDIT);
+	}
+
+	@Test
+	public void evaluateGeneralizedAdditiveClassifierAuditNA() throws Exception {
+		evaluate("GeneralizedAdditiveClassifier", AUDIT_NA);
+	}
+
+	@Test
 	public void evaluateExplainableBoostingRegressorAuto() throws Exception {
 		evaluate("ExplainableBoostingRegressor", AUTO, excludeFields("ebm(acceleration)", "ebm(cylinders)"));
 	}
@@ -43,6 +53,16 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateExplainableBoostingRegressorAutoNA() throws Exception {
 		evaluate("ExplainableBoostingRegressor", AUTO_NA);
+	}
+
+	@Test
+	public void evaluateGeneralizedAdditiveRegressorAuto() throws Exception {
+		evaluate("GeneralizedAdditiveRegressor", AUTO);
+	}
+
+	@Test
+	public void evaluateGeneralizedAdditiveRegressorAutoNA() throws Exception {
+		evaluate("GeneralizedAdditiveRegressor", AUTO_NA);
 	}
 
 	@Test
@@ -68,5 +88,10 @@ public class InterpretTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateExplainableBoostingClassifierVersicolor() throws Exception {
 		evaluate("ExplainableBoostingClassifier", VERSICOLOR, new PMMLEquivalence(5e-11, 5e-11));
+	}
+
+	@Test
+	public void evaluateGeneralizedAdditiveClassifierVersicolor() throws Exception {
+		evaluate("GeneralizedAdditiveClassifier", VERSICOLOR);
 	}
 }
