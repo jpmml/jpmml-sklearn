@@ -18,17 +18,24 @@
  */
 package sklearn.feature_extraction.text;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
+import org.jpmml.converter.Feature;
 import org.jpmml.python.HasArray;
-import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.SkLearnEncoder;
 import scipy.sparse.CSRMatrix;
+import sklearn.SkLearnTransformer;
 
-public class TfidfTransformer extends PythonObject {
+public class TfidfTransformer extends SkLearnTransformer {
 
 	public TfidfTransformer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		throw new UnsupportedOperationException();
 	}
 
 	public Number getWeight(int index){
@@ -52,7 +59,7 @@ public class TfidfTransformer extends PythonObject {
 	}
 
 	public String getNorm(){
-		return getOptionalEnum("norm", this::getOptionalString, Collections.emptyList());
+		return getOptionalEnum("norm", this::getOptionalString, Arrays.asList(TfidfTransformer.NORM_L1, TfidfTransformer.NORM_L2));
 	}
 
 	public Boolean getSublinearTf(){
@@ -62,4 +69,7 @@ public class TfidfTransformer extends PythonObject {
 	public Boolean getUseIdf(){
 		return getBoolean("use_idf");
 	}
+
+	static final String NORM_L1 = "l1";
+	static final String NORM_L2 = "l2";
 }

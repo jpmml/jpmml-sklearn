@@ -705,9 +705,13 @@ def build_sentiment(sentiment_df, classifier, tokenizer, name, with_proba = True
 	sentiment_X = sentiment_df["Sentence"]
 	sentiment_y = sentiment_df["Score"]
 
+	dtype = numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64
+	norm = "l1" if isinstance(classifier, LinearSVC) else "l2" if isinstance(classifier, LogisticRegressionCV) else None
+	sublinear_tf = isinstance(classifier, LogisticRegressionCV)
+
 	pipeline = PMMLPipeline([
 		("union", FeatureUnion([
-			("tf-idf", TfidfVectorizer(analyzer = "word", preprocessor = None, strip_accents = None, lowercase = True, tokenizer = tokenizer, stop_words = "english", ngram_range = (1, 2), norm = None, sublinear_tf = isinstance(classifier, LogisticRegressionCV), dtype = (numpy.float32 if isinstance(classifier, RandomForestClassifier) else numpy.float64))),
+			("tf-idf", TfidfVectorizer(analyzer = "word", dtype = dtype, lowercase = True, ngram_range = (1, 2), norm = norm, preprocessor = None, stop_words = "english", strip_accents = None, sublinear_tf = sublinear_tf, tokenizer = tokenizer)),
 			("count", WordCountTransformer())
 		])),
 		("selector", SelectKBest(f_classif, k = 1000)),

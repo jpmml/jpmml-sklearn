@@ -46,6 +46,10 @@ import sklearn.SkLearnTransformer;
 
 public class Normalizer extends SkLearnTransformer {
 
+	public Normalizer(){
+		this("sklearn.preprocessing", "Normalizer");
+	}
+
 	public Normalizer(String module, String name){
 		super(module, name);
 	}
@@ -131,6 +135,12 @@ public class Normalizer extends SkLearnTransformer {
 
 	public String getNorm(){
 		return getEnum("norm", this::getString, Arrays.asList(Normalizer.NORM_L1, Normalizer.NORM_L2, Normalizer.NORM_MAX));
+	}
+
+	public Normalizer setNorm(String norm){
+		setattr("norm", norm);
+
+		return this;
 	}
 
 	static

@@ -32,6 +32,7 @@ import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.preprocessing.Normalizer;
 
 public class TfidfVectorizer extends CountVectorizer {
 
@@ -69,12 +70,27 @@ public class TfidfVectorizer extends CountVectorizer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		TfidfTransformer transformer = getTransformer();
 
+		List<Feature> result = super.encodeFeatures(features, encoder);
+
 		String norm = transformer.getNorm();
 		if(norm != null){
-			throw new IllegalArgumentException(norm);
+
+			switch(norm){
+				case TfidfTransformer.NORM_L1:
+				case TfidfTransformer.NORM_L2:
+					{
+						Normalizer normalizer = new Normalizer()
+							.setNorm(norm);
+
+						result = normalizer.encodeFeatures(result, encoder);
+					}
+					break;
+				default:
+					throw new IllegalArgumentException(norm);
+			}
 		}
 
-		return super.encodeFeatures(features, encoder);
+		return result;
 	}
 
 	@Override
