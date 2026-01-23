@@ -29,23 +29,8 @@ import sklearn.OutlierDetector;
 public class SkTreeTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
-	public void evaluateExtendedIsolationForestHousing() throws Exception {
-		evaluate("ExtendedIsolationForest", HOUSING, excludeFields("rawAnomalyScore", "normalizedAnomalyScore", SkTreeTest.predictedValue), new PMMLEquivalence(5e-12, 5e-12));
-	}
-
-	@Test
 	public void evaluateObliqueDecisionTreeAudit() throws Exception {
 		evaluate("ObliqueDecisionTree", AUDIT);
-	}
-
-	@Test
-	public void evaluateObliqueDecisionTreeAuto() throws Exception {
-		evaluate("ObliqueDecisionTree", AUTO);
-	}
-
-	@Test
-	public void evaluateObliqueDecisionTreeIris() throws Exception {
-		evaluate("ObliqueDecisionTree", IRIS);
 	}
 
 	@Test
@@ -54,8 +39,23 @@ public class SkTreeTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateObliqueDecisionTreeAuto() throws Exception {
+		evaluate("ObliqueDecisionTree", AUTO);
+	}
+
+	@Test
 	public void evaluateObliqueRandomForestAuto() throws Exception {
 		evaluate("ObliqueRandomForest", AUTO);
+	}
+
+	@Test
+	public void evaluateExtendedIsolationForestHousing() throws Exception {
+		evaluate("ExtendedIsolationForest", HOUSING, excludeFields("rawAnomalyScore", "normalizedAnomalyScore", SkTreeTest.predictedValue), new PMMLEquivalence(5e-12, 5e-12));
+	}
+
+	@Test
+	public void evaluateObliqueDecisionTreeIris() throws Exception {
+		evaluate("ObliqueDecisionTree", IRIS);
 	}
 
 	@Test
