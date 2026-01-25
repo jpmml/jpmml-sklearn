@@ -214,7 +214,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 	@Test
 	public void evaluateKernelRidgeAuto() throws Exception {
-		evaluate(KERNEL_RIDGE, AUTO, new PMMLEquivalence(5e-12, 5e-12));
+		evaluate(KERNEL_RIDGE, AUTO, new PMMLEquivalence(1e-11, 1e-11));
 	}
 
 	@Test

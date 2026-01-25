@@ -361,7 +361,7 @@ def build_encoder_audit_na(audit_na_df, classifier, name, cont_transformer = Non
 	cont_cols = ["Age", "Hours", "Income"]
 	cat_cols = ["Employment", "Education", "Marital", "Occupation", "Gender"]
 
-	audit_na_X[cat_cols] = audit_na_X[cat_cols].replace({numpy.NaN : None})
+	audit_na_X[cat_cols] = audit_na_X[cat_cols].replace({numpy.nan : pandas.NA})
 
 	cont_transformer = [ContinuousDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_invalid"), with_statistics = True)] + ([cont_transformer] if cont_transformer else [])
 	cat_transformer = [CategoricalDomain(invalid_value_treatment = ("as_is" if with_invalid else "return_invalid"), with_statistics = True)] + ([cat_transformer] if cat_transformer else [])
