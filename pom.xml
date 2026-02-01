@@ -55,7 +55,7 @@
 	</issueManagement>
 
 	<properties>
-		<jpmml-evaluator.version>1.7.6</jpmml-evaluator.version>
+		<jpmml-evaluator.version>1.7.7</jpmml-evaluator.version>
 		<jpmml-h2o.version>1.3.5</jpmml-h2o.version>
 		<jpmml-lightgbm.version>1.6.5</jpmml-lightgbm.version>
 		<jpmml-python.version>1.3.19</jpmml-python.version>

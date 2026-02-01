@@ -28,8 +28,6 @@ import org.jpmml.evaluator.EvaluatorBuilder;
 import org.jpmml.evaluator.ModelEvaluatorBuilder;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
-import org.jpmml.evaluator.visitors.UnsupportedMarkupInspector;
-import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 
@@ -60,16 +58,6 @@ public class TransformerTest extends SkLearnEncoderBatchTest {
 					.setFunctionGuard(null);
 
 				return evaluatorBuilder;
-			}
-
-			@Override
-			public VisitorBattery getValidators(){
-				VisitorBattery visitorBattery = super.getValidators();
-
-				// XXX
-				visitorBattery.remove(UnsupportedMarkupInspector.class);
-
-				return visitorBattery;
 			}
 		};
 
