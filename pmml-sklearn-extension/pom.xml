@@ -8,9 +8,7 @@
 		<version>1.9-SNAPSHOT</version>
 	</parent>
 
-	<groupId>org.jpmml</groupId>
 	<artifactId>pmml-sklearn-extension</artifactId>
-	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn extensions converter</name>
 	<description>JPMML Scikit-Learn extension packages to PMML converter</description>

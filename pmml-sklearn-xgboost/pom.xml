@@ -8,9 +8,7 @@
 		<version>1.9-SNAPSHOT</version>
 	</parent>
 
-	<groupId>org.jpmml</groupId>
 	<artifactId>pmml-sklearn-xgboost</artifactId>
-	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn XGBoost converter</name>
 	<description>JPMML Scikit-Learn XGBoost to PMML converter</description>

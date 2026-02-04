@@ -8,9 +8,7 @@
 		<version>1.9-SNAPSHOT</version>
 	</parent>
 
-	<groupId>org.jpmml</groupId>
 	<artifactId>pmml-sklearn-evaluator</artifactId>
-	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn JPMML-Evaluator integration</name>
 	<description>JPMML Scikit-Learn JPMML-Evaluator integration</description>

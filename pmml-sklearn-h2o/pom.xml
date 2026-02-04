@@ -8,9 +8,7 @@
 		<version>1.9-SNAPSHOT</version>
 	</parent>
 
-	<groupId>org.jpmml</groupId>
 	<artifactId>pmml-sklearn-h2o</artifactId>
-	<packaging>jar</packaging>
 
 	<name>JPMML SkLearn H2O.ai converter</name>
 	<description>JPMML Scikit-Learn H2O.ai to PMML converter</description>
