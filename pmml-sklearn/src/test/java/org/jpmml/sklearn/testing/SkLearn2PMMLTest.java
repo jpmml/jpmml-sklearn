@@ -19,6 +19,7 @@
 package org.jpmml.sklearn.testing;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 import sklearn.SkLearnMethods;
 
-public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
+public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
 
 	@Override
 	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
@@ -51,7 +52,7 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
-				if(("LinearRegression").equals(algorithm) && ("Airline").equals(dataset)){
+				if(Objects.equals(LINEAR_REGRESSION, algorithm) && Objects.equals("Airline", dataset)){
 					Function<Object, Number> function = new Function<Object, Number>(){
 
 						@Override
@@ -89,7 +90,7 @@ public class SkLearn2PMMLTest extends SkLearnEncoderBatchTest implements Dataset
 
 	@Test
 	public void evaluateLinearRegressionAirline() throws Exception {
-		evaluate("LinearRegression", "Airline");
+		evaluate(LINEAR_REGRESSION, "Airline");
 	}
 
 	@Test

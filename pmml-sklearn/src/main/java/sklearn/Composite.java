@@ -20,6 +20,7 @@ package sklearn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
@@ -150,23 +151,23 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	@Override
 	public Object castTo(Class<?> clazz){
 
-		if((Transformer.class).equals(clazz)){
+		if(Objects.equals(Transformer.class, clazz)){
 			return toTransformer();
 		} else
 
-		if((Estimator.class).equals(clazz)){
+		if(Objects.equals(Estimator.class, clazz)){
 			return toEstimator();
 		} else
 
-		if((Classifier.class).equals(clazz)){
+		if(Objects.equals(Classifier.class, clazz)){
 			return toClassifier();
 		} else
 
-		if((Regressor.class).equals(clazz)){
+		if(Objects.equals(Regressor.class, clazz)){
 			return toRegressor();
 		} else
 
-		if((Clusterer.class).equals(clazz)){
+		if(Objects.equals(Clusterer.class, clazz)){
 			return toClusterer();
 		}
 

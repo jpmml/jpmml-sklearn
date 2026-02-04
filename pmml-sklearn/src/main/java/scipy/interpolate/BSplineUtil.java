@@ -21,6 +21,7 @@ package scipy.interpolate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
@@ -153,7 +154,7 @@ public class BSplineUtil {
 
 		if(k == 0){
 
-			if(!(t.get(i)).equals(t.get(i + 1))){
+			if(!Objects.equals(t.get(i), t.get(i + 1))){
 				expression = ExpressionUtil.createApply(PMMLFunctions.IF,
 					ExpressionUtil.createApply(PMMLFunctions.AND,
 						ExpressionUtil.createApply(PMMLFunctions.GREATEROREQUAL, new FieldRef(valueField), ExpressionUtil.createConstant(t.get(i))),
@@ -172,7 +173,7 @@ public class BSplineUtil {
 		{
 			List<Apply> expressions = new ArrayList<>(2);
 
-			if((i + k) < t.size() && !(t.get(i + k)).equals(t.get(i))){
+			if((i + k) < t.size() && !Objects.equals(t.get(i + k), t.get(i))){
 				Apply apply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE,
 					ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, new FieldRef(valueField), ExpressionUtil.createConstant(t.get(i))),
 					ExpressionUtil.createConstant((t.get(i + k)).doubleValue() - (t.get(i)).doubleValue())
@@ -183,7 +184,7 @@ public class BSplineUtil {
 				expressions.add(apply);
 			} // End if
 
-			if((i + k + 1) < t.size() && !(t.get(i + k + 1)).equals(t.get(i + 1))){
+			if((i + k + 1) < t.size() && !Objects.equals(t.get(i + k + 1), t.get(i + 1))){
 				Apply apply = ExpressionUtil.createApply(PMMLFunctions.DIVIDE,
 					ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, ExpressionUtil.createConstant(t.get(i + k + 1)), new FieldRef(valueField)),
 					ExpressionUtil.createConstant((t.get(i + k + 1)).doubleValue() - (t.get(i + 1)).doubleValue())

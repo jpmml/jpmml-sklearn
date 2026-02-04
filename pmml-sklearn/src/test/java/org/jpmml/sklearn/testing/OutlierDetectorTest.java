@@ -21,6 +21,7 @@ package org.jpmml.sklearn.testing;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -50,7 +51,7 @@ public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest imple
 			public List<Map<String, Object>> getOptionsMatrix(){
 				String algorithm = getAlgorithm();
 
-				if((ISOLATION_FOREST).equals(algorithm)){
+				if(Objects.equals(ISOLATION_FOREST, algorithm)){
 					Map<String, Object> options = new LinkedHashMap<>();
 					options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
 					options.put(HasTreeOptions.OPTION_PRUNE, new Boolean[]{false, true});

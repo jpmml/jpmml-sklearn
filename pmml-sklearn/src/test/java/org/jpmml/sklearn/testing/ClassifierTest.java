@@ -21,6 +21,7 @@ package org.jpmml.sklearn.testing;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -52,9 +53,9 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
-				if((AUDIT).equals(dataset) || (IRIS).equals(dataset)){
+				if(Objects.equals(AUDIT, dataset) || Objects.equals(IRIS, dataset)){
 
-					if((DECISION_TREE).equals(algorithm) || (RANDOM_FOREST).equals(algorithm)){
+					if(Objects.equals(DECISION_TREE, algorithm) || Objects.equals(RANDOM_FOREST, algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
 						options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
 
@@ -62,9 +63,9 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 					}
 				} else
 
-				if((AUDIT_NA).equals(dataset) || (IRIS_NA).equals(dataset)){
+				if(Objects.equals(AUDIT_NA, dataset) || Objects.equals(IRIS_NA, dataset)){
 
-					if((RANDOM_FOREST).equals(algorithm)){
+					if(Objects.equals(RANDOM_FOREST, algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
 						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
 						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
@@ -93,7 +94,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				String dataset = getDataset();
 
 				modelStats:
-				if((AUDIT).equals(dataset) || (AUDIT_NA).equals(dataset) || (IRIS).equals(dataset) || (IRIS_NA).equals(dataset)){
+				if(Objects.equals(AUDIT, dataset) || Objects.equals(AUDIT_NA, dataset) || Objects.equals(IRIS, dataset) || Objects.equals(IRIS_NA, dataset)){
 
 					switch(algorithm){
 						case DUMMY:
@@ -106,7 +107,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				} // End if
 
 				modelExplanation:
-				if((AUDIT).equals(dataset)){
+				if(Objects.equals(AUDIT, dataset)){
 
 					if(algorithm.startsWith("Multi")){
 						break modelExplanation;
@@ -121,7 +122,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 					}
 				} // End if
 
-				if((AUDIT).equals(dataset)){
+				if(Objects.equals(AUDIT, dataset)){
 
 					switch(algorithm){
 						case DECISION_TREE:

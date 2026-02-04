@@ -21,6 +21,7 @@ package org.jpmml.sklearn.testing;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -51,9 +52,9 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
-				if((AUTO).equals(dataset)){
+				if(Objects.equals(AUTO, dataset)){
 
-					if((DECISION_TREE).equals(algorithm) || (RANDOM_FOREST).equals(algorithm)){
+					if(Objects.equals(DECISION_TREE, algorithm) || Objects.equals(RANDOM_FOREST, algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
 						options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
 
@@ -61,9 +62,9 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 					}
 				} else
 
-				if((AUTO_NA).equals(dataset)){
+				if(Objects.equals(AUTO_NA, dataset)){
 
-					if((RANDOM_FOREST).equals(algorithm)){
+					if(Objects.equals(RANDOM_FOREST, algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
 						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
 						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
@@ -83,7 +84,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 				String dataset = getDataset();
 
 				modelStats:
-				if((AUTO).equals(dataset) || (AUTO_NA).equals(dataset) || (HOUSING).equals(dataset) || (VISIT).equals(dataset)){
+				if(Objects.equals(AUTO, dataset) || Objects.equals(AUTO_NA, dataset) || Objects.equals(HOUSING, dataset) || Objects.equals(VISIT, dataset)){
 
 					switch(algorithm){
 						case DUMMY:
@@ -97,7 +98,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 				} // End if
 
 				modelExplanation:
-				if((AUTO).equals(dataset)){
+				if(Objects.equals(AUTO, dataset)){
 
 					if(algorithm.startsWith("Multi")){
 						break modelExplanation;
