@@ -20,11 +20,8 @@ package sklearn2pmml.decoration;
 
 import java.util.List;
 
-import org.dmg.pmml.DataField;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ObjectFeature;
-import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.WildcardFeature;
 
 public class CategoricalDomain extends DiscreteDomain {
@@ -40,14 +37,13 @@ public class CategoricalDomain extends DiscreteDomain {
 
 	@Override
 	public Feature encodeFeature(WildcardFeature wildcardFeature, List<?> values){
-		PMMLEncoder encoder = wildcardFeature.getEncoder();
 
 		if(values == null || values.isEmpty()){
-			DataField dataField = (DataField)encoder.toCategorical(wildcardFeature.getName(), null);
+			return wildcardFeature.toCategoricalFeature();
+		} else
 
-			return new ObjectFeature(encoder, dataField);
+		{
+			return wildcardFeature.toCategoricalFeature(standardizeValues(wildcardFeature.getDataType(), values));
 		}
-
-		return wildcardFeature.toCategoricalFeature(standardizeValues(wildcardFeature.getDataType(), values));
 	}
 }

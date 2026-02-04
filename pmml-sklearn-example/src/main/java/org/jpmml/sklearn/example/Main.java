@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
-import org.jpmml.converter.ConversionException;
+import org.jpmml.converter.LoggingUtil;
 import org.jpmml.model.JAXBSerializer;
 import org.jpmml.model.metro.MetroJAXBSerializer;
 import org.jpmml.python.PythonUnpickler;
@@ -316,22 +315,16 @@ public class Main {
 		this.output = output;
 	}
 
-	// XXX
 	static {
-		ConversionException.SECTION_SEPARATOR = "";
+		LogManager logManager = LogManager.getLogManager();
+		logManager.reset();
 
-		try(InputStream is = Main.class.getResourceAsStream("/logging.properties")){
-			LogManager logManager = LogManager.getLogManager();
-
-			logManager.readConfiguration(is);
-		} catch(Exception e){
-			e.printStackTrace(System.err);
-		}
+		LoggingUtil.configureConsole();
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	static {
 		SkLearnUtil.initOnce();
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 }

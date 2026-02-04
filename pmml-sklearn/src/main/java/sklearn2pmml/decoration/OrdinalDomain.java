@@ -21,7 +21,7 @@ package sklearn2pmml.decoration;
 import java.util.List;
 
 import org.dmg.pmml.OpType;
-import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 
 public class OrdinalDomain extends DiscreteDomain {
@@ -36,7 +36,14 @@ public class OrdinalDomain extends DiscreteDomain {
 	}
 
 	@Override
-	public ObjectFeature encodeFeature(WildcardFeature wildcardFeature, List<?> values){
-		return wildcardFeature.toOrdinalFeature(values != null ? standardizeValues(wildcardFeature.getDataType(), values) : null);
+	public Feature encodeFeature(WildcardFeature wildcardFeature, List<?> values){
+
+		if(values == null || values.isEmpty()){
+			return wildcardFeature.toOrdinalFeature();
+		} else
+
+		{
+			return wildcardFeature.toOrdinalFeature(standardizeValues(wildcardFeature.getDataType(), values));
+		}
 	}
 }

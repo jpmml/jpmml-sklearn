@@ -21,7 +21,6 @@ package optbinning.scorecard;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import numpy.core.TypeDescriptor;
 import optbinning.BinnedFeature;
 import optbinning.BinningProcess;
 import org.dmg.pmml.DataField;
@@ -40,6 +39,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.HasArray;
+import org.jpmml.python.TypeInfoUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.BlockManager;
 import pandas.core.DataFrame;
@@ -218,9 +218,7 @@ public class Scorecard extends Estimator implements HasClasses {
 			.filter(blockValue -> {
 				Object descr = blockValue.getArrayType();
 
-				TypeDescriptor typeDescriptor = new TypeDescriptor(descr);
-
-				DataType dataType = typeDescriptor.getDataType();
+				DataType dataType = TypeInfoUtil.getDataType(descr);
 
 				return (dataType == DataType.DOUBLE);
 			})

@@ -55,7 +55,7 @@ public class TemporalDomain extends Domain {
 
 			WildcardFeature wildcardFeature = asWildcardFeature(feature);
 
-			feature = wildcardFeature.toOrdinalFeature(null);
+			feature = wildcardFeature.toOrdinalFeature();
 
 			result.add(feature);
 		}

@@ -23,7 +23,7 @@ import java.util.List;
 import org.dmg.pmml.Field;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.ObjectFeature;
+import org.jpmml.converter.OrdinalFeature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.CategoricalDtype;
@@ -56,11 +56,7 @@ public class CategoricalDtypeUtil {
 			if(ordered){
 				Field<?> field = encoder.toOrdinal(name, values);
 
-				if(feature instanceof ObjectFeature){
-					return feature;
-				}
-
-				return new ObjectFeature(encoder, field);
+				return new OrdinalFeature(encoder, field, values);
 			} else
 
 			{
