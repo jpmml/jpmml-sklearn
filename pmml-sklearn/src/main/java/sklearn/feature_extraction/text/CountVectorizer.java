@@ -18,9 +18,9 @@
  */
 package sklearn.feature_extraction.text;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,10 +28,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.io.CharStreams;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
@@ -302,8 +302,9 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 			throw new SkLearnException("Failed to locate the stop words list resource " + ExceptionUtil.formatLiteral(stopWords));
 		}
 
-		try(Reader reader = new InputStreamReader(is, "UTF-8")){
-			return CharStreams.readLines(reader);
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"))){
+			return reader.lines()
+				.collect(Collectors.toList());
 		} catch(Exception e){
 			throw new SkLearnException("Failed to load the stop words list", e);
 		}

@@ -18,7 +18,6 @@
  */
 package category_encoders;
 
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -26,10 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
-import com.google.common.math.IntMath;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.jpmml.converter.Feature;
@@ -201,7 +198,7 @@ public class BaseNEncoder extends BaseEncoder {
 		while(n > 0){
 			result += 1;
 
-			n = IntMath.divide(n, base, RoundingMode.FLOOR);
+			n = Math.floorDiv(n, base);
 		}
 
 		return result;
@@ -213,7 +210,10 @@ public class BaseNEncoder extends BaseEncoder {
 
 		Collection<? extends Map.Entry<?, Integer>> entries = categoryMappings.entrySet();
 		for(Map.Entry<?, Integer> entry : entries){
-			String baseValue = Strings.padStart(Integer.toString(entry.getValue(), base), requiredDigits, '0');
+			String baseValue = Integer.toString(entry.getValue(), base);
+
+			// Left-pad with zeros
+			baseValue = "0".repeat(Math.max(0, requiredDigits - baseValue.length())) + baseValue;
 
 			result.put(entry.getKey(), baseValue);
 		}

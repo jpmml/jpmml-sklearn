@@ -21,10 +21,9 @@ package sklearn.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import com.google.common.collect.ContiguousSet;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.Range;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
@@ -114,10 +113,9 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 
 		Integer featureSize = featureSizes.get(0);
 
-		List<Number> result = new ArrayList<>();
-		result.addAll(ContiguousSet.create(Range.closedOpen(0, featureSize), DiscreteDomain.integers()));
-
-		return result;
+		return IntStream.range(0, featureSize)
+			.boxed()
+			.collect(Collectors.toList());
 	}
 
 	public List<Number> getActiveFeatures(){

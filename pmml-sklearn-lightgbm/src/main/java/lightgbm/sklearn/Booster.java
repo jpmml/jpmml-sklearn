@@ -18,11 +18,10 @@
  */
 package lightgbm.sklearn;
 
-import java.io.Reader;
+import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.List;
+import java.util.Iterator;
 
-import com.google.common.io.CharStreams;
 import org.dmg.pmml.PMML;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
@@ -56,10 +55,11 @@ public class Booster extends PythonObject implements Encodable {
 	private GBDT loadGBDT(){
 		String handle = getHandle();
 
-		try(Reader reader = new StringReader(handle)){
-			List<String> lines = CharStreams.readLines(reader);
+		try(BufferedReader reader = new BufferedReader(new StringReader(handle))){
+			Iterator<String> linesIt = reader.lines()
+				.iterator();
 
-			return LightGBMUtil.loadGBDT(lines.iterator());
+			return LightGBMUtil.loadGBDT(linesIt);
 		} catch(Exception e){
 			throw new SkLearnException("Failed to load LightGBM booster object", e);
 		}

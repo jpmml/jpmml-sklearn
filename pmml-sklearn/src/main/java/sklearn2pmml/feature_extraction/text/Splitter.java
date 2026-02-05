@@ -20,7 +20,6 @@ package sklearn2pmml.feature_extraction.text;
 
 import java.util.List;
 
-import com.google.common.base.Joiner;
 import org.dmg.pmml.TextIndex;
 import sklearn.feature_extraction.text.Tokenizer;
 
@@ -47,9 +46,7 @@ public class Splitter extends Tokenizer {
 	public String formatStopWordsRE(List<String> stopWords){
 		String wordSeparatorRE = getWordSeparatorRE();
 
-		Joiner joiner = Joiner.on("|");
-
-		return "(^|" + wordSeparatorRE + ")\\p{Punct}*(" + joiner.join(stopWords) + ")\\p{Punct}*(" + wordSeparatorRE + "|$)";
+		return "(^|" + wordSeparatorRE + ")\\p{Punct}*(" + String.join("|", stopWords) + ")\\p{Punct}*(" + wordSeparatorRE + "|$)";
 	}
 
 	public void __setstate__(String wordSeparatorRE){

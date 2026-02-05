@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.math.DoubleMath;
 import org.jpmml.converter.CMatrixUtil;
 
 public class MulticlassOptimalBinning extends OptimalBinning {
@@ -113,7 +112,12 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 				woesByRow.add(woes.get(row));
 			}
 
-			result.add(DoubleMath.mean(woesByRow));
+			Double mean = woesByRow.stream()
+				.mapToDouble(Double::doubleValue)
+				.average()
+				.orElseThrow();
+
+			result.add(mean);
 		}
 
 		return result;

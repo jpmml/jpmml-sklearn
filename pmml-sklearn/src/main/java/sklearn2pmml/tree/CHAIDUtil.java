@@ -31,7 +31,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import chaid.Column;
-import com.google.common.math.DoubleMath;
 import org.dmg.pmml.CompoundPredicate;
 import org.dmg.pmml.False;
 import org.dmg.pmml.MiningFunction;
@@ -228,7 +227,10 @@ public class CHAIDUtil {
 		if(scalarLabel instanceof ContinuousLabel){
 			ContinuousLabel continuousLabel = (ContinuousLabel)scalarLabel;
 
-			Double score = DoubleMath.mean(depVArr);
+			Double score = depVArr.stream()
+				.mapToDouble(Number::doubleValue)
+				.average()
+				.orElseThrow();
 
 			result.setScore(score);
 		} else

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Joiner;
 import org.dmg.pmml.TextIndex;
 import sklearn.feature_extraction.text.Tokenizer;
 
@@ -61,9 +60,7 @@ public class Matcher extends Tokenizer {
 
 		boolean unicode = wordRE.startsWith("(?u)");
 
-		Joiner joiner = Joiner.on("|");
-
-		return (unicode ? "(?u)" : "") + "\\b(" + joiner.join(stopWords) + ")\\b";
+		return (unicode ? "(?u)" : "") + "\\b(" + String.join("|", stopWords) + ")\\b";
 	}
 
 	public void __setstate__(String wordRE){

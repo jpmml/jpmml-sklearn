@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import com.google.common.io.ByteStreams;
 import h2o.estimators.H2OEstimator;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
@@ -59,7 +58,7 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 				try(InputStream is = open("/" + h2oEstimator.getMojoPath())){
 
 					try(OutputStream os = new FileOutputStream(tmpFile)){
-						ByteStreams.copy(is, os);
+						is.transferTo(os);
 					}
 				}
 
