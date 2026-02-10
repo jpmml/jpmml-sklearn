@@ -144,6 +144,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateAdaBoostAudit() throws Exception {
+		evaluate(ADA_BOOST, AUDIT);
+	}
+
+	@Test
 	public void evaluateDecisionTreeAudit() throws Exception {
 		evaluate(DECISION_TREE, AUDIT);
 	}
@@ -530,6 +535,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateRandomForestSentiment() throws Exception {
 		evaluate(RANDOM_FOREST, SENTIMENT);
+	}
+
+	@Test
+	public void evaluateAdaBoostVersicolor() throws Exception {
+		evaluate(ADA_BOOST, VERSICOLOR);
 	}
 
 	@Test

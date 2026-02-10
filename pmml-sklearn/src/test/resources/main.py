@@ -8,7 +8,7 @@ from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.decomposition import IncrementalPCA, PCA, TruncatedSVD
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
-from sklearn.ensemble import AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingClassifier, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
+from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor, BaggingClassifier, BaggingRegressor, ExtraTreesClassifier, ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HistGradientBoostingClassifier, HistGradientBoostingRegressor, IsolationForest, RandomForestClassifier, RandomForestRegressor, StackingClassifier, StackingRegressor, VotingClassifier, VotingRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.feature_selection import f_classif, f_regression
@@ -191,6 +191,7 @@ def build_audit(audit_df, classifier, name, with_proba = True, fit_params = {}, 
 if "Audit" in datasets:
 	audit_df = load_audit("Audit", stringify = False)
 
+	build_audit(audit_df, AdaBoostClassifier(estimator = DecisionTreeClassifier(max_depth = 3), n_estimators = 11, random_state = 13), "AdaBoostAudit")
 	build_audit(audit_df, EstimatorProxy(DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13)), "DecisionTreeAudit", compact = False)
 	build_audit(audit_df, BaggingClassifier(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
 	build_audit(audit_df, CalibratedClassifierCV(DecisionTreeClassifier(min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "DecisionTreeIsotonicAudit")
@@ -476,6 +477,7 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 if "Versicolor" in datasets:
 	versicolor_df = load_versicolor("Versicolor")
 
+	build_versicolor(versicolor_df, AdaBoostClassifier(n_estimators = 11, random_state = 13), "AdaBoostVersicolor")
 	build_versicolor(versicolor_df, DummyClassifier(strategy = "prior"), "DummyVersicolor")
 	build_versicolor(versicolor_df, KNeighborsClassifier(metric = "euclidean"), "KNNVersicolor", with_proba = False)
 	build_versicolor(versicolor_df, TunedThresholdClassifierCV(LogisticRegression(), response_method = "predict_proba"), "LogisticRegressionVersicolor")
