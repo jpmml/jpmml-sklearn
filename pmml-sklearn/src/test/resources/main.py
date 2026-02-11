@@ -531,7 +531,11 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 				("normal_scale", FunctionTransformer(None, validate = True)),
 				("log_scale", FunctionTransformer(numpy.log10, validate = True)),
 				("power_scale", PowerFunctionTransformer(power = 2))
-			]))
+			], transformer_weights = {
+				"normal_scale" : 1.0,
+				"log_scale" : 1.5,
+				"power_scale" : 0.5
+			}))
 		])),
 		("pca", IncrementalPCA(n_components = 3, whiten = True)),
 		("renamer", DataFrameConstructor(columns = ["pca(1)", "pca(2)", "pca(3)"], dtype = numpy.float64)),

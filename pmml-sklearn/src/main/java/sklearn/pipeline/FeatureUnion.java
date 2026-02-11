@@ -20,10 +20,20 @@ package sklearn.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import numpy.core.ScalarUtil;
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.ProductFeature;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -53,15 +63,52 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		List<Object[]> transformers = getTransformerList();
+		Map<String, ?> transformerWeights = getTransformerWeights();
 
 		List<Feature> result = new ArrayList<>();
 
 		for(int i = 0; i < transformers.size(); i++){
+			String name = getName(transformers.get(i));
 			Transformer transformer = getTransformer(transformers.get(i));
 
 			List<Feature> transformerFeatures = new ArrayList<>(features);
 
 			transformerFeatures = transformer.encode(transformerFeatures, encoder);
+
+			if(transformerWeights != null && !transformerWeights.isEmpty()){
+				Number weight = (Number)ScalarUtil.decode(transformerWeights.get(name));
+
+				if(weight == null){
+					throw new IllegalArgumentException(name);
+				}
+
+				transformerFeatures = transformerFeatures.stream()
+					.map(transformerFeature -> {
+						return new ProductFeature(encoder, transformerFeature, weight){
+
+							@Override
+							public ContinuousFeature toContinuousFeature(){
+								Feature feature = getFeature();
+								Number factor = getFactor();
+
+								ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+								if(factor.doubleValue() == 1d){
+									return continuousFeature;
+								} else
+
+								{
+									Supplier<Apply> applySupplier = () -> {
+										return ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, continuousFeature.ref(), ExpressionUtil.createConstant(factor));
+									};
+
+									return toContinuousFeature(FieldNameUtil.create("weighted", transformerFeature), DataType.DOUBLE, applySupplier);
+								}
+							}
+						};
+					})
+					.collect(Collectors.toList());
+			}
 
 			result.addAll(transformerFeatures);
 		}
@@ -84,6 +131,15 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
 	public List<Object[]> getTransformerList(){
 		return getTupleList("transformer_list");
+	}
+
+	public Map<String, ?> getTransformerWeights(){
+		return getOptionalDict("transformer_weights");
+	}
+
+	static
+	protected String getName(Object[] transformer){
+		return TupleUtil.extractStringElement(transformer, 0);
 	}
 
 	static
