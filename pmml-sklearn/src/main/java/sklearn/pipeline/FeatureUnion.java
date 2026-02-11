@@ -39,10 +39,10 @@ import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasHead;
 import sklearn.SkLearnTransformer;
+import sklearn.SkLearnTransformerCastFunction;
 import sklearn.Step;
 import sklearn.StepUtil;
 import sklearn.Transformer;
-import sklearn.TransformerCastFunction;
 
 public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
@@ -144,7 +144,7 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
 	static
 	protected Transformer getTransformer(Object[] transformer){
-		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class);
+		CastFunction<Transformer> castFunction = new SkLearnTransformerCastFunction();
 
 		return TupleUtil.extractElement(transformer, 1, castFunction);
 	}
