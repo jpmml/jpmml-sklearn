@@ -21,7 +21,6 @@ package sklearn.compose;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
@@ -30,15 +29,12 @@ import org.jpmml.python.HasArray;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Drop;
 import sklearn.HasFeatureNamesIn;
 import sklearn.HasSparseOutput;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
-import sklearn.PassThrough;
-import sklearn.SkLearnSteps;
+import sklearn.SkLearnTransformerCastFunction;
 import sklearn.Transformer;
-import sklearn.TransformerCastFunction;
 import sklearn.TransformerUtil;
 
 public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, HasSparseOutput, Encodable {
@@ -105,22 +101,7 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 
 	static
 	protected Transformer getTransformer(Object[] fittedTransformer){
-		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class){
-
-			@Override
-			public Transformer apply(Object object){
-
-				if(Objects.equals(SkLearnSteps.DROP, object)){
-					return Drop.INSTANCE;
-				} else
-
-				if(Objects.equals(SkLearnSteps.PASSTHROUGH, object)){
-					return PassThrough.INSTANCE;
-				}
-
-				return super.apply(object);
-			}
-		};
+		CastFunction<Transformer> castFunction = new SkLearnTransformerCastFunction();
 
 		return TupleUtil.extractElement(fittedTransformer, 1, castFunction);
 	}

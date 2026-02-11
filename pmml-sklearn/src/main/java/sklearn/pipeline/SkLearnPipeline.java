@@ -36,14 +36,13 @@ import sklearn.Composite;
 import sklearn.Estimator;
 import sklearn.EstimatorCastFunction;
 import sklearn.HasSteps;
-import sklearn.PassThrough;
 import sklearn.SkLearnFields;
 import sklearn.SkLearnSteps;
+import sklearn.SkLearnTransformerCastFunction;
 import sklearn.Step;
 import sklearn.StepCastFunction;
 import sklearn.StepUtil;
 import sklearn.Transformer;
-import sklearn.TransformerCastFunction;
 
 public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
@@ -129,16 +128,16 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 		List<?> transformers = TupleUtil.extractElementList(steps, 1);
 
-		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class){
+		CastFunction<Transformer> castFunction = new SkLearnTransformerCastFunction(){
 
 			@Override
-			public Transformer apply(Object object){
+			protected boolean checkDrop(Object object){
+				return false;
+			}
 
-				if((object == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, object)){
-					return PassThrough.INSTANCE;
-				}
-
-				return super.apply(object);
+			@Override
+			protected boolean checkPassthrough(Object object){
+				return (object == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, object);
 			}
 		};
 
