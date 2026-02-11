@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.Visitor;
@@ -37,14 +38,19 @@ import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
+import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
+import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeClassifier;
+import sklearn.tree.TreeUtil;
 
-public class AdaBoostClassifier extends EnsembleClassifier {
+public class AdaBoostClassifier extends EnsembleClassifier implements HasTreeOptions {
 
 	public AdaBoostClassifier(String module, String name){
 		super(module, name);
@@ -59,12 +65,19 @@ public class AdaBoostClassifier extends EnsembleClassifier {
 
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
+		if(categoricalLabel.size() != 2){
+			throw new SkLearnException("Multiclass AdaBoost is not supported");
+		}
+
+		PredicateManager predicateManager = new PredicateManager();
+		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
+
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<TreeModel> treeModels = new ArrayList<>();
 
 		for(Classifier estimator : estimators){
-			TreeModel treeModel = (TreeModel)estimator.encode(segmentSchema);
+			TreeModel treeModel = TreeUtil.encodeTreeModel((TreeClassifier)estimator, MiningFunction.CLASSIFICATION, predicateManager, scoreDistributionManager, segmentSchema);
 
 			treeModel
 				.setMiningFunction(MiningFunction.REGRESSION)
@@ -116,6 +129,16 @@ public class AdaBoostClassifier extends EnsembleClassifier {
 			.setOutput(ModelUtil.createPredictedOutput("adaValue", OpType.CONTINUOUS, DataType.DOUBLE));
 
 		return MiningModelUtil.createBinaryLogisticClassification(miningModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, true, schema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		return TreeUtil.configureSchema(this, schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 
 	public String getAlgorithm(){
