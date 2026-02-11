@@ -21,7 +21,6 @@ package sklearn.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
@@ -53,11 +52,13 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		List<? extends Transformer> transformers = getTransformers();
+		List<Object[]> transformers = getTransformerList();
 
 		List<Feature> result = new ArrayList<>();
 
-		for(Transformer transformer : transformers){
+		for(int i = 0; i < transformers.size(); i++){
+			Transformer transformer = getTransformer(transformers.get(i));
+
 			List<Feature> transformerFeatures = new ArrayList<>(features);
 
 			transformerFeatures = transformer.encode(transformerFeatures, encoder);
@@ -70,10 +71,10 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
 	@Override
 	public Step getHead(){
-		List<? extends Transformer> transformers = getTransformers();
+		List<Object[]> transformers = getTransformerList();
 
 		if(!transformers.isEmpty()){
-			Transformer transformer = transformers.get(0);
+			Transformer transformer = getTransformer(transformers.get(0));
 
 			return StepUtil.getHead(transformer);
 		}
@@ -81,17 +82,14 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<? extends Transformer> getTransformers(){
-		List<Object[]> transformerList = getTransformerList();
-
-		List<?> transformers = TupleUtil.extractElementList(transformerList, 1);
-
-		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class);
-
-		return Lists.transform(transformers, castFunction);
-	}
-
 	public List<Object[]> getTransformerList(){
 		return getTupleList("transformer_list");
+	}
+
+	static
+	protected Transformer getTransformer(Object[] transformer){
+		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class);
+
+		return TupleUtil.extractElement(transformer, 1, castFunction);
 	}
 }
