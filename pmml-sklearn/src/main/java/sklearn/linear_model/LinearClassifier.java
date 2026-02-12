@@ -64,9 +64,7 @@ public class LinearClassifier extends SkLearnClassifier implements HasMultiDecis
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		if(numberOfClasses == 1){
-			categoricalLabel.expectCardinality(2);
-
+		if(categoricalLabel.size() == 2){
 			RegressionModel regressionModel = RegressionModelUtil.createBinaryLogisticClassification(features, CMatrixUtil.getRow(coef, numberOfClasses, numberOfFeatures, 0), intercept.get(0), RegressionModel.NormalizationMethod.LOGIT, false, schema);
 
 			if(hasProbabilityDistribution){
@@ -76,7 +74,7 @@ public class LinearClassifier extends SkLearnClassifier implements HasMultiDecis
 			return regressionModel;
 		} else
 
-		if(numberOfClasses >= 3){
+		if(categoricalLabel.size() >= 3){
 			categoricalLabel.expectCardinality(numberOfClasses);
 
 			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();

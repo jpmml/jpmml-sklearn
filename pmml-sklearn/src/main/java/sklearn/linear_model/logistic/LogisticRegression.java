@@ -124,9 +124,7 @@ public class LogisticRegression extends LinearClassifier {
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		if(numberOfClasses == 1){
-			categoricalLabel.expectCardinality(2);
-
+		if(categoricalLabel.size() == 2){
 			// See https://github.com/scikit-learn/scikit-learn/issues/9889
 			boolean corrected = (sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, "0.20") >= 0);
 
@@ -161,7 +159,7 @@ public class LogisticRegression extends LinearClassifier {
 			return miningModel;
 		} else
 
-		if(numberOfClasses >= 3){
+		if(categoricalLabel.size() >= 3){
 			categoricalLabel.expectCardinality(numberOfClasses);
 
 			List<RegressionTable> regressionTables = new ArrayList<>();

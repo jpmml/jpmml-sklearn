@@ -123,8 +123,6 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 		MiningModel miningModel;
 
 		if(categoricalLabel.size() == 2){
-			categoricalLabel.expectCardinality(2);
-
 			Model model = GradientBoostingUtil.encodeGradientBoosting(this, initialPredictions.apply(1), learningRate, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE, transformations));
 

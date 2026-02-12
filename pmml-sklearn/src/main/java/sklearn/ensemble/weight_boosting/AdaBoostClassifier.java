@@ -43,7 +43,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.model.visitors.AbstractVisitor;
-import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
 import sklearn.tree.HasTreeOptions;
@@ -63,11 +62,8 @@ public class AdaBoostClassifier extends EnsembleClassifier implements HasTreeOpt
 		List<Classifier> estimators = getEstimators();
 		List<Number> estimatorWeights = getEstimatorWeights();
 
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
-
-		if(categoricalLabel.size() != 2){
-			throw new SkLearnException("Multiclass AdaBoost is not supported");
-		}
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
+			.expectCardinality(2);
 
 		PredicateManager predicateManager = new PredicateManager();
 		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();

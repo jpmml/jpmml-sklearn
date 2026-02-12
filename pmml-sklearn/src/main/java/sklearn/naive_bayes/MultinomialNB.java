@@ -74,7 +74,8 @@ public class MultinomialNB extends SkLearnClassifier {
 
 		featureLogProb = Lists.transform(featureLogProb, function);
 
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
+		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
+			.expectCardinality(numberOfClasses);
 		List<? extends Feature> features = schema.getFeatures();
 
 		List<RegressionTable> regressionTables = new ArrayList<>();

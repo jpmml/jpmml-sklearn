@@ -82,7 +82,7 @@ public class LinearDiscriminantAnalysis extends LinearClassifier {
 			return super.encodeModel(schema);
 		} // End if
 
-		if(numberOfClasses >= 3){
+		if(categoricalLabel.size() >= 3){
 			categoricalLabel.expectCardinality(numberOfClasses);
 
 			Schema segmentSchema = (schema.toAnonymousRegressorSchema(DataType.DOUBLE)).toEmptySchema();

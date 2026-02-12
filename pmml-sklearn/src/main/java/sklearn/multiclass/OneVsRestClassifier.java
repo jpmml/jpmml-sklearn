@@ -70,9 +70,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		if(estimators.size() == 1){
-			categoricalLabel.expectCardinality(2);
-
+		if(categoricalLabel.size() == 2){
 			Classifier estimator = estimators.get(0);
 
 			if(!estimator.hasProbabilityDistribution()){
@@ -82,7 +80,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 			return estimator.encode(schema);
 		} else
 
-		if(estimators.size() >= 2){
+		if(categoricalLabel.size() >= 3){
 			categoricalLabel.expectCardinality(estimators.size());
 
 			List<Model> models = new ArrayList<>();

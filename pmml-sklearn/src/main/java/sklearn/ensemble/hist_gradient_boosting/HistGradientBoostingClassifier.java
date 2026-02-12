@@ -67,16 +67,14 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 
 		MiningModel miningModel;
 
-		if(numberOfTreesPerIteration == 1){
-			categoricalLabel.expectCardinality(2);
-
+		if(categoricalLabel.size() == 2){
 			Model model = HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, baselinePredictions, 0, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, false, schema);
 		} else
 
-		if(numberOfTreesPerIteration >= 3){
+		if(categoricalLabel.size() >= 3){
 			categoricalLabel.expectCardinality(numberOfTreesPerIteration);
 
 			List<Model> models = new ArrayList<>();
