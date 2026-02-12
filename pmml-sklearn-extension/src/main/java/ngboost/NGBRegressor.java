@@ -49,7 +49,6 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
@@ -86,17 +85,17 @@ public class NGBRegressor extends Regressor {
 		PMMLEncoder encoder = schema.getEncoder();
 		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
-		DataField ciDataField = encoder.createDataField("ci", OpType.CONTINUOUS, DataType.DOUBLE)
+		DataField ciDataField = encoder.createDataField(NGBoostNames.INPUT_CI, OpType.CONTINUOUS, DataType.DOUBLE)
 			.setDisplayName("Confidence level")
 			.addIntervals(new Interval(Interval.Closure.OPEN_OPEN, 0, 1));
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		ContinuousLabel regressionLabel = new ContinuousLabel(null, DataType.DOUBLE);
+		ContinuousLabel segmentLabel = segmentSchema.requireContinuousLabel();
 
 		MiningModel locModel = encodeParamModel(0, baseModels, scalings, segmentSchema)
-			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), regressionLabel))
-			.setOutput(ModelUtil.createPredictedOutput("loc", OpType.CONTINUOUS, DataType.DOUBLE));
+			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), segmentLabel))
+			.setOutput(ModelUtil.createPredictedOutput(NGBoostNames.OUTPUT_LOC, OpType.CONTINUOUS, DataType.DOUBLE));
 
 		Segment locSegment = new Segment(True.INSTANCE, locModel)
 			.setId("loc");
@@ -104,8 +103,8 @@ public class NGBRegressor extends Regressor {
 		Feature muFeature = new ContinuousFeature(encoder, getFinalOutputField(locModel));
 
 		MiningModel scaleModel = encodeParamModel(1, baseModels, scalings, segmentSchema)
-			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(1), regressionLabel))
-			.setOutput(ModelUtil.createPredictedOutput("scale", OpType.CONTINUOUS, DataType.DOUBLE, new ExpTransformation()));
+			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(1), segmentLabel))
+			.setOutput(ModelUtil.createPredictedOutput(NGBoostNames.OUTPUT_SCALE, OpType.CONTINUOUS, DataType.DOUBLE, new ExpTransformation()));
 
 		Segment scaleSegment = new Segment(new SimplePredicate(ciDataField, SimplePredicate.Operator.IS_NOT_MISSING, null), scaleModel)
 			.setId("scale");
@@ -116,11 +115,11 @@ public class NGBRegressor extends Regressor {
 
 		encoder.addDefineFunction(zScoreFunction);
 
-		OutputField lowerBoundOutputField = new OutputField(FieldNameUtil.create("lower", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+		OutputField lowerBoundOutputField = new OutputField(NGBoostNames.createLowerBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 			.setExpression(encodeTargetBound(new FieldRef(ciDataField), muFeature.ref(), sigmaFeature.ref(), -2d));
 
-		OutputField upperBoundOutputField = new OutputField(FieldNameUtil.create("upper", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+		OutputField upperBoundOutputField = new OutputField(NGBoostNames.createUpperBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 			.setExpression(encodeTargetBound(new FieldRef(ciDataField), muFeature.ref(), sigmaFeature.ref(), 2d));
 

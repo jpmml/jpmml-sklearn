@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
-import org.jpmml.converter.FieldNameUtil;
+import ngboost.NGBoostNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
@@ -53,7 +53,7 @@ public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 				if(Objects.equals(algorithm, "NGBoostWeighted") && Objects.equals(dataset, AUTO)){
 					int numberOfRows = table.getNumberOfRows();
 
-					table.setValues("ci", Collections.nCopies(numberOfRows, 0.95));
+					table.setValues(NGBoostNames.INPUT_CI, Collections.nCopies(numberOfRows, 0.95));
 				}
 
 				return table;
@@ -65,7 +65,7 @@ public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateNGBoostAuto() throws Exception {
-		evaluate("NGBoost", AUTO, excludeFields(FieldNameUtil.create("lower", "mpg"), FieldNameUtil.create("upper", "mpg")));
+		evaluate("NGBoost", AUTO, excludeFields(NGBoostNames.createLowerBound("mpg"), NGBoostNames.createUpperBound("mpg")));
 	}
 
 	@Test
