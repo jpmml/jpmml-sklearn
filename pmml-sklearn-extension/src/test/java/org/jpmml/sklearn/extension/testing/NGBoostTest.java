@@ -65,7 +65,7 @@ public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateNGBoostAuto() throws Exception {
-		evaluate("NGBoost", AUTO, excludeFields(NGBoostNames.createLowerBound("mpg"), NGBoostNames.createUpperBound("mpg")));
+		evaluate("NGBoost", AUTO);
 	}
 
 	@Test

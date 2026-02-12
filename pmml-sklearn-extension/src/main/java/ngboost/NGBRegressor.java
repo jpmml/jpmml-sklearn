@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataField;
@@ -47,6 +46,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
@@ -54,8 +54,6 @@ import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.converter.transformations.ExpTransformation;
-import org.jpmml.model.InvalidElementException;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.EstimatorCastFunction;
@@ -89,51 +87,63 @@ public class NGBRegressor extends Regressor {
 			.setDisplayName("Confidence level")
 			.addIntervals(new Interval(Interval.Closure.OPEN_OPEN, 0, 1));
 
+		Feature ciFeature = new ContinuousFeature(encoder, ciDataField);
+
+		DefineFunction defineFunction = encodeZCriticalFunction();
+
+		encoder.addDefineFunction(defineFunction);
+
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		ContinuousLabel segmentLabel = segmentSchema.requireContinuousLabel();
 
 		MiningModel locModel = encodeParamModel(0, baseModels, scalings, segmentSchema)
-			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), segmentLabel))
-			.setOutput(ModelUtil.createPredictedOutput(NGBoostNames.OUTPUT_LOC, OpType.CONTINUOUS, DataType.DOUBLE));
+			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), segmentLabel));
 
-		Segment locSegment = new Segment(True.INSTANCE, locModel)
-			.setId("loc");
+		OutputField locOutputField = ModelUtil.createPredictedField(NGBoostNames.OUTPUT_LOC, OpType.CONTINUOUS, DataType.DOUBLE);
 
-		Feature muFeature = new ContinuousFeature(encoder, getFinalOutputField(locModel));
+		DerivedOutputField locDerivedField = encoder.createDerivedField(locModel, locOutputField, true);
+
+		Feature locFeature = new ContinuousFeature(encoder, locDerivedField);
 
 		MiningModel scaleModel = encodeParamModel(1, baseModels, scalings, segmentSchema)
-			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(1), segmentLabel))
-			.setOutput(ModelUtil.createPredictedOutput(NGBoostNames.OUTPUT_SCALE, OpType.CONTINUOUS, DataType.DOUBLE, new ExpTransformation()));
+			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(1), segmentLabel));
 
-		Segment scaleSegment = new Segment(new SimplePredicate(ciDataField, SimplePredicate.Operator.IS_NOT_MISSING, null), scaleModel)
-			.setId("scale");
+		OutputField scaleOutputField = ModelUtil.createPredictedField(NGBoostNames.OUTPUT_SCALE, OpType.CONTINUOUS, DataType.DOUBLE);
 
-		Feature sigmaFeature = new ContinuousFeature(encoder, getFinalOutputField(scaleModel));
+		DerivedOutputField scaleDerivedField = encoder.createDerivedField(scaleModel, scaleOutputField, true);
 
-		DefineFunction zScoreFunction = encodeZScoreFunction();
+		Feature scaleFeature = new ContinuousFeature(encoder, scaleDerivedField);
 
-		encoder.addDefineFunction(zScoreFunction);
+		RegressionModel simpleRegressionModel = encodeRegression(locFeature, schema);
+
+		// XXX: Shared between two expressions
+		Apply boundApply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
+			ExpressionUtil.createApply(PMMLFunctions.EXP, scaleFeature.ref()),
+			ExpressionUtil.createApply(defineFunction, ciFeature.ref())
+		);
 
 		OutputField lowerBoundOutputField = new OutputField(NGBoostNames.createLowerBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(encodeTargetBound(new FieldRef(ciDataField), muFeature.ref(), sigmaFeature.ref(), -2d));
+			.setExpression(ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, locFeature.ref(), boundApply));
 
 		OutputField upperBoundOutputField = new OutputField(NGBoostNames.createUpperBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(encodeTargetBound(new FieldRef(ciDataField), muFeature.ref(), sigmaFeature.ref(), 2d));
+			.setExpression(ExpressionUtil.createApply(PMMLFunctions.ADD, locFeature.ref(), boundApply));
 
 		Output output = new Output()
 			.addOutputFields(lowerBoundOutputField, upperBoundOutputField);
 
-		RegressionModel ngboostModel = RegressionModelUtil.createRegression(Collections.singletonList(muFeature), Collections.singletonList(1d), null, RegressionModel.NormalizationMethod.NONE, schema)
+		RegressionModel complexRegressionModel = encodeRegression(locFeature, schema)
 			.setOutput(output);
 
-		Segment ngboostSegment = new Segment(True.INSTANCE, ngboostModel)
-			.setId("ngboost");
-
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.MODEL_CHAIN, null)
-			.addSegments(locSegment, scaleSegment, ngboostSegment);
+			.addSegments(
+				new Segment(True.INSTANCE, locModel),
+				new Segment(new SimplePredicate(ciDataField, SimplePredicate.Operator.IS_NOT_MISSING, null), scaleModel),
+				new Segment(new SimplePredicate(ciDataField, SimplePredicate.Operator.IS_MISSING, null), simpleRegressionModel),
+				new Segment(new SimplePredicate(ciDataField, SimplePredicate.Operator.IS_NOT_MISSING, null), complexRegressionModel)
+			);
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(segmentation);
@@ -205,55 +215,29 @@ public class NGBRegressor extends Regressor {
 	}
 
 	static
-	private DefineFunction encodeZScoreFunction(){
-		ParameterField ciField = new ParameterField("ci")
-			.setOpType(OpType.CONTINUOUS)
-			.setDataType(DataType.DOUBLE);
+	private RegressionModel encodeRegression(Feature locFeature, Schema schema){
+		RegressionModel regressionModel = RegressionModelUtil.createRegression(Collections.singletonList(locFeature), Collections.singletonList(1d), null, RegressionModel.NormalizationMethod.NONE, schema);
 
-		ParameterField divisorField = new ParameterField("divisor")
+		return regressionModel;
+	}
+
+	static
+	private DefineFunction encodeZCriticalFunction(){
+		ParameterField valueField = new ParameterField("p")
 			.setOpType(OpType.CONTINUOUS)
 			.setDataType(DataType.DOUBLE);
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.STDNORMALIDF,
 			ExpressionUtil.createApply(PMMLFunctions.ADD,
 				ExpressionUtil.createConstant(0.5d),
-				ExpressionUtil.createApply(PMMLFunctions.DIVIDE, new FieldRef(ciField), new FieldRef(divisorField))
+				ExpressionUtil.createApply(PMMLFunctions.DIVIDE, new FieldRef(valueField), ExpressionUtil.createConstant(2d))
 			)
 		);
 
-		DefineFunction defineFunction = new DefineFunction("zScore", OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
-			.addParameterFields(ciField, divisorField);
+		DefineFunction defineFunction = new DefineFunction("zCritical", OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
+			.addParameterFields(valueField);
 
 		return defineFunction;
-	}
-
-	static
-	private Apply encodeTargetBound(FieldRef ciFieldRef, FieldRef muFieldRef, FieldRef sigmaFieldRef, double divisor){
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
-			ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, ciFieldRef),
-			ExpressionUtil.createApply(PMMLFunctions.ADD,
-				muFieldRef,
-				ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
-					ExpressionUtil.createApply("zScore", ciFieldRef, ExpressionUtil.createConstant(divisor)),
-					sigmaFieldRef
-				)
-			)
-		);
-
-		return apply;
-	}
-
-	static
-	private OutputField getFinalOutputField(Model model){
-		Output output = model.getOutput();
-
-		if(output == null || !output.hasOutputFields()){
-			throw new InvalidElementException(model);
-		}
-
-		List<OutputField> outputFields = output.getOutputFields();
-
-		return Iterables.getLast(outputFields);
 	}
 
 	private static final String DIST_NORMAL = "Normal";
