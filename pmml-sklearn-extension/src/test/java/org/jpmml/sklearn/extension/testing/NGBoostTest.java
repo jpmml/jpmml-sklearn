@@ -18,15 +18,54 @@
  */
 package org.jpmml.sklearn.extension.testing;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.Table;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
 
 public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 
+	@Override
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public NGBoostTest getArchiveBatchTest(){
+				return NGBoostTest.this;
+			}
+
+			@Override
+			public Table getInput() throws IOException {
+				Table table = super.getInput();
+
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(Objects.equals(algorithm, "NGBoostWeighted") && Objects.equals(dataset, AUTO)){
+					int numberOfRows = table.getNumberOfRows();
+
+					table.setValues("ci", Collections.nCopies(numberOfRows, 0.95));
+				}
+
+				return table;
+			}
+		};
+
+		return result;
+	}
+
 	@Test
 	public void evaluateNGBoostAuto() throws Exception {
-		evaluate("NGBoost", AUTO);
+		evaluate("NGBoost", AUTO, excludeFields(FieldNameUtil.create("lower", "mpg"), FieldNameUtil.create("upper", "mpg")));
 	}
 
 	@Test

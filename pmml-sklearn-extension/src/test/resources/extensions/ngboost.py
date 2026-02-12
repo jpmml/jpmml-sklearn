@@ -25,7 +25,7 @@ if __name__ == "__main__":
 	else:
 		datasets = ["Auto"]
 
-def build_auto(auto_df, regressor, name, noisify_scales = False):
+def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
 	auto_X, auto_y = split_csv(auto_df)
 
 	cat_cols = ["cylinders", "model_year", "origin"]
@@ -47,10 +47,15 @@ def build_auto(auto_df, regressor, name, noisify_scales = False):
 	regressor.fitted_ = True
 	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
+	if ci:
+		auto_Xt = transformer.fit_transform(auto_X)
+		dist = regressor.pred_dist(auto_Xt)
+		mpg["lower(mpg)"] = dist.ppf((1 - ci) / 2)
+		mpg["upper(mpg)"] = dist.ppf(1 - (1 - ci) / 2)
 	store_csv(mpg, name)
 
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_auto(auto_df, NGBRegressor(n_estimators = 17, learning_rate = 0.1, Score = MLE, random_state = 13), "NGBoostAuto")
-	build_auto(auto_df, NGBRegressor(n_estimators = 17, learning_rate = 0.5, Score = LogScore, random_state = 13), "NGBoostWeightedAuto", noisify_scales = True)
+	build_auto(auto_df, NGBRegressor(n_estimators = 17, learning_rate = 0.5, Score = LogScore, random_state = 13), "NGBoostWeightedAuto", ci = 0.95, noisify_scales = True)
