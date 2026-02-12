@@ -288,6 +288,14 @@
 </details>
 
 <details>
+  <summary>NGBoost</summary>
+
+  Examples: [extensions/ngboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/ngboost.py)
+
+  * `ngboost.NGBRegressor`
+</details>
+
+<details>
   <summary>OptBinning</summary>
 
   Examples: [extensions/optbinning.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/optbinning.py)
