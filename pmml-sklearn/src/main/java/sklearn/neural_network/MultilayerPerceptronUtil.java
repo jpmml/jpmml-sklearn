@@ -163,7 +163,7 @@ public class MultilayerPerceptronUtil {
 					} else
 
 					// Multi-class classification
-					if(categoricalLabel.size() > 2){
+					if(categoricalLabel.size() >= 3){
 						neuralLayer.setNormalizationMethod(NeuralNetwork.NormalizationMethod.SOFTMAX);
 					} else
 

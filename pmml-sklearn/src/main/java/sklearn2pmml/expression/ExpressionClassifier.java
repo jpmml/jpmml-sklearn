@@ -112,7 +112,7 @@ public class ExpressionClassifier extends Classifier {
 				break;
 			case SOFTMAX:
 			case SIMPLEMAX:
-				if(categoricalLabel.size() >= 2){
+				if(categoricalLabel.size() >= 3){
 					regressionTables = encodeMultinomialClassifier(categories, categoryRegressionTables);
 				} else
 

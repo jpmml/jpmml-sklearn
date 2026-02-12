@@ -147,7 +147,7 @@ public class GradientBoostingClassifier extends SkLearnClassifier implements Has
 			miningModel = MiningModelUtil.createBinaryLogisticClassification(model, coefficient, 0d, normalizationMethod, false, schema);
 		} else
 
-		if(categoricalLabel.size() > 2){
+		if(categoricalLabel.size() >= 3){
 			List<TreeRegressor> estimators = getEstimators();
 
 			List<Model> models = new ArrayList<>();
