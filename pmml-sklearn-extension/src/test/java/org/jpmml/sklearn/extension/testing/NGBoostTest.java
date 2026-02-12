@@ -72,4 +72,9 @@ public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 	public void evaluateNGBoostWeightedAuto() throws Exception {
 		evaluate("NGBoostWeighted", AUTO);
 	}
+
+	@Test
+	public void evaluateNGBoostVisit() throws Exception {
+		evaluate("NGBoost", VISIT);
+	}
 }

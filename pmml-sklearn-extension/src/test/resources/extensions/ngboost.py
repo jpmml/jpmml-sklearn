@@ -5,6 +5,7 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 from common import *
 
 from ngboost import NGBRegressor
+from ngboost.distns import Normal, Poisson
 from ngboost.scores import LogScore, MLE
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
@@ -23,7 +24,13 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Auto"]
+		datasets = ["Auto", "Visit"]
+
+def make_column_transformer(cat_cols, cont_cols):
+	return ColumnTransformer(
+		[(cat_col, make_pipeline(CategoricalDomain(), OneHotEncoder()), [cat_col]) for cat_col in cat_cols] +
+		[(cont_col, ContinuousDomain(), [cont_col]) for cont_col in cont_cols]
+	)
 
 def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
 	auto_X, auto_y = split_csv(auto_df)
@@ -31,10 +38,7 @@ def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
 	cat_cols = ["cylinders", "model_year", "origin"]
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
 
-	transformer = ColumnTransformer(
-		[(cat_col, make_pipeline(CategoricalDomain(), OneHotEncoder()), [cat_col]) for cat_col in cat_cols] +
-		[(cont_col, ContinuousDomain(), [cont_col]) for cont_col in cont_cols]
-	)
+	transformer = make_column_transformer(cat_cols, cont_cols)
 
 	pipeline = PMMLPipeline([
 		("transformer", transformer),
@@ -43,12 +47,12 @@ def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
 	pipeline.fit(auto_X, auto_y)
 	if noisify_scales:
 		regressor.scalings = [scaling * (0.8 + 0.4 * numpy.random.random()) for scaling in regressor.scalings]
+	store_pkl(pipeline, name)
 	# XXX
 	regressor.fitted_ = True
-	store_pkl(pipeline, name)
 	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
 	if ci:
-		auto_Xt = transformer.fit_transform(auto_X)
+		auto_Xt = transformer.transform(auto_X)
 		dist = regressor.pred_dist(auto_Xt)
 		mpg["lower(mpg)"] = dist.ppf((1 - ci) / 2)
 		mpg["upper(mpg)"] = dist.ppf(1 - (1 - ci) / 2)
@@ -57,5 +61,29 @@ def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
-	build_auto(auto_df, NGBRegressor(n_estimators = 17, learning_rate = 0.1, Score = MLE, random_state = 13), "NGBoostAuto")
-	build_auto(auto_df, NGBRegressor(n_estimators = 17, learning_rate = 0.5, Score = LogScore, random_state = 13), "NGBoostWeightedAuto", ci = 0.95, noisify_scales = True)
+	build_auto(auto_df, NGBRegressor(Dist = Normal, n_estimators = 17, learning_rate = 0.1, Score = MLE, random_state = 13), "NGBoostAuto")
+	build_auto(auto_df, NGBRegressor(Dist = Normal, n_estimators = 17, learning_rate = 0.5, Score = LogScore, random_state = 13), "NGBoostWeightedAuto", ci = 0.95, noisify_scales = True)
+
+def build_visit(visit_df, regressor, name, ci = None):
+	visit_X, visit_y = split_csv(visit_df)
+
+	cat_cols = ["edlevel"] + ["female", "kids", "married", "outwork"]
+	cont_cols = ["age", "educ", "hhninc"]
+
+	transformer = make_column_transformer(cat_cols, cont_cols)
+
+	pipeline = PMMLPipeline([
+		("transformer", transformer),
+		("regressor", regressor)
+	])
+	pipeline.fit(visit_X, visit_y)
+	store_pkl(pipeline, name)
+	# XXX
+	regressor.fitted_ = True
+	docvis = DataFrame(pipeline.predict(visit_X), columns = ["docvis"])
+	store_csv(docvis, name)
+
+if "Visit" in datasets:
+	visit_df = load_visit("Visit")
+
+	build_visit(visit_df, NGBRegressor(Dist = Poisson, n_estimators = 31, learning_rate = 0.1, Score = LogScore), "NGBoostVisit")

@@ -66,10 +66,21 @@ public class NGBRegressor extends Regressor {
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
-		List<List<Regressor>> baseModels = getBaseModels();
-		@SuppressWarnings("unused")
+	public MiningModel encodeModel(Schema schema){
 		String distName = getDistName();
+
+		switch(distName){
+			case NGBRegressor.DIST_NORMAL:
+				return encodeNormalModel(schema);
+			case NGBRegressor.DIST_POISSON:
+				return encodePoissonModel(schema);
+			default:
+				throw new IllegalArgumentException(distName);
+		}
+	}
+
+	public MiningModel encodeNormalModel(Schema schema){
+		List<List<Regressor>> baseModels = getBaseModels();
 		List<Number> initParams = getInitParams();
 		Number learningRate = getLearningRate();
 		List<Number> scalings = getScalings();
@@ -100,22 +111,14 @@ public class NGBRegressor extends Regressor {
 		MiningModel locModel = encodeParamModel(0, baseModels, scalings, segmentSchema)
 			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), segmentLabel));
 
-		OutputField locOutputField = ModelUtil.createPredictedField(NGBoostNames.OUTPUT_LOC, OpType.CONTINUOUS, DataType.DOUBLE);
-
-		DerivedOutputField locDerivedField = encoder.createDerivedField(locModel, locOutputField, true);
-
-		Feature locFeature = new ContinuousFeature(encoder, locDerivedField);
+		Feature locFeature = encodePredictedParam(NGBoostNames.OUTPUT_LOC, locModel, encoder);
 
 		MiningModel scaleModel = encodeParamModel(1, baseModels, scalings, segmentSchema)
 			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(1), segmentLabel));
 
-		OutputField scaleOutputField = ModelUtil.createPredictedField(NGBoostNames.OUTPUT_SCALE, OpType.CONTINUOUS, DataType.DOUBLE);
+		Feature scaleFeature = encodePredictedParam(NGBoostNames.OUTPUT_SCALE, scaleModel, encoder);
 
-		DerivedOutputField scaleDerivedField = encoder.createDerivedField(scaleModel, scaleOutputField, true);
-
-		Feature scaleFeature = new ContinuousFeature(encoder, scaleDerivedField);
-
-		RegressionModel simpleRegressionModel = encodeRegression(locFeature, schema);
+		RegressionModel simpleRegressionModel = encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema);
 
 		// XXX: Shared between two expressions
 		Apply boundApply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
@@ -134,7 +137,7 @@ public class NGBRegressor extends Regressor {
 		Output output = new Output()
 			.addOutputFields(lowerBoundOutputField, upperBoundOutputField);
 
-		RegressionModel complexRegressionModel = encodeRegression(locFeature, schema)
+		RegressionModel complexRegressionModel = encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema)
 			.setOutput(output);
 
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.MODEL_CHAIN, null)
@@ -149,6 +152,29 @@ public class NGBRegressor extends Regressor {
 			.setSegmentation(segmentation);
 
 		return miningModel;
+	}
+
+	public MiningModel encodePoissonModel(Schema schema){
+		List<List<Regressor>> baseModels = getBaseModels();
+		List<Number> initParams = getInitParams();
+		Number learningRate = getLearningRate();
+		List<Number> scalings = getScalings();
+
+		ClassDictUtil.checkSize(baseModels, scalings);
+
+		PMMLEncoder encoder = schema.getEncoder();
+		Schema segmentSchema = schema.toAnonymousSchema();
+
+		ContinuousLabel segmentLabel = segmentSchema.requireContinuousLabel();
+
+		MiningModel locModel = encodeParamModel(0, baseModels, scalings, segmentSchema)
+			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), segmentLabel));
+
+		Feature locFeature = encodePredictedParam(NGBoostNames.OUTPUT_LOC, locModel, encoder);
+
+		RegressionModel regressionModel = encodeRegression(locFeature, RegressionModel.NormalizationMethod.EXP, schema);
+
+		return MiningModelUtil.createModelChain(Arrays.asList(locModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
 	public List<List<Regressor>> getBaseModels(){
@@ -168,7 +194,7 @@ public class NGBRegressor extends Regressor {
 	}
 
 	public String getDistName(){
-		return getEnum("Dist_name", this::getString, Arrays.asList(NGBRegressor.DIST_NORMAL));
+		return getEnum("Dist_name", this::getString, Arrays.asList(NGBRegressor.DIST_NORMAL, NGBRegressor.DIST_POISSON));
 	}
 
 	public List<Number> getInitParams(){
@@ -215,8 +241,17 @@ public class NGBRegressor extends Regressor {
 	}
 
 	static
-	private RegressionModel encodeRegression(Feature locFeature, Schema schema){
-		RegressionModel regressionModel = RegressionModelUtil.createRegression(Collections.singletonList(locFeature), Collections.singletonList(1d), null, RegressionModel.NormalizationMethod.NONE, schema);
+	private ContinuousFeature encodePredictedParam(String name, Model model, PMMLEncoder encoder){
+		OutputField outputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, DataType.DOUBLE);
+
+		DerivedOutputField derivedField = encoder.createDerivedField(model, outputField, true);
+
+		return new ContinuousFeature(encoder, derivedField);
+	}
+
+	static
+	private RegressionModel encodeRegression(Feature locFeature, RegressionModel.NormalizationMethod normalizationMethod, Schema schema){
+		RegressionModel regressionModel = RegressionModelUtil.createRegression(Collections.singletonList(locFeature), Collections.singletonList(1d), null, normalizationMethod, schema);
 
 		return regressionModel;
 	}
@@ -241,4 +276,5 @@ public class NGBRegressor extends Regressor {
 	}
 
 	private static final String DIST_NORMAL = "Normal";
+	private static final String DIST_POISSON = "Poisson";
 }
