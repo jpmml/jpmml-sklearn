@@ -18,18 +18,28 @@
  */
 package ngboost;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.mining.MiningModel;
+import org.dmg.pmml.mining.Segmentation.MissingPredictionTreatment;
 import org.dmg.pmml.regression.RegressionModel;
+import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CategoricalLabel;
+import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.LabelUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
 import sklearn.Regressor;
@@ -70,19 +80,63 @@ public class NGBClassifier extends Classifier {
 	public MiningModel encodeCategoricalModel(Schema schema){
 		List<List<Regressor>> baseModels = getBaseModels();
 		List<Number> initParams = getInitParams();
+		Integer k = getK();
 		Number learningRate = getLearningRate();
 		List<Number> scalings = getScalings();
 
-		@SuppressWarnings("unused")
+		PMMLEncoder encoder = schema.getEncoder();
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
-			.expectCardinality(2);
+			.expectCardinality(k);
 
 		Schema segmentSchema = schema.toAnonymousRegressorSchema(DataType.DOUBLE);
 
-		MiningModel locModel = NGBoostUtil.encodeParamModel(0, initParams, baseModels, scalings, learningRate, segmentSchema)
-			.setOutput(ModelUtil.createPredictedOutput(NGBoostNames.OUTPUT_LOC, OpType.CONTINUOUS, DataType.DOUBLE));
+		if(categoricalLabel.size() == 2){
+			MiningModel locModel = NGBoostUtil.encodeParamModel(0, initParams, baseModels, scalings, learningRate, segmentSchema)
+				.setOutput(ModelUtil.createPredictedOutput(NGBoostNames.OUTPUT_LOC, OpType.CONTINUOUS, DataType.DOUBLE));
 
-		return MiningModelUtil.createBinaryLogisticClassification(locModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, true, schema);
+			return MiningModelUtil.createBinaryLogisticClassification(locModel, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, true, schema);
+		} else
+
+		if(categoricalLabel.size() >= 3){
+			categoricalLabel.expectCardinality(initParams.size() + 1);
+
+			List<Model> models = new ArrayList<>();
+
+			for(int i = 0; i < (k - 1); i++){
+				MiningModel locModel = NGBoostUtil.encodeParamModel(i, initParams, baseModels, scalings, learningRate, segmentSchema)
+					.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create(NGBoostNames.OUTPUT_LOC, i), OpType.CONTINUOUS, DataType.DOUBLE));
+
+				models.add(locModel);
+			}
+
+			RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(schema), null)
+				.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX)
+				.setOutput(ModelUtil.createProbabilityOutput(DataType.DOUBLE, categoricalLabel));
+
+			{
+				RegressionTable referenceRegressionTable = new RegressionTable(0d)
+					.setTargetCategory(categoricalLabel.getValue(0));
+
+				regressionModel.addRegressionTables(referenceRegressionTable);
+			}
+
+			for(int i = 0; i < (k - 1); i++){
+				ContinuousFeature locFeature = new ContinuousFeature(encoder, FieldNameUtil.create(NGBoostNames.OUTPUT_LOC, i), DataType.DOUBLE);
+
+				RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(Collections.singletonList(locFeature), Collections.singletonList(1d), 0d)
+					.setTargetCategory(categoricalLabel.getValue(i + 1));
+
+				regressionModel.addRegressionTables(regressionTable);
+			}
+
+			models.add(regressionModel);
+
+			return MiningModelUtil.createModelChain(models, MissingPredictionTreatment.RETURN_MISSING);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public List<List<Regressor>> getBaseModels(){

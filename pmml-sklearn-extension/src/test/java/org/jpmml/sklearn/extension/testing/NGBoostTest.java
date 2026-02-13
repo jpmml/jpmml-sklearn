@@ -79,6 +79,11 @@ public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 	}
 
 	@Test
+	public void evaluateNGBoostIris() throws Exception {
+		evaluate("NGBoost", IRIS);
+	}
+
+	@Test
 	public void evaluateNGBoostVisit() throws Exception {
 		evaluate("NGBoost", VISIT);
 	}

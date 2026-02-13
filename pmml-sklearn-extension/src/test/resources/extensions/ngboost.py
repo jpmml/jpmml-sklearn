@@ -5,12 +5,12 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 from common import *
 
 from ngboost import NGBClassifier, NGBRegressor
-from ngboost.distns import Bernoulli, Normal, Poisson
+from ngboost.distns import k_categorical, Bernoulli, Normal, Poisson
 from ngboost.scores import LogScore, MLE
-from pandas import DataFrame
+from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Audit", "Auto", "Visit"]
+		datasets = ["Audit", "Auto", "Iris", "Visit"]
 
 def make_column_transformer(cat_cols, cont_cols):
 	return ColumnTransformer(
@@ -57,6 +57,29 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
 	build_audit(audit_df, NGBClassifier(Dist = Bernoulli, n_estimators = 31, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostAudit")
+
+def build_iris(iris_df, classifier, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	le = LabelEncoder()
+	iris_y = Series(le.fit_transform(iris_y), name = "Species")
+
+	pipeline = PMMLPipeline([
+		("classifier", classifier)
+	])
+	pipeline.fit(iris_X, iris_y)
+	store_pkl(pipeline, name)
+	# XXX
+	classifier.fitted_ = True
+	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])
+	species_proba = DataFrame(pipeline.predict_proba(iris_X), columns = ["probability(0)", "probability(1)", "probability(2)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
+if "Iris" in datasets:
+	iris_df = load_iris("Iris")
+
+	build_iris(iris_df, NGBClassifier(Dist = k_categorical(3), n_estimators = 5, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostIris")
 
 def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
 	auto_X, auto_y = split_csv(auto_df)
