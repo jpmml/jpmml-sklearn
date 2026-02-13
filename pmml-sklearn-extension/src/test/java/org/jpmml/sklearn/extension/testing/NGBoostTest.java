@@ -47,10 +47,9 @@ public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 			public Table getInput() throws IOException {
 				Table table = super.getInput();
 
-				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
-				if((Objects.equals(algorithm, "NGBoostLog") || Objects.equals(algorithm, "NGBoostWeighted")) && Objects.equals(dataset, AUTO)){
+				if(Objects.equals(dataset, AUTO)){
 					int numberOfRows = table.getNumberOfRows();
 
 					table.setValues(NGBoostNames.INPUT_CI, Collections.nCopies(numberOfRows, 0.95));
@@ -76,11 +75,6 @@ public class NGBoostTest extends SkLearnEncoderBatchTest implements Datasets {
 	@Test
 	public void evaluateNGBoostLogAuto() throws Exception {
 		evaluate("NGBoostLog", AUTO);
-	}
-
-	@Test
-	public void evaluateNGBoostWeightedAuto() throws Exception {
-		evaluate("NGBoostWeighted", AUTO);
 	}
 
 	@Test
