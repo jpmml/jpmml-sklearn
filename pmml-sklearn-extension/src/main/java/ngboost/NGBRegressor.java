@@ -18,12 +18,9 @@
  */
 package ngboost;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
@@ -31,7 +28,6 @@ import org.dmg.pmml.DefineFunction;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
@@ -46,17 +42,12 @@ import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.ExpressionUtil;
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
-import sklearn.EstimatorCastFunction;
 import sklearn.Regressor;
 
 public class NGBRegressor extends Regressor {
@@ -87,18 +78,13 @@ public class NGBRegressor extends Regressor {
 
 		ClassDictUtil.checkSize(baseModels, scalings);
 
-		if(!isWeighted(scalings)){
-			scalings = null;
-		}
-
 		PMMLEncoder encoder = schema.getEncoder();
-		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
 		DataField ciDataField = encoder.createDataField(NGBoostNames.INPUT_CI, OpType.CONTINUOUS, DataType.DOUBLE)
 			.setDisplayName("Confidence level")
 			.addIntervals(new Interval(Interval.Closure.OPEN_OPEN, 0, 1));
 
-		Feature ciFeature = new ContinuousFeature(encoder, ciDataField);
+		ContinuousFeature ciFeature = new ContinuousFeature(encoder, ciDataField);
 
 		DefineFunction defineFunction = encodeZCriticalFunction();
 
@@ -106,39 +92,18 @@ public class NGBRegressor extends Regressor {
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		ContinuousLabel segmentLabel = segmentSchema.requireContinuousLabel();
+		MiningModel locModel = NGBoostUtil.encodeParamModel(0, initParams, baseModels, scalings, learningRate, segmentSchema);
 
-		MiningModel locModel = encodeParamModel(0, baseModels, scalings, segmentSchema)
-			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), segmentLabel));
+		ContinuousFeature locFeature = NGBoostUtil.encodePredictedParam(NGBoostNames.OUTPUT_LOC, locModel, encoder);
 
-		Feature locFeature = encodePredictedParam(NGBoostNames.OUTPUT_LOC, locModel, encoder);
+		MiningModel scaleModel = NGBoostUtil.encodeParamModel(1, initParams, baseModels, scalings, learningRate, segmentSchema);
 
-		MiningModel scaleModel = encodeParamModel(1, baseModels, scalings, segmentSchema)
-			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(1), segmentLabel));
+		ContinuousFeature scaleFeature = NGBoostUtil.encodePredictedParam(NGBoostNames.OUTPUT_SCALE, scaleModel, encoder);
 
-		Feature scaleFeature = encodePredictedParam(NGBoostNames.OUTPUT_SCALE, scaleModel, encoder);
+		RegressionModel simpleRegressionModel = NGBoostUtil.encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema);
 
-		RegressionModel simpleRegressionModel = encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema);
-
-		// XXX: Shared between two expressions
-		Apply boundApply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
-			ExpressionUtil.createApply(PMMLFunctions.EXP, scaleFeature.ref()),
-			ExpressionUtil.createApply(defineFunction, ciFeature.ref())
-		);
-
-		OutputField lowerBoundOutputField = new OutputField(NGBoostNames.createLowerBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
-			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, locFeature.ref(), boundApply));
-
-		OutputField upperBoundOutputField = new OutputField(NGBoostNames.createUpperBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
-			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(ExpressionUtil.createApply(PMMLFunctions.ADD, locFeature.ref(), boundApply));
-
-		Output output = new Output()
-			.addOutputFields(lowerBoundOutputField, upperBoundOutputField);
-
-		RegressionModel complexRegressionModel = encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema)
-			.setOutput(output);
+		RegressionModel complexRegressionModel = NGBoostUtil.encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema)
+			.setOutput(encodeBoundsOutput(locFeature, scaleFeature, defineFunction, ciFeature, schema));
 
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.MODEL_CHAIN, null)
 			.addSegments(
@@ -163,34 +128,20 @@ public class NGBRegressor extends Regressor {
 		ClassDictUtil.checkSize(baseModels, scalings);
 
 		PMMLEncoder encoder = schema.getEncoder();
+
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		ContinuousLabel segmentLabel = segmentSchema.requireContinuousLabel();
+		MiningModel locModel = NGBoostUtil.encodeParamModel(0, initParams, baseModels, scalings, learningRate, segmentSchema);
 
-		MiningModel locModel = encodeParamModel(0, baseModels, scalings, segmentSchema)
-			.setTargets(ModelUtil.createRescaleTargets(-learningRate.doubleValue(), initParams.get(0), segmentLabel));
+		ContinuousFeature locFeature = NGBoostUtil.encodePredictedParam(NGBoostNames.OUTPUT_LOC, locModel, encoder);
 
-		Feature locFeature = encodePredictedParam(NGBoostNames.OUTPUT_LOC, locModel, encoder);
-
-		RegressionModel regressionModel = encodeRegression(locFeature, RegressionModel.NormalizationMethod.EXP, schema);
+		RegressionModel regressionModel = NGBoostUtil.encodeRegression(locFeature, RegressionModel.NormalizationMethod.EXP, schema);
 
 		return MiningModelUtil.createModelChain(Arrays.asList(locModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
 	public List<List<Regressor>> getBaseModels(){
-		CastFunction<List> castFunction = new CastFunction<List>(List.class){
-
-			@Override
-			public List<Regressor> apply(Object object){
-				List<?> values = super.apply(object);
-
-				CastFunction<Regressor> castFunction = new EstimatorCastFunction<>(Regressor.class);
-
-				return Lists.transform(values, castFunction);
-			}
-		};
-
-		return (List)getList("base_models", castFunction);
+		return NGBoostUtil.getBaseModels(this);
 	}
 
 	public String getDistName(){
@@ -210,50 +161,27 @@ public class NGBRegressor extends Regressor {
 	}
 
 	static
-	public boolean isWeighted(List<Number> scalings){
+	private Output encodeBoundsOutput(ContinuousFeature locFeature, ContinuousFeature scaleFeature, DefineFunction defineFunction, ContinuousFeature ciFeature, Schema schema){
+		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
-		for(Number scaling : scalings){
+		// XXX: Shared between two expressions
+		Apply boundApply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
+			ExpressionUtil.createApply(PMMLFunctions.EXP, scaleFeature.ref()),
+			ExpressionUtil.createApply(defineFunction, ciFeature.ref())
+		);
 
-			if(scaling.doubleValue() != 1d){
-				return true;
-			}
-		}
+		OutputField lowerBoundOutputField = new OutputField(NGBoostNames.createLowerBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+			.setExpression(ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, locFeature.ref(), boundApply));
 
-		return false;
-	}
+		OutputField upperBoundOutputField = new OutputField(NGBoostNames.createUpperBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
+			.setExpression(ExpressionUtil.createApply(PMMLFunctions.ADD, locFeature.ref(), boundApply));
 
-	static
-	private MiningModel encodeParamModel(int index, List<List<Regressor>> baseModels, List<Number> scalings, Schema schema){
-		List<Model> models = new ArrayList<>();
+		Output output = new Output()
+			.addOutputFields(lowerBoundOutputField, upperBoundOutputField);
 
-		for(int i = 0; i < baseModels.size(); i++){
-			Regressor regressor = (baseModels.get(i)).get(index);
-
-			Model model = regressor.encodeModel(schema);
-
-			models.add(model);
-		}
-
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
-			.setSegmentation(MiningModelUtil.createSegmentation((scalings != null ? Segmentation.MultipleModelMethod.WEIGHTED_SUM : Segmentation.MultipleModelMethod.SUM), Segmentation.MissingPredictionTreatment.RETURN_MISSING, models, scalings));
-
-		return miningModel;
-	}
-
-	static
-	private ContinuousFeature encodePredictedParam(String name, Model model, PMMLEncoder encoder){
-		OutputField outputField = ModelUtil.createPredictedField(name, OpType.CONTINUOUS, DataType.DOUBLE);
-
-		DerivedOutputField derivedField = encoder.createDerivedField(model, outputField, true);
-
-		return new ContinuousFeature(encoder, derivedField);
-	}
-
-	static
-	private RegressionModel encodeRegression(Feature locFeature, RegressionModel.NormalizationMethod normalizationMethod, Schema schema){
-		RegressionModel regressionModel = RegressionModelUtil.createRegression(Collections.singletonList(locFeature), Collections.singletonList(1d), null, normalizationMethod, schema);
-
-		return regressionModel;
+		return output;
 	}
 
 	static
