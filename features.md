@@ -292,6 +292,7 @@
 
   Examples: [extensions/ngboost.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/ngboost.py)
 
+  * `ngboost.NGBClassifier`
   * `ngboost.NGBRegressor`
 </details>
 

@@ -47,7 +47,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.python.ClassDictUtil;
 import sklearn.Regressor;
 
 public class NGBRegressor extends Regressor {
@@ -75,8 +74,6 @@ public class NGBRegressor extends Regressor {
 		List<Number> initParams = getInitParams();
 		Number learningRate = getLearningRate();
 		List<Number> scalings = getScalings();
-
-		ClassDictUtil.checkSize(baseModels, scalings);
 
 		PMMLEncoder encoder = schema.getEncoder();
 
@@ -124,8 +121,6 @@ public class NGBRegressor extends Regressor {
 		List<Number> initParams = getInitParams();
 		Number learningRate = getLearningRate();
 		List<Number> scalings = getScalings();
-
-		ClassDictUtil.checkSize(baseModels, scalings);
 
 		PMMLEncoder encoder = schema.getEncoder();
 

@@ -41,6 +41,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.jpmml.python.CastFunction;
+import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorCastFunction;
 import sklearn.Regressor;
@@ -71,6 +72,8 @@ public class NGBoostUtil {
 	static
 	public MiningModel encodeParamModel(int index, List<Number> initParams, List<List<Regressor>> baseModels, List<Number> scalings, Number learningRate, Schema schema){
 		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
+
+		ClassDictUtil.checkSize(baseModels, scalings);
 
 		List<Model> models = new ArrayList<>();
 
