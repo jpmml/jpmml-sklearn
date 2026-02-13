@@ -20,11 +20,15 @@ package ngboost;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
+import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DefineFunction;
+import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Interval;
 import org.dmg.pmml.MiningFunction;
@@ -48,6 +52,7 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.python.ClassDictConstructorUtil;
 import sklearn.Regressor;
 
 public class NGBRegressor extends Regressor {
@@ -61,6 +66,8 @@ public class NGBRegressor extends Regressor {
 		String distName = getDistName();
 
 		switch(distName){
+			case NGBRegressor.DIST_LOGNORMAL:
+				return encodeLogNormalModel(schema);
 			case NGBRegressor.DIST_NORMAL:
 				return encodeNormalModel(schema);
 			case NGBRegressor.DIST_POISSON:
@@ -68,6 +75,59 @@ public class NGBRegressor extends Regressor {
 			default:
 				throw new IllegalArgumentException(distName);
 		}
+	}
+
+	/**
+	 * @see NGBoostNames#INPUT_CI
+	 * @see NGBoostNames#OUTPUT_LOC
+	 * @see NGBoostNames#OUTPUT_SCALE
+	 */
+	public MiningModel encodeLogNormalModel(Schema schema){
+		List<List<Regressor>> baseModels = getBaseModels();
+		List<Number> initParams = getInitParams();
+		Number learningRate = getLearningRate();
+		List<Number> scalings = getScalings();
+
+		PMMLEncoder encoder = schema.getEncoder();
+
+		DataField ciDataField = encoder.createDataField(NGBoostNames.INPUT_CI, OpType.CONTINUOUS, DataType.DOUBLE)
+			.setDisplayName("Confidence level")
+			.addIntervals(new Interval(Interval.Closure.OPEN_OPEN, 0, 1));
+
+		ContinuousFeature ciFeature = new ContinuousFeature(encoder, ciDataField);
+
+		DefineFunction defineFunction = encodeZCriticalFunction();
+
+		encoder.addDefineFunction(defineFunction);
+
+		Schema segmentSchema = schema.toAnonymousSchema();
+
+		MiningModel locModel = NGBoostUtil.encodeParamModel(0, initParams, baseModels, scalings, learningRate, segmentSchema);
+
+		ContinuousFeature locFeature = NGBoostUtil.encodePredictedParam(NGBoostNames.OUTPUT_LOC, locModel, encoder);
+
+		MiningModel scaleModel = NGBoostUtil.encodeParamModel(1, initParams, baseModels, scalings, learningRate, segmentSchema);
+
+		ContinuousFeature scaleFeature = NGBoostUtil.encodePredictedParam(NGBoostNames.OUTPUT_SCALE, scaleModel, encoder);
+
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.ADD,
+			locFeature.ref(),
+			ExpressionUtil.createApply(PMMLFunctions.DIVIDE,
+				ExpressionUtil.createApply(PMMLFunctions.EXP,
+					ExpressionUtil.createApply(PMMLFunctions.MULTIPLY, ExpressionUtil.createConstant(2d), scaleFeature.ref())
+				),
+				ExpressionUtil.createConstant(2d)
+			)
+		);
+
+		DerivedField derivedField = encoder.createDerivedField("logMean", OpType.CONTINUOUS, DataType.DOUBLE, apply);
+
+		ContinuousFeature logMeanFeature = new ContinuousFeature(encoder, derivedField);
+
+		RegressionModel regressionModel = NGBoostUtil.encodeRegression(logMeanFeature, RegressionModel.NormalizationMethod.EXP, schema)
+			.setOutput(encodeBoundsOutput(locFeature, scaleFeature, defineFunction, ciFeature, true, schema));
+
+		return MiningModelUtil.createModelChain(Arrays.asList(locModel, scaleModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
 	/**
@@ -106,7 +166,7 @@ public class NGBRegressor extends Regressor {
 		RegressionModel simpleRegressionModel = NGBoostUtil.encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema);
 
 		RegressionModel complexRegressionModel = NGBoostUtil.encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema)
-			.setOutput(encodeBoundsOutput(locFeature, scaleFeature, defineFunction, ciFeature, schema));
+			.setOutput(encodeBoundsOutput(locFeature, scaleFeature, defineFunction, ciFeature, false, schema));
 
 		Segmentation segmentation = new Segmentation(Segmentation.MultipleModelMethod.MODEL_CHAIN, null)
 			.addSegments(
@@ -148,8 +208,29 @@ public class NGBRegressor extends Regressor {
 		return NGBoostUtil.getBaseModels(this);
 	}
 
+	public ClassDictConstructor getDist(){
+		return get("Dist", ClassDictConstructor.class);
+	}
+
 	public String getDistName(){
-		return getEnum("Dist_name", this::getString, Arrays.asList(NGBRegressor.DIST_NORMAL, NGBRegressor.DIST_POISSON));
+		Function<String, String> function = new Function<String, String>(){
+
+			@Override
+			public String apply(String name){
+				String distName = NGBRegressor.this.getString(name);
+
+				// XXX
+				if(Objects.equals("DistWithUncensoredScore", distName)){
+					ClassDictConstructor dictConstructor = getDist();
+
+					return ClassDictConstructorUtil.getName(dictConstructor);
+				}
+
+				return distName;
+			}
+		};
+
+		return getEnum("Dist_name", function, Arrays.asList(NGBRegressor.DIST_LOGNORMAL, NGBRegressor.DIST_NORMAL, NGBRegressor.DIST_POISSON));
 	}
 
 	public List<Number> getInitParams(){
@@ -165,7 +246,7 @@ public class NGBRegressor extends Regressor {
 	}
 
 	static
-	private Output encodeBoundsOutput(ContinuousFeature locFeature, ContinuousFeature scaleFeature, DefineFunction defineFunction, ContinuousFeature ciFeature, Schema schema){
+	private Output encodeBoundsOutput(ContinuousFeature locFeature, ContinuousFeature scaleFeature, DefineFunction defineFunction, ContinuousFeature ciFeature, boolean transformed, Schema schema){
 		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
 		// XXX: Shared between two expressions
@@ -174,13 +255,25 @@ public class NGBRegressor extends Regressor {
 			ExpressionUtil.createApply(defineFunction, ciFeature.ref())
 		);
 
+		Apply lowerBoundApply = ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, locFeature.ref(), boundApply);
+
+		if(transformed){
+			lowerBoundApply = ExpressionUtil.createApply(PMMLFunctions.EXP, lowerBoundApply);
+		}
+
 		OutputField lowerBoundOutputField = new OutputField(FieldNameUtil.create("lower", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, locFeature.ref(), boundApply));
+			.setExpression(lowerBoundApply);
+
+		Apply upperBoundApply = ExpressionUtil.createApply(PMMLFunctions.ADD, locFeature.ref(), boundApply);
+
+		if(transformed){
+			upperBoundApply = ExpressionUtil.createApply(PMMLFunctions.EXP, upperBoundApply);
+		}
 
 		OutputField upperBoundOutputField = new OutputField(FieldNameUtil.create("upper", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(ExpressionUtil.createApply(PMMLFunctions.ADD, locFeature.ref(), boundApply));
+			.setExpression(upperBoundApply);
 
 		Output output = new Output()
 			.addOutputFields(lowerBoundOutputField, upperBoundOutputField);
@@ -207,6 +300,7 @@ public class NGBRegressor extends Regressor {
 		return defineFunction;
 	}
 
+	private static final String DIST_LOGNORMAL = "LogNormal";
 	private static final String DIST_NORMAL = "Normal";
 	private static final String DIST_POISSON = "Poisson";
 }

@@ -5,7 +5,7 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 from common import *
 
 from ngboost import NGBClassifier, NGBRegressor
-from ngboost.distns import k_categorical, Bernoulli, Normal, Poisson
+from ngboost.distns import k_categorical, Bernoulli, LogNormal, Normal, Poisson
 from ngboost.scores import LogScore, MLE
 from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
@@ -81,7 +81,7 @@ if "Iris" in datasets:
 
 	build_iris(iris_df, NGBClassifier(Dist = k_categorical(3), n_estimators = 5, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostIris")
 
-def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
+def build_auto(auto_df, regressor, name, noisify_scalings = True, ci = None):
 	auto_X, auto_y = split_csv(auto_df)
 
 	cat_cols = ["cylinders", "model_year", "origin"]
@@ -94,7 +94,7 @@ def build_auto(auto_df, regressor, name, ci = None, noisify_scales = False):
 		("regressor", regressor)
 	])
 	pipeline.fit(auto_X, auto_y)
-	if noisify_scales:
+	if noisify_scalings:
 		regressor.scalings = [scaling * (0.8 + 0.4 * numpy.random.random()) for scaling in regressor.scalings]
 	store_pkl(pipeline, name)
 	# XXX
@@ -111,7 +111,8 @@ if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_auto(auto_df, NGBRegressor(Dist = Normal, n_estimators = 17, learning_rate = 0.1, Score = MLE, random_state = 13), "NGBoostAuto")
-	build_auto(auto_df, NGBRegressor(Dist = Normal, n_estimators = 17, learning_rate = 0.5, Score = LogScore, random_state = 13), "NGBoostWeightedAuto", ci = 0.95, noisify_scales = True)
+	build_auto(auto_df, NGBRegressor(Dist = LogNormal, n_estimators = 17, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostLogAuto", ci = 0.95)
+	build_auto(auto_df, NGBRegressor(Dist = Normal, n_estimators = 17, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostWeightedAuto", ci = 0.95, noisify_scalings = True)
 
 def build_visit(visit_df, regressor, name, ci = None):
 	visit_X, visit_y = split_csv(visit_df)
