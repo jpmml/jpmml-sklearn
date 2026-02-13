@@ -18,22 +18,10 @@
  */
 package ngboost;
 
-import org.jpmml.converter.FieldNameUtil;
-
 public interface NGBoostNames {
 
 	String INPUT_CI = "ci";
 
 	String OUTPUT_LOC = "loc";
 	String OUTPUT_SCALE = "scale";
-
-	static
-	public String createLowerBound(String name){
-		return FieldNameUtil.create("lower", name);
-	}
-
-	static
-	public String createUpperBound(String name){
-		return FieldNameUtil.create("upper", name);
-	}
 }

@@ -64,6 +64,9 @@ public class NGBClassifier extends Classifier {
 		}
 	}
 
+	/**
+	 * @see NGBoostNames#OUTPUT_LOC
+	 */
 	public MiningModel encodeCategoricalModel(Schema schema){
 		List<List<Regressor>> baseModels = getBaseModels();
 		List<Number> initParams = getInitParams();

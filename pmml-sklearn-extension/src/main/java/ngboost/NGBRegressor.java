@@ -43,6 +43,7 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ExpressionUtil;
+import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
@@ -69,6 +70,11 @@ public class NGBRegressor extends Regressor {
 		}
 	}
 
+	/**
+	 * @see NGBoostNames#INPUT_CI
+	 * @see NGBoostNames#OUTPUT_LOC
+	 * @see NGBoostNames#OUTPUT_SCALE
+	 */
 	public MiningModel encodeNormalModel(Schema schema){
 		List<List<Regressor>> baseModels = getBaseModels();
 		List<Number> initParams = getInitParams();
@@ -116,6 +122,9 @@ public class NGBRegressor extends Regressor {
 		return miningModel;
 	}
 
+	/**
+	 * @see NGBoostNames#OUTPUT_LOC
+	 */
 	public MiningModel encodePoissonModel(Schema schema){
 		List<List<Regressor>> baseModels = getBaseModels();
 		List<Number> initParams = getInitParams();
@@ -165,11 +174,11 @@ public class NGBRegressor extends Regressor {
 			ExpressionUtil.createApply(defineFunction, ciFeature.ref())
 		);
 
-		OutputField lowerBoundOutputField = new OutputField(NGBoostNames.createLowerBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+		OutputField lowerBoundOutputField = new OutputField(FieldNameUtil.create("lower", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 			.setExpression(ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, locFeature.ref(), boundApply));
 
-		OutputField upperBoundOutputField = new OutputField(NGBoostNames.createUpperBound(continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+		OutputField upperBoundOutputField = new OutputField(FieldNameUtil.create("upper", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 			.setExpression(ExpressionUtil.createApply(PMMLFunctions.ADD, locFeature.ref(), boundApply));
 
