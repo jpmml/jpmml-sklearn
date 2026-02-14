@@ -53,9 +53,10 @@ import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
+import sklearn.HasRegressorOptions;
 import sklearn.Regressor;
 
-public class NGBRegressor extends Regressor implements HasNGBoostOptions {
+public class NGBRegressor extends Regressor implements HasRegressorOptions {
 
 	public NGBRegressor(String module, String name){
 		super(module, name);
@@ -89,7 +90,7 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 
 		PMMLEncoder encoder = schema.getEncoder();
 
-		Object confidenceLevel = getOption(HasNGBoostOptions.OPTION_CONFIDENCE_LEVEL, false);
+		Object confidenceLevel = getOption(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, false);
 
 		Expression confidenceLevelExpression = encodeConfidenceLevel(confidenceLevel);
 
@@ -141,7 +142,7 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 
 		PMMLEncoder encoder = schema.getEncoder();
 
-		Object confidenceLevel = getOption(HasNGBoostOptions.OPTION_CONFIDENCE_LEVEL, false);
+		Object confidenceLevel = getOption(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, false);
 
 		Expression confidenceLevelExpression = encodeConfidenceLevel(confidenceLevel);
 

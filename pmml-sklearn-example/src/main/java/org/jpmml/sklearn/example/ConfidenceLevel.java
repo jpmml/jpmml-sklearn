@@ -16,11 +16,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ngboost;
+package org.jpmml.sklearn.example;
 
-import org.jpmml.converter.HasOptions;
+public class ConfidenceLevel {
 
-public interface HasNGBoostOptions extends HasOptions {
+	private Object value = null;
 
-	String OPTION_CONFIDENCE_LEVEL = "confidence_level";
+
+	public ConfidenceLevel(Object value){
+		setValue(value);
+	}
+
+	public Object getValue(){
+		return this.value;
+	}
+
+	private void setValue(Object value){
+		this.value = value;
+	}
 }

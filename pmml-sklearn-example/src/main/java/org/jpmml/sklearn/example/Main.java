@@ -48,6 +48,7 @@ import org.jpmml.telemetry.Incident;
 import org.jpmml.telemetry.TelemetryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sklearn.HasRegressorOptions;
 import sklearn.tree.HasTreeOptions;
 import sklearn2pmml.HasPMMLOptions;
 
@@ -140,6 +141,15 @@ public class Main {
 		order = 11
 	)
 	private Boolean winnerId = null;
+
+	@Parameter (
+		names = {"--X-" + HasRegressorOptions.OPTION_CONFIDENCE_LEVEL},
+		description = "Prediction confidence level",
+		converter = ConfidenceLevelConverter.class,
+		arity = 1,
+		order = 12
+	)
+	private ConfidenceLevel confidenceLevel = null;
 
 	@Parameter (
 		names = {"--help"},
@@ -292,6 +302,10 @@ public class Main {
 		options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
 		options.put(HasTreeOptions.OPTION_PRUNE, this.prune);
 		options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);
+
+		Object confidenceLevel = (this.confidenceLevel != null ? this.confidenceLevel.getValue() : null);
+
+		options.put(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, confidenceLevel);
 
 		// Ignore defaults
 		options.values().removeIf(Objects::isNull);
