@@ -51,6 +51,8 @@ import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictConstructorUtil;
+import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Regressor;
 
 public class NGBRegressor extends Regressor implements HasNGBoostOptions {
@@ -249,7 +251,7 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 			Number number = (Number)confidenceLevel;
 
 			if(!(number.doubleValue() > 0d && number.doubleValue() < 1d)){
-				throw new IllegalArgumentException();
+				throw new SkLearnException("Expected 0 < ci < 1 confidence level value, got " + number);
 			}
 
 			return ExpressionUtil.createConstant(number);
@@ -262,7 +264,7 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 		} else
 
 		{
-			throw new IllegalArgumentException();
+			throw new SkLearnException("Expected boolean, double or string confidence level value, got " + ClassDictUtil.formatClass(confidenceLevel));
 		}
 	}
 
