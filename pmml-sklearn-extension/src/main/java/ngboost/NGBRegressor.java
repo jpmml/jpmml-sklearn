@@ -89,7 +89,7 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 
 		Object confidenceLevel = getOption(HasNGBoostOptions.OPTION_CONFIDENCE_LEVEL, false);
 
-		boolean withBounds = hasConfidenceLevel(confidenceLevel);
+		Expression confidenceLevelExpression = encodeConfidenceLevel(confidenceLevel);
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
@@ -103,8 +103,8 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 
 		Output boundsOutput = null;
 
-		if(withBounds){
-			boundsOutput = encodeBoundsOutput(confidenceLevel, locFeature, scaleFeature, PMMLFunctions.EXP, schema);
+		if(confidenceLevelExpression != null){
+			boundsOutput = encodeBoundsOutput(locFeature, scaleFeature, confidenceLevelExpression, PMMLFunctions.EXP, schema);
 		}
 
 		Apply apply = ExpressionUtil.createApply(PMMLFunctions.ADD,
@@ -141,7 +141,7 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 
 		Object confidenceLevel = getOption(HasNGBoostOptions.OPTION_CONFIDENCE_LEVEL, false);
 
-		boolean withBounds = hasConfidenceLevel(confidenceLevel);
+		Expression confidenceLevelExpression = encodeConfidenceLevel(confidenceLevel);
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
@@ -155,14 +155,14 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 
 		Output boundsOutput = null;
 
-		if(withBounds){
+		if(confidenceLevelExpression != null){
 			MiningModel scaleModel = NGBoostUtil.encodeParamModel(1, initParams, baseModels, scalings, learningRate, segmentSchema);
 
 			ContinuousFeature scaleFeature = NGBoostUtil.encodePredictedParam(NGBoostNames.OUTPUT_SCALE, scaleModel, encoder);
 
 			models.add(scaleModel);
 
-			boundsOutput = encodeBoundsOutput(confidenceLevel, locFeature, scaleFeature, null, schema);
+			boundsOutput = encodeBoundsOutput(locFeature, scaleFeature, confidenceLevelExpression, null, schema);
 		}
 
 		RegressionModel regressionModel = NGBoostUtil.encodeRegression(locFeature, RegressionModel.NormalizationMethod.NONE, schema)
@@ -237,12 +237,12 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 	}
 
 	static
-	private boolean hasConfidenceLevel(Object confidenceLevel){
+	private Expression encodeConfidenceLevel(Object confidenceLevel){
 
 		if(confidenceLevel instanceof Boolean){
 			Boolean booleanValue = (Boolean)confidenceLevel;
 
-			return booleanValue;
+			return booleanValue ? new FieldRef(NGBoostNames.INPUT_CI) : null;
 		} else
 
 		if(confidenceLevel instanceof Number){
@@ -252,25 +252,46 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 				throw new IllegalArgumentException();
 			}
 
-			return true;
+			return ExpressionUtil.createConstant(number);
 		} else
 
 		if(confidenceLevel instanceof String){
-			return true;
+			String string = (String)confidenceLevel;
+
+			return new FieldRef(string);
 		} else
 
 		{
-			return false;
+			throw new IllegalArgumentException();
 		}
 	}
 
 	static
-	private Output encodeBoundsOutput(Object confidenceLevel, ContinuousFeature locFeature, ContinuousFeature scaleFeature, String function, Schema schema){
+	private Output encodeBoundsOutput(ContinuousFeature locFeature, ContinuousFeature scaleFeature, Expression confidenceLevelExpression, String function, Schema schema){
 		PMMLEncoder encoder = schema.getEncoder();
 		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
+		if(confidenceLevelExpression instanceof FieldRef){
+			FieldRef fieldRef = (FieldRef)confidenceLevelExpression;
+
+			@SuppressWarnings("unused")
+			DataField dataField = encoder.createDataField(fieldRef.requireField(), OpType.CONTINUOUS, DataType.DOUBLE)
+				.setDisplayName("Confidence level")
+				.addIntervals(new Interval(Interval.Closure.OPEN_OPEN, 0, 1));
+		}
+
+		DefineFunction defineFunction = encoder.getDefineFunction("zCritical");
+		if(defineFunction == null){
+			defineFunction = encodeZCriticalFunction("zCritical");
+
+			encoder.addDefineFunction(defineFunction);
+		}
+
 		// XXX: Shared between two expressions
-		Apply apply = encodeConfidenceLevel(confidenceLevel, scaleFeature, encoder);
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
+			ExpressionUtil.createApply(PMMLFunctions.EXP, scaleFeature.ref()),
+			ExpressionUtil.createApply(defineFunction, confidenceLevelExpression)
+		);
 
 		Apply lowerBoundApply = ExpressionUtil.createApply(PMMLFunctions.SUBTRACT, locFeature.ref(), apply);
 		Apply upperBoundApply = ExpressionUtil.createApply(PMMLFunctions.ADD, locFeature.ref(), apply);
@@ -278,6 +299,13 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 		if(function != null){
 			lowerBoundApply = ExpressionUtil.createApply(function, lowerBoundApply);
 			upperBoundApply = ExpressionUtil.createApply(function, upperBoundApply);
+		} // End if
+
+		if(confidenceLevelExpression instanceof FieldRef){
+			FieldRef fieldRef = (FieldRef)confidenceLevelExpression;
+
+			lowerBoundApply = encodeIsNotMissingCheck(fieldRef, lowerBoundApply);
+			upperBoundApply = encodeIsNotMissingCheck(fieldRef, upperBoundApply);
 		}
 
 		OutputField lowerBoundOutputField = new OutputField(FieldNameUtil.create("lower", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
@@ -295,55 +323,7 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 	}
 
 	static
-	public Apply encodeConfidenceLevel(Object confidenceLevel, ContinuousFeature scaleFeature, PMMLEncoder encoder){
-		Expression expression;
-
-		if(confidenceLevel instanceof Boolean){
-			Boolean booleanValue = (Boolean)confidenceLevel;
-
-			expression = booleanValue ? new FieldRef(NGBoostNames.INPUT_CI) : null;
-		} else
-
-		if(confidenceLevel instanceof Number){
-			Number number = (Number)confidenceLevel;
-
-			expression = ExpressionUtil.createConstant(number);
-		} else
-
-		if(confidenceLevel instanceof String){
-			String string = (String)confidenceLevel;
-
-			expression = new FieldRef(string);
-		} else
-
-		{
-			expression = null;
-		} // End if
-
-		if(expression == null){
-			return null;
-		}
-
-		DefineFunction defineFunction = encodeZCriticalFunction();
-
-		encoder.addDefineFunction(defineFunction);
-
-		if(expression instanceof FieldRef){
-			FieldRef fieldRef = (FieldRef)expression;
-
-			DataField dataField = encoder.createDataField(fieldRef.requireField(), OpType.CONTINUOUS, DataType.DOUBLE)
-				.setDisplayName("Confidence level")
-				.addIntervals(new Interval(Interval.Closure.OPEN_OPEN, 0, 1));
-		}
-
-		return ExpressionUtil.createApply(PMMLFunctions.MULTIPLY,
-			ExpressionUtil.createApply(PMMLFunctions.EXP, scaleFeature.ref()),
-			ExpressionUtil.createApply(defineFunction, expression)
-		);
-	}
-
-	static
-	private DefineFunction encodeZCriticalFunction(){
+	private DefineFunction encodeZCriticalFunction(String name){
 		ParameterField valueField = new ParameterField("p")
 			.setOpType(OpType.CONTINUOUS)
 			.setDataType(DataType.DOUBLE);
@@ -355,10 +335,18 @@ public class NGBRegressor extends Regressor implements HasNGBoostOptions {
 			)
 		);
 
-		DefineFunction defineFunction = new DefineFunction("zCritical", OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
+		DefineFunction defineFunction = new DefineFunction(name, OpType.CONTINUOUS, DataType.DOUBLE, null, apply)
 			.addParameterFields(valueField);
 
 		return defineFunction;
+	}
+
+	static
+	private Apply encodeIsNotMissingCheck(FieldRef fieldRef, Apply apply){
+		return ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, fieldRef),
+			apply
+		);
 	}
 
 	private static final String DIST_LOGNORMAL = "LogNormal";
