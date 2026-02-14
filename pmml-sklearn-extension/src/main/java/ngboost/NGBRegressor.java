@@ -37,6 +37,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.dmg.pmml.PMML;
 import org.dmg.pmml.PMMLFunctions;
 import org.dmg.pmml.ParameterField;
 import org.dmg.pmml.ResultFeature;
@@ -52,14 +53,22 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnException;
+import sklearn.EstimatorUtil;
+import sklearn.HasFeatureNamesIn;
 import sklearn.HasRegressorOptions;
 import sklearn.Regressor;
 
-public class NGBRegressor extends Regressor implements HasRegressorOptions {
+public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasRegressorOptions, Encodable {
 
 	public NGBRegressor(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		return getInteger("n_features");
 	}
 
 	@Override
@@ -196,6 +205,11 @@ public class NGBRegressor extends Regressor implements HasRegressorOptions {
 		RegressionModel regressionModel = NGBoostUtil.encodeRegression(locFeature, RegressionModel.NormalizationMethod.EXP, schema);
 
 		return MiningModelUtil.createModelChain(Arrays.asList(locModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return EstimatorUtil.encodePMML(this);
 	}
 
 	public List<List<Regressor>> getBaseModels(){

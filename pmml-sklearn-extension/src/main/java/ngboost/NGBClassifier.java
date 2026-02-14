@@ -27,6 +27,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMML;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation.MissingPredictionTreatment;
 import org.dmg.pmml.regression.RegressionModel;
@@ -40,14 +41,23 @@ import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
+import org.jpmml.sklearn.Encodable;
+import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
+import sklearn.HasFeatureNamesIn;
 import sklearn.Regressor;
 
-public class NGBClassifier extends Classifier {
+public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, Encodable {
 
 	public NGBClassifier(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	public int getNumberOfFeatures(){
+		return getInteger("n_features");
 	}
 
 	@Override
@@ -137,6 +147,11 @@ public class NGBClassifier extends Classifier {
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return EstimatorUtil.encodePMML(this);
 	}
 
 	public List<List<Regressor>> getBaseModels(){
