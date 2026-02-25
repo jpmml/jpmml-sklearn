@@ -41,7 +41,7 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 		try {
 			return super.apply(object);
 		} catch(ClassCastException cce){
-			throw new SkLearnException(formatMessage(object))
+			throw new SkLearnException(formatMessage(object), cce)
 				.setSolution(formatSolution(object))
 				.setExample(formatExample(object));
 		}
