@@ -177,6 +177,12 @@ public class BoosterUtil {
 
 		Learner learner = getLearner(estimator);
 
+		FeatureMap embeddedFeatureMap = learner.encodeFeatureMap();
+
+		if(embeddedFeatureMap == null || embeddedFeatureMap.isEmpty()){
+			throw new SkLearnException("The XGBoost estimator object does not specify feature information");
+		}
+
 		Map<String, ?> options = getOptions(booster, learner, estimator);
 
 		return learner.encodePMML(options, null, null, null);

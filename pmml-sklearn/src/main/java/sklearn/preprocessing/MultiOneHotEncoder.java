@@ -129,13 +129,13 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				if(hasMissingCategory(featureCategories)){
 
 					if(hasMissingCategory(discreteFeature.getValues())){
-						ClassDictUtil.checkSize(featureCategories, discreteFeature.getValues());
+						discreteFeature.expectCardinality(featureCategories.size());
 
 						featureCategories = new ArrayList<>(discreteFeature.getValues());
 					} else
 
 					{
-						ClassDictUtil.checkSize(dropMissingCategory(featureCategories), discreteFeature.getValues());
+						discreteFeature.expectCardinality(dropMissingCategory(featureCategories).size());
 
 						featureCategories = new ArrayList<>(discreteFeature.getValues());
 
@@ -153,7 +153,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				} else
 
 				{
-					ClassDictUtil.checkSize(featureCategories, discreteFeature.getValues());
+					discreteFeature.expectCardinality(featureCategories.size());
 
 					featureCategories = new ArrayList<>(discreteFeature.getValues());
 				}

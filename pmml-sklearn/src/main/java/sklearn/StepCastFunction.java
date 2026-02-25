@@ -18,6 +18,8 @@
  */
 package sklearn;
 
+import java.util.Collections;
+
 import net.razorvine.pickle.objects.ClassDict;
 import net.razorvine.pickle.objects.ClassDictConstructor;
 import org.jpmml.python.CastFunction;
@@ -41,9 +43,24 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 		try {
 			return super.apply(object);
 		} catch(ClassCastException cce){
-			throw new SkLearnException(formatMessage(object), cce)
-				.setSolution(formatSolution(object))
-				.setExample(formatExample(object));
+
+			if(object instanceof Transformer){
+				Transformer transformer = (Transformer)object;
+
+				throw new TransformerCastException(transformer, Collections.singletonList(clazz), cce);
+			} else
+
+			if(object instanceof Estimator){
+				Estimator estimator = (Estimator)object;
+
+				throw new EstimatorCastException(estimator, Collections.singletonList(clazz), cce);
+			} else
+
+			{
+				throw new SkLearnException(formatMessage(object), cce)
+					.setSolution(formatSolution(object))
+					.setExample(formatExample(object));
+			}
 		}
 	}
 

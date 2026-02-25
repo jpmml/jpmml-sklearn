@@ -66,9 +66,8 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 		List<Feature> result = new ArrayList<>();
 
 		if(feature instanceof DiscreteFeature){
-			DiscreteFeature discreteFeature = (DiscreteFeature)feature;
-
-			ClassDictUtil.checkSize(values, discreteFeature.getValues());
+			DiscreteFeature discreteFeature = ((DiscreteFeature)feature)
+				.expectCardinality(values.size());
 
 			for(int i = 0; i < values.size(); i++){
 				result.add(new BinaryFeature(encoder, discreteFeature, discreteFeature.getValue(i)));
