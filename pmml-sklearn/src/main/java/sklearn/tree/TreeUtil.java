@@ -20,6 +20,7 @@ package sklearn.tree;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
@@ -74,7 +75,7 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
-import sklearn.EstimatorCheckException;
+import sklearn.EstimatorCastException;
 import sklearn.HasApplyField;
 import sklearn.HasMultiApplyField;
 import sklearn.StepUtil;
@@ -672,7 +673,7 @@ public class TreeUtil {
 		} else
 
 		{
-			throw new EstimatorCheckException(estimator, HasApplyField.class, HasMultiApplyField.class);
+			throw new EstimatorCastException(estimator, Arrays.asList(HasApplyField.class, HasMultiApplyField.class));
 		}
 	}
 }

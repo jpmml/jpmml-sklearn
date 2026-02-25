@@ -358,7 +358,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			return clazz.cast(this);
 		}
 
-		throw new EstimatorCheckException(this, clazz);
+		throw new EstimatorCastException(this, Collections.singletonList(clazz));
 	}
 
 	public List<OutputField> createPredictProbaFields(DataType dataType, DiscreteLabel discreteLabel){

@@ -18,6 +18,7 @@
  */
 package sktree.ensemble.supervised_forest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
-import sklearn.EstimatorCheckException;
+import sklearn.EstimatorCastException;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.tree.HasTree;
 import sktree.tree.ObliqueDecisionTreeClassifier;
@@ -82,7 +83,7 @@ public class ObliqueForestUtil {
 					} else
 
 					{
-						throw new EstimatorCheckException(estimator, ObliqueDecisionTreeClassifier.class, ObliqueDecisionTreeRegressor.class);
+						throw new EstimatorCastException(estimator, Arrays.asList(ObliqueDecisionTreeClassifier.class, ObliqueDecisionTreeRegressor.class));
 					}
 				} finally {
 					estimator.setPMMLSegmentId(null);

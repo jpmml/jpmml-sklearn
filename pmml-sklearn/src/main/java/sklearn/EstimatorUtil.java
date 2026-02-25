@@ -18,6 +18,7 @@
  */
 package sklearn;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new EstimatorCheckException(estimator, HasApplyField.class, HasMultiApplyField.class);
+						throw new EstimatorCastException(estimator, Arrays.asList(HasApplyField.class, HasMultiApplyField.class));
 					}
 				}
 			case SkLearnMethods.DECISION_FUNCTION:
@@ -104,7 +105,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new EstimatorCheckException(estimator, HasDecisionFunctionField.class);
+						throw new EstimatorCastException(estimator, Collections.singletonList(HasDecisionFunctionField.class));
 					}
 				}
 			case SkLearnMethods.PREDICT:
@@ -164,7 +165,7 @@ public class EstimatorUtil {
 					} else
 
 					{
-						throw new EstimatorCheckException(estimator, HasClasses.class);
+						throw new EstimatorCastException(estimator, Collections.singletonList(HasClasses.class));
 					}
 				}
 			default:

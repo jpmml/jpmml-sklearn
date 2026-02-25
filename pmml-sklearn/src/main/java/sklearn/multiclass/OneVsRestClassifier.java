@@ -20,6 +20,7 @@ package sklearn.multiclass;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -32,7 +33,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Classifier;
-import sklearn.EstimatorCheckException;
+import sklearn.EstimatorCastException;
 import sklearn.HasClasses;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiDecisionFunctionField;
@@ -74,7 +75,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 			Classifier estimator = estimators.get(0);
 
 			if(!estimator.hasProbabilityDistribution()){
-				throw new EstimatorCheckException(estimator, HasClasses.class);
+				throw new EstimatorCastException(estimator, Collections.singletonList(HasClasses.class));
 			}
 
 			return estimator.encode(schema);
@@ -89,7 +90,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 				Classifier estimator = estimators.get(i);
 
 				if(!estimator.hasProbabilityDistribution()){
-					throw new EstimatorCheckException(estimator, HasClasses.class);
+					throw new EstimatorCastException(estimator, Collections.singletonList(HasClasses.class));
 				}
 
 				Output output = new Output()

@@ -51,7 +51,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Calibrator;
 import sklearn.Classifier;
 import sklearn.Estimator;
-import sklearn.EstimatorCheckException;
+import sklearn.EstimatorCastException;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
@@ -135,7 +135,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 					} else
 
 					{
-						throw new EstimatorCheckException(estimator, LinearClassifier.class, GradientBoostingClassifier.class);
+						throw new EstimatorCastException(estimator, Arrays.asList(LinearClassifier.class, GradientBoostingClassifier.class));
 					} // End if
 
 					if(outputField.getResultFeature() != ResultFeature.PREDICTED_VALUE){
