@@ -10,8 +10,9 @@ from ngboost.scores import LogScore, MLE
 from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.linear_model import Lasso
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
 from sklearn2pmml.pipeline import PMMLPipeline
 
@@ -27,10 +28,10 @@ if __name__ == "__main__":
 	else:
 		datasets = ["Audit", "Auto", "Iris", "Lung", "Visit"]
 
-def make_column_transformer(cat_cols, cont_cols, impute = False):
+def make_column_transformer(cat_cols, cont_cols, impute = False, scale = False):
 	return ColumnTransformer(
 		[(cat_col, make_pipeline(CategoricalDomain(), SimpleImputer(strategy = "most_frequent") if impute else "passthrough", OneHotEncoder()), [cat_col]) for cat_col in cat_cols] +
-		[(cont_col, make_pipeline(ContinuousDomain(), SimpleImputer() if impute else "passthrough"), [cont_col]) for cont_col in cont_cols]
+		[(cont_col, make_pipeline(ContinuousDomain(), SimpleImputer() if impute else "passthrough", StandardScaler() if scale else "passthrough"), [cont_col]) for cont_col in cont_cols]
 	)
 
 def build_audit(audit_df, classifier, name):
@@ -39,7 +40,7 @@ def build_audit(audit_df, classifier, name):
 	cat_cols = ["Education", "Employment", "Gender", "Marital", "Occupation"]
 	cont_cols = ["Age", "Hours", "Income"]
 
-	transformer = make_column_transformer(cat_cols, cont_cols)
+	transformer = make_column_transformer(cat_cols, cont_cols, scale = True)
 
 	pipeline = PMMLPipeline([
 		("transformer", transformer),
@@ -57,7 +58,7 @@ def build_audit(audit_df, classifier, name):
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
-	build_audit(audit_df, NGBClassifier(Dist = Bernoulli, n_estimators = 31, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostAudit")
+	build_audit(audit_df, NGBClassifier(Dist = Bernoulli, Base = Lasso(alpha = 0.1, random_state = 13), n_estimators = 17, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostAudit")
 
 def build_iris(iris_df, classifier, name):
 	iris_X, iris_y = split_csv(iris_df)
