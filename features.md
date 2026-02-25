@@ -294,6 +294,7 @@
 
   * `ngboost.NGBClassifier`
   * `ngboost.NGBRegressor`
+  * `ngboost.NGBSurvival`
 </details>
 
 <details>

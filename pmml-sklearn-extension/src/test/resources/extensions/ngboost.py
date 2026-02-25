@@ -4,11 +4,12 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
 
-from ngboost import NGBClassifier, NGBRegressor
+from ngboost import NGBClassifier, NGBRegressor, NGBSurvival
 from ngboost.distns import k_categorical, Bernoulli, LogNormal, Normal, Poisson
 from ngboost.scores import LogScore, MLE
 from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn2pmml.decoration import CategoricalDomain, ContinuousDomain
@@ -24,12 +25,12 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		datasets = (sys.argv[1]).split(",")
 	else:
-		datasets = ["Audit", "Auto", "Iris", "Visit"]
+		datasets = ["Audit", "Auto", "Iris", "Lung", "Visit"]
 
-def make_column_transformer(cat_cols, cont_cols):
+def make_column_transformer(cat_cols, cont_cols, impute = False):
 	return ColumnTransformer(
-		[(cat_col, make_pipeline(CategoricalDomain(), OneHotEncoder()), [cat_col]) for cat_col in cat_cols] +
-		[(cont_col, ContinuousDomain(), [cont_col]) for cont_col in cont_cols]
+		[(cat_col, make_pipeline(CategoricalDomain(), SimpleImputer(strategy = "most_frequent") if impute else "passthrough", OneHotEncoder()), [cat_col]) for cat_col in cat_cols] +
+		[(cont_col, make_pipeline(ContinuousDomain(), SimpleImputer() if impute else "passthrough"), [cont_col]) for cont_col in cont_cols]
 	)
 
 def build_audit(audit_df, classifier, name):
@@ -136,3 +137,32 @@ if "Visit" in datasets:
 	visit_df = load_visit("Visit")
 
 	build_visit(visit_df, NGBRegressor(Dist = Poisson, n_estimators = 31, learning_rate = 0.1, Score = LogScore, random_state = 13), "NGBoostVisit")
+
+def build_lung(lung_df, survival, name):
+	lung_E = lung_df["status"]
+	lung_T = lung_df["time"]
+	lung_X = lung_df.drop(columns = ["status", "time"])
+
+	cat_cols = ["inst", "sex"]
+	cont_cols = ["age", "meal.cal", "pat.karno", "ph.ecog", "ph.karno", "wt.loss"]
+
+	transformer = make_column_transformer(cat_cols, cont_cols, impute = True)
+	lung_Xt = transformer.fit_transform(lung_X)
+
+	survival.fit(lung_Xt, lung_T, lung_E)
+
+	pipeline = PMMLPipeline([
+		("transformer", transformer),
+		("survival", survival)
+	])
+	pipeline.active_fields = cat_cols + cont_cols
+	pipeline.target_fields = ["time"]
+	store_pkl(pipeline, name)
+
+	time = DataFrame(survival.predict(lung_Xt), columns = ["time"])
+	store_csv(time, name)
+
+if "Lung" in datasets:
+	lung_df = load_csv("Lung")
+
+	build_lung(lung_df, NGBSurvival(Dist = LogNormal, n_estimators = 17, learning_rate = 0.1, random_state = 13), "NGBoostLung")

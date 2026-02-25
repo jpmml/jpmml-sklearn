@@ -221,6 +221,12 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 	}
 
 	public String getDistName(){
+		Function<String, String> function = getDistNameFunction();
+
+		return this.getEnum("Dist_name", function, Arrays.asList(NGBRegressor.DIST_LOGNORMAL, NGBRegressor.DIST_NORMAL, NGBRegressor.DIST_POISSON));
+	}
+
+	protected Function<String, String> getDistNameFunction(){
 		Function<String, String> function = new Function<String, String>(){
 
 			@Override
@@ -229,16 +235,16 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 
 				// XXX
 				if(Objects.equals("DistWithUncensoredScore", distName)){
-					ClassDictConstructor dictConstructor = getDist();
+					ClassDictConstructor dist = getDist();
 
-					return ClassDictConstructorUtil.getName(dictConstructor);
+					return ClassDictConstructorUtil.getName(dist);
 				}
 
 				return distName;
 			}
 		};
 
-		return getEnum("Dist_name", function, Arrays.asList(NGBRegressor.DIST_LOGNORMAL, NGBRegressor.DIST_NORMAL, NGBRegressor.DIST_POISSON));
+		return function;
 	}
 
 	public List<Number> getInitParams(){
