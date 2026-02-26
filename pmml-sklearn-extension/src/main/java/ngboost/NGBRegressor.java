@@ -59,8 +59,11 @@ import sklearn.EstimatorUtil;
 import sklearn.HasFeatureNamesIn;
 import sklearn.HasRegressorOptions;
 import sklearn.Regressor;
+import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 
-public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasRegressorOptions, Encodable {
+public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasRegressorOptions, HasTreeOptions, Encodable {
 
 	public NGBRegressor(String module, String name){
 		super(module, name);
@@ -85,6 +88,33 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 			default:
 				throw new IllegalArgumentException(distName);
 		}
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		Regressor base = getBase();
+
+		if(base instanceof TreeRegressor){
+			return TreeUtil.configureSchema(this, schema);
+		}
+
+		return super.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Regressor base = getBase();
+
+		if(base instanceof TreeRegressor){
+			return TreeUtil.configureModel(this, model);
+		}
+
+		return super.configureModel(model);
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return EstimatorUtil.encodePMML(this);
 	}
 
 	/**
@@ -207,9 +237,8 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 		return MiningModelUtil.createModelChain(Arrays.asList(locModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
-	@Override
-	public PMML encodePMML(){
-		return EstimatorUtil.encodePMML(this);
+	public Regressor getBase(){
+		return getRegressor("Base");
 	}
 
 	public List<List<Regressor>> getBaseModels(){

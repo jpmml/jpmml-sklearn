@@ -48,8 +48,11 @@ import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.HasFeatureNamesIn;
 import sklearn.Regressor;
+import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 
-public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, Encodable {
+public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, HasTreeOptions, Encodable {
 
 	public NGBClassifier(String module, String name){
 		super(module, name);
@@ -82,6 +85,33 @@ public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasS
 			default:
 				throw new IllegalArgumentException(distName);
 		}
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		Regressor base = getBase();
+
+		if(base instanceof TreeRegressor){
+			return TreeUtil.configureSchema(this, schema);
+		}
+
+		return super.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Regressor base = getBase();
+
+		if(base instanceof TreeRegressor){
+			return TreeUtil.configureModel(this, model);
+		}
+
+		return super.configureModel(model);
+	}
+
+	@Override
+	public PMML encodePMML(){
+		return EstimatorUtil.encodePMML(this);
 	}
 
 	/**
@@ -149,9 +179,8 @@ public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasS
 		}
 	}
 
-	@Override
-	public PMML encodePMML(){
-		return EstimatorUtil.encodePMML(this);
+	public Regressor getBase(){
+		return getRegressor("Base");
 	}
 
 	public List<List<Regressor>> getBaseModels(){

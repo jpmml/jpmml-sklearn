@@ -37,6 +37,7 @@ import org.jpmml.converter.DerivedOutputField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLEncoder;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
@@ -45,6 +46,8 @@ import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorCastFunction;
 import sklearn.Regressor;
+import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 
 public class NGBoostUtil {
 
@@ -75,6 +78,8 @@ public class NGBoostUtil {
 
 		ClassDictUtil.checkSize(baseModels, scalings);
 
+		PredicateManager predicateManager = new PredicateManager();
+
 		List<Model> models = new ArrayList<>();
 
 		if(!NGBoostUtil.isWeighted(scalings)){
@@ -84,7 +89,17 @@ public class NGBoostUtil {
 		for(int i = 0; i < baseModels.size(); i++){
 			Regressor regressor = (baseModels.get(i)).get(index);
 
-			Model model = regressor.encodeModel(schema);
+			Model model;
+
+			if(regressor instanceof TreeRegressor){
+				TreeRegressor treeRegressor = (TreeRegressor)regressor;
+
+				model = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, predicateManager, null, schema);
+			} else
+
+			{
+				model = regressor.encodeModel(schema);
+			}
 
 			models.add(model);
 		}
