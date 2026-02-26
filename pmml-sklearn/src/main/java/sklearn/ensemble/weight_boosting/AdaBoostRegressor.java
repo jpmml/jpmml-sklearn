@@ -27,14 +27,18 @@ import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Regressor;
 import sklearn.StepUtil;
 import sklearn.ensemble.EnsembleRegressor;
+import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeRegressor;
+import sklearn.tree.TreeUtil;
 
-public class AdaBoostRegressor extends EnsembleRegressor {
+public class AdaBoostRegressor extends EnsembleRegressor implements HasTreeOptions {
 
 	public AdaBoostRegressor(String module, String name){
 		super(module, name);
@@ -58,12 +62,24 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 		List<Regressor> estimators = getEstimators();
 		List<Number> estimatorWeights = getEstimatorWeights();
 
+		PredicateManager predicateManager = new PredicateManager();
+
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<Model> models = new ArrayList<>();
 
 		for(Regressor estimator : estimators){
-			Model model = estimator.encode(segmentSchema);
+			Model model;
+
+			if(estimator instanceof TreeRegressor){
+				TreeRegressor treeRegressor = (TreeRegressor)estimator;
+
+				model = TreeUtil.encodeTreeModel(treeRegressor, MiningFunction.REGRESSION, predicateManager, null, segmentSchema);
+			} else
+
+			{
+				model = estimator.encode(segmentSchema);
+			}
 
 			models.add(model);
 		}
@@ -72,6 +88,28 @@ public class AdaBoostRegressor extends EnsembleRegressor {
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.WEIGHTED_MEDIAN, Segmentation.MissingPredictionTreatment.RETURN_MISSING, models, estimatorWeights));
 
 		return miningModel;
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		Regressor estimator = getEstimator();
+
+		if(estimator instanceof TreeRegressor){
+			return TreeUtil.configureSchema(this, schema);
+		}
+
+		return super.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Regressor estimator = getEstimator();
+
+		if(estimator instanceof TreeRegressor){
+			return TreeUtil.configureModel(this, model);
+		}
+
+		return super.configureModel(model);
 	}
 
 	public List<Number> getEstimatorWeights(){
