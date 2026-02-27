@@ -156,7 +156,14 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		checkLabel(schema.getLabel());
 		checkFeatures(schema.getFeatures());
 
-		schema = configureSchema(schema);
+		try {
+			schema = configureSchema(schema);
+		} catch(SkLearnException se){
+			throw se;
+		} catch(Exception e){
+			throw new SkLearnException("Failed to configure the schema", e)
+				.setSolution("Use different PMML conversion options");
+		}
 
 		Model model = encodeModel(schema);
 
@@ -178,7 +185,14 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		addFeatureImportances(model, schema);
 
-		model = configureModel(model);
+		try {
+			model = configureModel(model);
+		} catch(SkLearnException se){
+			throw se;
+		} catch(Exception e){
+			throw new SkLearnException("Failed to configure the model", e)
+				.setSolution("Use different PMML conversion options");
+		}
 
 		return model;
 	}
