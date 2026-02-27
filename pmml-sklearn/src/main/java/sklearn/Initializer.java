@@ -55,15 +55,20 @@ public class Initializer extends Transformer {
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 
 		try {
-			if(features.isEmpty()){
-				checkVersion();
-
-				return initializeFeatures(encoder);
-			}
-
-			return super.encode(features, encoder);
+			return encodeInternal(features, encoder);
 		} catch(ConversionException ce){
 			throw ce.ensureContext(this);
 		}
+	}
+
+	private List<Feature> encodeInternal(List<Feature> features, SkLearnEncoder encoder){
+
+		if(features.isEmpty()){
+			checkVersion();
+
+			return initializeFeatures(encoder);
+		}
+
+		return super.encode(features, encoder);
 	}
 }

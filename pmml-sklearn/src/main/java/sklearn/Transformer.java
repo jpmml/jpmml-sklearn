@@ -81,19 +81,23 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 
 		try {
-			checkVersion();
-
-			checkFeatures(features);
-
-			features = updateFeatures(features, encoder);
-
-			return encodeFeatures(features, encoder);
+			return encodeInternal(features, encoder);
 		} catch(SkLearnException se){
 			throw se.ensureContext(this);
 		} catch(Exception e){
 			throw new SkLearnException("Failed to convert the transformer object (" + ClassDictUtil.formatClass(this) + ") to PMML", e)
 				.setContext(this);
 		}
+	}
+
+	private List<Feature> encodeInternal(List<Feature> features, SkLearnEncoder encoder){
+		checkVersion();
+
+		checkFeatures(features);
+
+		features = updateFeatures(features, encoder);
+
+		return encodeFeatures(features, encoder);
 	}
 
 	public void checkFeatures(List<? extends Feature> features){

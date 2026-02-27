@@ -141,42 +141,46 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	public Model encode(Schema schema){
 
 		try {
-			checkVersion();
-
-			checkLabel(schema.getLabel());
-			checkFeatures(schema.getFeatures());
-
-			schema = configureSchema(schema);
-
-			Model model = encodeModel(schema);
-
-			String modelName = model.getModelName();
-			if(modelName == null){
-				String pmmlName = getPMMLName();
-
-				if(pmmlName != null){
-					model.setModelName(pmmlName);
-				}
-			}
-
-			String algorithmName = model.getAlgorithmName();
-			if(algorithmName == null){
-				String pyClassName = getAlgorithmName();
-
-				model.setAlgorithmName(pyClassName);
-			}
-
-			addFeatureImportances(model, schema);
-
-			model = configureModel(model);
-
-			return model;
+			return encodeInternal(schema);
 		} catch(SkLearnException se){
 			throw se.ensureContext(this);
 		} catch(Exception e){
 			throw new SkLearnException("Failed to convert the estimator object (" + ClassDictUtil.formatClass(this)  +") to PMML", e)
 				.setContext(this);
 		}
+	}
+
+	private Model encodeInternal(Schema schema){
+		checkVersion();
+
+		checkLabel(schema.getLabel());
+		checkFeatures(schema.getFeatures());
+
+		schema = configureSchema(schema);
+
+		Model model = encodeModel(schema);
+
+		String modelName = model.getModelName();
+		if(modelName == null){
+			String pmmlName = getPMMLName();
+
+			if(pmmlName != null){
+				model.setModelName(pmmlName);
+			}
+		}
+
+		String algorithmName = model.getAlgorithmName();
+		if(algorithmName == null){
+			String pyClassName = getAlgorithmName();
+
+			model.setAlgorithmName(pyClassName);
+		}
+
+		addFeatureImportances(model, schema);
+
+		model = configureModel(model);
+
+		return model;
 	}
 
 	public Model encode(Object segmentId, Schema schema){
