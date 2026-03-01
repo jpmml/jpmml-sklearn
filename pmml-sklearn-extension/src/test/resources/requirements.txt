@@ -1,5 +1,6 @@
 Boruta==0.4.3
 category_encoders==2.9.0
+causalml==0.16.0
 flaml==2.5.0
 # python -m pip install git+https://github.com/hyperopt/hyperopt-sklearn
 #hpsklearn==1.0.3
@@ -12,5 +13,6 @@ ngboost==0.5.8
 optbinning==0.21.0
 pycaret==3.3.2
 scikit-lego==0.9.6
+scikit-uplift==0.5.1
 tpot==0.12.2
 treeple==0.10.3

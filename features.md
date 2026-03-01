@@ -180,6 +180,14 @@
 </details>
 
 <details>
+  <summary>Causal ML</summary>
+
+  Examples: [extensions/causalml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/causalml.py)
+
+  * `causalml.inference.meta.BaseSRegressor`
+</details>
+
+<details>
   <summary>FLAML</summary>
 
   Examples: [extensions/flaml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/flaml.py)
