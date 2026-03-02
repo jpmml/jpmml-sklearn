@@ -69,8 +69,12 @@ def build_email(email_df, regressor, name):
 if "Email" in datasets:
 	email_df = load_csv("Email")
 
-	email_binary_df = email_df.head(2000 + 2000)
+	email_binary_df = email_df.copy()
+	email_binary_df["segment"] = email_binary_df["segment"].replace({
+		"mens_email" : "email",
+		"womens_email" : "email"
+	})
 
-	build_email(email_binary_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmail")
-	build_email(email_binary_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmail")
-	build_email(email_binary_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmail")
+	build_email(email_binary_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmailBin")
+	build_email(email_binary_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmailBin")
+	build_email(email_binary_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmailBin")

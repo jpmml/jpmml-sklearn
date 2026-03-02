@@ -20,11 +20,13 @@ package org.jpmml.sklearn.extension.testing;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
@@ -44,17 +46,38 @@ public class CausalMLTest extends SkLearnEncoderBatchTest {
 			public Table getInput() throws IOException {
 				Table table = super.getInput();
 
-				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
-				if(Objects.equals(dataset, "Email")){
+				if(Objects.equals(dataset, "EmailBin")){
+					Function<Object, String> function = new Function<Object, String>(){
 
-					if(Objects.equals(algorithm, "DecisionTreeSRegressor") || Objects.equals(algorithm, "GradientBoostingSRegressor") || Objects.equals(algorithm, "RandomForestSRegressor")){
-						return subTable(table, 4000);
-					}
+						@Override
+						public String apply(Object object){
+							String string = (String)object;
+
+							if(Objects.equals("control", string)){
+								return "control";
+							} else
+
+							{
+								return "email";
+							}
+						}
+					};
+
+					table.apply("segment", function);
 				}
 
 				return table;
+			}
+
+			@Override
+			public String getInputCsvPath(){
+				String path = super.getInputCsvPath();
+
+				path = path.replace("Bin", "");
+
+				return path;
 			}
 		};
 
@@ -62,34 +85,17 @@ public class CausalMLTest extends SkLearnEncoderBatchTest {
 	}
 
 	@Test
-	public void evaluateDecisionTreeSRegressorEmail() throws Exception {
-		evaluate("DecisionTreeSRegressor", "Email");
+	public void evaluateDecisionTreeSRegressorEmailBin() throws Exception {
+		evaluate("DecisionTreeSRegressor", "EmailBin");
 	}
 
 	@Test
-	public void evaluateGradientBoostingSRegressorEmail() throws Exception {
-		evaluate("GradientBoostingSRegressor", "Email");
+	public void evaluateGradientBoostingSRegressorEmailBin() throws Exception {
+		evaluate("GradientBoostingSRegressor", "EmailBin");
 	}
 
 	@Test
-	public void evaluateRandomForestSRegressorEmail() throws Exception {
-		evaluate("RandomForestSRegressor", "Email");
-	}
-
-	static
-	private Table subTable(Table table, int rows){
-		Table result = new Table(table.getColumns(), rows);
-
-		Table.Row readerRow = table.createReaderRow(0, rows);
-		Table.Row writerRow = result.createWriterRow(0);
-
-		while(readerRow.canAdvance()){
-			writerRow.putAll(readerRow);
-
-			readerRow.advance();
-			writerRow.advance();
-		}
-
-		return result;
+	public void evaluateRandomForestSRegressorEmailBin() throws Exception {
+		evaluate("RandomForestSRegressor", "EmailBin", new PMMLEquivalence(5e-11, 5e-11));
 	}
 }
