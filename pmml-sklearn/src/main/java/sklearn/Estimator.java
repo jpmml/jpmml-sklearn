@@ -32,6 +32,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
+import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
@@ -158,8 +159,8 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		try {
 			schema = configureSchema(schema);
-		} catch(SkLearnException se){
-			throw se;
+		} catch(ConversionException ce){
+			throw ce;
 		} catch(Exception e){
 			throw new SkLearnException("Failed to configure the schema", e)
 				.setSolution("Use different PMML conversion options");
@@ -187,8 +188,8 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		try {
 			model = configureModel(model);
-		} catch(SkLearnException se){
-			throw se;
+		} catch(ConversionException ce){
+			throw ce;
 		} catch(Exception e){
 			throw new SkLearnException("Failed to configure the model", e)
 				.setSolution("Use different PMML conversion options");
