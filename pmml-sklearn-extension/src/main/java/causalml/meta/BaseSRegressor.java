@@ -18,6 +18,7 @@
  */
 package causalml.meta;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
@@ -47,8 +49,10 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.converter.ValueUtil;
@@ -73,38 +77,63 @@ public class BaseSRegressor extends Regressor {
 		List<String> treatmentGroups = getTreatmentGroups();
 		Map<String, Regressor> models = getModels();
 
-		ClassDictUtil.checkSize(1, treatmentGroups, models.entrySet());
-
 		ModelEncoder encoder = schema.getEncoder();
-		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
+		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
+
+		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
+
+		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, models.entrySet());
 
 		Feature groupFeature = features.get(0);
 
 		if(groupFeature instanceof DiscreteFeature){
 			DiscreteFeature binaryFeature = ((DiscreteFeature)groupFeature)
-				.expectCardinality(2);
+				.expectCardinality(continuousLabels.size() + 1);
 		} else
 
 		{
 			throw new UnsupportedFeatureException("Expected a categorical feature, got " + groupFeature.typeString());
 		}
 
+		String groupName = groupFeature.getName();
+
+		List<Model> binaryModels = new ArrayList<>();
+
+		for(int i = 0; i < continuousLabels.size(); i++){
+			ContinuousLabel continuousLabel = continuousLabels.get(i);
+
+			String treatmentGroup = treatmentGroups.get(i);
+			Regressor regressor = models.get(treatmentGroup);
+
+			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
+
+			BinaryFeature controlFeature = new BinaryFeature(encoder, groupFeature, controlName);
+
+			// XXX
+			List<Feature> segmentFeatures = (List<Feature>)binarySchema.getFeatures();
+			segmentFeatures.set(0, controlFeature);
+
+			Model binaryModel = encodeBinaryModel(regressor, groupName, controlName, binarySchema);
+
+			binaryModels.add(binaryModel);
+		}
+
+		if(binaryModels.size() == 1){
+			return Iterables.getOnlyElement(binaryModels);
+		} else
+
+		{
+			return MiningModelUtil.createMultiModelChain(binaryModels, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
+		}
+	}
+
+	private MiningModel encodeBinaryModel(Regressor regressor, String groupName, String controlName, Schema schema){
 		Schema segmentSchema = schema.toAnonymousSchema();
-
-		BinaryFeature controlFeature = new BinaryFeature(encoder, groupFeature, controlName);
-
-		// XXX
-		List<Feature> segmentFeatures = (List<Feature>)segmentSchema.getFeatures();
-		segmentFeatures.set(0, controlFeature);
-
-		Regressor regressor = models.get(treatmentGroups.get(0));
 
 		Model treatmentModel = EstimatorUtil.encodeNativeLike(regressor, segmentSchema);
 
 		Model controlModel = EstimatorUtil.encodeNativeLike(regressor, segmentSchema);
-
-		String groupName = groupFeature.getName();
 
 		Visitor nullBranchMarker = new AbstractTreeModelTransformer(){
 
@@ -309,7 +338,7 @@ public class BaseSRegressor extends Regressor {
 		};
 		scoreNegater.applyTo(controlModel);
 
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(continuousLabel))
+		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
 
 		Visitor nullSegmentRemover = new AbstractVisitor(){

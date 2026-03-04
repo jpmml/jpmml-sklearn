@@ -60,14 +60,23 @@ def build_email(email_df, regressor, name):
 		("regressor", regressor)
 	])
 	pipeline.active_fields = numpy.asarray(email_X.columns.values)
-	pipeline.target_fields = numpy.asarray(["uplift"])
+	if name.endswith("Email"):
+		pipeline.target_fields = numpy.asarray(["uplift(mens)", "uplift(womens)"])
+	elif name.endswith("EmailBin"):
+		pipeline.target_fields = numpy.asarray(["uplift"])
+	else:
+		raise ValueError()
 	store_pkl(pipeline, name)
 
-	uplift = DataFrame(regressor.predict(email_features, email_treatment, email_y), columns = ["uplift"])
+	uplift = DataFrame(regressor.predict(email_features, email_treatment, email_y), columns = pipeline.target_fields)
 	store_csv(uplift, name)
 
 if "Email" in datasets:
 	email_df = load_csv("Email")
+
+	build_email(email_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmail")
+	build_email(email_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmail")
+	build_email(email_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmail")
 
 	email_binary_df = email_df.copy()
 	email_binary_df["segment"] = email_binary_df["segment"].replace({

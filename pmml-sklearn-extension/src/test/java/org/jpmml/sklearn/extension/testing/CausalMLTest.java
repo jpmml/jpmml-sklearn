@@ -85,13 +85,28 @@ public class CausalMLTest extends SkLearnEncoderBatchTest {
 	}
 
 	@Test
+	public void evaluateDecisionTreeSRegressorEmail() throws Exception {
+		evaluate("DecisionTreeSRegressor", "Email");
+	}
+
+	@Test
 	public void evaluateDecisionTreeSRegressorEmailBin() throws Exception {
 		evaluate("DecisionTreeSRegressor", "EmailBin");
 	}
 
 	@Test
+	public void evaluateGradientBoostingSRegressorEmail() throws Exception {
+		evaluate("GradientBoostingSRegressor", "Email");
+	}
+
+	@Test
 	public void evaluateGradientBoostingSRegressorEmailBin() throws Exception {
 		evaluate("GradientBoostingSRegressor", "EmailBin");
+	}
+
+	@Test
+	public void evaluateRandomForestSRegressorEmail() throws Exception {
+		evaluate("RandomForestSRegressor", "Email", new PMMLEquivalence(5e-11, 5e-11));
 	}
 
 	@Test
