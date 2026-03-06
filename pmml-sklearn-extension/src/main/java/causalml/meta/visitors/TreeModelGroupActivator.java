@@ -34,6 +34,10 @@ public class TreeModelGroupActivator extends AbstractTreeModelTransformer {
 	public Boolean getActivation(Predicate predicate);
 
 	@Override
+	public void enterNode(Node node){
+	}
+
+	@Override
 	public void exitNode(Node node){
 		Predicate predicate = node.requirePredicate();
 

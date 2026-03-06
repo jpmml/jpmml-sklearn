@@ -18,60 +18,34 @@
  */
 package causalml.meta;
 
-import java.util.Arrays;
+import java.util.Collections;
 
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.Target;
-import org.dmg.pmml.Visitor;
-import org.dmg.pmml.VisitorAction;
-import org.dmg.pmml.mining.MiningModel;
-import org.dmg.pmml.mining.Segmentation;
-import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
-import org.dmg.pmml.tree.Node;
-import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
-import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.model.visitors.AbstractVisitor;
+import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.EstimatorUtil;
+import sklearn.Regressor;
 
-public class BaseSRegressor extends BaseSLearner {
+public class BaseSRegressor extends BaseSLearner<Regressor> {
 
 	public BaseSRegressor(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public MiningModel encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema){
-		Visitor scoreNegater = new AbstractVisitor(){
+	public Class<Regressor> getEstimatorClass(){
+		return Regressor.class;
+	}
 
-			@Override
-			public VisitorAction visit(Node node){
-				Number score = (Number)node.requireScore();
+	@Override
+	public Model encodeEstimator(Regressor regressor, Schema schema){
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
-				if(score.doubleValue() != 0d){
-					node.setScore(ValueUtil.toNegative(score));
-				}
+		ContinuousLabel continuousLabel = (ContinuousLabel)regressor.encodeLabel(Collections.singletonList(null), encoder);
 
-				return super.visit(node);
-			}
+		Schema regressorSchema = schema.toRelabeledSchema(continuousLabel);
 
-			@Override
-			public VisitorAction visit(Target target){
-				Number rescaleConstant = target.getRescaleConstant();
-
-				if(rescaleConstant != null && rescaleConstant.doubleValue() != 0d){
-					target.setRescaleConstant((Number)ValueUtil.toNegative(rescaleConstant));
-				}
-
-				return super.visit(target);
-			}
-		};
-		scoreNegater.applyTo(controlModel);
-
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
-			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
-
-		return miningModel;
+		return EstimatorUtil.encodeNativeLike(regressor, regressorSchema);
 	}
 }

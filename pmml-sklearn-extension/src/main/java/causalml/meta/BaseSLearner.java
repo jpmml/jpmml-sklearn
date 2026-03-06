@@ -19,6 +19,7 @@
 package causalml.meta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,14 +31,18 @@ import java.util.stream.Collectors;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
 import com.google.common.collect.Iterables;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
+import org.dmg.pmml.Target;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
+import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
@@ -46,33 +51,38 @@ import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
+import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.UnsupportedFeatureException;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 import org.jpmml.converter.visitors.TreeModelPruner;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
+import sklearn.Estimator;
 import sklearn.EstimatorCastFunction;
-import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 abstract
-public class BaseSLearner extends Regressor {
+public class BaseSLearner<E extends Estimator> extends Regressor {
 
 	public BaseSLearner(String module, String name){
 		super(module, name);
 	}
 
 	abstract
-	public Model encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema);
+	public Class<? extends E> getEstimatorClass();
+
+	abstract
+	public Model encodeEstimator(E estimator, Schema schema);
 
 	@Override
 	public Model encodeModel(Schema schema){
 		String controlName = getControlName();
 		List<String> treatmentGroups = getTreatmentGroups();
-		Map<String, Regressor> models = getModels();
+		Map<String, E> models = getModels();
 
 		ModelEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
@@ -101,7 +111,7 @@ public class BaseSLearner extends Regressor {
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
 
 			String treatmentGroup = treatmentGroups.get(i);
-			Regressor regressor = models.get(treatmentGroup);
+			E estimator = models.get(treatmentGroup);
 
 			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
 
@@ -111,7 +121,7 @@ public class BaseSLearner extends Regressor {
 			List<Feature> segmentFeatures = (List<Feature>)binarySchema.getFeatures();
 			segmentFeatures.set(0, controlFeature);
 
-			Model binaryModel = encodeBinaryModel(regressor, groupName, controlName, binarySchema);
+			Model binaryModel = encodeBinaryModel(estimator, groupName, controlName, binarySchema);
 
 			binaryModels.add(binaryModel);
 		}
@@ -125,26 +135,14 @@ public class BaseSLearner extends Regressor {
 		}
 	}
 
-	private Model encodeBinaryModel(Regressor regressor, String groupName, String controlName, Schema schema){
-		Schema segmentSchema = schema.toAnonymousSchema();
-
-		Model treatmentModel = EstimatorUtil.encodeNativeLike(regressor, segmentSchema);
-
-		Model controlModel = EstimatorUtil.encodeNativeLike(regressor, segmentSchema);
+	protected Model encodeBinaryModel(E estimator, String groupName, String controlName, Schema schema){
+		Model treatmentModel = encodeEstimator(estimator, schema);
+		Model controlModel = encodeEstimator(estimator, schema);
 
 		Visitor nullBranchMarker = new AbstractTreeModelTransformer(){
 
 			private Set<Node> vitalNodes = new HashSet<>();
 
-
-			@Override
-			public void enterTreeModel(TreeModel treeModel){
-			}
-
-			@Override
-			public void exitTreeModel(TreeModel treeModel){
-				this.vitalNodes.clear();
-			}
 
 			@Override
 			public void enterNode(Node node){
@@ -178,6 +176,18 @@ public class BaseSLearner extends Regressor {
 					node.setScore(0d);
 				}
 			}
+
+			@Override
+			public void enterTreeModel(TreeModel treeModel){
+				super.enterTreeModel(treeModel);
+			}
+
+			@Override
+			public void exitTreeModel(TreeModel treeModel){
+				super.exitTreeModel(treeModel);
+
+				this.vitalNodes.clear();
+			}
 		};
 		nullBranchMarker.applyTo(controlModel);
 		nullBranchMarker.applyTo(treatmentModel);
@@ -209,6 +219,10 @@ public class BaseSLearner extends Regressor {
 
 				for(Node node : nodes){
 					Object score = node.getScore();
+
+					if(node.hasNodes()){
+						return null;
+					} // End if
 
 					if(score == null){
 						return null;
@@ -353,14 +367,49 @@ public class BaseSLearner extends Regressor {
 		return encodeBinaryModel(treatmentModel, controlModel, schema);
 	}
 
+	protected MiningModel encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema){
+		Visitor scoreNegater = new AbstractVisitor(){
+
+			@Override
+			public VisitorAction visit(Node node){
+				Number score = (Number)node.requireScore();
+
+				if(score.doubleValue() != 0d){
+					node.setScore(ValueUtil.toNegative(score));
+				}
+
+				return super.visit(node);
+			}
+
+			@Override
+			public VisitorAction visit(Target target){
+				Number rescaleConstant = target.getRescaleConstant();
+
+				if(rescaleConstant != null && rescaleConstant.doubleValue() != 0d){
+					target.setRescaleConstant((Number)ValueUtil.toNegative(rescaleConstant));
+				}
+
+				return super.visit(target);
+			}
+		};
+		scoreNegater.applyTo(controlModel);
+
+		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
+			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
+
+		return miningModel;
+	}
+
 	public String getControlName(){
 		return getString("control_name");
 	}
 
-	public Map<String, Regressor> getModels(){
+	public Map<String, E> getModels(){
 		Map<String, ?> models = getDict("models");
 
-		Function<Object, Regressor> valueFunction = new EstimatorCastFunction<Regressor>(Regressor.class){
+		Class<? extends E> estimatorClazz = getEstimatorClass();
+
+		Function<Object, E> valueFunction = new EstimatorCastFunction<E>(estimatorClazz){
 
 			@Override
 			protected String formatMessage(Object object){
@@ -368,7 +417,7 @@ public class BaseSLearner extends Regressor {
 			}
 		};
 
-		Map<String, Regressor> result = (models.entrySet()).stream()
+		Map<String, E> result = (models.entrySet()).stream()
 			.collect(Collectors.toMap(entry -> entry.getKey(), entry -> valueFunction.apply(entry.getValue())));
 
 		return result;

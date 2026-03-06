@@ -4,13 +4,13 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
 
-from causalml.inference.meta import BaseSRegressor
+from causalml.inference.meta import BaseSClassifier, BaseSRegressor
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.pipeline import make_pipeline, FeatureUnion
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn2pmml.pipeline import PMMLPipeline
 
 import joblib
@@ -25,7 +25,7 @@ if __name__ == "__main__":
 	else:
 		datasets = ["Email"]
 
-def build_email(email_df, regressor, name):
+def build_email(email_df, estimator, name):
 	email_X, email_y = split_csv(email_df)
 
 	cat_cols = ["channel", "zip_code"]
@@ -53,11 +53,11 @@ def build_email(email_df, regressor, name):
 	email_treatment = email_X.iloc[:, 0]
 	email_features = email_Xt.iloc[:, 1:]
 
-	regressor.fit(email_features, email_treatment, email_y)
+	estimator.fit(email_features, email_treatment, email_y)
 
 	pipeline = PMMLPipeline([
 		("transformer", union),
-		("regressor", regressor)
+		("estimator", estimator)
 	])
 	pipeline.active_fields = numpy.asarray(email_X.columns.values)
 	if name.endswith("Email"):
@@ -68,7 +68,7 @@ def build_email(email_df, regressor, name):
 		raise ValueError()
 	store_pkl(pipeline, name)
 
-	uplift = DataFrame(regressor.predict(email_features, email_treatment, email_y), columns = pipeline.target_fields)
+	uplift = DataFrame(estimator.predict(email_features, email_treatment, email_y), columns = pipeline.target_fields)
 	store_csv(uplift, name)
 
 if "Email" in datasets:
@@ -83,6 +83,9 @@ if "Email" in datasets:
 		"mens_email" : "email",
 		"womens_email" : "email"
 	})
+
+	build_email(email_binary_df, BaseSClassifier(DecisionTreeClassifier(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSClassifierEmailBin")
+	build_email(email_binary_df, BaseSClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSClassifierEmailBin")
 
 	build_email(email_binary_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmailBin")
 	build_email(email_binary_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmailBin")
