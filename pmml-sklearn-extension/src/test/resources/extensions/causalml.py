@@ -74,6 +74,9 @@ def build_email(email_df, estimator, name):
 if "Email" in datasets:
 	email_df = load_csv("Email")
 
+	build_email(email_df, BaseSClassifier(DecisionTreeClassifier(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSClassifierEmail")
+	build_email(email_df, BaseSClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSClassifierEmail")
+
 	build_email(email_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmail")
 	build_email(email_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmail")
 	build_email(email_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmail")

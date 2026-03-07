@@ -27,11 +27,12 @@ import com.google.common.base.Equivalence;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
+import org.jpmml.sklearn.testing.SkLearnAlgorithms;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
 
-public class CausalMLTest extends SkLearnEncoderBatchTest {
+public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms {
 
 	@Override
 	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
@@ -85,42 +86,52 @@ public class CausalMLTest extends SkLearnEncoderBatchTest {
 	}
 
 	@Test
+	public void evaluateDecisionTreeSClassifierEmail() throws Exception {
+		evaluate(DECISION_TREE + "SClassifier", "Email");
+	}
+
+	@Test
 	public void evaluateDecisionTreeSClassifierEmailBin() throws Exception {
-		evaluate("DecisionTreeSClassifier", "EmailBin");
+		evaluate(DECISION_TREE + "SClassifier", "EmailBin");
 	}
 
 	@Test
 	public void evaluateDecisionTreeSRegressorEmail() throws Exception {
-		evaluate("DecisionTreeSRegressor", "Email");
+		evaluate(DECISION_TREE + "SRegressor", "Email");
 	}
 
 	@Test
 	public void evaluateDecisionTreeSRegressorEmailBin() throws Exception {
-		evaluate("DecisionTreeSRegressor", "EmailBin");
+		evaluate(DECISION_TREE + "SRegressor", "EmailBin");
 	}
 
 	@Test
 	public void evaluateGradientBoostingSRegressorEmail() throws Exception {
-		evaluate("GradientBoostingSRegressor", "Email");
+		evaluate(GRADIENT_BOOSTING + "SRegressor", "Email");
 	}
 
 	@Test
 	public void evaluateGradientBoostingSRegressorEmailBin() throws Exception {
-		evaluate("GradientBoostingSRegressor", "EmailBin");
+		evaluate(GRADIENT_BOOSTING + "SRegressor", "EmailBin");
+	}
+
+	@Test
+	public void evaluateRandomForestSClassifierEmail() throws Exception {
+		evaluate(RANDOM_FOREST + "SClassifier", "Email", new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
 	public void evaluateRandomForestSClassifierEmailBin() throws Exception {
-		evaluate("RandomForestSClassifier", "EmailBin", new PMMLEquivalence(1e-12, 1e-12));
+		evaluate(RANDOM_FOREST + "SClassifier", "EmailBin", new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
 	public void evaluateRandomForestSRegressorEmail() throws Exception {
-		evaluate("RandomForestSRegressor", "Email", new PMMLEquivalence(5e-11, 5e-11));
+		evaluate(RANDOM_FOREST + "SRegressor", "Email", new PMMLEquivalence(5e-11, 5e-11));
 	}
 
 	@Test
 	public void evaluateRandomForestSRegressorEmailBin() throws Exception {
-		evaluate("RandomForestSRegressor", "EmailBin", new PMMLEquivalence(5e-11, 5e-11));
+		evaluate(RANDOM_FOREST + "SRegressor", "EmailBin", new PMMLEquivalence(5e-11, 5e-11));
 	}
 }
