@@ -43,18 +43,32 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Implementation-Title>JPMML-SkLearn library</Implementation-Title>
-							<Implementation-Version>${project.version}</Implementation-Version>
-						</manifestEntries>
-					</archive>
-					<excludes>
-						<exclude>attributes/</exclude>
-						<exclude>*.py</exclude>
-					</excludes>
-				</configuration>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Implementation-Title>JPMML-SkLearn library</Implementation-Title>
+									<Implementation-Version>${project.version}</Implementation-Version>
+								</manifestEntries>
+							</archive>
+							<excludes>
+								<exclude>attributes/</exclude>
+								<exclude>*.py</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-jar</id>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

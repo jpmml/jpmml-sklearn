@@ -73,6 +73,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.jpmml</groupId>
+				<artifactId>pmml-sklearn</artifactId>
+				<version>1.9-SNAPSHOT</version>
+				<classifier>tests</classifier>
+			</dependency>
+			<dependency>
+				<groupId>org.jpmml</groupId>
 				<artifactId>pmml-sklearn-evaluator</artifactId>
 				<version>1.9-SNAPSHOT</version>
 			</dependency>

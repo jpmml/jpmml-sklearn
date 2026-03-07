@@ -32,5 +32,12 @@
 			<artifactId>pmml-evaluator-testing</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-sklearn</artifactId>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
