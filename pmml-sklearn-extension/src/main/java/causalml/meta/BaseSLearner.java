@@ -31,11 +31,13 @@ import java.util.stream.Collectors;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
 import com.google.common.collect.Iterables;
+import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.Target;
+import org.dmg.pmml.Targets;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
@@ -368,31 +370,30 @@ public class BaseSLearner<E extends Estimator> extends Regressor {
 	}
 
 	protected MiningModel encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema){
-		Visitor scoreNegater = new AbstractVisitor(){
+		Targets targets = controlModel.getTargets();
 
-			@Override
-			public VisitorAction visit(Node node){
-				Number score = (Number)node.requireScore();
+		if(targets != null){
+			Target target = Iterables.getOnlyElement(targets);
 
-				if(score.doubleValue() != 0d){
-					node.setScore(ValueUtil.toNegative(score));
-				}
+			Number rescaleFactor = target.getRescaleFactor();
+			Number rescaleConstant = target.getRescaleConstant();
 
-				return super.visit(node);
+			if(rescaleFactor.doubleValue() != 0d){
+				target.setRescaleFactor((Number)ValueUtil.toNegative(rescaleFactor));
+			} // End if
+
+			if(rescaleConstant.doubleValue() != 0d){
+				target.setRescaleConstant((Number)ValueUtil.toNegative(rescaleConstant));
 			}
+		} else
 
-			@Override
-			public VisitorAction visit(Target target){
-				Number rescaleConstant = target.getRescaleConstant();
+		{
+			ContinuousLabel continuousLabel = new ContinuousLabel(null, DataType.DOUBLE);
 
-				if(rescaleConstant != null && rescaleConstant.doubleValue() != 0d){
-					target.setRescaleConstant((Number)ValueUtil.toNegative(rescaleConstant));
-				}
+			targets = ModelUtil.createRescaleTargets(-1, null, continuousLabel);
 
-				return super.visit(target);
-			}
-		};
-		scoreNegater.applyTo(controlModel);
+			controlModel.setTargets(targets);
+		}
 
 		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
