@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
 import com.google.common.collect.Iterables;
@@ -64,21 +62,13 @@ import org.jpmml.converter.visitors.TreeModelPruner;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
-import sklearn.EstimatorCastFunction;
-import sklearn.Regressor;
 
 abstract
-public class BaseSLearner<E extends Estimator> extends Regressor {
+public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 
 	public BaseSLearner(String module, String name){
 		super(module, name);
 	}
-
-	abstract
-	public Class<? extends E> getEstimatorClass();
-
-	abstract
-	public Model encodeEstimator(E estimator, Schema schema);
 
 	@Override
 	public Model encodeModel(Schema schema){
@@ -401,30 +391,7 @@ public class BaseSLearner<E extends Estimator> extends Regressor {
 		return miningModel;
 	}
 
-	public String getControlName(){
-		return getString("control_name");
-	}
-
 	public Map<String, E> getModels(){
-		Map<String, ?> models = getDict("models");
-
-		Class<? extends E> estimatorClazz = getEstimatorClass();
-
-		Function<Object, E> valueFunction = new EstimatorCastFunction<E>(estimatorClazz){
-
-			@Override
-			protected String formatMessage(Object object){
-				return "The model object (" + ClassDictUtil.formatClass(object) + ") is not a supported Estimator";
-			}
-		};
-
-		Map<String, E> result = (models.entrySet()).stream()
-			.collect(Collectors.toMap(entry -> entry.getKey(), entry -> valueFunction.apply(entry.getValue())));
-
-		return result;
-	}
-
-	public List<String> getTreatmentGroups(){
-		return getStringArray("t_groups");
+		return getModels("models");
 	}
 }
