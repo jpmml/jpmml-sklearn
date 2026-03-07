@@ -19,19 +19,20 @@
 package org.jpmml.sklearn.extension.testing;
 
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.sklearn.testing.SkLearnAlgorithms;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
 
-public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
+public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets, SkLearnAlgorithms {
 
 	@Test
 	public void evaluateExtraTreesEstimatorAudit() throws Exception {
-		evaluate("ExtraTreesEstimator", AUDIT);
+		evaluate(EXTRA_TREES + "Estimator", AUDIT);
 	}
 
 	@Test
 	public void evaluateHistGradientBoostingEstimatorAudit() throws Exception {
-		evaluate("HistGradientBoostingEstimator", AUDIT);
+		evaluate(HIST_GRADIENT_BOOSTING + "Estimator", AUDIT);
 	}
 
 	@Test
@@ -46,46 +47,46 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateRandomForestEstimatorAudit() throws Exception {
-		evaluate("RandomForestEstimator", AUDIT);
+		evaluate(RANDOM_FOREST + "Estimator", AUDIT);
 	}
 
 	@Test
 	public void evaluateSGDEstimatorAudit() throws Exception {
-		evaluate("SGDEstimator", AUDIT);
+		evaluate(SGD + "Estimator", AUDIT);
 	}
 
 	@Test
 	public void evaluateSVCEstimatorAudit() throws Exception {
-		evaluate("SVCEstimator", AUDIT);
+		evaluate(SVC + "Estimator", AUDIT);
 	}
 
 	@Test
 	public void evaluateExtraTreesEstimatorAuto() throws Exception {
-		evaluate("ExtraTreesEstimator", AUTO);
+		evaluate(EXTRA_TREES + "Estimator", AUTO);
 	}
 
 	@Test
 	public void evaluateElasticNetEstimatorAuto() throws Exception {
-		evaluate("ElasticNetEstimator", AUTO);
+		evaluate(ELASTIC_NET + "Estimator", AUTO);
 	}
 
 	@Test
 	public void evaluateHistGradientBoostingEstimatorAuto() throws Exception {
-		evaluate("HistGradientBoostingEstimator", AUTO);
+		evaluate(HIST_GRADIENT_BOOSTING + "Estimator", AUTO);
 	}
 
 	@Test
 	public void evaluateLassoLarsEstimatorAuto() throws Exception {
-		evaluate("LassoLarsEstimator", AUTO);
+		evaluate(LASSO_LARS + "Estimator", AUTO);
 	}
 
 	@Test
 	public void evaluateRandomForestEstimatorAuto() throws Exception {
-		evaluate("RandomForestEstimator", AUTO);
+		evaluate(RANDOM_FOREST + "Estimator", AUTO);
 	}
 
 	@Test
 	public void evaluateSGDEstimatorAuto() throws Exception {
-		evaluate("SGDEstimator", AUTO);
+		evaluate(SGD + "Estimator", AUTO);
 	}
 }
