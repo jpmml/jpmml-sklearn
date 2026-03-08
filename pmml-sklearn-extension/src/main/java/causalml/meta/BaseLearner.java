@@ -34,6 +34,7 @@ import org.dmg.pmml.Targets;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
+import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
@@ -41,9 +42,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorCastFunction;
-import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 abstract
@@ -57,17 +58,7 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 	public Class<? extends E> getEstimatorClass();
 
 	abstract
-	public Model encodeEstimator(E estimator, Schema schema);
-
-	protected Model encodeRegressor(Regressor regressor, Schema schema){
-		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
-		ContinuousLabel continuousLabel = (ContinuousLabel)regressor.encodeLabel(Collections.singletonList(null), encoder);
-
-		Schema regressorSchema = schema.toRelabeledSchema(continuousLabel);
-
-		return EstimatorUtil.encodeNativeLike(regressor, regressorSchema);
-	}
+	public Model encodeEstimator(Role role, E estimator, Schema schema);
 
 	protected MiningModel encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema){
 		Targets targets = controlModel.getTargets();
@@ -126,5 +117,24 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 
 	public List<String> getTreatmentGroups(){
 		return getStringArray("t_groups");
+	}
+
+	static
+	protected Schema toClassifierSchema(Classifier classifier, Schema schema){
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
+
+		CategoricalLabel categoricalLabel = ((CategoricalLabel)classifier.encodeLabel(Collections.singletonList(null), encoder))
+			.expectCardinality(2);
+
+		return schema.toRelabeledSchema(categoricalLabel);
+	}
+
+	static
+	protected Schema toRegressorSchema(Regressor regressor, Schema schema){
+		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
+
+		ContinuousLabel continuousLabel = (ContinuousLabel)regressor.encodeLabel(Collections.singletonList(null), encoder);
+
+		return schema.toRelabeledSchema(continuousLabel);
 	}
 }

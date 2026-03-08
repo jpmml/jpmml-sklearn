@@ -186,6 +186,7 @@
 
   * `causalml.inference.meta.BaseSClassifier`
   * `causalml.inference.meta.BaseSRegressor`
+  * `causalml.inference.meta.BaseTClassifier`
   * `causalml.inference.meta.BaseTRegressor`
 </details>
 

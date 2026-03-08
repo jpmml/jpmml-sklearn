@@ -119,8 +119,8 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 	}
 
 	protected Model encodeBinaryModel(E estimator, String groupName, String controlName, Schema schema){
-		Model treatmentModel = encodeEstimator(estimator, schema);
-		Model controlModel = encodeEstimator(estimator, schema);
+		Model treatmentModel = encodeEstimator(Role.TREATMENT, estimator, schema);
+		Model controlModel = encodeEstimator(Role.CONTROL, estimator, schema);
 
 		Visitor nullBranchMarker = new AbstractTreeModelTransformer(){
 

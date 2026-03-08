@@ -18,25 +18,12 @@
  */
 package causalml.meta;
 
-import org.dmg.pmml.Model;
-import org.jpmml.converter.Schema;
-import sklearn.Regressor;
+public enum Role {
+	TREATMENT,
+	CONTROL,
+	;
 
-public class BaseTRegressor extends BaseTLearner<Regressor> {
-
-	public BaseTRegressor(String module, String name){
-		super(module, name);
-	}
-
-	@Override
-	public Class<Regressor> getEstimatorClass(){
-		return Regressor.class;
-	}
-
-	@Override
-	public Model encodeEstimator(Role role, Regressor regressor, Schema schema){
-		Schema regressorSchema = toRegressorSchema(regressor, schema);
-
-		return regressor.encode(regressorSchema);
+	String getSegmentId(){
+		return name().toLowerCase();
 	}
 }

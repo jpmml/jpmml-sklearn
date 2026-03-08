@@ -18,7 +18,6 @@
  */
 package causalml.meta;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
@@ -29,11 +28,9 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 import org.jpmml.model.UnsupportedElementException;
-import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 
@@ -49,13 +46,8 @@ public class BaseSClassifier extends BaseSLearner<Classifier> {
 	}
 
 	@Override
-	public Model encodeEstimator(Classifier classifier, Schema schema){
-		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
-		CategoricalLabel categoricalLabel = ((CategoricalLabel)classifier.encodeLabel(Collections.singletonList(null), encoder))
-			.expectCardinality(2);
-
-		Schema classifierSchema = schema.toRelabeledSchema(categoricalLabel);
+	public Model encodeEstimator(Role role, Classifier classifier, Schema schema){
+		Schema classifierSchema = toClassifierSchema(classifier, schema);
 
 		Model model = EstimatorUtil.encodeNativeLike(classifier, classifierSchema);
 

@@ -63,8 +63,8 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 
 			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model treatmentModel = encodeEstimator(treatmentEstimator, binarySchema);
-			Model controlModel = encodeEstimator(controlEstimator, binarySchema);
+			Model treatmentModel = encodeEstimator(Role.TREATMENT, treatmentEstimator, binarySchema);
+			Model controlModel = encodeEstimator(Role.CONTROL, controlEstimator, binarySchema);
 
 			Model binaryModel = encodeBinaryModel(treatmentModel, controlModel, binarySchema);
 

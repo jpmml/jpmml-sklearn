@@ -4,7 +4,7 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
 
-from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTRegressor
+from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
@@ -131,11 +131,17 @@ def build_email_parallel(email_df, estimator, name):
 if "Email" in datasets:
 	email_df = load_csv("Email")
 
+	build_email_parallel(email_df, BaseTClassifier(DecisionTreeClassifier(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeTClassifierEmail")
+	build_email_parallel(email_df, BaseTClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestTClassifierEmail")
+
 	build_email_parallel(email_df, BaseTRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeTRegressorEmail")
 	build_email_parallel(email_df, BaseTRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingTRegressorEmail")
 	build_email_parallel(email_df, BaseTRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestTRegressorEmail")
 
 	email_binary_df = to_binary(email_df)
+
+	build_email_parallel(email_binary_df, BaseTClassifier(DecisionTreeClassifier(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeTClassifierEmailBin")
+	build_email_parallel(email_binary_df, BaseTClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestTClassifierEmailBin")
 
 	build_email_parallel(email_binary_df, BaseTRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeTRegressorEmailBin")
 	build_email_parallel(email_binary_df, BaseTRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingTRegressorEmailBin")
