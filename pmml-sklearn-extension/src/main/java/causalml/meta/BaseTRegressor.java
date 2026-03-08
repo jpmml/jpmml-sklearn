@@ -22,9 +22,9 @@ import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
-public class BaseSRegressor extends BaseSLearner<Regressor> {
+public class BaseTRegressor extends BaseTLearner<Regressor> {
 
-	public BaseSRegressor(String module, String name){
+	public BaseTRegressor(String module, String name){
 		super(module, name);
 	}
 

@@ -19,7 +19,6 @@
 package causalml.meta;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,20 +28,14 @@ import java.util.Set;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
 import com.google.common.collect.Iterables;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
-import org.dmg.pmml.Target;
-import org.dmg.pmml.Targets;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
-import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
-import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
@@ -51,11 +44,9 @@ import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.UnsupportedFeatureException;
-import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 import org.jpmml.converter.visitors.TreeModelPruner;
@@ -101,8 +92,8 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 
 		for(int i = 0; i < continuousLabels.size(); i++){
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
-
 			String treatmentGroup = treatmentGroups.get(i);
+
 			E estimator = models.get(treatmentGroup);
 
 			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
@@ -357,38 +348,6 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 		nullSegmentRemover.applyTo(controlModel);
 
 		return encodeBinaryModel(treatmentModel, controlModel, schema);
-	}
-
-	protected MiningModel encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema){
-		Targets targets = controlModel.getTargets();
-
-		if(targets != null){
-			Target target = Iterables.getOnlyElement(targets);
-
-			Number rescaleFactor = target.getRescaleFactor();
-			Number rescaleConstant = target.getRescaleConstant();
-
-			if(rescaleFactor.doubleValue() != 0d){
-				target.setRescaleFactor((Number)ValueUtil.toNegative(rescaleFactor));
-			} // End if
-
-			if(rescaleConstant.doubleValue() != 0d){
-				target.setRescaleConstant((Number)ValueUtil.toNegative(rescaleConstant));
-			}
-		} else
-
-		{
-			ContinuousLabel continuousLabel = new ContinuousLabel(null, DataType.DOUBLE);
-
-			targets = ModelUtil.createRescaleTargets(-1, null, continuousLabel);
-
-			controlModel.setTargets(targets);
-		}
-
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
-			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
-
-		return miningModel;
 	}
 
 	public Map<String, E> getModels(){

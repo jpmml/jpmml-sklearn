@@ -4,7 +4,7 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
 
-from causalml.inference.meta import BaseSClassifier, BaseSRegressor
+from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTRegressor
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
@@ -25,22 +25,33 @@ if __name__ == "__main__":
 	else:
 		datasets = ["Email"]
 
-def build_email(email_df, estimator, name):
-	email_X, email_y = split_csv(email_df)
+def to_binary(email_df):
+	email_binary_df = email_df.copy()
+	email_binary_df["segment"] = email_binary_df["segment"].replace({
+		"mens_email" : "email",
+		"womens_email" : "email"
+	})
+	return email_binary_df
 
+def make_email_transformer():
 	cat_cols = ["channel", "zip_code"]
 	binary_cols = ["mens", "newbie", "womens"]
 	cont_cols = ["history", "recency"]
+
+	return ColumnTransformer([
+		("cat", OneHotEncoder(sparse_output = False), cat_cols),
+		("binary", "passthrough", binary_cols),
+		("cont", "passthrough", cont_cols)
+	], remainder = "drop")
+
+def build_email_single(email_df, estimator, name):
+	email_X, email_y = split_csv(email_df)
 
 	treatment_transformer = ColumnTransformer([
 		("keep", OrdinalEncoder(), ["segment"])
 	], remainder = "drop")
 
-	features_transformer = ColumnTransformer([
-		("cat", OneHotEncoder(sparse_output = False), cat_cols),
-		("binary", "passthrough", binary_cols),
-		("cont", "passthrough", cont_cols)
-	], remainder = "drop")
+	features_transformer = make_email_transformer()
 
 	union = FeatureUnion([
 		("treatment", treatment_transformer),
@@ -74,22 +85,58 @@ def build_email(email_df, estimator, name):
 if "Email" in datasets:
 	email_df = load_csv("Email")
 
-	build_email(email_df, BaseSClassifier(DecisionTreeClassifier(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSClassifierEmail")
-	build_email(email_df, BaseSClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSClassifierEmail")
+	build_email_single(email_df, BaseSClassifier(DecisionTreeClassifier(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSClassifierEmail")
+	build_email_single(email_df, BaseSClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSClassifierEmail")
 
-	build_email(email_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmail")
-	build_email(email_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmail")
-	build_email(email_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmail")
+	build_email_single(email_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmail")
+	build_email_single(email_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmail")
+	build_email_single(email_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmail")
 
-	email_binary_df = email_df.copy()
-	email_binary_df["segment"] = email_binary_df["segment"].replace({
-		"mens_email" : "email",
-		"womens_email" : "email"
-	})
+	email_binary_df = to_binary(email_df)
 
-	build_email(email_binary_df, BaseSClassifier(DecisionTreeClassifier(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSClassifierEmailBin")
-	build_email(email_binary_df, BaseSClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSClassifierEmailBin")
+	build_email_single(email_binary_df, BaseSClassifier(DecisionTreeClassifier(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSClassifierEmailBin")
+	build_email_single(email_binary_df, BaseSClassifier(RandomForestClassifier(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSClassifierEmailBin")
 
-	build_email(email_binary_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmailBin")
-	build_email(email_binary_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmailBin")
-	build_email(email_binary_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmailBin")
+	build_email_single(email_binary_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmailBin")
+	build_email_single(email_binary_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmailBin")
+	build_email_single(email_binary_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmailBin")
+
+def build_email_parallel(email_df, estimator, name):
+	email_X, email_y = split_csv(email_df)
+
+	transformer = make_email_transformer()
+
+	email_Xt = transformer.fit_transform(email_X)
+
+	email_treatment = email_X.iloc[:, 0]
+
+	estimator.fit(email_Xt, email_treatment, email_y)
+
+	pipeline = PMMLPipeline([
+		("transformer", transformer),
+		("estimator", estimator)
+	])
+	pipeline.active_fields = numpy.asarray(email_X.columns.values)
+	if name.endswith("Email"):
+		pipeline.target_fields = numpy.asarray(["uplift(mens)", "uplift(womens)"])
+	elif name.endswith("EmailBin"):
+		pipeline.target_fields = numpy.asarray(["uplift"])
+	else:
+		raise ValueError()
+	store_pkl(pipeline, name)
+
+	uplift = DataFrame(estimator.predict(email_Xt), columns = pipeline.target_fields)
+	store_csv(uplift, name)
+
+if "Email" in datasets:
+	email_df = load_csv("Email")
+
+	build_email_parallel(email_df, BaseTRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeTRegressorEmail")
+	build_email_parallel(email_df, BaseTRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingTRegressorEmail")
+	build_email_parallel(email_df, BaseTRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestTRegressorEmail")
+
+	email_binary_df = to_binary(email_df)
+
+	build_email_parallel(email_binary_df, BaseTRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeTRegressorEmailBin")
+	build_email_parallel(email_binary_df, BaseTRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingTRegressorEmailBin")
+	build_email_parallel(email_binary_df, BaseTRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestTRegressorEmailBin")
