@@ -18,6 +18,7 @@
  */
 package causalml.meta;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.dmg.pmml.MiningFunction;
@@ -32,7 +33,10 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 import org.jpmml.model.UnsupportedElementException;
 import sklearn.Classifier;
+import sklearn.EstimatorCastException;
 import sklearn.EstimatorUtil;
+import sklearn.ensemble.forest.ForestClassifier;
+import sklearn.tree.TreeClassifier;
 
 public class BaseSClassifier extends BaseSLearner<Classifier> {
 
@@ -47,6 +51,19 @@ public class BaseSClassifier extends BaseSLearner<Classifier> {
 
 	@Override
 	public Model encodeEstimator(Role role, Classifier classifier, Schema schema){
+
+		if(classifier instanceof TreeClassifier){
+			TreeClassifier treeClassifier = (TreeClassifier)classifier;
+		} else
+
+		if(classifier instanceof ForestClassifier){
+			ForestClassifier forestClassifier = (ForestClassifier)classifier;
+		} else
+
+		{
+			throw new EstimatorCastException(classifier, Arrays.asList(TreeClassifier.class, ForestClassifier.class));
+		}
+
 		Schema classifierSchema = toClassifierSchema(classifier, schema);
 
 		Model model = EstimatorUtil.encodeNativeLike(classifier, classifierSchema);

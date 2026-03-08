@@ -18,15 +18,20 @@
  */
 package causalml.meta;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
+import sklearn.EstimatorCastException;
 import sklearn.EstimatorUtil;
 import sklearn.Regressor;
+import sklearn.ensemble.forest.ForestRegressor;
+import sklearn.ensemble.gradient_boosting.GradientBoostingRegressor;
 import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
 public class BaseSRegressor extends BaseSLearner<Regressor> implements HasTreeOptions {
@@ -42,6 +47,23 @@ public class BaseSRegressor extends BaseSLearner<Regressor> implements HasTreeOp
 
 	@Override
 	public Model encodeEstimator(Role role, Regressor regressor, Schema schema){
+
+		if(regressor instanceof TreeRegressor){
+			TreeRegressor treeRegressor = (TreeRegressor)regressor;
+		} else
+
+		if(regressor instanceof ForestRegressor){
+			ForestRegressor forestRegressor = (ForestRegressor)regressor;
+		} else
+
+		if(regressor instanceof GradientBoostingRegressor){
+			GradientBoostingRegressor gradientBoostingRegressor = (GradientBoostingRegressor)regressor;
+		} else
+
+		{
+			throw new EstimatorCastException(regressor, Arrays.asList(TreeRegressor.class, ForestRegressor.class, GradientBoostingRegressor.class));
+		}
+
 		Schema regressorSchema = toRegressorSchema(regressor, schema);
 
 		return EstimatorUtil.encodeNativeLike(regressor, regressorSchema);
