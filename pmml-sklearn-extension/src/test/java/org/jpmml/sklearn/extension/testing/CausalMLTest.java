@@ -19,11 +19,15 @@
 package org.jpmml.sklearn.extension.testing;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
+import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
@@ -31,6 +35,7 @@ import org.jpmml.sklearn.testing.SkLearnAlgorithms;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
+import sklearn.tree.HasTreeOptions;
 
 public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgorithms {
 
@@ -41,6 +46,20 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 			@Override
 			public CausalMLTest getArchiveBatchTest(){
 				return CausalMLTest.this;
+			}
+
+			@Override
+			public List<Map<String, Object>> getOptionsMatrix(){
+				String algorithm = getAlgorithm();
+
+				if(algorithm.endsWith("SRegressor")){
+					Map<String, Object> options = new LinkedHashMap<>();
+					options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
+
+					return OptionsUtil.generateOptionsMatrix(options);
+				}
+
+				return super.getOptionsMatrix();
 			}
 
 			@Override

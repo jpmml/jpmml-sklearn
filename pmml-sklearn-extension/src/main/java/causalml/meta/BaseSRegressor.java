@@ -18,12 +18,18 @@
  */
 package causalml.meta;
 
+import java.util.List;
+import java.util.function.Function;
+
 import org.dmg.pmml.Model;
+import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import sklearn.EstimatorUtil;
 import sklearn.Regressor;
+import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeUtil;
 
-public class BaseSRegressor extends BaseSLearner<Regressor> {
+public class BaseSRegressor extends BaseSLearner<Regressor> implements HasTreeOptions {
 
 	public BaseSRegressor(String module, String name){
 		super(module, name);
@@ -39,5 +45,27 @@ public class BaseSRegressor extends BaseSLearner<Regressor> {
 		Schema regressorSchema = toRegressorSchema(regressor, schema);
 
 		return EstimatorUtil.encodeNativeLike(regressor, regressorSchema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		Feature controlFeature = schema.getFeature(0);
+
+		Function<Feature, Feature> function = Function.identity();
+
+		Schema treeSchema = schema.toTransformedSchema(function);
+
+		treeSchema = TreeUtil.configureSchema(this, treeSchema);
+
+		// XXX
+		List<Feature> treeFeatures = (List<Feature>)treeSchema.getFeatures();
+		treeFeatures.set(0, controlFeature);
+
+		return treeSchema;
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return TreeUtil.configureModel(this, model);
 	}
 }
