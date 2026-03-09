@@ -43,8 +43,8 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 	@Override
 	public Model encodeModel(Schema schema){
 		List<String> treatmentGroups = getTreatmentGroups();
-		Map<String, E> treatmentModels = getModelsT();
 		Map<String, E> controlModels = getModelsC();
+		Map<String, E> treatmentModels = getModelsT();
 
 		Label label = schema.getLabel();
 
@@ -58,15 +58,15 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
 			String treatmentGroup = treatmentGroups.get(i);
 
-			E treatmentEstimator = treatmentModels.get(treatmentGroup);
 			E controlEstimator = controlModels.get(treatmentGroup);
+			E treatmentEstimator = treatmentModels.get(treatmentGroup);
 
 			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model treatmentModel = encodeEstimator(Role.TREATMENT, treatmentEstimator, binarySchema);
 			Model controlModel = encodeEstimator(Role.CONTROL, controlEstimator, binarySchema);
+			Model treatmentModel = encodeEstimator(Role.TREATMENT, treatmentEstimator, binarySchema);
 
-			Model binaryModel = encodeBinaryModel(treatmentModel, controlModel, binarySchema);
+			Model binaryModel = encodeBinaryModel(controlModel, treatmentModel, binarySchema);
 
 			binaryModels.add(binaryModel);
 		}
@@ -80,11 +80,11 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 		}
 	}
 
-	public Map<String, E> getModelsT(){
-		return getModels("models_t");
-	}
-
 	public Map<String, E> getModelsC(){
 		return getModels("models_c");
+	}
+
+	public Map<String, E> getModelsT(){
+		return getModels("models_t");
 	}
 }

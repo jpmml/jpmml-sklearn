@@ -119,8 +119,8 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 	}
 
 	protected Model encodeBinaryModel(E estimator, String groupName, String controlName, Schema schema){
-		Model treatmentModel = encodeEstimator(Role.TREATMENT, estimator, schema);
 		Model controlModel = encodeEstimator(Role.CONTROL, estimator, schema);
+		Model treatmentModel = encodeEstimator(Role.TREATMENT, estimator, schema);
 
 		Visitor nullBranchMarker = new AbstractTreeModelTransformer(){
 
@@ -225,29 +225,8 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 				return result;
 			}
 		};
-		branchPruner.applyTo(treatmentModel);
 		branchPruner.applyTo(controlModel);
-
-		Visitor treatmentActivator = new TreeModelGroupActivator(){
-
-			@Override
-			public Boolean getActivation(Predicate predicate){
-
-				if(hasFieldReference(predicate, groupName)){
-
-					if(hasOperator(predicate, SimplePredicate.Operator.EQUAL)){
-						return hasValue(predicate, controlName);
-					} else
-
-					if(hasOperator(predicate, SimplePredicate.Operator.NOT_EQUAL)){
-						return !hasValue(predicate, controlName);
-					}
-				}
-
-				return null;
-			}
-		};
-		treatmentActivator.applyTo(treatmentModel);
+		branchPruner.applyTo(treatmentModel);
 
 		Visitor controlActivator = new TreeModelGroupActivator(){
 
@@ -269,6 +248,27 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 			}
 		};
 		controlActivator.applyTo(controlModel);
+
+		Visitor treatmentActivator = new TreeModelGroupActivator(){
+
+			@Override
+			public Boolean getActivation(Predicate predicate){
+
+				if(hasFieldReference(predicate, groupName)){
+
+					if(hasOperator(predicate, SimplePredicate.Operator.EQUAL)){
+						return hasValue(predicate, controlName);
+					} else
+
+					if(hasOperator(predicate, SimplePredicate.Operator.NOT_EQUAL)){
+						return !hasValue(predicate, controlName);
+					}
+				}
+
+				return null;
+			}
+		};
+		treatmentActivator.applyTo(treatmentModel);
 
 		Visitor nodePruner = new TreeModelPruner(){
 
@@ -303,8 +303,8 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 				super.exitNode(node);
 			}
 		};
-		nodePruner.applyTo(treatmentModel);
 		nodePruner.applyTo(controlModel);
+		nodePruner.applyTo(treatmentModel);
 
 		Visitor nullSegmentRemover = new AbstractVisitor(){
 
@@ -344,10 +344,10 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 				return false;
 			}
 		};
-		nullSegmentRemover.applyTo(treatmentModel);
 		nullSegmentRemover.applyTo(controlModel);
+		nullSegmentRemover.applyTo(treatmentModel);
 
-		return encodeBinaryModel(treatmentModel, controlModel, schema);
+		return encodeBinaryModel(controlModel, treatmentModel, schema);
 	}
 
 	public Map<String, E> getModels(){

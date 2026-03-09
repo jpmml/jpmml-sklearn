@@ -55,7 +55,7 @@ public class BaseTClassifier extends BaseTLearner<Classifier> {
 	}
 
 	@Override
-	protected MiningModel encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema){
+	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
 		ModelEncoder encoder = schema.getEncoder();
 
 		OutputField treatmentOutputField = getProbabilityField(treatmentModel);

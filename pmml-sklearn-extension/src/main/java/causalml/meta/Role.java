@@ -19,8 +19,8 @@
 package causalml.meta;
 
 public enum Role {
-	TREATMENT,
 	CONTROL,
+	TREATMENT,
 	;
 
 	String getSegmentId(){

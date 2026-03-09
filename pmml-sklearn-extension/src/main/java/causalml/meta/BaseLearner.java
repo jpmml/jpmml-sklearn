@@ -60,7 +60,7 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 	abstract
 	public Model encodeEstimator(Role role, E estimator, Schema schema);
 
-	protected MiningModel encodeBinaryModel(Model treatmentModel, Model controlModel, Schema schema){
+	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
 		Targets targets = controlModel.getTargets();
 
 		if(targets != null){
@@ -97,9 +97,13 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 	}
 
 	public Map<String, E> getModels(String name){
-		Map<String, ?> models = getDict(name);
-
 		Class<? extends E> estimatorClazz = getEstimatorClass();
+
+		return getModels(name, estimatorClazz);
+	}
+
+	public <E extends Estimator> Map<String, E> getModels(String name, Class<? extends E> estimatorClazz){
+		Map<String, ?> models = getDict(name);
 
 		Function<Object, E> valueFunction = new EstimatorCastFunction<E>(estimatorClazz){
 
