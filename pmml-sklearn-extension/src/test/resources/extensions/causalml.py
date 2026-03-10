@@ -4,10 +4,11 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
 
-from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor
+from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor, BaseXRegressor
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline, FeatureUnion
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -110,6 +111,9 @@ def build_email_parallel(email_df, estimator, name):
 
 	email_treatment = email_X.iloc[:, 0]
 
+	if isinstance(estimator, BaseXRegressor):
+		estimator.model_p = LogisticRegression()
+
 	estimator.fit(email_Xt, email_treatment, email_y)
 
 	pipeline = PMMLPipeline([
@@ -125,7 +129,13 @@ def build_email_parallel(email_df, estimator, name):
 		raise ValueError()
 	store_pkl(pipeline, name)
 
-	uplift = DataFrame(estimator.predict(email_Xt), columns = pipeline.target_fields)
+	if isinstance(estimator, BaseXRegressor):
+		propensity = dict()
+		for group in estimator.t_groups:
+			propensity[group] = estimator.propensity_model[group].predict_proba(email_Xt)[:, 1]
+		uplift = DataFrame(estimator.predict(email_Xt, p = propensity), columns = pipeline.target_fields)
+	else:
+		uplift = DataFrame(estimator.predict(email_Xt), columns = pipeline.target_fields)
 	store_csv(uplift, name)
 
 if "Email" in datasets:
@@ -146,3 +156,16 @@ if "Email" in datasets:
 	build_email_parallel(email_binary_df, BaseTRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeTRegressorEmailBin")
 	build_email_parallel(email_binary_df, BaseTRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingTRegressorEmailBin")
 	build_email_parallel(email_binary_df, BaseTRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestTRegressorEmailBin")
+
+if "Email" in datasets:
+	email_df = load_csv("Email")
+
+	build_email_parallel(email_df, BaseXRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeXRegressorEmail")
+	build_email_parallel(email_df, BaseXRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingXRegressorEmail")
+	build_email_parallel(email_df, BaseXRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestXRegressorEmail")
+
+	email_binary_df = to_binary(email_df)
+
+	build_email_parallel(email_binary_df, BaseXRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeXRegressorEmailBin")
+	build_email_parallel(email_binary_df, BaseXRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingXRegressorEmailBin")
+	build_email_parallel(email_binary_df, BaseXRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestXRegressorEmailBin")

@@ -145,6 +145,16 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 	}
 
 	@Test
+	public void evaluateDecisionTreeXRegressorEmail() throws Exception {
+		evaluate(DECISION_TREE + "XRegressor", "Email");
+	}
+
+	@Test
+	public void evaluateDecisionTreeXRegressorEmailBin() throws Exception {
+		evaluate(DECISION_TREE + "XRegressor", "EmailBin");
+	}
+
+	@Test
 	public void evaluateGradientBoostingSRegressorEmail() throws Exception {
 		evaluate(GRADIENT_BOOSTING + "SRegressor", "Email");
 	}
@@ -162,6 +172,16 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 	@Test
 	public void evaluateGradientBoostingTRegressorEmailBin() throws Exception {
 		evaluate(GRADIENT_BOOSTING + "TRegressor", "EmailBin", new PMMLEquivalence(1e-12, 1e-12));
+	}
+
+	@Test
+	public void evaluateGradientBoostingXRegressorEmail() throws Exception {
+		evaluate(GRADIENT_BOOSTING + "XRegressor", "Email", new PMMLEquivalence(5e-11, 5e-11));
+	}
+
+	@Test
+	public void evaluateGradientBoostingXRegressorEmailBin() throws Exception {
+		evaluate(GRADIENT_BOOSTING + "XRegressor", "EmailBin");
 	}
 
 	@Test
@@ -202,5 +222,15 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 	@Test
 	public void evaluateRandomForestTRegressorEmailBin() throws Exception {
 		evaluate(RANDOM_FOREST + "TRegressor", "EmailBin");
+	}
+
+	@Test
+	public void evaluateRandomForestXRegressorEmail() throws Exception {
+		evaluate(RANDOM_FOREST + "XRegressor", "Email");
+	}
+
+	@Test
+	public void evaluateRandomForestXRegressorEmailBin() throws Exception {
+		evaluate(RANDOM_FOREST + "XRegressor", "EmailBin");
 	}
 }

@@ -19,11 +19,8 @@
 package causalml.meta;
 
 import java.util.Arrays;
-import java.util.List;
 
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.Output;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
@@ -34,7 +31,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Classifier;
-import sklearn.EstimatorUtil;
 
 public class BaseTClassifier extends BaseTLearner<Classifier> {
 
@@ -64,21 +60,5 @@ public class BaseTClassifier extends BaseTLearner<Classifier> {
 		RegressionModel regressionModel = RegressionModelUtil.createRegression(Arrays.asList(new ContinuousFeature(encoder, treatmentOutputField), new ContinuousFeature(encoder, controlOutputField)), Arrays.asList(1, -1), null, RegressionModel.NormalizationMethod.NONE, schema);
 
 		return MiningModelUtil.createModelChain(Arrays.asList(treatmentModel, controlModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
-	}
-
-	static
-	private OutputField getProbabilityField(Model model){
-		Output output = EstimatorUtil.getFinalOutput(model);
-
-		if(output == null || !output.hasOutputFields()){
-			throw new IllegalArgumentException();
-		}
-
-		List<OutputField> outputFields = output.getOutputFields();
-		if(outputFields.size() != 2){
-			throw new IllegalArgumentException();
-		}
-
-		return Iterables.getLast(outputFields);
 	}
 }

@@ -29,6 +29,8 @@ import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.Output;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Target;
 import org.dmg.pmml.Targets;
 import org.dmg.pmml.mining.MiningModel;
@@ -45,6 +47,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorCastFunction;
+import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 abstract
@@ -140,5 +143,21 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 		ContinuousLabel continuousLabel = (ContinuousLabel)regressor.encodeLabel(Collections.singletonList(null), encoder);
 
 		return schema.toRelabeledSchema(continuousLabel);
+	}
+
+	static
+	protected OutputField getProbabilityField(Model model){
+		Output output = EstimatorUtil.getFinalOutput(model);
+
+		if(output == null || !output.hasOutputFields()){
+			throw new IllegalArgumentException();
+		}
+
+		List<OutputField> outputFields = output.getOutputFields();
+		if(outputFields.size() != 2){
+			throw new IllegalArgumentException();
+		}
+
+		return Iterables.getLast(outputFields);
 	}
 }
