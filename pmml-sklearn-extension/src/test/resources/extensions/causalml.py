@@ -5,7 +5,8 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 from common import *
 
 from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor, BaseXClassifier, BaseXRegressor
-from pandas import DataFrame
+from causalml.propensity import LogisticRegressionPropensityModel
+from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LogisticRegression
@@ -101,6 +102,34 @@ if "Email" in datasets:
 	build_email_single(email_binary_df, BaseSRegressor(DecisionTreeRegressor(max_depth = 9, random_state = 42), control_name = "control"), "DecisionTreeSRegressorEmailBin")
 	build_email_single(email_binary_df, BaseSRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingSRegressorEmailBin")
 	build_email_single(email_binary_df, BaseSRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestSRegressorEmailBin")
+
+def build_email_propensity(email_df, estimator, name):
+	email_X, email_y = split_csv(email_df)
+
+	transformer = make_email_transformer()
+
+	email_Xt = transformer.fit_transform(email_X)
+
+	email_propensity = Series((email_X.iloc[:, 0] != "control").astype(int), name = "propensity")
+
+	estimator.fit(email_Xt, email_propensity)
+
+	pipeline = PMMLPipeline([
+		("transformer", transformer),
+		("estimator", estimator)
+	])
+	pipeline.active_fields = numpy.asarray(email_X.columns.values)
+	pipeline.target_fields = numpy.asarray(["propensity"])
+	store_pkl(pipeline, name)
+
+	propensity = DataFrame(estimator.predict(email_Xt), columns = pipeline.target_fields)
+	store_csv(propensity, name)
+
+if "Email" in datasets:
+	email_df = load_csv("Email")
+
+	build_email_propensity(email_df, LogisticRegressionPropensityModel(calibrate = True), "LogisticRegressionPropensityModelIsotonicEmail")
+	build_email_propensity(email_df, LogisticRegressionPropensityModel(calibrate = False, clip_bounds = (0.05, 0.95)), "LogisticRegressionPropensityModelEmail")
 
 def build_email_parallel(email_df, estimator, name):
 	email_X, email_y = split_csv(email_df)

@@ -105,6 +105,16 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 	}
 
 	@Test
+	public void evaluateLogisticRegressionPropensityModelEmail() throws Exception {
+		evaluate(LOGISTIC_REGRESSION + "PropensityModel", "Email");
+	}
+
+	@Test
+	public void evaluateLogisticRegressionPropensityModelIsotonicEmail() throws Exception {
+		evaluate(LOGISTIC_REGRESSION + "PropensityModel" + "Isotonic", "Email");
+	}
+
+	@Test
 	public void evaluateDecisionTreeSClassifierEmail() throws Exception {
 		evaluate(DECISION_TREE + "SClassifier", "Email");
 	}

@@ -37,15 +37,19 @@ import sklearn.Calibrator;
 
 public class IsotonicRegression extends Calibrator {
 
+	public IsotonicRegression(){
+		super("sklearn.isotonic", "IsotonicRegression");
+	}
+
 	public IsotonicRegression(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
+		String outOfBounds = getOutOfBounds();
 		List<Number> xThresholds = getXThresholds();
 		List<Number> yThresholds = getYThresholds();
-		String outOfBounds = getOutOfBounds();
 
 		ClassDictUtil.checkSize(xThresholds, yThresholds);
 
@@ -72,6 +76,10 @@ public class IsotonicRegression extends Calibrator {
 		return getBoolean("increasing_");
 	}
 
+	public String getOutOfBounds(){
+		return getEnum("out_of_bounds", this::getString, Arrays.asList(IsotonicRegression.OUTOFBOUNDS_CLIP, IsotonicRegression.OUTOFBOUNDS_NAN));
+	}
+
 	public List<Number> getXThresholds(){
 		// SkLearn 0.23
 		if(hasattr("_necessary_X_")){
@@ -92,10 +100,6 @@ public class IsotonicRegression extends Calibrator {
 		return getNumberArray("y_thresholds_");
 	}
 
-	public String getOutOfBounds(){
-		return getEnum("out_of_bounds", this::getString, Arrays.asList(IsotonicRegression.OUTOFBOUNDS_CLIP, IsotonicRegression.OUTOFBOUNDS_NAN));
-	}
-
 	static
 	public OutlierTreatmentMethod parseOutlierTreatment(String outOfBounds){
 
@@ -109,6 +113,6 @@ public class IsotonicRegression extends Calibrator {
 		}
 	}
 
-	private static final String OUTOFBOUNDS_CLIP = "clip";
-	private static final String OUTOFBOUNDS_NAN = "nan";
+	protected static final String OUTOFBOUNDS_CLIP = "clip";
+	protected static final String OUTOFBOUNDS_NAN = "nan";
 }
