@@ -22,15 +22,10 @@ import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 
-public class BaseRRegressor extends BaseRLearner<Regressor> {
+public class BaseRRegressor extends BaseRLearner {
 
 	public BaseRRegressor(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public Class<Regressor> getEstimatorClass(){
-		return Regressor.class;
 	}
 
 	@Override

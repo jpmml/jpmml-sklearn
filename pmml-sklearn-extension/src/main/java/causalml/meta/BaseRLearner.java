@@ -28,19 +28,24 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
-import sklearn.Estimator;
+import sklearn.Regressor;
 
 abstract
-public class BaseRLearner<E extends Estimator> extends BaseLearner<E> {
+public class BaseRLearner extends BaseLearner<Regressor> {
 
 	public BaseRLearner(String module, String name){
 		super(module, name);
 	}
 
 	@Override
+	public Class<Regressor> getEstimatorClass(){
+		return Regressor.class;
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
 		List<String> treatmentGroups = getTreatmentGroups();
-		Map<String, E> modelTau = getModelTau();
+		Map<String, Regressor> modelTau = getModelTau();
 
 		Label label = schema.getLabel();
 
@@ -48,25 +53,25 @@ public class BaseRLearner<E extends Estimator> extends BaseLearner<E> {
 
 		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelTau.entrySet());
 
-		List<Model> models = new ArrayList<>();
+		List<Model> effectModels = new ArrayList<>();
 
 		for(int i = 0; i < continuousLabels.size(); i++){
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
 			String treatmentGroup = treatmentGroups.get(i);
 
-			E estimator = modelTau.get(treatmentGroup);
+			Regressor effectEstimator = modelTau.get(treatmentGroup);
 
-			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
+			Schema effectSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model model = estimator.encode(segmentSchema);
+			Model effectModel = effectEstimator.encode(effectSchema);
 
-			models.add(model);
+			effectModels.add(effectModel);
 		}
 
-		return BaseLearnerUtil.encodeModel(models);
+		return BaseLearnerUtil.encodeModel(effectModels);
 	}
 
-	public Map<String, E> getModelTau(){
+	public Map<String, Regressor> getModelTau(){
 		return getModels("models_tau");
 	}
 }
