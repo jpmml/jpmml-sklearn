@@ -4,7 +4,7 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
 
-from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor, BaseXClassifier, BaseXRegressor
+from causalml.inference.meta import BaseRRegressor, BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor, BaseXClassifier, BaseXRegressor
 from causalml.propensity import ElasticNetPropensityModel, LogisticRegressionPropensityModel
 from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
@@ -198,3 +198,14 @@ if "Email" in datasets:
 	build_email_parallel(email_binary_df, BaseXRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeXRegressorEmailBin")
 	build_email_parallel(email_binary_df, BaseXRegressor(GradientBoostingRegressor(n_estimators = 31, max_depth = 3, random_state = 42), control_name = "control"), "GradientBoostingXRegressorEmailBin")
 	build_email_parallel(email_binary_df, BaseXRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestXRegressorEmailBin")
+
+if "Email" in datasets:
+	email_df = load_csv("Email")
+
+	build_email_parallel(email_df, BaseRRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeRRegressorEmail")
+	build_email_parallel(email_df, BaseRRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestRRegressorEmail")
+
+	email_binary_df = to_binary(email_df)
+
+	build_email_parallel(email_binary_df, BaseRRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeRRegressorEmailBin")
+	build_email_parallel(email_binary_df, BaseRRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestRRegressorEmailBin")

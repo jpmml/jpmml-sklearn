@@ -184,6 +184,7 @@
 
   Examples: [extensions/causalml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/causalml.py)
 
+  * `causalml.inference.meta.BaseRRegressor`
   * `causalml.inference.meta.BaseSClassifier`
   * `causalml.inference.meta.BaseSRegressor`
   * `causalml.inference.meta.BaseTClassifier`
