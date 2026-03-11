@@ -125,6 +125,16 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 	}
 
 	@Test
+	public void evaluateDecisionTreeRClassifierEmail() throws Exception {
+		evaluate(DECISION_TREE + "RClassifier", "Email");
+	}
+
+	@Test
+	public void evaluateDecisionTreeRClassifierEmailBin() throws Exception {
+		evaluate(DECISION_TREE + "RClassifier", "EmailBin");
+	}
+
+	@Test
 	public void evaluateDecisionTreeRRegressorEmail() throws Exception {
 		evaluate(DECISION_TREE + "RRegressor", "Email");
 	}
@@ -222,6 +232,16 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 	@Test
 	public void evaluateGradientBoostingXRegressorEmailBin() throws Exception {
 		evaluate(GRADIENT_BOOSTING + "XRegressor", "EmailBin");
+	}
+
+	@Test
+	public void evaluateRandomForestRClassifierEmail() throws Exception {
+		evaluate(RANDOM_FOREST + "RClassifier", "Email");
+	}
+
+	@Test
+	public void evaluateRandomForestRClassifierEmailBin() throws Exception {
+		evaluate(RANDOM_FOREST + "RClassifier", "EmailBin");
 	}
 
 	@Test

@@ -4,7 +4,7 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 
 from common import *
 
-from causalml.inference.meta import BaseRRegressor, BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor, BaseXClassifier, BaseXRegressor
+from causalml.inference.meta import BaseRClassifier, BaseRRegressor, BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor, BaseXClassifier, BaseXRegressor
 from causalml.propensity import ElasticNetPropensityModel, LogisticRegressionPropensityModel
 from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
@@ -202,10 +202,16 @@ if "Email" in datasets:
 if "Email" in datasets:
 	email_df = load_csv("Email")
 
+	build_email_parallel(email_df, BaseRClassifier(LogisticRegression(random_state = 42), DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeRClassifierEmail")
+	build_email_parallel(email_df, BaseRClassifier(LogisticRegression(random_state = 42), RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestRClassifierEmail")
+
 	build_email_parallel(email_df, BaseRRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeRRegressorEmail")
 	build_email_parallel(email_df, BaseRRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestRRegressorEmail")
 
 	email_binary_df = to_binary(email_df)
+
+	build_email_parallel(email_binary_df, BaseRClassifier(LogisticRegression(random_state = 42), DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeRClassifierEmailBin")
+	build_email_parallel(email_binary_df, BaseRClassifier(LogisticRegression(random_state = 42), RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestRClassifierEmailBin")
 
 	build_email_parallel(email_binary_df, BaseRRegressor(DecisionTreeRegressor(max_depth = 7, random_state = 42), control_name = "control"), "DecisionTreeRRegressorEmailBin")
 	build_email_parallel(email_binary_df, BaseRRegressor(RandomForestRegressor(n_estimators = 17, max_depth = 5, random_state = 42), control_name = "control"), "RandomForestRRegressorEmailBin")
