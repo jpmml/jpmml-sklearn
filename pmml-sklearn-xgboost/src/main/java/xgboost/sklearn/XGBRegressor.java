@@ -66,9 +66,16 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 
 	@Override
 	protected ScalarLabel encodeLabel(String name, SkLearnEncoder encoder){
-		DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.FLOAT);
 
-		return new ContinuousLabel(dataField);
+		if(name != null){
+			DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.FLOAT);
+
+			return new ContinuousLabel(dataField);
+		} else
+
+		{
+			return new ContinuousLabel(DataType.FLOAT);
+		}
 	}
 
 	@Override
