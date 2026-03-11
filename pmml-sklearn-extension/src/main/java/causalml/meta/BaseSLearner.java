@@ -94,15 +94,15 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 
 			E estimator = models.get(treatmentGroup);
 
-			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
+			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
 			BinaryFeature controlFeature = new BinaryFeature(encoder, groupFeature, controlName);
 
 			// XXX
-			List<Feature> segmentFeatures = (List<Feature>)binarySchema.getFeatures();
+			List<Feature> segmentFeatures = (List<Feature>)segmentSchema.getFeatures();
 			segmentFeatures.set(0, controlFeature);
 
-			Model binaryModel = encodeBinaryModel(estimator, groupName, controlName, binarySchema);
+			Model binaryModel = encodeBinaryModel(estimator, groupName, controlName, segmentSchema);
 
 			binaryModels.add(binaryModel);
 		}

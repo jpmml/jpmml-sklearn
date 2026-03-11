@@ -86,12 +86,12 @@ public class BaseXLearner extends BaseLearner<Regressor> {
 			Regressor controlEffectEstimator = controlEffectModels.get(treatmentGroup);
 			Regressor treatmentEffectEstimator = treatmentEffectModels.get(treatmentGroup);
 
-			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
+			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model controlEffectModel = encodeEstimator(Role.CONTROL, controlEffectEstimator, binarySchema);
-			Model treatmentEffectModel = encodeEstimator(Role.TREATMENT, treatmentEffectEstimator, binarySchema);
+			Model controlEffectModel = encodeEstimator(Role.CONTROL, controlEffectEstimator, segmentSchema);
+			Model treatmentEffectModel = encodeEstimator(Role.TREATMENT, treatmentEffectEstimator, segmentSchema);
 
-			Model binaryModel = encodeBinaryModel(treatmentGroup, propensityModel, controlEffectModel, treatmentEffectModel, binarySchema);
+			Model binaryModel = encodeBinaryModel(treatmentGroup, propensityModel, controlEffectModel, treatmentEffectModel, segmentSchema);
 
 			binaryModels.add(binaryModel);
 		}

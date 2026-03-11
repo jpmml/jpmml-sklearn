@@ -61,9 +61,9 @@ public class BaseRLearner extends BaseLearner<Regressor> {
 
 			Regressor effectEstimator = modelTau.get(treatmentGroup);
 
-			Schema effectSchema = schema.toRelabeledSchema(continuousLabel);
+			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model effectModel = effectEstimator.encode(effectSchema);
+			Model effectModel = effectEstimator.encode(segmentSchema);
 
 			effectModels.add(effectModel);
 		}

@@ -59,12 +59,12 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 			E controlEstimator = controlModels.get(treatmentGroup);
 			E treatmentEstimator = treatmentModels.get(treatmentGroup);
 
-			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
+			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model controlModel = encodeEstimator(Role.CONTROL, controlEstimator, binarySchema);
-			Model treatmentModel = encodeEstimator(Role.TREATMENT, treatmentEstimator, binarySchema);
+			Model controlModel = encodeEstimator(Role.CONTROL, controlEstimator, segmentSchema);
+			Model treatmentModel = encodeEstimator(Role.TREATMENT, treatmentEstimator, segmentSchema);
 
-			Model binaryModel = encodeBinaryModel(controlModel, treatmentModel, binarySchema);
+			Model binaryModel = encodeBinaryModel(controlModel, treatmentModel, segmentSchema);
 
 			binaryModels.add(binaryModel);
 		}
