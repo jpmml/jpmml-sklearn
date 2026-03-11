@@ -19,6 +19,7 @@
 package causalml.meta;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
@@ -71,5 +72,19 @@ public class BaseLearnerUtil {
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
 
 		return miningModel;
+	}
+
+	static
+	public Model encodeModel(List<Model> models){
+
+		if(models.size() == 1){
+			Model model = Iterables.getOnlyElement(models);
+
+			return model;
+		} else
+
+		{
+			return MiningModelUtil.createMultiModelChain(models, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
+		}
 	}
 }

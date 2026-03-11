@@ -25,7 +25,6 @@ import java.util.Map;
 
 import causalml.CausalMLUtil;
 import causalml.propensity.PropensityModel;
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -92,13 +91,7 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 			binaryModels.add(binaryModel);
 		}
 
-		if(binaryModels.size() == 1){
-			return Iterables.getOnlyElement(binaryModels);
-		} else
-
-		{
-			return MiningModelUtil.createMultiModelChain(binaryModels, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
-		}
+		return BaseLearnerUtil.encodeModel(binaryModels);
 	}
 
 	protected MiningModel encodeBinaryModel(String treatmentGroup, Model propensityModel, Model controlModel, Model treatmentModel, Schema schema){

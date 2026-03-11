@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
@@ -47,7 +46,6 @@ import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.UnsupportedFeatureException;
-import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 import org.jpmml.converter.visitors.TreeModelPruner;
 import org.jpmml.model.visitors.AbstractVisitor;
@@ -109,13 +107,7 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 			binaryModels.add(binaryModel);
 		}
 
-		if(binaryModels.size() == 1){
-			return Iterables.getOnlyElement(binaryModels);
-		} else
-
-		{
-			return MiningModelUtil.createMultiModelChain(binaryModels, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
-		}
+		return BaseLearnerUtil.encodeModel(binaryModels);
 	}
 
 	protected Model encodeBinaryModel(E estimator, String groupName, String controlName, Schema schema){

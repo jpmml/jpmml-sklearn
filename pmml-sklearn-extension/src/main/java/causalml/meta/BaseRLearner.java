@@ -22,14 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Iterables;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 
@@ -66,13 +63,7 @@ public class BaseRLearner<E extends Estimator> extends BaseLearner<E> {
 			models.add(model);
 		}
 
-		if(models.size() == 1){
-			return Iterables.getOnlyElement(models);
-		} else
-
-		{
-			return MiningModelUtil.createMultiModelChain(models, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
-		}
+		return BaseLearnerUtil.encodeModel(models);
 	}
 
 	public Map<String, E> getModelTau(){
