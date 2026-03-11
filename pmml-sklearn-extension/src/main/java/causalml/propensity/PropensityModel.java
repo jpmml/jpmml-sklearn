@@ -78,12 +78,14 @@ public class PropensityModel extends Regressor {
 			};
 		}
 
+		Object pmmlSegmentId = getPMMLSegmentId();
+
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
 		Schema classifierSchema = CausalMLUtil.toClassifierSchema(model, schema);
 
-		Model classifierModel = model.encode(classifierSchema);
+		Model classifierModel = model.encode(pmmlSegmentId, classifierSchema);
 
 		OutputField eventOutputField = CausalMLUtil.getProbabilityField(classifierModel);
 

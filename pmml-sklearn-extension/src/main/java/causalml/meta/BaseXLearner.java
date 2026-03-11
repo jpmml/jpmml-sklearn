@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import causalml.CausalMLUtil;
+import causalml.propensity.PropensityModel;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.PredictorTerm;
@@ -44,7 +44,6 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.SkLearnMethods;
 
@@ -60,7 +59,7 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 		List<String> treatmentGroups = getTreatmentGroups();
 		Map<String, E> controlEffectModels = getModelsTauC();
 		Map<String, E> treatmentEffectModels = getModelsTauT();
-		Map<String, Classifier> propensityModels = getPropensityModels();
+		Map<String, PropensityModel> propensityModels = getPropensityModels();
 
 		Label label = schema.getLabel();
 
@@ -74,11 +73,11 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
 			String treatmentGroup = treatmentGroups.get(i);
 
-			Classifier propensityEstimator = propensityModels.get(treatmentGroup);
+			PropensityModel propensityEstimator = propensityModels.get(treatmentGroup);
 
-			Schema propensitySchema = CausalMLUtil.toClassifierSchema(propensityEstimator, schema);
+			Schema propensitySchema = CausalMLUtil.toRegressorSchema(propensityEstimator, schema);
 
-			Model propensityModel = propensityEstimator.encode(propensitySchema);
+			Model propensityModel = propensityEstimator.encode(treatmentGroup, propensitySchema);
 
 			E controlEffectEstimator = controlEffectModels.get(treatmentGroup);
 			E treatmentEffectEstimator = treatmentEffectModels.get(treatmentGroup);
@@ -105,11 +104,9 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 	protected MiningModel encodeBinaryModel(String treatmentGroup, Model propensityModel, Model controlModel, Model treatmentModel, Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
-		OutputField propensityOutputField = CausalMLUtil.getProbabilityField(propensityModel);
-
-		ContinuousFeature propensityFeature = new ContinuousFeature(encoder, propensityOutputField);
-
 		ContinuousLabel continuousLabel = new ContinuousLabel(null, DataType.DOUBLE);
+
+		ContinuousFeature propensityFeature = (ContinuousFeature)encoder.exportPrediction(propensityModel, FieldNameUtil.create(SkLearnMethods.PREDICT, treatmentGroup, "propensity"), continuousLabel);
 
 		ContinuousFeature controlFeature = (ContinuousFeature)encoder.exportPrediction(controlModel, FieldNameUtil.create(SkLearnMethods.PREDICT, treatmentGroup, "control"), continuousLabel);
 		ContinuousFeature treatmentFeature = (ContinuousFeature)encoder.exportPrediction(treatmentModel, FieldNameUtil.create(SkLearnMethods.PREDICT, treatmentGroup, "treatment"), continuousLabel);
@@ -140,7 +137,7 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 		return getModels("models_tau_t");
 	}
 
-	public Map<String, Classifier> getPropensityModels(){
-		return getModels("propensity_model", Classifier.class);
+	public Map<String, PropensityModel> getPropensityModels(){
+		return getModels("propensity_model", PropensityModel.class);
 	}
 }

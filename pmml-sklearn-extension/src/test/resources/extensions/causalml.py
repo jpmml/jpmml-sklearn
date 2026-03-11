@@ -143,9 +143,6 @@ def build_email_parallel(email_df, estimator, name):
 
 	email_treatment = email_X.iloc[:, 0]
 
-	if isinstance(estimator, (BaseXClassifier, BaseXRegressor)):
-		estimator.model_p = LogisticRegression()
-
 	estimator.fit(email_Xt, email_treatment, email_y)
 
 	pipeline = PMMLPipeline([
@@ -161,13 +158,7 @@ def build_email_parallel(email_df, estimator, name):
 		raise ValueError()
 	store_pkl(pipeline, name)
 
-	if isinstance(estimator, (BaseXClassifier, BaseXRegressor)):
-		propensity = dict()
-		for group in estimator.t_groups:
-			propensity[group] = estimator.propensity_model[group].predict_proba(email_Xt)[:, 1]
-		uplift = DataFrame(estimator.predict(email_Xt, p = propensity), columns = pipeline.target_fields)
-	else:
-		uplift = DataFrame(estimator.predict(email_Xt), columns = pipeline.target_fields)
+	uplift = DataFrame(estimator.predict(email_Xt), columns = pipeline.target_fields)
 	store_csv(uplift, name)
 
 if "Email" in datasets:

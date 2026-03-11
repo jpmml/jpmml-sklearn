@@ -261,7 +261,7 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 
 	@Test
 	public void evaluateRandomForestXClassifierEmailBin() throws Exception {
-		evaluate(RANDOM_FOREST + "XClassifier", "EmailBin");
+		evaluate(RANDOM_FOREST + "XClassifier", "EmailBin", new PMMLEquivalence(1e-12, 1e-12));
 	}
 
 	@Test
