@@ -24,6 +24,7 @@ import java.util.Map;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
@@ -78,6 +79,10 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 		{
 			return MiningModelUtil.createMultiModelChain(binaryModels, Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 		}
+	}
+
+	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
+		return BaseLearnerUtil.encodeBinaryModel(controlModel, treatmentModel, schema);
 	}
 
 	public Map<String, E> getModelsC(){

@@ -18,6 +18,7 @@
  */
 package causalml.meta;
 
+import causalml.CausalMLUtil;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
@@ -35,7 +36,7 @@ public class BaseXRegressor extends BaseXLearner<Regressor> {
 
 	@Override
 	public Model encodeEstimator(Role role, Regressor regressor, Schema schema){
-		Schema regressorSchema = toRegressorSchema(regressor, schema);
+		Schema regressorSchema = CausalMLUtil.toRegressorSchema(regressor, schema);
 
 		return regressor.encode(regressorSchema);
 	}

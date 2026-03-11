@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import causalml.CausalMLUtil;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
@@ -64,7 +65,7 @@ public class BaseSRegressor extends BaseSLearner<Regressor> implements HasTreeOp
 			throw new EstimatorCastException(regressor, Arrays.asList(TreeRegressor.class, ForestRegressor.class, GradientBoostingRegressor.class));
 		}
 
-		Schema regressorSchema = toRegressorSchema(regressor, schema);
+		Schema regressorSchema = CausalMLUtil.toRegressorSchema(regressor, schema);
 
 		return EstimatorUtil.encodeNativeLike(regressor, regressorSchema);
 	}

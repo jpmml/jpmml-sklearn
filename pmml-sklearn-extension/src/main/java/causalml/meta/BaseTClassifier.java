@@ -20,6 +20,7 @@ package causalml.meta;
 
 import java.util.Arrays;
 
+import causalml.CausalMLUtil;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
@@ -45,7 +46,7 @@ public class BaseTClassifier extends BaseTLearner<Classifier> {
 
 	@Override
 	public Model encodeEstimator(Role role, Classifier classifier, Schema schema){
-		Schema classifierSchema = toClassifierSchema(classifier, schema);
+		Schema classifierSchema = CausalMLUtil.toClassifierSchema(classifier, schema);
 
 		return classifier.encode(role.getSegmentId(), classifierSchema);
 	}
@@ -54,8 +55,8 @@ public class BaseTClassifier extends BaseTLearner<Classifier> {
 	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
 		ModelEncoder encoder = schema.getEncoder();
 
-		OutputField treatmentOutputField = getProbabilityField(treatmentModel);
-		OutputField controlOutputField = getProbabilityField(controlModel);
+		OutputField treatmentOutputField = CausalMLUtil.getProbabilityField(treatmentModel);
+		OutputField controlOutputField = CausalMLUtil.getProbabilityField(controlModel);
 
 		RegressionModel regressionModel = RegressionModelUtil.createRegression(Arrays.asList(new ContinuousFeature(encoder, treatmentOutputField), new ContinuousFeature(encoder, controlOutputField)), Arrays.asList(1, -1), null, RegressionModel.NormalizationMethod.NONE, schema);
 

@@ -18,36 +18,16 @@
  */
 package causalml.meta;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Iterables;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.Output;
-import org.dmg.pmml.OutputField;
-import org.dmg.pmml.Target;
-import org.dmg.pmml.Targets;
-import org.dmg.pmml.mining.MiningModel;
-import org.dmg.pmml.mining.Segmentation;
-import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
-import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.ContinuousLabel;
-import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ValueUtil;
-import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.EstimatorCastFunction;
-import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 abstract
@@ -62,38 +42,6 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 
 	abstract
 	public Model encodeEstimator(Role role, E estimator, Schema schema);
-
-	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
-		Targets targets = controlModel.getTargets();
-
-		if(targets != null){
-			Target target = Iterables.getOnlyElement(targets);
-
-			Number rescaleFactor = target.getRescaleFactor();
-			Number rescaleConstant = target.getRescaleConstant();
-
-			if(rescaleFactor.doubleValue() != 0d){
-				target.setRescaleFactor((Number)ValueUtil.toNegative(rescaleFactor));
-			} // End if
-
-			if(rescaleConstant.doubleValue() != 0d){
-				target.setRescaleConstant((Number)ValueUtil.toNegative(rescaleConstant));
-			}
-		} else
-
-		{
-			ContinuousLabel continuousLabel = new ContinuousLabel(null, DataType.DOUBLE);
-
-			targets = ModelUtil.createRescaleTargets(-1, null, continuousLabel);
-
-			controlModel.setTargets(targets);
-		}
-
-		MiningModel miningModel = new MiningModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema))
-			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
-
-		return miningModel;
-	}
 
 	public String getControlName(){
 		return getString("control_name");
@@ -124,40 +72,5 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 
 	public List<String> getTreatmentGroups(){
 		return getStringArray("t_groups");
-	}
-
-	static
-	protected Schema toClassifierSchema(Classifier classifier, Schema schema){
-		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
-		CategoricalLabel categoricalLabel = ((CategoricalLabel)classifier.encodeLabel(Collections.singletonList(null), encoder))
-			.expectCardinality(2);
-
-		return schema.toRelabeledSchema(categoricalLabel);
-	}
-
-	static
-	protected Schema toRegressorSchema(Regressor regressor, Schema schema){
-		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
-
-		ContinuousLabel continuousLabel = (ContinuousLabel)regressor.encodeLabel(Collections.singletonList(null), encoder);
-
-		return schema.toRelabeledSchema(continuousLabel);
-	}
-
-	static
-	protected OutputField getProbabilityField(Model model){
-		Output output = EstimatorUtil.getFinalOutput(model);
-
-		if(output == null || !output.hasOutputFields()){
-			throw new IllegalArgumentException();
-		}
-
-		List<OutputField> outputFields = output.getOutputFields();
-		if(outputFields.size() != 2){
-			throw new IllegalArgumentException();
-		}
-
-		return Iterables.getLast(outputFields);
 	}
 }

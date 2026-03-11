@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import causalml.CausalMLUtil;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
@@ -75,7 +76,7 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 
 			Classifier propensityEstimator = propensityModels.get(treatmentGroup);
 
-			Schema propensitySchema = toClassifierSchema(propensityEstimator, schema);
+			Schema propensitySchema = CausalMLUtil.toClassifierSchema(propensityEstimator, schema);
 
 			Model propensityModel = propensityEstimator.encode(propensitySchema);
 
@@ -104,7 +105,7 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 	protected MiningModel encodeBinaryModel(String treatmentGroup, Model propensityModel, Model controlModel, Model treatmentModel, Schema schema){
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 
-		OutputField propensityOutputField = getProbabilityField(propensityModel);
+		OutputField propensityOutputField = CausalMLUtil.getProbabilityField(propensityModel);
 
 		ContinuousFeature propensityFeature = new ContinuousFeature(encoder, propensityOutputField);
 

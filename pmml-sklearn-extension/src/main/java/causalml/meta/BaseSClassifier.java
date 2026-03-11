@@ -21,6 +21,7 @@ package causalml.meta;
 import java.util.Arrays;
 import java.util.List;
 
+import causalml.CausalMLUtil;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLObject;
@@ -64,7 +65,7 @@ public class BaseSClassifier extends BaseSLearner<Classifier> {
 			throw new EstimatorCastException(classifier, Arrays.asList(TreeClassifier.class, ForestClassifier.class));
 		}
 
-		Schema classifierSchema = toClassifierSchema(classifier, schema);
+		Schema classifierSchema = CausalMLUtil.toClassifierSchema(classifier, schema);
 
 		Model model = EstimatorUtil.encodeNativeLike(classifier, classifierSchema);
 

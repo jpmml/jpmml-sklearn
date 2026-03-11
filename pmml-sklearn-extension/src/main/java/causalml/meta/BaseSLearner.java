@@ -347,7 +347,7 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 		nullSegmentRemover.applyTo(controlModel);
 		nullSegmentRemover.applyTo(treatmentModel);
 
-		return encodeBinaryModel(controlModel, treatmentModel, schema);
+		return BaseLearnerUtil.encodeBinaryModel(controlModel, treatmentModel, schema);
 	}
 
 	public Map<String, E> getModels(){
