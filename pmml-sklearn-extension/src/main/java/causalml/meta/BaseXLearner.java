@@ -43,21 +43,26 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Estimator;
+import sklearn.Regressor;
 import sklearn.SkLearnMethods;
 
 abstract
-public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
+public class BaseXLearner extends BaseLearner<Regressor> {
 
 	public BaseXLearner(String module, String name){
 		super(module, name);
 	}
 
 	@Override
+	public Class<Regressor> getEstimatorClass(){
+		return Regressor.class;
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
 		List<String> treatmentGroups = getTreatmentGroups();
-		Map<String, E> controlEffectModels = getModelsTauC();
-		Map<String, E> treatmentEffectModels = getModelsTauT();
+		Map<String, Regressor> controlEffectModels = getModelsTauC();
+		Map<String, Regressor> treatmentEffectModels = getModelsTauT();
 		Map<String, PropensityModel> propensityModels = getPropensityModels();
 
 		Label label = schema.getLabel();
@@ -78,8 +83,8 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 
 			Model propensityModel = propensityEstimator.encode(treatmentGroup, propensitySchema);
 
-			E controlEffectEstimator = controlEffectModels.get(treatmentGroup);
-			E treatmentEffectEstimator = treatmentEffectModels.get(treatmentGroup);
+			Regressor controlEffectEstimator = controlEffectModels.get(treatmentGroup);
+			Regressor treatmentEffectEstimator = treatmentEffectModels.get(treatmentGroup);
 
 			Schema binarySchema = schema.toRelabeledSchema(continuousLabel);
 
@@ -122,11 +127,11 @@ public class BaseXLearner<E extends Estimator> extends BaseLearner<E> {
 		return MiningModelUtil.createModelChain(Arrays.asList(propensityModel, treatmentModel, controlModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
-	public Map<String, E> getModelsTauC(){
+	public Map<String, Regressor> getModelsTauC(){
 		return getModels("models_tau_c");
 	}
 
-	public Map<String, E> getModelsTauT(){
+	public Map<String, Regressor> getModelsTauT(){
 		return getModels("models_tau_t");
 	}
 
