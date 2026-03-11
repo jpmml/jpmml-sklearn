@@ -34,9 +34,9 @@ import sklearn.Classifier;
 import sklearn.Regressor;
 import sklearn.isotonic.IsotonicRegression;
 
-public class LogisticRegressionPropensityModel extends Regressor {
+public class PropensityModel extends Regressor {
 
-	public LogisticRegressionPropensityModel(String module, String name){
+	public PropensityModel(String module, String name){
 		super(module, name);
 	}
 

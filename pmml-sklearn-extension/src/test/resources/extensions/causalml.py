@@ -5,7 +5,7 @@ sys.path.append("../../../../pmml-sklearn/src/test/resources/")
 from common import *
 
 from causalml.inference.meta import BaseSClassifier, BaseSRegressor, BaseTClassifier, BaseTRegressor, BaseXClassifier, BaseXRegressor
-from causalml.propensity import LogisticRegressionPropensityModel
+from causalml.propensity import ElasticNetPropensityModel, LogisticRegressionPropensityModel
 from pandas import DataFrame, Series
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
@@ -127,6 +127,9 @@ def build_email_propensity(email_df, estimator, name):
 
 if "Email" in datasets:
 	email_df = load_csv("Email")
+
+	build_email_propensity(email_df, ElasticNetPropensityModel(calibrate = True), "ElasticNetPropensityModelIsotonicEmail")
+	build_email_propensity(email_df, ElasticNetPropensityModel(calibrate = False, clip_bounds = (0.05, 0.95)), "ElasticNetPropensityModelEmail")
 
 	build_email_propensity(email_df, LogisticRegressionPropensityModel(calibrate = True), "LogisticRegressionPropensityModelIsotonicEmail")
 	build_email_propensity(email_df, LogisticRegressionPropensityModel(calibrate = False, clip_bounds = (0.05, 0.95)), "LogisticRegressionPropensityModelEmail")

@@ -190,6 +190,7 @@
   * `causalml.inference.meta.BaseTRegressor`
   * `causalml.inference.meta.BaseXClassifier`
   * `causalml.inference.meta.BaseXRegressor`
+  * `causalml.propensity.ElasticNetPropensityModel`
   * `causalml.propensity.LogisticRegressionPropensityModel`
 </details>
 
