@@ -47,6 +47,12 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 		return getString("control_name");
 	}
 
+	public E getModel(String name){
+		Class<? extends E> estimatorClazz = getEstimatorClass();
+
+		return getEstimator(name, estimatorClazz);
+	}
+
 	public Map<String, E> getModels(String name){
 		Class<? extends E> estimatorClazz = getEstimatorClass();
 

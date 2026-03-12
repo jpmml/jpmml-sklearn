@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 import causalml.CausalMLUtil;
 import org.dmg.pmml.Model;
@@ -31,7 +30,6 @@ import org.dmg.pmml.Predicate;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 import sklearn.EstimatorCastException;
@@ -39,11 +37,9 @@ import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 import sklearn.ensemble.forest.ForestRegressor;
 import sklearn.ensemble.gradient_boosting.GradientBoostingRegressor;
-import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
-import sklearn.tree.TreeUtil;
 
-public class BaseSRegressor extends BaseSLearner<Regressor> implements HasTreeOptions {
+public class BaseSRegressor extends BaseSLearner<Regressor> {
 
 	public BaseSRegressor(String module, String name){
 		super(module, name);
@@ -190,27 +186,5 @@ public class BaseSRegressor extends BaseSLearner<Regressor> implements HasTreeOp
 	@Override
 	protected Model postOptimizeModel(Model model, String groupName){
 		return super.postOptimizeModel(model, groupName);
-	}
-
-	@Override
-	public Schema configureSchema(Schema schema){
-		Feature controlFeature = schema.getFeature(0);
-
-		Function<Feature, Feature> function = Function.identity();
-
-		Schema treeSchema = schema.toTransformedSchema(function);
-
-		treeSchema = TreeUtil.configureSchema(this, treeSchema);
-
-		// XXX
-		List<Feature> treeFeatures = (List<Feature>)treeSchema.getFeatures();
-		treeFeatures.set(0, controlFeature);
-
-		return treeSchema;
-	}
-
-	@Override
-	public Model configureModel(Model model){
-		return TreeUtil.configureModel(this, model);
 	}
 }

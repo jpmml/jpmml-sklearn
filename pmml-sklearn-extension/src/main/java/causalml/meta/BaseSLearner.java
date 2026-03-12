@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
 import org.dmg.pmml.MiningFunction;
@@ -49,9 +50,11 @@ import org.jpmml.converter.visitors.TreeModelPruner;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeUtil;
 
 abstract
-public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
+public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements HasTreeOptions {
 
 	public BaseSLearner(String module, String name){
 		super(module, name);
@@ -106,6 +109,40 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 		}
 
 		return BaseLearnerUtil.encodeModel(binaryModels);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		E estimator = getModel();
+
+		if(estimator instanceof HasTreeOptions){
+			Feature controlFeature = schema.getFeature(0);
+
+			Function<Feature, Feature> function = Function.identity();
+
+			Schema treeSchema = schema.toTransformedSchema(function);
+
+			treeSchema = TreeUtil.configureSchema(this, treeSchema);
+
+			// XXX
+			List<Feature> treeFeatures = (List<Feature>)treeSchema.getFeatures();
+			treeFeatures.set(0, controlFeature);
+
+			return treeSchema;
+		}
+
+		return super.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		E estimator = getModel();
+
+		if(estimator instanceof HasTreeOptions){
+			return TreeUtil.configureModel(this, model);
+		}
+
+		return super.configureModel(model);
 	}
 
 	protected MiningModel encodeBinaryModel(E estimator, String groupName, String controlName, Schema schema){
@@ -285,6 +322,10 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 		nullSegmentRemover.applyTo(model);
 
 		return model;
+	}
+
+	public E getModel(){
+		return getModel("model");
 	}
 
 	public Map<String, E> getModels(){
