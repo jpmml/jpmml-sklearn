@@ -73,7 +73,7 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 	}
 
 	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
-		return BaseLearnerUtil.encodeBinaryModel(controlModel, treatmentModel, schema);
+		return BaseLearnerUtil.encodeBinaryRegressor(controlModel, treatmentModel, schema);
 	}
 
 	public Map<String, E> getModelsC(){

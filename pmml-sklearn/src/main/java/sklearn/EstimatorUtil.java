@@ -198,6 +198,11 @@ public class EstimatorUtil {
 
 	static
 	public Model encodeNativeLike(Estimator estimator, Schema schema){
+		return encodeNativeLike(estimator, null, schema);
+	}
+
+	static
+	public Model encodeNativeLike(Estimator estimator, Object pmmlSegmentId, Schema schema){
 
 		if(estimator instanceof HasNativeConfiguration){
 			HasNativeConfiguration hasNativeConfiguration = (HasNativeConfiguration)estimator;
@@ -207,7 +212,13 @@ public class EstimatorUtil {
 			try {
 				estimator.setPMMLOptions(hasNativeConfiguration.getNativeConfiguration());
 
-				return estimator.encode(schema);
+				if(pmmlSegmentId != null){
+					return estimator.encode(pmmlSegmentId, schema);
+				} else
+
+				{
+					return estimator.encode(schema);
+				}
 			} finally {
 				estimator.setPMMLOptions(prevPmmlOptions);
 			}

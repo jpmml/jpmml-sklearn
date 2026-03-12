@@ -21,20 +21,26 @@ package causalml.meta;
 import java.util.Arrays;
 import java.util.List;
 
+import causalml.CausalMLUtil;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Target;
 import org.dmg.pmml.Targets;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.mining.Segmentation.MultipleModelMethod;
+import org.dmg.pmml.regression.RegressionModel;
+import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
+import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.converter.regression.RegressionModelUtil;
 
 public class BaseLearnerUtil {
 
@@ -42,7 +48,7 @@ public class BaseLearnerUtil {
 	}
 
 	static
-	public MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
+	public MiningModel encodeBinaryRegressor(Model controlModel, Model treatmentModel, Schema schema){
 		Targets targets = controlModel.getTargets();
 
 		if(targets != null){
@@ -72,6 +78,18 @@ public class BaseLearnerUtil {
 			.setSegmentation(MiningModelUtil.createSegmentation(MultipleModelMethod.SUM, Segmentation.MissingPredictionTreatment.RETURN_MISSING, Arrays.asList(treatmentModel, controlModel)));
 
 		return miningModel;
+	}
+
+	static
+	public MiningModel encodeBinaryClassifier(Model controlModel, Model treatmentModel, Schema schema){
+		ModelEncoder encoder = schema.getEncoder();
+
+		OutputField treatmentOutputField = CausalMLUtil.getProbabilityField(treatmentModel);
+		OutputField controlOutputField = CausalMLUtil.getProbabilityField(controlModel);
+
+		RegressionModel regressionModel = RegressionModelUtil.createRegression(Arrays.asList(new ContinuousFeature(encoder, treatmentOutputField), new ContinuousFeature(encoder, controlOutputField)), Arrays.asList(1, -1), null, RegressionModel.NormalizationMethod.NONE, schema);
+
+		return MiningModelUtil.createModelChain(Arrays.asList(treatmentModel, controlModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
 	}
 
 	static

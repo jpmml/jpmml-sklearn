@@ -19,20 +19,11 @@
 package causalml.meta;
 
 import java.util.Arrays;
-import java.util.List;
 
 import causalml.CausalMLUtil;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.PMMLObject;
-import org.dmg.pmml.ScoreDistribution;
-import org.dmg.pmml.Visitor;
 import org.dmg.pmml.mining.MiningModel;
-import org.dmg.pmml.tree.Node;
-import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
-import org.jpmml.model.UnsupportedElementException;
 import sklearn.Classifier;
 import sklearn.EstimatorCastException;
 import sklearn.EstimatorUtil;
@@ -67,99 +58,11 @@ public class BaseSClassifier extends BaseSLearner<Classifier> {
 
 		Schema classifierSchema = CausalMLUtil.toClassifierSchema(classifier, schema);
 
-		Model model = EstimatorUtil.encodeNativeLike(classifier, classifierSchema);
+		return EstimatorUtil.encodeNativeLike(classifier, role.getSegmentId(), classifierSchema);
+	}
 
-		Visitor visitor = new AbstractTreeModelTransformer(){
-
-			@Override
-			public void pushParent(PMMLObject object){
-				super.pushParent(object);
-
-				if(object instanceof MiningModel){
-					enterMiningModel((MiningModel)object);
-				}
-			}
-
-			@Override
-			public PMMLObject popParent(){
-				PMMLObject object = super.popParent();
-
-				if(object instanceof MiningModel){
-					exitMiningModel((MiningModel)object);
-				}
-
-				return object;
-			}
-
-			@Override
-			public void enterNode(Node node){
-			}
-
-			@Override
-			public void exitNode(Node node){
-				Object score = node.getScore();
-
-				if(node.hasNodes()){
-
-					if(score != null || node.hasScoreDistributions()){
-						throw new UnsupportedElementException(node);
-					}
-
-					node.setScore(0d);
-				} else
-
-				{
-					if(!node.hasScoreDistributions()){
-						throw new UnsupportedElementException(node);
-					}
-
-					Number recordCount = node.getRecordCount();
-					List<ScoreDistribution> scoreDistributions = node.getScoreDistributions();
-
-					if((recordCount.doubleValue() != 1d) || (scoreDistributions.size() != 2)){
-						throw new UnsupportedElementException(node);
-					}
-
-					ScoreDistribution eventScoreDistribution = scoreDistributions.get(1);
-
-					Number eventRecordCount = eventScoreDistribution.getRecordCount();
-					if(eventRecordCount == null){
-						throw new UnsupportedElementException(eventScoreDistribution);
-					}
-
-					node
-						.setScore(eventRecordCount.doubleValue())
-						.setRecordCount(null);
-
-					scoreDistributions.clear();
-				}
-			}
-
-			@Override
-			public void enterTreeModel(TreeModel treeModel){
-				super.enterTreeModel(treeModel);
-			}
-
-			@Override
-			public void exitTreeModel(TreeModel treeModel){
-				super.exitTreeModel(treeModel);
-
-				treeModel
-					.setMiningFunction(MiningFunction.REGRESSION)
-					.setOutput(null);
-			}
-
-			public void enterMiningModel(MiningModel miningModel){
-			}
-
-			public void exitMiningModel(MiningModel miningModel){
-				miningModel
-					.setMiningFunction(MiningFunction.REGRESSION)
-					.setOutput(null);
-			}
-		};
-		visitor.applyTo(model);
-
-		return model;
+	@Override
+	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
+		return BaseLearnerUtil.encodeBinaryClassifier(controlModel, treatmentModel, schema);
 	}
 }

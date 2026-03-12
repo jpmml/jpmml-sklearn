@@ -18,19 +18,10 @@
  */
 package causalml.meta;
 
-import java.util.Arrays;
-
 import causalml.CausalMLUtil;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.OutputField;
 import org.dmg.pmml.mining.MiningModel;
-import org.dmg.pmml.mining.Segmentation;
-import org.dmg.pmml.regression.RegressionModel;
-import org.jpmml.converter.ContinuousFeature;
-import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.Classifier;
 
 public class BaseTClassifier extends BaseTLearner<Classifier> {
@@ -53,13 +44,6 @@ public class BaseTClassifier extends BaseTLearner<Classifier> {
 
 	@Override
 	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
-		ModelEncoder encoder = schema.getEncoder();
-
-		OutputField treatmentOutputField = CausalMLUtil.getProbabilityField(treatmentModel);
-		OutputField controlOutputField = CausalMLUtil.getProbabilityField(controlModel);
-
-		RegressionModel regressionModel = RegressionModelUtil.createRegression(Arrays.asList(new ContinuousFeature(encoder, treatmentOutputField), new ContinuousFeature(encoder, controlOutputField)), Arrays.asList(1, -1), null, RegressionModel.NormalizationMethod.NONE, schema);
-
-		return MiningModelUtil.createModelChain(Arrays.asList(treatmentModel, controlModel, regressionModel), Segmentation.MissingPredictionTreatment.RETURN_MISSING);
+		return BaseLearnerUtil.encodeBinaryClassifier(controlModel, treatmentModel, schema);
 	}
 }

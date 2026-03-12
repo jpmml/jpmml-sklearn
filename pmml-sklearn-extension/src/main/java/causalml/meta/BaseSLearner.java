@@ -19,20 +19,19 @@
 package causalml.meta;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 import causalml.meta.visitors.TreeModelGroupActivator;
+import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
 import org.dmg.pmml.VisitorAction;
+import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.Node;
@@ -46,7 +45,6 @@ import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.UnsupportedFeatureException;
-import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
 import org.jpmml.converter.visitors.TreeModelPruner;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
@@ -110,115 +108,22 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 		return BaseLearnerUtil.encodeModel(binaryModels);
 	}
 
-	protected Model encodeBinaryModel(E estimator, String groupName, String controlName, Schema schema){
+	protected MiningModel encodeBinaryModel(E estimator, String groupName, String controlName, Schema schema){
 		Model controlModel = encodeEstimator(Role.CONTROL, estimator, schema);
 		Model treatmentModel = encodeEstimator(Role.TREATMENT, estimator, schema);
 
-		Visitor nullBranchMarker = new AbstractTreeModelTransformer(){
+		controlModel = optimizeControlModel(controlModel, groupName, controlName);
+		treatmentModel = optimizeTreatmentModel(treatmentModel, groupName, controlName);
 
-			private Set<Node> vitalNodes = new HashSet<>();
+		return encodeBinaryModel(controlModel, treatmentModel, schema);
+	}
 
+	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
+		return BaseLearnerUtil.encodeBinaryRegressor(controlModel, treatmentModel, schema);
+	}
 
-			@Override
-			public void enterNode(Node node){
-				Number recordCount = node.getRecordCount();
-
-				if(recordCount != null){
-					node.setRecordCount(null);
-				}
-			}
-
-			@Override
-			public void exitNode(Node node){
-				Predicate predicate = node.requirePredicate();
-
-				if(hasFieldReference(predicate, groupName)){
-					this.vitalNodes.add(node);
-				} // End if
-
-				if(this.vitalNodes.contains(node)){
-					Node parentNode = getParentNode();
-
-					if(parentNode != null){
-						this.vitalNodes.add(parentNode);
-					}
-
-					return;
-				}
-
-				Node treatmentAncestor = getAncestorNode(parentNode -> hasFieldReference(parentNode.requirePredicate(), groupName));
-				if(treatmentAncestor == null){
-					node.setScore(0d);
-				}
-			}
-
-			@Override
-			public void enterTreeModel(TreeModel treeModel){
-				super.enterTreeModel(treeModel);
-			}
-
-			@Override
-			public void exitTreeModel(TreeModel treeModel){
-				super.exitTreeModel(treeModel);
-
-				this.vitalNodes.clear();
-			}
-		};
-		nullBranchMarker.applyTo(controlModel);
-		nullBranchMarker.applyTo(treatmentModel);
-
-		Visitor branchPruner = new AbstractTreeModelTransformer(){
-
-			@Override
-			public void exitNode(Node node){
-				Object defaultChild = node.getDefaultChild();
-				Object score = node.getScore();
-
-				if(node.hasNodes()){
-					List<Node> children = node.getNodes();
-
-					Object childScore = getConstantScore(children);
-					if(Objects.equals(score, childScore)){
-
-						if(defaultChild != null){
-							node.setDefaultChild(null);
-						}
-
-						children.clear();
-					}
-				}
-			}
-
-			private Object getConstantScore(List<Node> nodes){
-				Object result = null;
-
-				for(Node node : nodes){
-					Object score = node.getScore();
-
-					if(node.hasNodes()){
-						return null;
-					} // End if
-
-					if(score == null){
-						return null;
-					} // End if
-
-					if(result == null){
-						result = score;
-					} else
-
-					{
-						if(!Objects.equals(score, result)){
-							return null;
-						}
-					}
-				}
-
-				return result;
-			}
-		};
-		branchPruner.applyTo(controlModel);
-		branchPruner.applyTo(treatmentModel);
+	protected Model optimizeControlModel(Model model, String groupName, String controlName){
+		model = preOptimizeModel(model, groupName);
 
 		Visitor controlActivator = new TreeModelGroupActivator(){
 
@@ -239,7 +144,15 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 				return null;
 			}
 		};
-		controlActivator.applyTo(controlModel);
+		controlActivator.applyTo(model);
+
+		model = postOptimizeModel(model, groupName);
+
+		return model;
+	}
+
+	protected Model optimizeTreatmentModel(Model model, String groupName, String controlName){
+		model = preOptimizeModel(model, groupName);
 
 		Visitor treatmentActivator = new TreeModelGroupActivator(){
 
@@ -260,9 +173,22 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 				return null;
 			}
 		};
-		treatmentActivator.applyTo(treatmentModel);
+		treatmentActivator.applyTo(model);
 
+		model = postOptimizeModel(model, groupName);
+
+		return model;
+	}
+
+	protected Model preOptimizeModel(Model model, String groupName){
+		return model;
+	}
+
+	protected Model postOptimizeModel(Model model, String groupName){
 		Visitor nodePruner = new TreeModelPruner(){
+
+			private MiningFunction miningFunction = null;
+
 
 			@Override
 			public void exitNode(Node node){
@@ -281,9 +207,16 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 
 							if(defaultChild != null){
 								node.setDefaultChild(null);
+							} // End if
+
+							if(miningFunction == MiningFunction.REGRESSION){
+								initScore(node, child);
+							} else
+
+							if(miningFunction == MiningFunction.CLASSIFICATION){
+								initScoreDistribution(node, child);
 							}
 
-							initScore(node, child);
 							initDefaultChild(node, child);
 							replaceChildWithGrandchildren(node, child);
 
@@ -294,9 +227,22 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 
 				super.exitNode(node);
 			}
+
+			@Override
+			public void enterTreeModel(TreeModel treeModel){
+				super.enterTreeModel(treeModel);
+
+				this.miningFunction = treeModel.requireMiningFunction();
+			}
+
+			@Override
+			public void exitTreeModel(TreeModel treeModel){
+				super.exitTreeModel(treeModel);
+
+				this.miningFunction = null;
+			}
 		};
-		nodePruner.applyTo(controlModel);
-		nodePruner.applyTo(treatmentModel);
+		nodePruner.applyTo(model);
 
 		Visitor nullSegmentRemover = new AbstractVisitor(){
 
@@ -336,10 +282,9 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> {
 				return false;
 			}
 		};
-		nullSegmentRemover.applyTo(controlModel);
-		nullSegmentRemover.applyTo(treatmentModel);
+		nullSegmentRemover.applyTo(model);
 
-		return BaseLearnerUtil.encodeBinaryModel(controlModel, treatmentModel, schema);
+		return model;
 	}
 
 	public Map<String, E> getModels(){
