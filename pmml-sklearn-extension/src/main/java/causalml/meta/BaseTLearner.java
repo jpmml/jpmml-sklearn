@@ -43,14 +43,14 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> implements
 	@Override
 	public Model encodeModel(Schema schema){
 		List<String> treatmentGroups = getTreatmentGroups();
-		Map<String, E> controlModels = getModelsC();
-		Map<String, E> treatmentModels = getModelsT();
+		Map<String, E> modelsC = getModelsC();
+		Map<String, E> modelsT = getModelsT();
 
 		Label label = schema.getLabel();
 
 		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
 
-		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, treatmentModels.entrySet(), controlModels.entrySet());
+		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelsT.entrySet(), modelsC.entrySet());
 
 		List<Model> binaryModels = new ArrayList<>();
 
@@ -58,8 +58,8 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> implements
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
 			String treatmentGroup = treatmentGroups.get(i);
 
-			E controlEstimator = controlModels.get(treatmentGroup);
-			E treatmentEstimator = treatmentModels.get(treatmentGroup);
+			E controlEstimator = modelsC.get(treatmentGroup);
+			E treatmentEstimator = modelsT.get(treatmentGroup);
 
 			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 

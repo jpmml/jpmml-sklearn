@@ -61,15 +61,15 @@ public class BaseXLearner extends BaseLearner<Regressor> {
 	@Override
 	public Model encodeModel(Schema schema){
 		List<String> treatmentGroups = getTreatmentGroups();
-		Map<String, Regressor> controlEffectModels = getModelsTauC();
-		Map<String, Regressor> treatmentEffectModels = getModelsTauT();
+		Map<String, Regressor> modelsTauC = getModelsTauC();
+		Map<String, Regressor> modelsTauT = getModelsTauT();
 		Map<String, PropensityModel> propensityModels = getPropensityModels();
 
 		Label label = schema.getLabel();
 
 		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
 
-		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, treatmentEffectModels.entrySet(), controlEffectModels.entrySet(), propensityModels.entrySet());
+		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelsTauT.entrySet(), modelsTauC.entrySet(), propensityModels.entrySet());
 
 		List<Model> binaryModels = new ArrayList<>();
 
@@ -83,13 +83,13 @@ public class BaseXLearner extends BaseLearner<Regressor> {
 
 			Model propensityModel = propensityEstimator.encode(treatmentGroup, propensitySchema);
 
-			Regressor controlEffectEstimator = controlEffectModels.get(treatmentGroup);
-			Regressor treatmentEffectEstimator = treatmentEffectModels.get(treatmentGroup);
+			Regressor controlEffectRegressor = modelsTauC.get(treatmentGroup);
+			Regressor treatmentEffectRegressor = modelsTauT.get(treatmentGroup);
 
 			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model controlEffectModel = encodeEstimator(Role.CONTROL, controlEffectEstimator, segmentSchema);
-			Model treatmentEffectModel = encodeEstimator(Role.TREATMENT, treatmentEffectEstimator, segmentSchema);
+			Model controlEffectModel = encodeEstimator(Role.CONTROL, controlEffectRegressor, segmentSchema);
+			Model treatmentEffectModel = encodeEstimator(Role.TREATMENT, treatmentEffectRegressor, segmentSchema);
 
 			Model binaryModel = encodeBinaryModel(treatmentGroup, propensityModel, controlEffectModel, treatmentEffectModel, segmentSchema);
 

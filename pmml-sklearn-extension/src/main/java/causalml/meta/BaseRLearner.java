@@ -62,11 +62,11 @@ public class BaseRLearner extends BaseLearner<Regressor> implements HasTreeOptio
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
 			String treatmentGroup = treatmentGroups.get(i);
 
-			Regressor effectEstimator = modelsTau.get(treatmentGroup);
+			Regressor effectRegressor = modelsTau.get(treatmentGroup);
 
 			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model effectModel = EstimatorUtil.encodeNativeLike(effectEstimator, segmentSchema);
+			Model effectModel = EstimatorUtil.encodeNativeLike(effectRegressor, segmentSchema);
 
 			effectModels.add(effectModel);
 		}
