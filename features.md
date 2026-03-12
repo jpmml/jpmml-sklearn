@@ -184,18 +184,18 @@
 
   Examples: [extensions/causalml.py](https://github.com/jpmml/jpmml-sklearn/blob/master/pmml-sklearn-extension/src/test/resources/extensions/causalml.py)
 
-  * `causalml.inference.meta.BaseRClassifier`
-  * `causalml.inference.meta.BaseRRegressor`
-  * `causalml.inference.meta.BaseSClassifier`
-  * `causalml.inference.meta.BaseSRegressor`
-  * `causalml.inference.meta.BaseTClassifier`
-  * `causalml.inference.meta.BaseTRegressor`
-  * `causalml.inference.meta.BaseXClassifier`
-  * `causalml.inference.meta.BaseXRegressor`
-  * `causalml.inference.meta.XGBRRegressor`
-  * `causalml.inference.meta.XGBTRegressor`
-  * `causalml.propensity.ElasticNetPropensityModel`
-  * `causalml.propensity.LogisticRegressionPropensityModel`
+  * [`causalml.inference.meta.BaseRClassifier`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseRClassifier)
+  * [`causalml.inference.meta.BaseRRegressor`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseRRegressor)
+  * [`causalml.inference.meta.BaseSClassifier`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseSClassifier)
+  * [`causalml.inference.meta.BaseSRegressor`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseSRegressor)
+  * [`causalml.inference.meta.BaseTClassifier`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseTClassifier)
+  * [`causalml.inference.meta.BaseTRegressor`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseTRegressor)
+  * [`causalml.inference.meta.BaseXClassifier`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseXClassifier)
+  * [`causalml.inference.meta.BaseXRegressor`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.BaseXRegressor)
+  * [`causalml.inference.meta.XGBRRegressor`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.XGBRRegressor)
+  * [`causalml.inference.meta.XGBTRegressor`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.inference.meta.XGBTRegressor)
+  * [`causalml.propensity.ElasticNetPropensityModel`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.propensity.ElasticNetPropensityModel)
+  * [`causalml.propensity.LogisticRegressionPropensityModel`](https://causalml.readthedocs.io/en/stable/causalml.html#causalml.propensity.LogisticRegressionPropensityModel)
 </details>
 
 <details>
