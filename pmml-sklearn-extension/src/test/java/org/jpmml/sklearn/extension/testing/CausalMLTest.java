@@ -52,7 +52,7 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements SkLearnAlgo
 			public List<Map<String, Object>> getOptionsMatrix(){
 				String algorithm = getAlgorithm();
 
-				if((algorithm.endsWith("SClassifier") || algorithm.endsWith("SRegressor")) || (algorithm.endsWith("TClassifier") || algorithm.endsWith("TRegressor"))){
+				if((algorithm.endsWith("RClassifier") || algorithm.endsWith("RRegressor")) || (algorithm.endsWith("SClassifier") || algorithm.endsWith("SRegressor")) || (algorithm.endsWith("TClassifier") || algorithm.endsWith("TRegressor"))){
 					Map<String, Object> options = new LinkedHashMap<>();
 					options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
 

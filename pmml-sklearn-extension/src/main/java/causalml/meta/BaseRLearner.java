@@ -28,10 +28,13 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import sklearn.EstimatorUtil;
 import sklearn.Regressor;
+import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeUtil;
 
 abstract
-public class BaseRLearner extends BaseLearner<Regressor> {
+public class BaseRLearner extends BaseLearner<Regressor> implements HasTreeOptions {
 
 	public BaseRLearner(String module, String name){
 		super(module, name);
@@ -45,13 +48,13 @@ public class BaseRLearner extends BaseLearner<Regressor> {
 	@Override
 	public Model encodeModel(Schema schema){
 		List<String> treatmentGroups = getTreatmentGroups();
-		Map<String, Regressor> modelTau = getModelTau();
+		Map<String, Regressor> modelsTau = getModelsTau();
 
 		Label label = schema.getLabel();
 
 		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
 
-		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelTau.entrySet());
+		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelsTau.entrySet());
 
 		List<Model> effectModels = new ArrayList<>();
 
@@ -59,11 +62,11 @@ public class BaseRLearner extends BaseLearner<Regressor> {
 			ContinuousLabel continuousLabel = continuousLabels.get(i);
 			String treatmentGroup = treatmentGroups.get(i);
 
-			Regressor effectEstimator = modelTau.get(treatmentGroup);
+			Regressor effectEstimator = modelsTau.get(treatmentGroup);
 
 			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model effectModel = effectEstimator.encode(segmentSchema);
+			Model effectModel = EstimatorUtil.encodeNativeLike(effectEstimator, segmentSchema);
 
 			effectModels.add(effectModel);
 		}
@@ -71,7 +74,37 @@ public class BaseRLearner extends BaseLearner<Regressor> {
 		return BaseLearnerUtil.encodeModel(effectModels);
 	}
 
-	public Map<String, Regressor> getModelTau(){
+	@Override
+	public Schema configureSchema(Schema schema){
+
+		if(hasTreeOptions()){
+			return TreeUtil.configureSchema(this, schema);
+		}
+
+		return super.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+
+		if(hasTreeOptions()){
+			return TreeUtil.configureModel(this, model);
+		}
+
+		return super.configureModel(model);
+	}
+
+	protected boolean hasTreeOptions(){
+		Regressor modelTau = getModelTau();
+
+		return (modelTau instanceof HasTreeOptions);
+	}
+
+	public Regressor getModelTau(){
+		return getModel("model_tau");
+	}
+
+	public Map<String, Regressor> getModelsTau(){
 		return getModels("models_tau");
 	}
 }

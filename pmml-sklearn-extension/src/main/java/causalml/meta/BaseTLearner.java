@@ -99,10 +99,10 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> implements
 	}
 
 	protected boolean hasTreeOptions(){
-		E controlModel = getModelC();
-		E treatmentModel = getModelT();
+		E modelC = getModelC();
+		E modelT = getModelT();
 
-		return ((controlModel instanceof HasTreeOptions) && (treatmentModel instanceof HasTreeOptions));
+		return ((modelC instanceof HasTreeOptions) && (modelT instanceof HasTreeOptions));
 	}
 
 	public E getModelC(){
