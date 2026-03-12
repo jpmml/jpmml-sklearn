@@ -30,9 +30,11 @@ import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.tree.HasTreeOptions;
+import sklearn.tree.TreeUtil;
 
 abstract
-public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
+public class BaseTLearner<E extends Estimator> extends BaseLearner<E> implements HasTreeOptions {
 
 	public BaseTLearner(String module, String name){
 		super(module, name);
@@ -72,8 +74,43 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> {
 		return BaseLearnerUtil.encodeModel(binaryModels);
 	}
 
+	@Override
+	public Schema configureSchema(Schema schema){
+
+		if(hasTreeOptions()){
+			return TreeUtil.configureSchema(this, schema);
+		}
+
+		return super.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+
+		if(hasTreeOptions()){
+			return TreeUtil.configureModel(this, model);
+		}
+
+		return super.configureModel(model);
+	}
+
 	protected MiningModel encodeBinaryModel(Model controlModel, Model treatmentModel, Schema schema){
 		return BaseLearnerUtil.encodeBinaryRegressor(controlModel, treatmentModel, schema);
+	}
+
+	protected boolean hasTreeOptions(){
+		E controlModel = getModelC();
+		E treatmentModel = getModelT();
+
+		return ((controlModel instanceof HasTreeOptions) && (treatmentModel instanceof HasTreeOptions));
+	}
+
+	public E getModelC(){
+		return getModel("model_c");
+	}
+
+	public E getModelT(){
+		return getModel("model_t");
 	}
 
 	public Map<String, E> getModelsC(){

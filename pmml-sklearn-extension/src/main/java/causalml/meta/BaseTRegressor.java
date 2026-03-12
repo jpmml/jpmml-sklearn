@@ -21,6 +21,7 @@ package causalml.meta;
 import causalml.CausalMLUtil;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
+import sklearn.EstimatorUtil;
 import sklearn.Regressor;
 
 public class BaseTRegressor extends BaseTLearner<Regressor> {
@@ -38,6 +39,6 @@ public class BaseTRegressor extends BaseTLearner<Regressor> {
 	public Model encodeEstimator(Role role, Regressor regressor, Schema schema){
 		Schema regressorSchema = CausalMLUtil.toRegressorSchema(regressor, schema);
 
-		return regressor.encode(regressorSchema);
+		return EstimatorUtil.encodeNativeLike(regressor, regressorSchema);
 	}
 }

@@ -23,6 +23,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.EstimatorUtil;
 
 public class BaseTClassifier extends BaseTLearner<Classifier> {
 
@@ -39,7 +40,7 @@ public class BaseTClassifier extends BaseTLearner<Classifier> {
 	public Model encodeEstimator(Role role, Classifier classifier, Schema schema){
 		Schema classifierSchema = CausalMLUtil.toClassifierSchema(classifier, schema);
 
-		return classifier.encode(role.getSegmentId(), classifierSchema);
+		return EstimatorUtil.encodeNativeLike(classifier, role.getSegmentId(), classifierSchema);
 	}
 
 	@Override

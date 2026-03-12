@@ -113,9 +113,8 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 
 	@Override
 	public Schema configureSchema(Schema schema){
-		E estimator = getModel();
 
-		if(estimator instanceof HasTreeOptions){
+		if(hasTreeOptions()){
 			Feature controlFeature = schema.getFeature(0);
 
 			Function<Feature, Feature> function = Function.identity();
@@ -136,9 +135,8 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 
 	@Override
 	public Model configureModel(Model model){
-		E estimator = getModel();
 
-		if(estimator instanceof HasTreeOptions){
+		if(hasTreeOptions()){
 			return TreeUtil.configureModel(this, model);
 		}
 
@@ -322,6 +320,12 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 		nullSegmentRemover.applyTo(model);
 
 		return model;
+	}
+
+	protected boolean hasTreeOptions(){
+		E model = getModel();
+
+		return (model instanceof HasTreeOptions);
 	}
 
 	public E getModel(){
