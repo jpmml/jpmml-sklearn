@@ -21,7 +21,7 @@ from sklearn.linear_model import ARDRegression, BayesianRidge, ElasticNet, Elast
 from sklearn.model_selection import FixedThresholdClassifier, GridSearchCV, RandomizedSearchCV, TunedThresholdClassifierCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.multioutput import ClassifierChain, MultiOutputClassifier, MultiOutputRegressor, RegressorChain
-from sklearn.naive_bayes import CategoricalNB, BernoulliNB, GaussianNB, MultinomialNB
+from sklearn.naive_bayes import BernoulliNB, CategoricalNB, ComplementNB, GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, NearestCentroid, NearestNeighbors
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import make_pipeline
@@ -770,10 +770,13 @@ def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
 if "Sentiment" in datasets:
 	sentiment_df = load_sentiment("Sentiment")
 
-	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0, force_alpha = True), "CategoricalNBSentiment")
-	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0.75), "CategoricalNBSmoothSentiment")
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment")
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0.75), "BernoulliNBSmoothSentiment")
+	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0, force_alpha = True), "CategoricalNBSentiment")
+	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0.75), "CategoricalNBSmoothSentiment")
+	# XXX
+	#build_sentiment_nb(sentiment_df, ComplementNB(alpha = 0, force_alpha = True), "ComplementNBSentiment")
+	build_sentiment_nb(sentiment_df, ComplementNB(alpha = 0.75), "ComplementNBSmoothSentiment")
 	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 1e-5, force_alpha = True), "MultinomialNBSentiment")
 	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 0.75), "MultinomialNBSmoothSentiment")
 

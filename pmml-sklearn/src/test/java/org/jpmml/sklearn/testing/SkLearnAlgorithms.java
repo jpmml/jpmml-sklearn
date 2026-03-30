@@ -25,6 +25,7 @@ public interface SkLearnAlgorithms {
 	String BAYESIAN_ARD = "Bayesian" + ARD;
 	String BERNOULLI_NB = "BernoulliNB";
 	String CATEGORICAL_NB = "CategoricalNB";
+	String COMPLEMENT_NB = "ComplementNB";
 	String CQR = "CQR";
 	String DECISION_TREE = "DecisionTree";
 	String TRANSFORMED_DECISION_TREE = "Transformed" + DECISION_TREE;

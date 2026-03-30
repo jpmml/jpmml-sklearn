@@ -59,21 +59,6 @@ public class MultinomialNB extends SkLearnClassifier {
 		List<Number> classLogPrior = getClassLogPrior();
 		List<Number> featureLogProb = getFeatureLogProb();
 
-		Function<Number, Number> function = new Function<Number, Number>(){
-
-			@Override
-			public Number apply(Number value){
-
-				if(value.doubleValue() == Double.NEGATIVE_INFINITY){
-					return null;
-				}
-
-				return value;
-			}
-		};
-
-		featureLogProb = Lists.transform(featureLogProb, function);
-
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
 			.expectCardinality(numberOfClasses);
 		List<? extends Feature> features = schema.getFeatures();
@@ -81,7 +66,7 @@ public class MultinomialNB extends SkLearnClassifier {
 		List<RegressionTable> regressionTables = new ArrayList<>();
 
 		for(int i = 0; i < numberOfClasses; i++){
-			List<Number> coefficients = CMatrixUtil.getRow(featureLogProb, numberOfClasses, numberOfFeatures, i);
+			List<Number> coefficients = getCoefficients(featureLogProb, i, numberOfClasses, numberOfFeatures);
 			Number intercept = classLogPrior.get(i);
 
 			RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, coefficients, intercept)
@@ -96,6 +81,25 @@ public class MultinomialNB extends SkLearnClassifier {
 		encodePredictProbaOutput(regressionModel, DataType.DOUBLE, categoricalLabel);
 
 		return regressionModel;
+	}
+
+	protected List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
+		List<Number> coefficients = CMatrixUtil.getRow(featureLogProb, numberOfClasses, numberOfFeatures, index);
+
+		Function<Number, Number> function = new Function<Number, Number>(){
+
+			@Override
+			public Number apply(Number value){
+
+				if(value.doubleValue() == Double.NEGATIVE_INFINITY){
+					return null;
+				}
+
+				return value;
+			}
+		};
+
+		return Lists.transform(coefficients, function);
 	}
 
 	public List<Number> getClassLogPrior(){
