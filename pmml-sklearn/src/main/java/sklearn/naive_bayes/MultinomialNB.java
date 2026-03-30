@@ -18,72 +18,20 @@
  */
 package sklearn.naive_bayes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
-import org.dmg.pmml.Model;
-import org.dmg.pmml.regression.RegressionModel;
-import org.dmg.pmml.regression.RegressionTable;
 import org.jpmml.converter.CMatrixUtil;
-import org.jpmml.converter.CategoricalLabel;
-import org.jpmml.converter.Feature;
-import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.Schema;
-import org.jpmml.converter.regression.RegressionModelUtil;
-import sklearn.SkLearnClassifier;
 
-public class MultinomialNB extends SkLearnClassifier {
+public class MultinomialNB extends ContinuousNB {
 
 	public MultinomialNB(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public int getNumberOfFeatures(){
-		int[] shape = getFeatureCountShape();
-
-		return shape[1];
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		int[] shape = getFeatureCountShape();
-
-		int numberOfClasses = shape[0];
-		int numberOfFeatures = shape[1];
-
-		List<Number> classLogPrior = getClassLogPrior();
-		List<Number> featureLogProb = getFeatureLogProb();
-
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
-			.expectCardinality(numberOfClasses);
-		List<? extends Feature> features = schema.getFeatures();
-
-		List<RegressionTable> regressionTables = new ArrayList<>();
-
-		for(int i = 0; i < numberOfClasses; i++){
-			List<Number> coefficients = getCoefficients(featureLogProb, i, numberOfClasses, numberOfFeatures);
-			Number intercept = classLogPrior.get(i);
-
-			RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, coefficients, intercept)
-				.setTargetCategory(categoricalLabel.getValue(i));
-
-			regressionTables.add(regressionTable);
-		}
-
-		RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), regressionTables)
-			.setNormalizationMethod(RegressionModel.NormalizationMethod.SOFTMAX);
-
-		encodePredictProbaOutput(regressionModel, DataType.DOUBLE, categoricalLabel);
-
-		return regressionModel;
-	}
-
-	protected List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
+	public List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
 		List<Number> coefficients = CMatrixUtil.getRow(featureLogProb, numberOfClasses, numberOfFeatures, index);
 
 		Function<Number, Number> function = new Function<Number, Number>(){
@@ -100,17 +48,5 @@ public class MultinomialNB extends SkLearnClassifier {
 		};
 
 		return Lists.transform(coefficients, function);
-	}
-
-	public List<Number> getClassLogPrior(){
-		return getNumberArray("class_log_prior_");
-	}
-
-	public int[] getFeatureCountShape(){
-		return getArrayShape("feature_count_", 2);
-	}
-
-	public List<Number> getFeatureLogProb(){
-		return getNumberArray("feature_log_prob_");
 	}
 }

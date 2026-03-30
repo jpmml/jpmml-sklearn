@@ -25,14 +25,14 @@ import com.google.common.collect.Lists;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ValueUtil;
 
-public class ComplementNB extends MultinomialNB {
+public class ComplementNB extends ContinuousNB {
 
 	public ComplementNB(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	protected List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
+	public List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
 		int complementIndex = (numberOfClasses - 1) - index;
 
 		List<Number> coefficients = CMatrixUtil.getRow(featureLogProb, numberOfClasses, numberOfFeatures, complementIndex);
