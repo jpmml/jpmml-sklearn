@@ -1,3 +1,4 @@
 CHAID==5.4.2
 numpy==2.4.1
+nltk==3.9.4
 pandas==3.0.0

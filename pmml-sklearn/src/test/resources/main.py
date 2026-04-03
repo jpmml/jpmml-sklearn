@@ -1,6 +1,7 @@
 from common import *
 
 from lxml import etree
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from pandas import CategoricalDtype, DataFrame, Series
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -42,6 +43,7 @@ from sklearn2pmml.util import Slicer
 from sklearn_pandas import CategoricalImputer, DataFrameMapper
 from xgboost.sklearn import XGBClassifier, XGBRegressor, XGBRFClassifier
 
+import nltk
 import numpy
 import pandas
 import sys
@@ -757,7 +759,7 @@ def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
 		store_pkl(pipeline, name)
 	score = DataFrame(pipeline.predict(sentiment_X), columns = ["Score"])
 	if with_proba:
-		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability(0)", "probability(1)"])
+		score_proba = DataFrame(pipeline.predict_proba(sentiment_X), columns = ["probability({})".format(label) for label in classifier.classes_])
 		score = pandas.concat((score, score_proba), axis = 1)
 	if isinstance(classifier, CategoricalNB):
 		fitted_steps = pipeline.steps
@@ -770,14 +772,38 @@ def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
 if "Sentiment" in datasets:
 	sentiment_df = load_sentiment("Sentiment")
 
+	nltk.download("vader_lexicon", quiet = True)
+
+	sentiment_analyzer = SentimentIntensityAnalyzer()
+
+	def vader_binary_label(text):
+		score = sentiment_analyzer.polarity_scores(text)["compound"]
+		if score >= 0:
+			return "positive"
+		else:
+			return "negative"
+
+	sentiment_df["Score"] = sentiment_df["Sentence"].apply(vader_binary_label)
+
 	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment")
-	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0.75), "BernoulliNBSmoothSentiment")
 	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0, force_alpha = True), "CategoricalNBSentiment")
-	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0.75), "CategoricalNBSmoothSentiment")
-	# XXX
-	#build_sentiment_nb(sentiment_df, ComplementNB(alpha = 0, force_alpha = True), "ComplementNBSentiment")
-	build_sentiment_nb(sentiment_df, ComplementNB(alpha = 0.75), "ComplementNBSmoothSentiment")
+	build_sentiment_nb(sentiment_df, ComplementNB(alpha = 1e-5, force_alpha = True), "ComplementNBSentiment")
 	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 1e-5, force_alpha = True), "MultinomialNBSentiment")
+
+	def vader_multiclass_label(text):
+		score = sentiment_analyzer.polarity_scores(text)["compound"]
+		if score >= 0.05:
+			return "positive"
+		elif score <= -0.05:
+			return "negative"
+		else:
+			return "neutral"
+
+	sentiment_df["Score"] = sentiment_df["Sentence"].apply(vader_multiclass_label)
+
+	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0.75), "BernoulliNBSmoothSentiment")
+	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0.75), "CategoricalNBSmoothSentiment")
+	build_sentiment_nb(sentiment_df, ComplementNB(alpha = 0.75), "ComplementNBSmoothSentiment")
 	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 0.75), "MultinomialNBSmoothSentiment")
 
 #
