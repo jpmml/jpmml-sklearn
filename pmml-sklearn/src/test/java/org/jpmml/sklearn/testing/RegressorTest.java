@@ -296,6 +296,16 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluatePLSRegressionAuto() throws Exception {
+		evaluate(PLS_REGRESSION, AUTO);
+	}
+
+	@Test
+	public void evaluateMultiPLSRegressionAuto() throws Exception {
+		evaluate(MULTI_PLS_REGRESSION, AUTO);
+	}
+
+	@Test
 	public void evaluateRandomForestAuto() throws Exception {
 		evaluate(RANDOM_FOREST, AUTO);
 	}

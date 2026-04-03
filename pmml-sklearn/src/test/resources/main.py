@@ -6,6 +6,7 @@ from pandas import CategoricalDtype, DataFrame, Series
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import IncrementalPCA, PCA, TruncatedSVD
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier, DummyRegressor
@@ -914,6 +915,7 @@ if "Auto" in datasets:
 	build_auto(auto_df, LinearRegression(), "LinearRegressionAuto")
 	build_auto(auto_df, BaggingRegressor(LinearRegression(), max_features = 0.75, random_state = 13), "LinearRegressionEnsembleAuto")
 	build_auto(auto_df, OrthogonalMatchingPursuitCV(cv = 3), "OMPAuto")
+	build_auto(auto_df, PLSRegression(), "PLSRegressionAuto")
 	build_auto(auto_df, QuantileRegressor(quantile = 0.65), "CQRAuto")
 	build_auto(auto_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuto", flat = True)
 	build_auto(auto_df, RidgeCV(), "RidgeAuto")
@@ -1146,6 +1148,7 @@ if "Auto" in datasets:
 	build_multi_auto(auto_df, KNeighborsRegressor(algorithm = "brute"), "MultiKNNAuto", with_kneighbors = True)
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
+	build_multi_auto(auto_df, PLSRegression(n_components = 3), "MultiPLSRegressionAuto")
 	build_multi_auto(auto_df, RegressorChain(LinearRegression()), "LinearRegressionChainAuto")
 
 def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_options):

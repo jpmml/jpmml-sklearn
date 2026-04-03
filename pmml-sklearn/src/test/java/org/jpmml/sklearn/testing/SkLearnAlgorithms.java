@@ -74,6 +74,8 @@ public interface SkLearnAlgorithms {
 	String ONE_CLASS_SVM = "OneClassSVM";
 	String ONE_VS_REST = "OneVsRest";
 	String PERCEPTRON = "Perceptron";
+	String PLS_REGRESSION = "PLSRegression";
+	String MULTI_PLS_REGRESSION = "Multi" + PLS_REGRESSION;
 	String POISSON_REGRESSION = "PoissonRegression";
 	String RANDOM_FOREST = "RandomForest";
 	String RIDGE = "Ridge";
