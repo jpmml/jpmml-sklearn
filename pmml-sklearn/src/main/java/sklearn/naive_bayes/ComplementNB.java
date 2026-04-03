@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.ValueUtil;
 
 public class ComplementNB extends ContinuousNB {
@@ -32,24 +31,29 @@ public class ComplementNB extends ContinuousNB {
 	}
 
 	@Override
-	public List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
-		int complementIndex = (numberOfClasses - 1) - index;
+	protected List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
 
-		List<Number> coefficients = CMatrixUtil.getRow(featureLogProb, numberOfClasses, numberOfFeatures, complementIndex);
+		if(numberOfClasses == 2){
+			int complementIndex = (index == 0) ? 1 : 0;
 
-		Function<Number, Number> function = new Function<Number, Number>(){
+			Function<Number, Number> function = new Function<Number, Number>(){
 
-			@Override
-			public Number apply(Number value){
-
-				if(value.doubleValue() == Double.POSITIVE_INFINITY){
-					return null;
+				@Override
+				public Number apply(Number value){
+					return (Number)ValueUtil.toNegative(value);
 				}
+			};
 
-				return (Number)ValueUtil.toNegative(value);
-			}
-		};
+			return super.getCoefficients(Lists.transform(featureLogProb, function), complementIndex, numberOfClasses, numberOfFeatures);
+		} else
 
-		return Lists.transform(coefficients, function);
+		{
+			return super.getCoefficients(featureLogProb, index, numberOfClasses, numberOfFeatures);
+		}
+	}
+
+	@Override
+	protected Number getIntercept(List<Number> classLogPrior, int index){
+		return null;
 	}
 }

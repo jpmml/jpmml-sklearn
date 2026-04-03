@@ -18,35 +18,9 @@
  */
 package sklearn.naive_bayes;
 
-import java.util.List;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.jpmml.converter.CMatrixUtil;
-
 public class MultinomialNB extends ContinuousNB {
 
 	public MultinomialNB(String module, String name){
 		super(module, name);
-	}
-
-	@Override
-	public List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
-		List<Number> coefficients = CMatrixUtil.getRow(featureLogProb, numberOfClasses, numberOfFeatures, index);
-
-		Function<Number, Number> function = new Function<Number, Number>(){
-
-			@Override
-			public Number apply(Number value){
-
-				if(value.doubleValue() == Double.NEGATIVE_INFINITY){
-					return null;
-				}
-
-				return value;
-			}
-		};
-
-		return Lists.transform(coefficients, function);
 	}
 }

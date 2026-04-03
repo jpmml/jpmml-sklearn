@@ -513,6 +513,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateComplementNBSentiment() throws Exception {
+		evaluate(COMPLEMENT_NB, SENTIMENT);
+	}
+
+	@Test
 	public void evaluateComplementNBSmoothSentiment() throws Exception {
 		evaluate(COMPLEMENT_NB + "Smooth", SENTIMENT);
 	}

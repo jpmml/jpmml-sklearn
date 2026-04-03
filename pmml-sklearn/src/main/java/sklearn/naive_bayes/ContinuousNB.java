@@ -21,10 +21,13 @@ package sklearn.naive_bayes;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
+import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ModelUtil;
@@ -38,9 +41,6 @@ public class ContinuousNB extends SkLearnClassifier {
 	public ContinuousNB(String module, String name){
 		super(module, name);
 	}
-
-	abstract
-	public List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures);
 
 	@Override
 	public int getNumberOfFeatures(){
@@ -67,7 +67,7 @@ public class ContinuousNB extends SkLearnClassifier {
 
 		for(int i = 0; i < numberOfClasses; i++){
 			List<Number> coefficients = getCoefficients(featureLogProb, i, numberOfClasses, numberOfFeatures);
-			Number intercept = classLogPrior.get(i);
+			Number intercept = getIntercept(classLogPrior, i);
 
 			RegressionTable regressionTable = RegressionModelUtil.createRegressionTable(features, coefficients, intercept)
 				.setTargetCategory(categoricalLabel.getValue(i));
@@ -81,6 +81,29 @@ public class ContinuousNB extends SkLearnClassifier {
 		encodePredictProbaOutput(regressionModel, DataType.DOUBLE, categoricalLabel);
 
 		return regressionModel;
+	}
+
+	protected List<Number> getCoefficients(List<Number> featureLogProb, int index, int numberOfClasses, int numberOfFeatures){
+		List<Number> coefficients = CMatrixUtil.getRow(featureLogProb, numberOfClasses, numberOfFeatures, index);
+
+		Function<Number, Number> function = new Function<Number, Number>(){
+
+			@Override
+			public Number apply(Number value){
+
+				if(value.doubleValue() == Double.NEGATIVE_INFINITY){
+					return null;
+				}
+
+				return value;
+			}
+		};
+
+		return Lists.transform(coefficients, function);
+	}
+
+	protected Number getIntercept(List<Number> classLogPrior, int index){
+		return classLogPrior.get(index);
 	}
 
 	public List<Number> getClassLogPrior(){
