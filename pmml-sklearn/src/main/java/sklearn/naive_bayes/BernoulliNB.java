@@ -23,13 +23,10 @@ import java.util.List;
 
 import org.dmg.pmml.naive_bayes.BayesInput;
 import org.dmg.pmml.naive_bayes.BayesInputs;
-import org.dmg.pmml.naive_bayes.NaiveBayesModel;
 import org.dmg.pmml.naive_bayes.PairCounts;
 import org.jpmml.converter.CMatrixUtil;
-import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.Schema;
 import org.jpmml.converter.UnsupportedFeatureException;
 
 public class BernoulliNB extends DiscreteNB {
@@ -97,15 +94,6 @@ public class BernoulliNB extends DiscreteNB {
 		}
 
 		return bayesInputs;
-	}
-
-	@Override
-	public NaiveBayesModel encodeModel(Schema schema){
-		@SuppressWarnings("unused")
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
-			.expectCardinality(2);
-
-		return super.encodeModel(schema);
 	}
 
 	public List<Integer> getFeatureCount(){
