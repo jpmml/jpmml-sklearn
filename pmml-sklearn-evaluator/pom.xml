@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jpmml</groupId>
 		<artifactId>jpmml-sklearn</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9.35</version>
 	</parent>
 
 	<artifactId>pmml-sklearn-evaluator</artifactId>
@@ -25,4 +25,8 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+  <scm>
+    <tag>1,9.35</tag>
+  </scm>
 </project>
