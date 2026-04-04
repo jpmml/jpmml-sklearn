@@ -1,36 +1,26 @@
 <?xml version="1.0" ?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" child.project.url.inherit.append.path="false">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.jpmml</groupId>
 		<artifactId>jpmml-parent</artifactId>
-		<version>1.0.14</version>
+		<version>1.0.18</version>
 	</parent>
 
-	<groupId>org.jpmml</groupId>
 	<artifactId>jpmml-sklearn</artifactId>
 	<version>1.9-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>JPMML-SkLearn</name>
 	<description>Java library and command-line application for converting Scikit-Learn pipelines to PMML</description>
-	<url>https://github.com/jpmml/jpmml-sklearn</url>
 
 	<licenses>
 		<license>
 			<name>GNU Affero General Public License (AGPL) version 3.0</name>
 			<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
-			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
-	<developers>
-		<developer>
-			<id>villu.ruusmann</id>
-			<name>Villu Ruusmann</name>
-		</developer>
-	</developers>
 
 	<modules>
 		<module>pmml-sklearn</module>
@@ -43,18 +33,8 @@
 		<module>pmml-sklearn-xgboost</module>
 	</modules>
 
-	<scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
-		<connection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</connection>
-		<developerConnection>scm:git:git@github.com:jpmml/jpmml-sklearn.git</developerConnection>
-		<url>git://github.com/jpmml/jpmml-sklearn.git</url>
-		<tag>HEAD</tag>
-	</scm>
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/jpmml/jpmml-sklearn/issues</url>
-	</issueManagement>
-
 	<properties>
+		<github.repo>jpmml/jpmml-sklearn</github.repo>
 		<jpmml-evaluator.version>1.7.7</jpmml-evaluator.version>
 		<jpmml-h2o.version>1.3.5</jpmml-h2o.version>
 		<jpmml-lightgbm.version>1.6.5</jpmml-lightgbm.version>
@@ -183,33 +163,6 @@
 						<java.util.logging.config.file>src/test/resources/logging.properties</java.util.logging.config.file>
 					</systemPropertyVariables>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.7.3</version>
-				<configuration>
-					<updatePomFile>true</updatePomFile>
-					<flattenMode>oss</flattenMode>
-					<flattenDependencyMode>inherited</flattenDependencyMode>
-				</configuration>
-				<executions>
-					<execution>
-						<id>flatten</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>flatten</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>flatten-clean</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 			<plugin>
