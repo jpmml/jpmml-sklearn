@@ -33,6 +33,10 @@
 		<module>pmml-sklearn-xgboost</module>
 	</modules>
 
+	<scm>
+		<tag>HEAD</tag>
+	</scm>
+
 	<properties>
 		<github.repo>jpmml/jpmml-sklearn</github.repo>
 		<jpmml-evaluator.version>1.7.7</jpmml-evaluator.version>
