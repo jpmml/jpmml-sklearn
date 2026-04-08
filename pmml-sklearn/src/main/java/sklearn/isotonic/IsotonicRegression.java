@@ -57,7 +57,9 @@ public class IsotonicRegression extends Calibrator {
 
 		OutlierTreatmentMethod outlierTreatment = parseOutlierTreatment(outOfBounds);
 
-		NormContinuous normContinuous = new NormContinuous(feature.getName(), null)
+		ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+		NormContinuous normContinuous = new NormContinuous(continuousFeature.getName(), null)
 			.setOutlierTreatment(outlierTreatment);
 
 		for(int i = 0; i < xThresholds.size(); i++){

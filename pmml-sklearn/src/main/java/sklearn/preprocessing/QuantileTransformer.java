@@ -119,7 +119,9 @@ public class QuantileTransformer extends SkLearnTransformer {
 
 	static
 	private NormContinuous encodeQuantileTransform(Feature feature, List<Number> quantiles, List<Number> references){
-		NormContinuous normContinupus = new NormContinuous(feature.getName(), null)
+		ContinuousFeature continuousFeature = feature.toContinuousFeature();
+
+		NormContinuous normContinupus = new NormContinuous(continuousFeature.getName(), null)
 			.setOutlierTreatment(OutlierTreatmentMethod.AS_EXTREME_VALUES);
 
 		for(int i = 0; i < quantiles.size(); i++){
