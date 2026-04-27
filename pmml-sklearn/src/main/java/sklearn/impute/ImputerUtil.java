@@ -18,8 +18,6 @@
  */
 package sklearn.impute;
 
-import java.util.Collections;
-
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -54,7 +52,7 @@ public class ImputerUtil {
 			encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatmentMethod, replacementValue));
 
 			if(missingValue != null){
-				FieldUtil.addValues(dataField, Value.Property.MISSING, Collections.singletonList(missingValue));
+				FieldUtil.addValue(dataField, Value.Property.MISSING, missingValue);
 			}
 
 			return feature;

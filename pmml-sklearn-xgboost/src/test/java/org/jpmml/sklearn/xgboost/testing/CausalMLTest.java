@@ -18,11 +18,12 @@
  */
 package org.jpmml.sklearn.xgboost.testing;
 
+import org.jpmml.converter.testing.Datasets;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
 
-public class CausalMLTest extends SkLearnEncoderBatchTest {
+public class CausalMLTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	public CausalMLTest(){
 		super(new PMMLEquivalence(1e-7, 1e-7));
@@ -30,11 +31,11 @@ public class CausalMLTest extends SkLearnEncoderBatchTest {
 
 	@Test
 	public void evaluateXGBRRegressorEmail() throws Exception {
-		evaluate("XGBRRegressor", "Email");
+		evaluate("XGBRRegressor", EMAIL);
 	}
 
 	@Test
 	public void evaluateXGBTRegressorEmail() throws Exception {
-		evaluate("XGBTRegressor", "Email", new PMMLEquivalence(3e-4, 3e-4));
+		evaluate("XGBTRegressor", EMAIL, new PMMLEquivalence(3e-4, 3e-4));
 	}
 }

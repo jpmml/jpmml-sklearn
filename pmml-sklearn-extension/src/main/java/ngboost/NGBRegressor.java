@@ -360,11 +360,11 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 			upperBoundApply = encodeIsNotMissingCheck(fieldRef, upperBoundApply);
 		}
 
-		OutputField lowerBoundOutputField = new OutputField(FieldNameUtil.create("lower", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+		OutputField lowerBoundOutputField = new OutputField(FieldNameUtil.create("lower", continuousLabel), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 			.setExpression(lowerBoundApply);
 
-		OutputField upperBoundOutputField = new OutputField(FieldNameUtil.create("upper", continuousLabel.getName()), OpType.CONTINUOUS, DataType.DOUBLE)
+		OutputField upperBoundOutputField = new OutputField(FieldNameUtil.create("upper", continuousLabel), OpType.CONTINUOUS, DataType.DOUBLE)
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 			.setExpression(upperBoundApply);
 

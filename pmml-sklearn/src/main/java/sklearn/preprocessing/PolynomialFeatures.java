@@ -148,7 +148,10 @@ public class PolynomialFeatures extends SkLearnTransformer implements HasSparseO
 					sb.append(name);
 				}
 
-				result.add(new InteractionFeature(encoder, sb.toString(), DataType.DOUBLE, powerFeatures));
+				Feature feature = new InteractionFeature(encoder, sb.toString(), DataType.DOUBLE, powerFeatures)
+					.simplify();
+
+				result.add(feature);
 			}
 		}
 

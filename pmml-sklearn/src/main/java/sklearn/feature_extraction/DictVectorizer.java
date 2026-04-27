@@ -78,7 +78,7 @@ public class DictVectorizer extends Initializer {
 			Feature feature;
 
 			if(value != null){
-				FieldUtil.addValues(dataField, Collections.singletonList(value));
+				FieldUtil.addValue(dataField, value);
 
 				feature = new BinaryFeature(encoder, dataField, value);
 			} else
