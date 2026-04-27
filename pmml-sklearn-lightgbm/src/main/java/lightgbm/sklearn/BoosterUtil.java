@@ -21,8 +21,8 @@ package lightgbm.sklearn;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.GBDT;
@@ -52,7 +52,7 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster & HasLightGBMOptions> MiningModel encodeModel(E estimator, Schema schema){
+	public <E extends Estimator & HasBooster & HasLightGBMOptions> Model encodeModel(E estimator, Schema schema){
 		GBDT gbdt = getGBDT(estimator);
 
 		ModelEncoder encoder = schema.getEncoder();
@@ -61,11 +61,11 @@ public class BoosterUtil {
 
 		Integer numIterations = (Integer)options.get(HasLightGBMOptions.OPTION_NUM_ITERATION);
 
-		MiningModel miningModel = gbdt.encodeModel(numIterations, schema);
+		Model model = gbdt.encodeModel(numIterations, schema);
 
-		encoder.transferFeatureImportances(null, miningModel);
+		encoder.transferFeatureImportances(null, model);
 
-		return miningModel;
+		return model;
 	}
 
 	static
@@ -82,14 +82,14 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster & HasLightGBMOptions> MiningModel configureModel(E estimator, MiningModel miningModel){
+	public <E extends Estimator & HasBooster & HasLightGBMOptions> Model configureModel(E estimator, Model model){
 		GBDT gbdt = getGBDT(estimator);
 
 		Map<String, ?> options = getOptions(gbdt, estimator);
 
-		miningModel = gbdt.configureModel(options, miningModel);
+		model = gbdt.configureModel(options, model);
 
-		return miningModel;
+		return model;
 	}
 
 	static

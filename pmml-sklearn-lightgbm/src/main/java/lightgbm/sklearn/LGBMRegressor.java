@@ -20,7 +20,6 @@ package lightgbm.sklearn;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
@@ -54,7 +53,7 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public Model encodeModel(Schema schema){
 		return BoosterUtil.encodeModel(this, schema);
 	}
 
@@ -64,8 +63,8 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 	}
 
 	@Override
-	public MiningModel configureModel(Model model){
-		return BoosterUtil.configureModel(this, (MiningModel)model);
+	public Model configureModel(Model model){
+		return BoosterUtil.configureModel(this, model);
 	}
 
 	@Override
