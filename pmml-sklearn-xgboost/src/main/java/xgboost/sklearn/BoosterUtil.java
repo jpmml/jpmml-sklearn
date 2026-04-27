@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
@@ -71,7 +71,7 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel encodeModel(E estimator, Schema schema){
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> Model encodeModel(E estimator, Schema schema){
 		Booster booster = estimator.getBooster();
 
 		Learner learner = getLearner(estimator);
@@ -80,9 +80,9 @@ public class BoosterUtil {
 
 		Integer ntreeLimit = (Integer)options.get(HasXGBoostOptions.OPTION_NTREE_LIMIT);
 
-		MiningModel miningModel = learner.encodeModel(ntreeLimit, schema);
+		Model model = learner.encodeModel(ntreeLimit, schema);
 
-		return miningModel;
+		return model;
 	}
 
 	static
@@ -132,16 +132,16 @@ public class BoosterUtil {
 	}
 
 	static
-	public <E extends Estimator & HasBooster & HasXGBoostOptions> MiningModel configureModel(E estimator, MiningModel miningModel){
+	public <E extends Estimator & HasBooster & HasXGBoostOptions> Model configureModel(E estimator, Model model){
 		Booster booster = estimator.getBooster();
 
 		Learner learner = getLearner(estimator);
 
 		Map<String, ?> options = getOptions(booster, learner, estimator);
 
-		miningModel = learner.configureModel(options, miningModel);
+		model = learner.configureModel(options, model);
 
-		return miningModel;
+		return model;
 	}
 
 	static

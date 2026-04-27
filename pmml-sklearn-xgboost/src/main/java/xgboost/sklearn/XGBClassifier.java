@@ -23,7 +23,6 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.LabelUtil;
@@ -79,7 +78,7 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public Model encodeModel(Schema schema){
 		return BoosterUtil.encodeModel(this, schema);
 	}
 
@@ -89,8 +88,8 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	}
 
 	@Override
-	public MiningModel configureModel(Model model){
-		return BoosterUtil.configureModel(this, (MiningModel)model);
+	public Model configureModel(Model model){
+		return BoosterUtil.configureModel(this, model);
 	}
 
 	@Override

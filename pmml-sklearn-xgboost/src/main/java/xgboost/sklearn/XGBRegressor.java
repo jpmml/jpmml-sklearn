@@ -23,7 +23,6 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
-import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
@@ -79,7 +78,7 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 	}
 
 	@Override
-	public MiningModel encodeModel(Schema schema){
+	public Model encodeModel(Schema schema){
 		return BoosterUtil.encodeModel(this, schema);
 	}
 
@@ -89,8 +88,8 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 	}
 
 	@Override
-	public MiningModel configureModel(Model model){
-		return BoosterUtil.configureModel(this, (MiningModel)model);
+	public Model configureModel(Model model){
+		return BoosterUtil.configureModel(this, model);
 	}
 
 	@Override
