@@ -33,6 +33,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.ScalarCastFunction;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.CategoricalDtype;
@@ -146,7 +147,7 @@ public class DiscreteDomain extends Domain implements HasMultiType {
 			Object dataValues = getObject("data_values_");
 
 			if(dataValues instanceof List){
-				return getArrayList("data_values_", Object.class);
+				return getArrayList("data_values_", new ScalarCastFunction(Object.class));
 			}
 
 			return Collections.singletonList(getObjectArray("data_values_"));
