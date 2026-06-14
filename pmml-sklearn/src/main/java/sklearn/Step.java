@@ -56,7 +56,7 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
 	public void checkSkLearnVersion(){
 		String sklearnVersion = getSkLearnVersion();
-		String supportedSklearnVersion = "1.8.0";
+		String supportedSklearnVersion = "1.9.0";
 
 		if(sklearnVersion != null && VersionUtil.compareVersion(sklearnVersion, supportedSklearnVersion) > 0){
 			throw new SkLearnException("Scikit-Learn version " + ExceptionUtil.formatVersion(sklearnVersion) + " is not supported")
