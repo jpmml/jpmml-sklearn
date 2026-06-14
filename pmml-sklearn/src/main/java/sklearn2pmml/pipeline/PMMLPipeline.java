@@ -527,8 +527,9 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	public List<String> getActiveFields(){
+		Object activeFields = getattr("active_fields", null);
 
-		if(!hasattr("active_fields")){
+		if(activeFields == null){
 			return null;
 		}
 
@@ -542,6 +543,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	public List<String> getTargetFields(){
+		Object targetFields = getattr("target_fields", null);
 
 		// SkLearn2PMML 0.24.3
 		if(hasattr("target_field")){
@@ -549,7 +551,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		} // End if
 
 		// SkLearn2PMML 0.25+
-		if(!hasattr("target_fields")){
+		if(targetFields == null){
 			return null;
 		}
 
