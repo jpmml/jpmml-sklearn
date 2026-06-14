@@ -19,7 +19,6 @@
 package sklearn.preprocessing;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
@@ -50,9 +49,7 @@ public class BaseEncoder extends SkLearnTransformer implements HasMultiType {
 
 		List<Object> featureCategories = categories.get(index);
 
-		featureCategories = featureCategories.stream()
-			.filter(category -> !EncoderUtil.isMissingCategory(category))
-			.collect(Collectors.toList());
+		featureCategories = EncoderUtil.filterCategories(featureCategories);
 
 		return TypeUtil.getDataType(featureCategories, DataType.STRING);
 	}
