@@ -23,6 +23,7 @@ import java.util.List;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.python.ScalarCastFunction;
 import sklearn.HasMultiType;
 import sklearn.SkLearnTransformer;
 
@@ -55,6 +56,6 @@ public class BaseEncoder extends SkLearnTransformer implements HasMultiType {
 	}
 
 	public List<List<Object>> getCategories(){
-		return getArrayList("categories_", Object.class);
+		return getArrayList("categories_", new ScalarCastFunction(Object.class));
 	}
 }
