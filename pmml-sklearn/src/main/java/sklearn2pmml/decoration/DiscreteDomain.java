@@ -33,11 +33,10 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.HasArray;
 import org.jpmml.python.ScalarCastFunction;
 import org.jpmml.python.TypeInfo;
+import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import pandas.core.CategoricalDtype;
 import sklearn.HasMultiType;
 
 abstract
@@ -111,26 +110,14 @@ public class DiscreteDomain extends Domain implements HasMultiType {
 
 			DataField dataField = wildcardFeature.getField();
 
-			List<?> values = Collections.emptyList();
+			List<?> values;
 
 			if(withData){
 				values = dataValues.get(i);
 			} else
 
 			{
-				if(dtype instanceof CategoricalDtype){
-					CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
-
-					values = categoricalDtype.getValues();
-				} else
-
-				if(dtype instanceof polars.datatypes.Enum){
-					polars.datatypes.Enum _enum = (polars.datatypes.Enum)dtype;
-
-					HasArray categories = _enum.getCategories();
-
-					values = categories.getArrayContent();
-				}
+				values = DTypeUtil.getCategories(dtype);
 			}
 
 			feature = encodeFeature(wildcardFeature, values);

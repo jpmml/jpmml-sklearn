@@ -37,6 +37,26 @@ public class DTypeUtil {
 	}
 
 	static
+	public List<?> getCategories(TypeInfo dtype){
+
+		if(dtype instanceof CategoricalDtype){
+			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+			return categoricalDtype.getValues();
+		} else
+
+		if(dtype instanceof Enum){
+			Enum _enum = (Enum)dtype;
+
+			HasArray categories = _enum.getCategories();
+
+			return categories.getArrayContent();
+		}
+
+		return null;
+	}
+
+	static
 	public Feature refineFeature(Feature feature, TypeInfo dtype, SkLearnEncoder encoder){
 
 		if(dtype instanceof CategoricalDtype){
