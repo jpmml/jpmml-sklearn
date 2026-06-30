@@ -20,11 +20,8 @@ package pandas;
 
 import java.util.List;
 
-import org.dmg.pmml.Field;
-import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.OrdinalFeature;
-import org.jpmml.converter.WildcardFeature;
+import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.CategoricalDtype;
 
@@ -38,32 +35,6 @@ public class CategoricalDtypeUtil {
 		Boolean ordered = categoricalDtype.getOrdered();
 		List<?> values = categoricalDtype.getValues();
 
-		if(feature instanceof WildcardFeature){
-			WildcardFeature wildcardFeature = (WildcardFeature)feature;
-
-			if(ordered){
-				return wildcardFeature.toOrdinalFeature(values);
-			} else
-
-			{
-				return wildcardFeature.toCategoricalFeature(values);
-			}
-		} else
-
-		{
-			String name = feature.getName();
-
-			if(ordered){
-				Field<?> field = encoder.toOrdinal(name, values);
-
-				return new OrdinalFeature(encoder, field, values);
-			} else
-
-			{
-				Field<?> field = encoder.toCategorical(name, values);
-
-				return new CategoricalFeature(encoder, field, values);
-			}
-		}
+		return DTypeUtil.refineFeature(feature, ordered, values, encoder);
 	}
 }
