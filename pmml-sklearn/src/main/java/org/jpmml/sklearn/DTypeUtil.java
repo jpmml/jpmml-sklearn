@@ -25,10 +25,44 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.OrdinalFeature;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.python.HasArray;
+import org.jpmml.python.TypeInfo;
+import pandas.core.CategoricalDtype;
+import polars.datatypes.Categorical;
+import polars.datatypes.Enum;
 
 public class DTypeUtil {
 
 	private DTypeUtil(){
+	}
+
+	static
+	public Feature refineFeature(Feature feature, TypeInfo dtype, SkLearnEncoder encoder){
+
+		if(dtype instanceof CategoricalDtype){
+			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
+
+			Boolean ordered = categoricalDtype.getOrdered();
+			List<?> values = categoricalDtype.getValues();
+
+			return refineFeature(feature, ordered, values, encoder);
+		} else
+
+		if(dtype instanceof Categorical){
+			Categorical categorical = (Categorical)dtype;
+
+			return refineFeature(feature, false, null, encoder);
+		} else
+
+		if(dtype instanceof Enum){
+			Enum _enum = (Enum)dtype;
+
+			HasArray categories = _enum.getCategories();
+
+			return refineFeature(feature, true, categories.getArrayContent(), encoder);
+		}
+
+		return feature;
 	}
 
 	static

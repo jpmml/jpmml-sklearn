@@ -29,9 +29,8 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.TypeInfo;
+import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import pandas.CategoricalDtypeUtil;
-import pandas.core.CategoricalDtype;
 import sklearn.Initializer;
 
 public class DataFrameConstructor extends Initializer {
@@ -55,11 +54,7 @@ public class DataFrameConstructor extends Initializer {
 
 			Feature feature = new WildcardFeature(encoder, dataField);
 
-			if(dtype instanceof CategoricalDtype){
-				CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
-
-				feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
-			}
+			feature = DTypeUtil.refineFeature(feature, dtype, encoder);
 
 			result.add(feature);
 		}
@@ -89,11 +84,7 @@ public class DataFrameConstructor extends Initializer {
 
 			String column = columns.get(i);
 
-			if(dtype instanceof CategoricalDtype){
-				CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
-
-				feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
-			}
+			feature = DTypeUtil.refineFeature(feature, dtype, encoder);
 
 			encoder.renameFeature(feature, column);
 

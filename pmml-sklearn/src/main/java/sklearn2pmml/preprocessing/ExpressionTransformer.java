@@ -45,11 +45,9 @@ import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
 import org.jpmml.python.TypeInfo;
+import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
-import pandas.CategoricalDtypeUtil;
-import pandas.core.CategoricalDtype;
-import polars.DataTypeUtil;
 import sklearn.Transformer;
 import sklearn2pmml.util.EvaluatableUtil;
 
@@ -178,7 +176,7 @@ public class ExpressionTransformer extends Transformer {
 				Field<?> field = feature.getField();
 
 				if((field.requireOpType() == opType) && (field.requireDataType() == dataType)){
-					feature = refineFeature(feature, dtype, encoder);
+					feature = DTypeUtil.refineFeature(feature, dtype, encoder);
 
 					return Collections.singletonList(feature);
 				}
@@ -197,26 +195,9 @@ public class ExpressionTransformer extends Transformer {
 
 		Feature feature = FeatureUtil.createFeature(derivedField, encoder);
 
-		feature = refineFeature(feature, dtype, encoder);
+		feature = DTypeUtil.refineFeature(feature, dtype, encoder);
 
 		return Collections.singletonList(feature);
-	}
-
-	public Feature refineFeature(Feature feature, TypeInfo dtype, SkLearnEncoder encoder){
-
-		if(dtype instanceof CategoricalDtype){
-			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
-
-			return CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
-		} else
-
-		if(dtype instanceof polars.datatypes.DataType){
-			polars.datatypes.DataType polarsDataType = (polars.datatypes.DataType)dtype;
-
-			return DataTypeUtil.refineFeature(feature, polarsDataType, encoder);
-		}
-
-		return feature;
 	}
 
 	public Object getDefaultValue(){

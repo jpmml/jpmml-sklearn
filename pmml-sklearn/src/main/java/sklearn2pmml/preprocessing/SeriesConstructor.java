@@ -26,9 +26,8 @@ import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.python.TypeInfo;
+import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import pandas.CategoricalDtypeUtil;
-import pandas.core.CategoricalDtype;
 import sklearn.Transformer;
 
 public class SeriesConstructor extends Transformer {
@@ -47,11 +46,7 @@ public class SeriesConstructor extends Transformer {
 		Feature feature = SchemaUtil.getOnlyFeature(features)
 			.expectDataType(dataType);
 
-		if(dtype instanceof CategoricalDtype){
-			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
-
-			feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
-		} // End if
+		feature = DTypeUtil.refineFeature(feature, dtype, encoder);
 
 		if(name != null && !Objects.equals(feature.getName(), name)){
 			encoder.renameFeature(feature, name);

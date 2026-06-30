@@ -30,10 +30,8 @@ import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.TypeInfo;
+import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import pandas.CategoricalDtypeUtil;
-import pandas.core.CategoricalDtype;
-import polars.DataTypeUtil;
 import sklearn.Transformer;
 
 abstract
@@ -49,17 +47,7 @@ public class TypeTransformer extends Transformer {
 
 		feature = refineFeature(feature, opType, dataType, encoder);
 
-		if(dtype instanceof CategoricalDtype){
-			CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
-
-			feature = CategoricalDtypeUtil.refineFeature(feature, categoricalDtype, encoder);
-		} else
-
-		if(dtype instanceof polars.datatypes.DataType){
-			polars.datatypes.DataType polarsDataType = (polars.datatypes.DataType)dtype;
-
-			feature = DataTypeUtil.refineFeature(feature, polarsDataType, encoder);
-		}
+		feature = DTypeUtil.refineFeature(feature, dtype, encoder);
 
 		return feature;
 	}
