@@ -33,6 +33,7 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.HasArray;
 import org.jpmml.python.ScalarCastFunction;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -121,6 +122,14 @@ public class DiscreteDomain extends Domain implements HasMultiType {
 					CategoricalDtype categoricalDtype = (CategoricalDtype)dtype;
 
 					values = categoricalDtype.getValues();
+				} else
+
+				if(dtype instanceof polars.datatypes.Enum){
+					polars.datatypes.Enum _enum = (polars.datatypes.Enum)dtype;
+
+					HasArray categories = _enum.getCategories();
+
+					values = categories.getArrayContent();
 				}
 			}
 
