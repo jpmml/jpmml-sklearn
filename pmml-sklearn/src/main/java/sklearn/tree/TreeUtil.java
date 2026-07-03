@@ -193,11 +193,13 @@ public class TreeUtil {
 					valueFilter = valueFilter.and(value -> !ValueUtil.isNaN(value));
 				}
 
-				List<Object> leftValues = thresholdFeature.getValues((Number value) -> (toSplitValue(value) <= threshold)).stream()
+				float floatThreshold = toFloatThreshold(threshold);
+
+				List<Object> leftValues = thresholdFeature.getValues((Number value) -> (value.floatValue() <= floatThreshold)).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
-				List<Object> rightValues = thresholdFeature.getValues((Number value) -> (toSplitValue(value)) > threshold).stream()
+				List<Object> rightValues = thresholdFeature.getValues((Number value) -> (value.floatValue() > floatThreshold)).stream()
 					.filter(valueFilter)
 					.collect(Collectors.toList());
 
@@ -209,7 +211,7 @@ public class TreeUtil {
 			} else
 
 			{
-				ContinuousFeature continuousFeature = toContinuousFeature(feature);
+				ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.FLOAT);
 
 				Object value;
 
@@ -219,7 +221,7 @@ public class TreeUtil {
 				} else
 
 				{
-					value = threshold;
+					value = toFloatThreshold(threshold);
 				}
 
 				leftPredicate = predicateManager.createSimplePredicate(continuousFeature, SimplePredicate.Operator.LESS_OR_EQUAL, value);
@@ -603,7 +605,7 @@ public class TreeUtil {
 				} else
 
 				{
-					ContinuousFeature continuousFeature = toContinuousFeature(feature);
+					ContinuousFeature continuousFeature = feature.toContinuousFeature(DataType.FLOAT);
 
 					return continuousFeature;
 				}
@@ -614,15 +616,16 @@ public class TreeUtil {
 	}
 
 	static
-	private ContinuousFeature toContinuousFeature(Feature feature){
-		return feature
-			.toContinuousFeature(DataType.FLOAT) // First, cast from any numeric type (including numpy.float64) to numpy.float32
-			.toContinuousFeature(DataType.DOUBLE); // Second, cast from numpy.float32 to numpy.float64
-	}
+	private float toFloatThreshold(double threshold){
+		float result = (float)threshold;
 
-	static
-	private double toSplitValue(Number value){
-		return (double)value.floatValue();
+		// Inverse of the <code>(double)(float)x</code> combined cast operation:
+		// select the largest float value that is less than or equal to the original double value.
+		if((double)result > threshold){
+			result = Math.nextDown(result);
+		}
+
+		return result;
 	}
 
 	static
