@@ -73,6 +73,7 @@ import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.sklearn.FloatUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
 import sklearn.EstimatorCastException;
@@ -615,17 +616,12 @@ public class TreeUtil {
 		return schema.toTransformedSchema(function);
 	}
 
+	/**
+	 * Undoes the &quot;outer layer&quot; of Scikit-Learn's <code>(double)(float)x</code> cast operation.
+	 */
 	static
 	private float toFloatThreshold(double threshold){
-		float result = (float)threshold;
-
-		// Inverse of the <code>(double)(float)x</code> combined cast operation:
-		// select the largest float value that is less than or equal to the original double value.
-		if((double)result > threshold){
-			result = Math.nextDown(result);
-		}
-
-		return result;
+		return FloatUtil.floor(threshold);
 	}
 
 	static
