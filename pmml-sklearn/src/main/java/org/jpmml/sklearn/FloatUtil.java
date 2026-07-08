@@ -18,9 +18,51 @@
  */
 package org.jpmml.sklearn;
 
+import java.util.List;
+
+import org.dmg.pmml.DataType;
+import org.dmg.pmml.Field;
+import org.dmg.pmml.HasContinuousDomain;
+import org.dmg.pmml.HasDiscreteDomain;
+import org.dmg.pmml.Interval;
+
 public class FloatUtil {
 
 	private FloatUtil(){
+	}
+
+	static
+	public <E extends Field<?>> E narrow(E field){
+		field.setDataType(DataType.FLOAT);
+
+		if(field instanceof HasDiscreteDomain){
+			HasDiscreteDomain<?> hasDiscreteDomain = (HasDiscreteDomain<?>)field;
+
+			// Ignored
+		} // End if
+
+		if(field instanceof HasContinuousDomain){
+			HasContinuousDomain<?> hasContinuousDomain = (HasContinuousDomain<?>)field;
+
+			if(hasContinuousDomain.hasIntervals()){
+				List<Interval> intervals = hasContinuousDomain.getIntervals();
+
+				for(Interval interval : intervals){
+					Number leftMargin = interval.getLeftMargin();
+					Number rightMargin = interval.getRightMargin();
+
+					if(leftMargin != null && !(leftMargin instanceof Float)){
+						interval.setLeftMargin(leftMargin.floatValue());
+					} // End if
+
+					if(rightMargin != null && !(rightMargin instanceof Float)){
+						interval.setRightMargin(rightMargin.floatValue());
+					}
+				}
+			}
+		}
+
+		return field;
 	}
 
 	/**

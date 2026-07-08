@@ -32,9 +32,7 @@ import com.google.common.primitives.Doubles;
 import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Field;
-import org.dmg.pmml.HasContinuousDomain;
 import org.dmg.pmml.HasExtensions;
-import org.dmg.pmml.Interval;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLConstants;
@@ -539,29 +537,7 @@ public class TreeUtil {
 					if(dataType != DataType.FLOAT){
 						Field<?> field = continuousFeature.getField();
 
-						field.setDataType(DataType.FLOAT);
-
-						// XXX
-						if(field instanceof HasContinuousDomain){
-							HasContinuousDomain<?> hasContinuousDomain = (HasContinuousDomain<?>)field;
-
-							if(hasContinuousDomain.hasIntervals()){
-								List<Interval> intervals = hasContinuousDomain.getIntervals();
-
-								for(Interval interval : intervals){
-									Number leftMargin = interval.getLeftMargin();
-									Number rightMargin = interval.getRightMargin();
-
-									if(leftMargin != null){
-										interval.setLeftMargin((double)leftMargin.floatValue());
-									} // End if
-
-									if(rightMargin != null){
-										interval.setRightMargin((double)rightMargin.floatValue());
-									}
-								}
-							}
-						}
+						field = FloatUtil.narrow(field);
 
 						return new ContinuousFeature(continuousFeature.getEncoder(), field);
 					}
