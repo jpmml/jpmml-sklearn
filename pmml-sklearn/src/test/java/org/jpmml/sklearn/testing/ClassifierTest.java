@@ -18,10 +18,13 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
@@ -31,6 +34,8 @@ import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.Table;
+import org.jpmml.evaluator.TableCollector;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
@@ -84,6 +89,25 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				path = path.replace("Dict", "");
 
 				return path;
+			}
+
+			@Override
+			public Table getInput() throws IOException {
+				Table table = super.getInput();
+
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(Objects.equals(KNN, algorithm) && (Objects.equals(IRIS, dataset) || Objects.equals(VERSICOLOR, dataset))){
+					Set<Map<String, Object>> uniqueRows = new HashSet<>();
+
+					table = table.stream()
+						.map(row -> new LinkedHashMap<>(row))
+						.filter(uniqueRows::add)
+						.collect(new TableCollector());
+				}
+
+				return table;
 			}
 
 			@Override
@@ -389,7 +413,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateKNNIris() throws Exception {
-		evaluate(KNN, IRIS, excludeFields(createNeighborFields(5)));
+		evaluate(KNN, IRIS);
 	}
 
 	@Test
@@ -564,7 +588,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 	@Test
 	public void evaluateKNNVersicolor() throws Exception {
-		evaluate(KNN, VERSICOLOR, excludeFields(createNeighborFields(5)));
+		evaluate(KNN, VERSICOLOR);
 	}
 
 	@Test

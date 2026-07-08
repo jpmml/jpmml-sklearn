@@ -20,7 +20,6 @@ package sklearn.neighbors;
 
 import java.util.List;
 
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
 import org.jpmml.converter.Schema;
@@ -43,11 +42,6 @@ public class NearestNeighbors extends SkLearnClusterer implements HasMetric, Has
 	@Override
 	public int getNumberOfOutputs(){
 		return 0;
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
 	}
 
 	@Override

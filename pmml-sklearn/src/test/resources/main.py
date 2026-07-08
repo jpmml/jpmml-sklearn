@@ -438,7 +438,10 @@ if "Audit" in datasets:
 
 	build_multi_audit(audit_df, ClassifierChain(LogisticRegression()), "LogisticRegressionChainAudit")
 
-def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_options):
+def build_versicolor(versicolor_df, classifier, name, with_proba = True, with_kneighbors = False, **pmml_options):
+	if with_kneighbors:
+		versicolor_df = versicolor_df.drop_duplicates().reset_index(drop = True)
+
 	versicolor_X, versicolor_y = split_csv(versicolor_df)
 
 	scaler = ColumnTransformer([
@@ -475,6 +478,11 @@ def build_versicolor(versicolor_df, classifier, name, with_proba = True, **pmml_
 	if with_proba:
 		species_proba = DataFrame(pipeline.predict_proba(versicolor_X), columns = ["probability(0)", "probability(1)"])
 		species = pandas.concat((species, species_proba), axis = 1)
+	if with_kneighbors:
+		Xt = pipeline_transform(pipeline, versicolor_X)
+		kneighbors = classifier.kneighbors(Xt)
+		species_ids = DataFrame(kneighbors[1] + 1, columns = make_kneighbor_cols(classifier))
+		species = pandas.concat((species, species_ids), axis = 1)
 	store_csv(species, name)
 
 if "Versicolor" in datasets:
@@ -482,7 +490,7 @@ if "Versicolor" in datasets:
 
 	build_versicolor(versicolor_df, AdaBoostClassifier(n_estimators = 11, random_state = 13), "AdaBoostVersicolor")
 	build_versicolor(versicolor_df, DummyClassifier(strategy = "prior"), "DummyVersicolor")
-	build_versicolor(versicolor_df, KNeighborsClassifier(metric = "euclidean"), "KNNVersicolor", with_proba = False)
+	build_versicolor(versicolor_df, KNeighborsClassifier(metric = "euclidean"), "KNNVersicolor", with_proba = False, with_kneighbors = True)
 	build_versicolor(versicolor_df, TunedThresholdClassifierCV(LogisticRegression(), response_method = "predict_proba"), "LogisticRegressionVersicolor")
 	build_versicolor(versicolor_df, MLPClassifier(activation = "tanh", hidden_layer_sizes = (8,), solver = "lbfgs", tol = 0.1, max_iter = 100, random_state = 13), "MLPVersicolor")
 	build_versicolor(versicolor_df, Perceptron(random_state = 13), "PerceptronVersicolor", with_proba = False)
@@ -520,7 +528,10 @@ if "Versicolor" in datasets:
 # Multi-class classification
 #
 
-def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, **pmml_options):
+def build_iris(iris_df, classifier, name, with_proba = True, with_kneighbors = False, fit_params = {}, predict_params = {}, predict_proba_params = {}, **pmml_options):
+	if with_kneighbors:
+		iris_df = iris_df.drop_duplicates().reset_index(drop = True)
+
 	iris_X, iris_y = split_csv(iris_df)
 
 	pipeline = Pipeline([
@@ -556,6 +567,11 @@ def build_iris(iris_df, classifier, name, with_proba = True, fit_params = {}, pr
 	if with_proba:
 		species_proba = DataFrame(pipeline.predict_proba(iris_X, **predict_proba_params), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
 		species = pandas.concat((species, species_proba), axis = 1)
+	if with_kneighbors:
+		Xt = pipeline_transform(pipeline, iris_X)
+		kneighbors = classifier.kneighbors(Xt)
+		species_ids = DataFrame(kneighbors[1] + 1, columns = make_kneighbor_cols(classifier))
+		species = pandas.concat((species, species_ids), axis = 1)
 	store_csv(species, name)
 
 if "Iris" in datasets:
@@ -568,7 +584,7 @@ if "Iris" in datasets:
 	build_iris(iris_df, ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesIris")
 	build_iris(iris_df, GradientBoostingClassifier(init = None, n_estimators = 17, random_state = 13), "GradientBoostingIris")
 	build_iris(iris_df, HistGradientBoostingClassifier(max_iter = 10, random_state = 13), "HistGradientBoostingIris")
-	build_iris(iris_df, KNeighborsClassifier(metric = "manhattan"), "KNNIris", with_proba = False)
+	build_iris(iris_df, KNeighborsClassifier(metric = "manhattan"), "KNNIris", with_proba = False, with_kneighbors = True)
 	build_iris(iris_df, LinearDiscriminantAnalysis(), "LinearDiscriminantAnalysisIris")
 	build_iris(iris_df, LinearSVC(random_state = 13), "LinearSVCIris", with_proba = False)
 	build_iris(iris_df, CalibratedClassifierCV(LinearSVC(random_state = 13), ensemble = False, method = "isotonic"), "LinearSVCIsotonicIris")

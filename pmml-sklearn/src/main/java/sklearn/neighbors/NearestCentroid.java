@@ -20,7 +20,6 @@ package sklearn.neighbors;
 
 import java.util.List;
 
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.nearest_neighbor.NearestNeighborModel;
@@ -44,11 +43,6 @@ public class NearestCentroid extends SkLearnClassifier implements HasMetric, Has
 	@Override
 	public int getNumberOfOutputs(){
 		return 1;
-	}
-
-	@Override
-	public DataType getDataType(){
-		return DataType.FLOAT;
 	}
 
 	@Override
