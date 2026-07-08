@@ -21,8 +21,12 @@ package sklearn.ensemble.hist_gradient_boosting;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.UnsignedInts;
+import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.PythonObject;
 
 public class TreePredictor extends PythonObject {
@@ -38,7 +42,27 @@ public class TreePredictor extends PythonObject {
 			return null;
 		}
 
-		return Ints.toArray(getIntegerArray("raw_left_cat_bitsets"));
+		List<Number> values = getNumberArray("raw_left_cat_bitsets");
+
+		Function<Number, Integer> function = new Function<Number, Integer>(){
+
+			@Override
+			public Integer apply(Number value){
+
+				// numpy.uint32 values
+				if(value instanceof Long){
+					Long longValue = (Long)value;
+
+					return UnsignedInts.checkedCast(longValue);
+				}
+
+				return ValueUtil.asInt(value);
+			}
+		};
+
+		values = Lists.transform(values, function);
+
+		return Ints.toArray(values);
 	}
 
 	public double[] getValues(){
