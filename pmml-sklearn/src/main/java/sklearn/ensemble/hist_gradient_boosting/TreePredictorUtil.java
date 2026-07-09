@@ -105,9 +105,6 @@ public class TreePredictorUtil {
 
 					int row = bitsetIdx[index];
 
-					// XXX
-					int rawLeftCatBitset = rawLeftCatBitsets[row * 8];
-
 					List<Object> leftValues = new ArrayList<>();
 					List<Object> rightValues = new ArrayList<>();
 
@@ -116,9 +113,10 @@ public class TreePredictorUtil {
 
 						if(!valueFilter.test(value)){
 							continue;
-						} // End if
+						}
 
-						if(((rawLeftCatBitset >> i) & 1) == 1){
+						int word = rawLeftCatBitsets[row * 8 + (i / 32)];
+						if(((word >>> (i % 32)) & 1) == 1){
 							leftValues.add(value);
 						} else
 

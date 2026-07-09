@@ -86,7 +86,9 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 			public String getInputCsvPath(){
 				String path = super.getInputCsvPath();
 
-				path = path.replace("Dict", "");
+				path = path
+					.replace("Cat", "")
+					.replace("Dict", "");
 
 				return path;
 			}
@@ -222,6 +224,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateHistGradientBoostingAudit() throws Exception {
 		evaluate(HIST_GRADIENT_BOOSTING, AUDIT);
+	}
+
+	@Test
+	public void evaluateHistGradientBoostingAuditCat() throws Exception {
+		evaluate(HIST_GRADIENT_BOOSTING, AUDIT + "Cat");
 	}
 
 	@Test

@@ -246,6 +246,38 @@ if "Audit" in datasets:
 	build_audit_dict(audit_df, LogisticRegression(), "LogisticRegressionAuditDict")
 	build_audit_dict(audit_df, NearestCentroid(), "NearestCentroidAuditDict", with_proba = False)
 
+def build_audit_cat(audit_df, classifier, name):
+	audit_X, audit_y = split_csv(audit_df)
+
+	def _check_multiword(pipeline):
+		multiword = False
+		for predictors in pipeline["classifier"]._predictors:
+			for predictor in predictors:
+				bitsets = predictor.binned_left_cat_bitsets
+				if (bitsets[:, 1:] != 0).any():
+					multiword = True
+		assert multiword
+
+	pipeline = PMMLPipeline([
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_X, audit_y)
+	_check_multiword(pipeline)
+	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
+	store_pkl(pipeline, name)
+
+	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
+if "Audit" in datasets:
+	audit_df = load_audit("Audit", stringify = False)
+
+	audit_df = audit_df[["Age", "Hours", "Income", "Adjusted"]]
+
+	build_audit_cat(audit_df, HistGradientBoostingClassifier(max_iter = 11, categorical_features = ["Age"], random_state = 13), "HistGradientBoostingAuditCat")
+
 def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params = {}, predict_params = {}, predict_proba_params = {}, predict_transformer = None, predict_proba_transformer = None, **pmml_options):
 	audit_na_X, audit_na_y = split_csv(audit_na_df)
 
