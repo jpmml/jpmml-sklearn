@@ -51,7 +51,7 @@
 		<jpmml-lightgbm.version>1.6.7</jpmml-lightgbm.version>
 		<jpmml-python.version>1.3.21</jpmml-python.version>
 		<jpmml-statsmodels.version>1.3.13</jpmml-statsmodels.version>
-		<jpmml-xgboost.version>1.9.8</jpmml-xgboost.version>
+		<jpmml-xgboost.version>1.9.9</jpmml-xgboost.version>
 		<project.build.outputTimestamp>2026-06-30T09:45:50Z</project.build.outputTimestamp>
 	</properties>
 
