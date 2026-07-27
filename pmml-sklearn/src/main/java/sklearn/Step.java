@@ -33,6 +33,13 @@ import sklearn2pmml.SkLearn2PMMLFields;
 abstract
 public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 
+	/**
+	 * The parent step in the Scikit-Learn step graph.
+	 * This field is set by the parent (to itself) only for the duration of the encode method, and restored afterwards.
+	 */
+	private Step parent = null;
+
+
 	public Step(String module, String name){
 		super(module, name);
 	}
@@ -197,5 +204,13 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		} catch(ConversionException ce){
 			throw ce.ensureContext(this);
 		}
+	}
+
+	public Step getParent(){
+		return this.parent;
+	}
+
+	public void setParent(Step parent){
+		this.parent = parent;
 	}
 }

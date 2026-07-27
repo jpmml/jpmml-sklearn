@@ -110,7 +110,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 			List<? extends Transformer> transformers = getTransformers();
 
 			for(Transformer transformer : transformers){
-				features = transformer.encode(features, encoder);
+				features = transformer.encode(this, features, encoder);
 			}
 		}
 
@@ -138,7 +138,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 		if(hasFinalEstimator()){
 			Estimator estimator = getFinalEstimator();
 
-			return estimator.encode(schema);
+			return estimator.encode(this, schema);
 		}
 
 		throw new UnsupportedOperationException();

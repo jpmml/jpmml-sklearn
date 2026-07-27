@@ -78,6 +78,18 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 		return (Map)StepUtil.getTag(getSkLearnTags(), "transformer_tags");
 	}
 
+	public List<Feature> encode(Step parent, List<Feature> features, SkLearnEncoder encoder){
+		Step prevParent = getParent();
+
+		try {
+			setParent(parent);
+
+			return encode(features, encoder);
+		} finally {
+			setParent(prevParent);
+		}
+	}
+
 	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
 
 		try {

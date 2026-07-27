@@ -139,6 +139,18 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		return getClassName();
 	}
 
+	public Model encode(Step parent, Schema schema){
+		Step prevParent = getParent();
+
+		try {
+			setParent(parent);
+
+			return encode(schema);
+		} finally {
+			setParent(prevParent);
+		}
+	}
+
 	public Model encode(Schema schema){
 
 		try {
@@ -148,6 +160,30 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} catch(Exception e){
 			throw new SkLearnException("Failed to convert the estimator object (" + ClassDictUtil.formatClass(this)  +") to PMML", e)
 				.setContext(this);
+		}
+	}
+
+	public Model encode(Step parent, Object segmentId, Schema schema){
+		Step prevParent = getParent();
+
+		try {
+			setParent(parent);
+
+			return encode(segmentId, schema);
+		} finally {
+			setParent(prevParent);
+		}
+	}
+
+	public Model encode(Object segmentId, Schema schema){
+		Object prevSegmentId = getPMMLSegmentId();
+
+		try {
+			setPMMLSegmentId(segmentId);
+
+			return encode(schema);
+		} finally {
+			setPMMLSegmentId(prevSegmentId);
 		}
 	}
 
@@ -196,18 +232,6 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		}
 
 		return model;
-	}
-
-	public Model encode(Object segmentId, Schema schema){
-		Object prevSegmentId = getPMMLSegmentId();
-
-		try {
-			setPMMLSegmentId(segmentId);
-
-			return encode(schema);
-		} finally {
-			setPMMLSegmentId(prevSegmentId);
-		}
 	}
 
 	public Schema configureSchema(Schema schema){
