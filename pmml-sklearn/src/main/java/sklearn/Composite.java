@@ -104,6 +104,21 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	/**
 	 * @see Transformer
 	 */
+	public List<Feature> encodeFeatures(Step parent, List<Feature> features, SkLearnEncoder encoder){
+		Step prevParent = getParent();
+
+		try {
+			setParent(parent);
+
+			return encodeFeatures(features, encoder);
+		} finally {
+			setParent(prevParent);
+		}
+	}
+
+	/**
+	 * @see Transformer
+	 */
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 
 		if(hasTransformers()){
@@ -115,6 +130,21 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 		}
 
 		return features;
+	}
+
+	/**
+	 * @see Estimator
+	 */
+	public Model encodeModel(Step parent, Schema schema){
+		Step prevParent = getParent();
+
+		try {
+			setParent(parent);
+
+			return encodeModel(schema);
+		} finally {
+			setParent(prevParent);
+		}
 	}
 
 	/**

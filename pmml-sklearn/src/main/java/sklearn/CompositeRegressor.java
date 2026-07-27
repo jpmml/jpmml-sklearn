@@ -89,7 +89,7 @@ public class CompositeRegressor extends Regressor implements HasFeatureNamesIn, 
 	public Model encodeModel(Schema schema){
 		Composite composite = getComposite();
 
-		return composite.encodeModel(schema);
+		return composite.encodeModel(getParent(), schema);
 	}
 
 	@Override

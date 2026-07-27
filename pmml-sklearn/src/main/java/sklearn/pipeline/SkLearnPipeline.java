@@ -223,7 +223,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 
 		Schema schema = encoder.createSchema();
 
-		Model model = estimator.encode(schema);
+		Model model = estimator.encode(this, schema);
 
 		encoder.setModel(model);
 

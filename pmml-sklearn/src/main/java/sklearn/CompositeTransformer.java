@@ -61,7 +61,7 @@ public class CompositeTransformer extends Transformer implements HasHead, Proxy 
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Composite composite = getComposite();
 
-		return composite.encodeFeatures(features, encoder);
+		return composite.encodeFeatures(getParent(), features, encoder);
 	}
 
 	@Override

@@ -123,7 +123,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 
 		Schema schema = encoder.createSchema();
 
-		Model model = estimator.encode(schema);
+		Model model = estimator.encode(this, schema);
 
 		encoder.setModel(model);
 
