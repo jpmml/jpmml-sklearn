@@ -82,18 +82,14 @@ public class EncodableUtil {
 
 		SkLearnPipeline pipeline = new SkLearnPipeline(){
 
-			{
-				List<Object[]> steps = Collections.singletonList(new Object[]{"estimator", step});
-
-				setSteps(steps);
-			}
-
 			@Override
 			// No-op, to leave an identification mark into exception stack traces
 			public PMML encodePMML(){
 				return super.encodePMML();
 			}
 		};
+
+		pipeline.setSteps(Collections.singletonList(new Object[]{"estimator", step}));
 
 		return pipeline;
 	}
