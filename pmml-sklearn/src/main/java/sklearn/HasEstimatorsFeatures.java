@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Villu Ruusmann
+ * Copyright (c) 2026 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,18 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn.ensemble.iforest;
+package sklearn;
 
 import java.util.List;
 
-import sklearn.HasEstimatorsFeatures;
-import sklearn.Regressor;
+public interface HasEstimatorsFeatures {
 
-public interface HasIsolationForest extends HasEstimatorsFeatures {
-
-	List<Regressor> getEstimators();
-
-	Integer getMaxSamples();
-
-	Number getOffset();
+	List<List<Number>> getEstimatorsFeatures();
 }
