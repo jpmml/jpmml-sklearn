@@ -25,7 +25,7 @@ import org.jpmml.converter.Schema;
 import sklearn.Regressor;
 import sklearn.SkLearnRegressor;
 
-public class RegressorChain extends SkLearnRegressor {
+public class RegressorChain extends SkLearnRegressor implements HasEstimatorChain<Regressor> {
 
 	public RegressorChain(String module, String name){
 		super(module, name);
@@ -43,13 +43,15 @@ public class RegressorChain extends SkLearnRegressor {
 		List<Regressor> estimators = getEstimators();
 		List<Integer> order = getOrder();
 
-		return ChainUtil.encodeChain(estimators, order, schema);
+		return ChainUtil.encodeChain(this, schema);
 	}
 
+	@Override
 	public List<Regressor> getEstimators(){
 		return getRegressorList("estimators_");
 	}
 
+	@Override
 	public List<Integer> getOrder(){
 		return getIntegerArray("order_");
 	}

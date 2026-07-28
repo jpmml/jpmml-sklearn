@@ -40,7 +40,10 @@ public class ChainUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeChain(List<E> estimators, List<Integer> order, Schema schema){
+	public <E extends Estimator & HasEstimatorChain<?>> MiningModel encodeChain(E ensembleEstimator, Schema schema){
+		List<? extends Estimator> estimators = ensembleEstimator.getEstimators();
+		List<Integer> order = ensembleEstimator.getOrder();
+
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
@@ -54,7 +57,7 @@ public class ChainUtil {
 		List<Feature> augmentedFeatures = new ArrayList<>(features);
 
 		for(int i = 0; i < estimators.size(); i++){
-			E estimator = estimators.get(i);
+			Estimator estimator = estimators.get(i);
 			ScalarLabel scalarLabel = scalarLabels.get(i);
 
 			if(order.get(i) != i){

@@ -25,7 +25,7 @@ import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import sklearn.SkLearnClassifier;
 
-public class ClassifierChain extends SkLearnClassifier {
+public class ClassifierChain extends SkLearnClassifier implements HasEstimatorChain<Classifier> {
 
 	public ClassifierChain(String module, String name){
 		super(module, name);
@@ -40,16 +40,15 @@ public class ClassifierChain extends SkLearnClassifier {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<? extends Classifier> estimators = getEstimators();
-		List<Integer> order = getOrder();
-
-		return ChainUtil.encodeChain(estimators, order, schema);
+		return ChainUtil.encodeChain(this, schema);
 	}
 
+	@Override
 	public List<Classifier> getEstimators(){
 		return getClassifierList("estimators_");
 	}
 
+	@Override
 	public List<Integer> getOrder(){
 		return getIntegerArray("order_");
 	}
