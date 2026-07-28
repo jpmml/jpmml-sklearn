@@ -53,7 +53,7 @@ public class IsolationForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasIsolationForest & OutlierDetector> MiningModel encodeMiningModel(E estimator, List<TreeModel> treeModels, boolean corrected, boolean nodeSampleCorrected, Schema schema){
+	public <E extends Estimator & HasIsolationEnsemble & OutlierDetector> MiningModel encodeMiningModel(E estimator, List<TreeModel> treeModels, boolean corrected, boolean nodeSampleCorrected, Schema schema){
 		// "rawAnomalyScore / averagePathLength(maxSamples)"
 		Transformation normalizedAnomalyScore = new AbstractTransformation(){
 

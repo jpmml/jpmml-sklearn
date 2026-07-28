@@ -30,13 +30,13 @@ import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.OutlierDetector;
 import sklearn.Regressor;
-import sklearn.ensemble.iforest.HasIsolationForest;
+import sklearn.ensemble.iforest.HasIsolationEnsemble;
 import sklearn.ensemble.iforest.IsolationForestUtil;
 import sklearn.tree.Tree;
 import sktree.tree.ObliqueDecisionTreeRegressor;
 import sktree.tree.ProjectionManager;
 
-public class ExtendedIsolationForest extends Regressor implements HasIsolationForest, OutlierDetector {
+public class ExtendedIsolationForest extends Regressor implements HasIsolationEnsemble, OutlierDetector {
 
 	public ExtendedIsolationForest(String module, String name){
 		super(module, name);

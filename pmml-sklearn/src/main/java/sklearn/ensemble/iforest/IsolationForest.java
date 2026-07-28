@@ -41,7 +41,7 @@ import sklearn.tree.Tree;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class IsolationForest extends EnsembleRegressor implements HasIsolationForest, HasTreeOptions, OutlierDetector {
+public class IsolationForest extends EnsembleRegressor implements HasIsolationEnsemble, HasTreeOptions, OutlierDetector {
 
 	public IsolationForest(String module, String name){
 		super(module, name);

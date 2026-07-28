@@ -18,14 +18,11 @@
  */
 package sklearn.ensemble.iforest;
 
-import java.util.List;
-
+import sklearn.HasEstimatorEnsemble;
 import sklearn.HasEstimatorsFeatures;
 import sklearn.Regressor;
 
-public interface HasIsolationForest extends HasEstimatorsFeatures {
-
-	List<Regressor> getEstimators();
+public interface HasIsolationEnsemble extends HasEstimatorEnsemble<Regressor>, HasEstimatorsFeatures {
 
 	Integer getMaxSamples();
 
