@@ -58,7 +58,7 @@ public class TransformerWrapper extends Transformer {
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Transformer transformer = getTransformer();
 
-		return transformer.encode(features, encoder);
+		return transformer.encode(this, features, encoder);
 	}
 
 	public Transformer getTransformer(){

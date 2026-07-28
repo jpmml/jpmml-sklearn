@@ -32,6 +32,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
+import sklearn.Step;
 import sklearn.TransformerCastFunction;
 
 public class BinningProcess extends Initializer {
@@ -91,7 +92,7 @@ public class BinningProcess extends Initializer {
 				}
 			}
 
-			feature = Iterables.getOnlyElement(optimalBinning.encode(Collections.singletonList(feature), encoder));
+			feature = Iterables.getOnlyElement(optimalBinning.encode(Step.PARENT_ROOT, Collections.singletonList(feature), encoder));
 
 			result.add(feature);
 		}

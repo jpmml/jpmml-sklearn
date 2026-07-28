@@ -412,7 +412,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 			features.add(new WildcardFeature(outputEncoder, dataField));
 		}
 
-		List<Feature> outputFeatures = transformer.encode(features, outputEncoder);
+		List<Feature> outputFeatures = transformer.encode(Step.PARENT_ROOT, features, outputEncoder);
 
 		Map<String, Integer> finalResults = new LinkedHashMap<>();
 

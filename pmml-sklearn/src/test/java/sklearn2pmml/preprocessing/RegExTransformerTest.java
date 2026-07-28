@@ -36,6 +36,7 @@ import org.jpmml.evaluator.FieldValue;
 import org.jpmml.evaluator.FieldValueUtil;
 import org.jpmml.evaluator.VirtualEvaluationContext;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Step;
 
 abstract
 public class RegExTransformerTest {
@@ -58,7 +59,7 @@ public class RegExTransformerTest {
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
-		List<Feature> outputFeatures = regExTransformer.encode(Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = regExTransformer.encode(Step.PARENT_ROOT, Collections.singletonList(inputFeature), encoder);
 
 		Feature outputFeature = Iterables.getOnlyElement(outputFeatures);
 

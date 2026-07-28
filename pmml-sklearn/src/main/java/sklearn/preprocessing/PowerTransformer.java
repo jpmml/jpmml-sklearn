@@ -33,6 +33,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Step;
 import sklearn.SkLearnTransformer;
 
 public class PowerTransformer extends SkLearnTransformer {
@@ -78,7 +79,7 @@ public class PowerTransformer extends SkLearnTransformer {
 		if(standardize){
 			StandardScaler scaler = getScaler();
 
-			result = scaler.encode(result, encoder);
+			result = scaler.encode(Step.PARENT_ROOT, result, encoder);
 		}
 
 		return result;

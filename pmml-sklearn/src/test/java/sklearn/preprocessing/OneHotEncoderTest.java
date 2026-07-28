@@ -31,6 +31,7 @@ import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.jupiter.api.Test;
+import sklearn.Step;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -49,7 +50,7 @@ public class OneHotEncoderTest {
 		OneHotEncoder oneHotEncoder = new OneHotEncoder("sklearn.preprocessing.data", "OneHotEncoder");
 		oneHotEncoder.put("n_values_", 3);
 
-		List<Feature> outputFeatures = oneHotEncoder.encode(Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = oneHotEncoder.encode(Step.PARENT_ROOT, Collections.singletonList(inputFeature), encoder);
 		for(int i = 0; i < 3; i++){
 			BinaryFeature outputFeature = (BinaryFeature)outputFeatures.get(i);
 

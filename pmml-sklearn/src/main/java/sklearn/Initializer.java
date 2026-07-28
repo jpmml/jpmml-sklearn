@@ -52,16 +52,21 @@ public class Initializer extends Transformer {
 	}
 
 	@Override
-	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encode(Step parent, List<Feature> features, SkLearnEncoder encoder){
+		Step prevParent = getParent();
 
 		try {
-			return encodeInternal(features, encoder);
+			setParent(parent);
+
+			return encodeInternal(parent, features, encoder);
 		} catch(ConversionException ce){
 			throw ce.ensureContext(this);
+		} finally {
+			setParent(prevParent);
 		}
 	}
 
-	private List<Feature> encodeInternal(List<Feature> features, SkLearnEncoder encoder){
+	private List<Feature> encodeInternal(Step parent, List<Feature> features, SkLearnEncoder encoder){
 
 		if(features.isEmpty()){
 			checkVersion();
@@ -69,6 +74,6 @@ public class Initializer extends Transformer {
 			return initializeFeatures(encoder);
 		}
 
-		return super.encode(features, encoder);
+		return super.encode(parent, features, encoder);
 	}
 }

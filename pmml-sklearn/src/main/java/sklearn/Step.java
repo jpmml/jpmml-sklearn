@@ -213,4 +213,12 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	public void setParent(Step parent){
 		this.parent = parent;
 	}
+
+	/**
+	 * The parent step for physically or logically &quot;topmost&quot; steps.
+	 * A physically topmost step is a standalone Scikit-Learn object that the user passed to the converter.
+	 * A logically topmost step is one that does not connect to the surrounding step graph,
+	 * such as an ad-hoc step that exists inside another Scikit-Learn object unbeknownst to the user.
+	 */
+	public static final Step PARENT_ROOT = null;
 }

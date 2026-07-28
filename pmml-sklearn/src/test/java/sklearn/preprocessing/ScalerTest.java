@@ -27,6 +27,7 @@ import org.dmg.pmml.DerivedField;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Step;
 import sklearn.Transformer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +43,7 @@ class ScalerTest {
 		DataField dataField = encoder.createDataField("x");
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
-		Feature outputFeature = Iterables.getOnlyElement(transformer.encode(Collections.singletonList(inputFeature), encoder));
+		Feature outputFeature = Iterables.getOnlyElement(transformer.encode(Step.PARENT_ROOT, Collections.singletonList(inputFeature), encoder));
 
 		assertSame(inputFeature, outputFeature);
 	}
@@ -53,7 +54,7 @@ class ScalerTest {
 		DataField dataField = encoder.createDataField("x");
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
-		Feature outputFeature = Iterables.getOnlyElement(transformer.encode(Collections.singletonList(inputFeature), encoder));
+		Feature outputFeature = Iterables.getOnlyElement(transformer.encode(Step.PARENT_ROOT, Collections.singletonList(inputFeature), encoder));
 
 		assertNotSame(inputFeature, outputFeature);
 

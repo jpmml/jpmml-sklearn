@@ -65,7 +65,7 @@ public class SelectFirstUtil {
 		List<Feature> controlFeatures = (List)features;
 
 		if(controller != null){
-			controlFeatures = controller.encode(controlFeatures, encoder);
+			controlFeatures = controller.encode(ensembleEstimator, controlFeatures, encoder);
 		}
 
 		CastFunction<Estimator> castFunction = new EstimatorCastFunction<Estimator>(Estimator.class);

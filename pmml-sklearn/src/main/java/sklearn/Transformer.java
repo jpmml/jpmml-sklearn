@@ -84,21 +84,14 @@ public class Transformer extends Step implements HasPMMLName<Transformer> {
 		try {
 			setParent(parent);
 
-			return encode(features, encoder);
-		} finally {
-			setParent(prevParent);
-		}
-	}
-
-	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
-
-		try {
 			return encodeInternal(features, encoder);
 		} catch(SkLearnException se){
 			throw se.ensureContext(this);
 		} catch(Exception e){
 			throw new SkLearnException("Failed to convert the transformer object (" + ClassDictUtil.formatClass(this) + ") to PMML", e)
 				.setContext(this);
+		} finally {
+			setParent(prevParent);
 		}
 	}
 

@@ -43,6 +43,7 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
+import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.compose.ColumnTransformer;
 import sklearn.preprocessing.OrdinalEncoder;
@@ -170,7 +171,7 @@ public class HistGradientBoostingUtil {
 			}
 		};
 
-		List<Feature> filterFeatures = filterPreprocessor.encode(features, encoder);
+		List<Feature> filterFeatures = filterPreprocessor.encode(Step.PARENT_ROOT, features, encoder);
 
 		return new Schema(encoder, label, filterFeatures);
 	}

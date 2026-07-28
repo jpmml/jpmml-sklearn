@@ -34,6 +34,7 @@ import org.jpmml.converter.WildcardFeature;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.junit.jupiter.api.Test;
 import sklearn.SkLearnFields;
+import sklearn.Step;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,7 +54,7 @@ public class LabelBinarizerTest {
 		binarizer.put("pos_label", 1d);
 		binarizer.put("neg_label", -1d);
 
-		List<Feature> outputFeatures = binarizer.encode(Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = binarizer.encode(Step.PARENT_ROOT, Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof CategoricalFeature);
 		}
@@ -62,7 +63,7 @@ public class LabelBinarizerTest {
 
 		binarizer.put("neg_label", 0d);
 
-		outputFeatures = binarizer.encode(Collections.singletonList(inputFeature), encoder);
+		outputFeatures = binarizer.encode(Step.PARENT_ROOT, Collections.singletonList(inputFeature), encoder);
 		for(Feature outputFeature : outputFeatures){
 			assertTrue(outputFeature instanceof BinaryFeature);
 		}

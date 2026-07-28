@@ -40,6 +40,7 @@ import org.jpmml.model.ReflectionUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 import org.junit.jupiter.api.Test;
+import sklearn.Step;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -124,7 +125,7 @@ public class ExpressionTransformerTest {
 
 		Feature inputFeature = new WildcardFeature(encoder, dataField);
 
-		List<Feature> outputFeatures = expressionTransformer.encode(Collections.singletonList(inputFeature), encoder);
+		List<Feature> outputFeatures = expressionTransformer.encode(Step.PARENT_ROOT, Collections.singletonList(inputFeature), encoder);
 
 		Feature outputFeature = Iterables.getOnlyElement(outputFeatures);
 

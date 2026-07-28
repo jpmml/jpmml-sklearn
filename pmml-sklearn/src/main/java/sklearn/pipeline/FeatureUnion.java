@@ -73,7 +73,7 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 
 			List<Feature> transformerFeatures = new ArrayList<>(features);
 
-			transformerFeatures = transformer.encode(transformerFeatures, encoder);
+			transformerFeatures = transformer.encode(this, transformerFeatures, encoder);
 
 			if(transformerWeights != null && !transformerWeights.isEmpty()){
 				Number weight = (Number)ScalarUtil.decode(transformerWeights.get(name));

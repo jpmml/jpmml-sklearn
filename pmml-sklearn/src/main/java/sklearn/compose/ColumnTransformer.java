@@ -72,7 +72,7 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 
 			List<Feature> rowFeatures = getFeatures(fittedTransformer, features, encoder);
 
-			rowFeatures = transformer.encode(rowFeatures, encoder);
+			rowFeatures = transformer.encode(this, rowFeatures, encoder);
 
 			result.addAll(rowFeatures);
 		}

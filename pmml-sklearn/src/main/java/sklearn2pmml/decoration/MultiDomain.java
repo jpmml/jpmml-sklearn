@@ -47,7 +47,7 @@ public class MultiDomain extends Decorator {
 			List<Feature> domainFeatures = Collections.singletonList(feature);
 
 			if(domain != null){
-				domainFeatures = domain.encode(domainFeatures, encoder);
+				domainFeatures = domain.encode(this, domainFeatures, encoder);
 			}
 
 			result.addAll(domainFeatures);

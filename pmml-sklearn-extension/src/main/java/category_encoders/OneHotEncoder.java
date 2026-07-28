@@ -29,6 +29,7 @@ import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.UnsupportedFeatureException;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Step;
 
 public class OneHotEncoder extends BaseEncoder {
 
@@ -45,7 +46,7 @@ public class OneHotEncoder extends BaseEncoder {
 		String handleUnknown = getHandleUnknown();
 		OrdinalEncoder ordinalEncoder = getOrdinalEncoder();
 
-		features = ordinalEncoder.encode(features, encoder);
+		features = ordinalEncoder.encode(Step.PARENT_ROOT, features, encoder);
 
 		List<Feature> result = new ArrayList<>();
 

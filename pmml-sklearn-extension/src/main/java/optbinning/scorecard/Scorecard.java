@@ -124,7 +124,7 @@ public class Scorecard extends Estimator implements HasClasses {
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		features = binningProcess.encode((List)features, encoder);
+		features = binningProcess.encode(this, (List)features, encoder);
 
 		schema = new Schema(encoder, label, features);
 

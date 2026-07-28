@@ -23,6 +23,7 @@ import java.util.List;
 import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.Feature;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.Step;
 
 public class BinaryEncoder extends BaseNEncoder {
 
@@ -31,18 +32,23 @@ public class BinaryEncoder extends BaseNEncoder {
 	}
 
 	@Override
-	public List<Feature> encode(List<Feature> features, SkLearnEncoder encoder){
+	public List<Feature> encode(Step parent, List<Feature> features, SkLearnEncoder encoder){
+		Step prevParent = getParent();
 
 		try {
+			setParent(parent);
+
 			BaseNEncoder baseNEncoder = getBaseNEncoder();
 
 			if(baseNEncoder != this){
-				return baseNEncoder.encode(features, encoder);
+				return baseNEncoder.encode(Step.PARENT_ROOT, features, encoder);
 			}
 
-			return super.encode(features, encoder);
+			return super.encode(parent, features, encoder);
 		} catch(ConversionException ce){
 			throw ce.ensureContext(this);
+		} finally {
+			setParent(prevParent);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Villu Ruusmann
+ * Copyright (c) 2026 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -16,34 +16,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml.preprocessing;
+package sklearn;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.jpmml.converter.Feature;
-import org.jpmml.converter.SchemaUtil;
-import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
 
-public class WordCountTransformer extends StringTransformer {
+abstract
+public class StepTest {
 
-	public WordCountTransformer(String module, String name){
-		super(module, name);
+	static
+	protected SkLearnPipeline createPipeline(String name, Step step){
+		SkLearnPipeline pipeline = new SkLearnPipeline();
+
+		pipeline.setSteps(Collections.singletonList(new Object[]{name, step}));
+
+		return pipeline;
 	}
 
-	@Override
-	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
-		SkLearnPipeline pipeline = getPipeline();
+	static
+	protected List<Step> collectParents(Step step){
+		List<Step> result = new ArrayList<>();
 
-		SchemaUtil.checkSize(1, features);
+		for(Step parent = step.getParent(); parent != null; parent = parent.getParent()){
+			result.add(parent);
+		}
 
-		Transformer transformer = pipeline.toTransformer();
-
-		return transformer.encode(this, features, encoder);
-	}
-
-	public SkLearnPipeline getPipeline(){
-		return getStep("pipeline_", SkLearnPipeline.class);
+		return result;
 	}
 }

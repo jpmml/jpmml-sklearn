@@ -65,7 +65,7 @@ public class SelectFirstTransformer extends Transformer implements HasController
 		List<Feature> controlFeatures = features;
 
 		if(controller != null){
-			controlFeatures = controller.encode(controlFeatures, encoder);
+			controlFeatures = controller.encode(this, controlFeatures, encoder);
 		}
 
 		CastFunction<Transformer> castFunction = new TransformerCastFunction<Transformer>(Transformer.class);
@@ -86,7 +86,7 @@ public class SelectFirstTransformer extends Transformer implements HasController
 
 			Expression expression = EvaluatableUtil.translateExpression(expr, scope);
 
-			List<Feature> stepFeatures = transformer.encode(Collections.singletonList(feature), encoder);
+			List<Feature> stepFeatures = transformer.encode(this, Collections.singletonList(feature), encoder);
 
 			Feature stepFeature = SchemaUtil.getOnlyFeature(stepFeatures);
 

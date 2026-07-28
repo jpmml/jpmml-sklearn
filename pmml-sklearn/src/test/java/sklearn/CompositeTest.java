@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class CompositeTest {
+public class CompositeTest extends StepTest {
 
 	@Test
 	public void encodeTransformer(){
@@ -57,11 +57,9 @@ public class CompositeTest {
 			}
 		};
 
-		SkLearnPipeline transformerPipeline = new SkLearnPipeline();
-		transformerPipeline.setSteps(Collections.singletonList(new Object[]{"transformer", transformer}));
+		SkLearnPipeline transformerPipeline = createPipeline("transformer", transformer);
 
-		SkLearnPipeline pipeline = new SkLearnPipeline();
-		pipeline.setSteps(Collections.singletonList(new Object[]{"pipeline", transformerPipeline}));
+		SkLearnPipeline pipeline = createPipeline("pipeline", transformerPipeline);
 
 		Transformer compositeTransformer = pipeline.toTransformer();
 
@@ -98,11 +96,9 @@ public class CompositeTest {
 			}
 		};
 
-		SkLearnPipeline regressorPipeline = new SkLearnPipeline();
-		regressorPipeline.setSteps(Collections.singletonList(new Object[]{"regressor", regressor}));
+		SkLearnPipeline regressorPipeline = createPipeline("regressor", regressor);
 
-		SkLearnPipeline pipeline = new SkLearnPipeline();
-		pipeline.setSteps(Collections.singletonList(new Object[]{"pipeline", regressorPipeline}));
+		SkLearnPipeline pipeline = createPipeline("pipeline", regressorPipeline);
 
 		Regressor compositeRegressor = pipeline.toRegressor();
 
@@ -114,16 +110,5 @@ public class CompositeTest {
 
 		assertSame(regressorPipeline, parents.get(0));
 		assertSame(pipeline, parents.get(1));
-	}
-
-	static
-	private List<Step> collectParents(Step step){
-		List<Step> result = new ArrayList<>();
-
-		for(Step parent = step.getParent(); parent != null; parent = parent.getParent()){
-			result.add(parent);
-		}
-
-		return result;
 	}
 }

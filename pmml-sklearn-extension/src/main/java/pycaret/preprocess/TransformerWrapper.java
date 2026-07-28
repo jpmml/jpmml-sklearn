@@ -105,7 +105,7 @@ public class TransformerWrapper extends Initializer {
 			return features;
 		}
 
-		List<Feature> transformedIncludeFeatures = transformer.encode(includeFeatures, encoder);
+		List<Feature> transformedIncludeFeatures = transformer.encode(this, includeFeatures, encoder);
 
 		boolean replaceFeatures = false;
 

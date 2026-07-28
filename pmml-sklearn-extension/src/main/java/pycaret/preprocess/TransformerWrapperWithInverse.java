@@ -83,7 +83,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 
 			FieldUtil.clearValues(dataField, Value.Property.VALID);
 
-			Feature transformedLabelFeature = Iterables.getOnlyElement(transformer.encode(Collections.singletonList(labelFeature), encoder));
+			Feature transformedLabelFeature = Iterables.getOnlyElement(transformer.encode(this, Collections.singletonList(labelFeature), encoder));
 
 			result = new ArrayList<>(result);
 			result.set(labelFeatureIndex, transformedLabelFeature);

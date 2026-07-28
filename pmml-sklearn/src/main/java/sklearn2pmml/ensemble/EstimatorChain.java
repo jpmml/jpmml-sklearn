@@ -193,7 +193,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 		List<Feature> controlFeatures = (List)features;
 
 		if(controller != null){
-			controlFeatures = controller.encode(controlFeatures, encoder);
+			controlFeatures = controller.encode(this, controlFeatures, encoder);
 		}
 
 		CastFunction<Estimator> castFunction = new EstimatorCastFunction<Estimator>(Estimator.class);

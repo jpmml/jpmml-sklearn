@@ -57,7 +57,7 @@ public class BusinessDecisionTransformer extends Transformer {
 		Model model = encoder.getModel();
 
 		if(transformer != null){
-			features = transformer.encode(features, encoder);
+			features = transformer.encode(this, features, encoder);
 		}
 
 		Feature feature = SchemaUtil.getOnlyFeature(features);
