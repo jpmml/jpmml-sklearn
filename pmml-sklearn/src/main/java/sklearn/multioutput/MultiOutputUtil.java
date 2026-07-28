@@ -30,6 +30,7 @@ import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
+import sklearn.HasEstimatorEnsemble;
 
 public class MultiOutputUtil {
 
@@ -37,7 +38,8 @@ public class MultiOutputUtil {
 	}
 
 	static
-	public <E extends Estimator> Model encodeEstimators(List<E> estimators, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<?>> Model encodeEstimators(E ensembleEstimator, Schema schema){
+		List<? extends Estimator> estimators = ensembleEstimator.getEstimators();
 
 		if(estimators.size() == 1){
 			Estimator estimator = estimators.get(0);
@@ -55,7 +57,7 @@ public class MultiOutputUtil {
 			List<Model> models = new ArrayList<>();
 
 			for(int i = 0; i < estimators.size(); i++){
-				E estimator = estimators.get(i);
+				Estimator estimator = estimators.get(i);
 				ScalarLabel scalarLabel = scalarLabels.get(i);
 
 				Schema segmentSchema = schema.toRelabeledSchema(scalarLabel);

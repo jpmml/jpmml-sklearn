@@ -23,9 +23,10 @@ import java.util.List;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.SkLearnClassifier;
 
-public class MultiOutputClassifier extends SkLearnClassifier {
+public class MultiOutputClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
 
 	public MultiOutputClassifier(String module, String name){
 		super(module, name);
@@ -40,11 +41,10 @@ public class MultiOutputClassifier extends SkLearnClassifier {
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<Classifier> estimators = getEstimators();
-
-		return MultiOutputUtil.encodeEstimators(estimators, schema);
+		return MultiOutputUtil.encodeEstimators(this, schema);
 	}
 
+	@Override
 	public List<Classifier> getEstimators(){
 		return getClassifierList("estimators_");
 	}

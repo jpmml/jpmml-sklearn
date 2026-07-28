@@ -23,9 +23,10 @@ import java.util.List;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.SkLearnRegressor;
 
-public class MultiOutputRegressor extends SkLearnRegressor {
+public class MultiOutputRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<Regressor> {
 
 	public MultiOutputRegressor(String module, String name){
 		super(module, name);
@@ -40,11 +41,10 @@ public class MultiOutputRegressor extends SkLearnRegressor {
 
 	@Override
 	public Model encodeModel(Schema schema){
-		List<Regressor> estimators = getEstimators();
-
-		return MultiOutputUtil.encodeEstimators(estimators, schema);
+		return MultiOutputUtil.encodeEstimators(this, schema);
 	}
 
+	@Override
 	public List<Regressor> getEstimators(){
 		return getRegressorList("estimators_");
 	}
