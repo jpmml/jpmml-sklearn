@@ -21,15 +21,15 @@ package sklearn.ensemble.bagging;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.Schema;
+import sklearn.HasEstimatorsFeatures;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
 
-public class BaggingClassifier extends EnsembleClassifier {
+public class BaggingClassifier extends EnsembleClassifier implements HasEstimatorsFeatures {
 
 	public BaggingClassifier(String module, String name){
 		super(module, name);
@@ -38,7 +38,6 @@ public class BaggingClassifier extends EnsembleClassifier {
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		List<Classifier> estimators = getEstimators();
-		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
@@ -53,13 +52,14 @@ public class BaggingClassifier extends EnsembleClassifier {
 			}
 		}
 
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunction.CLASSIFICATION, multipleModelMethod, schema);
+		MiningModel miningModel = BaggingUtil.encodeBagging(this, multipleModelMethod, schema);
 
 		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 
 		return miningModel;
 	}
 
+	@Override
 	public List<List<Number>> getEstimatorsFeatures(){
 		return getArrayList("estimators_features_", Number.class);
 	}

@@ -20,14 +20,14 @@ package sklearn.ensemble.bagging;
 
 import java.util.List;
 
-import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.Schema;
+import sklearn.HasEstimatorsFeatures;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 
-public class BaggingRegressor extends EnsembleRegressor {
+public class BaggingRegressor extends EnsembleRegressor implements HasEstimatorsFeatures {
 
 	public BaggingRegressor(String module, String name){
 		super(module, name);
@@ -35,14 +35,12 @@ public class BaggingRegressor extends EnsembleRegressor {
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<Regressor> estimators = getEstimators();
-		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
-
-		MiningModel miningModel = BaggingUtil.encodeBagging(estimators, estimatorsFeatures, MiningFunction.REGRESSION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+		MiningModel miningModel = BaggingUtil.encodeBagging(this, Segmentation.MultipleModelMethod.AVERAGE, schema);
 
 		return miningModel;
 	}
 
+	@Override
 	public List<List<Number>> getEstimatorsFeatures(){
 		return getArrayList("estimators_features_", Number.class);
 	}

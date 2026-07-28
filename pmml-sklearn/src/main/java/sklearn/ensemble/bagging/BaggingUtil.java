@@ -30,6 +30,8 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
+import sklearn.HasEstimatorEnsemble;
+import sklearn.HasEstimatorsFeatures;
 
 public class BaggingUtil {
 
@@ -37,13 +39,17 @@ public class BaggingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeBagging(List<E> estimators, List<List<Number>> estimatorsFeatures, MiningFunction miningFunction, Segmentation.MultipleModelMethod multipleModelMethod, Schema schema){
+	public <E extends Estimator & HasEstimatorEnsemble<?> & HasEstimatorsFeatures> MiningModel encodeBagging(E ensembleEstimator, Segmentation.MultipleModelMethod multipleModelMethod, Schema schema){
+		List<? extends Estimator> estimators = ensembleEstimator.getEstimators();
+		List<List<Number>> estimatorsFeatures = ensembleEstimator.getEstimatorsFeatures();
+		MiningFunction miningFunction = ensembleEstimator.getMiningFunction();
+
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<Model> models = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
-			E estimator = estimators.get(i);
+			Estimator estimator = estimators.get(i);
 			List<Number> estimatorFeatures = estimatorsFeatures.get(i);
 
 			Schema estimatorSchema = segmentSchema.toSubSchema(Ints.toArray(estimatorFeatures));
