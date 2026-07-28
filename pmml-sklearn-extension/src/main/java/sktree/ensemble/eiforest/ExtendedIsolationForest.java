@@ -36,7 +36,7 @@ import sklearn.tree.Tree;
 import sktree.tree.ObliqueDecisionTreeRegressor;
 import sktree.tree.ProjectionManager;
 
-public class ExtendedIsolationForest extends Regressor implements HasIsolationEnsemble, OutlierDetector {
+public class ExtendedIsolationForest extends Regressor implements HasIsolationEnsemble<ObliqueDecisionTreeRegressor>, OutlierDetector {
 
 	public ExtendedIsolationForest(String module, String name){
 		super(module, name);
@@ -59,8 +59,7 @@ public class ExtendedIsolationForest extends Regressor implements HasIsolationEn
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		@SuppressWarnings({"rawtypes", "unchecked"})
-		List<ObliqueDecisionTreeRegressor> estimators = (List)getEstimators();
+		List<ObliqueDecisionTreeRegressor> estimators = getEstimators();
 		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
 		// Assume SkLearn 1.3.0+
@@ -101,7 +100,7 @@ public class ExtendedIsolationForest extends Regressor implements HasIsolationEn
 	}
 
 	@Override
-	public List<Regressor> getEstimators(){
+	public List<ObliqueDecisionTreeRegressor> getEstimators(){
 		return getEstimatorList("estimators_", ObliqueDecisionTreeRegressor.class);
 	}
 

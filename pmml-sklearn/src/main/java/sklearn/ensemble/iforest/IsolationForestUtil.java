@@ -45,6 +45,8 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import sklearn.Estimator;
 import sklearn.OutlierDetector;
 import sklearn.OutlierDetectorUtil;
+import sklearn.Regressor;
+import sklearn.tree.HasTree;
 import sklearn.tree.Tree;
 
 public class IsolationForestUtil {
@@ -53,7 +55,7 @@ public class IsolationForestUtil {
 	}
 
 	static
-	public <E extends Estimator & HasIsolationEnsemble & OutlierDetector> MiningModel encodeMiningModel(E estimator, List<TreeModel> treeModels, boolean corrected, boolean nodeSampleCorrected, Schema schema){
+	public <E extends Estimator & HasIsolationEnsemble<T> & OutlierDetector, T extends Regressor & HasTree> MiningModel encodeMiningModel(E estimator, List<TreeModel> treeModels, boolean corrected, boolean nodeSampleCorrected, Schema schema){
 		// "rawAnomalyScore / averagePathLength(maxSamples)"
 		Transformation normalizedAnomalyScore = new AbstractTransformation(){
 

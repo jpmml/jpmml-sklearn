@@ -29,7 +29,7 @@ import sklearn.HasEstimatorsFeatures;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
 
-public class BaggingClassifier extends EnsembleClassifier implements HasEstimatorsFeatures {
+public class BaggingClassifier extends EnsembleClassifier<Classifier> implements HasEstimatorsFeatures {
 
 	public BaggingClassifier(String module, String name){
 		super(module, name);

@@ -49,7 +49,7 @@ import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeClassifier;
 import sklearn.tree.TreeUtil;
 
-public class AdaBoostClassifier extends EnsembleClassifier implements HasTreeOptions {
+public class AdaBoostClassifier extends EnsembleClassifier<Classifier> implements HasTreeOptions {
 
 	public AdaBoostClassifier(String module, String name){
 		super(module, name);

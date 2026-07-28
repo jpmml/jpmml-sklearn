@@ -38,7 +38,7 @@ import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class AdaBoostRegressor extends EnsembleRegressor implements HasTreeOptions {
+public class AdaBoostRegressor extends EnsembleRegressor<Regressor> implements HasTreeOptions {
 
 	public AdaBoostRegressor(String module, String name){
 		super(module, name);

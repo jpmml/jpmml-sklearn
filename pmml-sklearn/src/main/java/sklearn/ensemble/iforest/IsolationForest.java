@@ -41,7 +41,7 @@ import sklearn.tree.Tree;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class IsolationForest extends EnsembleRegressor implements HasIsolationEnsemble, HasTreeOptions, OutlierDetector {
+public class IsolationForest extends EnsembleRegressor<TreeRegressor> implements HasIsolationEnsemble<TreeRegressor>, HasTreeOptions, OutlierDetector {
 
 	public IsolationForest(String module, String name){
 		super(module, name);
@@ -65,8 +65,7 @@ public class IsolationForest extends EnsembleRegressor implements HasIsolationEn
 	@Override
 	public MiningModel encodeModel(Schema schema){
 		String sklearnVersion = getSkLearnVersion();
-		@SuppressWarnings({"rawtypes", "unchecked"})
-		List<TreeRegressor> estimators = (List)getEstimators();
+		List<TreeRegressor> estimators = getEstimators();
 		List<List<Number>> estimatorsFeatures = getEstimatorsFeatures();
 
 		// See https://github.com/scikit-learn/scikit-learn/issues/8549
@@ -135,7 +134,7 @@ public class IsolationForest extends EnsembleRegressor implements HasIsolationEn
 	}
 
 	@Override
-	public List<Regressor> getEstimators(){
+	public List<TreeRegressor> getEstimators(){
 		return getEstimatorList("estimators_", TreeRegressor.class);
 	}
 

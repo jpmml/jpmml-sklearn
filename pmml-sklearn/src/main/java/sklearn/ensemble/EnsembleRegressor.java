@@ -27,7 +27,7 @@ import sklearn.Regressor;
 import sklearn.SkLearnRegressor;
 
 abstract
-public class EnsembleRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<Regressor> {
+public class EnsembleRegressor<E extends Regressor> extends SkLearnRegressor implements HasEstimatorEnsemble<E> {
 
 	public EnsembleRegressor(String module, String name){
 		super(module, name);
@@ -59,7 +59,8 @@ public class EnsembleRegressor extends SkLearnRegressor implements HasEstimatorE
 	}
 
 	@Override
-	public List<Regressor> getEstimators(){
-		return getRegressorList("estimators_");
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public List<E> getEstimators(){
+		return (List)getRegressorList("estimators_");
 	}
 }

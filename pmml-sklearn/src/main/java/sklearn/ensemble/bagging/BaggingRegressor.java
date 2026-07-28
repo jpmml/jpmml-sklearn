@@ -27,7 +27,7 @@ import sklearn.HasEstimatorsFeatures;
 import sklearn.Regressor;
 import sklearn.ensemble.EnsembleRegressor;
 
-public class BaggingRegressor extends EnsembleRegressor implements HasEstimatorsFeatures {
+public class BaggingRegressor extends EnsembleRegressor<Regressor> implements HasEstimatorsFeatures {
 
 	public BaggingRegressor(String module, String name){
 		super(module, name);

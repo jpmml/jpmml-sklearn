@@ -27,7 +27,7 @@ import sklearn.HasEstimatorEnsemble;
 import sklearn.SkLearnClassifier;
 
 abstract
-public class EnsembleClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
+public class EnsembleClassifier<E extends Classifier> extends SkLearnClassifier implements HasEstimatorEnsemble<E> {
 
 	public EnsembleClassifier(String module, String name){
 		super(module, name);
@@ -59,7 +59,8 @@ public class EnsembleClassifier extends SkLearnClassifier implements HasEstimato
 	}
 
 	@Override
-	public List<Classifier> getEstimators(){
-		return getClassifierList("estimators_");
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public List<E> getEstimators(){
+		return (List)getClassifierList("estimators_");
 	}
 }
