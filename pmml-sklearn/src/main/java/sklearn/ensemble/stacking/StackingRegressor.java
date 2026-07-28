@@ -30,13 +30,12 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Estimator;
-import sklearn.HasEstimatorEnsemble;
 import sklearn.Regressor;
 import sklearn.SkLearnMethods;
 import sklearn.SkLearnRegressor;
 import sklearn.StepUtil;
 
-public class StackingRegressor extends SkLearnRegressor implements HasEstimatorEnsemble<Regressor> {
+public class StackingRegressor extends SkLearnRegressor implements HasEstimatorStack<Regressor> {
 
 	public StackingRegressor(String module, String name){
 		super(module, name);
@@ -51,11 +50,6 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<Regressor> estimators = getEstimators();
-		Regressor finalEstimator = getFinalEstimator();
-		Boolean passthrough = getPassthrough();
-		List<String> stackMethod = getStackMethod();
-
 		ContinuousLabel continuousLabel = schema.requireContinuousLabel();
 
 		StackingUtil.PredictFunction predictFunction = new StackingUtil.PredictFunction(){
@@ -76,7 +70,7 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 			}
 		};
 
-		return StackingUtil.encodeStacking(estimators, stackMethod, predictFunction, finalEstimator, passthrough, schema);
+		return StackingUtil.encodeStacking(this, predictFunction, schema);
 	}
 
 	@Override
@@ -84,14 +78,17 @@ public class StackingRegressor extends SkLearnRegressor implements HasEstimatorE
 		return getRegressorList("estimators_");
 	}
 
+	@Override
 	public Regressor getFinalEstimator(){
 		return getRegressor("final_estimator_");
 	}
 
+	@Override
 	public Boolean getPassthrough(){
 		return getBoolean("passthrough");
 	}
 
+	@Override
 	public List<String> getStackMethod(){
 		return getEnumList("stack_method_", this::getStringList, Arrays.asList(SkLearnMethods.PREDICT));
 	}

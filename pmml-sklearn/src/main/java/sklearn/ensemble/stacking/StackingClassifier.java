@@ -31,12 +31,11 @@ import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Classifier;
-import sklearn.HasEstimatorEnsemble;
 import sklearn.SkLearnClassifier;
 import sklearn.SkLearnMethods;
 import sklearn.StepUtil;
 
-public class StackingClassifier extends SkLearnClassifier implements HasEstimatorEnsemble<Classifier> {
+public class StackingClassifier extends SkLearnClassifier implements HasEstimatorStack<Classifier> {
 
 	public StackingClassifier(String module, String name){
 		super(module, name);
@@ -51,11 +50,6 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		List<Classifier> estimators = getEstimators();
-		Classifier finalEstimator = getFinalEstimator();
-		Boolean passthrough = getPassthrough();
-		List<String> stackMethod = getStackMethod();
-
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 		List<?> values;
@@ -92,7 +86,7 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 			}
 		};
 
-		return StackingUtil.encodeStacking(estimators, stackMethod, predictFunction, finalEstimator, passthrough, schema);
+		return StackingUtil.encodeStacking(this, predictFunction, schema);
 	}
 
 	@Override
@@ -100,14 +94,17 @@ public class StackingClassifier extends SkLearnClassifier implements HasEstimato
 		return getClassifierList("estimators_");
 	}
 
+	@Override
 	public Classifier getFinalEstimator(){
 		return getClassifier("final_estimator_");
 	}
 
+	@Override
 	public Boolean getPassthrough(){
 		return getBoolean("passthrough");
 	}
 
+	@Override
 	public List<String> getStackMethod(){
 		return getEnumList("stack_method_", this::getStringList, Arrays.asList(SkLearnMethods.PREDICT_PROBA));
 	}

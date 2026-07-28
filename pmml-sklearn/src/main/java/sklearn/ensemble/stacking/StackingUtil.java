@@ -38,7 +38,12 @@ public class StackingUtil {
 	}
 
 	static
-	public <E extends Estimator> MiningModel encodeStacking(List<? extends E> estimators, List<String> stackMethods, PredictFunction predictFunction, E finalEstimator, boolean passthrough, Schema schema){
+	public <E extends Estimator & HasEstimatorStack<?>> MiningModel encodeStacking(E ensembleEstimator, PredictFunction predictFunction, Schema schema){
+		List<? extends Estimator> estimators = ensembleEstimator.getEstimators();
+		Estimator finalEstimator = ensembleEstimator.getFinalEstimator();
+		Boolean passthrough = ensembleEstimator.getPassthrough();
+		List<String> stackMethods = ensembleEstimator.getStackMethod();
+
 		ClassDictUtil.checkSize(estimators, stackMethods);
 
 		SkLearnEncoder encoder = (SkLearnEncoder)schema.getEncoder();
@@ -52,7 +57,7 @@ public class StackingUtil {
 		List<Model> models = new ArrayList<>();
 
 		for(int i = 0; i < estimators.size(); i++){
-			E estimator = estimators.get(i);
+			Estimator estimator = estimators.get(i);
 			String stackMethod = stackMethods.get(i);
 
 			Model model = estimator.encode((i + 1), segmentSchema);
