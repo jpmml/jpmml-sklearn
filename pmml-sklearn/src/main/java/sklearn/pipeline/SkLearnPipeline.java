@@ -18,6 +18,7 @@
  */
 package sklearn.pipeline;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -239,6 +240,10 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 		setattr("steps", steps);
 
 		return this;
+	}
+
+	public SkLearnPipeline setOnlyStep(String name, Object step){
+		return setSteps(Collections.singletonList(new Object[]{name, step}));
 	}
 
 	static

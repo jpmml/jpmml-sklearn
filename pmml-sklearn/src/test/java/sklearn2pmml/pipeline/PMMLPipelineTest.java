@@ -43,7 +43,7 @@ public class PMMLPipelineTest {
 		Estimator estimator = new DummyClassifier();
 
 		pipeline
-			.setSteps(Collections.singletonList(new Object[]{"estimator", estimator}))
+			.setOnlyStep("estimator", estimator)
 			.setRepr("PMMLPipeline([steps=(\"estimator\", DummyClassifier())])")
 			.setTargetFields(Collections.singletonList("y"))
 			.setActiveFields(Arrays.asList("x1", "x2", "x3"));

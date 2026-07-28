@@ -87,9 +87,8 @@ public class EncodableUtil {
 			public PMML encodePMML(){
 				return super.encodePMML();
 			}
-		};
-
-		pipeline.setSteps(Collections.singletonList(new Object[]{"estimator", step}));
+		}
+			.setOnlyStep("estimator", step);
 
 		return pipeline;
 	}

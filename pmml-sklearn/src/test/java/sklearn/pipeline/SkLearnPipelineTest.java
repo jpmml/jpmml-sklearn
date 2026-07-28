@@ -59,7 +59,7 @@ public class SkLearnPipelineTest {
 	@Test
 	public void nonePipeline(){
 		SkLearnPipeline pipeline = new SkLearnPipeline()
-			.setSteps(Collections.singletonList(new Object[]{"step", null}));
+			.setOnlyStep("step", null);
 
 		checkIdentityTransform(pipeline);
 	}
@@ -67,7 +67,7 @@ public class SkLearnPipelineTest {
 	@Test
 	public void passthroughPipeline(){
 		SkLearnPipeline pipeline = new SkLearnPipeline()
-			.setSteps(Collections.singletonList(new Object[]{"step", SkLearnSteps.PASSTHROUGH}));
+			.setOnlyStep("step", SkLearnSteps.PASSTHROUGH);
 
 		checkIdentityTransform(pipeline);
 	}

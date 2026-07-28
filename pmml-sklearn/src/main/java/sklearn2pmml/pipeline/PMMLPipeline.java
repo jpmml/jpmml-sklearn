@@ -478,6 +478,11 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 	}
 
 	@Override
+	public PMMLPipeline setOnlyStep(String name, Object step){
+		return (PMMLPipeline)super.setOnlyStep(name, step);
+	}
+
+	@Override
 	public Map<String, ?> getPMMLOptions(){
 
 		if(hasFinalEstimator()){

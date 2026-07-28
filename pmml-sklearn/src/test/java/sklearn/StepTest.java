@@ -19,7 +19,6 @@
 package sklearn;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import sklearn.pipeline.SkLearnPipeline;
@@ -29,9 +28,8 @@ public class StepTest {
 
 	static
 	protected SkLearnPipeline createPipeline(String name, Step step){
-		SkLearnPipeline pipeline = new SkLearnPipeline();
-
-		pipeline.setSteps(Collections.singletonList(new Object[]{name, step}));
+		SkLearnPipeline pipeline = new SkLearnPipeline()
+			.setOnlyStep(name, step);
 
 		return pipeline;
 	}
