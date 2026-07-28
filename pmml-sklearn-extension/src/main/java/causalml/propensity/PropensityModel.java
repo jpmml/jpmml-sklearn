@@ -85,7 +85,7 @@ public class PropensityModel extends Regressor {
 
 		Schema classifierSchema = CausalMLUtil.toClassifierSchema(model, schema);
 
-		Model classifierModel = model.encode(pmmlSegmentId, classifierSchema);
+		Model classifierModel = model.encode(this, pmmlSegmentId, classifierSchema);
 
 		OutputField eventOutputField = CausalMLUtil.getProbabilityField(classifierModel);
 
@@ -93,7 +93,7 @@ public class PropensityModel extends Regressor {
 
 		Schema propensitySchema = new Schema(encoder, continuousLabel, eventFeatures);
 
-		Model propensityModel = calibrator.encode(propensitySchema);
+		Model propensityModel = calibrator.encode(this, propensitySchema);
 
 		return MiningModelUtil.createModelChain(Arrays.asList(classifierModel, propensityModel), MissingPredictionTreatment.RETURN_MISSING);
 	}

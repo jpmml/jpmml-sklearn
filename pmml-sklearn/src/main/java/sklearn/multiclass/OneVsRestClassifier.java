@@ -78,7 +78,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 				throw new EstimatorCastException(estimator, Collections.singletonList(HasClasses.class));
 			}
 
-			return estimator.encode(schema);
+			return estimator.encode(this, schema);
 		} else
 
 		if(categoricalLabel.size() >= 3){
@@ -100,7 +100,7 @@ public class OneVsRestClassifier extends SkLearnClassifier implements HasEstimat
 
 				Schema segmentSchema = schema.toRelabeledSchema(segmentCategoricalLabel);
 
-				Model model = estimator.encode(segmentSchema)
+				Model model = estimator.encode(this, segmentSchema)
 					.setOutput(output);
 
 				models.add(model);

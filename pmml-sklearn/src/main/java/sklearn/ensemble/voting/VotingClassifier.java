@@ -60,7 +60,7 @@ public class VotingClassifier extends SkLearnClassifier implements HasEstimatorE
 		List<Model> models = new ArrayList<>();
 
 		for(Classifier estimator : estimators){
-			Model model = estimator.encode(schema);
+			Model model = estimator.encode(this, schema);
 
 			models.add(model);
 		}

@@ -39,6 +39,6 @@ public class BaseTRegressor extends BaseTLearner<Regressor> {
 	public Model encodeEstimator(Role role, Regressor regressor, Schema schema){
 		Schema regressorSchema = CausalMLUtil.toRegressorSchema(regressor, schema);
 
-		return EstimatorUtil.encodeNativeLike(regressor, regressorSchema);
+		return EstimatorUtil.encodeNativeLike(this, regressor, regressorSchema);
 	}
 }

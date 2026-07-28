@@ -40,7 +40,7 @@ public class BaseTClassifier extends BaseTLearner<Classifier> {
 	public Model encodeEstimator(Role role, Classifier classifier, Schema schema){
 		Schema classifierSchema = CausalMLUtil.toClassifierSchema(classifier, schema);
 
-		return EstimatorUtil.encodeNativeLike(classifier, role.getSegmentId(), classifierSchema);
+		return EstimatorUtil.encodeNativeLike(this, classifier, role.getSegmentId(), classifierSchema);
 	}
 
 	@Override

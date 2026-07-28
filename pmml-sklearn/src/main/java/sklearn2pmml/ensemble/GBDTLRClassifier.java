@@ -69,7 +69,7 @@ public class GBDTLRClassifier extends Classifier implements HasMultiDecisionFunc
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		Model model = GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), segmentSchema)
+		Model model = GBDTUtil.encodeModel(this, gbdt, ohe, coef, Iterables.getOnlyElement(intercept), segmentSchema)
 			.setOutput(ModelUtil.createPredictedOutput(getMultiDecisionFunctionField(categoricalLabel.getValue(1)), OpType.CONTINUOUS, DataType.DOUBLE));
 
 		MiningModel miningModel = MiningModelUtil.createBinaryLogisticClassification(model, 1d, 0d, RegressionModel.NormalizationMethod.LOGIT, false, schema);

@@ -132,7 +132,7 @@ public class Scorecard extends Estimator implements HasClasses {
 			return encodeScorecard(schema);
 		}
 
-		return estimator.encode(schema);
+		return estimator.encode(this, schema);
 	}
 
 	private org.dmg.pmml.scorecard.Scorecard encodeScorecard(Schema schema){

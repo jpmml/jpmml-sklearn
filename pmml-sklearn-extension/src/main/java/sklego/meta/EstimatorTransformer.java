@@ -87,7 +87,7 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 				break;
 		}
 
-		Model model = estimator.encode(schema);
+		Model model = estimator.encode(this, schema);
 
 		encoder.addTransformer(model);
 

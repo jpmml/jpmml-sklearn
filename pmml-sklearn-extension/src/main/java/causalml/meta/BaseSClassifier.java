@@ -58,7 +58,7 @@ public class BaseSClassifier extends BaseSLearner<Classifier> {
 
 		Schema classifierSchema = CausalMLUtil.toClassifierSchema(classifier, schema);
 
-		return EstimatorUtil.encodeNativeLike(classifier, role.getSegmentId(), classifierSchema);
+		return EstimatorUtil.encodeNativeLike(this, classifier, role.getSegmentId(), classifierSchema);
 	}
 
 	@Override

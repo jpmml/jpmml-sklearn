@@ -46,7 +46,7 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 
 		Schema schema = new Schema(encoder, null, features);
 
-		Model model = estimator.encode(schema);
+		Model model = estimator.encode(this, schema);
 
 		encoder.addTransformer(model);
 

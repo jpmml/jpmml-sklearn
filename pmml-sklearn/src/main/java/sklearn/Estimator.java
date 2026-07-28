@@ -145,43 +145,24 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		try {
 			setParent(parent);
 
-			return encode(schema);
-		} finally {
-			setParent(prevParent);
-		}
-	}
-
-	public Model encode(Schema schema){
-
-		try {
 			return encodeInternal(schema);
 		} catch(SkLearnException se){
 			throw se.ensureContext(this);
 		} catch(Exception e){
 			throw new SkLearnException("Failed to convert the estimator object (" + ClassDictUtil.formatClass(this)  +") to PMML", e)
 				.setContext(this);
-		}
-	}
-
-	public Model encode(Step parent, Object segmentId, Schema schema){
-		Step prevParent = getParent();
-
-		try {
-			setParent(parent);
-
-			return encode(segmentId, schema);
 		} finally {
 			setParent(prevParent);
 		}
 	}
 
-	public Model encode(Object segmentId, Schema schema){
+	public Model encode(Step parent, Object segmentId, Schema schema){
 		Object prevSegmentId = getPMMLSegmentId();
 
 		try {
 			setPMMLSegmentId(segmentId);
 
-			return encode(schema);
+			return encode(parent, schema);
 		} finally {
 			setPMMLSegmentId(prevSegmentId);
 		}

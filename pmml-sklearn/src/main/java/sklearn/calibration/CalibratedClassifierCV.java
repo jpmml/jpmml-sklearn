@@ -47,7 +47,7 @@ public class CalibratedClassifierCV extends SkLearnClassifier {
 		if(calibratedClassifiers.size() == 1){
 			CalibratedClassifier calibratedClassifier = calibratedClassifiers.get(0);
 
-			return calibratedClassifier.encode(schema);
+			return calibratedClassifier.encode(this, schema);
 		} else
 
 		if(calibratedClassifiers.size() >= 2){
@@ -58,7 +58,7 @@ public class CalibratedClassifierCV extends SkLearnClassifier {
 			for(int i = 0; i < calibratedClassifiers.size(); i++){
 				CalibratedClassifier calibratedClassifier = calibratedClassifiers.get(i);
 
-				Model model = calibratedClassifier.encode((i + 1), segmentSchema);
+				Model model = calibratedClassifier.encode(this, (i + 1), segmentSchema);
 
 				models.add(model);
 			}

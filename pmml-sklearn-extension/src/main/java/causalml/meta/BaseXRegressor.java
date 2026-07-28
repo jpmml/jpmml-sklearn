@@ -33,6 +33,6 @@ public class BaseXRegressor extends BaseXLearner {
 	public Model encodeEstimator(Role role, Regressor regressor, Schema schema){
 		Schema regressorSchema = CausalMLUtil.toRegressorSchema(regressor, schema);
 
-		return regressor.encode(regressorSchema);
+		return regressor.encode(this, regressorSchema);
 	}
 }

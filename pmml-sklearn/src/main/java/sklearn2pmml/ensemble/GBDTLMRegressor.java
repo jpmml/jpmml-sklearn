@@ -42,7 +42,7 @@ public class GBDTLMRegressor extends Regressor {
 		List<Number> coef = lm.getCoef();
 		List<Number> intercept = lm.getIntercept();
 
-		return GBDTUtil.encodeModel(gbdt, ohe, coef, Iterables.getOnlyElement(intercept), schema);
+		return GBDTUtil.encodeModel(this, gbdt, ohe, coef, Iterables.getOnlyElement(intercept), schema);
 	}
 
 	public Regressor getGBDT(){

@@ -54,7 +54,7 @@ public class VotingRegressor extends SkLearnRegressor implements HasEstimatorEns
 		List<Model> models = new ArrayList<>();
 
 		for(Regressor estimator : estimators){
-			Model model = estimator.encode(schema);
+			Model model = estimator.encode(this, schema);
 
 			models.add(model);
 		}

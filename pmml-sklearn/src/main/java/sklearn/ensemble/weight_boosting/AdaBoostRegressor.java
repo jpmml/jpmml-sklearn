@@ -78,7 +78,7 @@ public class AdaBoostRegressor extends EnsembleRegressor<Regressor> implements H
 			} else
 
 			{
-				model = estimator.encode(segmentSchema);
+				model = estimator.encode(this, segmentSchema);
 			}
 
 			models.add(model);

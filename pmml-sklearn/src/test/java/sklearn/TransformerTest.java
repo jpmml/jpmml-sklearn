@@ -61,11 +61,6 @@ public class TransformerTest extends StepTest {
 		Transformer encoder = new OneHotEncoder(null, null){
 
 			@Override
-			public int getNumberOfFeatures(){
-				return 1;
-			}
-
-			@Override
 			public DataType getDataType(){
 				return DataType.INTEGER;
 			}

@@ -81,7 +81,7 @@ public class BaseXLearner extends BaseLearner<Regressor> {
 
 			Schema propensitySchema = CausalMLUtil.toRegressorSchema(propensityEstimator, schema);
 
-			Model propensityModel = propensityEstimator.encode(treatmentGroup, propensitySchema);
+			Model propensityModel = propensityEstimator.encode(this, treatmentGroup, propensitySchema);
 
 			Regressor controlEffectRegressor = modelsTauC.get(treatmentGroup);
 			Regressor treatmentEffectRegressor = modelsTauT.get(treatmentGroup);

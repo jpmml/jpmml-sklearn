@@ -53,7 +53,7 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 
 		Identifiable inverseFunc = transformer.getInverseFunc();
 		if(inverseFunc == null){
-			return regressor.encode(schema);
+			return regressor.encode(this, schema);
 		}
 
 		PMMLEncoder encoder = schema.getEncoder();
@@ -76,7 +76,7 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
-		Model model = regressor.encode(segmentSchema)
+		Model model = regressor.encode(this, segmentSchema)
 			.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("func", name), OpType.CONTINUOUS, DataType.DOUBLE, transformation));
 
 		return MiningModelUtil.createRegression(model, NormalizationMethod.NONE, schema);

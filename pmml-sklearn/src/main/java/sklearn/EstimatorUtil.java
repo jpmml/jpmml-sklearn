@@ -189,7 +189,7 @@ public class EstimatorUtil {
 
 		Schema schema = encoder.createSchema();
 
-		Model model = encodeNativeLike(estimator, schema);
+		Model model = encodeNativeLike(Step.PARENT_ROOT, estimator, schema);
 
 		encoder.setModel(model);
 
@@ -197,12 +197,12 @@ public class EstimatorUtil {
 	}
 
 	static
-	public Model encodeNativeLike(Estimator estimator, Schema schema){
-		return encodeNativeLike(estimator, null, schema);
+	public Model encodeNativeLike(Step parent, Estimator estimator, Schema schema){
+		return encodeNativeLike(parent, estimator, null, schema);
 	}
 
 	static
-	public Model encodeNativeLike(Estimator estimator, Object pmmlSegmentId, Schema schema){
+	public Model encodeNativeLike(Step parent, Estimator estimator, Object pmmlSegmentId, Schema schema){
 
 		if(estimator instanceof HasNativeConfiguration){
 			HasNativeConfiguration hasNativeConfiguration = (HasNativeConfiguration)estimator;
@@ -213,11 +213,11 @@ public class EstimatorUtil {
 				estimator.setPMMLOptions(hasNativeConfiguration.getNativeConfiguration());
 
 				if(pmmlSegmentId != null){
-					return estimator.encode(pmmlSegmentId, schema);
+					return estimator.encode(parent, pmmlSegmentId, schema);
 				} else
 
 				{
-					return estimator.encode(schema);
+					return estimator.encode(parent, schema);
 				}
 			} finally {
 				estimator.setPMMLOptions(prevPmmlOptions);
@@ -225,7 +225,7 @@ public class EstimatorUtil {
 		} else
 
 		{
-			return estimator.encode(schema);
+			return estimator.encode(parent, schema);
 		}
 	}
 

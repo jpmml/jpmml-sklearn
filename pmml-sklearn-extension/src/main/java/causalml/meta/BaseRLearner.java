@@ -66,7 +66,7 @@ public class BaseRLearner extends BaseLearner<Regressor> implements HasTreeOptio
 
 			Schema segmentSchema = schema.toRelabeledSchema(continuousLabel);
 
-			Model effectModel = EstimatorUtil.encodeNativeLike(effectRegressor, segmentSchema);
+			Model effectModel = EstimatorUtil.encodeNativeLike(this, effectRegressor, segmentSchema);
 
 			effectModels.add(effectModel);
 		}

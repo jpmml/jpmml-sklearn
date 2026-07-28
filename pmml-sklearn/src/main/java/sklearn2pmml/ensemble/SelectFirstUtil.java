@@ -85,7 +85,7 @@ public class SelectFirstUtil {
 
 			Predicate predicate = EvaluatableUtil.translatePredicate(expr, scope);
 
-			Model model = estimator.encode(schema);
+			Model model = estimator.encode(ensembleEstimator, schema);
 
 			Segment segment = new Segment(predicate, model)
 				.setId(name);

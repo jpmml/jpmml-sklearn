@@ -77,7 +77,7 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		Model model = estimator.encode(schema);
+		Model model = estimator.encode(this, schema);
 
 		List<Model> models = new ArrayList<>();
 

@@ -54,7 +54,7 @@ public class BaggingUtil {
 
 			Schema estimatorSchema = segmentSchema.toSubSchema(Ints.toArray(estimatorFeatures));
 
-			Model model = estimator.encode(estimatorSchema);
+			Model model = estimator.encode(ensembleEstimator, estimatorSchema);
 
 			models.add(model);
 		}

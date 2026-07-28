@@ -217,11 +217,11 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 			Model model;
 
 			if(multioutput){
-				model = estimator.encode(scalarLabel.getName(), segmentSchema);
+				model = estimator.encode(this, scalarLabel.getName(), segmentSchema);
 			} else
 
 			{
-				model = estimator.encode(segmentSchema);
+				model = estimator.encode(this, segmentSchema);
 			}
 
 			models.add(model);

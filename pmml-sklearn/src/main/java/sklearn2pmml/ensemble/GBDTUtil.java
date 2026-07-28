@@ -44,6 +44,7 @@ import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
+import sklearn.Step;
 import sklearn.preprocessing.MultiOneHotEncoder;
 
 public class GBDTUtil {
@@ -52,8 +53,8 @@ public class GBDTUtil {
 	}
 
 	static
-	public MiningModel encodeModel(Estimator gbdt, MultiOneHotEncoder ohe, List<? extends Number> coef, Number intercept, Schema schema){
-		Model model = EstimatorUtil.encodeNativeLike(gbdt, schema);
+	public MiningModel encodeModel(Step parent, Estimator gbdt, MultiOneHotEncoder ohe, List<? extends Number> coef, Number intercept, Schema schema){
+		Model model = EstimatorUtil.encodeNativeLike(parent, gbdt, schema);
 
 		List<TreeModel> treeModels = new ArrayList<>();
 

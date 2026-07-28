@@ -107,7 +107,7 @@ public class OrdinalClassifier extends Classifier {
 
 			Schema segmentSchema = schema.toRelabeledSchema(segmentLabel);
 
-			Model model = estimator.encode(segmentSchema);
+			Model model = estimator.encode(this, segmentSchema);
 
 			// XXX
 			String name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, segmentLabel.getValue(1));
