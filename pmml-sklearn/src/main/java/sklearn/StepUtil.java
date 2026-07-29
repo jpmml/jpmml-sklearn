@@ -45,6 +45,18 @@ public class StepUtil {
 	}
 
 	static
+	public Step getTail(Step step){
+
+		if(step instanceof HasTail){
+			HasTail hasTail = (HasTail)step;
+
+			return hasTail.getTail();
+		}
+
+		return step;
+	}
+
+	static
 	public int getNumberOfFeatures(List<? extends Step> steps){
 
 		for(Step step : steps){

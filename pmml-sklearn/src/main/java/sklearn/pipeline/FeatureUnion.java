@@ -38,13 +38,14 @@ import org.jpmml.python.CastFunction;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasHead;
+import sklearn.HasTail;
 import sklearn.SkLearnTransformer;
 import sklearn.SkLearnTransformerCastFunction;
 import sklearn.Step;
 import sklearn.StepUtil;
 import sklearn.Transformer;
 
-public class FeatureUnion extends SkLearnTransformer implements HasHead {
+public class FeatureUnion extends SkLearnTransformer implements HasHead, HasTail {
 
 	public FeatureUnion(String module, String name){
 		super(module, name);
@@ -126,6 +127,11 @@ public class FeatureUnion extends SkLearnTransformer implements HasHead {
 			return StepUtil.getHead(transformer);
 		}
 
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Step getTail(){
 		throw new UnsupportedOperationException();
 	}
 

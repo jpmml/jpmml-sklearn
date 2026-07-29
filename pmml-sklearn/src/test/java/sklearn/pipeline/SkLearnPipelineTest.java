@@ -37,6 +37,7 @@ import sklearn.dummy.DummyRegressor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -88,6 +89,25 @@ public class SkLearnPipelineTest {
 		Regressor regressor = pipeline.toRegressor();
 
 		assertTrue(regressor instanceof CompositeRegressor);
+	}
+
+	@Test
+	public void nestedRegressorPipeline(){
+		Estimator estimator = new DummyRegressor();
+
+		SkLearnPipeline regressorPipeline = forEstimator(estimator);
+
+		SkLearnPipeline pipeline = new SkLearnPipeline()
+			.setOnlyStep("pipeline", regressorPipeline);
+
+		assertFalse(pipeline.hasTransformers());
+		assertTrue(pipeline.hasFinalEstimator());
+
+		assertNull(pipeline.getHead());
+		assertSame(estimator, pipeline.getTail());
+
+		// The cast-based accessor stops at the composite boundary
+		assertTrue(pipeline.getFinalEstimator() instanceof CompositeRegressor);
 	}
 
 	static

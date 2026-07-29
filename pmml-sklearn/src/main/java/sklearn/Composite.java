@@ -36,7 +36,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 
 abstract
-public class Composite extends Step implements Castable, HasFeatureNamesIn, HasHead {
+public class Composite extends Step implements Castable, HasFeatureNamesIn, HasHead, HasTail {
 
 	public Composite(String module, String name){
 		super(module, name);
@@ -99,6 +99,13 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 		}
 
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Step getTail(){
+		Estimator estimator = getFinalEstimator();
+
+		return StepUtil.getTail(estimator);
 	}
 
 	/**

@@ -205,6 +205,34 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 	}
 
 	@Override
+	public Step getTail(){
+		List<Object[]> steps = getSteps();
+
+		if(steps.isEmpty()){
+			throw new SkLearnException("Expected one or more steps, got " + 0);
+		}
+
+		Object[] tailStep = steps.get(steps.size() - 1);
+
+		CastFunction<Step> castFunction = new StepCastFunction<Step>(Step.class){
+
+			@Override
+			public Step apply(Object object){
+
+				if((object == null) || Objects.equals(SkLearnSteps.PASSTHROUGH, object)){
+					return null;
+				}
+
+				return super.apply(object);
+			}
+		};
+
+		Step step = TupleUtil.extractElement(tailStep, 1, castFunction);
+
+		return StepUtil.getTail(step);
+	}
+
+	@Override
 	public PMML encodePMML(){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
