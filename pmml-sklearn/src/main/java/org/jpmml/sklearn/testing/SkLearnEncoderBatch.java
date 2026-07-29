@@ -30,7 +30,6 @@ import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
-import sklearn2pmml.HasPMMLOptions;
 
 abstract
 public class SkLearnEncoderBatch extends PythonEncoderBatch {
@@ -55,9 +54,7 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 			Encodable encodable = EncodableUtil.toEncodable(object);
 
 			if(options != null && !options.isEmpty()){
-				HasPMMLOptions<?> hasPmmlOptions = (HasPMMLOptions<?>)encodable;
-
-				hasPmmlOptions.setPMMLOptions(options);
+				EncodableUtil.configure(encodable, options);
 			}
 
 			PMML pmml = EncodableUtil.encodePMML(encodable);

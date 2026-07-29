@@ -21,6 +21,7 @@ package org.jpmml.sklearn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.python.Attribute;
@@ -37,6 +38,8 @@ import sklearn.StepCastFunction;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 import sklearn.pipeline.SkLearnPipeline;
+import sklearn2pmml.HasPMMLOptions;
+import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class EncodableUtil {
 
@@ -57,6 +60,22 @@ public class EncodableUtil {
 		} catch(Exception e){
 			throw new SkLearnException("Failed to convert the object (" + ClassDictUtil.formatClass(encodable) + ") to PMML", e)
 				.setContext(encodable);
+		}
+	}
+
+	static
+	public void configure(Encodable encodable, Map<String, ?> pmmlOptions){
+
+		if(encodable instanceof PMMLPipeline){
+			PMMLPipeline pipeline = (PMMLPipeline)encodable;
+
+			pipeline.configure(pmmlOptions);
+		} else
+
+		{
+			HasPMMLOptions<?> hasPMMLOptions = (HasPMMLOptions<?>)encodable;
+
+			hasPMMLOptions.setPMMLOptions(pmmlOptions);
 		}
 	}
 

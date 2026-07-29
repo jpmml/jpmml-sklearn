@@ -75,10 +75,9 @@ import sklearn.Transformer;
 import sklearn.pipeline.SkLearnPipeline;
 import sklearn2pmml.Customization;
 import sklearn2pmml.CustomizationUtil;
-import sklearn2pmml.HasPMMLOptions;
 import sklearn2pmml.decoration.Domain;
 
-public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMMLPipeline> {
+public class PMMLPipeline extends SkLearnPipeline {
 
 	public PMMLPipeline(){
 		this("sklearn2pmml.pipeline", "PMMLPipeline");
@@ -482,20 +481,7 @@ public class PMMLPipeline extends SkLearnPipeline implements HasPMMLOptions<PMML
 		return (PMMLPipeline)super.setOnlyStep(name, step);
 	}
 
-	@Override
-	public Map<String, ?> getPMMLOptions(){
-
-		if(hasFinalEstimator()){
-			Estimator estimator = getFinalEstimator();
-
-			return estimator.getPMMLOptions();
-		}
-
-		return null;
-	}
-
-	@Override
-	public PMMLPipeline setPMMLOptions(Map<String, ?> pmmlOptions){
+	public PMMLPipeline configure(Map<String, ?> pmmlOptions){
 
 		if(hasFinalEstimator()){
 			Estimator estimator = getFinalEstimator();

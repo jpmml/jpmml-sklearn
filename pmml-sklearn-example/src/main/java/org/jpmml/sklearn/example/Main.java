@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.HasRegressorOptions;
 import sklearn.tree.HasTreeOptions;
-import sklearn2pmml.HasPMMLOptions;
 
 public class Main {
 
@@ -247,9 +246,7 @@ public class Main {
 
 			Map<String, ?> options = getOptions();
 			if(!options.isEmpty()){
-				HasPMMLOptions<?> hasPmmlOptions = (HasPMMLOptions<?>)encodable;
-
-				hasPmmlOptions.setPMMLOptions(options);
+				EncodableUtil.configure(encodable, options);
 			}
 		} catch(Exception e){
 			logger.error("Failed to recognize PKL", e);
