@@ -38,8 +38,12 @@ public class StepTest {
 	protected List<Step> collectParents(Step step){
 		List<Step> result = new ArrayList<>();
 
-		for(Step parent = step.getParent(); parent != null; parent = parent.getParent()){
+		Step parent = step.getParent();
+
+		while(parent != null){
 			result.add(parent);
+
+			parent = parent.getParent();
 		}
 
 		return result;

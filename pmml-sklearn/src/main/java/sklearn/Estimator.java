@@ -287,14 +287,18 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			return getattr(key);
 		}
 
-		for(Step parent = getParent(); parent instanceof Estimator; parent = parent.getParent()){
-			Estimator estimator = (Estimator)parent;
+		Step parent = getParent();
 
-			Map<String, ?> parentPMMLOptions = estimator.getPMMLOptions();
+		while(parent instanceof Estimator){
+			Estimator parentEstimator = (Estimator)parent;
+
+			Map<String, ?> parentPMMLOptions = parentEstimator.getPMMLOptions();
 
 			if(parentPMMLOptions != null && parentPMMLOptions.containsKey(key)){
 				return parentPMMLOptions.get(key);
 			}
+
+			parent = parent.getParent();
 		}
 
 		return defaultValue;
