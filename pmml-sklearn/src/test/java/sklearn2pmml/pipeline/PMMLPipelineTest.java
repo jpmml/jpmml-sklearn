@@ -24,6 +24,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
 import sklearn.dummy.DummyClassifier;
+import sklearn.pipeline.SkLearnPipeline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,5 +55,37 @@ public class PMMLPipelineTest {
 		assertNotNull(pipeline.getRepr());
 		assertEquals(Arrays.asList("y"), pipeline.getTargetFields());
 		assertEquals(Arrays.asList("x1", "x2", "x3"), pipeline.getActiveFields());
+	}
+
+
+	@Test
+	public void configure(){
+		Estimator estimator = new DummyClassifier();
+
+		PMMLPipeline pipeline = new PMMLPipeline()
+			.setOnlyStep("estimator", estimator);
+
+		assertNull(estimator.getPMMLOptions());
+
+		pipeline.configure(Collections.singletonMap("flag", true));
+
+		assertEquals(Collections.singletonMap("flag", true), estimator.getPMMLOptions());
+	}
+
+	@Test
+	public void configureNested(){
+		Estimator estimator = new DummyClassifier();
+
+		SkLearnPipeline classifierPipeline = new SkLearnPipeline()
+			.setOnlyStep("estimator", estimator);
+
+		PMMLPipeline pipeline = new PMMLPipeline()
+			.setOnlyStep("pipeline", classifierPipeline);
+
+		assertNull(estimator.getPMMLOptions());
+
+		pipeline.configure(Collections.singletonMap("flag", true));
+
+		assertEquals(Collections.singletonMap("flag", true), estimator.getPMMLOptions());
 	}
 }
