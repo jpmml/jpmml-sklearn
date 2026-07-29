@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.Model;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
@@ -42,19 +43,50 @@ public class EstimatorTest extends StepTest {
 
 		Regressor regressor = new Regressor(null, null){
 
+			{
+				putOption("overridden", "regressor");
+			}
+
 			@Override
 			public RegressionModel encodeModel(Schema schema){
 				List<? extends Feature> features = schema.getFeatures();
 
 				assertEquals(1, features.size());
 
+				checkOptions();
+
 				parents.addAll(collectParents(this));
 
 				return RegressionModelUtil.createRegression(features, Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
 			}
+
+			@Override
+			public Schema configureSchema(Schema schema){
+				checkOptions();
+
+				return schema;
+			}
+
+			@Override
+			public Model configureModel(Model model){
+				checkOptions();
+
+				return model;
+			}
+
+			private void checkOptions(){
+				assertEquals("transformedTargetRegressor", getOption("inherited", null));
+				assertEquals("regressor", getOption("overridden", null));
+				assertEquals("fallback", getOption("undeclared", "fallback"));
+			}
 		};
 
 		TransformedTargetRegressor transformedTargetRegressor = new TransformedTargetRegressor(null, null){
+
+			{
+				putOption("inherited", "transformedTargetRegressor");
+				putOption("overridden", "transformedTargetRegressor");
+			}
 
 			@Override
 			public int getNumberOfFeatures(){

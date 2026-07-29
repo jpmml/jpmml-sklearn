@@ -265,6 +265,11 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		}
 	}
 
+	/**
+	 * Looks up an option starting from this estimator,
+	 * and ascending towards the root of the step graph for as long as the parent step is also an estimator.
+	 * Consequently, an option that is set on a meta-estimator will be visible to all its constituent estimators (unless overridden by them).
+	 */
 	public Object getOption(String key, Object defaultValue){
 		Map<String, ?> pmmlOptions = getPMMLOptions();
 
@@ -280,6 +285,16 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			logger.warn("Attribute " + ExceptionUtil.formatName(attribute.format()) + " is not set. Falling back to the surrogate attribute " + ExceptionUtil.formatName(surrogateAttribute.format()));
 
 			return getattr(key);
+		}
+
+		for(Step parent = getParent(); parent instanceof Estimator; parent = parent.getParent()){
+			Estimator estimator = (Estimator)parent;
+
+			Map<String, ?> parentPMMLOptions = estimator.getPMMLOptions();
+
+			if(parentPMMLOptions != null && parentPMMLOptions.containsKey(key)){
+				return parentPMMLOptions.get(key);
+			}
 		}
 
 		return defaultValue;
