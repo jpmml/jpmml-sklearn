@@ -35,6 +35,7 @@ import sklearn.HasClasses;
 import sklearn.HasEstimator;
 import sklearn.HasFeatureNamesIn;
 import sklearn.Proxy;
+import sklearn.Step;
 
 public class EstimatorProxy extends Estimator implements HasClasses, HasEstimator<Estimator>, HasFeatureNamesIn, Proxy {
 
@@ -127,7 +128,15 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	public Model encodeModel(Schema schema){
 		Estimator estimator = getEstimator();
 
-		return estimator.encodeModel(schema);
+		Step prevParent = estimator.getParent();
+
+		try {
+			estimator.setParent(this);
+
+			return estimator.encodeModel(schema);
+		} finally {
+			estimator.setParent(prevParent);
+		}
 	}
 
 	@Override
