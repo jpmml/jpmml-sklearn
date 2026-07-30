@@ -42,12 +42,11 @@ public class TunedThresholdClassifierCV extends SkLearnClassifier implements Has
 
 	@Override
 	public Model encodeModel(Schema schema){
-		Classifier estimator = getEstimator();
 		@SuppressWarnings("unused")
 		String responseMethod = getResponseMethod();
 		Number bestThreshold = getBestThreshold();
 
-		return ThresholdClassifierUtil.encodeModel(estimator, bestThreshold, schema);
+		return ThresholdClassifierUtil.encodeModel(this, bestThreshold, schema);
 	}
 
 	@Override

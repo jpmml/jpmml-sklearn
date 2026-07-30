@@ -46,12 +46,11 @@ public class FixedThresholdClassifier extends SkLearnClassifier implements HasEs
 
 	@Override
 	public Model encodeModel(Schema schema){
-		Classifier estimator = getEstimator();
 		@SuppressWarnings("unused")
 		String responseMethod = getResponseMethod();
 		Number threshold = getThreshold();
 
-		return ThresholdClassifierUtil.encodeModel(estimator, threshold, schema);
+		return ThresholdClassifierUtil.encodeModel(this, threshold, schema);
 	}
 
 	@Override

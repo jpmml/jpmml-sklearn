@@ -33,6 +33,8 @@ import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
+import sklearn.HasEstimator;
+import sklearn.Step;
 
 public class ThresholdClassifierUtil {
 
@@ -40,11 +42,23 @@ public class ThresholdClassifierUtil {
 	}
 
 	static
-	public Model encodeModel(Classifier estimator, Number threshold, Schema schema){
+	public <E extends Classifier & HasEstimator<Classifier>> Model encodeModel(E thresholdClassifier, Number threshold, Schema schema){
+		Classifier classifier = thresholdClassifier.getEstimator();
+
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
 			.expectCardinality(2);
 
-		Model model = estimator.encodeModel(schema);
+		Step prevParent = classifier.getParent();
+
+		Model model;
+
+		try {
+			classifier.setParent(thresholdClassifier);
+
+			model = classifier.encodeModel(schema);
+		} finally {
+			classifier.setParent(prevParent);
+		}
 
 		Output output = EstimatorUtil.getFinalOutput(model);
 		if(output == null){
