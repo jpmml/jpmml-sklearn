@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,50 +18,19 @@
  */
 package sklearn.model_selection;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
-import org.dmg.pmml.Model;
 import org.jpmml.converter.ExceptionUtil;
-import org.jpmml.converter.Schema;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.InvalidAttributeException;
-import sklearn.Classifier;
-import sklearn.HasEstimator;
-import sklearn.SkLearnClassifier;
 
-public class FixedThresholdClassifier extends SkLearnClassifier implements HasEstimator<Classifier> {
+public class FixedThresholdClassifier extends ThresholdClassifier {
 
 	public FixedThresholdClassifier(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public List<?> getClasses(){
-		Classifier estimator = getEstimator();
-
-		return estimator.getClasses();
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		@SuppressWarnings("unused")
-		String responseMethod = getResponseMethod();
-		Number threshold = getThreshold();
-
-		return ThresholdClassifierUtil.encodeModel(this, threshold, schema);
-	}
-
-	@Override
-	public Classifier getEstimator(){
-		return getClassifier("estimator_");
-	}
-
-	public String getResponseMethod(){
-		return getEnum("response_method", this::getString, Arrays.asList(FixedThresholdClassifier.RESPONSEMETHOD_PREDICT_PROBA));
-	}
-
 	public Number getThreshold(){
 		Object threshold = getObject("threshold");
 
@@ -71,8 +40,6 @@ public class FixedThresholdClassifier extends SkLearnClassifier implements HasEs
 
 		return getNumber("threshold");
 	}
-
-	private static final String RESPONSEMETHOD_PREDICT_PROBA = "predict_proba";
 
 	private static final String THRESHOLD_AUTO = "auto";
 }

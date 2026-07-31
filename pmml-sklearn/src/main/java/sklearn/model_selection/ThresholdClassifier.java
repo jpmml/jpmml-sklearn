@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Villu Ruusmann
+ * Copyright (c) 2026 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,6 +18,9 @@
  */
 package sklearn.model_selection;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Model;
@@ -34,16 +37,33 @@ import org.jpmml.converter.Schema;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
+import sklearn.SkLearnClassifier;
 import sklearn.Step;
 
-public class ThresholdClassifierUtil {
+abstract
+public class ThresholdClassifier extends SkLearnClassifier implements HasEstimator<Classifier> {
 
-	private ThresholdClassifierUtil(){
+	public ThresholdClassifier(String module, String name){
+		super(module, name);
 	}
 
-	static
-	public <E extends Classifier & HasEstimator<Classifier>> Model encodeModel(E thresholdClassifier, Number threshold, Schema schema){
-		Classifier classifier = thresholdClassifier.getEstimator();
+	abstract
+	public Number getThreshold();
+
+	@Override
+	public List<?> getClasses(){
+		Classifier estimator = getEstimator();
+
+		return estimator.getClasses();
+	}
+
+	@Override
+	public Model encodeModel(Schema schema){
+		@SuppressWarnings("unused")
+		String responseMethod = getResponseMethod();
+		Number threshold = getThreshold();
+
+		Classifier classifier = getEstimator();
 
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
 			.expectCardinality(2);
@@ -53,7 +73,7 @@ public class ThresholdClassifierUtil {
 		Model model;
 
 		try {
-			classifier.setParent(thresholdClassifier);
+			classifier.setParent(this);
 
 			model = classifier.encodeModel(schema);
 		} finally {
@@ -83,4 +103,15 @@ public class ThresholdClassifierUtil {
 
 		return model;
 	}
+
+	@Override
+	public Classifier getEstimator(){
+		return getClassifier("estimator_");
+	}
+
+	public String getResponseMethod(){
+		return getEnum("response_method", this::getString, Arrays.asList(ThresholdClassifier.RESPONSEMETHOD_PREDICT_PROBA));
+	}
+
+	private static final String RESPONSEMETHOD_PREDICT_PROBA = "predict_proba";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Villu Ruusmann
+ * Copyright (c) 2024 Villu Ruusmann
  *
  * This file is part of JPMML-SkLearn
  *
@@ -18,49 +18,18 @@
  */
 package sklearn.model_selection;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.dmg.pmml.Model;
-import org.jpmml.converter.Schema;
-import sklearn.Classifier;
-import sklearn.HasEstimator;
-import sklearn.SkLearnClassifier;
-
-public class TunedThresholdClassifierCV extends SkLearnClassifier implements HasEstimator<Classifier> {
+public class TunedThresholdClassifierCV extends ThresholdClassifier {
 
 	public TunedThresholdClassifierCV(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public List<?> getClasses(){
-		Classifier estimator = getEstimator();
-
-		return estimator.getClasses();
-	}
-
-	@Override
-	public Model encodeModel(Schema schema){
-		@SuppressWarnings("unused")
-		String responseMethod = getResponseMethod();
-		Number bestThreshold = getBestThreshold();
-
-		return ThresholdClassifierUtil.encodeModel(this, bestThreshold, schema);
-	}
-
-	@Override
-	public Classifier getEstimator(){
-		return getClassifier("estimator_");
+	public Number getThreshold(){
+		return getBestThreshold();
 	}
 
 	public Number getBestThreshold(){
 		return getNumber("best_threshold_");
 	}
-
-	public String getResponseMethod(){
-		return getEnum("response_method", this::getString, Arrays.asList(TunedThresholdClassifierCV.RESPONSEMETHOD_PREDICT_PROBA));
-	}
-
-	private static final String RESPONSEMETHOD_PREDICT_PROBA = "predict_proba";
 }
