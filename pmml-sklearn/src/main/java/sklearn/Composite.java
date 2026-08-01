@@ -38,6 +38,19 @@ import org.jpmml.sklearn.SkLearnException;
 abstract
 public class Composite extends Step implements Castable, HasFeatureNamesIn, HasHead, HasTail {
 
+	/**
+	 * The result of casting this composite step.
+	 * A composite step can be logically and physically cast to one Step subclass only.
+	 *
+	 * The first cast operation freezes the result object.
+	 * Subsequent cast operations, if any, must agree with the first one on the Step subclass.
+	 *
+	 * Furthermore, all cast operations must return the same object instance,
+	 * in order to enable the same step graph (not simply an equivalent step graph!) to be created and re-created in different encoding stages.
+	 */
+	private Object castResult = null;
+
+
 	public Composite(String module, String name){
 		super(module, name);
 	}
@@ -215,9 +228,13 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 
 		if(hasFinalEstimator()){
 			throw new IllegalStateException();
+		} // End if
+
+		if(this.castResult == null){
+			this.castResult = new CompositeTransformer(this);
 		}
 
-		return new CompositeTransformer(this);
+		return (Transformer)this.castResult;
 	}
 
 	public Estimator toEstimator(){
@@ -237,15 +254,30 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	}
 
 	public Classifier toClassifier(){
-		return new CompositeClassifier(this);
+
+		if(this.castResult == null){
+			this.castResult = new CompositeClassifier(this);
+		}
+
+		return (Classifier)this.castResult;
 	}
 
 	public Regressor toRegressor(){
-		return new CompositeRegressor(this);
+
+		if(this.castResult == null){
+			this.castResult = new CompositeRegressor(this);
+		}
+
+		return (Regressor)this.castResult;
 	}
 
 	public Clusterer toClusterer(){
-		return new CompositeClusterer(this);
+
+		if(this.castResult == null){
+			this.castResult = new CompositeClusterer(this);
+		}
+
+		return (Clusterer)this.castResult;
 	}
 
 	protected List<String> initLabel(List<String> targetFields, SkLearnEncoder encoder){

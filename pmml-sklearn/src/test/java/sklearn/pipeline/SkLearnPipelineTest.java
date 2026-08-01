@@ -24,12 +24,10 @@ import java.util.List;
 
 import org.jpmml.sklearn.SkLearnException;
 import org.junit.jupiter.api.Test;
-import sklearn.Classifier;
 import sklearn.CompositeClassifier;
 import sklearn.CompositeRegressor;
 import sklearn.Estimator;
 import sklearn.PassThrough;
-import sklearn.Regressor;
 import sklearn.SkLearnSteps;
 import sklearn.dummy.DummyClassifier;
 import sklearn.dummy.DummyRegressor;
@@ -77,18 +75,16 @@ public class SkLearnPipelineTest {
 	public void classifierPipeline(){
 		SkLearnPipeline pipeline = forEstimator(new DummyClassifier());
 
-		Classifier classifier = pipeline.toClassifier();
-
-		assertTrue(classifier instanceof CompositeClassifier);
+		assertTrue(pipeline.getFinalEstimator() instanceof DummyClassifier);
+		assertTrue(pipeline.toClassifier() instanceof CompositeClassifier);
 	}
 
 	@Test
 	public void regressorPipeline(){
 		SkLearnPipeline pipeline = forEstimator(new DummyRegressor());
 
-		Regressor regressor = pipeline.toRegressor();
-
-		assertTrue(regressor instanceof CompositeRegressor);
+		assertTrue(pipeline.getFinalEstimator() instanceof DummyRegressor);
+		assertTrue(pipeline.toRegressor() instanceof CompositeRegressor);
 	}
 
 	@Test
@@ -106,8 +102,13 @@ public class SkLearnPipelineTest {
 		assertNull(pipeline.getHead());
 		assertSame(estimator, pipeline.getTail());
 
-		// The cast-based accessor stops at the composite boundary
+		assertSame(pipeline.getFinalEstimator(), pipeline.getFinalEstimator());
 		assertTrue(pipeline.getFinalEstimator() instanceof CompositeRegressor);
+
+		assertSame(pipeline.toRegressor(), pipeline.toEstimator());
+		assertTrue(pipeline.toRegressor() instanceof CompositeRegressor);
+
+		assertThrows(ClassCastException.class, () -> pipeline.toClassifier());
 	}
 
 	static
