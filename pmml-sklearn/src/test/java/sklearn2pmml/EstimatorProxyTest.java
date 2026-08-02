@@ -19,6 +19,7 @@
 package sklearn2pmml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +36,6 @@ import sklearn.StepTest;
 import sklearn.pipeline.SkLearnPipeline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class EstimatorProxyTest extends StepTest {
 
@@ -56,7 +56,7 @@ public class EstimatorProxyTest extends StepTest {
 
 				assertEquals(1, features.size());
 
-				checkParents();
+				checkParents(2, this);
 
 				parents.addAll(collectParents(this));
 
@@ -65,23 +65,18 @@ public class EstimatorProxyTest extends StepTest {
 
 			@Override
 			public Schema configureSchema(Schema schema){
-				checkParents();
+				checkParents(2, this);
 
 				return schema;
 			}
 
 			@Override
 			public Model configureModel(Model model){
-				checkParents();
+				checkParents(2, this);
 
 				return model;
 			}
 
-			private void checkParents(){
-				List<Step> parents = collectParents(this);
-
-				assertEquals(2, parents.size());
-			}
 		};
 
 		EstimatorProxy estimatorProxy = new EstimatorProxy(){
@@ -96,10 +91,7 @@ public class EstimatorProxyTest extends StepTest {
 
 		pipeline.encodePMML();
 
-		assertEquals(2, parents.size());
-
-		assertSame(estimatorProxy, parents.get(0));
-		assertSame(pipeline, parents.get(1));
+		checkParents(Arrays.asList(estimatorProxy, pipeline), parents);
 	}
 
 	@Test
@@ -133,10 +125,13 @@ public class EstimatorProxyTest extends StepTest {
 
 		pipeline.encodePMML();
 
-		assertEquals(3, parents.size());
+		checkParents(Arrays.asList(regressorPipeline, estimatorProxy, pipeline), parents);
+	}
 
-		assertSame(regressorPipeline, parents.get(0));
-		assertSame(estimatorProxy, parents.get(1));
-		assertSame(pipeline, parents.get(2));
+	static
+	private void checkParents(int numberOfParents, Step step){
+		List<Step> parents = collectParents(step);
+
+		assertEquals(numberOfParents, parents.size());
 	}
 }

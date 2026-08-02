@@ -19,6 +19,7 @@
 package sklearn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +33,6 @@ import sklearn.pipeline.SkLearnPipeline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class CompositeTest extends StepTest {
 
@@ -67,10 +67,7 @@ public class CompositeTest extends StepTest {
 
 		pipeline.encodePMML();
 
-		assertEquals(2, parents.size());
-
-		assertSame(transformerPipeline, parents.get(0));
-		assertSame(pipeline, parents.get(1));
+		checkParents(Arrays.asList(transformerPipeline, pipeline), parents);
 	}
 
 	@Test
@@ -106,9 +103,6 @@ public class CompositeTest extends StepTest {
 
 		pipeline.encodePMML();
 
-		assertEquals(2, parents.size());
-
-		assertSame(regressorPipeline, parents.get(0));
-		assertSame(pipeline, parents.get(1));
+		checkParents(Arrays.asList(regressorPipeline, pipeline), parents);
 	}
 }

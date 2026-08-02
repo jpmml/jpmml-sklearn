@@ -19,6 +19,7 @@
 package sklearn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +34,6 @@ import sklearn.pipeline.SkLearnPipeline;
 import sklearn.preprocessing.FunctionTransformer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class EstimatorTest extends StepTest {
 
@@ -108,9 +108,6 @@ public class EstimatorTest extends StepTest {
 
 		pipeline.encodePMML();
 
-		assertEquals(2, parents.size());
-
-		assertSame(transformedTargetRegressor, parents.get(0));
-		assertSame(pipeline, parents.get(1));
+		checkParents(Arrays.asList(transformedTargetRegressor, pipeline), parents);
 	}
 }

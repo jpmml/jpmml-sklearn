@@ -23,6 +23,9 @@ import java.util.List;
 
 import sklearn.pipeline.SkLearnPipeline;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 abstract
 public class StepTest {
 
@@ -32,6 +35,15 @@ public class StepTest {
 			.setOnlyStep(name, step);
 
 		return pipeline;
+	}
+
+	static
+	protected void checkParents(List<Step> expectedParents, List<Step> parents){
+		assertEquals(expectedParents.size(), parents.size());
+
+		for(int i = 0; i < expectedParents.size(); i++){
+			assertSame(expectedParents.get(i), parents.get(i));
+		}
 	}
 
 	static

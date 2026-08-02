@@ -32,7 +32,6 @@ import sklearn.preprocessing.OneHotEncoder;
 import sklearn.preprocessing.StandardScaler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TransformerTest extends StepTest {
 
@@ -90,14 +89,7 @@ public class TransformerTest extends StepTest {
 
 		pipeline.encodePMML();
 
-		assertEquals(2, scalerParents.size());
-
-		assertSame(columnTransformer, scalerParents.get(0));
-		assertSame(pipeline, scalerParents.get(1));
-
-		assertEquals(2, encoderParents.size());
-
-		assertSame(columnTransformer, encoderParents.get(0));
-		assertSame(pipeline, encoderParents.get(1));
+		checkParents(Arrays.asList(columnTransformer, pipeline), scalerParents);
+		checkParents(Arrays.asList(columnTransformer, pipeline), encoderParents);
 	}
 }
