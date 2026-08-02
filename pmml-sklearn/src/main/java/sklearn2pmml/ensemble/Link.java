@@ -27,11 +27,13 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasClasses;
 import sklearn.HasEstimator;
 import sklearn.SkLearnMethods;
+import sklearn.Step;
 import sklearn.tree.HasTreeOptions;
 
 public class Link extends Estimator implements HasClasses, HasEstimator<Estimator> {
@@ -83,27 +85,42 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
+	public Model encode(Step parent, Schema schema){
 		List<String> augmentFuncs = getAugmentFuncs();
 		Estimator estimator = getEstimator();
+
+		if(!(parent instanceof EstimatorChain)){
+			throw new SkLearnException("The link object is not parented by an estimator chain object")
+				.setContext(this);
+		}
 
 		for(String augmentFunc : augmentFuncs){
 
 			switch(augmentFunc){
 				case SkLearnMethods.APPLY:
 					{
-						if(estimator instanceof HasTreeOptions){
-							HasTreeOptions hasTreeOptions = (HasTreeOptions)estimator;
-
-							// XXX
-							estimator.putOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
-						}
+						putOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
 					}
 					break;
 				default:
 					break;
 			}
 		}
+
+		Step prevParent = estimator.getParent();
+
+		try {
+			estimator.setParent(this);
+
+			return super.encode(parent, schema);
+		} finally {
+			estimator.setParent(prevParent);
+		}
+	}
+
+	@Override
+	public Model encodeModel(Schema schema){
+		Estimator estimator = getEstimator();
 
 		return estimator.encodeModel(schema);
 	}
