@@ -38,6 +38,13 @@ public class StepTest {
 	}
 
 	static
+	protected void checkParents(int numberOfParents, Step step){
+		List<Step> parents = collectParents(step);
+
+		assertEquals(numberOfParents, parents.size());
+	}
+
+	static
 	protected void checkParents(List<Step> expectedParents, List<Step> parents){
 		assertEquals(expectedParents.size(), parents.size());
 

@@ -38,6 +38,7 @@ import sklearn.Classifier;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnClassifier;
+import sklearn.SkLearnMethods;
 import sklearn.Step;
 
 abstract
@@ -58,6 +59,21 @@ public class ThresholdClassifier extends SkLearnClassifier implements HasEstimat
 	}
 
 	@Override
+	public Model encode(Step parent, Schema schema){
+		Classifier classifier = getEstimator();
+
+		Step prevParent = classifier.getParent();
+
+		try {
+			classifier.setParent(this);
+
+			return super.encode(parent, schema);
+		} finally {
+			classifier.setParent(prevParent);
+		}
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
 		@SuppressWarnings("unused")
 		String responseMethod = getResponseMethod();
@@ -68,17 +84,7 @@ public class ThresholdClassifier extends SkLearnClassifier implements HasEstimat
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel()
 			.expectCardinality(2);
 
-		Step prevParent = classifier.getParent();
-
-		Model model;
-
-		try {
-			classifier.setParent(this);
-
-			model = classifier.encodeModel(schema);
-		} finally {
-			classifier.setParent(prevParent);
-		}
+		Model model = classifier.encodeModel(schema);
 
 		Output output = EstimatorUtil.getFinalOutput(model);
 		if(output == null){
@@ -105,13 +111,25 @@ public class ThresholdClassifier extends SkLearnClassifier implements HasEstimat
 	}
 
 	@Override
+	public Schema configureSchema(Schema schema){
+		Classifier classifier = getEstimator();
+
+		return classifier.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Classifier classifier = getEstimator();
+
+		return classifier.configureModel(model);
+	}
+
+	@Override
 	public Classifier getEstimator(){
 		return getClassifier("estimator_");
 	}
 
 	public String getResponseMethod(){
-		return getEnum("response_method", this::getString, Arrays.asList(ThresholdClassifier.RESPONSEMETHOD_PREDICT_PROBA));
+		return getEnum("response_method", this::getString, Arrays.asList(SkLearnMethods.PREDICT_PROBA));
 	}
-
-	private static final String RESPONSEMETHOD_PREDICT_PROBA = "predict_proba";
 }

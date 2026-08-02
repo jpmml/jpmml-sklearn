@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with JPMML-SkLearn.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sklearn2pmml;
+package sklearn.model_selection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,21 +29,22 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.regression.RegressionModelUtil;
 import org.junit.jupiter.api.Test;
-import sklearn.Estimator;
-import sklearn.Regressor;
+import sklearn.Classifier;
+import sklearn.SkLearnMethods;
 import sklearn.Step;
 import sklearn.StepTest;
 import sklearn.pipeline.SkLearnPipeline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EstimatorProxyTest extends StepTest {
+public class ThresholdClassifierTest extends StepTest {
 
 	@Test
-	public void encodeEstimatorProxy(){
+	public void encodeThresholdClassifier(){
 		List<Step> parents = new ArrayList<>();
+		List<String> stages = new ArrayList<>();
 
-		Regressor regressor = new Regressor(null, null){
+		Classifier classifier = new Classifier(null, null){
 
 			@Override
 			public int getNumberOfFeatures(){
@@ -51,20 +52,27 @@ public class EstimatorProxyTest extends StepTest {
 			}
 
 			@Override
+			public List<?> getClasses(){
+				return Arrays.asList(0, 1);
+			}
+
+			@Override
 			public RegressionModel encodeModel(Schema schema){
 				List<? extends Feature> features = schema.getFeatures();
 
-				assertEquals(1, features.size());
+				stages.add("encodeModel");
 
 				checkParents(2, this);
 
 				parents.addAll(collectParents(this));
 
-				return RegressionModelUtil.createRegression(features, Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+				return RegressionModelUtil.createBinaryLogisticClassification(features, Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.LOGIT, true, schema);
 			}
 
 			@Override
 			public Schema configureSchema(Schema schema){
+				stages.add("configureSchema");
+
 				checkParents(2, this);
 
 				return schema;
@@ -72,33 +80,15 @@ public class EstimatorProxyTest extends StepTest {
 
 			@Override
 			public Model configureModel(Model model){
+				stages.add("configureModel");
+
 				checkParents(2, this);
 
 				return model;
 			}
-
 		};
 
-		EstimatorProxy estimatorProxy = new EstimatorProxy(){
-
-			@Override
-			public Estimator getEstimator(){
-				return regressor;
-			}
-		};
-
-		SkLearnPipeline pipeline = createPipeline("estimatorProxy", estimatorProxy);
-
-		pipeline.encodePMML();
-
-		checkParents(Arrays.asList(estimatorProxy, pipeline), parents);
-	}
-
-	@Test
-	public void encodeCompositeEstimatorProxy(){
-		List<Step> parents = new ArrayList<>();
-
-		Regressor regressor = new Regressor(null, null){
+		ThresholdClassifier thresholdClassifier = new ThresholdClassifier(null, null){
 
 			@Override
 			public int getNumberOfFeatures(){
@@ -106,25 +96,27 @@ public class EstimatorProxyTest extends StepTest {
 			}
 
 			@Override
-			public RegressionModel encodeModel(Schema schema){
-				List<? extends Feature> features = schema.getFeatures();
+			public Classifier getEstimator(){
+				return classifier;
+			}
 
-				parents.addAll(collectParents(this));
+			@Override
+			public String getResponseMethod(){
+				return SkLearnMethods.PREDICT_PROBA;
+			}
 
-				return RegressionModelUtil.createRegression(features, Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+			@Override
+			public Number getThreshold(){
+				return 0.5d;
 			}
 		};
 
-		SkLearnPipeline regressorPipeline = new SkLearnPipeline()
-			.setOnlyStep("estimator", regressor);
-
-		EstimatorProxy estimatorProxy = new EstimatorProxy();
-		estimatorProxy.setattr("estimator", regressorPipeline);
-
-		SkLearnPipeline pipeline = createPipeline("estimatorProxy", estimatorProxy);
+		SkLearnPipeline pipeline = createPipeline("thresholdClassifier", thresholdClassifier);
 
 		pipeline.encodePMML();
 
-		checkParents(Arrays.asList(regressorPipeline, estimatorProxy, pipeline), parents);
+		assertEquals(Arrays.asList("configureSchema", "encodeModel", "configureModel"), stages);
+
+		checkParents(Arrays.asList(thresholdClassifier, pipeline), parents);
 	}
 }
