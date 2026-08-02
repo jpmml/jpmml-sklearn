@@ -125,7 +125,7 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 	}
 
 	@Override
-	public Model encodeModel(Schema schema){
+	public Model encode(Step parent, Schema schema){
 		Estimator estimator = getEstimator();
 
 		Step prevParent = estimator.getParent();
@@ -133,10 +133,17 @@ public class EstimatorProxy extends Estimator implements HasClasses, HasEstimato
 		try {
 			estimator.setParent(this);
 
-			return estimator.encodeModel(schema);
+			return super.encode(parent, schema);
 		} finally {
 			estimator.setParent(prevParent);
 		}
+	}
+
+	@Override
+	public Model encodeModel(Schema schema){
+		Estimator estimator = getEstimator();
+
+		return estimator.encodeModel(schema);
 	}
 
 	@Override

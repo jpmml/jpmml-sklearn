@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.Model;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Schema;
@@ -55,9 +56,31 @@ public class EstimatorProxyTest extends StepTest {
 
 				assertEquals(1, features.size());
 
+				checkParents();
+
 				parents.addAll(collectParents(this));
 
 				return RegressionModelUtil.createRegression(features, Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+			}
+
+			@Override
+			public Schema configureSchema(Schema schema){
+				checkParents();
+
+				return schema;
+			}
+
+			@Override
+			public Model configureModel(Model model){
+				checkParents();
+
+				return model;
+			}
+
+			private void checkParents(){
+				List<Step> parents = collectParents(this);
+
+				assertEquals(2, parents.size());
 			}
 		};
 
@@ -77,5 +100,43 @@ public class EstimatorProxyTest extends StepTest {
 
 		assertSame(estimatorProxy, parents.get(0));
 		assertSame(pipeline, parents.get(1));
+	}
+
+	@Test
+	public void encodeCompositeEstimatorProxy(){
+		List<Step> parents = new ArrayList<>();
+
+		Regressor regressor = new Regressor(null, null){
+
+			@Override
+			public int getNumberOfFeatures(){
+				return 1;
+			}
+
+			@Override
+			public RegressionModel encodeModel(Schema schema){
+				List<? extends Feature> features = schema.getFeatures();
+
+				parents.addAll(collectParents(this));
+
+				return RegressionModelUtil.createRegression(features, Collections.singletonList(1d), 0d, RegressionModel.NormalizationMethod.NONE, schema);
+			}
+		};
+
+		SkLearnPipeline regressorPipeline = new SkLearnPipeline()
+			.setOnlyStep("estimator", regressor);
+
+		EstimatorProxy estimatorProxy = new EstimatorProxy();
+		estimatorProxy.setattr("estimator", regressorPipeline);
+
+		SkLearnPipeline pipeline = createPipeline("estimatorProxy", estimatorProxy);
+
+		pipeline.encodePMML();
+
+		assertEquals(3, parents.size());
+
+		assertSame(regressorPipeline, parents.get(0));
+		assertSame(estimatorProxy, parents.get(1));
+		assertSame(pipeline, parents.get(2));
 	}
 }
