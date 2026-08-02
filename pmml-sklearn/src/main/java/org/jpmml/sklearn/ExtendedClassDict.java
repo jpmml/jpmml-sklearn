@@ -33,20 +33,32 @@ import sklearn2pmml.SkLearn2PMMLFields;
 
 public class ExtendedClassDict extends ClassDict implements Castable {
 
+	private ClassDict dict = null;
+
+
 	public ExtendedClassDict(String module, String name){
 		super(module, name);
 	}
 
 	@Override
 	public Object castTo(Class<?> clazz){
-		ClassDictConstructor dictConstructor = (ClassDictConstructor)getObjectConstructor();
+		ClassDict dict = ensureDict();
 
-		ClassDict dict = (ClassDict)dictConstructor.construct(new Object[0]);
-		dict.__setstate__(this);
+		return CastUtil.deepCastTo(dict, clazz);
+	}
 
-		Object object = CastUtil.deepCastTo(dict, clazz);
+	private ClassDict ensureDict(){
 
-		return clazz.cast(object);
+		if(this.dict == null){
+			ClassDictConstructor dictConstructor = (ClassDictConstructor)getObjectConstructor();
+
+			ClassDict dict = (ClassDict)dictConstructor.construct(new Object[0]);
+			dict.__setstate__(this);
+
+			this.dict = dict;
+		}
+
+		return this.dict;
 	}
 
 	private IObjectConstructor getObjectConstructor(){
