@@ -216,7 +216,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, CalibratedClassifierCV(RidgeClassifier(), ensemble = True, method = "sigmoid"), "RidgeSigmoidAudit")
 	build_audit(audit_df, StackingClassifier([("lda", LinearDiscriminantAnalysis(solver = "lsqr")), ("lr", LogisticRegression())], final_estimator = GradientBoostingClassifier(n_estimators = 11, random_state = 13)), "StackingEnsembleAudit")
 	build_audit(audit_df, SVC(gamma = "auto"), "SVCAudit", with_proba = False)
-	build_audit(audit_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit")
+	build_audit(audit_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())], voting = "soft", weights = [3, 1, 2]), "VotingEnsembleAudit", input_float = False)
 
 def build_audit_dict(audit_df, classifier, name, with_proba = True):
 	audit_X, audit_y = split_csv(audit_df)
@@ -636,7 +636,7 @@ if "Iris" in datasets:
 	build_iris(iris_df, StackingClassifier([("lda", LinearDiscriminantAnalysis()), ("lr", LogisticRegression())], final_estimator = GradientBoostingClassifier(n_estimators = 5, random_state = 13), passthrough = True), "StackingEnsembleIris")
 	build_iris(iris_df, SVC(gamma = "auto"), "SVCIris", with_proba = False)
 	build_iris(iris_df, NuSVC(gamma = "auto"), "NuSVCIris", with_proba = False)
-	build_iris(iris_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False)
+	build_iris(iris_df, VotingClassifier([("dt", DecisionTreeClassifier(random_state = 13)), ("nb", GaussianNB()), ("lr", LogisticRegression())]), "VotingEnsembleIris", with_proba = False, input_float = False)
 
 class IrisStandardScaler(StandardScaler):
 	
@@ -969,7 +969,7 @@ if "Auto" in datasets:
 	build_auto(auto_df, RidgeCV(), "RidgeAuto")
 	build_auto(auto_df, StackingRegressor([("ridge", Ridge(random_state = 13)), ("lasso", Lasso(random_state = 13))], final_estimator = GradientBoostingRegressor(n_estimators = 7, random_state = 13)), "StackingEnsembleAuto")
 	build_auto(auto_df, TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")
-	build_auto(auto_df, VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor(algorithm = "kd_tree")), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto")
+	build_auto(auto_df, VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("knn", KNeighborsRegressor(algorithm = "kd_tree")), ("lr", LinearRegression())], weights = [3, 1, 2]), "VotingEnsembleAuto", input_float = False)
 
 if "Auto" in datasets:
 	build_auto(auto_df, TransformedTargetRegressor(DecisionTreeRegressor(random_state = 13)), "TransformedDecisionTreeAuto")
@@ -1240,7 +1240,7 @@ if "Housing" in datasets:
 	build_housing(housing_df, SVR(gamma = "auto"), "SVRHousing")
 	build_housing(housing_df, LinearSVR(random_state = 13), "LinearSVRHousing")
 	build_housing(housing_df, NuSVR(gamma = "auto"), "NuSVRHousing")
-	build_housing(housing_df, VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("lr", LinearRegression())]), "VotingEnsembleHousing")
+	build_housing(housing_df, VotingRegressor([("dt", DecisionTreeRegressor(random_state = 13)), ("lr", LinearRegression())]), "VotingEnsembleHousing", input_float = False)
 
 def build_visit(visit_df, regressor, name):
 	visit_X, visit_y = split_csv(visit_df)

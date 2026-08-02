@@ -34,6 +34,7 @@ import sklearn.Estimator;
 import sklearn.HasClasses;
 import sklearn.HasEstimator;
 import sklearn.Transformer;
+import sklearn.tree.HasTreeOptions;
 
 public class StackingEstimator extends Transformer implements HasEstimator<Estimator> {
 
@@ -55,6 +56,11 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 		ScalarLabel scalarLabel = (ScalarLabel)estimator.encodeLabel(Collections.singletonList(null), encoder);
 
 		Schema schema = new Schema(encoder, scalarLabel, features);
+
+		// TPOT wraps any non-final estimator of a pipeline into StackingEstimator to make it function as a transformer.
+		// They operate on shared features.
+		// Therefore, any one of them must be prevented from unilaterally downcasting continuous features from double data type to float.
+		estimator.putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
 
 		Model model = estimator.encode(this, schema);
 

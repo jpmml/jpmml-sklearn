@@ -31,6 +31,7 @@ import sklearn.Estimator;
 import sklearn.HasEstimator;
 import sklearn.IdentityTransformer;
 import sklearn.OutlierDetector;
+import sklearn.tree.HasTreeOptions;
 
 public class RemoveOutliers extends IdentityTransformer implements HasEstimator<Estimator> {
 
@@ -45,6 +46,11 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 		OutlierDetector outlierDetector = estimator.asInstance(OutlierDetector.class);
 
 		Schema schema = new Schema(encoder, null, features);
+
+		// This estimator functions as a transformer, not as an estimator.
+		// By the identity transformer contract, it must pass all features through unchanged.
+		// Specifically, it must be prevented from downcasting continuous features from double data type to float.
+		estimator.putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
 
 		Model model = estimator.encode(this, schema);
 

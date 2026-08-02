@@ -72,6 +72,11 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 		Schema schema = new Schema(encoder, scalarLabel, features);
 
+		// This estimator functions as a transformer, not as an estimator.
+		// It operates on features, which are likely operated on by subsequent transformers and estimators, such as the final estimator of a pipeline.
+		// Therefore, it must be prevented from downcasting continuous features from double data type to float.
+		estimator.putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
+
 		switch(predictFunc){
 			case SkLearnMethods.APPLY:
 				{

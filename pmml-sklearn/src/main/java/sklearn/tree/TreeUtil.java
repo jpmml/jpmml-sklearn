@@ -320,7 +320,7 @@ public class TreeUtil {
 	static
 	public <E extends Estimator & HasTreeOptions> Schema configureSchema(E estimator, Schema schema){
 		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-		Boolean inputFloat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_INPUT_FLOAT, null);
+		Boolean inputFloat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
 
 		return toTreeModelSchema(numeric, inputFloat, schema);
 	}

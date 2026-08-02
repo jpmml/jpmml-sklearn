@@ -45,6 +45,8 @@ import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Regressor;
 import sklearn.SkLearnMethods;
+import sklearn.Step;
+import sklearn.tree.HasTreeOptions;
 
 abstract
 public class BaseXLearner extends BaseLearner<Regressor> {
@@ -56,6 +58,15 @@ public class BaseXLearner extends BaseLearner<Regressor> {
 	@Override
 	public Class<Regressor> getEstimatorClass(){
 		return Regressor.class;
+	}
+
+	@Override
+	public Model encode(Step parent, Schema schema){
+		// The linear propensity model and tree effect models operate on shared features.
+		// Therefore, tree effect models must be prevented from unilaterally downcasting continuous features from double data type to float.
+		putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
+
+		return super.encode(parent, schema);
 	}
 
 	@Override
