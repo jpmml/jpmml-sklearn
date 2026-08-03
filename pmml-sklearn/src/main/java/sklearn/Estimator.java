@@ -270,7 +270,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	 * and ascending towards the root of the step graph for as long as the parent step is also an estimator.
 	 * Consequently, an option that is set on a meta-estimator will be visible to all its constituent estimators (unless overridden by them).
 	 */
-	public Object getOption(String key, Object defaultValue){
+	public Object getPMMLOption(String key, Object defaultValue){
 		Object value = resolvePMMLOption(key, true);
 
 		if(value != Step.PMML_VALUE_UNKNOWN){
@@ -313,12 +313,12 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		return super.resolvePMMLOption(key, useSurrogate);
 	}
 
-	public void putOption(String key, Object value){
-		putOptions(Collections.singletonMap(key, value));
+	public void putPMMLOption(String key, Object value){
+		putPMMLOptions(Collections.singletonMap(key, value));
 	}
 
 	@SuppressWarnings("unchecked")
-	public void putOptions(Map<String, ?> options){
+	public void putPMMLOptions(Map<String, ?> options){
 		Map<String, Object> pmmlOptions = (Map<String, Object>)getPMMLOptions();
 
 		if(pmmlOptions == null){

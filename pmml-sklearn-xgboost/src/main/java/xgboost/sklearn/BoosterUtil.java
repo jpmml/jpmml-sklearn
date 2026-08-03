@@ -192,8 +192,8 @@ public class BoosterUtil {
 	private <E extends Estimator & HasBooster & HasXGBoostOptions> Learner getLearner(E estimator){
 		Booster booster = estimator.getBooster();
 
-		String byteOrder = (String)estimator.getOption(HasXGBoostOptions.OPTION_BYTE_ORDER, (ByteOrder.nativeOrder()).toString());
-		String charset = (String)estimator.getOption(HasXGBoostOptions.OPTION_CHARSET, null);
+		String byteOrder = (String)estimator.getPMMLOption(HasXGBoostOptions.OPTION_BYTE_ORDER, (ByteOrder.nativeOrder()).toString());
+		String charset = (String)estimator.getPMMLOption(HasXGBoostOptions.OPTION_CHARSET, null);
 
 		return booster.getLearner(ByteOrderUtil.forValue(byteOrder), charset);
 	}
@@ -239,16 +239,16 @@ public class BoosterUtil {
 			}
 		}
 
-		Integer ntreeLimit = (Integer)estimator.getOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
+		Integer ntreeLimit = (Integer)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
 		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
 		Number missing = estimator.getOptionalNumber("missing");
 		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
 
-		Boolean compact = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());
-		Boolean inputFloat = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, null);
-		Boolean numeric = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
-		Boolean prune = (Boolean)estimator.getOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());
+		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, null);
+		Boolean numeric = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
+		Boolean prune = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
 
 		result.put(HasXGBoostOptions.OPTION_COMPACT, compact);
 		result.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);

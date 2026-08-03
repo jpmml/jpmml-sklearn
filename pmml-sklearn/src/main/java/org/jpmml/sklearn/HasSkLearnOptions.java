@@ -22,7 +22,7 @@ import org.jpmml.converter.HasOptions;
 import sklearn.Estimator;
 
 /**
- * @see Estimator#getOption(String, Object)
+ * @see Estimator#getPMMLOption(String, Object)
  */
 public interface HasSkLearnOptions extends HasOptions {
 }

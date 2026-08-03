@@ -169,7 +169,7 @@ public class Classifier extends Estimator implements HasClasses {
 		if(name != null){
 			DataField dataField = encoder.createDataField(name, opType, dataType, categories);
 
-			Map<String, Map<String, ?>> classExtensions = (Map)getOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
+			Map<String, Map<String, ?>> classExtensions = (Map)getPMMLOption(HasClassifierOptions.OPTION_CLASS_EXTENSIONS, null);
 			if(classExtensions != null){
 				addClassExtensions(dataField, classExtensions);
 			}

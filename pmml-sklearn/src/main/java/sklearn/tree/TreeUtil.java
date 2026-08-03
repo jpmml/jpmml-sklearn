@@ -319,26 +319,26 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasTreeOptions> Schema configureSchema(E estimator, Schema schema){
-		Boolean numeric = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-		Boolean inputFloat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
+		Boolean numeric = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
+		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
 
 		return toTreeModelSchema(numeric, inputFloat, schema);
 	}
 
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M configureModel(E estimator, M model){
-		Boolean allowMissing = (Boolean)estimator.getOption(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.FALSE);
-		Boolean winnerId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
+		Boolean allowMissing = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.FALSE);
+		Boolean winnerId = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
 
-		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
-		Boolean nodeId = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
-		Boolean nodeScore = (Boolean)estimator.getOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
+		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getPMMLOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
+		Boolean nodeId = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
+		Boolean nodeScore = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
 
 		boolean fixed = ((nodeExtensions != null) || (nodeId != null && nodeId) || (nodeScore != null && nodeScore));
 
-		Boolean compact = (Boolean)estimator.getOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
-		Boolean flat = (Boolean)estimator.getOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
-		Boolean prune = (Boolean)estimator.getOption(HasTreeOptions.OPTION_PRUNE, fixed ? Boolean.FALSE : Boolean.TRUE);
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
+		Boolean flat = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+		Boolean prune = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_PRUNE, fixed ? Boolean.FALSE : Boolean.TRUE);
 
 		if(compact || flat || prune){
 

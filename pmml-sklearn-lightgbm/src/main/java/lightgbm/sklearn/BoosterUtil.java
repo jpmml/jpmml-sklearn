@@ -133,13 +133,13 @@ public class BoosterUtil {
 
 		Integer bestIteration = estimator.getOptionalInteger("best_iteration_");
 
-		Integer numIteration = (Integer)estimator.getOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
+		Integer numIteration = (Integer)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
 		result.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);
 
-		Boolean nanAsMissing = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, Boolean.TRUE);
+		Boolean nanAsMissing = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, Boolean.TRUE);
 		result.put(HasLightGBMOptions.OPTION_NAN_AS_MISSING, nanAsMissing);
 
-		Boolean compact = (Boolean)estimator.getOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.TRUE);
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.TRUE);
 		result.put(HasLightGBMOptions.OPTION_COMPACT, compact);
 
 		return result;

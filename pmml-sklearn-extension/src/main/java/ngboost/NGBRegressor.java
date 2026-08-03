@@ -129,7 +129,7 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 
 		PMMLEncoder encoder = schema.getEncoder();
 
-		Object confidenceLevel = getOption(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, false);
+		Object confidenceLevel = getPMMLOption(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, false);
 
 		Expression confidenceLevelExpression = encodeConfidenceLevel(confidenceLevel);
 
@@ -181,7 +181,7 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 
 		PMMLEncoder encoder = schema.getEncoder();
 
-		Object confidenceLevel = getOption(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, false);
+		Object confidenceLevel = getPMMLOption(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, false);
 
 		Expression confidenceLevelExpression = encodeConfidenceLevel(confidenceLevel);
 

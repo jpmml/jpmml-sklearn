@@ -45,7 +45,7 @@ public class EstimatorTest extends StepTest {
 		Regressor regressor = new Regressor(null, null){
 
 			{
-				putOption("overridden", "regressor");
+				putPMMLOption("overridden", "regressor");
 			}
 
 			@Override
@@ -94,19 +94,19 @@ public class EstimatorTest extends StepTest {
 			}
 
 			private void checkOptions(){
-				assertEquals("transformedTargetRegressor", getOption("inherited", null));
-				assertEquals("regressor", getOption("overridden", null));
-				assertEquals("regressor", getOption("computed", null));
-				assertEquals("fallback", getOption("surrogate", "fallback"));
-				assertEquals("fallback", getOption("undeclared", "fallback"));
+				assertEquals("transformedTargetRegressor", getPMMLOption("inherited", null));
+				assertEquals("regressor", getPMMLOption("overridden", null));
+				assertEquals("regressor", getPMMLOption("computed", null));
+				assertEquals("fallback", getPMMLOption("surrogate", "fallback"));
+				assertEquals("fallback", getPMMLOption("undeclared", "fallback"));
 			}
 		};
 
 		TransformedTargetRegressor transformedTargetRegressor = new TransformedTargetRegressor(null, null){
 
 			{
-				putOption("inherited", "transformedTargetRegressor");
-				putOption("overridden", "transformedTargetRegressor");
+				putPMMLOption("inherited", "transformedTargetRegressor");
+				putPMMLOption("overridden", "transformedTargetRegressor");
 
 				setattr("surrogate", "transformedTargetRegressor");
 			}
