@@ -279,7 +279,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		Step parent = getParent();
 
-		while(parent instanceof Estimator){
+		while(canAscend(parent)){
 			value = parent.resolvePMMLOption(key, false);
 
 			if(value != Step.PMML_VALUE_UNKNOWN){
@@ -494,6 +494,20 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		(output.getOutputFields()).addAll(applyFields);
 
 		return applyFields;
+	}
+
+	static
+	private boolean canAscend(Step step){
+
+		if(step instanceof Estimator){
+			return true;
+		} else
+
+		if((step instanceof Transformer) && (step instanceof HasEstimator)){
+			return true;
+		}
+
+		return false;
 	}
 
 	static

@@ -21,6 +21,7 @@ package sklego.meta;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.DerivedField;
@@ -39,6 +40,7 @@ import sklearn.Estimator;
 import sklearn.EstimatorUtil;
 import sklearn.HasEstimator;
 import sklearn.SkLearnMethods;
+import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.tree.HasTreeOptions;
 
@@ -46,6 +48,28 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 
 	public EstimatorTransformer(String module, String name){
 		super(module, name);
+	}
+
+	@Override
+	protected Object resolvePMMLOption(String key, boolean useSurrogate){
+		Object value = super.resolvePMMLOption(key, useSurrogate);
+
+		if(value == Step.PMML_VALUE_UNKNOWN){
+			String predictFunc = getPrePredictFunc();
+
+			// This estimator functions as a transformer, not as an estimator.
+			// It operates on features, which are likely operated on by subsequent transformers and estimators, such as the final estimator of a pipeline.
+			// Therefore, it must be prevented from downcasting continuous features from double data type to float.
+			if(Objects.equals(HasTreeOptions.OPTION_INPUT_FLOAT, key)){
+				return Boolean.FALSE;
+			} else
+
+			if(Objects.equals(HasTreeOptions.OPTION_WINNER_ID, key) && Objects.equals(SkLearnMethods.APPLY, predictFunc)){
+				return Boolean.TRUE;
+			}
+		}
+
+		return value;
 	}
 
 	@Override
@@ -71,26 +95,6 @@ public class EstimatorTransformer extends Transformer implements HasEstimator<Es
 		}
 
 		Schema schema = new Schema(encoder, scalarLabel, features);
-
-		// This estimator functions as a transformer, not as an estimator.
-		// It operates on features, which are likely operated on by subsequent transformers and estimators, such as the final estimator of a pipeline.
-		// Therefore, it must be prevented from downcasting continuous features from double data type to float.
-		estimator.putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
-
-		switch(predictFunc){
-			case SkLearnMethods.APPLY:
-				{
-					if(estimator instanceof HasTreeOptions){
-						HasTreeOptions hasTreeOptions = (HasTreeOptions)estimator;
-
-						// XXX
-						estimator.putOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
-					}
-				}
-				break;
-			default:
-				break;
-		}
 
 		Model model = estimator.encode(this, schema);
 

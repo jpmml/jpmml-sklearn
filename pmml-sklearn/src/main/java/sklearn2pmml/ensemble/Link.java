@@ -20,6 +20,7 @@ package sklearn2pmml.ensemble;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -94,19 +95,6 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 				.setContext(this);
 		}
 
-		for(String augmentFunc : augmentFuncs){
-
-			switch(augmentFunc){
-				case SkLearnMethods.APPLY:
-					{
-						putOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.TRUE);
-					}
-					break;
-				default:
-					break;
-			}
-		}
-
 		Step prevParent = estimator.getParent();
 
 		try {
@@ -116,6 +104,21 @@ public class Link extends Estimator implements HasClasses, HasEstimator<Estimato
 		} finally {
 			estimator.setParent(prevParent);
 		}
+	}
+
+	@Override
+	protected Object resolvePMMLOption(String key, boolean useSurrogate){
+		Object value = super.resolvePMMLOption(key, useSurrogate);
+
+		if(value == Step.PMML_VALUE_UNKNOWN){
+			List<String> augmentFuncs = getAugmentFuncs();
+
+			if(Objects.equals(HasTreeOptions.OPTION_WINNER_ID, key) && augmentFuncs.contains(SkLearnMethods.APPLY)){
+				return Boolean.TRUE;
+			}
+		}
+
+		return value;
 	}
 
 	@Override

@@ -21,6 +21,7 @@ package tpot.builtins;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
@@ -33,6 +34,7 @@ import sklearn.Classifier;
 import sklearn.Estimator;
 import sklearn.HasClasses;
 import sklearn.HasEstimator;
+import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.tree.HasTreeOptions;
 
@@ -50,17 +52,29 @@ public class StackingEstimator extends Transformer implements HasEstimator<Estim
 	}
 
 	@Override
+	protected Object resolvePMMLOption(String key, boolean useSurrogate){
+		Object value = super.resolvePMMLOption(key, useSurrogate);
+
+		if(value == Step.PMML_VALUE_UNKNOWN){
+
+			// TPOT wraps any non-final estimator of a pipeline into StackingEstimator to make it function as a transformer.
+			// They operate on shared features.
+			// Therefore, any one of them must be prevented from unilaterally downcasting continuous features from double data type to float.
+			if(Objects.equals(HasTreeOptions.OPTION_INPUT_FLOAT, key)){
+				return Boolean.FALSE;
+			}
+		}
+
+		return value;
+	}
+
+	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
 		ScalarLabel scalarLabel = (ScalarLabel)estimator.encodeLabel(Collections.singletonList(null), encoder);
 
 		Schema schema = new Schema(encoder, scalarLabel, features);
-
-		// TPOT wraps any non-final estimator of a pipeline into StackingEstimator to make it function as a transformer.
-		// They operate on shared features.
-		// Therefore, any one of them must be prevented from unilaterally downcasting continuous features from double data type to float.
-		estimator.putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
 
 		Model model = estimator.encode(this, schema);
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import causalml.CausalMLUtil;
 import causalml.propensity.PropensityModel;
@@ -56,17 +57,24 @@ public class BaseXLearner extends BaseLearner<Regressor> {
 	}
 
 	@Override
-	public Class<Regressor> getEstimatorClass(){
-		return Regressor.class;
+	protected Object resolvePMMLOption(String key, boolean useSurrogate){
+		Object value = super.resolvePMMLOption(key, useSurrogate);
+
+		if(value == Step.PMML_VALUE_UNKNOWN){
+
+			// The linear propensity model and tree effect models operate on shared features.
+			// Therefore, tree effect models must be prevented from unilaterally downcasting continuous features from double data type to float.
+			if(Objects.equals(HasTreeOptions.OPTION_INPUT_FLOAT, key)){
+				return Boolean.FALSE;
+			}
+		}
+
+		return value;
 	}
 
 	@Override
-	public Model encode(Step parent, Schema schema){
-		// The linear propensity model and tree effect models operate on shared features.
-		// Therefore, tree effect models must be prevented from unilaterally downcasting continuous features from double data type to float.
-		putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
-
-		return super.encode(parent, schema);
+	public Class<Regressor> getEstimatorClass(){
+		return Regressor.class;
 	}
 
 	@Override

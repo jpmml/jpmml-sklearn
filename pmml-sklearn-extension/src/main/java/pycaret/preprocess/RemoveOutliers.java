@@ -20,6 +20,7 @@ package pycaret.preprocess;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.Predicate;
@@ -31,6 +32,7 @@ import sklearn.Estimator;
 import sklearn.HasEstimator;
 import sklearn.IdentityTransformer;
 import sklearn.OutlierDetector;
+import sklearn.Step;
 import sklearn.tree.HasTreeOptions;
 
 public class RemoveOutliers extends IdentityTransformer implements HasEstimator<Estimator> {
@@ -40,17 +42,29 @@ public class RemoveOutliers extends IdentityTransformer implements HasEstimator<
 	}
 
 	@Override
+	protected Object resolvePMMLOption(String key, boolean useSurrogate){
+		Object value = super.resolvePMMLOption(key, useSurrogate);
+
+		if(value == Step.PMML_VALUE_UNKNOWN){
+
+			// This estimator functions as a transformer, not as an estimator.
+			// By the identity transformer contract, it must pass all features through unchanged.
+			// Specifically, it must be prevented from downcasting continuous features from double data type to float.
+			if(Objects.equals(HasTreeOptions.OPTION_INPUT_FLOAT, key)){
+				return Boolean.FALSE;
+			}
+		}
+
+		return value;
+	}
+
+	@Override
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Estimator estimator = getEstimator();
 
 		OutlierDetector outlierDetector = estimator.asInstance(OutlierDetector.class);
 
 		Schema schema = new Schema(encoder, null, features);
-
-		// This estimator functions as a transformer, not as an estimator.
-		// By the identity transformer contract, it must pass all features through unchanged.
-		// Specifically, it must be prevented from downcasting continuous features from double data type to float.
-		estimator.putOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.FALSE);
 
 		Model model = estimator.encode(this, schema);
 
