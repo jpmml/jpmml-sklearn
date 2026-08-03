@@ -206,6 +206,10 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 		}
 	}
 
+	protected Object resolvePMMLOption(String key, boolean useSurrogate){
+		return Step.PMML_VALUE_UNKNOWN;
+	}
+
 	public Step getParent(){
 		return this.parent;
 	}
@@ -228,4 +232,6 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	 * and therefore, symbolically, merit separate rooting.
 	 */
 	public static final Step PARENT_OUTPUT_ROOT = null;
+
+	protected static final Object PMML_VALUE_UNKNOWN = new Object();
 }

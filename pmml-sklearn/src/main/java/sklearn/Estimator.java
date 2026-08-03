@@ -271,6 +271,29 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 	 * Consequently, an option that is set on a meta-estimator will be visible to all its constituent estimators (unless overridden by them).
 	 */
 	public Object getOption(String key, Object defaultValue){
+		Object value = resolvePMMLOption(key, true);
+
+		if(value != Step.PMML_VALUE_UNKNOWN){
+			return value;
+		}
+
+		Step parent = getParent();
+
+		while(parent instanceof Estimator){
+			value = parent.resolvePMMLOption(key, false);
+
+			if(value != Step.PMML_VALUE_UNKNOWN){
+				return value;
+			}
+
+			parent = parent.getParent();
+		}
+
+		return defaultValue;
+	}
+
+	@Override
+	protected Object resolvePMMLOption(String key, boolean useSurrogate){
 		Map<String, ?> pmmlOptions = getPMMLOptions();
 
 		if(pmmlOptions != null && pmmlOptions.containsKey(key)){
@@ -278,7 +301,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		} // End if
 
 		// XXX
-		if(hasattr(key)){
+		if(useSurrogate && hasattr(key)){
 			Attribute attribute = new Attribute(this, SkLearn2PMMLFields.PMML_OPTIONS);
 			Attribute surrogateAttribute = new Attribute(this, key);
 
@@ -287,21 +310,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 			return getattr(key);
 		}
 
-		Step parent = getParent();
-
-		while(parent instanceof Estimator){
-			Estimator parentEstimator = (Estimator)parent;
-
-			Map<String, ?> parentPMMLOptions = parentEstimator.getPMMLOptions();
-
-			if(parentPMMLOptions != null && parentPMMLOptions.containsKey(key)){
-				return parentPMMLOptions.get(key);
-			}
-
-			parent = parent.getParent();
-		}
-
-		return defaultValue;
+		return super.resolvePMMLOption(key, useSurrogate);
 	}
 
 	public void putOption(String key, Object value){

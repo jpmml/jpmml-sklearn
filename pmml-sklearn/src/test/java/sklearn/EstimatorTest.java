@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.regression.RegressionModel;
@@ -61,6 +62,24 @@ public class EstimatorTest extends StepTest {
 			}
 
 			@Override
+			protected Object resolvePMMLOption(String key, boolean useSurrogate){
+				Object value = super.resolvePMMLOption(key, useSurrogate);
+
+				if(value == Step.PMML_VALUE_UNKNOWN){
+
+					if(Objects.equals("computed", key)){
+						return "regressor";
+					} else
+
+					if(Objects.equals("overridden", key)){
+						return "unreachable";
+					}
+				}
+
+				return value;
+			}
+
+			@Override
 			public Schema configureSchema(Schema schema){
 				checkOptions();
 
@@ -77,6 +96,8 @@ public class EstimatorTest extends StepTest {
 			private void checkOptions(){
 				assertEquals("transformedTargetRegressor", getOption("inherited", null));
 				assertEquals("regressor", getOption("overridden", null));
+				assertEquals("regressor", getOption("computed", null));
+				assertEquals("fallback", getOption("surrogate", "fallback"));
 				assertEquals("fallback", getOption("undeclared", "fallback"));
 			}
 		};
@@ -86,6 +107,8 @@ public class EstimatorTest extends StepTest {
 			{
 				putOption("inherited", "transformedTargetRegressor");
 				putOption("overridden", "transformedTargetRegressor");
+
+				setattr("surrogate", "transformedTargetRegressor");
 			}
 
 			@Override
