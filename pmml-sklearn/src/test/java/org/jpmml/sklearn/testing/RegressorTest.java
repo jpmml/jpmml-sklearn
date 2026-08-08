@@ -351,6 +351,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateGradientBoostingHousing() throws Exception {
+		evaluate(GRADIENT_BOOSTING, HOUSING);
+	}
+
+	@Test
 	public void evaluateHistGradientBoostingHousing() throws Exception {
 		evaluate(HIST_GRADIENT_BOOSTING, HOUSING);
 	}

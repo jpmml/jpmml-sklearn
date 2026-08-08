@@ -1233,6 +1233,7 @@ if "Housing" in datasets:
 
 	build_housing(housing_df, AdaBoostRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), n_estimators = 17, random_state = 13), "AdaBoostHousing")
 	build_housing(housing_df, BayesianRidge(), "BayesianRidgeHousing")
+	build_housing(housing_df, GradientBoostingRegressor(loss = "huber", random_state = 13), "GradientBoostingHousing")
 	build_housing(housing_df, HistGradientBoostingRegressor(max_iter = 31, random_state = 13), "HistGradientBoostingHousing")
 	build_housing(housing_df, KNeighborsRegressor(), "KNNHousing", with_kneighbors = True)
 	build_housing(housing_df, MLPRegressor(activation = "tanh", hidden_layer_sizes = (26,), solver = "lbfgs", tol = 0.001, max_iter = 1000, random_state = 13), "MLPHousing")
