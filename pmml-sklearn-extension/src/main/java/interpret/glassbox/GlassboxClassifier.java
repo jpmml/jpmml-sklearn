@@ -23,6 +23,7 @@ import java.util.List;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Classifier;
+import sklearn.Step;
 
 public class GlassboxClassifier extends Classifier {
 
@@ -37,9 +38,24 @@ public class GlassboxClassifier extends Classifier {
 
 	@Override
 	public boolean hasProbabilityDistribution(){
-		Classifier classifier = getSkModel();
+		Classifier skModel = getSkModel();
 
-		return classifier.hasProbabilityDistribution();
+		return skModel.hasProbabilityDistribution();
+	}
+
+	@Override
+	public Model encode(Step parent, Schema schema){
+		Classifier skModel = getSkModel();
+
+		Step prevParent = skModel.getParent();
+
+		try {
+			skModel.setParent(this);
+
+			return super.encode(parent, schema);
+		} finally {
+			skModel.setParent(prevParent);
+		}
 	}
 
 	@Override
@@ -47,6 +63,20 @@ public class GlassboxClassifier extends Classifier {
 		Classifier skModel = getSkModel();
 
 		return skModel.encodeModel(schema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		Classifier skModel = getSkModel();
+
+		return skModel.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Classifier skModel = getSkModel();
+
+		return skModel.configureModel(model);
 	}
 
 	public Classifier getSkModel(){

@@ -21,6 +21,7 @@ package interpret.glassbox;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import sklearn.Regressor;
+import sklearn.Step;
 
 public class GlassboxRegressor extends Regressor {
 
@@ -29,10 +30,39 @@ public class GlassboxRegressor extends Regressor {
 	}
 
 	@Override
+	public Model encode(Step parent, Schema schema){
+		Regressor skModel = getSkModel();
+
+		Step prevParent = skModel.getParent();
+
+		try {
+			skModel.setParent(this);
+
+			return super.encode(parent, schema);
+		} finally {
+			skModel.setParent(prevParent);
+		}
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
 		Regressor skModel = getSkModel();
 
 		return skModel.encodeModel(schema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		Regressor skModel = getSkModel();
+
+		return skModel.configureSchema(schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		Regressor skModel = getSkModel();
+
+		return skModel.configureModel(model);
 	}
 
 	public Regressor getSkModel(){
