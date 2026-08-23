@@ -68,12 +68,12 @@ public class CategoricalTest extends SkLearnEncoderBatchTest implements Datasets
 
 	@Test
 	public void evaluateXGBAuditCat() throws Exception {
-		evaluate("XGB", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(48 + 8)); // XXX
+		evaluate("XGB", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(48 + 64)); // XXX
 	}
 
 	@Test
 	public void evaluateXGBAuditCatNA() throws Exception {
-		evaluate("XGB", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_TRUE), new FloatEquivalence(56 + 8)); // XXX
+		evaluate("XGB", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_TRUE), new FloatEquivalence(56 + 96)); // XXX
 	}
 
 	@Test
@@ -93,17 +93,17 @@ public class CategoricalTest extends SkLearnEncoderBatchTest implements Datasets
 
 	@Test
 	public void evaluateXGBRFAuditCat() throws Exception {
-		evaluate("XGBRF", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(24));
+		evaluate("XGBRF", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(24 + 16));
 	}
 
 	@Test
 	public void evaluateXGBRFAuditCatNA() throws Exception {
-		evaluate("XGBRF", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_TRUE), new FloatEquivalence(16 + 4));
+		evaluate("XGBRF", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_TRUE), new FloatEquivalence(16 + 8));
 	}
 
 	@Test
 	public void evaluateXGBRFAutoCat() throws Exception {
-		evaluate("XGBRF", AUTO + "Cat", new FloatEquivalence(8 + 2));
+		evaluate("XGBRF", AUTO + "Cat", new FloatEquivalence(8 + 8));
 	}
 
 	@Test

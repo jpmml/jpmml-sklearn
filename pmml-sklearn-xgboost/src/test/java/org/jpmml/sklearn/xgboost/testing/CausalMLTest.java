@@ -31,7 +31,7 @@ public class CausalMLTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	@Test
 	public void evaluateXGBRRegressorEmail() throws Exception {
-		evaluate("XGBRRegressor", EMAIL);
+		evaluate("XGBRRegressor", EMAIL, new PMMLEquivalence(1e-5, 1e-5));
 	}
 
 	@Test

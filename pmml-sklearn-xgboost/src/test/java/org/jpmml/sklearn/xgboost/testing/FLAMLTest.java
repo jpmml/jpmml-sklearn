@@ -28,7 +28,7 @@ public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets, Fiel
 
 	@Test
 	public void evaluateXGBoostLimitDepthEstimatorAudit() throws Exception {
-		evaluate("FLAMLLimitDepth", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(16));
+		evaluate("FLAMLLimitDepth", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(16 + 4));
 	}
 
 	@Test

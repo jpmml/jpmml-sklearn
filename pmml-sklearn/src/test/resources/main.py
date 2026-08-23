@@ -678,7 +678,7 @@ if "Iris" in datasets:
 
 	build_iris_frozen(iris_df)
 
-def build_iris_cat(iris_df, classifier, name, **pmml_options):
+def build_iris_cat(iris_df, classifier, name, allow_float = False, **pmml_options):
 	iris_X, iris_y = split_csv(iris_df)
 
 	dtype = CategoricalDtype(categories = list(range(0, 10)))
@@ -686,8 +686,8 @@ def build_iris_cat(iris_df, classifier, name, **pmml_options):
 	pipeline = PMMLPipeline([
 		("discretizer", FunctionTransformer(numpy.rint)),
 		("transformer", ColumnTransformer([
-			("sepal_length", CastTransformer(dtype = "category"), [0]),
-			("sepal_width", Alias(ExpressionTransformer("X[0]", dtype = "category"), name = "rint(Sepal.With)", prefit = True), [1]),
+			("sepal_length", CastTransformer(dtype = "category") if allow_float else "drop", [0]),
+			("sepal_width", Alias(ExpressionTransformer("X[0]" if allow_float else "int(X[0])", dtype = "category"), name = "int(Sepal.Width)", prefit = True), [1]),
 			("petal_length", make_pipeline(Alias(ExpressionTransformer("X[0]", dtype = int), name = "rint(Petal.Length)", prefit = True), SeriesConstructor(name = None, dtype = dtype)), [2]),
 			("petal_width", make_pipeline(Alias(ExpressionTransformer("X[0]", dtype = int), name = "rint(Petal.Width)", prefit = True), CastTransformer(dtype = dtype)), [3])
 		])),
@@ -695,10 +695,14 @@ def build_iris_cat(iris_df, classifier, name, **pmml_options):
 	])
 	pipeline.set_output(transform = "pandas")
 	pipeline.fit(iris_X, iris_y)
+	# XXX: With Pandas output, ColumnTransformer loses row alignment when combining results
+	# from index-preserving (eg. CastTransformer) and index-resetting (eg. ExpressionTransformer) transformers.
+	# The workaround is to use a contiguous (ie. 0..(n - 1) range) row index, which stays aligned even after index-resetting transformations.
+	iris_sample_X = (iris_X.sample(frac = 0.10, random_state = 13)).reset_index(drop = True)
 	if isinstance(classifier, XGBClassifier):
-		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13), precision = 1e-5, zeroThreshold = 1e-5)
+		pipeline.verify(iris_sample_X, precision = 1e-5, zeroThreshold = 1e-5)
 	else:
-		pipeline.verify(iris_X.sample(frac = 0.10, random_state = 13))
+		pipeline.verify(iris_sample_X)
 	pipeline.configure(**pmml_options)
 	store_pkl(pipeline, name)
 	species = DataFrame(pipeline.predict(iris_X), columns = ["Species"])

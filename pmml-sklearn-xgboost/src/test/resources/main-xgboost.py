@@ -69,7 +69,7 @@ if "Iris" in datasets:
 	classifier = XGBClassifier(objective = "multi:softprob", n_estimators = 11, enable_categorical = True, random_state = 13)
 	classifier._le = le
 
-	build_iris_cat(iris_df, classifier, "XGBIrisCat")
+	build_iris_cat(iris_df, classifier, "XGBIrisCat", allow_float = False)
 
 	classifier = XGBClassifier(objective = "multi:softprob", eval_metric = "mlogloss", early_stopping_rounds = 3, random_state = 13)
 	classifier._le = le

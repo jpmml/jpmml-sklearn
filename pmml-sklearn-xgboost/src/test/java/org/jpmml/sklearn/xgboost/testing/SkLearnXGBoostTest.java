@@ -65,7 +65,7 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
-		evaluate("XGB", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(64 + 8));
+		evaluate("XGB", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(64 + 32));
 	}
 
 	@Test

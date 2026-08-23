@@ -56,6 +56,9 @@ def build_auto(auto_df, regressor, name):
 	cont_cols = ["acceleration", "displacement", "horsepower", "weight"]
 	cat_cols = ["cylinders", "model_year", "origin"]
 
+	for cat_col in cat_cols:
+		auto_X[cat_col] = auto_X[cat_col].astype("Int64")
+
 	mapper = make_dataframe_mapper(cont_cols, cat_cols)
 
 	pipeline = PMMLPipeline([
