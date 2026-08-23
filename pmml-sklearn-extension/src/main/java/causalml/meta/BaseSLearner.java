@@ -329,7 +329,14 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 	}
 
 	public E getModel(){
-		return getModel("model");
+
+		// CausalML 0.16
+		if(containsKey("model")){
+			return getModel("model");
+		}
+
+		// CausalML 0.17+
+		return getPrototype(getModels());
 	}
 
 	public Map<String, E> getModels(){

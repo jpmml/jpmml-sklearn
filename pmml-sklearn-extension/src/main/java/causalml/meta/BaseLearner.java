@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Iterables;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
@@ -78,5 +79,10 @@ public class BaseLearner<E extends Estimator> extends Regressor {
 
 	public List<String> getTreatmentGroups(){
 		return getStringArray("t_groups");
+	}
+
+	static
+	protected <E extends Estimator> E getPrototype(Map<String, E> models){
+		return Iterables.getFirst(models.values(), null);
 	}
 }
