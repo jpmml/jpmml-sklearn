@@ -18,6 +18,8 @@ from sklearn2pmml.pipeline import PMMLPipeline
 
 import numpy
 
+pandas.set_option("mode.string_storage", "python")
+
 datasets = []
 
 if __name__ == "__main__":
