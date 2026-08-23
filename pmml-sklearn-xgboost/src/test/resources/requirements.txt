@@ -1,4 +1,4 @@
 category_encoders==2.10.0
 causalml==0.17.0
-flaml==2.5.0
+flaml==2.6.0
 xgboost==3.0.5
