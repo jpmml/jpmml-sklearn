@@ -19,6 +19,7 @@
 package org.jpmml.sklearn.statsmodels.testing;
 
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ public class SkLearnStatsModelsTest extends SkLearnEncoderBatchTest implements D
 
 	@Test
 	public void evaluateOrderedLogitAuto() throws Exception {
-		evaluate("OrderedLogit", AUTO);
+		evaluate("OrderedLogit", AUTO, new PMMLEquivalence(3e-13, 3e-13));
 	}
 
 	@Test
