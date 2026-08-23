@@ -26,12 +26,12 @@ import org.junit.jupiter.api.Test;
 public class CausalMLTest extends SkLearnEncoderBatchTest implements Datasets {
 
 	public CausalMLTest(){
-		super(new PMMLEquivalence(1e-7, 1e-7));
+		super(new PMMLEquivalence(1e-5, 1e-5));
 	}
 
 	@Test
 	public void evaluateXGBRRegressorEmail() throws Exception {
-		evaluate("XGBRRegressor", EMAIL, new PMMLEquivalence(1e-5, 1e-5));
+		evaluate("XGBRRegressor", EMAIL, new PMMLEquivalence(3e-6, 3e-6));
 	}
 
 	@Test

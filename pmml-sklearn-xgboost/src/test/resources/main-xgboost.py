@@ -20,8 +20,8 @@ if "Audit" in datasets:
 
 	build_audit(audit_df, GBDTLRClassifier(XGBClassifier(n_estimators = 17, random_state = 13), LogisticRegression()), "XGBLRAudit")
 	build_audit(audit_df, GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, max_depth = 6, random_state = 13), SGDClassifier(loss = "log_loss", penalty = "elasticnet", random_state = 13)), "XGBRFLRAudit")
-	build_audit(audit_df, XGBClassifier(objective = "binary:logistic", importance_type = "weight", random_state = 13), "XGBAudit", predict_params = {"iteration_range" : (0, 71)}, predict_proba_params = {"iteration_range" : (0, 71)}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
-	build_audit(audit_df, XGBRFClassifier(objective = "binary:logistic", n_estimators = 31, max_depth = 5, random_state = 13), "XGBRFAudit")
+	build_audit(audit_df, XGBClassifier(n_estimators = 71, objective = "binary:logistic", importance_type = "weight", random_state = 13), "XGBAudit", predict_params = {"iteration_range" : (0, 71)}, predict_proba_params = {"iteration_range" : (0, 71)}, byte_order = "LITTLE_ENDIAN", charset = "US-ASCII", ntree_limit = 71)
+	build_audit(audit_df, XGBRFClassifier(n_estimators = 71, objective = "binary:logistic", max_depth = 5, random_state = 13), "XGBRFAudit")
 
 def build_audit_na_direct(audit_na_df, classifier, name):
 	audit_na_X, audit_na_y = split_csv(audit_na_df)
@@ -48,7 +48,7 @@ if "Audit" in datasets:
 	# XXX
 	feature_types = 3 * ["q"] + 5 * ["c"]
 
-	build_audit_na_direct(audit_na_df, XGBClassifier(objective = "binary:logistic", feature_types = feature_types, use_label_encoder = False, random_state = 13), "XGBAuditNA")
+	build_audit_na_direct(audit_na_df, XGBClassifier(n_estimators = 71, objective = "binary:logistic", feature_types = feature_types, use_label_encoder = False, random_state = 13), "XGBAuditNA")
 
 if "Versicolor" in datasets:
 	versicolor_df = load_versicolor("Versicolor")
@@ -66,12 +66,12 @@ if "Iris" in datasets:
 
 	iris_df = pandas.concat((iris_X, Series(iris_y, name = "Species")), axis = 1)
 
-	classifier = XGBClassifier(objective = "multi:softprob", n_estimators = 11, enable_categorical = True, random_state = 13)
+	classifier = XGBClassifier(n_estimators = 11, objective = "multi:softprob", enable_categorical = True, random_state = 13)
 	classifier._le = le
 
 	build_iris_cat(iris_df, classifier, "XGBIrisCat", allow_float = False)
 
-	classifier = XGBClassifier(objective = "multi:softprob", eval_metric = "mlogloss", early_stopping_rounds = 3, random_state = 13)
+	classifier = XGBClassifier(n_estimators = 11, objective = "multi:softprob", eval_metric = "mlogloss", early_stopping_rounds = 3, random_state = 13)
 	classifier._le = le
 
 	build_iris_opt(iris_df, classifier, "XGBIris", fit_params = {"classifier__eval_set" : [(iris_X[iris_test_mask], iris_y[iris_test_mask])]})
@@ -93,7 +93,7 @@ if "Auto" in datasets:
 if "Auto" in datasets:
 	auto_X, auto_y = split_csv(auto_df)
 
-	regressor = XGBRegressor(objective = "reg:squarederror", missing = 1, eval_metric = "rmse", early_stopping_rounds = 3, random_state = 13)
+	regressor = XGBRegressor(n_estimators = 31, objective = "reg:squarederror", missing = 1, eval_metric = "rmse", early_stopping_rounds = 3, random_state = 13)
 
 	build_auto_opt(auto_df, regressor, "XGBAuto", fit_params = {"regressor__eval_set" : [(auto_X[auto_test_mask], auto_y[auto_test_mask])]})
 

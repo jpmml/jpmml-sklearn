@@ -43,12 +43,12 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit", stringify = True)
 
 	build_audit(audit_df, XGBClassifier(n_estimators = 71, objective = "binary:logistic", enable_categorical = True, tree_method = "hist", random_state = 13), "XGBAuditCat")
-	build_audit(audit_df, XGBRFClassifier(objective = "binary:logistic", max_depth = 5, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAuditCat")
+	build_audit(audit_df, XGBRFClassifier(n_estimators = 71, objective = "binary:logistic", max_depth = 5, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAuditCat")
 
 	audit_na_df = load_audit("AuditNA")
 
 	build_audit(audit_na_df, XGBClassifier(n_estimators = 71, objective = "binary:logistic", booster = "dart", enable_categorical = True, tree_method = "hist", random_state = 13), "XGBAuditCatNA")
-	build_audit(audit_na_df, XGBRFClassifier(objective = "binary:logistic", booster = "dart", max_depth = 5, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAuditCatNA")
+	build_audit(audit_na_df, XGBRFClassifier(n_estimators = 71, objective = "binary:logistic", booster = "dart", max_depth = 5, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAuditCatNA")
 
 def build_auto(auto_df, regressor, name):
 	auto_X, auto_y = split_csv(auto_df)
@@ -73,13 +73,13 @@ def build_auto(auto_df, regressor, name):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
-	build_auto(auto_df, XGBRegressor(objective = "reg:squarederror", enable_categorical = True, tree_method = "hist", random_state = 13), "XGBAutoCat")
-	build_auto(auto_df, XGBRFRegressor(objective = "reg:squarederror", max_depth = 3, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAutoCat")
+	build_auto(auto_df, XGBRegressor(n_estimators = 31, objective = "reg:squarederror", enable_categorical = True, tree_method = "hist", random_state = 13), "XGBAutoCat")
+	build_auto(auto_df, XGBRFRegressor(n_estimators = 31, objective = "reg:squarederror", max_depth = 3, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAutoCat")
 
 	auto_na_df = load_auto("AutoNA")
 
-	build_auto(auto_na_df, XGBRegressor(objective = "reg:squarederror", booster = "dart", enable_categorical = True, tree_method = "hist", random_state = 13), "XGBAutoCatNA")
-	build_auto(auto_na_df, XGBRFRegressor(objective = "reg:squarederror", booster = "dart", max_depth = 3, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAutoCatNA")
+	build_auto(auto_na_df, XGBRegressor(n_estimators = 31, objective = "reg:squarederror", booster = "dart", enable_categorical = True, tree_method = "hist", random_state = 13), "XGBAutoCatNA")
+	build_auto(auto_na_df, XGBRFRegressor(n_estimators = 31, objective = "reg:squarederror", booster = "dart", max_depth = 3, enable_categorical = True, tree_method = "hist", random_state = 13), "XGBRFAutoCatNA")
 
 def build_multi_auto(auto_df, regressor, name):
 	auto_X, auto_y = split_multi_csv(auto_df, ["acceleration", "mpg"])
@@ -101,5 +101,5 @@ def build_multi_auto(auto_df, regressor, name):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
-	build_multi_auto(auto_df, XGBRegressor(objective = "reg:squarederror", enable_categorical = True, tree_method = "hist", random_state = 13), "MultiXGBAutoCat")
-	build_multi_auto(auto_df, XGBRFRegressor(objective = "reg:squarederror", enable_categorical = True, tree_method = "hist", random_state = 13), "MultiXGBRFAutoCat")
+	build_multi_auto(auto_df, XGBRegressor(n_estimators = 31, objective = "reg:squarederror", enable_categorical = True, tree_method = "hist", random_state = 13), "MultiXGBAutoCat")
+	build_multi_auto(auto_df, XGBRFRegressor(n_estimators = 31, objective = "reg:squarederror", enable_categorical = True, tree_method = "hist", random_state = 13), "MultiXGBRFAutoCat")

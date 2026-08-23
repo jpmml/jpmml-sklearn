@@ -8,7 +8,7 @@ from xgboost import XGBClassifier
 
 xgb_pmml_options = {"compact": False, "numeric": False}
 
-classifier = XGBClassifier(n_estimators = 101, random_state = 13)
+classifier = XGBClassifier(n_estimators = 71, random_state = 13)
 
 build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", **xgb_pmml_options)
 
@@ -18,7 +18,7 @@ build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "v
 
 xgb_pmml_options = {"compact": False, "numeric": True, "prune": True}
 
-classifier = XGBClassifier(n_estimators = 101, random_state = 13)
+classifier = XGBClassifier(n_estimators = 71, random_state = 13)
 
 build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAuditNA", **xgb_pmml_options)
 build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAuditNA", **xgb_pmml_options)

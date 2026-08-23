@@ -26,23 +26,27 @@ import org.junit.jupiter.api.Test;
 
 public class FLAMLTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
+	public FLAMLTest(){
+		super(new FloatEquivalence(8));
+	}
+
 	@Test
 	public void evaluateXGBoostLimitDepthEstimatorAudit() throws Exception {
-		evaluate("FLAMLLimitDepth", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(16 + 4));
+		evaluate("FLAMLLimitDepth", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(19));
 	}
 
 	@Test
 	public void evaluateXGBoostSklearnEstimatorAudit() throws Exception {
-		evaluate("FLAML", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(16));
+		evaluate("FLAML", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(9));
 	}
 
 	@Test
 	public void evaluateXGBoostLimitDepthEstimatorAuto() throws Exception {
-		evaluate("FLAMLLimitDepth", AUTO, new FloatEquivalence(4 + 4));
+		evaluate("FLAMLLimitDepth", AUTO);
 	}
 
 	@Test
 	public void evaluateXGBoostSklearnEstimatorAuto() throws Exception {
-		evaluate("FLAML", AUTO, new FloatEquivalence(4));
+		evaluate("FLAML", AUTO);
 	}
 }

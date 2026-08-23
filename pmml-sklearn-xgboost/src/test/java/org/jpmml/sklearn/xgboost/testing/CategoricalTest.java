@@ -36,6 +36,10 @@ import org.junit.jupiter.api.Test;
 
 public class CategoricalTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
+	public CategoricalTest(){
+		super(new FloatEquivalence(8));
+	}
+
 	@Override
 	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
 		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
@@ -68,51 +72,51 @@ public class CategoricalTest extends SkLearnEncoderBatchTest implements Datasets
 
 	@Test
 	public void evaluateXGBAuditCat() throws Exception {
-		evaluate("XGB", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(48 + 64)); // XXX
+		evaluate("XGB", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(103)); // XXX
 	}
 
 	@Test
 	public void evaluateXGBAuditCatNA() throws Exception {
-		evaluate("XGB", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_TRUE), new FloatEquivalence(56 + 96)); // XXX
+		evaluate("XGB", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(40));
 	}
 
 	@Test
 	public void evaluateXGBAutoCat() throws Exception {
-		evaluate("XGB", AUTO + "Cat", new FloatEquivalence(8 + 4));
+		evaluate("XGB", AUTO + "Cat");
 	}
 
 	@Test
 	public void evaluateMultiXGBAutoCat() throws Exception {
-		evaluate("MultiXGB", AUTO + "Cat", new FloatEquivalence(12));
+		evaluate("MultiXGB", AUTO + "Cat");
 	}
 
 	@Test
 	public void evaluateXGBAutoCatNA() throws Exception {
-		evaluate("XGB", AUTO + "CatNA", excludeFields(AUTO_MPG), new FloatEquivalence(8)); // XXX
+		evaluate("XGB", AUTO + "CatNA", excludeFields(AUTO_MPG));
 	}
 
 	@Test
 	public void evaluateXGBRFAuditCat() throws Exception {
-		evaluate("XGBRF", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(24 + 16));
+		evaluate("XGBRF", AUDIT + "Cat", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(26));
 	}
 
 	@Test
 	public void evaluateXGBRFAuditCatNA() throws Exception {
-		evaluate("XGBRF", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_TRUE), new FloatEquivalence(16 + 8));
+		evaluate("XGBRF", AUDIT + "CatNA", excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(24));
 	}
 
 	@Test
 	public void evaluateXGBRFAutoCat() throws Exception {
-		evaluate("XGBRF", AUTO + "Cat", new FloatEquivalence(8 + 8));
+		evaluate("XGBRF", AUTO + "Cat");
 	}
 
 	@Test
 	public void evaluateMultiXGBRFAutoCat() throws Exception {
-		evaluate("MultiXGBRF", AUTO + "Cat", new FloatEquivalence(32 + 8));
+		evaluate("MultiXGBRF", AUTO + "Cat", new FloatEquivalence(13));
 	}
 
 	@Test
 	public void evaluateXGBRFAutoCatNA() throws Exception {
-		evaluate("XGBRF", AUTO + "CatNA", new FloatEquivalence(16)); // XXX
+		evaluate("XGBRF", AUTO + "CatNA");
 	}
 }

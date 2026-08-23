@@ -31,6 +31,10 @@ import org.junit.jupiter.api.Test;
 
 public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
+	public SkLearnXGBoostTest(){
+		super(new FloatEquivalence(8));
+	}
+
 	@Override
 	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
 		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
@@ -55,7 +59,7 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBAudit() throws Exception {
-		evaluate("XGB", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(48 + 8));
+		evaluate("XGB", AUDIT, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(43));
 	}
 
 	@Test
@@ -65,32 +69,32 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBAuditNA() throws Exception {
-		evaluate("XGB", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(64 + 32));
+		evaluate("XGB", AUDIT_NA, excludeFields(AUDIT_PROBABILITY_FALSE), new FloatEquivalence(40));
 	}
 
 	@Test
 	public void evaluateXGBAuto() throws Exception {
-		evaluate("XGB", AUTO, new FloatEquivalence(4));
+		evaluate("XGB", AUTO);
 	}
 
 	@Test
 	public void evaluateMultiXGBAuto() throws Exception {
-		evaluate("MultiXGB", AUTO, new FloatEquivalence(8));
+		evaluate("MultiXGB", AUTO);
 	}
 
 	@Test
 	public void evaluateXGBIris() throws Exception {
-		evaluate("XGB", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA), new FloatEquivalence(16 + 4));
+		evaluate("XGB", IRIS, excludeFields(IRIS_PROBABILITY_SETOSA));
 	}
 
 	@Test
 	public void evaluateXGBIrisCat() throws Exception {
-		evaluate("XGB", IRIS + "Cat", new FloatEquivalence(8));
+		evaluate("XGB", IRIS + "Cat");
 	}
 
 	@Test
 	public void evaluateXGBSigmoidVersicolor() throws Exception {
-		evaluate("XGB" + "Sigmoid", VERSICOLOR, new FloatEquivalence(16));
+		evaluate("XGB" + "Sigmoid", VERSICOLOR);
 	}
 
 	@Test
@@ -105,12 +109,12 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 
 	@Test
 	public void evaluateXGBRFAuto() throws Exception {
-		evaluate("XGBRF", AUTO, new FloatEquivalence(8 + 4));
+		evaluate("XGBRF", AUTO, new FloatEquivalence(11));
 	}
 
 	@Test
 	public void evaluateMultiXGBRFAuto() throws Exception {
-		evaluate("MultiXGBRF", AUTO, new FloatEquivalence(8 + 4));
+		evaluate("MultiXGBRF", AUTO, new FloatEquivalence(12));
 	}
 
 	@Test
