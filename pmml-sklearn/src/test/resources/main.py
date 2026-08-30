@@ -300,9 +300,11 @@ def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params 
 		[(["Hours"], [ContinuousDomain(missing_values = None, with_data = False, with_statistics = True), Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else X[0]"), name = "flag_missing(Hours, -999)"), SimpleImputer(missing_values = -999, add_indicator = True)])] +
 		[(["Income"], [ContinuousDomain(missing_values = None, outlier_treatment = "as_missing_values", low_value = 5000, high_value = 200000, with_data = False, with_statistics = True), SimpleImputer(strategy = "median", add_indicator = True)])] +
 		[(["Employment"], [CategoricalDomain(missing_values = None, with_data = False, with_statistics = True), CategoricalImputer(missing_values = None), StringNormalizer(function = "uppercase"), LookupTransformer(employment_mapping, "OTHER"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()])] +
-		[([column], [CategoricalDomain(missing_values = None, missing_value_replacement = "N/A", with_data = False, with_statistics = True), SimpleImputer(missing_values = "N/A", strategy = "most_frequent"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()]) for column in ["Education", "Marital", "Occupation"]] #+
+		[([column], [CategoricalDomain(missing_values = None, missing_value_replacement = "N/A", with_data = False, with_statistics = True), SimpleImputer(missing_values = "N/A", strategy = "most_frequent"), StringNormalizer(function = "lowercase"), PMMLLabelBinarizer(), DiscreteDomainEraser()]) for column in ["Education", "Marital", "Occupation"]] +
 		# XXX
 		#[(["Gender"], [CategoricalDomain(missing_values = None, with_data = False, with_statistics = True), SimpleImputer(strategy = "constant"), StringNormalizer(function = "uppercase"), LookupTransformer(gender_mapping, None)])]
+		[(["Deductions"], [Alias(ExpressionTransformer("numpy.nan", dtype = float), name = "drop(Deductions)", prefit = True), SimpleImputer(strategy = "mean")])] +
+		[(["Deductions"], [Alias(ExpressionTransformer("numpy.nan", dtype = float), name = "constant(Deductions)", prefit = True), SimpleImputer(strategy = "mean", keep_empty_features = True)])]
 	)
 	pipeline = PMMLPipeline([
 		("mapper", mapper),

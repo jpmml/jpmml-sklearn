@@ -110,6 +110,10 @@ public class SimpleImputer extends SkLearnTransformer {
 				Feature indicatorFeature = ImputerUtil.encodeIndicatorFeature(this, feature, missingValues, encoder);
 
 				indicatorFeatures.add(indicatorFeature);
+			} // End if
+
+			if(ValueUtil.isNaN(statistic)){
+				continue;
 			}
 
 			feature = ImputerUtil.encodeFeature(this, feature, addIndicator, missingValues, statistic, missingValueTreatment, encoder);
