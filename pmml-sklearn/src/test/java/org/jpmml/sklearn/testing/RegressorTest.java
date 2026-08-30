@@ -18,6 +18,8 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,8 @@ import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.Table;
+import org.jpmml.evaluator.TableCollector;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
@@ -74,6 +78,32 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 				}
 
 				return super.getOptionsMatrix();
+			}
+
+			@Override
+			public Table getInput() throws IOException {
+				Table table = super.getInput();
+
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(Objects.equals(algorithm, LINEAR_REGRESSION) && Objects.equals(dataset, AUTO_NA)){
+					List<String> columns = Arrays.asList("cylinders", "model_year", "origin");
+
+					table = table.stream()
+						.map(row -> {
+							Map<String, Object> result = new LinkedHashMap<>(row);
+
+							for(String column : columns){
+								result.computeIfAbsent(column, key -> -1);
+							}
+
+							return result;
+						})
+						.collect(new TableCollector());
+				}
+
+				return table;
 			}
 
 			@Override

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
 import numpy.core.NDArrayUtil;
 import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
@@ -106,14 +107,14 @@ public class ImputerTest {
 		Feature feature = encodeFeature(name, Arrays.asList(imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
-		assertNull(encoder.getDerivedField(imputedName));
+		assertNotNull(encoder.getDerivedField(imputedName));
 
 		List<Decorator> decorators = getDecorators(encoder, name);
 
-		assertEquals(1, decorators.size());
+		assertNull(decorators);
 
-		assertTrue(feature instanceof WildcardFeature);
-		assertEquals(name, feature.getName());
+		assertTrue(feature instanceof ContinuousFeature);
+		assertEquals(imputedName, feature.getName());
 
 		ContinuousDomain continuousDomain = new ContinuousDomain("sklearn2pmml.decoration", "ContinuousDomain");
 		continuousDomain.put("invalid_value_treatment", "return_invalid");
@@ -125,14 +126,14 @@ public class ImputerTest {
 		feature = encodeFeature(name, Arrays.asList(continuousDomain, imputer), encoder);
 
 		assertNotNull(encoder.getDataField(name));
-		assertNull(encoder.getDerivedField(imputedName));
+		assertNotNull(encoder.getDerivedField(imputedName));
 
 		decorators = getDecorators(encoder, name);
 
-		assertEquals(2, decorators.size());
+		assertEquals(1, decorators.size());
 
 		assertTrue(feature instanceof ContinuousFeature);
-		assertEquals(name, feature.getName());
+		assertEquals(imputedName, feature.getName());
 
 		Binarizer binarizer = new Binarizer("sklearn.preprocessing.data", "Binarizer");
 		binarizer.put("threshold", 1d / 3d);
@@ -155,7 +156,13 @@ public class ImputerTest {
 
 	static
 	private List<Decorator> getDecorators(ModelEncoder encoder, String name){
-		return (encoder.getDecorators()).get(null).get(name);
+		ListMultimap<String, Decorator> modelDecorators = (encoder.getDecorators()).get(null);
+
+		if(modelDecorators != null){
+			return modelDecorators.get(name);
+		}
+
+		return null;
 	}
 
 	static

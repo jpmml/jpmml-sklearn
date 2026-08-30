@@ -1037,8 +1037,8 @@ def build_auto_na(auto_na_df, regressor, name, predict_transformer = None, **pmm
 	auto_na_X, auto_na_y = split_csv(auto_na_df)
 
 	mapper = DataFrameMapper(
-		[([column], [CategoricalDomain(with_statistics = True, missing_values = -1), CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
-		[(["origin"], [CategoricalDomain(with_statistics = True, missing_values = -1), SimpleImputer(missing_values = -1, strategy = "most_frequent"), OneHotEncoder()])] +
+		[([column], [CategoricalImputer(missing_values = -1), PMMLLabelBinarizer()]) for column in ["cylinders", "model_year"]] +
+		[(["origin"], [SimpleImputer(missing_values = -1, strategy = "most_frequent"), OneHotEncoder()])] +
 		[(["acceleration"], [ContinuousDomain(with_statistics = True, missing_values = None), CutTransformer(bins = [5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25], labels = False), CategoricalImputer(), LabelBinarizer()])] +
 		[(["displacement"], [ContinuousDomain(with_statistics = True, missing_values = None), SimpleImputer(), CutTransformer(bins = [0, 100, 200, 300, 400, 500], labels = ["XS", "S", "M", "L", "XL"]), LabelBinarizer()])] +
 		[(["horsepower"], [ContinuousDomain(with_statistics = True, missing_values = None, outlier_treatment = "as_extreme_values", low_value = 50, high_value = 225), SimpleImputer(strategy = "median")])] +

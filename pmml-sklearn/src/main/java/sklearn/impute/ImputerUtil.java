@@ -18,11 +18,14 @@
  */
 package sklearn.impute;
 
+import java.util.List;
+
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
+import org.dmg.pmml.HasDiscreteDomain;
 import org.dmg.pmml.MissingValueTreatmentMethod;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
@@ -34,7 +37,9 @@ import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.FieldUtil;
 import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.model.UnsupportedElementException;
+import org.jpmml.python.PythonFormatterUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import org.jpmml.sklearn.SkLearnException;
 import sklearn.Transformer;
 
 public class ImputerUtil {
@@ -46,16 +51,21 @@ public class ImputerUtil {
 	public Feature encodeFeature(Transformer transformer, Feature feature, Boolean addIndicator, Object missingValue, Object replacementValue, MissingValueTreatmentMethod missingValueTreatmentMethod, SkLearnEncoder encoder){
 		Field<?> field = feature.getField();
 
-		if(field instanceof DataField && !addIndicator){
+		if(field instanceof DataField){
 			DataField dataField = (DataField)field;
 
-			encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatmentMethod, replacementValue));
-
 			if(missingValue != null){
-				FieldUtil.addValue(dataField, Value.Property.MISSING, missingValue);
-			}
 
-			return feature;
+				if(isMissing(dataField, missingValue)){
+					throw new SkLearnException("Cannot re-assign " + PythonFormatterUtil.formatValue(missingValue) + " value from missing value space to valid value space");
+				}
+			} // End if
+
+			if(!addIndicator && missingValue == null){
+				encoder.addDecorator(dataField, new MissingValueDecorator(missingValueTreatmentMethod, replacementValue));
+
+				return feature;
+			}
 		} // End if
 
 		if((field instanceof DataField) || (field instanceof DerivedField)){
@@ -74,6 +84,16 @@ public class ImputerUtil {
 				ExpressionUtil.createConstant(feature.getDataType(), replacementValue),
 				feature.ref()
 			);
+
+			// Defend the "equal" function against missing values (JPMML-Evaluator non-standard behaviour).
+			// This defense is needed globally. However, it is most critical here, because imputers are much more
+			// likely to come into contact with occasional missing values than non-imputer transformers.
+			if(missingValue != null){
+				expression = ExpressionUtil.createApply(PMMLFunctions.IF,
+					ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
+					expression
+				);
+			}
 
 			DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("imputer", feature), field.requireOpType(), field.requireDataType(), expression);
 
@@ -100,5 +120,13 @@ public class ImputerUtil {
 		DerivedField derivedField = encoder.createDerivedField(transformer.createFieldName("missingIndicator", feature), OpType.CATEGORICAL, DataType.BOOLEAN, expression);
 
 		return new BooleanFeature(encoder, derivedField);
+	}
+
+	static
+	private <F extends Field<F> & HasDiscreteDomain<F>> boolean isMissing(F field, Object value){
+		List<?> values = FieldUtil.getValues(field, Value.Property.MISSING);
+
+		// XXX
+		return values.contains(value);
 	}
 }
