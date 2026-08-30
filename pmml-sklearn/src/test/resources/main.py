@@ -796,13 +796,16 @@ if "Sentiment" in datasets:
 	build_sentiment(sentiment_df, LogisticRegressionCV(cv = 3), None, "LogisticRegressionSentiment")
 	build_sentiment(sentiment_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), Matcher(), "RandomForestSentiment", compact = False)
 
-def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
+def build_sentiment_nb(sentiment_df, classifier, name, vocabulary = None, with_proba = True):
 	sentiment_X = sentiment_df["Sentence"]
 	sentiment_y = sentiment_df["Score"]
 
 	steps = []
 
-	steps.append(("vectorizer", CountVectorizer(max_features = 100, binary = isinstance(classifier, BernoulliNB))))
+	if vocabulary is not None:
+		steps.append(("vectorizer", CountVectorizer(vocabulary = vocabulary, binary = isinstance(classifier, BernoulliNB))))
+	else:
+		steps.append(("vectorizer", CountVectorizer(max_features = 100, binary = isinstance(classifier, BernoulliNB))))
 	if isinstance(classifier, CategoricalNB):
 		steps.append(("densifier", FunctionTransformer(lambda x: x.toarray(), accept_sparse = True)))
 		steps.append(("discretizer", KBinsDiscretizer(n_bins = 3, encode = "ordinal", strategy = "uniform")))
@@ -827,6 +830,11 @@ def build_sentiment_nb(sentiment_df, classifier, name, with_proba = True):
 if "Sentiment" in datasets:
 	sentiment_df = load_sentiment("Sentiment")
 
+	vocabulary = CountVectorizer(max_features = 100) \
+		.fit(sentiment_df["Sentence"]) \
+		.get_feature_names_out()
+	vocabulary = numpy.asarray(vocabulary, dtype = str)
+
 	nltk.download("vader_lexicon", quiet = True)
 
 	sentiment_analyzer = SentimentIntensityAnalyzer()
@@ -840,10 +848,10 @@ if "Sentiment" in datasets:
 
 	sentiment_df["Score"] = sentiment_df["Sentence"].apply(vader_binary_label)
 
-	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment")
-	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0, force_alpha = True), "CategoricalNBSentiment")
-	build_sentiment_nb(sentiment_df, ComplementNB(alpha = 1e-5, force_alpha = True), "ComplementNBSentiment")
-	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 1e-5, force_alpha = True), "MultinomialNBSentiment")
+	build_sentiment_nb(sentiment_df, BernoulliNB(alpha = 0, force_alpha = True), "BernoulliNBSentiment", vocabulary = vocabulary)
+	build_sentiment_nb(sentiment_df, CategoricalNB(alpha = 0, force_alpha = True), "CategoricalNBSentiment", vocabulary = vocabulary)
+	build_sentiment_nb(sentiment_df, ComplementNB(alpha = 1e-5, force_alpha = True), "ComplementNBSentiment", vocabulary = vocabulary)
+	build_sentiment_nb(sentiment_df, MultinomialNB(alpha = 1e-5, force_alpha = True), "MultinomialNBSentiment", vocabulary = vocabulary)
 
 	def vader_multiclass_label(text):
 		score = sentiment_analyzer.polarity_scores(text)["compound"]

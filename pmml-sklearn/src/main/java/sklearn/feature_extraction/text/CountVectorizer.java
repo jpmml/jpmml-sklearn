@@ -93,15 +93,15 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 	public List<Feature> encodeFeatures(List<Feature> features, SkLearnEncoder encoder){
 		Boolean binary = getBinary();
 		Boolean lowercase = getLowercase();
-		Map<String, ?> vocabulary = getVocabulary();
+		Map<?, ?> vocabulary = getVocabulary();
 
 		Feature feature = SchemaUtil.getOnlyFeature(features);
 
 		BiMap<String, Integer> termIndexMap = HashBiMap.create(vocabulary.size());
 
-		Collection<? extends Map.Entry<String, ?>> entries = vocabulary.entrySet();
-		for(Map.Entry<String, ?> entry : entries){
-			termIndexMap.put(entry.getKey(), ValueUtil.asInteger((Number)ScalarUtil.decode(entry.getValue())));
+		Collection<? extends Map.Entry<?, ?>> entries = vocabulary.entrySet();
+		for(Map.Entry<?, ?> entry : entries){
+			termIndexMap.put((String)ScalarUtil.decode(entry.getKey()), ValueUtil.asInteger((Number)ScalarUtil.decode(entry.getValue())));
 		}
 
 		BiMap<Integer, String> indexTermMap = termIndexMap.inverse();
@@ -290,7 +290,7 @@ public class CountVectorizer extends SkLearnTransformer implements HasSparseOutp
 		return getString("token_pattern");
 	}
 
-	public Map<String, ?> getVocabulary(){
+	public Map<?, ?> getVocabulary(){
 		return getDict("vocabulary_");
 	}
 
