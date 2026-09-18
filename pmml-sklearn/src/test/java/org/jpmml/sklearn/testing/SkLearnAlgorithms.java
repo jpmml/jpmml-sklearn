@@ -28,6 +28,7 @@ public interface SkLearnAlgorithms {
 	String COMPLEMENT_NB = "ComplementNB";
 	String CQR = "CQR";
 	String DECISION_TREE = "DecisionTree";
+	String MULTI_DECISION_TREE = "Multi" + DECISION_TREE;
 	String TRANSFORMED_DECISION_TREE = "Transformed" + DECISION_TREE;
 	String DECISION_TREE_ENSEMBLE = DECISION_TREE + "Ensemble";
 	String DUMMY = "Dummy";
@@ -78,6 +79,7 @@ public interface SkLearnAlgorithms {
 	String MULTI_PLS_REGRESSION = "Multi" + PLS_REGRESSION;
 	String POISSON_REGRESSION = "PoissonRegression";
 	String RANDOM_FOREST = "RandomForest";
+	String MULTI_RANDOM_FOREST = "Multi" + RANDOM_FOREST;
 	String RIDGE = "Ridge";
 	String BAYESIAN_RIDGE = "Bayesian" + RIDGE;
 	String RIDGE_ENSEMBLE = RIDGE + "Ensemble";

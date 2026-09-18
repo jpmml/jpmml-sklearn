@@ -179,6 +179,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateMultiDecisionTreeAuto() throws Exception {
+		evaluate(MULTI_DECISION_TREE, AUTO);
+	}
+
+	@Test
 	public void evaluateDecisionTreeAutoNA() throws Exception {
 		evaluate(DECISION_TREE, AUTO_NA);
 	}
@@ -338,6 +343,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluateRandomForestAuto() throws Exception {
 		evaluate(RANDOM_FOREST, AUTO);
+	}
+
+	@Test
+	public void evaluateMultiRandomForestAuto() throws Exception {
+		evaluate(MULTI_RANDOM_FOREST, AUTO);
 	}
 
 	@Test

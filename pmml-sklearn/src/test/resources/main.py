@@ -1206,11 +1206,13 @@ def build_multi_auto(auto_df, regressor, name, with_kneighbors = False):
 if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
+	build_multi_auto(auto_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "MultiDecisionTreeAuto")
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
 	build_multi_auto(auto_df, KNeighborsRegressor(algorithm = "brute"), "MultiKNNAuto", with_kneighbors = True)
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
 	build_multi_auto(auto_df, PLSRegression(n_components = 3), "MultiPLSRegressionAuto")
+	build_multi_auto(auto_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "MultiRandomForestAuto")
 	build_multi_auto(auto_df, RegressorChain(LinearRegression()), "LinearRegressionChainAuto")
 
 def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_options):

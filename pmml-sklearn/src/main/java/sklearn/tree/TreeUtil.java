@@ -49,6 +49,7 @@ import org.dmg.pmml.mining.Segment;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.BranchNode;
 import org.dmg.pmml.tree.ClassifierNode;
+import org.dmg.pmml.tree.ComplexNode;
 import org.dmg.pmml.tree.LeafNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.NodeTransformer;
@@ -65,6 +66,7 @@ import org.jpmml.converter.FloatUtil;
 import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ModelTransformer;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PayloadManager;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
@@ -114,10 +116,12 @@ public class TreeUtil {
 		int[] rightChildren = tree.getChildrenRight();
 		int[] features = tree.getFeature();
 		double[] thresholds = tree.getThreshold();
+		int numberOfOutputs = estimator.getNumberOfOutputs();
+
 		double[] values = tree.getValues();
 		int[] missingGoToLeft = hasMissingValueSupport ? tree.getMissingGoToLeft() : null;
 
-		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, payloadManager, schema);
+		Node root = encodeNode(0, True.INSTANCE, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, payloadManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
@@ -129,7 +133,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int numberOfOutputs, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -232,8 +236,8 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, payloadManager, schema);
-			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, payloadManager, schema);
+			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, payloadManager, schema);
+			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, payloadManager, schema);
 
 			Node result;
 
@@ -305,10 +309,39 @@ public class TreeUtil {
 			} else
 
 			if(miningFunction == MiningFunction.REGRESSION){
-				double value = values[index];
 
-				result = new LeafNode(value, predicate)
-					.setId(id);
+				if(numberOfOutputs == 1){
+					double value = values[index];
+
+					result = new LeafNode(value, predicate)
+						.setId(id);
+				} else
+
+				{
+					MultiLabel multiLabel = schema.requireMultiLabel();
+
+					double[] leafValues = getRow(values, leftChildren.length, numberOfOutputs, index);
+
+					List<Number> scores = new AbstractList<Number>(){
+
+						@Override
+						public int size(){
+							return leafValues.length;
+						}
+
+						@Override
+						public Number get(int index){
+							double leafValue = leafValues[index];
+
+							return ValueUtil.narrow(leafValue);
+						}
+					};
+
+					result = new ComplexNode(null, predicate)
+						.setId(id);
+
+					payloadManager.addScores(result, scores, multiLabel);
+				}
 			} else
 
 			{

@@ -39,10 +39,10 @@ public class TreeEnsembleUtil {
 	public <E extends Estimator & HasEstimatorEnsemble<T>, T extends Estimator & HasTree> List<TreeModel> encodeTreeModelEnsemble(E estimator, MiningFunction miningFunction, Schema schema){
 		List<? extends T> estimators = estimator.getEstimators();
 
-		Schema segmentSchema = schema.toAnonymousSchema();
+		Schema segmentSchema = schema.toSegmentSchema();
 
 		PredicateManager predicateManager = new PredicateManager();
-		PayloadManager payloadManager = (miningFunction == MiningFunction.CLASSIFICATION) ? new PayloadManager() : null;
+		PayloadManager payloadManager = new PayloadManager();
 
 		Function<T, TreeModel> function = new Function<T, TreeModel>(){
 
