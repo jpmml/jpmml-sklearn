@@ -1,4 +1,4 @@
-h2o(Adjusted),probability(0),probability(1)
+defaultThreshold(Adjusted),probability(0),probability(1)
 0,0.96,0.04
 0,0.96,0.04
 0,0.998461538553238,0.001538461446762

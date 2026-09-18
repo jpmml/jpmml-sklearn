@@ -17,6 +17,7 @@ from sklearn2pmml.preprocessing.h2o import H2OFrameConstructor
 from sklearn_pandas import DataFrameMapper
 
 import h2o
+import numpy
 
 h2o.init()
 h2o.connect()
@@ -52,8 +53,12 @@ def build_audit(audit_df, classifier, name):
 	store_mojo(classifier, name)
 	embed_stored_mojo(classifier, 50000)
 	store_pkl(pipeline, name, flavour = "dill")
-	adjusted = pipeline.predict(audit_X)
-	adjusted.set_names(["h2o(Adjusted)", "probability(0)", "probability(1)"])
+	# XXX
+	audit_Xt = audit_X
+	for _, step in pipeline.steps[:-1]:
+		audit_Xt = step.transform(audit_Xt)
+	adjusted = classifier.predict(audit_Xt)
+	adjusted.set_names(["defaultThreshold(Adjusted)", "probability(0)", "probability(1)"])
 	store_csv(adjusted.as_data_frame(), name)
 
 if "Audit" in datasets:

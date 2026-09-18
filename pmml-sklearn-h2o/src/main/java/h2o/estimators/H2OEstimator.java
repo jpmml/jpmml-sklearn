@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import hex.genmodel.MojoModel;
 import hex.genmodel.algos.glm.GlmOrdinalMojoModel;
@@ -46,9 +48,11 @@ import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
+import org.jpmml.converter.tree.HasTreeModelOptions;
 import org.jpmml.h2o.Converter;
 import org.jpmml.h2o.ConverterFactory;
 import org.jpmml.h2o.H2OEncoder;
+import org.jpmml.h2o.HasH2OOptions;
 import org.jpmml.h2o.MojoModelUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
@@ -58,9 +62,11 @@ import sklearn.Estimator;
 import sklearn.HasClasses;
 import sklearn2pmml.SkLearn2PMMLFields;
 
-public class H2OEstimator extends Estimator implements HasClasses, PMMLEncodable {
+public class H2OEstimator extends Estimator implements HasClasses, HasH2OOptions, PMMLEncodable {
 
 	private MojoModel mojoModel = null;
+
+	private Converter<?> converter = null;
 
 
 	public H2OEstimator(String module, String name){
@@ -199,7 +205,16 @@ public class H2OEstimator extends Estimator implements HasClasses, PMMLEncodable
 
 	@Override
 	public Model encodeModel(Schema schema){
-		Converter<?> converter = createConverter();
+		Converter<?> converter = getConverter();
+
+		Map<String, ?> options = getOptions();
+
+		return converter.encodeModel(options, schema);
+	}
+
+	@Override
+	public Schema configureSchema(Schema schema){
+		Converter<?> converter = getConverter();
 
 		ModelEncoder encoder = schema.getEncoder();
 		Label label = schema.getLabel();
@@ -237,16 +252,16 @@ public class H2OEstimator extends Estimator implements HasClasses, PMMLEncodable
 			reorderedFeatures.add(feature);
 		}
 
-		Schema mojoModelSchema = converter.toMojoModelSchema(new Schema(encoder, label, reorderedFeatures));
-
-		return converter.encodeModel(mojoModelSchema);
+		return converter.toMojoModelSchema(new Schema(encoder, label, reorderedFeatures));
 	}
 
 	@Override
 	public PMML encodePMML(Map<String, ?> options){
-		Converter<?> converter = createConverter();
+		Converter<?> converter = getConverter();
 
-		return converter.encodePMML();
+		Map<String, ?> h2oOptions = getOptions();
+
+		return converter.encodePMML(h2oOptions);
 	}
 
 	public String getEstimatorType(){
@@ -265,6 +280,15 @@ public class H2OEstimator extends Estimator implements HasClasses, PMMLEncodable
 		setattr("_mojo_path", mojoPath);
 
 		return this;
+	}
+
+	private Converter<?> getConverter(){
+
+		if(this.converter == null){
+			this.converter = createConverter();
+		}
+
+		return this.converter;
 	}
 
 	private Converter<?> createConverter(){
@@ -286,6 +310,26 @@ public class H2OEstimator extends Estimator implements HasClasses, PMMLEncodable
 		}
 
 		return this.mojoModel;
+	}
+
+	private Map<String, ?> getOptions(){
+		Map<String, Object> result = new LinkedHashMap<>();
+
+		Boolean compact = getPMMLOption(HasTreeModelOptions.OPTION_COMPACT, null);
+		Boolean flat = getPMMLOption(HasTreeModelOptions.OPTION_FLAT, null);
+		Boolean nodeId = getPMMLOption(HasTreeModelOptions.OPTION_NODE_ID, null);
+		Boolean nodeRecordCount = getPMMLOption(HasTreeModelOptions.OPTION_NODE_RECORDCOUNT, null);
+		Boolean prune = getPMMLOption(HasTreeModelOptions.OPTION_PRUNE, null);
+
+		result.put(HasTreeModelOptions.OPTION_COMPACT, compact);
+		result.put(HasTreeModelOptions.OPTION_FLAT, flat);
+		result.put(HasTreeModelOptions.OPTION_NODE_ID, nodeId);
+		result.put(HasTreeModelOptions.OPTION_NODE_RECORDCOUNT, nodeRecordCount);
+		result.put(HasTreeModelOptions.OPTION_PRUNE, prune);
+
+		result.values().removeIf(Objects::isNull);
+
+		return result;
 	}
 
 	private MojoModel loadMojoModel(){

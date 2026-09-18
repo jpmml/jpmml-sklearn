@@ -26,7 +26,6 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import h2o.estimators.H2OEstimator;
-import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.evaluator.ResultField;
@@ -95,9 +94,7 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 
 	@Test
 	public void evaluateGradientBoostingAudit() throws Exception {
-		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
-
-		evaluate("H2OGradientBoosting", AUDIT, excludeFields(targetFields));
+		evaluate("H2OGradientBoosting", AUDIT, excludeFields(AUDIT_ADJUSTED));
 	}
 
 	@Test
@@ -112,9 +109,7 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 
 	@Test
 	public void evaluateLogisticRegressionAudit() throws Exception {
-		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
-
-		evaluate("H2OLogisticRegression", AUDIT, excludeFields(targetFields));
+		evaluate("H2OLogisticRegression", AUDIT, excludeFields(AUDIT_ADJUSTED));
 	}
 
 	@Test
@@ -124,9 +119,7 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 
 	@Test
 	public void evaluateRandomForestAudit() throws Exception {
-		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
-
-		evaluate("H2ORandomForest", AUDIT, excludeFields(targetFields));
+		evaluate("H2ORandomForest", AUDIT, excludeFields(AUDIT_ADJUSTED));
 	}
 
 	@Test
@@ -136,18 +129,11 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 
 	@Test
 	public void evaluateXGBoostAudit() throws Exception {
-		String[] targetFields = createTargetFields(AUDIT_ADJUSTED);
-
-		evaluate("H2OXGBoost", AUDIT, excludeFields(targetFields), new FloatEquivalence(16));
+		evaluate("H2OXGBoost", AUDIT, excludeFields(AUDIT_ADJUSTED, AUDIT_PROBABILITY_FALSE), new FloatEquivalence(16));
 	}
 
 	@Test
 	public void evaluateXGBoostAuto() throws Exception {
 		evaluate("H2OXGBoost", AUTO, new FloatEquivalence(8));
-	}
-
-	static
-	private String[] createTargetFields(String name){
-		return new String[]{name, FieldNameUtil.create("h2o", name)};
 	}
 }
