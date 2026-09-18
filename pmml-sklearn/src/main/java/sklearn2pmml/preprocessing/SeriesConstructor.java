@@ -25,8 +25,8 @@ import java.util.Objects;
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.SchemaUtil;
+import org.jpmml.python.DTypeUtil;
 import org.jpmml.python.TypeInfo;
-import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 

@@ -26,7 +26,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
+import org.jpmml.converter.PayloadManager;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 
@@ -42,13 +42,13 @@ public class TreeEnsembleUtil {
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = (miningFunction == MiningFunction.CLASSIFICATION) ? new ScoreDistributionManager() : null;
+		PayloadManager payloadManager = (miningFunction == MiningFunction.CLASSIFICATION) ? new PayloadManager() : null;
 
 		Function<T, TreeModel> function = new Function<T, TreeModel>(){
 
 			@Override
 			public TreeModel apply(T estimator){
-				TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, miningFunction, predicateManager, scoreDistributionManager, segmentSchema);
+				TreeModel treeModel = TreeUtil.encodeTreeModel(estimator, miningFunction, predicateManager, payloadManager, segmentSchema);
 
 				// XXX
 				if(estimator.hasFeatureImportances()){

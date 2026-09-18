@@ -19,6 +19,7 @@
 package sklearn;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -290,6 +291,20 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		}
 
 		return defaultValue;
+	}
+
+	public Map<String, ?> getPMMLOptions(Collection<String> keys){
+		Map<String, Object> result = new LinkedHashMap<>();
+
+		for(String key : keys){
+			Object value = getPMMLOption(key, null);
+
+			if(value != null){
+				result.put(key, value);
+			}
+		}
+
+		return result;
 	}
 
 	@Override

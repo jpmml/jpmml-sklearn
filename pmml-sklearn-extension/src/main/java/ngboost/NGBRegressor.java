@@ -21,6 +21,7 @@ package ngboost;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -48,12 +49,12 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.FieldNameUtil;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.EstimatorUtil;
 import sklearn.HasFeatureNamesIn;
@@ -63,7 +64,7 @@ import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasRegressorOptions, HasTreeOptions, Encodable {
+public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasRegressorOptions, HasTreeOptions, PMMLEncodable {
 
 	public NGBRegressor(String module, String name){
 		super(module, name);
@@ -113,7 +114,7 @@ public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasReg
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return EstimatorUtil.encodePMML(this);
 	}
 

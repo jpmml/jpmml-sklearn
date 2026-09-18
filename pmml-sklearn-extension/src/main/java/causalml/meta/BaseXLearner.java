@@ -39,7 +39,6 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -86,7 +85,7 @@ public class BaseXLearner extends BaseLearner<Regressor> {
 
 		Label label = schema.getLabel();
 
-		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
+		List<ContinuousLabel> continuousLabels = label.toScalarLabels(ContinuousLabel.class);
 
 		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelsTauT.entrySet(), modelsTauC.entrySet(), propensityModels.entrySet());
 

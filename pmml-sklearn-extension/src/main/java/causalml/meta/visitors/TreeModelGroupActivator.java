@@ -24,11 +24,11 @@ import org.dmg.pmml.False;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.tree.Node;
-import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
+import org.jpmml.converter.tree.visitors.TreeModelTransformer;
 import org.jpmml.model.UnsupportedElementException;
 
 abstract
-public class TreeModelGroupActivator extends AbstractTreeModelTransformer {
+public class TreeModelGroupActivator extends TreeModelTransformer {
 
 	abstract
 	public Boolean getActivation(Predicate predicate);

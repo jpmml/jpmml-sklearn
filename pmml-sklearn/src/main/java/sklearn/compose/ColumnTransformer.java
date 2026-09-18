@@ -21,13 +21,14 @@ package sklearn.compose;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TupleUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasFeatureNamesIn;
 import sklearn.HasSparseOutput;
@@ -37,7 +38,7 @@ import sklearn.SkLearnTransformerCastFunction;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
-public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, HasSparseOutput, Encodable {
+public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, HasSparseOutput, PMMLEncodable {
 
 	public ColumnTransformer(String module, String name){
 		super(module, name);
@@ -81,7 +82,7 @@ public class ColumnTransformer extends Initializer implements HasFeatureNamesIn,
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return TransformerUtil.encodePMML(this);
 	}
 

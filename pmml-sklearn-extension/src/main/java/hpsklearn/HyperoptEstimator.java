@@ -20,14 +20,15 @@ package hpsklearn;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Composite;
 import sklearn.Estimator;
@@ -36,7 +37,7 @@ import sklearn.StepUtil;
 import sklearn.Transformer;
 import sklearn.TransformerCastFunction;
 
-public class HyperoptEstimator extends Composite implements Encodable {
+public class HyperoptEstimator extends Composite implements PMMLEncodable {
 
 	public HyperoptEstimator(String module, String name){
 		super(module, name);
@@ -99,7 +100,7 @@ public class HyperoptEstimator extends Composite implements Encodable {
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		Estimator estimator = getFinalEstimator();

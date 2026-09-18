@@ -55,7 +55,6 @@ import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.NamingException;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.ValueUtil;
@@ -88,7 +87,7 @@ public class PMMLPipeline extends SkLearnPipeline {
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		List<String> activeFields = getActiveFields();
@@ -161,7 +160,7 @@ public class PMMLPipeline extends SkLearnPipeline {
 
 				List<OutputField> predictFields = new ArrayList<>();
 
-				List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+				List<ScalarLabel> scalarLabels = label.toScalarLabels();
 				for(ScalarLabel scalarLabel : scalarLabels){
 					OutputField predictField = ModelUtil.createPredictedField(FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName()), scalarLabel.getOpType(), scalarLabel.getDataType())
 						.setFinalResult(false);
@@ -231,7 +230,7 @@ public class PMMLPipeline extends SkLearnPipeline {
 			Number precision = verification.getPrecision();
 			Number zeroThreshold = verification.getZeroThreshold();
 
-			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+			List<ScalarLabel> scalarLabels = label.toScalarLabels();
 
 			boolean hasProbabilityValues = verification.hasProbabilityValues();
 
@@ -341,20 +340,6 @@ public class PMMLPipeline extends SkLearnPipeline {
 			}
 
 			@Override
-			public void addDataField(DataField dataField){
-				checkField(dataField.requireName());
-
-				super.addDataField(dataField);
-			}
-
-			@Override
-			public void addDerivedField(DerivedField derivedField){
-				checkField(derivedField.requireName());
-
-				super.addDerivedField(derivedField);
-			}
-
-			@Override
 			public Field<?> getField(String name){
 
 				try {
@@ -379,19 +364,20 @@ public class PMMLPipeline extends SkLearnPipeline {
 				return encoder.getMemory();
 			}
 
-			private void checkField(String name){
+			@Override
+			protected String checkField(String name){
 				Field<?> field;
 
 				try {
 					field = encoder.getField(name);
 				} catch(SchemaException se){
-					return;
+					return super.checkField(name);
 				}
 
 				if(field instanceof DerivedOutputField){
 					DerivedOutputField derivedOutputField = (DerivedOutputField)field;
 
-					return;
+					return super.checkField(name);
 				}
 
 				throw new NamingException("Field " + ExceptionUtil.formatName(name) + " is already defined");

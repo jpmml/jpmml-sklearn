@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
@@ -51,7 +52,7 @@ public class EncodableUtil {
 	 * @see TransformerUtil#encodePMML(Transformer)
 	 */
 	static
-	public PMML encodePMML(Encodable encodable){
+	public PMML encodePMML(PMMLEncodable encodable){
 
 		try {
 			return encodable.encodePMML();
@@ -64,7 +65,7 @@ public class EncodableUtil {
 	}
 
 	static
-	public void configure(Encodable encodable, Map<String, ?> pmmlOptions){
+	public void configure(PMMLEncodable encodable, Map<String, ?> pmmlOptions){
 
 		if(encodable instanceof PMMLPipeline){
 			PMMLPipeline pipeline = (PMMLPipeline)encodable;
@@ -80,10 +81,10 @@ public class EncodableUtil {
 	}
 
 	static
-	public Encodable toEncodable(Object object){
+	public PMMLEncodable toEncodable(Object object){
 
-		if(object instanceof Encodable){
-			Encodable encodable = (Encodable)object;
+		if(object instanceof PMMLEncodable){
+			PMMLEncodable encodable = (PMMLEncodable)object;
 
 			return encodable;
 		}
@@ -93,8 +94,8 @@ public class EncodableUtil {
 		Step step = castFunction.apply(object);
 
 		// A Castable non-Step class may turn into a Step subclass during "deep casting"
-		if(step instanceof Encodable){
-			Encodable encodable = (Encodable)step;
+		if(step instanceof PMMLEncodable){
+			PMMLEncodable encodable = (PMMLEncodable)step;
 
 			return encodable;
 		}
@@ -103,8 +104,8 @@ public class EncodableUtil {
 
 			@Override
 			// No-op, to leave an identification mark into exception stack traces
-			public PMML encodePMML(){
-				return super.encodePMML();
+			public PMML encodePMML(Map<String, ?> options){
+				return super.encodePMML(options);
 			}
 		}
 			.setOnlyStep("estimator", step);

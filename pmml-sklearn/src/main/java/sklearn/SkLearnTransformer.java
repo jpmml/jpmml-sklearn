@@ -18,18 +18,20 @@
  */
 package sklearn;
 
+import java.util.Map;
+
 import org.dmg.pmml.PMML;
-import org.jpmml.sklearn.Encodable;
+import org.jpmml.converter.PMMLEncodable;
 
 abstract
-public class SkLearnTransformer extends Transformer implements HasFeatureNamesIn, Encodable {
+public class SkLearnTransformer extends Transformer implements HasFeatureNamesIn, PMMLEncodable {
 
 	public SkLearnTransformer(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return TransformerUtil.encodePMML(this);
 	}
 }

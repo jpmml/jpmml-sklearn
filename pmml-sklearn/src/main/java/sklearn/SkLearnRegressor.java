@@ -18,19 +18,21 @@
  */
 package sklearn;
 
+import java.util.Map;
+
 import org.dmg.pmml.PMML;
-import org.jpmml.sklearn.Encodable;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
 
 abstract
-public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn, HasSkLearnOptions, Encodable {
+public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn, HasSkLearnOptions, PMMLEncodable {
 
 	public SkLearnRegressor(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return EstimatorUtil.encodePMML(this);
 	}
 }

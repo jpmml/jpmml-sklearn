@@ -20,17 +20,18 @@ package category_encoders;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
-import org.jpmml.sklearn.Encodable;
+import org.jpmml.converter.PMMLEncodable;
 import sklearn.HasFeatureNamesIn;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
 abstract
-public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encodable, BaseEncoderConstants {
+public class BaseEncoder extends Transformer implements HasFeatureNamesIn, PMMLEncodable, BaseEncoderConstants {
 
 	public BaseEncoder(String module, String name){
 		super(module, name);
@@ -47,7 +48,7 @@ public class BaseEncoder extends Transformer implements HasFeatureNamesIn, Encod
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return TransformerUtil.encodePMML(this);
 	}
 

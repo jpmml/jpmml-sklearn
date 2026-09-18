@@ -18,19 +18,21 @@
  */
 package lightgbm.sklearn;
 
+import java.util.Map;
+
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.Schema;
 import org.jpmml.lightgbm.HasLightGBMOptions;
 import org.jpmml.lightgbm.LightGBMException;
 import org.jpmml.lightgbm.ObjectiveFunction;
 import org.jpmml.lightgbm.Regression;
-import org.jpmml.sklearn.Encodable;
 import sklearn.Regressor;
 
-public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMOptions, Encodable {
+public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMOptions, PMMLEncodable {
 
 	public LGBMRegressor(String module, String name){
 		super(module, name);
@@ -68,7 +70,7 @@ public class LGBMRegressor extends Regressor implements HasBooster, HasLightGBMO
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return BoosterUtil.encodePMML(this);
 	}
 

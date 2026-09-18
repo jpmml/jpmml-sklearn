@@ -35,12 +35,12 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.LoggingUtil;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.model.JAXBSerializer;
 import org.jpmml.model.metro.MetroJAXBSerializer;
 import org.jpmml.python.PythonUnpickler;
 import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
@@ -239,7 +239,7 @@ public class Main {
 			throw e;
 		}
 
-		Encodable encodable;
+		PMMLEncodable encodable;
 
 		try {
 			encodable = EncodableUtil.toEncodable(object);

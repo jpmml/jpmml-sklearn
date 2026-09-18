@@ -51,7 +51,7 @@ public class DummyRegressor extends SkLearnRegressor implements HasDefaultValue 
 
 		Number intercept = Iterables.getOnlyElement(constant);
 
-		return RegressionModelUtil.createRegression(Collections.emptyList(), Collections.emptyList(), intercept.doubleValue(), null, schema);
+		return RegressionModelUtil.createRegression(Collections.emptyList(), Collections.emptyList(), intercept.doubleValue(), RegressionModel.NormalizationMethod.NONE, schema);
 	}
 
 	public List<Number> getConstant(){

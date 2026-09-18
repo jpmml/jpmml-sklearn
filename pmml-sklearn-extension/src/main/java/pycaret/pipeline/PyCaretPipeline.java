@@ -21,6 +21,7 @@ package pycaret.pipeline;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 import org.dmg.pmml.DataField;
@@ -66,7 +67,7 @@ public class PyCaretPipeline extends SkLearnPipeline {
 		if(label != null){
 			result = new ArrayList<>(result);
 
-			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+			List<ScalarLabel> scalarLabels = label.toScalarLabels();
 			for(ScalarLabel scalarLabel : scalarLabels){
 				Feature labelFeature = FeatureUtil.findLabelFeature(result, scalarLabel);
 
@@ -85,7 +86,7 @@ public class PyCaretPipeline extends SkLearnPipeline {
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		List<? extends TransformerWrapper> transformers = getTransformers();

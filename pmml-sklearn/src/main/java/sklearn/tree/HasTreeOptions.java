@@ -19,40 +19,22 @@
 package sklearn.tree;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OutputField;
-import org.dmg.pmml.SimplePredicate;
-import org.dmg.pmml.SimpleSetPredicate;
 import org.dmg.pmml.tree.Node;
 import org.jpmml.converter.HasNativeConfiguration;
+import org.jpmml.converter.HasSchemaOptions;
+import org.jpmml.converter.tree.HasTreeModelOptions;
 import org.jpmml.sklearn.HasSkLearnOptions;
-import sklearn.tree.visitors.TreeModelCompactor;
-import sklearn.tree.visitors.TreeModelFlattener;
-import sklearn.tree.visitors.TreeModelPruner;
 
-public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguration {
+public interface HasTreeOptions extends HasSkLearnOptions, HasSchemaOptions, HasTreeModelOptions, HasNativeConfiguration {
 
 	/**
 	 * @see Node#getDefaultChild()
 	 */
 	String OPTION_ALLOW_MISSING = "allow_missing";
-
-	/**
-	 * @see TreeModelCompactor
-	 */
-	String OPTION_COMPACT = "compact";
-
-	/**
-	 * @see TreeModelFlattener
-	 */
-	String OPTION_FLAT = "flat";
-
-	/**
-	 * @see DerivedField
-	 */
-	String OPTION_INPUT_FLOAT = "input_float";
 
 	/**
 	 * @see Node#hasExtensions()
@@ -61,30 +43,16 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasNativeConfiguratio
 	String OPTION_NODE_EXTENSIONS = "node_extensions";
 
 	/**
-	 * @see Node#getId()
-	 */
-	String OPTION_NODE_ID = "node_id";
-
-	/**
 	 * @see Node#getScore()
 	 */
 	String OPTION_NODE_SCORE = "node_score";
 
 	/**
-	 * @see SimplePredicate
-	 * @see SimpleSetPredicate
-	 */
-	String OPTION_NUMERIC = "numeric";
-
-	/**
-	 * @see TreeModelPruner
-	 */
-	String OPTION_PRUNE = "prune";
-
-	/**
 	 * @see OutputField
 	 */
 	String OPTION_WINNER_ID = "winner_id";
+
+	List<String> OPTIONS_NODE = List.of(HasTreeOptions.OPTION_NODE_EXTENSIONS, HasTreeOptions.OPTION_NODE_ID, HasTreeOptions.OPTION_NODE_RECORDCOUNT, HasTreeOptions.OPTION_NODE_SCORE, HasTreeOptions.OPTION_WINNER_ID);
 
 	@Override
 	default

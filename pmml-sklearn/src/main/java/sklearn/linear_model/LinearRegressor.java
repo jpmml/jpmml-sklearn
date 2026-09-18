@@ -29,7 +29,6 @@ import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
@@ -79,7 +78,7 @@ public class LinearRegressor extends SkLearnRegressor {
 		if(numberOfOutputs >= 2){
 			MultiLabel multiLabel = schema.requireMultiLabel();
 
-			List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(multiLabel);
+			List<ScalarLabel> scalarLabels = multiLabel.toScalarLabels();
 
 			ClassDictUtil.checkSize(numberOfOutputs, intercept, scalarLabels);
 
@@ -102,7 +101,7 @@ public class LinearRegressor extends SkLearnRegressor {
 	}
 
 	protected RegressionModel createRegression(List<? extends Number> coef, Number intercept, Schema schema){
-		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, null, schema);
+		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, RegressionModel.NormalizationMethod.NONE, schema);
 	}
 
 	public List<Number> getCoef(){

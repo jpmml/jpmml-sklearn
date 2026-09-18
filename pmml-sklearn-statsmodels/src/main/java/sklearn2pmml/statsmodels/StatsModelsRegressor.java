@@ -18,14 +18,16 @@
  */
 package sklearn2pmml.statsmodels;
 
+import java.util.Map;
+
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.Encodable;
 import sklearn.Regressor;
 import statsmodels.ResultsWrapper;
 
-public class StatsModelsRegressor extends Regressor implements HasResults, Encodable {
+public class StatsModelsRegressor extends Regressor implements HasResults, PMMLEncodable {
 
 	public StatsModelsRegressor(String module, String name){
 		super(module, name);
@@ -44,7 +46,7 @@ public class StatsModelsRegressor extends Regressor implements HasResults, Encod
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return StatsModelsUtil.encodePMML(this);
 	}
 

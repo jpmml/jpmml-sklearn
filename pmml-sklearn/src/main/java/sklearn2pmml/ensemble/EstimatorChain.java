@@ -34,7 +34,6 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.python.CastFunction;
@@ -145,18 +144,18 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 		} else
 
 		if(names.size() >= 2){
-			List<Label> labels = new ArrayList<>();
+			List<ScalarLabel> scalarLabels = new ArrayList<>();
 
 			for(int i = 0; i < names.size(); i++){
 				String name = names.get(i);
 				Estimator estimator = estimators.get(i);
 
-				ScalarLabel label = (ScalarLabel)estimator.encodeLabel(Collections.singletonList(name), encoder);
+				ScalarLabel scalarLabel = (ScalarLabel)estimator.encodeLabel(Collections.singletonList(name), encoder);
 
-				labels.add(label);
+				scalarLabels.add(scalarLabel);
 			}
 
-			return new MultiLabel(labels);
+			return new MultiLabel(scalarLabels);
 		} else
 
 		{
@@ -178,7 +177,7 @@ public class EstimatorChain extends Estimator implements HasClasses, HasControll
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		List<ScalarLabel> scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+		List<ScalarLabel> scalarLabels = label.toScalarLabels();
 
 		if(multioutput){
 			ClassDictUtil.checkSize(steps, scalarLabels);

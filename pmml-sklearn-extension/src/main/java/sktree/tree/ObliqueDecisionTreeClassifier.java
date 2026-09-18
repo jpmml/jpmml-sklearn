@@ -24,7 +24,7 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
+import org.jpmml.converter.PayloadManager;
 import sklearn.Classifier;
 import sklearn.tree.HasTree;
 import sklearn.tree.TreeUtil;
@@ -49,13 +49,13 @@ public class ObliqueDecisionTreeClassifier extends Classifier implements HasTree
 	@Override
 	public TreeModel encodeModel(Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
+		PayloadManager payloadManager = new PayloadManager();
 		ProjectionManager projectionManager = new ProjectionManager();
 
-		return encodeModel(predicateManager, scoreDistributionManager, projectionManager, schema);
+		return encodeModel(predicateManager, payloadManager, projectionManager, schema);
 	}
 
-	public TreeModel encodeModel(PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, ProjectionManager projectionManager, Schema schema){
+	public TreeModel encodeModel(PredicateManager predicateManager, PayloadManager payloadManager, ProjectionManager projectionManager, Schema schema){
 		ObliqueTree tree = getTree();
 
 		if(tree.hasProjVecs()){
@@ -74,12 +74,12 @@ public class ObliqueDecisionTreeClassifier extends Classifier implements HasTree
 				}
 			};
 
-			return sklearnClassifier.encodeModel(predicateManager, scoreDistributionManager, projectionManager, sklearnSchema);
+			return sklearnClassifier.encodeModel(predicateManager, payloadManager, projectionManager, sklearnSchema);
 		}
 
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, scoreDistributionManager, schema);
+		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, payloadManager, schema);
 
 		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
 

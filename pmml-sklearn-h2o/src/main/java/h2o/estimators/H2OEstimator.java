@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import hex.genmodel.MojoModel;
 import hex.genmodel.algos.glm.GlmOrdinalMojoModel;
@@ -41,6 +42,7 @@ import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
 import org.jpmml.converter.OrdinalLabel;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.TypeUtil;
@@ -49,7 +51,6 @@ import org.jpmml.h2o.ConverterFactory;
 import org.jpmml.h2o.H2OEncoder;
 import org.jpmml.h2o.MojoModelUtil;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
@@ -57,7 +58,7 @@ import sklearn.Estimator;
 import sklearn.HasClasses;
 import sklearn2pmml.SkLearn2PMMLFields;
 
-public class H2OEstimator extends Estimator implements HasClasses, Encodable {
+public class H2OEstimator extends Estimator implements HasClasses, PMMLEncodable {
 
 	private MojoModel mojoModel = null;
 
@@ -242,7 +243,7 @@ public class H2OEstimator extends Estimator implements HasClasses, Encodable {
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		Converter<?> converter = createConverter();
 
 		return converter.encodePMML();

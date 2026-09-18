@@ -40,8 +40,9 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
+import org.jpmml.converter.PayloadManager;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.converter.tree.visitors.NodeRecordCountCleaner;
 import org.jpmml.model.visitors.AbstractVisitor;
 import sklearn.Classifier;
 import sklearn.ensemble.EnsembleClassifier;
@@ -66,14 +67,14 @@ public class AdaBoostClassifier extends EnsembleClassifier<Classifier> implement
 			.expectCardinality(2);
 
 		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
+		PayloadManager payloadManager = new PayloadManager();
 
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		List<TreeModel> treeModels = new ArrayList<>();
 
 		for(Classifier estimator : estimators){
-			TreeModel treeModel = TreeUtil.encodeTreeModel((TreeClassifier)estimator, MiningFunction.CLASSIFICATION, predicateManager, scoreDistributionManager, segmentSchema);
+			TreeModel treeModel = TreeUtil.encodeTreeModel((TreeClassifier)estimator, MiningFunction.CLASSIFICATION, predicateManager, payloadManager, segmentSchema);
 
 			treeModel
 				.setMiningFunction(MiningFunction.REGRESSION)
@@ -116,6 +117,9 @@ public class AdaBoostClassifier extends EnsembleClassifier<Classifier> implement
 				}
 			};
 			visitor.applyTo(treeModel);
+
+			Visitor recordCountCleaner = new NodeRecordCountCleaner();
+			recordCountCleaner.applyTo(treeModel);
 
 			treeModels.add(treeModel);
 		}

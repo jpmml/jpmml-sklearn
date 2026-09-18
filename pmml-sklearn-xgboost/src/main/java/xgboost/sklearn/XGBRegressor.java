@@ -18,6 +18,8 @@
  */
 package xgboost.sklearn;
 
+import java.util.Map;
+
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
@@ -26,9 +28,9 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
@@ -36,7 +38,7 @@ import org.jpmml.xgboost.Regression;
 import org.jpmml.xgboost.XGBoostException;
 import sklearn.Regressor;
 
-public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOptions, Encodable {
+public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOptions, PMMLEncodable {
 
 	public XGBRegressor(String module, String name){
 		super(module, name);
@@ -93,7 +95,7 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return BoosterUtil.encodePMML(this);
 	}
 

@@ -31,7 +31,8 @@ import org.dmg.pmml.Visitor;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.visitors.AbstractTreeModelTransformer;
+import org.jpmml.converter.tree.visitors.NodeRecordCountCleaner;
+import org.jpmml.converter.tree.visitors.TreeModelTransformer;
 import sklearn.EstimatorCastException;
 import sklearn.EstimatorUtil;
 import sklearn.Regressor;
@@ -76,18 +77,14 @@ public class BaseSRegressor extends BaseSLearner<Regressor> {
 
 	@Override
 	protected Model preOptimizeModel(Model model, String groupName){
-		Visitor nullBranchMarker = new AbstractTreeModelTransformer(){
+		Visitor nullBranchMarker = new TreeModelTransformer(){
 
 			private Set<Node> vitalNodes = new HashSet<>();
 
 
 			@Override
 			public void enterNode(Node node){
-				Number recordCount = node.getRecordCount();
-
-				if(recordCount != null){
-					node.setRecordCount(null);
-				}
+				super.enterNode(node);
 			}
 
 			@Override
@@ -121,18 +118,22 @@ public class BaseSRegressor extends BaseSLearner<Regressor> {
 
 			@Override
 			public void exitTreeModel(TreeModel treeModel){
-				super.exitTreeModel(treeModel);
-
 				this.vitalNodes.clear();
+
+				super.exitTreeModel(treeModel);
 			}
 		};
 		nullBranchMarker.applyTo(model);
 
-		Visitor branchPruner = new AbstractTreeModelTransformer(){
+		Visitor branchPruner = new TreeModelTransformer(){
+
+			@Override
+			public void enterNode(Node node){
+				super.enterNode(node);
+			}
 
 			@Override
 			public void exitNode(Node node){
-				Object defaultChild = node.getDefaultChild();
 				Object score = node.getScore();
 
 				if(node.hasNodes()){
@@ -141,9 +142,7 @@ public class BaseSRegressor extends BaseSLearner<Regressor> {
 					Object childScore = getConstantScore(children);
 					if(Objects.equals(score, childScore)){
 
-						if(defaultChild != null){
-							node.setDefaultChild(null);
-						}
+						clearDefaultChild(node);
 
 						children.clear();
 					}
@@ -179,6 +178,9 @@ public class BaseSRegressor extends BaseSLearner<Regressor> {
 			}
 		};
 		branchPruner.applyTo(model);
+
+		Visitor recordCountCleaner = new NodeRecordCountCleaner();
+		recordCountCleaner.applyTo(model);
 
 		return model;
 	}

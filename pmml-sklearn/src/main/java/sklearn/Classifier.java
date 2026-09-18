@@ -125,7 +125,7 @@ public class Classifier extends Estimator implements HasClasses {
 		} else
 
 		if(names.size() >= 2){
-			List<Label> labels = new ArrayList<>();
+			List<DiscreteLabel> discreteLabels = new ArrayList<>();
 
 			for(int i = 0; i < names.size(); i++){
 				String name = names.get(i);
@@ -145,12 +145,12 @@ public class Classifier extends Estimator implements HasClasses {
 
 				List<?> categories = castFunction.apply(classes.get(i));
 
-				Label label = encodeLabel(name, categories, encoder);
+				DiscreteLabel discreteLabel = encodeLabel(name, categories, encoder);
 
-				labels.add(label);
+				discreteLabels.add(discreteLabel);
 			}
 
-			return new MultiLabel(labels);
+			return new MultiLabel(discreteLabels);
 		} else
 
 		{

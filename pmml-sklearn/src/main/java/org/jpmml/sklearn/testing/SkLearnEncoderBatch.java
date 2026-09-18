@@ -24,9 +24,9 @@ import java.util.function.Predicate;
 import com.google.common.base.Equivalence;
 import net.razorvine.pickle.Unpickler;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.python.testing.PythonEncoderBatch;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
@@ -51,7 +51,7 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		activate(object);
 
 		try {
-			Encodable encodable = EncodableUtil.toEncodable(object);
+			PMMLEncodable encodable = EncodableUtil.toEncodable(object);
 
 			if(options != null && !options.isEmpty()){
 				EncodableUtil.configure(encodable, options);

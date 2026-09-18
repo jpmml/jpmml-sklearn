@@ -67,7 +67,7 @@ public class TreePredictorUtil {
 		int[] bitsetIdx = treePredictor.getBitsetIdx();
 		int[] missingGoToLeft = treePredictor.getMissingGoToLeft();
 		double[] values = treePredictor.getValues();
-		int[] rawLeftCatBitsets = treePredictor.getRawLeftCatBitsets();
+		long[] rawLeftCatBitsets = treePredictor.getRawLeftCatBitsets();
 
 		Node root = encodeNode(0, True.INSTANCE, leaf, leftChildren, rightChildren, featureIdx, isCategorical, thresholds, bitsetIdx, missingGoToLeft, values, binMapper, rawLeftCatBitsets, new CategoryManager(), predicateManager, schema);
 
@@ -79,7 +79,7 @@ public class TreePredictorUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, int[] isCategorical, double[] thresholds, int[] bitsetIdx, int[] missingGoToLeft, double[] values, BinMapper binMapper, int[] rawLeftCatBitsets, CategoryManager categoryManager, PredicateManager predicateManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, int[] leaf, int[] leftChildren, int[] rightChildren, int[] featureIdx, int[] isCategorical, double[] thresholds, int[] bitsetIdx, int[] missingGoToLeft, double[] values, BinMapper binMapper, long[] rawLeftCatBitsets, CategoryManager categoryManager, PredicateManager predicateManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		if(leaf[index] == 0){
@@ -115,8 +115,8 @@ public class TreePredictorUtil {
 							continue;
 						}
 
-						int word = rawLeftCatBitsets[row * 8 + (i / 32)];
-						if(((word >>> (i % 32)) & 1) == 1){
+						long word = rawLeftCatBitsets[row * 8 + (i / 32)];
+						if(((word >>> (i % 32)) & 1L) == 1L){
 							leftValues.add(value);
 						} else
 

@@ -26,7 +26,7 @@ import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
+import org.jpmml.converter.PayloadManager;
 import sklearn.HasApplyField;
 import sklearn.SkLearnClassifier;
 
@@ -49,15 +49,15 @@ public class TreeClassifier extends SkLearnClassifier implements HasApplyField, 
 	@Override
 	public TreeModel encodeModel(Schema schema){
 		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
+		PayloadManager payloadManager = new PayloadManager();
 
-		return encodeModel(predicateManager, scoreDistributionManager, schema);
+		return encodeModel(predicateManager, payloadManager, schema);
 	}
 
-	public TreeModel encodeModel(PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	public TreeModel encodeModel(PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
 		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, scoreDistributionManager, schema);
+		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, payloadManager, schema);
 
 		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
 

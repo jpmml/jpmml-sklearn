@@ -30,7 +30,7 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
+import org.jpmml.converter.PayloadManager;
 import org.jpmml.converter.mining.MiningModelUtil;
 import sklearn.Estimator;
 import sklearn.EstimatorCastException;
@@ -52,7 +52,7 @@ public class ObliqueForestUtil {
 		Schema segmentSchema = schema.toAnonymousSchema();
 
 		PredicateManager predicateManager = new PredicateManager();
-		ScoreDistributionManager scoreDistributionManager = (miningFunction == MiningFunction.CLASSIFICATION) ? new ScoreDistributionManager() : null;
+		PayloadManager payloadManager = (miningFunction == MiningFunction.CLASSIFICATION) ? new PayloadManager() : null;
 		ProjectionManager projectionManager = new ProjectionManager();
 
 		Function<T, TreeModel> function = new Function<T, TreeModel>(){
@@ -73,7 +73,7 @@ public class ObliqueForestUtil {
 					if(estimator instanceof ObliqueDecisionTreeClassifier){
 						ObliqueDecisionTreeClassifier classifier = (ObliqueDecisionTreeClassifier)estimator;
 
-						treeModel = classifier.encodeModel(predicateManager, scoreDistributionManager, projectionManager, segmentSchema);
+						treeModel = classifier.encodeModel(predicateManager, payloadManager, projectionManager, segmentSchema);
 					} else
 
 					if(estimator instanceof ObliqueDecisionTreeRegressor){

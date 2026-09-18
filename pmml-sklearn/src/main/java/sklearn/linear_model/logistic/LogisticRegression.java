@@ -134,7 +134,7 @@ public class LogisticRegression extends LinearClassifier {
 
 			Schema segmentSchema = schema.toRelabeledSchema(null);
 
-			Model firstModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), null, segmentSchema)
+			Model firstModel = RegressionModelUtil.createRegression(features, CMatrixUtil.getRow(coef, 1, numberOfFeatures, 0), intercept.get(0), RegressionModel.NormalizationMethod.NONE, segmentSchema)
 				.setOutput(ModelUtil.createPredictedOutput(Estimator.FIELD_DECISION_FUNCTION, OpType.CONTINUOUS, DataType.DOUBLE));
 
 			Feature feature = new ContinuousFeature(encoder, Estimator.FIELD_DECISION_FUNCTION, DataType.DOUBLE);

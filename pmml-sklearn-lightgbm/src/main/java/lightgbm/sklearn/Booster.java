@@ -21,15 +21,16 @@ package lightgbm.sklearn;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.lightgbm.GBDT;
 import org.jpmml.lightgbm.LightGBMUtil;
 import org.jpmml.python.PythonObject;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnException;
 
-public class Booster extends PythonObject implements Encodable {
+public class Booster extends PythonObject implements PMMLEncodable {
 
 	private GBDT gbdt = null;
 
@@ -39,7 +40,7 @@ public class Booster extends PythonObject implements Encodable {
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return BoosterUtil.encodePMML(this);
 	}
 

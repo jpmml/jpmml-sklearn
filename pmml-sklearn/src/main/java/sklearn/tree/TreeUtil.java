@@ -22,9 +22,12 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,7 +40,6 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLConstants;
 import org.dmg.pmml.Predicate;
-import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
@@ -59,19 +61,22 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FloatUtil;
 import org.jpmml.converter.MissingValueFeature;
+import org.jpmml.converter.ModelTransformer;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PayloadManager;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.converter.ThresholdFeature;
 import org.jpmml.converter.ThresholdFeatureUtil;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.converter.tree.TreeModelTransformerBuilder;
+import org.jpmml.converter.tree.visitors.TreeModelTransformer;
 import org.jpmml.converter.visitors.AbstractExtender;
 import org.jpmml.model.UnsupportedElementException;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.FloatUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
 import sklearn.EstimatorCastException;
@@ -79,9 +84,6 @@ import sklearn.HasApplyField;
 import sklearn.HasMultiApplyField;
 import sklearn.StepUtil;
 import sklearn.VersionUtil;
-import sklearn.tree.visitors.TreeModelCompactor;
-import sklearn.tree.visitors.TreeModelFlattener;
-import sklearn.tree.visitors.TreeModelPruner;
 
 public class TreeUtil {
 
@@ -104,7 +106,7 @@ public class TreeUtil {
 	}
 
 	static
-	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	public <E extends Estimator & HasTree> TreeModel encodeTreeModel(E estimator, MiningFunction miningFunction, PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
 		Tree tree = estimator.getTree();
 		boolean hasMissingValueSupport = estimator.hasMissingValueSupport();
 
@@ -115,7 +117,7 @@ public class TreeUtil {
 		double[] values = tree.getValues();
 		int[] missingGoToLeft = hasMissingValueSupport ? tree.getMissingGoToLeft() : null;
 
-		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, scoreDistributionManager, schema);
+		Node root = encodeNode(0, True.INSTANCE, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, payloadManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
@@ -127,7 +129,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, ScoreDistributionManager scoreDistributionManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -230,8 +232,8 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, scoreDistributionManager, schema);
-			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, scoreDistributionManager, schema);
+			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, payloadManager, schema);
+			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, payloadManager, schema);
 
 			Node result;
 
@@ -291,7 +293,7 @@ public class TreeUtil {
 				}
 
 				// XXX
-				int maxIndex = ScoreDistributionManager.indexOfMax(Doubles.asList(leafValues));
+				int maxIndex = PayloadManager.indexOfMax(Doubles.asList(leafValues));
 
 				Object score = categoricalLabel.getValue(maxIndex);
 
@@ -299,7 +301,7 @@ public class TreeUtil {
 					.setId(id)
 					.setRecordCount(ValueUtil.narrow(totalRecordCount));
 
-				scoreDistributionManager.addScoreDistributions(result, categoricalLabel.getValues(), recordCounts, null);
+				payloadManager.addScoreDistributions(result, recordCounts, null, categoricalLabel);
 			} else
 
 			if(miningFunction == MiningFunction.REGRESSION){
@@ -327,179 +329,36 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M configureModel(E estimator, M model){
-		Boolean allowMissing = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.FALSE);
 		Boolean winnerId = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
-
-		Map<String, Map<Integer, ?>> nodeExtensions = (Map)estimator.getPMMLOption(HasTreeOptions.OPTION_NODE_EXTENSIONS, null);
-		Boolean nodeId = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_NODE_ID, winnerId);
-		Boolean nodeScore = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_NODE_SCORE, winnerId ? Boolean.TRUE : null);
-
-		boolean fixed = ((nodeExtensions != null) || (nodeId != null && nodeId) || (nodeScore != null && nodeScore));
-
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_COMPACT, fixed ? Boolean.FALSE : Boolean.TRUE);
-		Boolean flat = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
-		Boolean prune = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_PRUNE, fixed ? Boolean.FALSE : Boolean.TRUE);
-
-		if(compact || flat || prune){
-
-			if(fixed){
-				throw new SkLearnException("Conflicting tree model options");
-			}
-
-			// Activate defaults
-			nodeExtensions = null;
-			nodeId = (winnerId ? Boolean.TRUE : allowMissing);
-			nodeScore = (winnerId ? Boolean.TRUE : null);
-		} // End if
 
 		if((Boolean.TRUE).equals(winnerId)){
 			encodeNodeId(estimator, model);
 		}
 
-		List<Visitor> visitors = new ArrayList<>();
+		List<String> names = new ArrayList<>();
+		names.add(HasTreeOptions.OPTION_ALLOW_MISSING);
+		names.addAll(HasTreeOptions.OPTIONS_TREEMODEL_TRANSFORMATIONS);
+		names.addAll(HasTreeOptions.OPTIONS_NODE);
 
-		if((Boolean.FALSE).equals(allowMissing)){
-			Visitor defaultChildCleaner = new AbstractVisitor(){
+		Map<String, ?> options = estimator.getPMMLOptions(names);
 
-				@Override
-				public VisitorAction visit(TreeModel treeModel){
-					treeModel.setMissingValueStrategy(null);
+		Set<MiningFunction> miningFunctions = EnumSet.noneOf(MiningFunction.class);
 
-					return super.visit(treeModel);
-				}
+		Visitor miningFunctionCollector = new AbstractVisitor(){
 
-				@Override
-				public VisitorAction visit(Node node){
-					Object defaultChild = node.getDefaultChild();
+			@Override
+			public VisitorAction visit(TreeModel treeModel){
+				miningFunctions.add(treeModel.requireMiningFunction());
 
-					if(defaultChild != null){
-						node.setDefaultChild(null);
-					}
-
-					return super.visit(node);
-				}
-			};
-
-			visitors.add(defaultChildCleaner);
-		} // End if
-
-		// Prune first, in order to make the tree model smaller for subsequent transformers
-		if((Boolean.TRUE).equals(prune)){
-			visitors.add(new TreeModelPruner());
-		} // End if
-
-		if((Boolean.TRUE).equals(compact)){
-			visitors.add(new TreeModelCompactor());
-		} // End if
-
-		if((Boolean.TRUE).equals(flat)){
-			visitors.add(new TreeModelFlattener());
-		} // End if
-
-		if(nodeExtensions != null){
-			Collection<? extends Map.Entry<String, Map<Integer, ?>>> entries = nodeExtensions.entrySet();
-
-			for(Map.Entry<String, Map<Integer, ?>> entry : entries){
-				String name = entry.getKey();
-				Map<Integer, ?> values = entry.getValue();
-
-				Visitor nodeExtender = new AbstractExtender(name){
-
-					private NodeTransformer nodeTransformer = SimplifyingNodeTransformer.INSTANCE;
-
-
-					@Override
-					public VisitorAction visit(TreeModel treeModel){
-						treeModel.setNode(ensureExtensibility(treeModel.getNode()));
-
-						return super.visit(treeModel);
-					}
-
-					@Override
-					public VisitorAction visit(Node node){
-
-						if(node.hasNodes()){
-							List<Node> children = node.getNodes();
-
-							for(ListIterator<Node> childIt = children.listIterator(); childIt.hasNext(); ){
-								childIt.set(ensureExtensibility(childIt.next()));
-							}
-						}
-
-						Object value = getValue(node);
-						if(value != null){
-							value = ScalarUtil.decode(value);
-
-							addExtension((Node & HasExtensions)node, ValueUtil.asString(value));
-						}
-
-						return super.visit(node);
-					}
-
-					private Node ensureExtensibility(Node node){
-
-						if(node instanceof HasExtensions){
-							return node;
-						}
-
-						Object value = getValue(node);
-						if(value != null){
-							return this.nodeTransformer.toComplexNode(node);
-						}
-
-						return node;
-					}
-
-					private Object getValue(Node node){
-						Integer id = ValueUtil.asInteger((Number)node.getId());
-
-						return values.get(id);
-					}
-				};
-
-				visitors.add(nodeExtender);
+				return super.visit(treeModel);
 			}
-		} // End if
+		};
+		miningFunctionCollector.applyTo(model);
 
-		if((Boolean.FALSE).equals(nodeId)){
-			Visitor nodeIdCleaner = new AbstractVisitor(){
+		for(MiningFunction miningFunction : miningFunctions){
+			ModelTransformer modelTransformer = createTreeModelTransformer(miningFunction, options);
 
-				@Override
-				public VisitorAction visit(Node node){
-					node.setId(null);
-
-					return super.visit(node);
-				}
-			};
-
-			visitors.add(nodeIdCleaner);
-		} // End if
-
-		if((Boolean.FALSE).equals(nodeScore)){
-			Visitor nodeScoreCleaner = new AbstractVisitor(){
-
-				@Override
-				public VisitorAction visit(Node node){
-
-					if(node.hasNodes()){
-						node.setScore(null);
-
-						if(node.hasScoreDistributions()){
-							List<ScoreDistribution> scoreDistributions = node.getScoreDistributions();
-
-							scoreDistributions.clear();
-						}
-					}
-
-					return super.visit(node);
-				}
-			};
-
-			visitors.add(nodeScoreCleaner);
-		}
-
-		for(Visitor visitor : visitors){
-			visitor.applyTo(model);
+			modelTransformer.applyTo(model);
 		}
 
 		return model;
@@ -650,5 +509,184 @@ public class TreeUtil {
 		{
 			throw new EstimatorCastException(estimator, Arrays.asList(HasApplyField.class, HasMultiApplyField.class));
 		}
+	}
+
+	static
+	private ModelTransformer createTreeModelTransformer(MiningFunction miningFunction, Map<String, ?> options){
+		ModelTransformer result = new TreeModelTransformerBuilder(miningFunction){
+
+			@Override
+			public ModelTransformer build(){
+				ModelTransformer result = super.build();
+
+				List<Visitor> visitors = new ArrayList<>();
+
+				if(!isEnabled(HasTreeOptions.OPTION_ALLOW_MISSING)){
+					visitors.add(createNodeDefaultChildCleaner(miningFunction));
+				} // End if
+
+				if(isEnabled(HasTreeOptions.OPTION_NODE_EXTENSIONS)){
+					Map<String, Map<Integer, ?>> nodeExtensions = (Map)getOption(HasTreeOptions.OPTION_NODE_EXTENSIONS);
+
+					Collection<? extends Map.Entry<String, Map<Integer, ?>>> entries = nodeExtensions.entrySet();
+
+					for(Map.Entry<String, Map<Integer, ?>> entry : entries){
+						visitors.add(createNodeExtender(miningFunction, entry.getKey(), entry.getValue()));
+					}
+				} // End if
+
+				if(isDisabled(HasTreeOptions.OPTION_NODE_SCORE)){
+					visitors.add(createNodeScoreCleaner(miningFunction));
+				}
+
+				result.addAll(0, visitors);
+
+				return result;
+			}
+
+			@Override
+			protected Map<String, ?> getDefaults(){
+				Map<String, Object> result = new LinkedHashMap<>();
+				result.put(HasTreeOptions.OPTION_COMPACT, Boolean.TRUE);
+				result.put(HasTreeOptions.OPTION_PRUNE, Boolean.TRUE);
+
+				if(isExplicitlyEnabled(HasTreeOptions.OPTION_WINNER_ID)){
+					result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
+					result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
+				} else
+
+				if(!isExplicitlyEnabled(HasTreeOptions.OPTION_ALLOW_MISSING)){
+					result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.FALSE);
+				}
+
+				return result;
+			}
+
+			@Override
+			protected List<String> getNodeOptions(){
+				return HasTreeOptions.OPTIONS_NODE;
+			}
+		}
+			.putOptions(options)
+			.build();
+
+		return result;
+	}
+
+	static
+	private Visitor createNodeDefaultChildCleaner(MiningFunction miningFunction){
+		Visitor result = new TreeModelTransformer(miningFunction){
+
+			@Override
+			public void enterNode(Node node){
+				clearDefaultChild(node);
+			}
+
+			@Override
+			public void exitNode(Node node){
+			}
+
+			@Override
+			public void enterTreeModel(TreeModel treeModel){
+				super.enterTreeModel(treeModel);
+
+				treeModel.setMissingValueStrategy(null);
+			}
+
+			@Override
+			public void exitTreeModel(TreeModel treeModel){
+				super.exitTreeModel(treeModel);
+			}
+		};
+
+		return result;
+	}
+
+	static
+	private Visitor createNodeExtender(MiningFunction miningFunction, String name, Map<Integer, ?> values){
+		Visitor result = new AbstractExtender(name){
+
+			private NodeTransformer nodeTransformer = SimplifyingNodeTransformer.INSTANCE;
+
+
+			@Override
+			public VisitorAction visit(TreeModel treeModel){
+
+				if(treeModel.requireMiningFunction() != miningFunction){
+					return VisitorAction.SKIP;
+				}
+
+				treeModel.setNode(ensureExtensibility(treeModel.getNode()));
+
+				return super.visit(treeModel);
+			}
+
+			@Override
+			public VisitorAction visit(Node node){
+
+				if(node.hasNodes()){
+					List<Node> children = node.getNodes();
+
+					for(ListIterator<Node> childIt = children.listIterator(); childIt.hasNext(); ){
+						childIt.set(ensureExtensibility(childIt.next()));
+					}
+				}
+
+				Object value = getValue(node);
+				if(value != null){
+					value = ScalarUtil.decode(value);
+
+					addExtension((Node & HasExtensions)node, ValueUtil.asString(value));
+				}
+
+				return super.visit(node);
+			}
+
+			private Node ensureExtensibility(Node node){
+
+				if(node instanceof HasExtensions){
+					return node;
+				}
+
+				Object value = getValue(node);
+				if(value != null){
+					return this.nodeTransformer.toComplexNode(node);
+				}
+
+				return node;
+			}
+
+			private Object getValue(Node node){
+				Integer id = ValueUtil.asInteger((Number)node.requireId());
+
+				return values.get(id);
+			}
+		};
+
+		return result;
+	}
+
+	static
+	private Visitor createNodeScoreCleaner(MiningFunction miningFunction){
+		Visitor result = new TreeModelTransformer(miningFunction){
+
+			@Override
+			public void enterNode(Node node){
+
+				if(node.hasNodes()){
+					clearScore(node);
+
+					if(node.hasPayloads()){
+						(node.getPayloads()).clear();
+					}
+				}
+			}
+
+			@Override
+			public void exitNode(Node node){
+			}
+		};
+
+		return result;
 	}
 }

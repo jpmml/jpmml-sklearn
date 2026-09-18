@@ -21,16 +21,17 @@ package xgboost.sklearn;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.ByteOrder;
+import java.util.Map;
 
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.python.PythonObject;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.XGBoostUtil;
 import pandas.core.DataFrame;
 
-public class Booster extends PythonObject implements Encodable {
+public class Booster extends PythonObject implements PMMLEncodable {
 
 	private Learner learner = null;
 
@@ -40,7 +41,7 @@ public class Booster extends PythonObject implements Encodable {
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return BoosterUtil.encodePMML(this);
 	}
 

@@ -38,8 +38,8 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.DTypeUtil;
 import org.jpmml.python.HasArray;
-import org.jpmml.python.TypeInfoUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import pandas.core.BlockManager;
 import pandas.core.DataFrame;
@@ -218,7 +218,7 @@ public class Scorecard extends Estimator implements HasClasses {
 			.filter(blockValue -> {
 				Object descr = blockValue.getArrayType();
 
-				DataType dataType = TypeInfoUtil.getDataType(descr);
+				DataType dataType = DTypeUtil.getDataType(descr);
 
 				return (dataType == DataType.DOUBLE);
 			})

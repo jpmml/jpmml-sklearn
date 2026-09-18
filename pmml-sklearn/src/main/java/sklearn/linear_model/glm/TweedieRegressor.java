@@ -35,7 +35,9 @@ public class TweedieRegressor extends LinearRegressor {
 	protected RegressionModel createRegression(List<? extends Number> coef, Number intercept, Schema schema){
 		Number power = getPower();
 
-		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, (power.doubleValue() > 0d ? RegressionModel.NormalizationMethod.EXP : null), schema);
+		RegressionModel.NormalizationMethod normalizationMethod = (power.doubleValue() > 0d ? RegressionModel.NormalizationMethod.EXP : RegressionModel.NormalizationMethod.NONE);
+
+		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, normalizationMethod, schema);
 	}
 
 	public Number getPower(){

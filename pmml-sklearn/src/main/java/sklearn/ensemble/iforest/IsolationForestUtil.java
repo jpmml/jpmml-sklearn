@@ -125,7 +125,7 @@ public class IsolationForestUtil {
 						nodeDepth++;
 					}
 
-					double nodeSample = this.nodeSamples[ValueUtil.asInt((Number)node.getId())];
+					double nodeSample = this.nodeSamples[ValueUtil.asInt((Number)node.requireId())];
 
 					double averagePathLength = (corrected ? correctedAveragePathLength(nodeSample, nodeSampleCorrected) : averagePathLength(nodeSample));
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
@@ -37,11 +38,11 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.LabelUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
@@ -52,7 +53,7 @@ import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, HasTreeOptions, Encodable {
+public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, HasTreeOptions, PMMLEncodable {
 
 	public NGBClassifier(String module, String name){
 		super(module, name);
@@ -110,7 +111,7 @@ public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasS
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return EstimatorUtil.encodePMML(this);
 	}
 

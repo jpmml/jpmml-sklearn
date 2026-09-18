@@ -110,7 +110,7 @@ public class GBDTUtil {
 
 				@Override
 				public VisitorAction visit(Node node){
-					Object id = node.getId();
+					Object id = node.requireId();
 
 					if(id instanceof String){
 						String string = (String)id;

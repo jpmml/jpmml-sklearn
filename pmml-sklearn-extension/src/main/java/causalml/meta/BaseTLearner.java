@@ -26,7 +26,6 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
@@ -48,7 +47,7 @@ public class BaseTLearner<E extends Estimator> extends BaseLearner<E> implements
 
 		Label label = schema.getLabel();
 
-		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
+		List<ContinuousLabel> continuousLabels = label.toScalarLabels(ContinuousLabel.class);
 
 		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelsT.entrySet(), modelsC.entrySet());
 

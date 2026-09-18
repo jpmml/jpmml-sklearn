@@ -25,7 +25,6 @@ import java.util.Map;
 import org.dmg.pmml.Model;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.EstimatorUtil;
@@ -52,7 +51,7 @@ public class BaseRLearner extends BaseLearner<Regressor> implements HasTreeOptio
 
 		Label label = schema.getLabel();
 
-		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
+		List<ContinuousLabel> continuousLabels = label.toScalarLabels(ContinuousLabel.class);
 
 		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, modelsTau.entrySet());
 

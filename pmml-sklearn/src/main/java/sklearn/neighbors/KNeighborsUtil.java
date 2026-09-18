@@ -50,7 +50,6 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PMMLUtil;
 import org.jpmml.converter.ScalarLabel;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.python.ClassDictUtil;
@@ -129,7 +128,7 @@ public class KNeighborsUtil {
 		List<ScalarLabel> scalarLabels = Collections.emptyList();
 
 		if(label != null){
-			scalarLabels = ScalarLabelUtil.toScalarLabels(label);
+			scalarLabels = label.toScalarLabels();
 		}
 
 		ClassDictUtil.checkSize(numberOfOutputs, scalarLabels);

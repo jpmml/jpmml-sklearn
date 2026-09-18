@@ -56,7 +56,7 @@ public class SGDOneClassSVM extends SkLearnRegressor implements OutlierDetector 
 		List<Number> coef = getCoef();
 		List<Number> offset = getOffset();
 
-		RegressionModel regressionModel = RegressionModelUtil.createRegression(schema.getFeatures(), coef, -1 * (Iterables.getOnlyElement(offset).doubleValue()), null, schema)
+		RegressionModel regressionModel = RegressionModelUtil.createRegression(schema.getFeatures(), coef, -1 * (Iterables.getOnlyElement(offset).doubleValue()), RegressionModel.NormalizationMethod.NONE, schema)
 			.setOutput(OutlierDetectorUtil.createPredictedOutput(this));
 
 		return regressionModel;

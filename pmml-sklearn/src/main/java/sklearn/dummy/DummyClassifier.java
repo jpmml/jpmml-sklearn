@@ -30,8 +30,8 @@ import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.PayloadManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.ScoreDistributionManager;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.HasPriorProbability;
 import sklearn.HasSparseOutput;
@@ -93,14 +93,14 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 				break;
 			case DummyClassifier.STRATEGY_MOST_FREQUENT:
 				{
-					maxIndex = ScoreDistributionManager.indexOfMax((List)classPrior);
+					maxIndex = PayloadManager.indexOfMax((List)classPrior);
 
 					probabilities = createProbabilities(classes, maxIndex);
 				}
 				break;
 			case DummyClassifier.STRATEGY_PRIOR:
 				{
-					maxIndex = ScoreDistributionManager.indexOfMax((List)classPrior);
+					maxIndex = PayloadManager.indexOfMax((List)classPrior);
 
 					probabilities = classPrior;
 				}
@@ -111,9 +111,9 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 
 		Node root = new ClassifierNode(categoricalLabel.getValue(maxIndex), True.INSTANCE);
 
-		ScoreDistributionManager scoreDistributionManager = new ScoreDistributionManager();
+		PayloadManager payloadManager = new PayloadManager();
 
-		scoreDistributionManager.addScoreDistributions(root, categoricalLabel.getValues(), null, probabilities);
+		payloadManager.addScoreDistributions(root, null, probabilities, categoricalLabel);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root);
 

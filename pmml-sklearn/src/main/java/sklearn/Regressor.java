@@ -68,15 +68,15 @@ public class Regressor extends Estimator {
 		} else
 
 		if(names.size() >= 2){
-			List<Label> labels = new ArrayList<>();
+			List<ScalarLabel> scalarLabels = new ArrayList<>();
 
 			for(String name : names){
-				Label label = encodeLabel(name, encoder);
+				ScalarLabel scalarLabel = encodeLabel(name, encoder);
 
-				labels.add(label);
+				scalarLabels.add(scalarLabel);
 			}
 
-			return new MultiLabel(labels);
+			return new MultiLabel(scalarLabels);
 		} else
 
 		{

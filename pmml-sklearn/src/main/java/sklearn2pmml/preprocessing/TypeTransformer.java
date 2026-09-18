@@ -29,8 +29,8 @@ import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.WildcardFeature;
+import org.jpmml.python.DTypeUtil;
 import org.jpmml.python.TypeInfo;
-import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.Transformer;
 

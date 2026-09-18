@@ -20,17 +20,18 @@ package sklearn.pipeline;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import com.google.common.collect.Lists;
 import net.razorvine.pickle.objects.ClassDict;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.CastUtil;
 import org.jpmml.python.TupleUtil;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Composite;
@@ -45,7 +46,7 @@ import sklearn.StepCastFunction;
 import sklearn.StepUtil;
 import sklearn.Transformer;
 
-public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
+public class SkLearnPipeline extends Composite implements HasSteps, PMMLEncodable {
 
 	public SkLearnPipeline(){
 		this("sklearn.pipeline", "Pipeline");
@@ -233,7 +234,7 @@ public class SkLearnPipeline extends Composite implements Encodable, HasSteps {
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		Estimator estimator = null;

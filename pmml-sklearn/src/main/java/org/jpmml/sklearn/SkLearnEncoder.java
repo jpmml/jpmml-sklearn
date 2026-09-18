@@ -52,7 +52,6 @@ import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.NamingException;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.SchemaException;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.model.ReflectionUtil;
@@ -289,18 +288,7 @@ public class SkLearnEncoder extends PythonEncoder {
 				.setSolution("Rename input fields in Python beforehand (eg. as DataFrame columns)");
 		}
 
-		org.dmg.pmml.Field<?> renamedPmmlField;
-
-		try {
-			renamedPmmlField = getField(renamedName);
-		} catch(SchemaException se){
-			renamedPmmlField = null;
-		}
-
-		if(renamedPmmlField != null){
-			throw new NamingException("Field " + ExceptionUtil.formatName(renamedName) + " is already defined")
-				.setSolution("Choose a different name");
-		}
+		checkField(renamedName);
 
 		DerivedField derivedField = removeDerivedField(name);
 

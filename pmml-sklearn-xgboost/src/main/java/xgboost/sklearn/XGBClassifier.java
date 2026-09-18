@@ -19,6 +19,7 @@
 package xgboost.sklearn;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.Model;
@@ -26,8 +27,8 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.LabelUtil;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.Schema;
-import org.jpmml.sklearn.Encodable;
 import org.jpmml.xgboost.Classification;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.ObjFunction;
@@ -36,7 +37,7 @@ import sklearn.LabelEncoderClassifier;
 import sklearn.SkLearnFields;
 import sklearn2pmml.SkLearn2PMMLFields;
 
-public class XGBClassifier extends LabelEncoderClassifier implements HasBooster, HasXGBoostOptions, Encodable {
+public class XGBClassifier extends LabelEncoderClassifier implements HasBooster, HasXGBoostOptions, PMMLEncodable {
 
 	public XGBClassifier(String module, String name){
 		super(module, name);
@@ -93,7 +94,7 @@ public class XGBClassifier extends LabelEncoderClassifier implements HasBooster,
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return BoosterUtil.encodePMML(this);
 	}
 

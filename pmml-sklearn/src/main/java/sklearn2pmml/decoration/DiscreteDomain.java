@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import builtins.ObjectType;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DiscrStats;
@@ -33,9 +34,9 @@ import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.DTypeUtil;
 import org.jpmml.python.ScalarCastFunction;
 import org.jpmml.python.TypeInfo;
-import org.jpmml.sklearn.DTypeUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import sklearn.HasMultiType;
 
@@ -54,6 +55,12 @@ public class DiscreteDomain extends Domain implements HasMultiType {
 		TypeInfo dtype = getDType();
 
 		if(dtype != null){
+
+			// XXX
+			if(dtype instanceof ObjectType){
+				return DataType.STRING;
+			}
+
 			return dtype.getDataType();
 		}
 

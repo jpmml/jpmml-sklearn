@@ -43,10 +43,11 @@ import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
-import org.jpmml.converter.ScalarLabelUtil;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.UnsupportedFeatureException;
-import org.jpmml.converter.visitors.TreeModelPruner;
+import org.jpmml.converter.tree.visitors.ClassificationTreeModelPruner;
+import org.jpmml.converter.tree.visitors.RegressionTreeModelPruner;
+import org.jpmml.converter.tree.visitors.TreeModelPruner;
 import org.jpmml.model.visitors.AbstractVisitor;
 import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
@@ -70,7 +71,7 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 		Label label = schema.getLabel();
 		List<? extends Feature> features = schema.getFeatures();
 
-		List<ContinuousLabel> continuousLabels = ScalarLabelUtil.toScalarLabels(ContinuousLabel.class, label);
+		List<ContinuousLabel> continuousLabels = label.toScalarLabels(ContinuousLabel.class);
 
 		ClassDictUtil.checkSize(continuousLabels, treatmentGroups, models.entrySet());
 
@@ -220,63 +221,7 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 	}
 
 	protected Model postOptimizeModel(Model model, String groupName){
-		Visitor nodePruner = new TreeModelPruner(){
-
-			private MiningFunction miningFunction = null;
-
-
-			@Override
-			public void exitNode(Node node){
-				Object defaultChild = node.getDefaultChild();
-
-				if(node.hasNodes()){
-					List<Node> children = node.getNodes();
-
-					if(children.size() == 1){
-						Node child = children.get(0);
-
-						Predicate childPredicate = child.requirePredicate();
-
-						if(childPredicate instanceof True){
-							node.setScore(null);
-
-							if(defaultChild != null){
-								node.setDefaultChild(null);
-							} // End if
-
-							if(miningFunction == MiningFunction.REGRESSION){
-								initScore(node, child);
-							} else
-
-							if(miningFunction == MiningFunction.CLASSIFICATION){
-								initScoreDistribution(node, child);
-							}
-
-							initDefaultChild(node, child);
-							replaceChildWithGrandchildren(node, child);
-
-							return;
-						}
-					}
-				}
-
-				super.exitNode(node);
-			}
-
-			@Override
-			public void enterTreeModel(TreeModel treeModel){
-				super.enterTreeModel(treeModel);
-
-				this.miningFunction = treeModel.requireMiningFunction();
-			}
-
-			@Override
-			public void exitTreeModel(TreeModel treeModel){
-				super.exitTreeModel(treeModel);
-
-				this.miningFunction = null;
-			}
-		};
+		Visitor nodePruner = createNodePruner();
 		nodePruner.applyTo(model);
 
 		Visitor nullSegmentRemover = new AbstractVisitor(){
@@ -322,6 +267,58 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 		return model;
 	}
 
+	protected TreeModelPruner createNodePruner(){
+		E model = getModel();
+
+		MiningFunction miningFunction = model.getMiningFunction();
+		switch(miningFunction){
+			case CLASSIFICATION:
+				return new ClassificationTreeModelPruner(){
+
+					@Override
+					public void enterNode(Node node){
+						super.enterNode(node);
+					}
+
+					@Override
+					public void exitNode(Node node){
+						Node child = getTrueChild(node);
+
+						if(child != null){
+							mergeNode(node, child);
+
+							return;
+						}
+
+						super.exitNode(node);
+					}
+				};
+			case REGRESSION:
+				return new RegressionTreeModelPruner(){
+
+					@Override
+					public void enterNode(Node node){
+						super.enterNode(node);
+					}
+
+					@Override
+					public void exitNode(Node node){
+						Node child = getTrueChild(node);
+
+						if(child != null){
+							mergeNode(node, child);
+
+							return;
+						}
+
+						super.exitNode(node);
+					}
+				};
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
 	protected boolean hasTreeOptions(){
 		E model = getModel();
 
@@ -341,5 +338,25 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 
 	public Map<String, E> getModels(){
 		return getModels("models");
+	}
+
+	static
+	private Node getTrueChild(Node node){
+
+		if(node.hasNodes()){
+			List<Node> children = node.getNodes();
+
+			if(children.size() == 1){
+				Node child = children.get(0);
+
+				Predicate childPredicate = child.requirePredicate();
+
+				if(childPredicate instanceof True){
+					return child;
+				}
+			}
+		}
+
+		return null;
 	}
 }

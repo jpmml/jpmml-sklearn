@@ -18,19 +18,21 @@
  */
 package sklearn;
 
+import java.util.Map;
+
 import org.dmg.pmml.PMML;
-import org.jpmml.sklearn.Encodable;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
 
 abstract
-public class SkLearnClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, Encodable {
+public class SkLearnClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, PMMLEncodable {
 
 	public SkLearnClassifier(String module, String name){
 		super(module, name);
 	}
 
 	@Override
-	public PMML encodePMML(){
+	public PMML encodePMML(Map<String, ?> options){
 		return EstimatorUtil.encodePMML(this);
 	}
 }
