@@ -246,9 +246,7 @@ public class TreeUtil {
 			} else
 
 			if(miningFunction == MiningFunction.REGRESSION){
-				double value = values[index];
-
-				result = new BranchNode(value, predicate);
+				result = createRegressionNode(index, predicate, false, numberOfOutputs, leftChildren, values, payloadManager, schema);
 			} else
 
 			{
@@ -309,45 +307,57 @@ public class TreeUtil {
 			} else
 
 			if(miningFunction == MiningFunction.REGRESSION){
-
-				if(numberOfOutputs == 1){
-					double value = values[index];
-
-					result = new LeafNode(value, predicate)
-						.setId(id);
-				} else
-
-				{
-					MultiLabel multiLabel = schema.requireMultiLabel()
-						.expectSize(numberOfOutputs);
-
-					double[] leafValues = getRow(values, leftChildren.length, numberOfOutputs, index);
-
-					List<Number> scores = new AbstractList<Number>(){
-
-						@Override
-						public int size(){
-							return leafValues.length;
-						}
-
-						@Override
-						public Number get(int index){
-							double leafValue = leafValues[index];
-
-							return ValueUtil.narrow(leafValue);
-						}
-					};
-
-					result = new ComplexNode(null, predicate)
-						.setId(id);
-
-					payloadManager.addScores(result, scores, multiLabel);
-				}
+				result = createRegressionNode(index, predicate, true, numberOfOutputs, leftChildren, values, payloadManager, schema)
+					.setId(id);
 			} else
 
 			{
 				throw new IllegalArgumentException();
 			}
+
+			return result;
+		}
+	}
+
+	static
+	private Node createRegressionNode(int index, Predicate predicate, boolean leaf, int numberOfOutputs, int[] leftChildren, double[] values, PayloadManager payloadManager, Schema schema){
+
+		if(numberOfOutputs == 1){
+			double value = values[index];
+
+			if(leaf){
+				return new LeafNode(value, predicate);
+			} else
+
+			{
+				return new BranchNode(value, predicate);
+			}
+		} else
+
+		{
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(numberOfOutputs);
+
+			double[] nodeValues = getRow(values, leftChildren.length, numberOfOutputs, index);
+
+			List<Number> scores = new AbstractList<Number>(){
+
+				@Override
+				public int size(){
+					return nodeValues.length;
+				}
+
+				@Override
+				public Number get(int index){
+					double nodeValue = nodeValues[index];
+
+					return ValueUtil.narrow(nodeValue);
+				}
+			};
+
+			Node result = new ComplexNode(null, predicate);
+
+			payloadManager.addScores(result, scores, multiLabel);
 
 			return result;
 		}
