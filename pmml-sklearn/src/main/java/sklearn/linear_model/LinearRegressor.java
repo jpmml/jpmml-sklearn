@@ -76,11 +76,12 @@ public class LinearRegressor extends SkLearnRegressor {
 		} else
 
 		if(numberOfOutputs >= 2){
-			MultiLabel multiLabel = schema.requireMultiLabel();
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(numberOfOutputs);
 
 			List<ScalarLabel> scalarLabels = multiLabel.toScalarLabels();
 
-			ClassDictUtil.checkSize(numberOfOutputs, intercept, scalarLabels);
+			ClassDictUtil.checkSize(numberOfOutputs, intercept);
 
 			List<Model> models = new ArrayList<>();
 

@@ -27,7 +27,6 @@ import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.python.ClassDictUtil;
 import sklearn.Estimator;
 import sklearn.HasEstimatorEnsemble;
 
@@ -47,11 +46,10 @@ public class MultiOutputUtil {
 		} else
 
 		if(estimators.size() >= 2){
-			MultiLabel multiLabel = schema.requireMultiLabel();
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(estimators.size());
 
 			List<ScalarLabel> scalarLabels = multiLabel.toScalarLabels();
-
-			ClassDictUtil.checkSize(estimators, scalarLabels);
 
 			List<Model> models = new ArrayList<>();
 

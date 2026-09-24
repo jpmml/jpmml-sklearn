@@ -318,7 +318,8 @@ public class TreeUtil {
 				} else
 
 				{
-					MultiLabel multiLabel = schema.requireMultiLabel();
+					MultiLabel multiLabel = schema.requireMultiLabel()
+						.expectSize(numberOfOutputs);
 
 					double[] leafValues = getRow(values, leftChildren.length, numberOfOutputs, index);
 
