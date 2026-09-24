@@ -244,6 +244,26 @@ public class Classifier extends Estimator implements HasClasses {
 		return predictProbaFields;
 	}
 
+	public List<OutputField> encodePredictProbaOutput(Model model, DataType dataType, MultiLabel multiLabel){
+		List<DiscreteLabel> discreteLabels = multiLabel.toScalarLabels(DiscreteLabel.class);
+
+		List<OutputField> predictProbaFields = new ArrayList<>();
+
+		for(DiscreteLabel discreteLabel : discreteLabels){
+			List<OutputField> targetPredictProbaFields = createPredictProbaFields(dataType, discreteLabel);
+
+			predictProbaFields.addAll(targetPredictProbaFields);
+		}
+
+		model = MiningModelUtil.getFinalModel(model);
+
+		Output output = ModelUtil.ensureOutput(model);
+
+		(output.getOutputFields()).addAll(predictProbaFields);
+
+		return predictProbaFields;
+	}
+
 	static
 	public Object canonicalizeValue(Object value){
 

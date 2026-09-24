@@ -40,6 +40,7 @@ import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMMLConstants;
 import org.dmg.pmml.Predicate;
+import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.SimplePredicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.Visitor;
@@ -242,7 +243,7 @@ public class TreeUtil {
 			Node result;
 
 			if(miningFunction == MiningFunction.CLASSIFICATION){
-				result = new ClassifierNode(null, predicate);
+				result = createClassificationNode(index, predicate, false, numberOfOutputs, leftChildren, values, payloadManager, schema);
 			} else
 
 			if(miningFunction == MiningFunction.REGRESSION){
@@ -269,22 +270,45 @@ public class TreeUtil {
 			Node result;
 
 			if(miningFunction == MiningFunction.CLASSIFICATION){
+				result = createClassificationNode(index, predicate, true, numberOfOutputs, leftChildren, values, payloadManager, schema)
+					.setId(id);
+			} else
+
+			if(miningFunction == MiningFunction.REGRESSION){
+				result = createRegressionNode(index, predicate, true, numberOfOutputs, leftChildren, values, payloadManager, schema)
+					.setId(id);
+			} else
+
+			{
+				throw new IllegalArgumentException();
+			}
+
+			return result;
+		}
+	}
+
+	static
+	private Node createClassificationNode(int index, Predicate predicate, boolean leaf, int numberOfOutputs, int[] leftChildren, double[] values, PayloadManager payloadManager, Schema schema){
+
+		if(numberOfOutputs == 1){
+
+			if(leaf){
 				CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-				double[] leafValues = getRow(values, leftChildren.length, categoricalLabel.size(), index);
+				double[] nodeValues = getRow(values, leftChildren.length, categoricalLabel.size(), index);
 
 				List<Number> recordCounts = new AbstractList<Number>(){
 
 					@Override
 					public int size(){
-						return leafValues.length;
+						return nodeValues.length;
 					}
 
 					@Override
 					public Number get(int index){
-						double leafValue = leafValues[index];
+						double recordCount = nodeValues[index];
 
-						return ValueUtil.narrow(leafValue);
+						return ValueUtil.narrow(recordCount);
 					}
 				};
 
@@ -295,24 +319,54 @@ public class TreeUtil {
 				}
 
 				// XXX
-				int maxIndex = PayloadManager.indexOfMax(Doubles.asList(leafValues));
+				int maxIndex = PayloadManager.indexOfMax(Doubles.asList(nodeValues));
 
 				Object score = categoricalLabel.getValue(maxIndex);
 
-				result = new ClassifierNode(score, predicate)
-					.setId(id)
+				Node result = new ClassifierNode(score, predicate)
 					.setRecordCount(ValueUtil.narrow(totalRecordCount));
 
 				payloadManager.addScoreDistributions(result, recordCounts, null, categoricalLabel);
-			} else
 
-			if(miningFunction == MiningFunction.REGRESSION){
-				result = createRegressionNode(index, predicate, true, numberOfOutputs, leftChildren, values, payloadManager, schema)
-					.setId(id);
+				return result;
 			} else
 
 			{
-				throw new IllegalArgumentException();
+				return new ClassifierNode(null, predicate);
+			}
+		} else
+
+		{
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(numberOfOutputs);
+
+			List<CategoricalLabel> categoricalLabels = multiLabel.toScalarLabels(CategoricalLabel.class);
+
+			int maxNumberOfClasses = 0;
+
+			for(CategoricalLabel categoricalLabel : categoricalLabels){
+				maxNumberOfClasses = Math.max(maxNumberOfClasses, categoricalLabel.size());
+			}
+
+			double[] nodeValues = getRow(values, leftChildren.length, numberOfOutputs * maxNumberOfClasses, index);
+
+			Node result = new ComplexNode(null, predicate);
+
+			List<ScoreDistribution> scoreDistributions = result.getScoreDistributions();
+
+			for(int i = 0, max = categoricalLabels.size(); i < max; i++){
+				CategoricalLabel categoricalLabel = categoricalLabels.get(i);
+
+				String name = categoricalLabel.getName();
+
+				for(int j = 0; j < categoricalLabel.size(); j++){
+					Object value = categoricalLabel.getValue(j);
+					double recordCount = nodeValues[i * maxNumberOfClasses + j];
+
+					ScoreDistribution scoreDistribution = payloadManager.createScoreFrequency(name, value, ValueUtil.narrow(recordCount));
+
+					scoreDistributions.add(scoreDistribution);
+				}
 			}
 
 			return result;
@@ -349,9 +403,9 @@ public class TreeUtil {
 
 				@Override
 				public Number get(int index){
-					double nodeValue = nodeValues[index];
+					double value = nodeValues[index];
 
-					return ValueUtil.narrow(nodeValue);
+					return ValueUtil.narrow(value);
 				}
 			};
 

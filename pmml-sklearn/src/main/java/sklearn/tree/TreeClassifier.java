@@ -24,9 +24,10 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.FieldNames;
+import org.jpmml.converter.MultiLabel;
+import org.jpmml.converter.PayloadManager;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.PayloadManager;
 import sklearn.HasApplyField;
 import sklearn.SkLearnClassifier;
 
@@ -55,13 +56,28 @@ public class TreeClassifier extends SkLearnClassifier implements HasApplyField, 
 	}
 
 	public TreeModel encodeModel(PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
+		int numberOfOutputs = getNumberOfOutputs();
 
-		TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, payloadManager, schema);
+		if(numberOfOutputs == 1){
+			CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
+			TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, payloadManager, schema);
 
-		return treeModel;
+			encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
+
+			return treeModel;
+		} else
+
+		{
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(numberOfOutputs);
+
+			TreeModel treeModel = TreeUtil.encodeTreeModel(this, MiningFunction.CLASSIFICATION, predicateManager, payloadManager, schema);
+
+			encodePredictProbaOutput(treeModel, DataType.DOUBLE, multiLabel);
+
+			return treeModel;
+		}
 	}
 
 	@Override

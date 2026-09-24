@@ -28,6 +28,7 @@ import org.dmg.pmml.mining.Segmentation;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.FieldNames;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.Schema;
 import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiApplyField;
@@ -59,13 +60,28 @@ public class ForestClassifier extends SkLearnClassifier implements HasEstimatorE
 
 	@Override
 	public MiningModel encodeModel(Schema schema){
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
+		int numberOfOutputs = getNumberOfOutputs();
 
-		MiningModel miningModel = ForestUtil.encodeForest(this, MiningFunction.CLASSIFICATION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+		if(numberOfOutputs == 1){
+			CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+			MiningModel miningModel = ForestUtil.encodeForest(this, MiningFunction.CLASSIFICATION, Segmentation.MultipleModelMethod.AVERAGE, schema);
 
-		return miningModel;
+			encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
+
+			return miningModel;
+		} else
+
+		{
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(numberOfOutputs);
+
+			MiningModel miningModel = ForestUtil.encodeForest(this, MiningFunction.CLASSIFICATION, Segmentation.MultipleModelMethod.AVERAGE, schema);
+
+			encodePredictProbaOutput(miningModel, DataType.DOUBLE, multiLabel);
+
+			return miningModel;
+		}
 	}
 
 	@Override

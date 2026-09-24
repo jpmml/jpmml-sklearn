@@ -435,7 +435,7 @@ if "Audit" in datasets:
 	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "OrdinalEncoderAuditNA", cat_transformer = make_pipeline(OrdinalEncoder(), OneHotEncoder()), with_invalid = False, allow_missing = True)
 	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "TargetEncoderAuditNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
 
-def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
+def build_multi_audit(audit_df, classifier, name, with_proba = False, with_kneighbors = False):
 	audit_X, audit_y = split_multi_csv(audit_df, ["Gender", "Adjusted"])
 
 	audit_y["Gender"] = audit_y["Gender"].astype(str)
@@ -452,6 +452,11 @@ def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 	pipeline.fit(audit_X, audit_y)
 	store_pkl(pipeline, name)
 	gender_adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Gender", "Adjusted"])
+	if with_proba:
+		gender_adjusted_proba = pipeline.predict_proba(audit_X)
+		for i, column in enumerate(["Gender", "Adjusted"]):
+			proba = DataFrame(gender_adjusted_proba[i], columns = ["probability(" + column + ", " + str(value) + ")" for value in classifier.classes_[i]])
+			gender_adjusted = pandas.concat((gender_adjusted, proba), axis = 1)
 	if with_kneighbors:
 		Xt = pipeline_transform(pipeline, audit_X)
 		kneighbors = classifier.kneighbors(Xt)
@@ -462,8 +467,10 @@ def build_multi_audit(audit_df, classifier, name, with_kneighbors = False):
 if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
+	build_multi_audit(audit_df, DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13), "MultiDecisionTreeAudit", with_proba = True)
 	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit", with_kneighbors = True)
 	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
+	build_multi_audit(audit_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "MultiRandomForestAudit", with_proba = True)
 
 	# Translate labels from string to numeric
 	# Use unique labels (-2/2 vs 0/1) between individual classifiers

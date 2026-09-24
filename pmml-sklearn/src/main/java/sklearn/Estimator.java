@@ -434,21 +434,38 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 		@SuppressWarnings("unused")
 		HasClasses hasClasses = asInstance(HasClasses.class);
 
+		int numberOfOutputs = getNumberOfOutputs();
+
+		String targetField;
+
+		if(numberOfOutputs == 1){
+			targetField = null;
+		} else
+
+		{
+			targetField = discreteLabel.getName();
+		}
+
 		List<?> values = discreteLabel.getValues();
 
 		return values.stream()
 			.map(value -> {
-				String name;
+				List<Object> args = new ArrayList<>();
 
 				if(pmmlSegmentId != null){
-					name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, pmmlSegmentId, value);
-				} else
+					args.add(pmmlSegmentId);
+				} // End if
 
-				{
-					name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, value);
+				if(targetField != null){
+					args.add(targetField);
 				}
 
-				return ModelUtil.createProbabilityField(name, dataType, value);
+				args.add(value);
+
+				String name = FieldNameUtil.create(Classifier.FIELD_PROBABILITY, args);
+
+				return ModelUtil.createProbabilityField(name, dataType, value)
+					.setTargetField(targetField);
 			})
 			.collect(Collectors.toList());
 	}

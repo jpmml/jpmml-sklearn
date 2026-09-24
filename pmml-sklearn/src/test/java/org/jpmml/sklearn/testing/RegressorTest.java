@@ -63,6 +63,13 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 						options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
 
 						return OptionsUtil.generateOptionsMatrix(options);
+					} else
+
+					if(Objects.equals(MULTI_DECISION_TREE, algorithm) || Objects.equals(MULTI_RANDOM_FOREST, algorithm)){
+						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
+
+						return OptionsUtil.generateOptionsMatrix(options);
 					}
 				} else
 
