@@ -56,6 +56,10 @@ public class Tree extends CythonObject {
 		return Ints.toArray(getNodeAttribute("n_node_samples"));
 	}
 
+	public double[] getWeightedNodeSamples(){
+		return Doubles.toArray(getNodeAttribute("weighted_n_node_samples"));
+	}
+
 	public int[] getMissingGoToLeft(){
 		return Ints.toArray(getNodeAttribute("missing_go_to_left"));
 	}

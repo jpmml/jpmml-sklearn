@@ -30,6 +30,10 @@ import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
+import sklearn.Estimator;
+import sklearn.pipeline.SkLearnPipeline;
+import sklearn.tree.Tree;
+import sklearn.tree.TreeUtil;
 
 abstract
 public class SkLearnEncoderBatch extends PythonEncoderBatch {
@@ -47,6 +51,18 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		Map<String, ?> options = getOptions();
 
 		Object object = loadPickle(Object.class);
+
+		Number recordCount = getRecordCount();
+
+		if(recordCount != null){
+			Tree tree = findFirstTree(object);
+
+			if(tree != null){
+				double[] weightedNodeSamples = tree.getWeightedNodeSamples();
+
+				assertRecordCount(weightedNodeSamples[0]);
+			}
+		}
 
 		activate(object);
 
@@ -76,6 +92,24 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	}
 
 	protected void deactivate(Object object) throws Exception {
+	}
+
+	static
+	private Tree findFirstTree(Object object){
+
+		if(object instanceof Estimator){
+			Estimator estimator = (Estimator)object;
+
+			return TreeUtil.findFirstTree(estimator);
+		} else
+
+		if(object instanceof SkLearnPipeline){
+			SkLearnPipeline pipeline = (SkLearnPipeline)object;
+
+			return TreeUtil.findFirstTree(pipeline.getFinalEstimator());
+		}
+
+		return null;
 	}
 
 	static {

@@ -84,6 +84,8 @@ import org.jpmml.sklearn.SkLearnException;
 import sklearn.Estimator;
 import sklearn.EstimatorCastException;
 import sklearn.HasApplyField;
+import sklearn.HasEstimator;
+import sklearn.HasEstimatorEnsemble;
 import sklearn.HasMultiApplyField;
 import sklearn.StepUtil;
 import sklearn.VersionUtil;
@@ -91,6 +93,32 @@ import sklearn.VersionUtil;
 public class TreeUtil {
 
 	private TreeUtil(){
+	}
+
+	static
+	public Tree findFirstTree(Estimator estimator){
+
+		if(estimator instanceof HasTree){
+			HasTree hasTree = (HasTree)estimator;
+
+			return hasTree.getTree();
+		} else
+
+		if(estimator instanceof HasEstimator){
+			HasEstimator<?> hasEstimator = (HasEstimator<?>)estimator;
+
+			return findFirstTree(hasEstimator.getEstimator());
+		} else
+
+		if(estimator instanceof HasEstimatorEnsemble){
+			HasEstimatorEnsemble<?> hasEstimatorEnsemble = (HasEstimatorEnsemble<?>)estimator;
+
+			List<? extends Estimator> estimators = hasEstimatorEnsemble.getEstimators();
+
+			return findFirstTree(estimators.get(0));
+		}
+
+		return null;
 	}
 
 	static
@@ -121,8 +149,9 @@ public class TreeUtil {
 
 		double[] values = tree.getValues();
 		int[] missingGoToLeft = hasMissingValueSupport ? tree.getMissingGoToLeft() : null;
+		double[] weightedNodeSamples = (miningFunction == MiningFunction.CLASSIFICATION) ? tree.getWeightedNodeSamples() : null;
 
-		Node root = encodeNode(0, True.INSTANCE, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, new CategoryManager(), predicateManager, payloadManager, schema);
+		Node root = encodeNode(0, True.INSTANCE, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, weightedNodeSamples, new CategoryManager(), predicateManager, payloadManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
 			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
@@ -134,7 +163,7 @@ public class TreeUtil {
 	}
 
 	static
-	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int numberOfOutputs, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, CategoryManager categoryManager, PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
+	private Node encodeNode(int index, Predicate predicate, MiningFunction miningFunction, int numberOfOutputs, int[] leftChildren, int[] rightChildren, int[] features, double[] thresholds, double[] values, int[] missingGoToLeft, double[] weightedNodeSamples, CategoryManager categoryManager, PredicateManager predicateManager, PayloadManager payloadManager, Schema schema){
 		Integer id = Integer.valueOf(index);
 
 		int featureIndex = features[index];
@@ -237,13 +266,13 @@ public class TreeUtil {
 			int leftIndex = leftChildren[index];
 			int rightIndex = rightChildren[index];
 
-			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, leftCategoryManager, predicateManager, payloadManager, schema);
-			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, rightCategoryManager, predicateManager, payloadManager, schema);
+			Node leftChild = encodeNode(leftIndex, leftPredicate, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, weightedNodeSamples, leftCategoryManager, predicateManager, payloadManager, schema);
+			Node rightChild = encodeNode(rightIndex, rightPredicate, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, weightedNodeSamples, rightCategoryManager, predicateManager, payloadManager, schema);
 
 			Node result;
 
 			if(miningFunction == MiningFunction.CLASSIFICATION){
-				result = createClassificationNode(index, predicate, false, numberOfOutputs, leftChildren, values, payloadManager, schema);
+				result = createClassificationNode(index, predicate, false, numberOfOutputs, leftChildren, values, weightedNodeSamples, payloadManager, schema);
 			} else
 
 			if(miningFunction == MiningFunction.REGRESSION){
@@ -270,7 +299,7 @@ public class TreeUtil {
 			Node result;
 
 			if(miningFunction == MiningFunction.CLASSIFICATION){
-				result = createClassificationNode(index, predicate, true, numberOfOutputs, leftChildren, values, payloadManager, schema)
+				result = createClassificationNode(index, predicate, true, numberOfOutputs, leftChildren, values, weightedNodeSamples, payloadManager, schema)
 					.setId(id);
 			} else
 
@@ -288,7 +317,8 @@ public class TreeUtil {
 	}
 
 	static
-	private Node createClassificationNode(int index, Predicate predicate, boolean leaf, int numberOfOutputs, int[] leftChildren, double[] values, PayloadManager payloadManager, Schema schema){
+	private Node createClassificationNode(int index, Predicate predicate, boolean leaf, int numberOfOutputs, int[] leftChildren, double[] values, double[] weightedNodeSamples, PayloadManager payloadManager, Schema schema){
+		double totalRecordCount = weightedNodeSamples[index];
 
 		if(numberOfOutputs == 1){
 
@@ -296,27 +326,22 @@ public class TreeUtil {
 				CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
 				double[] nodeValues = getRow(values, leftChildren.length, categoricalLabel.size(), index);
+				double[] nodeRecordCounts = toRecordCounts(nodeValues, totalRecordCount);
 
 				List<Number> recordCounts = new AbstractList<Number>(){
 
 					@Override
 					public int size(){
-						return nodeValues.length;
+						return nodeRecordCounts.length;
 					}
 
 					@Override
 					public Number get(int index){
-						double recordCount = nodeValues[index];
+						double recordCount = nodeRecordCounts[index];
 
 						return ValueUtil.narrow(recordCount);
 					}
 				};
-
-				double totalRecordCount = 0d;
-
-				for(Number recordCount : recordCounts){
-					totalRecordCount += recordCount.doubleValue();
-				}
 
 				// XXX
 				int maxIndex = PayloadManager.indexOfMax(Doubles.asList(nodeValues));
@@ -332,7 +357,8 @@ public class TreeUtil {
 			} else
 
 			{
-				return new ClassifierNode(null, predicate);
+				return new ClassifierNode(null, predicate)
+					.setRecordCount(ValueUtil.narrow(totalRecordCount));
 			}
 		} else
 
@@ -350,7 +376,8 @@ public class TreeUtil {
 
 			double[] nodeValues = getRow(values, leftChildren.length, numberOfOutputs * maxNumberOfClasses, index);
 
-			Node result = new ComplexNode(null, predicate);
+			Node result = new ComplexNode(null, predicate)
+				.setRecordCount(ValueUtil.narrow(totalRecordCount));
 
 			List<ScoreDistribution> scoreDistributions = result.getScoreDistributions();
 
@@ -359,9 +386,12 @@ public class TreeUtil {
 
 				String name = categoricalLabel.getName();
 
+				double[] targetValues = Arrays.copyOfRange(nodeValues, i * maxNumberOfClasses, i * maxNumberOfClasses + categoricalLabel.size());
+				double[] targetRecordCounts = toRecordCounts(targetValues, totalRecordCount);
+
 				for(int j = 0; j < categoricalLabel.size(); j++){
 					Object value = categoricalLabel.getValue(j);
-					double recordCount = nodeValues[i * maxNumberOfClasses + j];
+					double recordCount = targetRecordCounts[j];
 
 					ScoreDistribution scoreDistribution = payloadManager.createScoreFrequency(name, value, ValueUtil.narrow(recordCount));
 
@@ -567,6 +597,23 @@ public class TreeUtil {
 		double[] result = new double[columns];
 
 		System.arraycopy(values, (row * columns), result, 0, columns);
+
+		return result;
+	}
+
+	static
+	private double[] toRecordCounts(double[] values, double totalRecordCount){
+		double valueSum = 0d;
+
+		for(double value : values){
+			valueSum += value;
+		}
+
+		double[] result = new double[values.length];
+
+		for(int i = 0; i < values.length; i++){
+			result[i] = (values[i] / valueSum) * totalRecordCount;
+		}
 
 		return result;
 	}

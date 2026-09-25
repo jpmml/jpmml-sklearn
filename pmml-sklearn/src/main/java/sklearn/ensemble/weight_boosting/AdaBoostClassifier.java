@@ -85,6 +85,11 @@ public class AdaBoostClassifier extends EnsembleClassifier<Classifier> implement
 
 				@Override
 				public VisitorAction visit(Node node){
+					Number recordCount = node.getRecordCount();
+
+					if(recordCount != null){
+						node.setRecordCount(null);
+					} // End if
 
 					if(node.hasScoreDistributions()){
 						Object score = node.requireScore();
@@ -95,15 +100,11 @@ public class AdaBoostClassifier extends EnsembleClassifier<Classifier> implement
 						} // End if
 
 						if(Objects.equals(score, categoricalLabel.getValue(0))){
-							node
-								.setScore(-2)
-								.setRecordCount(null);
+							node.setScore(-2);
 						} else
 
 						if(Objects.equals(score, categoricalLabel.getValue(1))){
-							node
-								.setScore(2)
-								.setRecordCount(null);
+							node.setScore(2);
 						} else
 
 						{

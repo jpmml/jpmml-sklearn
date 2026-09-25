@@ -48,6 +48,34 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	public ValidatingSkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
 		ValidatingSkLearnEncoderBatch result = new ValidatingSkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
 
+			{
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(Objects.equals(algorithm, ADA_BOOST)){
+					// Ignored
+				} else
+
+				if(Objects.equals(dataset, AUDIT) || Objects.equals(dataset, AUDIT_NA)){
+
+					if(Objects.equals(algorithm, "OneHotEncoder") || Objects.equals(algorithm, "TargetEncoder")){
+						setRecordCount(1498);
+					} else
+
+					{
+						setRecordCount(1899);
+					}
+				} else
+
+				if(Objects.equals(dataset, IRIS) || Objects.equals(dataset, IRIS_NA) || Objects.equals(dataset, VERSICOLOR)){
+					setRecordCount(150);
+				} else
+
+				if(Objects.equals(dataset, SENTIMENT)){
+					setRecordCount(1000);
+				}
+			}
+
 			@Override
 			public ClassifierTest getArchiveBatchTest(){
 				return ClassifierTest.this;
