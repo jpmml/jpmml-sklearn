@@ -41,7 +41,6 @@ import org.jpmml.python.HasArray;
 import org.jpmml.sklearn.SkLearnException;
 import org.jpmml.xgboost.ByteOrderUtil;
 import org.jpmml.xgboost.FeatureMap;
-import org.jpmml.xgboost.GBTree;
 import org.jpmml.xgboost.HasXGBoostOptions;
 import org.jpmml.xgboost.Learner;
 import org.jpmml.xgboost.ObjFunction;
@@ -219,8 +218,6 @@ public class BoosterUtil {
 
 	static
 	private <E extends Estimator & HasBooster & HasXGBoostOptions> Map<String, ?> getOptions(Booster booster, Learner learner, E estimator){
-		GBTree gbtree = learner.gbtree();
-
 		Map<String, Object> result = new LinkedHashMap<>();
 
 		Integer bestNTreeLimit = booster.getBestNTreeLimit();
@@ -245,7 +242,7 @@ public class BoosterUtil {
 		Number missing = estimator.getOptionalNumber("missing");
 		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
 
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, !gbtree.hasCategoricalSplits());
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
 		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, null);
 		Boolean numeric = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
 		Boolean prune = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
