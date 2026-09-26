@@ -139,7 +139,7 @@ public class BoosterUtil {
 		Boolean nanAsMissing = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, Boolean.TRUE);
 		result.put(HasLightGBMOptions.OPTION_NAN_AS_MISSING, nanAsMissing);
 
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_COMPACT, Boolean.TRUE);
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_COMPACT, !gbdt.hasLinearTree());
 		result.put(HasLightGBMOptions.OPTION_COMPACT, compact);
 
 		return result;
