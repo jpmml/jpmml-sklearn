@@ -104,9 +104,9 @@ if "Audit" in datasets:
 	build_audit(Pipeline([("basen", BaseNEncoder(base = 3, drop_invariant = True, handle_missing = "error", handle_unknown = "error")), ("ohe", SkLearnOneHotEncoder())]), "passthrough", clone(classifier), "Base3EncoderAudit")
 	build_audit(Pipeline([("basen", BaseNEncoder(base = 3, handle_missing = "value", handle_unknown = "value")), ("ohe", SkLearnOneHotEncoder(handle_unknown = "ignore"))]), SimpleImputer(), clone(classifier), "Base3EncoderAuditNA")
 
-	classifier = RandomForestClassifier(n_estimators = 71, random_state = 13)
+	classifier = RandomForestClassifier(n_estimators = 31, random_state = 13)
 
-	rf_pmml_options = {"compact" : False, "numeric": False}
+	rf_pmml_options = {}
 
 	build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", **rf_pmml_options)
 	build_audit(BinaryEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "BinaryEncoderAudit", **rf_pmml_options)
@@ -117,7 +117,7 @@ if "Audit" in datasets:
 	build_audit(TargetEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "TargetEncoderAudit", **rf_pmml_options)
 	build_audit(WOEEncoder(handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "WOEEncoderAudit", **rf_pmml_options)
 
-	rf_pmml_options = {"compact" : False, "numeric" : True, "allow_missing" : True}
+	rf_pmml_options = {"allow_missing" : True}
 
 	build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "Base4EncoderAuditNA", **rf_pmml_options)
 	build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "BinaryEncoderAuditNA", **rf_pmml_options)

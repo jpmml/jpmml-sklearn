@@ -52,10 +52,6 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
-				if(Objects.equals(algorithm, ADA_BOOST)){
-					// Ignored
-				} else
-
 				if(Objects.equals(dataset, AUDIT) || Objects.equals(dataset, AUDIT_NA)){
 
 					if(Objects.equals(algorithm, "OneHotEncoder") || Objects.equals(algorithm, "TargetEncoder")){
@@ -73,6 +69,10 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 				if(Objects.equals(dataset, SENTIMENT)){
 					setRecordCount(1000);
+				} // End if
+
+				if(Objects.equals(algorithm, ADA_BOOST)){
+					setRecordCount(null);
 				}
 			}
 
@@ -90,6 +90,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 					if(Objects.equals(DECISION_TREE, algorithm) || Objects.equals(RANDOM_FOREST, algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreeOptions.OPTION_FLAT, new Boolean[]{false, true});
 						options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
 
 						return OptionsUtil.generateOptionsMatrix(options);
@@ -107,8 +108,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 					if(Objects.equals(RANDOM_FOREST, algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
-						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
 						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
+						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
 
 						return OptionsUtil.generateOptionsMatrix(options);
 					}

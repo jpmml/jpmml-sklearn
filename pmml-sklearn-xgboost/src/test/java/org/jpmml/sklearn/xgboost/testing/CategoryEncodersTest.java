@@ -18,16 +18,62 @@
  */
 package org.jpmml.sklearn.xgboost.testing;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.converter.testing.OptionsUtil;
+import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.FloatEquivalence;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
+import org.jpmml.xgboost.HasXGBoostOptions;
 import org.junit.jupiter.api.Test;
 
 public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
 
 	public CategoryEncodersTest(){
 		super(new FloatEquivalence(8));
+	}
+
+	@Override
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public CategoryEncodersTest getArchiveBatchTest(){
+				return CategoryEncodersTest.this;
+			}
+
+			@Override
+			public List<Map<String, Object>> getOptionsMatrix(){
+				String dataset = getDataset();
+
+				if(Objects.equals(AUDIT, dataset)){
+					Map<String, Object> options = new LinkedHashMap<>();
+					options.put(HasXGBoostOptions.OPTION_COMPACT, new Boolean[]{false, true});
+					options.put(HasXGBoostOptions.OPTION_NUMERIC, new Boolean[]{false, true});
+
+					return OptionsUtil.generateOptionsMatrix(options);
+				} else
+
+				if(Objects.equals(AUDIT_NA, dataset)){
+					Map<String, Object> options = new LinkedHashMap<>();
+					options.put(HasXGBoostOptions.OPTION_COMPACT, new Boolean[]{false, true});
+
+					return OptionsUtil.generateOptionsMatrix(options);
+				}
+
+				return super.getOptionsMatrix();
+			}
+		};
+
+		return result;
 	}
 
 	@Test

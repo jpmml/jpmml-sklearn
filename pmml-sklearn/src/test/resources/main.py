@@ -195,7 +195,7 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit", stringify = False)
 
 	build_audit(audit_df, AdaBoostClassifier(estimator = DecisionTreeClassifier(max_depth = 3), n_estimators = 11, random_state = 13), "AdaBoostAudit")
-	build_audit(audit_df, EstimatorProxy(DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13)), "DecisionTreeAudit", compact = False)
+	build_audit(audit_df, EstimatorProxy(DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13)), "DecisionTreeAudit")
 	build_audit(audit_df, BaggingClassifier(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAudit")
 	build_audit(audit_df, CalibratedClassifierCV(DecisionTreeClassifier(min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "DecisionTreeIsotonicAudit")
 	build_audit(audit_df, DummyClassifier(strategy = "most_frequent"), "DummyAudit")
@@ -209,7 +209,7 @@ if "Audit" in datasets:
 	build_audit(audit_df, BaggingClassifier(LogisticRegression(), n_estimators = 3, max_features = 0.5, random_state = 13), "LogisticRegressionEnsembleAudit")
 	build_audit(audit_df, GaussianNB(), "GaussianNBAudit")
 	build_audit(audit_df, OneVsRestClassifier(LogisticRegression()), "OneVsRestAudit")
-	build_audit(audit_df, EstimatorProxy(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)), "RandomForestAudit", flat = True)
+	build_audit(audit_df, EstimatorProxy(RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)), "RandomForestAudit")
 	build_audit(audit_df, CalibratedClassifierCV(RandomForestClassifier(n_estimators = 3, min_samples_leaf = 15, random_state = 13), ensemble = False, method = "sigmoid"), "RandomForestSigmoidAudit")
 	build_audit(audit_df, RidgeClassifierCV(), "RidgeAudit", with_proba = False)
 	build_audit(audit_df, BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleAudit")
@@ -563,7 +563,7 @@ def build_versicolor_direct(versicolor_df, classifier, name, with_proba = True, 
 	store_csv(species, name)
 
 if "Versicolor" in datasets:
-	build_versicolor_direct(versicolor_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeVersicolor", compact = False)
+	build_versicolor_direct(versicolor_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeVersicolor")
 
 #
 # Multi-class classification
@@ -618,7 +618,7 @@ def build_iris(iris_df, classifier, name, with_proba = True, with_kneighbors = F
 if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
-	build_iris(iris_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeIris", compact = False)
+	build_iris(iris_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeIris")
 	build_iris(iris_df, BaggingClassifier(DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleIris")
 	build_iris(iris_df, CalibratedClassifierCV(DecisionTreeClassifier(min_samples_leaf = 15, random_state = 13), ensemble = False, method = "isotonic"), "DecisionTreeIsotonicIris")
 	build_iris(iris_df, DummyClassifier(strategy = "constant", constant = "versicolor"), "DummyIris")
@@ -635,7 +635,7 @@ if "Iris" in datasets:
 	build_iris(iris_df, GaussianNB(), "GaussianNBIris")
 	build_iris(iris_df, OneVsRestClassifier(LogisticRegression()), "OneVsRestIris")
 	build_iris(iris_df, Perceptron(random_state = 13), "PerceptronIris", with_proba = False)
-	build_iris(iris_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIris", flat = True)
+	build_iris(iris_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "RandomForestIris")
 	build_iris(iris_df, RidgeClassifierCV(), "RidgeIris", with_proba = False)
 	build_iris(iris_df, CalibratedClassifierCV(RidgeClassifier(), ensemble = True, method = "sigmoid"), "RidgeSigmoidIris")
 	build_iris(iris_df, BaggingClassifier(RidgeClassifier(random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "RidgeEnsembleIris")
@@ -801,7 +801,7 @@ if "Sentiment" in datasets:
 
 	build_sentiment(sentiment_df, LinearSVC(random_state = 13), Splitter(), "LinearSVCSentiment", with_proba = False)
 	build_sentiment(sentiment_df, LogisticRegressionCV(cv = 3), None, "LogisticRegressionSentiment")
-	build_sentiment(sentiment_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), Matcher(), "RandomForestSentiment", compact = False)
+	build_sentiment(sentiment_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), Matcher(), "RandomForestSentiment")
 
 def build_sentiment_nb(sentiment_df, classifier, name, vocabulary = None, with_proba = True):
 	sentiment_X = sentiment_df["Sentence"]
@@ -970,7 +970,7 @@ if "Auto" in datasets:
 	build_auto(auto_df, AdaBoostRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), random_state = 13, n_estimators = 17), "AdaBoostAuto")
 	build_auto(auto_df, ARDRegression(), "BayesianARDAuto")
 	build_auto(auto_df, BayesianRidge(), "BayesianRidgeAuto")
-	build_auto(auto_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAuto", compact = False)
+	build_auto(auto_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAuto")
 	build_auto(auto_df, BaggingRegressor(DecisionTreeRegressor(min_samples_leaf = 5, random_state = 13), n_estimators = 3, max_features = 0.5, random_state = 13), "DecisionTreeEnsembleAuto")
 	build_auto(auto_df, DummyRegressor(strategy = "median"), "DummyAuto")
 	build_auto(auto_df, ElasticNetCV(cv = 3, random_state = 13), "ElasticNetAuto")
@@ -986,7 +986,7 @@ if "Auto" in datasets:
 	build_auto(auto_df, OrthogonalMatchingPursuitCV(cv = 3), "OMPAuto")
 	build_auto(auto_df, PLSRegression(), "PLSRegressionAuto")
 	build_auto(auto_df, QuantileRegressor(quantile = 0.65), "CQRAuto")
-	build_auto(auto_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuto", flat = True)
+	build_auto(auto_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuto")
 	build_auto(auto_df, RidgeCV(), "RidgeAuto")
 	build_auto(auto_df, StackingRegressor([("ridge", Ridge(random_state = 13)), ("lasso", Lasso(random_state = 13))], final_estimator = GradientBoostingRegressor(n_estimators = 7, random_state = 13)), "StackingEnsembleAuto")
 	build_auto(auto_df, TheilSenRegressor(n_subsamples = 31, random_state = 13), "TheilSenAuto")

@@ -54,7 +54,6 @@ public class OutlierDetectorTest extends ValidatingSkLearnEncoderBatchTest imple
 				if(Objects.equals(ISOLATION_FOREST, algorithm)){
 					Map<String, Object> options = new LinkedHashMap<>();
 					options.put(HasTreeOptions.OPTION_INPUT_FLOAT, new Boolean[]{false, true});
-					options.put(HasTreeOptions.OPTION_PRUNE, new Boolean[]{false, true});
 
 					return OptionsUtil.generateOptionsMatrix(options);
 				}

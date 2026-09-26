@@ -18,12 +18,71 @@
  */
 package org.jpmml.sklearn.extension.testing;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
+
+import com.google.common.base.Equivalence;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.converter.testing.OptionsUtil;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
+import sklearn.tree.HasTreeOptions;
 
 public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
+
+	@Override
+	public SkLearnEncoderBatch createBatch(String algorithm, String dataset, Predicate<ResultField> columnFilter, Equivalence<Object> equivalence){
+		SkLearnEncoderBatch result = new SkLearnEncoderBatch(algorithm, dataset, columnFilter, equivalence){
+
+			@Override
+			public CategoryEncodersTest getArchiveBatchTest(){
+				return CategoryEncodersTest.this;
+			}
+
+			@Override
+			public List<Map<String, Object>> getOptionsMatrix(){
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(Objects.equals(AUDIT, dataset)){
+
+					if(RANDOM_FOREST_ENCODERS.contains(algorithm)){
+						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
+						options.put(HasTreeOptions.OPTION_NUMERIC, new Boolean[]{false, true});
+
+						if(Objects.equals("CatBoostEncoder", algorithm)){
+							options.put(HasTreeOptions.OPTION_PRUNE, new Boolean[]{false, true});
+						}
+
+						return OptionsUtil.generateOptionsMatrix(options);
+					}
+				} else
+
+				if(Objects.equals(AUDIT_NA, dataset)){
+
+					if(RANDOM_FOREST_ENCODERS.contains(algorithm)){
+						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
+						options.put(HasTreeOptions.OPTION_ALLOW_MISSING, Boolean.TRUE);
+
+						return OptionsUtil.generateOptionsMatrix(options);
+					}
+				}
+
+				return super.getOptionsMatrix();
+			}
+		};
+
+		return result;
+	}
 
 	@Test
 	public void evaluateBalancedDecisionTreeEnsembleAudit() throws Exception {
@@ -144,4 +203,6 @@ public class CategoryEncodersTest extends SkLearnEncoderBatchTest implements Dat
 	public void evaluateWOEEncoderAuditNA() throws Exception {
 		evaluate("WOEEncoder", AUDIT_NA);
 	}
+
+	private static final Set<String> RANDOM_FOREST_ENCODERS = Set.of("Base4Encoder", "BinaryEncoder", "CatBoostEncoder", "CountEncoder", "LeaveOneOutEncoder", "TargetEncoder", "WOEEncoder");
 }

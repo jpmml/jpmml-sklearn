@@ -61,7 +61,7 @@ public class CategoricalTest extends SkLearnEncoderBatchTest implements Datasets
 			@Override
 			public List<Map<String, Object>> getOptionsMatrix(){
 				Map<String, Object> options = new LinkedHashMap<>();
-				options.put(HasXGBoostOptions.OPTION_COMPACT, false);
+				options.put(HasXGBoostOptions.OPTION_COMPACT, new Boolean[]{false, true});
 
 				return OptionsUtil.generateOptionsMatrix(options);
 			}

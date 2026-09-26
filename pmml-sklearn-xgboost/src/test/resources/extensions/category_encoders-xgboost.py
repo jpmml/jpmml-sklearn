@@ -6,17 +6,13 @@ from extensions.category_encoders import *
 
 from xgboost import XGBClassifier
 
-xgb_pmml_options = {"compact": False, "numeric": False}
+xgb_pmml_options = {}
 
 classifier = XGBClassifier(n_estimators = 71, random_state = 13)
 
 build_audit(BaseNEncoder(base = 4, drop_invariant = True, handle_missing = "error", handle_unknown = "error"), "passthrough", clone(classifier), "Base4EncoderAudit", **xgb_pmml_options)
 
-xgb_pmml_options = {"compact": False, "numeric": True}
-
 build_audit(BaseNEncoder(base = 4, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "Base4EncoderAuditNA", **xgb_pmml_options)
-
-xgb_pmml_options = {"compact": False, "numeric": True, "prune": True}
 
 classifier = XGBClassifier(n_estimators = 71, random_state = 13)
 
@@ -24,8 +20,6 @@ build_audit(BinaryEncoder(handle_missing = "value", handle_unknown = "value"), "
 build_audit(CatBoostEncoder(a = 0.5, handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "CatBoostEncoderAuditNA", **xgb_pmml_options)
 build_audit(CountEncoder(min_group_size = 10, handle_missing = "value", handle_unknown = 10), "passthrough", clone(classifier), "CountEncoderAuditNA", **xgb_pmml_options)
 build_audit(LeaveOneOutEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "LeaveOneOutEncoderAuditNA", **xgb_pmml_options)
-
-xgb_pmml_options = {"compact": False, "numeric": True}
 
 build_audit(TargetEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "TargetEncoderAuditNA", **xgb_pmml_options)
 build_audit(WOEEncoder(handle_missing = "value", handle_unknown = "value"), "passthrough", clone(classifier), "WOEEncoderAuditNA", **xgb_pmml_options)
