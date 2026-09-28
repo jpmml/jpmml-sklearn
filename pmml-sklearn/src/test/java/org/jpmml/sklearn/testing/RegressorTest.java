@@ -38,6 +38,7 @@ import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
 import sklearn.Estimator;
+import sklearn.ensemble.hist_gradient_boosting.HasTreePredictorOptions;
 import sklearn.tree.HasTreeOptions;
 
 public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements SkLearnAlgorithms, Datasets, Fields {
@@ -55,6 +56,16 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 			public List<Map<String, Object>> getOptionsMatrix(){
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
+
+				if(dataset != null){
+
+					if(Objects.equals(HIST_GRADIENT_BOOSTING, algorithm)){
+						Map<String, Object> options = new LinkedHashMap<>();
+						options.put(HasTreePredictorOptions.OPTION_COMPACT, new Boolean[]{false, true});
+
+						return OptionsUtil.generateOptionsMatrix(options);
+					}
+				} // End if
 
 				if(Objects.equals(AUTO, dataset)){
 

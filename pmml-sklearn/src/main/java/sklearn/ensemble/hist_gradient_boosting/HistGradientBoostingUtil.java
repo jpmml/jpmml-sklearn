@@ -21,12 +21,15 @@ package sklearn.ensemble.hist_gradient_boosting;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.tree.TreeModel;
@@ -35,14 +38,17 @@ import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
+import org.jpmml.converter.ModelTransformer;
 import org.jpmml.converter.ModelUtil;
 import org.jpmml.converter.PredicateManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
+import org.jpmml.converter.tree.TreeModelTransformerBuilder;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.TypeInfo;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
+import sklearn.Estimator;
 import sklearn.Step;
 import sklearn.Transformer;
 import sklearn.compose.ColumnTransformer;
@@ -174,6 +180,29 @@ public class HistGradientBoostingUtil {
 		List<Feature> filterFeatures = filterPreprocessor.encode(Step.PARENT_ROOT, features, encoder);
 
 		return new Schema(encoder, label, filterFeatures);
+	}
+
+	static
+	public <E extends Estimator & HasTreePredictorOptions> Model configureModel(E estimator, Model model){
+		List<String> names = new ArrayList<>();
+		names.addAll(HasTreePredictorOptions.OPTIONS_TREEMODEL_TRANSFORMATIONS);
+		names.addAll(HasTreePredictorOptions.OPTIONS_NODE);
+
+		Map<String, ?> options = estimator.getPMMLOptions(names);
+
+		ModelTransformer modelTransformer = new TreeModelTransformerBuilder(MiningFunction.REGRESSION){
+
+			@Override
+			protected Map<String, ?> getDefaults(){
+				return Collections.singletonMap(HasTreePredictorOptions.OPTION_COMPACT, Boolean.TRUE);
+			}
+		}
+			.putOptions(options)
+			.build();
+
+		modelTransformer.applyTo(model);
+
+		return model;
 	}
 
 	static

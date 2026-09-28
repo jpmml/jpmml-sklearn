@@ -37,7 +37,7 @@ import sklearn.HasMultiDecisionFunctionField;
 import sklearn.SkLearnClassifier;
 import sklearn.compose.ColumnTransformer;
 
-public class HistGradientBoostingClassifier extends SkLearnClassifier implements HasMultiDecisionFunctionField {
+public class HistGradientBoostingClassifier extends SkLearnClassifier implements HasMultiDecisionFunctionField, HasTreePredictorOptions {
 
 	public HistGradientBoostingClassifier(String module, String name){
 		super(module, name);
@@ -96,6 +96,11 @@ public class HistGradientBoostingClassifier extends SkLearnClassifier implements
 		encodePredictProbaOutput(miningModel, DataType.DOUBLE, categoricalLabel);
 
 		return miningModel;
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return HistGradientBoostingUtil.configureModel(this, model);
 	}
 
 	public List<Number> getBaselinePrediction(){

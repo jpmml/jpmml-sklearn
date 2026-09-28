@@ -21,6 +21,7 @@ package sklearn.ensemble.hist_gradient_boosting;
 import java.util.Collections;
 import java.util.List;
 
+import org.dmg.pmml.Model;
 import org.dmg.pmml.mining.MiningModel;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.AttributeException;
@@ -28,7 +29,7 @@ import org.jpmml.python.ClassDictUtil;
 import sklearn.SkLearnRegressor;
 import sklearn.compose.ColumnTransformer;
 
-public class HistGradientBoostingRegressor extends SkLearnRegressor {
+public class HistGradientBoostingRegressor extends SkLearnRegressor implements HasTreePredictorOptions {
 
 	public HistGradientBoostingRegressor(String module, String name){
 		super(module, name);
@@ -46,6 +47,11 @@ public class HistGradientBoostingRegressor extends SkLearnRegressor {
 		}
 
 		return HistGradientBoostingUtil.encodeHistGradientBoosting(predictors, binMapper, Collections.singletonList(baselinePrediction), 0, schema);
+	}
+
+	@Override
+	public Model configureModel(Model model){
+		return HistGradientBoostingUtil.configureModel(this, model);
 	}
 
 	public Number getBaselinePrediction(){
