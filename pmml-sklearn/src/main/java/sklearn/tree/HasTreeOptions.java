@@ -24,12 +24,11 @@ import java.util.Map;
 
 import org.dmg.pmml.OutputField;
 import org.dmg.pmml.tree.Node;
-import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.converter.HasSchemaOptions;
 import org.jpmml.converter.tree.HasTreeModelOptions;
 import org.jpmml.sklearn.HasSkLearnOptions;
 
-public interface HasTreeOptions extends HasSkLearnOptions, HasSchemaOptions, HasTreeModelOptions, HasNativeConfiguration {
+public interface HasTreeOptions extends HasSkLearnOptions, HasSchemaOptions, HasTreeModelOptions {
 
 	/**
 	 * @see Node#getDefaultChild()
@@ -58,13 +57,11 @@ public interface HasTreeOptions extends HasSkLearnOptions, HasSchemaOptions, Has
 	default
 	public Map<String, ?> getNativeConfiguration(){
 		Map<String, Object> result = new LinkedHashMap<>();
-		result.put(HasTreeOptions.OPTION_COMPACT, Boolean.FALSE);
-		result.put(HasTreeOptions.OPTION_FLAT, Boolean.FALSE);
+		result.putAll(HasTreeModelOptions.super.getNativeConfiguration());
 		result.put(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_ID, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NODE_SCORE, Boolean.TRUE);
 		result.put(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-		result.put(HasTreeOptions.OPTION_PRUNE, Boolean.FALSE);
 		result.put(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
 
 		return result;
