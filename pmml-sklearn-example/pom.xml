@@ -45,7 +45,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.beust</groupId>
+			<groupId>org.jcommander</groupId>
 			<artifactId>jcommander</artifactId>
 		</dependency>
 	</dependencies>
