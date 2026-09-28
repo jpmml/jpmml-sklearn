@@ -36,6 +36,9 @@ import com.beust.jcommander.ParameterException;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.LoggingUtil;
 import org.jpmml.converter.PMMLEncodable;
+import org.jpmml.converter.Parameters;
+import org.jpmml.converter.SchemaParameters;
+import org.jpmml.converter.tree.TreeModelParameters;
 import org.jpmml.model.JAXBSerializer;
 import org.jpmml.model.metro.MetroJAXBSerializer;
 import org.jpmml.python.PythonUnpickler;
@@ -57,102 +60,110 @@ public class Main {
 		names = {"--pkl-pipeline-input", "--pkl-input"},
 		description = "Pickle input file",
 		required = true,
-		order = 1
+		order = Parameters.BLOCK_IO + 1
 	)
 	private File input = null;
 
 	@Parameter (
-		names = {"--pmml-output"},
-		description = "PMML output file",
+		names = {Parameters.NAME_PMML_OUTPUT},
+		description = Parameters.DESCRIPTION_PMML_OUTPUT,
 		required = true,
-		order = 2
+		order = Parameters.BLOCK_IO + 2
 	)
 	private File output = null;
 
 	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_ALLOW_MISSING},
-		description = "Allow \"value is missing\" node split conditions",
+		names = {SchemaParameters.NAME_INPUT_FLOAT},
+		description = SchemaParameters.DESCRIPTION_INPUT_FLOAT,
 		arity = 1,
-		order = 3
-	)
-	private Boolean allowMissing = null;
-
-	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_COMPACT},
-		description = "Transform SkLearn-style trees to PMML-style trees",
-		arity = 1,
-		order = 4
-	)
-	private Boolean compact = null;
-
-	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_FLAT},
-		description = "Flatten trees",
-		arity = 1,
-		order = 5
-	)
-	private Boolean flat = null;
-
-	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_INPUT_FLOAT},
-		description = "Allow field data type updates",
-		arity = 1,
-		order = 6
+		order = Parameters.BLOCK_SCHEMA_OPTIONS + 1
 	)
 	private Boolean inputFloat = null;
 
 	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_NODE_ID},
-		description = "Keep SkLearn node identifiers",
+		names = {SchemaParameters.NAME_NUMERIC},
+		description = SchemaParameters.DESCRIPTION_NUMERIC,
 		arity = 1,
-		order = 7
-	)
-	private Boolean nodeId = null;
-
-	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_NODE_SCORE},
-		description = "Keep SkLearn node scores for branch (non-leaf) nodes",
-		arity = 1,
-		order = 8
-	)
-	private Boolean nodeScore = null;
-
-	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_NUMERIC},
-		description = "Transform non-numeric node split conditions to numeric",
-		arity = 1,
-		order = 9
+		order = Parameters.BLOCK_SCHEMA_OPTIONS + 2
 	)
 	private Boolean numeric = null;
 
 	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_PRUNE},
-		description = "Truncate invariant leaf nodes",
+		names = {Parameters.PREFIX_OPTION + HasTreeOptions.OPTION_ALLOW_MISSING},
+		description = "Allow missing-value-aware splits",
 		arity = 1,
-		order = 10
+		order = Parameters.BLOCK_MODEL_OPTIONS + 1
 	)
-	private Boolean prune = null;
+	private Boolean allowMissing = null;
 
 	@Parameter (
-		names = {"--X-" + HasTreeOptions.OPTION_WINNER_ID},
-		description = "Output node identifiers",
+		names = {TreeModelParameters.NAME_COMPACT},
+		description = TreeModelParameters.DESCRIPTION_COMPACT,
 		arity = 1,
-		order = 11
+		order = Parameters.BLOCK_MODEL_OPTIONS + 2
 	)
-	private Boolean winnerId = null;
+	private Boolean compact = null;
 
 	@Parameter (
-		names = {"--X-" + HasRegressorOptions.OPTION_CONFIDENCE_LEVEL},
-		description = "Prediction confidence level",
+		names = {Parameters.PREFIX_OPTION + HasRegressorOptions.OPTION_CONFIDENCE_LEVEL},
+		description = "Output prediction interval bounds at the given confidence level",
 		converter = ConfidenceLevelConverter.class,
 		arity = 1,
-		order = 12
+		order = Parameters.BLOCK_MODEL_OPTIONS + 3
 	)
 	private ConfidenceLevel confidenceLevel = null;
 
 	@Parameter (
-		names = {"--help"},
-		description = "Show the list of configuration options and exit",
+		names = {TreeModelParameters.NAME_FLAT},
+		description = TreeModelParameters.DESCRIPTION_FLAT,
+		arity = 1,
+		order = Parameters.BLOCK_MODEL_OPTIONS + 4
+	)
+	private Boolean flat = null;
+
+	@Parameter (
+		names = {TreeModelParameters.NAME_NODE_ID},
+		description = TreeModelParameters.DESCRIPTION_NODE_ID,
+		arity = 1,
+		order = Parameters.BLOCK_MODEL_OPTIONS + 5
+	)
+	private Boolean nodeId = null;
+
+	@Parameter (
+		names = {TreeModelParameters.NAME_NODE_RECORDCOUNT},
+		description = TreeModelParameters.DESCRIPTION_NODE_RECORDCOUNT,
+		arity = 1,
+		order = Parameters.BLOCK_MODEL_OPTIONS + 6
+	)
+	private Boolean nodeRecordCount = null;
+
+	@Parameter (
+		names = {Parameters.PREFIX_OPTION + HasTreeOptions.OPTION_NODE_SCORE},
+		description = "Keep branch node scores",
+		arity = 1,
+		order = Parameters.BLOCK_MODEL_OPTIONS + 7
+	)
+	private Boolean nodeScore = null;
+
+	@Parameter (
+		names = {TreeModelParameters.NAME_PRUNE},
+		description = TreeModelParameters.DESCRIPTION_PRUNE,
+		arity = 1,
+		order = Parameters.BLOCK_MODEL_OPTIONS + 8
+	)
+	private Boolean prune = null;
+
+	@Parameter (
+		names = {Parameters.PREFIX_OPTION + HasTreeOptions.OPTION_WINNER_ID},
+		description = "Output winning node identifiers",
+		arity = 1,
+		order = Parameters.BLOCK_MODEL_OPTIONS + 9
+	)
+	private Boolean winnerId = null;
+
+	@Parameter (
+		names = {Parameters.NAME_HELP},
+		description = Parameters.DESCRIPTION_HELP,
 		help = true,
 		order = Integer.MAX_VALUE
 	)
@@ -290,19 +301,19 @@ public class Main {
 	private Map<String, ?> getOptions(){
 		Map<String, Object> options = new LinkedHashMap<>();
 
-		options.put(HasTreeOptions.OPTION_ALLOW_MISSING, this.allowMissing);
-		options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
-		options.put(HasTreeOptions.OPTION_FLAT, this.flat);
-		options.put(HasTreeOptions.OPTION_INPUT_FLOAT, this.inputFloat);
-		options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
-		options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
-		options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
-		options.put(HasTreeOptions.OPTION_PRUNE, this.prune);
-		options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);
-
 		Object confidenceLevel = (this.confidenceLevel != null ? this.confidenceLevel.getValue() : null);
 
+		options.put(HasTreeOptions.OPTION_INPUT_FLOAT, this.inputFloat);
+		options.put(HasTreeOptions.OPTION_NUMERIC, this.numeric);
+		options.put(HasTreeOptions.OPTION_ALLOW_MISSING, this.allowMissing);
+		options.put(HasTreeOptions.OPTION_COMPACT, this.compact);
 		options.put(HasRegressorOptions.OPTION_CONFIDENCE_LEVEL, confidenceLevel);
+		options.put(HasTreeOptions.OPTION_FLAT, this.flat);
+		options.put(HasTreeOptions.OPTION_NODE_ID, this.nodeId);
+		options.put(HasTreeOptions.OPTION_NODE_RECORDCOUNT, this.nodeRecordCount);
+		options.put(HasTreeOptions.OPTION_NODE_SCORE, this.nodeScore);
+		options.put(HasTreeOptions.OPTION_PRUNE, this.prune);
+		options.put(HasTreeOptions.OPTION_WINNER_ID, this.winnerId);
 
 		// Ignore defaults
 		options.values().removeIf(Objects::isNull);
