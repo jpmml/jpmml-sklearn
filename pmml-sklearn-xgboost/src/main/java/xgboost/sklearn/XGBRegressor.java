@@ -29,7 +29,6 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.PMMLEncodable;
-import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.xgboost.HasXGBoostOptions;
@@ -66,7 +65,7 @@ public class XGBRegressor extends Regressor implements HasBooster, HasXGBoostOpt
 	}
 
 	@Override
-	protected ScalarLabel encodeLabel(String name, SkLearnEncoder encoder){
+	protected ContinuousLabel encodeLabel(String name, SkLearnEncoder encoder){
 
 		if(name != null){
 			DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.FLOAT);

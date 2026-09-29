@@ -29,7 +29,6 @@ import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.MultiLabel;
-import org.jpmml.converter.ScalarLabel;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
@@ -68,15 +67,15 @@ public class Regressor extends Estimator {
 		} else
 
 		if(names.size() >= 2){
-			List<ScalarLabel> scalarLabels = new ArrayList<>();
+			List<ContinuousLabel> continuousLabels = new ArrayList<>();
 
 			for(String name : names){
-				ScalarLabel scalarLabel = encodeLabel(name, encoder);
+				ContinuousLabel continuousLabel = encodeLabel(name, encoder);
 
-				scalarLabels.add(scalarLabel);
+				continuousLabels.add(continuousLabel);
 			}
 
-			return new MultiLabel(scalarLabels);
+			return new MultiLabel(continuousLabels);
 		} else
 
 		{
@@ -84,7 +83,7 @@ public class Regressor extends Estimator {
 		}
 	}
 
-	protected ScalarLabel encodeLabel(String name, SkLearnEncoder encoder){
+	protected ContinuousLabel encodeLabel(String name, SkLearnEncoder encoder){
 
 		if(name != null){
 			DataField dataField = encoder.createDataField(name, OpType.CONTINUOUS, DataType.DOUBLE);
