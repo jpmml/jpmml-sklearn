@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>org.jpmml</groupId>
-		<artifactId>jpmml-parent</artifactId>
-		<version>1.0.22</version>
+		<artifactId>jpmml-converter-parent</artifactId>
+		<version>1.0.0</version>
 	</parent>
 
 	<artifactId>jpmml-sklearn</artifactId>
@@ -15,13 +15,6 @@
 	<name>JPMML-SkLearn</name>
 	<description>Java library and command-line application for converting Scikit-Learn pipelines to PMML</description>
 	<url>https://github.com/jpmml/jpmml-sklearn</url>
-
-	<licenses>
-		<license>
-			<name>GNU Affero General Public License (AGPL) version 3.0</name>
-			<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
-		</license>
-	</licenses>
 
 	<modules>
 		<module>pmml-sklearn</module>
@@ -155,12 +148,6 @@
 				<artifactId>telemetry-client</artifactId>
 				<version>1.0.3</version>
 			</dependency>
-
-			<dependency>
-				<groupId>org.jcommander</groupId>
-				<artifactId>jcommander</artifactId>
-				<version>1.85</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -179,19 +166,6 @@
 			<plugin>
 				<groupId>de.jutzig</groupId>
 				<artifactId>github-release-plugin</artifactId>
-				<version>1.2.0</version>
-				<executions>
-					<execution>
-						<id>default-cli</id>
-						<configuration>
-							<artifact>${project.build.directory}/${project.artifactId}-executable-${project.version}.${project.packaging}</artifact>
-							<description>https://github.com/jpmml/jpmml-sklearn</description>
-							<releaseName>${project.version}</releaseName>
-							<repositoryId>jpmml/jpmml-sklearn</repositoryId>
-							<tag>${project.version}</tag>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
