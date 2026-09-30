@@ -18,11 +18,7 @@
  */
 package sklearn.linear_model.glm;
 
-import java.util.List;
-
 import org.dmg.pmml.regression.RegressionModel;
-import org.jpmml.converter.Schema;
-import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.linear_model.LinearRegressor;
 
 public class GeneralizedLinearRegressor extends LinearRegressor {
@@ -32,7 +28,7 @@ public class GeneralizedLinearRegressor extends LinearRegressor {
 	}
 
 	@Override
-	protected RegressionModel createRegression(List<? extends Number> coef, Number intercept, Schema schema){
-		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, RegressionModel.NormalizationMethod.EXP, schema);
+	protected RegressionModel.NormalizationMethod getNormalizationMethod(){
+		return RegressionModel.NormalizationMethod.EXP;
 	}
 }

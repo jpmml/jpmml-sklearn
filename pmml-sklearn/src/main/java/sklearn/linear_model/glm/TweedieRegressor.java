@@ -18,11 +18,7 @@
  */
 package sklearn.linear_model.glm;
 
-import java.util.List;
-
 import org.dmg.pmml.regression.RegressionModel;
-import org.jpmml.converter.Schema;
-import org.jpmml.converter.regression.RegressionModelUtil;
 import sklearn.linear_model.LinearRegressor;
 
 public class TweedieRegressor extends LinearRegressor {
@@ -32,12 +28,14 @@ public class TweedieRegressor extends LinearRegressor {
 	}
 
 	@Override
-	protected RegressionModel createRegression(List<? extends Number> coef, Number intercept, Schema schema){
+	protected RegressionModel.NormalizationMethod getNormalizationMethod(){
 		Number power = getPower();
 
-		RegressionModel.NormalizationMethod normalizationMethod = (power.doubleValue() > 0d ? RegressionModel.NormalizationMethod.EXP : RegressionModel.NormalizationMethod.NONE);
+		if(power.doubleValue() > 0d){
+			return RegressionModel.NormalizationMethod.EXP;
+		}
 
-		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, normalizationMethod, schema);
+		return super.getNormalizationMethod();
 	}
 
 	public Number getPower(){

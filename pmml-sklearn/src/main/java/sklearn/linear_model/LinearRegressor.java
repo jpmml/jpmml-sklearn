@@ -23,16 +23,11 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Model;
-import org.dmg.pmml.mining.Segmentation;
 import org.dmg.pmml.regression.RegressionModel;
 import org.jpmml.converter.CMatrixUtil;
 import org.jpmml.converter.Feature;
-import org.jpmml.converter.MultiLabel;
-import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
-import org.jpmml.converter.mining.MiningModelUtil;
 import org.jpmml.converter.regression.RegressionModelUtil;
-import org.jpmml.python.ClassDictUtil;
 import sklearn.SkLearnRegressor;
 
 public class LinearRegressor extends SkLearnRegressor {
@@ -70,30 +65,21 @@ public class LinearRegressor extends SkLearnRegressor {
 
 		List<? extends Feature> features = schema.getFeatures();
 
+		RegressionModel.NormalizationMethod normalizationMethod = getNormalizationMethod();
+
 		int numberOfOutputs = getNumberOfOutputs();
 		if(numberOfOutputs == 1){
-			return createRegression(coef, Iterables.getOnlyElement(intercept), schema);
+			return RegressionModelUtil.createRegression(features, coef, Iterables.getOnlyElement(intercept), normalizationMethod, schema);
 		} else
 
 		if(numberOfOutputs >= 2){
-			MultiLabel multiLabel = schema.requireMultiLabel()
-				.expectSize(numberOfOutputs);
-
-			List<ScalarLabel> scalarLabels = multiLabel.toScalarLabels();
-
-			ClassDictUtil.checkSize(numberOfOutputs, intercept);
-
-			List<Model> models = new ArrayList<>();
+			List<List<? extends Number>> coefficients = new ArrayList<>();
 
 			for(int i = 0, max = numberOfOutputs; i < max; i++){
-				Schema segmentSchema = schema.toRelabeledSchema(scalarLabels.get(i));
-
-				Model model = createRegression(CMatrixUtil.getRow(coef, numberOfOutputs, features.size(), i), intercept.get(i), segmentSchema);
-
-				models.add(model);
+				coefficients.add(CMatrixUtil.getRow(coef, numberOfOutputs, features.size(), i));
 			}
 
-			return MiningModelUtil.createMultiModelChain(models, Segmentation.MissingPredictionTreatment.CONTINUE);
+			return RegressionModelUtil.createMultiRegression(features, coefficients, intercept, normalizationMethod, schema);
 		} else
 
 		{
@@ -101,8 +87,8 @@ public class LinearRegressor extends SkLearnRegressor {
 		}
 	}
 
-	protected RegressionModel createRegression(List<? extends Number> coef, Number intercept, Schema schema){
-		return RegressionModelUtil.createRegression(schema.getFeatures(), coef, intercept, RegressionModel.NormalizationMethod.NONE, schema);
+	protected RegressionModel.NormalizationMethod getNormalizationMethod(){
+		return RegressionModel.NormalizationMethod.NONE;
 	}
 
 	public List<Number> getCoef(){
