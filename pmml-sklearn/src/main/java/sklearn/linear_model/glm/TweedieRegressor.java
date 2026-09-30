@@ -18,6 +18,8 @@
  */
 package sklearn.linear_model.glm;
 
+import java.util.Arrays;
+
 import org.dmg.pmml.regression.RegressionModel;
 import sklearn.linear_model.LinearRegressor;
 
@@ -29,16 +31,41 @@ public class TweedieRegressor extends LinearRegressor {
 
 	@Override
 	protected RegressionModel.NormalizationMethod getNormalizationMethod(){
-		Number power = getPower();
+		String link = getLink();
 
-		if(power.doubleValue() > 0d){
-			return RegressionModel.NormalizationMethod.EXP;
+		switch(link){
+			case TweedieRegressor.LINK_AUTO:
+				{
+					Number power = getPower();
+
+					if(power.doubleValue() > 0d){
+						return RegressionModel.NormalizationMethod.EXP;
+					}
+
+					return super.getNormalizationMethod();
+				}
+			case TweedieRegressor.LINK_IDENTITY:
+				{
+					return super.getNormalizationMethod();
+				}
+			case TweedieRegressor.LINK_LOG:
+				{
+					return RegressionModel.NormalizationMethod.EXP;
+				}
+			default:
+				throw new IllegalArgumentException(link);
 		}
+	}
 
-		return super.getNormalizationMethod();
+	public String getLink(){
+		return getEnum("link", this::getString, Arrays.asList(TweedieRegressor.LINK_AUTO, TweedieRegressor.LINK_IDENTITY, TweedieRegressor.LINK_LOG));
 	}
 
 	public Number getPower(){
 		return getNumber("power");
 	}
+
+	private static final String LINK_AUTO = "auto";
+	private static final String LINK_IDENTITY = "identity";
+	private static final String LINK_LOG = "log";
 }

@@ -1291,8 +1291,9 @@ if "Visit" in datasets:
 	build_visit(visit_df, GammaRegressor(), "GammaRegressionVisit")
 	build_visit(visit_df, GradientBoostingRegressor(loss = "quantile", alpha = 0.9, random_state = 13), "GradientBoostingVisit")
 	build_visit(visit_df, PoissonRegressor(), "PoissonRegressionVisit")
-	build_visit(visit_df, TweedieRegressor(power = 0), "TweedieRegressionVisit")
-	build_visit(visit_df, TweedieRegressor(power = 1.5), "TweedieRegressionLogVisit")
+	# Explicit link overrides the power-derived default link
+	build_visit(visit_df, TweedieRegressor(power = 1.5, link = "identity"), "TweedieRegressionVisit")
+	build_visit(visit_df, TweedieRegressor(power = 0, link = "log", max_iter = 1000), "TweedieRegressionLogVisit")
 
 #
 # Outlier detection
