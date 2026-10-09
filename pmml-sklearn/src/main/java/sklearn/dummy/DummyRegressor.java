@@ -49,9 +49,22 @@ public class DummyRegressor extends SkLearnRegressor implements HasDefaultValue 
 	public RegressionModel encodeModel(Schema schema){
 		List<Number> constant = getConstant();
 
-		Number intercept = Iterables.getOnlyElement(constant);
+		int numberOfOutputs = getNumberOfOutputs();
+		if(numberOfOutputs == 1){
+			Number intercept = Iterables.getOnlyElement(constant);
 
-		return RegressionModelUtil.createRegression(Collections.emptyList(), Collections.emptyList(), intercept.doubleValue(), RegressionModel.NormalizationMethod.NONE, schema);
+			return RegressionModelUtil.createRegression(Collections.emptyList(), Collections.emptyList(), intercept.doubleValue(), RegressionModel.NormalizationMethod.NONE, schema);
+		} else
+
+		if(numberOfOutputs >= 2){
+			List<List<? extends Number>> coefficients = Collections.nCopies(numberOfOutputs, Collections.emptyList());
+
+			return RegressionModelUtil.createMultiRegression(Collections.emptyList(), coefficients, constant, RegressionModel.NormalizationMethod.NONE, schema);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public List<Number> getConstant(){

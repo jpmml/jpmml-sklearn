@@ -32,6 +32,7 @@ public interface SkLearnAlgorithms {
 	String TRANSFORMED_DECISION_TREE = "Transformed" + DECISION_TREE;
 	String DECISION_TREE_ENSEMBLE = DECISION_TREE + "Ensemble";
 	String DUMMY = "Dummy";
+	String MULTI_DUMMY = "Multi" + DUMMY;
 	String ELASTIC_NET = "ElasticNet";
 	String EXTRA_TREES = "ExtraTrees";
 	String GAMMA_REGRESSION = "GammaRegression";

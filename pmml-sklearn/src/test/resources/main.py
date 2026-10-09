@@ -1214,6 +1214,7 @@ if "Auto" in datasets:
 	auto_df = load_auto("Auto")
 
 	build_multi_auto(auto_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "MultiDecisionTreeAuto")
+	build_multi_auto(auto_df, DummyRegressor(strategy = "median"), "MultiDummyAuto")
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
 	build_multi_auto(auto_df, KNeighborsRegressor(algorithm = "brute"), "MultiKNNAuto", with_kneighbors = True)
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")

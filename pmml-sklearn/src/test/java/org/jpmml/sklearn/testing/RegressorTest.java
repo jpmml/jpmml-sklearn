@@ -137,6 +137,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 					switch(algorithm){
 						case DUMMY:
+						case MULTI_DUMMY:
 						case ISOTONIC_REGRESSION_DECR:
 						case ISOTONIC_REGRESSION_INCR:
 							break;
@@ -220,6 +221,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluateDummyAuto() throws Exception {
 		evaluate(DUMMY, AUTO);
+	}
+
+	@Test
+	public void evaluateMultiDummyAuto() throws Exception {
+		evaluate(MULTI_DUMMY, AUTO);
 	}
 
 	@Test
