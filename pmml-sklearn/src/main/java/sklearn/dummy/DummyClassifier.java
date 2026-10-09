@@ -19,17 +19,21 @@
 package sklearn.dummy;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.primitives.Doubles;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.MiningFunction;
+import org.dmg.pmml.ScoreDistribution;
 import org.dmg.pmml.True;
 import org.dmg.pmml.tree.ClassifierNode;
+import org.dmg.pmml.tree.ComplexNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PayloadManager;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.ClassDictUtil;
@@ -67,59 +71,80 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 
 	@Override
 	public TreeModel encodeModel(Schema schema){
-		List<?> classes = getClasses();
-		List<Number> classPrior = getClassPrior();
-		Object constant = getConstant();
 		String strategy = getStrategy();
-
-		ClassDictUtil.checkSize(classes, classPrior);
-
-		CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
-
-		int maxIndex;
-
-		List<? extends Number> probabilities;
-
-		switch(strategy){
-			case DummyClassifier.STRATEGY_CONSTANT:
-				{
-					maxIndex = classes.indexOf(constant);
-					if(maxIndex < 0){
-						throw new IllegalArgumentException();
-					}
-
-					probabilities = createProbabilities(classes, maxIndex);
-				}
-				break;
-			case DummyClassifier.STRATEGY_MOST_FREQUENT:
-				{
-					maxIndex = PayloadManager.indexOfMax((List)classPrior);
-
-					probabilities = createProbabilities(classes, maxIndex);
-				}
-				break;
-			case DummyClassifier.STRATEGY_PRIOR:
-				{
-					maxIndex = PayloadManager.indexOfMax((List)classPrior);
-
-					probabilities = classPrior;
-				}
-				break;
-			default:
-				throw new IllegalArgumentException(strategy);
-		}
-
-		Node root = new ClassifierNode(categoricalLabel.getValue(maxIndex), True.INSTANCE);
 
 		PayloadManager payloadManager = new PayloadManager();
 
-		payloadManager.addScoreDistributions(root, null, probabilities, categoricalLabel);
+		int numberOfOutputs = getNumberOfOutputs();
+		if(numberOfOutputs == 1){
+			List<?> classes = getClasses();
+			List<Number> classPrior = getClassPrior();
+			Object constant = getConstant();
 
-		TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root);
+			CategoricalLabel categoricalLabel = schema.requireCategoricalLabel();
 
-		encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
+			List<? extends Number> probabilities = encodeProbabilities(strategy, classes, classPrior, constant);
 
-		return treeModel;
+			int maxIndex = PayloadManager.indexOfMax((List)probabilities);
+
+			Node root = new ClassifierNode(categoricalLabel.getValue(maxIndex), True.INSTANCE);
+
+			payloadManager.addScoreDistributions(root, null, probabilities, categoricalLabel);
+
+			TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(categoricalLabel), root);
+
+			encodePredictProbaOutput(treeModel, DataType.DOUBLE, categoricalLabel);
+
+			return treeModel;
+		} else
+
+		if(numberOfOutputs >= 2){
+			List<List<?>> classes = (List)getClasses();
+			List<List<Number>> classPrior = getArrayList("class_prior_", Number.class);
+			List<?> constant = (DummyClassifier.STRATEGY_CONSTANT).equals(strategy) ? getListLike("constant") : Collections.nCopies(numberOfOutputs, null);
+
+			ClassDictUtil.checkSize(numberOfOutputs, classes, classPrior, constant);
+
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(numberOfOutputs);
+
+			List<CategoricalLabel> categoricalLabels = multiLabel.toScalarLabels(CategoricalLabel.class);
+
+			Node root = new ComplexNode(null, True.INSTANCE);
+
+			List<ScoreDistribution> scoreDistributions = root.getScoreDistributions();
+
+			for(int i = 0; i < numberOfOutputs; i++){
+				CategoricalLabel categoricalLabel = categoricalLabels.get(i);
+
+				List<?> targetClasses = classes.get(i);
+				List<Number> targetClassPrior = classPrior.get(i);
+				Object targetConstant = constant.get(i);
+
+				String name = categoricalLabel.getName();
+
+				List<? extends Number> probabilities = encodeProbabilities(strategy, targetClasses, targetClassPrior, targetConstant);
+
+				for(int j = 0; j < categoricalLabel.size(); j++){
+					Object value = categoricalLabel.getValue(j);
+					Number probability = probabilities.get(j);
+
+					ScoreDistribution scoreDistribution = payloadManager.createScoreProbability(name, value, null, probability);
+
+					scoreDistributions.add(scoreDistribution);
+				}
+			}
+
+			TreeModel treeModel = new TreeModel(MiningFunction.CLASSIFICATION, ModelUtil.createMiningSchema(multiLabel), root);
+
+			encodePredictProbaOutput(treeModel, DataType.DOUBLE, multiLabel);
+
+			return treeModel;
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public List<Number> getClassPrior(){
@@ -137,6 +162,35 @@ public class DummyClassifier extends SkLearnClassifier implements HasPriorProbab
 
 	public String getStrategy(){
 		return getEnum("strategy", this::getString, Arrays.asList(DummyClassifier.STRATEGY_CONSTANT, DummyClassifier.STRATEGY_MOST_FREQUENT, DummyClassifier.STRATEGY_PRIOR));
+	}
+
+	static
+	private List<? extends Number> encodeProbabilities(String strategy, List<?> classes, List<Number> classPrior, Object constant){
+		ClassDictUtil.checkSize(classes, classPrior);
+
+		switch(strategy){
+			case DummyClassifier.STRATEGY_CONSTANT:
+				{
+					int index = classes.indexOf(constant);
+					if(index < 0){
+						throw new IllegalArgumentException();
+					}
+
+					return createProbabilities(classes, index);
+				}
+			case DummyClassifier.STRATEGY_MOST_FREQUENT:
+				{
+					int index = PayloadManager.indexOfMax((List)classPrior);
+
+					return createProbabilities(classes, index);
+				}
+			case DummyClassifier.STRATEGY_PRIOR:
+				{
+					return classPrior;
+				}
+			default:
+				throw new IllegalArgumentException(strategy);
+		}
 	}
 
 	static

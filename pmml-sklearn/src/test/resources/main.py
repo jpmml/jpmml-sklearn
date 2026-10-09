@@ -468,6 +468,7 @@ if "Audit" in datasets:
 	audit_df = load_audit("Audit")
 
 	build_multi_audit(audit_df, DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13), "MultiDecisionTreeAudit", with_proba = True)
+	build_multi_audit(audit_df, DummyClassifier(strategy = "prior"), "MultiDummyAudit", with_proba = True)
 	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit", with_kneighbors = True)
 	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
 	build_multi_audit(audit_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "MultiRandomForestAudit", with_proba = True)

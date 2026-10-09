@@ -171,6 +171,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 
 					switch(algorithm){
 						case DUMMY:
+						case MULTI_DUMMY:
 						case "Frozen":
 							break;
 						default:
@@ -256,6 +257,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateDummyAudit() throws Exception {
 		evaluate(DUMMY, AUDIT);
+	}
+
+	@Test
+	public void evaluateMultiDummyAudit() throws Exception {
+		evaluate(MULTI_DUMMY, AUDIT);
 	}
 
 	@Test
