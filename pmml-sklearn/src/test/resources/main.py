@@ -1222,6 +1222,7 @@ if "Auto" in datasets:
 	build_multi_auto(auto_df, MultiOutputRegressor(LinearSVR(random_state = 13)), "MultiLinearSVRAuto")
 	build_multi_auto(auto_df, PLSRegression(n_components = 3), "MultiPLSRegressionAuto")
 	build_multi_auto(auto_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "MultiRandomForestAuto")
+	build_multi_auto(auto_df, TransformedTargetRegressor(LinearRegression(), func = numpy.log, inverse_func = numpy.exp), "TransformedMultiLinearRegressionAuto")
 	build_multi_auto(auto_df, RegressorChain(LinearRegression()), "LinearRegressionChainAuto")
 
 def build_housing(housing_df, regressor, name, with_kneighbors = False, **pmml_options):

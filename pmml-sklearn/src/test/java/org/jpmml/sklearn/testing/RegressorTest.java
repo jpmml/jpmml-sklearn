@@ -159,6 +159,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 						case ISOTONIC_REGRESSION_DECR:
 						case ISOTONIC_REGRESSION_INCR:
 						case LINEAR_REGRESSION_CHAIN:
+						case TRANSFORMED_MULTI_LINEAR_REGRESSION:
 							break;
 						default:
 							visitorBattery.add(ModelExplanationInspector.class);
@@ -343,6 +344,11 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluateTransformedLinearRegressionAuto() throws Exception {
 		evaluate(TRANSFORMED_LINEAR_REGRESSION, AUTO);
+	}
+
+	@Test
+	public void evaluateTransformedMultiLinearRegressionAuto() throws Exception {
+		evaluate(TRANSFORMED_MULTI_LINEAR_REGRESSION, AUTO);
 	}
 
 	@Test

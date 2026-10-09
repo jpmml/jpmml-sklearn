@@ -20,7 +20,6 @@ package sklearn.compose;
 
 import java.util.Collections;
 
-import org.dmg.pmml.DataType;
 import org.dmg.pmml.Expression;
 import org.dmg.pmml.FieldRef;
 import org.dmg.pmml.Model;
@@ -28,6 +27,7 @@ import org.dmg.pmml.OpType;
 import org.dmg.pmml.regression.RegressionModel.NormalizationMethod;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.ModelUtil;
+import org.jpmml.converter.MultiLabel;
 import org.jpmml.converter.PMMLEncoder;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
@@ -47,6 +47,13 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 	}
 
 	@Override
+	public int getNumberOfOutputs(){
+		Regressor regressor = getRegressor();
+
+		return regressor.getNumberOfOutputs();
+	}
+
+	@Override
 	public Model encodeModel(Schema schema){
 		Regressor regressor = getRegressor();
 		FunctionTransformer transformer = getTransformer();
@@ -57,7 +64,6 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 		}
 
 		PMMLEncoder encoder = schema.getEncoder();
-		ScalarLabel scalarLabel = schema.requireScalarLabel();
 
 		Transformation transformation = new AbstractTransformation(){
 
@@ -72,14 +78,35 @@ public class TransformedTargetRegressor extends SkLearnRegressor {
 			}
 		};
 
-		String name = scalarLabel.getName();
+		int numberOfOutputs = getNumberOfOutputs();
+		if(numberOfOutputs == 1){
+			ScalarLabel scalarLabel = schema.requireScalarLabel();
 
-		Schema segmentSchema = schema.toAnonymousSchema();
+			Schema segmentSchema = schema.toAnonymousSchema();
 
-		Model model = regressor.encode(this, segmentSchema)
-			.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("func", name), OpType.CONTINUOUS, DataType.DOUBLE, transformation));
+			Model model = regressor.encode(this, segmentSchema)
+				.setOutput(ModelUtil.createPredictedOutput(FieldNameUtil.create("func", scalarLabel), OpType.CONTINUOUS, regressor.getDataType(), transformation));
 
-		return MiningModelUtil.createRegression(model, NormalizationMethod.NONE, schema);
+			return MiningModelUtil.createRegression(model, NormalizationMethod.NONE, schema);
+		} else
+
+		if(numberOfOutputs >= 2){
+			MultiLabel multiLabel = schema.requireMultiLabel()
+				.expectSize(numberOfOutputs);
+
+			Schema segmentSchema = schema.toLocalRegressorSchema(regressor.getDataType());
+
+			MultiLabel segmentMultiLabel = segmentSchema.requireMultiLabel();
+
+			Model model = regressor.encode(this, segmentSchema)
+				.setOutput(ModelUtil.createPredictedOutput("func", OpType.CONTINUOUS, regressor.getDataType(), multiLabel, segmentMultiLabel, transformation));
+
+			return MiningModelUtil.createMultiRegression(model, NormalizationMethod.NONE, schema);
+		} else
+
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public Regressor getRegressor(){
