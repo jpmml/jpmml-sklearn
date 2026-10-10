@@ -99,7 +99,7 @@ public class ThresholdClassifier extends SkLearnClassifier implements HasEstimat
 			ExpressionUtil.createConstant(categoricalLabel.getDataType(), categoricalLabel.getValue(0)), ExpressionUtil.createConstant(categoricalLabel.getDataType(), categoricalLabel.getValue(1))
 		);
 
-		OutputField thresholdedOutputField = new OutputField(FieldNameUtil.create("thresholded", categoricalLabel.getName()), categoricalLabel.getOpType(), categoricalLabel.getDataType())
+		OutputField thresholdedOutputField = new OutputField(FieldNameUtil.create("thresholded", categoricalLabel), categoricalLabel.getOpType(), categoricalLabel.getDataType())
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
 			.setExpression(expression);
 

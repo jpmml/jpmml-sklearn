@@ -225,7 +225,7 @@ public class SkLearnEncoder extends PythonEncoder {
 		} else
 
 		{
-			name = FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel.getName());
+			name = FieldNameUtil.create(Estimator.FIELD_PREDICT, scalarLabel);
 		}
 
 		return exportPrediction(model, name, scalarLabel);
