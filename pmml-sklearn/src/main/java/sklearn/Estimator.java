@@ -236,7 +236,7 @@ public class Estimator extends Step implements HasNumberOfOutputs, HasPMMLOption
 
 		{
 			if(label != null){
-				throw new UnsupportedLabelException("Expected no label, got " + label.typeString());
+				throw new UnsupportedLabelException("Expected no label, got " + ExceptionUtil.formatLabel(label));
 			}
 		}
 	}

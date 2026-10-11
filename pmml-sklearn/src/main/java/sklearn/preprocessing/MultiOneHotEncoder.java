@@ -34,6 +34,7 @@ import org.jpmml.converter.CategoricalFeature;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
 import org.jpmml.converter.DiscreteFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.InvalidValueDecorator;
 import org.jpmml.converter.MissingValueFeature;
@@ -185,7 +186,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			} else
 
 			{
-				throw new UnsupportedFeatureException("Expected a categorical or categorical-like feature, got " + feature.typeString());
+				throw new UnsupportedFeatureException("Expected a categorical or categorical-like feature, got " + ExceptionUtil.formatFeature(feature));
 			} // End if
 
 			if(featureInfrequentEnabled){

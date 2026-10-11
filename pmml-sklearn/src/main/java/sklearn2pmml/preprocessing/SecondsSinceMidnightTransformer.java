@@ -26,6 +26,7 @@ import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.ContinuousFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ObjectFeature;
@@ -52,7 +53,7 @@ public class SecondsSinceMidnightTransformer extends Transformer {
 			Feature feature = features.get(i);
 
 			if(!(feature instanceof ObjectFeature)){
-				throw new UnsupportedFeatureException("Expected a time-type object feature, got " + feature.typeString());
+				throw new UnsupportedFeatureException("Expected a time-type object feature, got " + ExceptionUtil.formatFeature(feature));
 			}
 
 			ObjectFeature objectFeature = (ObjectFeature)feature;

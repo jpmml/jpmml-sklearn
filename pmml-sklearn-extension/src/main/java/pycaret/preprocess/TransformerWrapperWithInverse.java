@@ -94,7 +94,7 @@ public class TransformerWrapperWithInverse extends TransformerWrapper {
 		} else
 
 		{
-			throw new UnsupportedFeatureException("Expected a wildcard feature, got " + labelFeature.typeString());
+			throw new UnsupportedFeatureException("Expected a wildcard feature, got " + ExceptionUtil.formatFeature(labelFeature));
 		}
 
 		return result;

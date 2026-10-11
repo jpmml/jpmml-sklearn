@@ -36,6 +36,7 @@ import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.CategoryManager;
 import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.DiscreteFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ModelUtil;
@@ -146,7 +147,7 @@ public class TreePredictorUtil {
 				} else
 
 				{
-					throw new UnsupportedFeatureException("Expected a categorical feature, got " + feature.typeString());
+					throw new UnsupportedFeatureException("Expected a categorical feature, got " + ExceptionUtil.formatFeature(feature));
 				}
 			} else
 

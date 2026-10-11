@@ -80,7 +80,7 @@ public class DurationTransformer extends Transformer {
 			Feature feature = features.get(i);
 
 			if(!(feature instanceof ObjectFeature)){
-				throw new UnsupportedFeatureException("Expected a date-type object feature, got " + feature.typeString());
+				throw new UnsupportedFeatureException("Expected a date-type object feature, got " + ExceptionUtil.formatFeature(feature));
 			}
 
 			ObjectFeature objectFeature = (ObjectFeature)feature;

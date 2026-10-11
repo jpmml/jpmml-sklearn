@@ -28,6 +28,7 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.DiscreteFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.TypeUtil;
@@ -93,7 +94,7 @@ public class OneHotEncoder extends SkLearnTransformer implements HasSparseOutput
 		} else
 
 		{
-			throw new UnsupportedFeatureException("Expected a categorical feature, got " + feature.typeString());
+			throw new UnsupportedFeatureException("Expected a categorical feature, got " + ExceptionUtil.formatFeature(feature));
 		}
 
 		return result;

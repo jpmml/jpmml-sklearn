@@ -40,6 +40,7 @@ import org.dmg.pmml.tree.TreeModel;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.ContinuousLabel;
 import org.jpmml.converter.DiscreteFeature;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.ModelEncoder;
@@ -83,7 +84,7 @@ public class BaseSLearner<E extends Estimator> extends BaseLearner<E> implements
 		} else
 
 		{
-			throw new UnsupportedFeatureException("Expected a categorical feature, got " + groupFeature.typeString());
+			throw new UnsupportedFeatureException("Expected a categorical feature, got " + ExceptionUtil.formatFeature(groupFeature));
 		}
 
 		String groupName = groupFeature.getName();
