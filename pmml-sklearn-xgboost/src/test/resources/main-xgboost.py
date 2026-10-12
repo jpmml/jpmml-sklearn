@@ -53,7 +53,7 @@ if "Audit" in datasets:
 if "Versicolor" in datasets:
 	versicolor_df = load_versicolor("Versicolor")
 
-	build_versicolor(versicolor_df, CalibratedClassifierCV(XGBClassifier(n_estimators = 7), ensemble = False, method = "sigmoid"), "XGBSigmoidVersicolor")
+	build_versicolor(versicolor_df, CalibratedClassifierCV(XGBClassifier(n_estimators = 7), ensemble = False, method = "sigmoid"), "XGBSigmoidVersicolor", input_float = False)
 
 	build_versicolor(versicolor_df, GBDTLRClassifier(XGBRFClassifier(n_estimators = 7, random_state = 13), LinearSVC(random_state = 13)), "XGBRFLRVersicolor", with_proba = False)
 

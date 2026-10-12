@@ -243,7 +243,7 @@ public class BoosterUtil {
 		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
 
 		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
-		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, null);
+		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
 		Boolean numeric = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
 		Boolean prune = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
 
