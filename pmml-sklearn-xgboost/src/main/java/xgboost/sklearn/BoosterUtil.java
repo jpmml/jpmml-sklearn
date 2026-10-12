@@ -236,20 +236,22 @@ public class BoosterUtil {
 			}
 		}
 
+		Number missing = estimator.getOptionalNumber("missing");
 		Integer ntreeLimit = (Integer)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
+
+		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
 		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
-		Number missing = estimator.getOptionalNumber("missing");
-		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
-
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
 		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
 		Boolean numeric = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
+
+		result.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
+		result.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
+
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
 		Boolean prune = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
 
 		result.put(HasXGBoostOptions.OPTION_COMPACT, compact);
-		result.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
-		result.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
 		result.put(HasXGBoostOptions.OPTION_PRUNE, prune);
 
 		return result;
