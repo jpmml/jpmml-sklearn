@@ -18,12 +18,18 @@
  */
 package org.jpmml.sklearn.lightgbm.testing;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.jpmml.converter.testing.Datasets;
+import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.RealNumberEquivalence;
+import org.jpmml.lightgbm.HasLightGBMOptions;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
 import org.junit.jupiter.api.Test;
@@ -37,6 +43,22 @@ public class SkLearnLightGBMTest extends SkLearnEncoderBatchTest implements Data
 			@Override
 			public SkLearnLightGBMTest getArchiveBatchTest(){
 				return SkLearnLightGBMTest.this;
+			}
+
+			@Override
+			public List<Map<String, Object>> getOptionsMatrix(){
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(Objects.equals("LGBM", algorithm) && Objects.equals(AUTO, dataset)){
+					Map<String, Object> options = new LinkedHashMap<>();
+					options.put(HasLightGBMOptions.OPTION_COMPACT, new Boolean[]{false, true});
+					options.put(HasLightGBMOptions.OPTION_FLAT, new Boolean[]{false, true});
+
+					return OptionsUtil.generateOptionsMatrix(options);
+				}
+
+				return super.getOptionsMatrix();
 			}
 
 			@Override

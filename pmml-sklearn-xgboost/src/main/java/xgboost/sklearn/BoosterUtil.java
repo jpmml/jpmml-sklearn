@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -243,16 +244,24 @@ public class BoosterUtil {
 		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
 
 		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
-		Boolean numeric = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, Boolean.TRUE);
+		Boolean numeric = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, null);
 
 		result.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
 		result.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
 
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, Boolean.TRUE);
-		Boolean prune = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, Boolean.TRUE);
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, null);
+		Boolean flat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_FLAT, null);
+		Boolean nodeId = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NODE_ID, null);
+		Boolean nodeRecordCount = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NODE_RECORDCOUNT, null);
+		Boolean prune = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, null);
 
 		result.put(HasXGBoostOptions.OPTION_COMPACT, compact);
+		result.put(HasXGBoostOptions.OPTION_FLAT, flat);
+		result.put(HasXGBoostOptions.OPTION_NODE_ID, nodeId);
+		result.put(HasXGBoostOptions.OPTION_NODE_RECORDCOUNT, nodeRecordCount);
 		result.put(HasXGBoostOptions.OPTION_PRUNE, prune);
+
+		result.values().removeIf(Objects::isNull);
 
 		return result;
 	}

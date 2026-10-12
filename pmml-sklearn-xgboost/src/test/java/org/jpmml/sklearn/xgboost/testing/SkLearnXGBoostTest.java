@@ -18,15 +18,21 @@
  */
 package org.jpmml.sklearn.xgboost.testing;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
+import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.testing.FloatEquivalence;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatch;
 import org.jpmml.sklearn.testing.SkLearnEncoderBatchTest;
+import org.jpmml.xgboost.HasXGBoostOptions;
 import org.junit.jupiter.api.Test;
 
 public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datasets, Fields {
@@ -42,6 +48,22 @@ public class SkLearnXGBoostTest extends SkLearnEncoderBatchTest implements Datas
 			@Override
 			public SkLearnXGBoostTest getArchiveBatchTest(){
 				return SkLearnXGBoostTest.this;
+			}
+
+			@Override
+			public List<Map<String, Object>> getOptionsMatrix(){
+				String algorithm = getAlgorithm();
+				String dataset = getDataset();
+
+				if(Objects.equals("XGB", algorithm) && Objects.equals(AUTO, dataset)){
+					Map<String, Object> options = new LinkedHashMap<>();
+					options.put(HasXGBoostOptions.OPTION_COMPACT, new Boolean[]{false, true});
+					options.put(HasXGBoostOptions.OPTION_FLAT, new Boolean[]{false, true});
+
+					return OptionsUtil.generateOptionsMatrix(options);
+				}
+
+				return super.getOptionsMatrix();
 			}
 
 			@Override

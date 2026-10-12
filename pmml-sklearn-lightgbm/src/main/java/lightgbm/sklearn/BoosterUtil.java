@@ -18,8 +18,10 @@
  */
 package lightgbm.sklearn;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
@@ -57,7 +59,7 @@ public class BoosterUtil {
 
 		ModelEncoder encoder = schema.getEncoder();
 
-		Map<String, ?> options = getOptions(gbdt, estimator);
+		Map<String, ?> options = getOptions(estimator);
 
 		Integer numIterations = (Integer)options.get(HasLightGBMOptions.OPTION_NUM_ITERATION);
 
@@ -72,7 +74,7 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> Schema configureSchema(E estimator, Schema schema){
 		GBDT gbdt = getGBDT(estimator);
 
-		Map<String, ?> options = getOptions(gbdt, estimator);
+		Map<String, ?> options = getOptions(estimator);
 
 		Schema lgbmSchema = gbdt.toLightGBMSchema(schema);
 
@@ -85,7 +87,7 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> Model configureModel(E estimator, Model model){
 		GBDT gbdt = getGBDT(estimator);
 
-		Map<String, ?> options = getOptions(gbdt, estimator);
+		Map<String, ?> options = getOptions(estimator);
 
 		model = gbdt.configureModel(options, model);
 
@@ -96,7 +98,7 @@ public class BoosterUtil {
 	public PMML encodePMML(Booster booster){
 		GBDT gbdt = booster.getGBDT();
 
-		Map<String, ?> options = getOptions(gbdt);
+		Map<String, ?> options = Collections.emptyMap();
 
 		return gbdt.encodePMML(options, null, null);
 	}
@@ -105,7 +107,7 @@ public class BoosterUtil {
 	public <E extends Estimator & HasBooster & HasLightGBMOptions> PMML encodePMML(E estimator){
 		GBDT gbdt = getGBDT(estimator);
 
-		Map<String, ?> options = getOptions(gbdt, estimator);
+		Map<String, ?> options = getOptions(estimator);
 
 		return gbdt.encodePMML(options, null, null);
 	}
@@ -118,30 +120,30 @@ public class BoosterUtil {
 	}
 
 	static
-	private Map<String, ?> getOptions(GBDT gbdt){
-		Map<String, Object> result = new LinkedHashMap<>();
-
-		Boolean nanAsMissing = Boolean.TRUE;
-		result.put(HasLightGBMOptions.OPTION_NAN_AS_MISSING, nanAsMissing);
-
-		return result;
-	}
-
-	static
-	private <E extends Estimator & HasBooster & HasLightGBMOptions> Map<String, ?> getOptions(GBDT gbdt, E estimator){
+	private <E extends Estimator & HasBooster & HasLightGBMOptions> Map<String, ?> getOptions(E estimator){
 		Map<String, Object> result = new LinkedHashMap<>();
 
 		Integer bestIteration = estimator.getOptionalInteger("best_iteration_");
 
-		Boolean nanAsMissing = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, Boolean.TRUE);
+		Boolean nanAsMissing = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, null);
 		Integer numIteration = (Integer)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
 
 		result.put(HasLightGBMOptions.OPTION_NAN_AS_MISSING, nanAsMissing);
 		result.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);
 
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_COMPACT, !gbdt.hasLinearTree());
+		Boolean compact = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_COMPACT, null);
+		Boolean flat = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_FLAT, null);
+		Boolean nodeId = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NODE_ID, null);
+		Boolean nodeRecordCount = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NODE_RECORDCOUNT, null);
+		Boolean prune = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_PRUNE, null);
 
 		result.put(HasLightGBMOptions.OPTION_COMPACT, compact);
+		result.put(HasLightGBMOptions.OPTION_FLAT, flat);
+		result.put(HasLightGBMOptions.OPTION_NODE_ID, nodeId);
+		result.put(HasLightGBMOptions.OPTION_NODE_RECORDCOUNT, nodeRecordCount);
+		result.put(HasLightGBMOptions.OPTION_PRUNE, prune);
+
+		result.values().removeIf(Objects::isNull);
 
 		return result;
 	}
