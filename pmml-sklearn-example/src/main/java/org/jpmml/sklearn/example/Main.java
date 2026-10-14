@@ -44,7 +44,6 @@ import org.jpmml.model.metro.MetroJAXBSerializer;
 import org.jpmml.python.PythonUnpickler;
 import org.jpmml.python.Storage;
 import org.jpmml.python.StorageUtil;
-import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
 import org.jpmml.telemetry.Incident;
@@ -253,11 +252,11 @@ public class Main {
 		PMMLEncodable encodable;
 
 		try {
-			encodable = EncodableUtil.toEncodable(object);
+			encodable = SkLearnUtil.toEncodable(object);
 
 			Map<String, ?> options = getOptions();
 			if(!options.isEmpty()){
-				EncodableUtil.configure(encodable, options);
+				SkLearnUtil.configure(encodable, options);
 			}
 		} catch(Exception e){
 			logger.error("Failed to recognize PKL", e);
@@ -271,7 +270,7 @@ public class Main {
 			logger.info("Converting PKL to PMML..");
 
 			long begin = System.currentTimeMillis();
-			pmml = EncodableUtil.encodePMML(encodable);
+			pmml = SkLearnUtil.encodePMML(encodable);
 			long end = System.currentTimeMillis();
 
 			logger.info("Converted PKL to PMML in {} ms.", (end - begin));

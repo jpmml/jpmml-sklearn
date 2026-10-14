@@ -27,7 +27,6 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.python.testing.PythonEncoderBatch;
-import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
 import sklearn.Estimator;
@@ -67,13 +66,13 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		activate(object);
 
 		try {
-			PMMLEncodable encodable = EncodableUtil.toEncodable(object);
+			PMMLEncodable encodable = SkLearnUtil.toEncodable(object);
 
 			if(options != null && !options.isEmpty()){
-				EncodableUtil.configure(encodable, options);
+				SkLearnUtil.configure(encodable, options);
 			}
 
-			PMML pmml = EncodableUtil.encodePMML(encodable);
+			PMML pmml = SkLearnUtil.encodePMML(encodable);
 
 			validatePMML(pmml);
 
