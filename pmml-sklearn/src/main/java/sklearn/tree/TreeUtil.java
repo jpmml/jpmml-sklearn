@@ -449,15 +449,15 @@ public class TreeUtil {
 
 	static
 	public <E extends Estimator & HasTreeOptions> Schema configureSchema(E estimator, Schema schema){
-		Boolean numeric = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
-		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
+		Boolean numeric = estimator.getPMMLOption(HasTreeOptions.OPTION_NUMERIC, Boolean.TRUE);
+		Boolean inputFloat = estimator.getPMMLOption(HasTreeOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
 
 		return toTreeModelSchema(numeric, inputFloat, schema);
 	}
 
 	static
 	public <E extends Estimator & HasTreeOptions, M extends Model> M configureModel(E estimator, M model){
-		Boolean winnerId = (Boolean)estimator.getPMMLOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
+		Boolean winnerId = estimator.getPMMLOption(HasTreeOptions.OPTION_WINNER_ID, Boolean.FALSE);
 
 		if((Boolean.TRUE).equals(winnerId)){
 			encodeNodeId(estimator, model);

@@ -58,11 +58,9 @@ public class BoosterUtil {
 
 		ModelEncoder encoder = schema.getEncoder();
 
-		Map<String, ?> options = getOptions(estimator);
+		Integer numIteration = getNumIteration(estimator);
 
-		Integer numIterations = (Integer)options.get(HasLightGBMOptions.OPTION_NUM_ITERATION);
-
-		Model model = gbdt.encodeModel(numIterations, schema);
+		Model model = gbdt.encodeModel(numIteration, schema);
 
 		encoder.transferFeatureImportances(null, model);
 
@@ -113,19 +111,17 @@ public class BoosterUtil {
 	private <E extends Estimator & HasBooster & HasLightGBMOptions> Map<String, ?> getOptions(E estimator){
 		Map<String, Object> result = new LinkedHashMap<>();
 
-		Integer bestIteration = estimator.getOptionalInteger("best_iteration_");
-
-		Boolean nanAsMissing = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, null);
-		Integer numIteration = (Integer)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
+		Boolean nanAsMissing = estimator.getPMMLOption(HasLightGBMOptions.OPTION_NAN_AS_MISSING, null);
+		Integer numIteration = getNumIteration(estimator);
 
 		result.put(HasLightGBMOptions.OPTION_NAN_AS_MISSING, nanAsMissing);
 		result.put(HasLightGBMOptions.OPTION_NUM_ITERATION, numIteration);
 
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_COMPACT, null);
-		Boolean flat = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_FLAT, null);
-		Boolean nodeId = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NODE_ID, null);
-		Boolean nodeRecordCount = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_NODE_RECORDCOUNT, null);
-		Boolean prune = (Boolean)estimator.getPMMLOption(HasLightGBMOptions.OPTION_PRUNE, null);
+		Boolean compact = estimator.getPMMLOption(HasLightGBMOptions.OPTION_COMPACT, null);
+		Boolean flat = estimator.getPMMLOption(HasLightGBMOptions.OPTION_FLAT, null);
+		Boolean nodeId = estimator.getPMMLOption(HasLightGBMOptions.OPTION_NODE_ID, null);
+		Boolean nodeRecordCount = estimator.getPMMLOption(HasLightGBMOptions.OPTION_NODE_RECORDCOUNT, null);
+		Boolean prune = estimator.getPMMLOption(HasLightGBMOptions.OPTION_PRUNE, null);
 
 		result.put(HasLightGBMOptions.OPTION_COMPACT, compact);
 		result.put(HasLightGBMOptions.OPTION_FLAT, flat);
@@ -136,5 +132,12 @@ public class BoosterUtil {
 		result.values().removeIf(Objects::isNull);
 
 		return result;
+	}
+
+	static
+	private <E extends Estimator & HasBooster & HasLightGBMOptions> Integer getNumIteration(E estimator){
+		Integer bestIteration = estimator.getOptionalInteger("best_iteration_");
+
+		return estimator.getPMMLOption(HasLightGBMOptions.OPTION_NUM_ITERATION, bestIteration);
 	}
 }

@@ -76,9 +76,7 @@ public class BoosterUtil {
 
 		Learner learner = getLearner(estimator);
 
-		Map<String, ?> options = getOptions(booster, learner, estimator);
-
-		Integer ntreeLimit = (Integer)options.get(HasXGBoostOptions.OPTION_NTREE_LIMIT);
+		Integer ntreeLimit = getNTreeLimit(estimator, booster, learner);
 
 		Model model = learner.encodeModel(ntreeLimit, schema);
 
@@ -92,7 +90,7 @@ public class BoosterUtil {
 
 		Learner learner = getLearner(estimator);
 
-		Map<String, ?> options = getOptions(booster, learner, estimator);
+		Map<String, ?> options = getOptions(estimator, booster, learner);
 
 		Function<Feature, Feature> function = new Function<Feature, Feature>(){
 
@@ -137,7 +135,7 @@ public class BoosterUtil {
 
 		Learner learner = getLearner(estimator);
 
-		Map<String, ?> options = getOptions(booster, learner, estimator);
+		Map<String, ?> options = getOptions(estimator, booster, learner);
 
 		model = learner.configureModel(options, model);
 
@@ -183,7 +181,7 @@ public class BoosterUtil {
 			throw new SkLearnException("The XGBoost estimator object does not specify feature information");
 		}
 
-		Map<String, ?> options = getOptions(booster, learner, estimator);
+		Map<String, ?> options = getOptions(estimator, booster, learner);
 
 		return learner.encodePMML(options, null, null, null);
 	}
@@ -192,8 +190,8 @@ public class BoosterUtil {
 	private <E extends Estimator & HasBooster & HasXGBoostOptions> Learner getLearner(E estimator){
 		Booster booster = estimator.getBooster();
 
-		String byteOrder = (String)estimator.getPMMLOption(HasXGBoostOptions.OPTION_BYTE_ORDER, (ByteOrder.nativeOrder()).toString());
-		String charset = (String)estimator.getPMMLOption(HasXGBoostOptions.OPTION_CHARSET, null);
+		String byteOrder = estimator.getPMMLOption(HasXGBoostOptions.OPTION_BYTE_ORDER, (ByteOrder.nativeOrder()).toString());
+		String charset = estimator.getPMMLOption(HasXGBoostOptions.OPTION_CHARSET, null);
 
 		return booster.getLearner(ByteOrderUtil.forValue(byteOrder), charset);
 	}
@@ -220,9 +218,40 @@ public class BoosterUtil {
 	}
 
 	static
-	private <E extends Estimator & HasBooster & HasXGBoostOptions> Map<String, ?> getOptions(Booster booster, Learner learner, E estimator){
+	private <E extends Estimator & HasBooster & HasXGBoostOptions> Map<String, ?> getOptions(E estimator, Booster booster, Learner learner){
 		Map<String, Object> result = new LinkedHashMap<>();
 
+		Number missing = estimator.getOptionalNumber("missing");
+		Integer ntreeLimit = getNTreeLimit(estimator, booster, learner);
+
+		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
+		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
+
+		Boolean inputFloat = estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
+		Boolean numeric = estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, null);
+
+		result.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
+		result.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
+
+		Boolean compact = estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, null);
+		Boolean flat = estimator.getPMMLOption(HasXGBoostOptions.OPTION_FLAT, null);
+		Boolean nodeId = estimator.getPMMLOption(HasXGBoostOptions.OPTION_NODE_ID, null);
+		Boolean nodeRecordCount = estimator.getPMMLOption(HasXGBoostOptions.OPTION_NODE_RECORDCOUNT, null);
+		Boolean prune = estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, null);
+
+		result.put(HasXGBoostOptions.OPTION_COMPACT, compact);
+		result.put(HasXGBoostOptions.OPTION_FLAT, flat);
+		result.put(HasXGBoostOptions.OPTION_NODE_ID, nodeId);
+		result.put(HasXGBoostOptions.OPTION_NODE_RECORDCOUNT, nodeRecordCount);
+		result.put(HasXGBoostOptions.OPTION_PRUNE, prune);
+
+		result.values().removeIf(Objects::isNull);
+
+		return result;
+	}
+
+	static
+	private <E extends Estimator & HasBooster & HasXGBoostOptions> Integer getNTreeLimit(E estimator, Booster booster, Learner learner){
 		Integer bestNTreeLimit = booster.getBestNTreeLimit();
 
 		// XGBoost 1.7
@@ -239,33 +268,7 @@ public class BoosterUtil {
 			}
 		}
 
-		Number missing = estimator.getOptionalNumber("missing");
-		Integer ntreeLimit = (Integer)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
-
-		result.put(HasXGBoostOptions.OPTION_MISSING, missing);
-		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, ntreeLimit);
-
-		Boolean inputFloat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_INPUT_FLOAT, Boolean.TRUE);
-		Boolean numeric = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NUMERIC, null);
-
-		result.put(HasXGBoostOptions.OPTION_INPUT_FLOAT, inputFloat);
-		result.put(HasXGBoostOptions.OPTION_NUMERIC, numeric);
-
-		Boolean compact = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_COMPACT, null);
-		Boolean flat = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_FLAT, null);
-		Boolean nodeId = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NODE_ID, null);
-		Boolean nodeRecordCount = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_NODE_RECORDCOUNT, null);
-		Boolean prune = (Boolean)estimator.getPMMLOption(HasXGBoostOptions.OPTION_PRUNE, null);
-
-		result.put(HasXGBoostOptions.OPTION_COMPACT, compact);
-		result.put(HasXGBoostOptions.OPTION_FLAT, flat);
-		result.put(HasXGBoostOptions.OPTION_NODE_ID, nodeId);
-		result.put(HasXGBoostOptions.OPTION_NODE_RECORDCOUNT, nodeRecordCount);
-		result.put(HasXGBoostOptions.OPTION_PRUNE, prune);
-
-		result.values().removeIf(Objects::isNull);
-
-		return result;
+		return estimator.getPMMLOption(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
 	}
 
 	static
