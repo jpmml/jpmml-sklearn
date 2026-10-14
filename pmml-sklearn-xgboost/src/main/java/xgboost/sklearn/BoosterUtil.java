@@ -145,7 +145,7 @@ public class BoosterUtil {
 	}
 
 	static
-	public PMML encodePMML(Booster booster){
+	public PMML encodePMML(Booster booster, Map<String, ?> options){
 		FeatureMap featureMap = null;
 
 		DataFrame fmap = booster.getFMap();
@@ -166,7 +166,7 @@ public class BoosterUtil {
 			}
 		}
 
-		Map<String, ?> options = getOptions(booster, learner);
+		options = getOptions(booster, learner, options);
 
 		return learner.encodePMML(options, null, null, featureMap);
 	}
@@ -199,7 +199,7 @@ public class BoosterUtil {
 	}
 
 	static
-	private Map<String, ?> getOptions(Booster booster, Learner learner){
+	private Map<String, ?> getOptions(Booster booster, Learner learner, Map<String, ?> options){
 		Map<String, Object> result = new LinkedHashMap<>();
 
 		Integer bestNTreeLimit = booster.getBestNTreeLimit();
@@ -213,6 +213,8 @@ public class BoosterUtil {
 		}
 
 		result.put(HasXGBoostOptions.OPTION_NTREE_LIMIT, bestNTreeLimit);
+
+		result.putAll(options);
 
 		return result;
 	}

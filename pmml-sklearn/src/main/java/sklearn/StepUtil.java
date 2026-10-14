@@ -20,16 +20,20 @@ package sklearn;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.converter.SchemaException;
 import org.jpmml.python.Attribute;
 import org.jpmml.python.MissingAttributeException;
+import sklearn.pipeline.SkLearnPipeline;
 
 public class StepUtil {
 
@@ -167,6 +171,66 @@ public class StepUtil {
 		}
 
 		return generateNames("y", numberOfOutputs, false);
+	}
+
+	/**
+	 * @see EstimatorUtil#encodePMML(Estimator)
+	 * @see TransformerUtil#encodePMML(Transformer)
+	 */
+	static
+	public <E extends Step & PMMLEncodable> PMML encodePMML(E step, Map<String, ?> options){
+
+		if(!options.isEmpty()){
+			Estimator estimator = getFinalEstimator(step);
+
+			if(estimator != null){
+				Map<String, ?> prevPmmlOptions = estimator.getPMMLOptions();
+
+				Map<String, Object> pmmlOptions = new LinkedHashMap<>();
+
+				if(prevPmmlOptions != null){
+					pmmlOptions.putAll(prevPmmlOptions);
+				}
+
+				pmmlOptions.putAll(options);
+
+				try {
+					estimator.setPMMLOptions(pmmlOptions);
+
+					return step.encodePMML(options);
+				} finally {
+					estimator.setPMMLOptions(prevPmmlOptions);
+				}
+			}
+		}
+
+		return step.encodePMML(options);
+	}
+
+	static
+	private Estimator getFinalEstimator(Step step){
+
+		if(step instanceof SkLearnPipeline){
+			SkLearnPipeline pipeline = (SkLearnPipeline)step;
+
+			if(pipeline.hasFinalEstimator()){
+				Step tail = pipeline.getTail();
+
+				if(tail instanceof Estimator){
+					Estimator estimator = (Estimator)tail;
+
+					return estimator;
+				}
+			}
+		} else
+
+		if(step instanceof Estimator){
+			Estimator estimator = (Estimator)step;
+
+			return estimator;
+		}
+
+		return null;
 	}
 
 	static

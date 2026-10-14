@@ -24,15 +24,10 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
-import sklearn.Estimator;
-import sklearn.EstimatorUtil;
 import sklearn.Step;
 import sklearn.StepCastFunction;
-import sklearn.Transformer;
-import sklearn.TransformerUtil;
+import sklearn.StepUtil;
 import sklearn.pipeline.SkLearnPipeline;
-import sklearn2pmml.HasPMMLOptions;
-import sklearn2pmml.pipeline.PMMLPipeline;
 
 public class SkLearnUtil {
 
@@ -83,30 +78,16 @@ public class SkLearnUtil {
 	}
 
 	static
-	public void configure(PMMLEncodable encodable, Map<String, ?> pmmlOptions){
-
-		if(encodable instanceof PMMLPipeline){
-			PMMLPipeline pipeline = (PMMLPipeline)encodable;
-
-			pipeline.configure(pmmlOptions);
-		} else
-
-		{
-			HasPMMLOptions<?> hasPMMLOptions = (HasPMMLOptions<?>)encodable;
-
-			hasPMMLOptions.setPMMLOptions(pmmlOptions);
-		}
-	}
-
-	/**
-	 * @see EstimatorUtil#encodePMML(Estimator)
-	 * @see TransformerUtil#encodePMML(Transformer)
-	 */
-	static
-	public PMML encodePMML(PMMLEncodable encodable){
+	public PMML encodePMML(PMMLEncodable encodable, Map<String, ?> options){
 
 		try {
-			return encodable.encodePMML();
+			if(encodable instanceof Step){
+				return StepUtil.encodePMML((Step & PMMLEncodable)encodable, options);
+			} else
+
+			{
+				return encodable.encodePMML(options);
+			}
 		} catch(SkLearnException se){
 			throw se.ensureContext(encodable);
 		} catch(Exception e){

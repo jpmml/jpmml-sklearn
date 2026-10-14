@@ -42,7 +42,7 @@ public class Booster extends PythonObject implements PMMLEncodable {
 
 	@Override
 	public PMML encodePMML(Map<String, ?> options){
-		return BoosterUtil.encodePMML(this);
+		return BoosterUtil.encodePMML(this, options);
 	}
 
 	public Learner getLearner(ByteOrder byteOrder, String charset){

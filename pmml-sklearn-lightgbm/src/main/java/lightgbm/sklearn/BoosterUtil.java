@@ -18,7 +18,6 @@
  */
 package lightgbm.sklearn;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -92,15 +91,6 @@ public class BoosterUtil {
 		model = gbdt.configureModel(options, model);
 
 		return model;
-	}
-
-	static
-	public PMML encodePMML(Booster booster){
-		GBDT gbdt = booster.getGBDT();
-
-		Map<String, ?> options = Collections.emptyMap();
-
-		return gbdt.encodePMML(options, null, null);
 	}
 
 	static

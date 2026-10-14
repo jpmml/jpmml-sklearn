@@ -18,6 +18,7 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -48,6 +49,9 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 	@Override
 	public PMML getPMML() throws Exception {
 		Map<String, ?> options = getOptions();
+		if(options == null){
+			options = Collections.emptyMap();
+		}
 
 		Object object = loadPickle(Object.class);
 
@@ -68,11 +72,7 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		try {
 			PMMLEncodable encodable = SkLearnUtil.toEncodable(object);
 
-			if(options != null && !options.isEmpty()){
-				SkLearnUtil.configure(encodable, options);
-			}
-
-			PMML pmml = SkLearnUtil.encodePMML(encodable);
+			PMML pmml = SkLearnUtil.encodePMML(encodable, options);
 
 			validatePMML(pmml);
 

@@ -41,7 +41,9 @@ public class Booster extends PythonObject implements PMMLEncodable {
 
 	@Override
 	public PMML encodePMML(Map<String, ?> options){
-		return BoosterUtil.encodePMML(this);
+		GBDT gbdt = getGBDT();
+
+		return gbdt.encodePMML(options);
 	}
 
 	public GBDT getGBDT(){

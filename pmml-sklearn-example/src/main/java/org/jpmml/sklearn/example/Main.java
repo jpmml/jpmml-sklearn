@@ -253,16 +253,13 @@ public class Main {
 
 		try {
 			encodable = SkLearnUtil.toEncodable(object);
-
-			Map<String, ?> options = getOptions();
-			if(!options.isEmpty()){
-				SkLearnUtil.configure(encodable, options);
-			}
 		} catch(Exception e){
 			logger.error("Failed to recognize PKL", e);
 
 			throw e;
 		}
+
+		Map<String, ?> options = getOptions();
 
 		PMML pmml;
 
@@ -270,7 +267,7 @@ public class Main {
 			logger.info("Converting PKL to PMML..");
 
 			long begin = System.currentTimeMillis();
-			pmml = SkLearnUtil.encodePMML(encodable);
+			pmml = SkLearnUtil.encodePMML(encodable, options);
 			long end = System.currentTimeMillis();
 
 			logger.info("Converted PKL to PMML in {} ms.", (end - begin));
