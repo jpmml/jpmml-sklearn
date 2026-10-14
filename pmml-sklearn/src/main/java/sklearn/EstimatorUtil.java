@@ -38,7 +38,6 @@ import org.jpmml.converter.HasNativeConfiguration;
 import org.jpmml.converter.ScalarLabel;
 import org.jpmml.converter.Schema;
 import org.jpmml.converter.mining.MiningModelUtil;
-import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnEncoder;
 
@@ -178,12 +177,12 @@ public class EstimatorUtil {
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		if(estimator.isSupervised()){
-			List<String> targetFields = EncodableUtil.generateOutputNames(estimator);
+			List<String> targetFields = StepUtil.generateOutputNames(estimator);
 
 			encoder.initLabel(estimator, targetFields);
 		}
 
-		List<String> activeFields = EncodableUtil.getOrGenerateFeatureNames(estimator);
+		List<String> activeFields = StepUtil.getOrGenerateFeatureNames(estimator);
 
 		encoder.initFeatures(estimator, activeFields);
 

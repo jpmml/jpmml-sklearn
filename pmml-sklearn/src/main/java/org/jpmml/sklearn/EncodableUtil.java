@@ -18,22 +18,14 @@
  */
 package org.jpmml.sklearn;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLEncodable;
-import org.jpmml.python.Attribute;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.python.MissingAttributeException;
 import sklearn.Estimator;
 import sklearn.EstimatorUtil;
-import sklearn.HasNumberOfFeatures;
-import sklearn.HasNumberOfOutputs;
-import sklearn.SkLearnFields;
 import sklearn.Step;
 import sklearn.StepCastFunction;
 import sklearn.Transformer;
@@ -111,60 +103,5 @@ public class EncodableUtil {
 			.setOnlyStep("estimator", step);
 
 		return pipeline;
-	}
-
-	static
-	public List<String> getOrGenerateFeatureNames(Step step){
-		List<String> names = step.getFeatureNamesIn();
-
-		if(names == null){
-			return generateFeatureNames(step);
-		}
-
-		return names;
-	}
-
-	static
-	public List<String> generateFeatureNames(Step step){
-		int numberOfFeatures = step.getNumberOfFeatures();
-
-		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
-			throw new MissingAttributeException(new Attribute(step, SkLearnFields.N_FEATURES_IN));
-		}
-
-		return generateNames("x", numberOfFeatures, true);
-	}
-
-	static
-	public List<String> generateOutputNames(Estimator estimator){
-		int numberOfOutputs = estimator.getNumberOfOutputs();
-
-		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
-			throw new MissingAttributeException(new Attribute(estimator, SkLearnFields.N_OUTPUTS));
-		}
-
-		return generateNames("y", numberOfOutputs, false);
-	}
-
-	static
-	private List<String> generateNames(String name, int count, boolean indexed){
-
-		if(count == 1){
-			return Collections.singletonList(name + (indexed ? "1" : ""));
-		} else
-
-		if(count >= 2){
-			List<String> result = new ArrayList<>(count);
-
-			for(int i = 0; i < count; i++){
-				result.add(name + String.valueOf(i + 1));
-			}
-
-			return result;
-		} else
-
-		{
-			throw new IllegalArgumentException();
-		}
 	}
 }

@@ -31,7 +31,6 @@ import org.jpmml.converter.Label;
 import org.jpmml.converter.Schema;
 import org.jpmml.python.Castable;
 import org.jpmml.python.ClassDictUtil;
-import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 
@@ -296,7 +295,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	}
 
 	protected List<String> initTargetFields(Estimator estimator){
-		return EncodableUtil.generateOutputNames(estimator);
+		return StepUtil.generateOutputNames(estimator);
 	}
 
 	protected List<String> initFeatures(List<String> activeFields, SkLearnEncoder encoder){
@@ -345,6 +344,6 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	}
 
 	protected List<String> initActiveFields(Step step){
-		return EncodableUtil.getOrGenerateFeatureNames(step);
+		return StepUtil.getOrGenerateFeatureNames(step);
 	}
 }

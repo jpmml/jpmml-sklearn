@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.Feature;
-import org.jpmml.sklearn.EncodableUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 public class TransformerUtil {
@@ -34,7 +33,7 @@ public class TransformerUtil {
 	public <E extends Transformer & HasFeatureNamesIn> PMML encodePMML(E transformer){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		List<String> activeFields = EncodableUtil.getOrGenerateFeatureNames(transformer);
+		List<String> activeFields = StepUtil.getOrGenerateFeatureNames(transformer);
 
 		List<Feature> features = encoder.initFeatures(transformer, activeFields);
 

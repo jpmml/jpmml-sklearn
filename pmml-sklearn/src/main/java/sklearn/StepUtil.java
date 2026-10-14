@@ -18,6 +18,8 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,8 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.SchemaException;
+import org.jpmml.python.Attribute;
+import org.jpmml.python.MissingAttributeException;
 
 public class StepUtil {
 
@@ -129,6 +133,61 @@ public class StepUtil {
 			};
 
 			return hasMultiType;
+		}
+	}
+
+	static
+	public List<String> getOrGenerateFeatureNames(Step step){
+		List<String> names = step.getFeatureNamesIn();
+
+		if(names == null){
+			return generateFeatureNames(step);
+		}
+
+		return names;
+	}
+
+	static
+	public List<String> generateFeatureNames(Step step){
+		int numberOfFeatures = step.getNumberOfFeatures();
+
+		if(numberOfFeatures == HasNumberOfFeatures.UNKNOWN){
+			throw new MissingAttributeException(new Attribute(step, SkLearnFields.N_FEATURES_IN));
+		}
+
+		return generateNames("x", numberOfFeatures, true);
+	}
+
+	static
+	public List<String> generateOutputNames(Estimator estimator){
+		int numberOfOutputs = estimator.getNumberOfOutputs();
+
+		if(numberOfOutputs == HasNumberOfOutputs.UNKNOWN){
+			throw new MissingAttributeException(new Attribute(estimator, SkLearnFields.N_OUTPUTS));
+		}
+
+		return generateNames("y", numberOfOutputs, false);
+	}
+
+	static
+	private List<String> generateNames(String name, int count, boolean indexed){
+
+		if(count == 1){
+			return Collections.singletonList(name + (indexed ? "1" : ""));
+		} else
+
+		if(count >= 2){
+			List<String> result = new ArrayList<>(count);
+
+			for(int i = 0; i < count; i++){
+				result.add(name + String.valueOf(i + 1));
+			}
+
+			return result;
+		} else
+
+		{
+			throw new IllegalArgumentException();
 		}
 	}
 }
