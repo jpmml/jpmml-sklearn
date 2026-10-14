@@ -467,21 +467,6 @@ public class PMMLPipeline extends SkLearnPipeline {
 		return (PMMLPipeline)super.setOnlyStep(name, step);
 	}
 
-	public PMMLPipeline configure(Map<String, ?> pmmlOptions){
-
-		if(hasFinalEstimator()){
-			Step tail = getTail();
-
-			if(tail instanceof Estimator){
-				Estimator estimator = (Estimator)tail;
-
-				estimator.setPMMLOptions(pmmlOptions);
-			}
-		}
-
-		return this;
-	}
-
 	public Map<String, ?> getHeader(){
 		return getOptionalDict("header");
 	}
