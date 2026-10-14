@@ -52,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sklearn.HasRegressorOptions;
 import sklearn.tree.HasTreeOptions;
+import sklearn2pmml.statsmodels.StatsModelsUtil;
 
 public class Main {
 
@@ -344,5 +345,6 @@ public class Main {
 
 	static {
 		SkLearnUtil.initOnce();
+		StatsModelsUtil.initOnce();
 	}
 }
