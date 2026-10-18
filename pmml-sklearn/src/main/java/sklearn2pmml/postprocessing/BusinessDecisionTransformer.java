@@ -104,8 +104,8 @@ public class BusinessDecisionTransformer extends Transformer {
 		OutputField outputField = new OutputField(createFieldName("decision", feature), opType, dataType)
 			.setResultFeature(ResultFeature.DECISION)
 			.setFinalResult(true)
-			.setExpression(expression)
-			.setDecisions(pmmlDecisions);
+			.setDecisions(pmmlDecisions)
+			.setExpression(expression);
 
 		DerivedField decisionDerivedField = encoder.createDerivedField(model, outputField, true);
 

@@ -54,8 +54,8 @@ public class CustomizationTest {
 		Targets targets = new Targets();
 
 		RegressionModel regressionModel = new RegressionModel(MiningFunction.CLASSIFICATION, miningSchema, null)
-			.setOutput(output)
-			.setTargets(targets);
+			.setTargets(targets)
+			.setOutput(output);
 
 		assertFalse(regressionModel.hasExtensions());
 

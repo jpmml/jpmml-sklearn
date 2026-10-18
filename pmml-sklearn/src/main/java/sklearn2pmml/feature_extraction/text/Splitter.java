@@ -38,8 +38,8 @@ public class Splitter extends Tokenizer {
 		String wordSeparatorRE = getWordSeparatorRE();
 
 		return textIndex
-			.setTokenize(Boolean.TRUE)
-			.setWordSeparatorCharacterRE(wordSeparatorRE);
+			.setWordSeparatorCharacterRE(wordSeparatorRE)
+			.setTokenize(Boolean.TRUE);
 	}
 
 	@Override

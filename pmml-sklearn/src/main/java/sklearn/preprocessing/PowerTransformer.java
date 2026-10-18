@@ -172,7 +172,8 @@ public class PowerTransformer extends SkLearnTransformer {
 
 		return ExpressionUtil.createApply(PMMLFunctions.IF,
 			ExpressionUtil.createApply(PMMLFunctions.GREATEROREQUAL, continuousFeature.ref(), ExpressionUtil.createConstant(0d)),
-			trueApply, falseApply
+			trueApply,
+			falseApply
 		);
 	}
 

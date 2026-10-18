@@ -154,8 +154,8 @@ public class TreeUtil {
 		Node root = encodeNode(0, True.INSTANCE, miningFunction, numberOfOutputs, leftChildren, rightChildren, features, thresholds, values, missingGoToLeft, weightedNodeSamples, new CategoryManager(), predicateManager, payloadManager, schema);
 
 		TreeModel treeModel = new TreeModel(miningFunction, ModelUtil.createMiningSchema(schema), root)
-			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
-			.setMissingValueStrategy(hasMissingValueSupport ? TreeModel.MissingValueStrategy.DEFAULT_CHILD : TreeModel.MissingValueStrategy.NULL_PREDICTION);
+			.setMissingValueStrategy(hasMissingValueSupport ? TreeModel.MissingValueStrategy.DEFAULT_CHILD : TreeModel.MissingValueStrategy.NULL_PREDICTION)
+			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
 
 		ClassDictUtil.clearContent(tree);
 

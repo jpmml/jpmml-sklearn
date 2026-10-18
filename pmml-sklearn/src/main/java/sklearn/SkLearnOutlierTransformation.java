@@ -55,7 +55,11 @@ public class SkLearnOutlierTransformation extends AbstractTransformation {
 
 	@Override
 	public Expression createExpression(FieldRef fieldRef){
-		return ExpressionUtil.createApply(PMMLFunctions.IF, fieldRef, ExpressionUtil.createConstant(VALUE_OUTLIER), ExpressionUtil.createConstant(VALUE_INLIER));
+		return ExpressionUtil.createApply(PMMLFunctions.IF,
+			fieldRef,
+			ExpressionUtil.createConstant(VALUE_OUTLIER),
+			ExpressionUtil.createConstant(VALUE_INLIER)
+		);
 	}
 
 	@Override

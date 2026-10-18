@@ -328,8 +328,8 @@ public class CalibratedClassifier extends SkLearnClassifier implements HasEstima
 
 		OutputField outputField = new OutputField(derivedField.requireName(), derivedField.requireOpType(), derivedField.requireDataType())
 			.setResultFeature(ResultFeature.TRANSFORMED_VALUE)
-			.setExpression(derivedField.requireExpression())
-			.setFinalResult(false);
+			.setFinalResult(false)
+			.setExpression(derivedField.requireExpression());
 
 		derivedField = encoder.createDerivedField(model, outputField, true);
 

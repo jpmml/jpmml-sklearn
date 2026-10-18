@@ -73,8 +73,8 @@ public class TreePredictorUtil {
 		Node root = encodeNode(0, True.INSTANCE, leaf, leftChildren, rightChildren, featureIdx, isCategorical, thresholds, bitsetIdx, missingGoToLeft, values, binMapper, rawLeftCatBitsets, new CategoryManager(), predicateManager, schema);
 
 		TreeModel treeModel = new TreeModel(MiningFunction.REGRESSION, ModelUtil.createMiningSchema(schema), root)
-			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT)
-			.setMissingValueStrategy(TreeModel.MissingValueStrategy.DEFAULT_CHILD);
+			.setMissingValueStrategy(TreeModel.MissingValueStrategy.DEFAULT_CHILD)
+			.setSplitCharacteristic(TreeModel.SplitCharacteristic.BINARY_SPLIT);
 
 		return treeModel;
 	}

@@ -96,7 +96,8 @@ public class ThresholdClassifier extends SkLearnClassifier implements HasEstimat
 
 		Expression expression = ExpressionUtil.createApply(PMMLFunctions.IF,
 			ExpressionUtil.createApply(PMMLFunctions.LESSTHAN, new FieldRef(name), ExpressionUtil.createConstant(threshold)),
-			ExpressionUtil.createConstant(categoricalLabel.getDataType(), categoricalLabel.getValue(0)), ExpressionUtil.createConstant(categoricalLabel.getDataType(), categoricalLabel.getValue(1))
+			ExpressionUtil.createConstant(categoricalLabel.getDataType(), categoricalLabel.getValue(0)),
+			ExpressionUtil.createConstant(categoricalLabel.getDataType(), categoricalLabel.getValue(1))
 		);
 
 		OutputField thresholdedOutputField = new OutputField(FieldNameUtil.create("thresholded", categoricalLabel), categoricalLabel.getOpType(), categoricalLabel.getDataType())

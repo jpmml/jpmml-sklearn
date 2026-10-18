@@ -129,8 +129,8 @@ public class Domain extends Decorator {
 		}
 
 		dataField
-			.setDataType(dataType)
-			.setOpType(opType);
+			.setOpType(opType)
+			.setDataType(dataType);
 
 		encoder.setDomain(name, this);
 

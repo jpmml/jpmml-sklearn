@@ -88,8 +88,8 @@ public class RuleSetClassifier extends Classifier {
 
 		if(defaultScore != null){
 			ruleSet
-				.setDefaultConfidence(1d)
-				.setDefaultScore(defaultScore);
+				.setDefaultScore(defaultScore)
+				.setDefaultConfidence(1d);
 		}
 
 		Scope scope = new DataFrameScope("X", features);

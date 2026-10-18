@@ -40,8 +40,8 @@ public class Matcher extends Tokenizer {
 		String wordRE = getWordRE();
 
 		return textIndex
-			.setTokenize(Boolean.TRUE)
-			.setWordRE(wordRE);
+			.setWordRE(wordRE)
+			.setTokenize(Boolean.TRUE);
 	}
 
 	@Override

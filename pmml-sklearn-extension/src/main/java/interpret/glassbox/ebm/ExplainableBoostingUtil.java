@@ -220,7 +220,8 @@ public class ExplainableBoostingUtil {
 
 			Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
 				ExpressionUtil.createApply(PMMLFunctions.ISMISSING, new FieldRef(field)),
-				ExpressionUtil.createConstant(missingCategory), new FieldRef(field)
+				ExpressionUtil.createConstant(missingCategory),
+				new FieldRef(field)
 			);
 
 			categories.add(0, missingCategory);

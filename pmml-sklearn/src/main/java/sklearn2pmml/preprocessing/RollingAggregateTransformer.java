@@ -67,8 +67,8 @@ public class RollingAggregateTransformer extends Transformer {
 			Field<?> field = feature.getField();
 
 			Lag lag = new Lag(field.requireName())
-				.setAggregate(aggregate)
-				.setN(n);
+				.setN(n)
+				.setAggregate(aggregate);
 
 			if(pmmlBlockIndicators != null){
 				lag = lag.addBlockIndicators(pmmlBlockIndicators);
