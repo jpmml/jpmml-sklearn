@@ -103,6 +103,21 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 	}
 
 	@Test
+	public void evaluateGradientBoostingIsotonicAudit() throws Exception {
+		evaluate("H2OGradientBoostingIsotonic", AUDIT, excludeFields(AUDIT_ADJUSTED));
+	}
+
+	@Test
+	public void evaluateGradientBoostingSigmoidAudit() throws Exception {
+		evaluate("H2OGradientBoostingSigmoid", AUDIT, excludeFields(AUDIT_ADJUSTED));
+	}
+
+	@Test
+	public void evaluateIsotonicRegressionAuto() throws Exception {
+		evaluate("H2OIsotonicRegression", AUTO);
+	}
+
+	@Test
 	public void evaluateLinearRegressionAuto() throws Exception {
 		evaluate("H2OLinearRegression", AUTO);
 	}
@@ -125,6 +140,16 @@ public class SkLearnH2OTest extends SkLearnEncoderBatchTest implements Datasets,
 	@Test
 	public void evaluateRandomForestAuto() throws Exception {
 		evaluate("H2ORandomForest", AUTO);
+	}
+
+	@Test
+	public void evaluateRandomForestIsotonicAudit() throws Exception {
+		evaluate("H2ORandomForestIsotonic", AUDIT, excludeFields(AUDIT_ADJUSTED));
+	}
+
+	@Test
+	public void evaluateRandomForestSigmoidAudit() throws Exception {
+		evaluate("H2ORandomForestSigmoid", AUDIT, excludeFields(AUDIT_ADJUSTED));
 	}
 
 	@Test
