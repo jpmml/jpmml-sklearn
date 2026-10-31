@@ -26,6 +26,7 @@ import org.dmg.pmml.OpType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.ValueUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
+import sklearn.SkLearnFields;
 import sklearn.SkLearnTransformer;
 
 public class MissingIndicator extends SkLearnTransformer {
@@ -36,9 +37,14 @@ public class MissingIndicator extends SkLearnTransformer {
 
 	@Override
 	public int getNumberOfFeatures(){
-		int[] shape = getFeatureIndicesShape();
 
-		return shape[0];
+		// SkLearn 0.20 through 0.22
+		if(!hasattr(SkLearnFields.N_FEATURES_IN)){
+			return getInteger("_n_features");
+		}
+
+		// SkLearn 0.23+
+		return super.getNumberOfFeatures();
 	}
 
 	@Override
@@ -75,10 +81,6 @@ public class MissingIndicator extends SkLearnTransformer {
 
 	public List<Integer> getFeatureIndices(){
 		return getIntegerArray("features_");
-	}
-
-	public int[] getFeatureIndicesShape(){
-		return getArrayShape("features_", 1);
 	}
 
 	public Object getMissingValues(){
