@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import builtins.ObjectType;
 import com.google.common.collect.Iterables;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
@@ -42,6 +43,7 @@ import org.jpmml.converter.Feature;
 import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.TypeUtil;
 import org.jpmml.converter.ValueUtil;
+import org.jpmml.python.Attribute;
 import org.jpmml.python.DTypeUtil;
 import org.jpmml.python.DataFrameScope;
 import org.jpmml.python.Scope;
@@ -75,6 +77,15 @@ public class ExpressionTransformer extends Transformer {
 
 		if(ValueUtil.isNaN(mapMissingTo)){
 			mapMissingTo = null;
+		} // End if
+
+		if(dtype instanceof ObjectType){
+			ObjectType objectType = (ObjectType)dtype;
+
+			Attribute attribute = new Attribute(this, "dtype_");
+
+			throw new SkLearnException("Type " + ExceptionUtil.formatName(objectType.getClassName()) + " is ambiguous")
+				.setSolution("Set the " + ExceptionUtil.formatName(attribute.format()) + " attribute to a specific type, such as " + ExceptionUtil.formatNames(Arrays.asList("bool", "float", "int", "str")) + ", or their NumPy or Pandas equivalents");
 		}
 
 		Scope scope = new DataFrameScope("X", features, encoder);
