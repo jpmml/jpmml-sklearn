@@ -1,3 +1,7 @@
+from sklearn2pmml.sklearn_pandas import patch_sklearn
+
+patch_sklearn()
+
 import sys
 
 from pandas import DataFrame, Series
@@ -41,7 +45,7 @@ if __name__ == "__main__":
 def make_bins(X, cols):
 	result = dict()
 	for col in cols:
-		bins = numpy.nanquantile(X[col], q = [0.0, 0.25, 0.50, 0.75, 1.0], interpolation = "nearest")
+		bins = numpy.nanquantile(X[col], q = [0.0, 0.25, 0.50, 0.75, 1.0], method = "nearest")
 		# Deduplicate
 		bins = list(dict.fromkeys(bins))
 		# Unbox Numpy float scalars to Python floats

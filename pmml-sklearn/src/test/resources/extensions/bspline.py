@@ -43,6 +43,8 @@ for fun in [gaussian, sin, tanh]:
 	bspline = make_interp_spline(train, fun(train), k = 3)
 
 	transformer = BSplineTransformer(bspline)
+	# XXX
+	transformer.n_features_in_ = 1
 
 	pipeline = make_dummy_pipeline(transformer)
 	store_pkl(pipeline, name)

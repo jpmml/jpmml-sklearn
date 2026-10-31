@@ -1,3 +1,7 @@
+from sklearn2pmml.sklearn_pandas import patch_sklearn
+
+patch_sklearn()
+
 from pandas import DataFrame
 from sklearn_pandas import DataFrameMapper
 from sklearn.pipeline import FeatureUnion, Pipeline
