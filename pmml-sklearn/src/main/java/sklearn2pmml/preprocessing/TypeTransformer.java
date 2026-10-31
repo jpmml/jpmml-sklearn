@@ -18,6 +18,7 @@
  */
 package sklearn2pmml.preprocessing;
 
+import builtins.ObjectType;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
@@ -42,6 +43,12 @@ public class TypeTransformer extends Transformer {
 	}
 
 	public Feature refineFeature(Feature feature, TypeInfo dtype, SkLearnEncoder encoder){
+
+		// XXX
+		if(dtype instanceof ObjectType){
+			return feature;
+		}
+
 		DataType dataType = dtype.getDataType();
 		OpType opType = TypeUtil.getOpType(dataType);
 
