@@ -18,14 +18,24 @@
  */
 package sklearn;
 
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import net.razorvine.pickle.IObjectConstructor;
 import net.razorvine.pickle.objects.ClassDict;
 import net.razorvine.pickle.objects.ClassDictConstructor;
+import org.jpmml.converter.ExceptionUtil;
 import org.jpmml.python.CastFunction;
 import org.jpmml.python.CastUtil;
 import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PickleUtil;
+import org.jpmml.python.PythonObjectConstructor;
 import org.jpmml.sklearn.SkLearnException;
 
 public class StepCastFunction<E extends Step> extends CastFunction<E> {
@@ -72,6 +82,12 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 		String className = getClassName(object);
 
 		if(className != null){
+			List<PythonObjectConstructor> subclassConstructors = getInstantiableSubclassConstructors(className);
+
+			if(!subclassConstructors.isEmpty()){
+				return "Replace this class with one of its supported subclasses " + formatClassNames(subclassConstructors);
+			}
+
 			return "Develop and register a custom JPMML-SkLearn converter";
 		}
 
@@ -80,6 +96,54 @@ public class StepCastFunction<E extends Step> extends CastFunction<E> {
 
 	protected String formatExample(Object object){
 		return null;
+	}
+
+	static
+	protected List<PythonObjectConstructor> getInstantiableSubclassConstructors(String className){
+		Class<?> clazz;
+
+		try {
+			clazz = Class.forName(className);
+		} catch(ClassNotFoundException cnfe){
+			return Collections.emptyList();
+		}
+
+		if(!Modifier.isAbstract(clazz.getModifiers())){
+			return Collections.emptyList();
+		}
+
+		List<PythonObjectConstructor> result = new ArrayList<>();
+
+		Map<String, IObjectConstructor> objectConstructors = PickleUtil.getObjectConstructors();
+
+		Collection<IObjectConstructor> values = objectConstructors.values();
+		for(IObjectConstructor value : values){
+
+			if(value instanceof PythonObjectConstructor){
+				PythonObjectConstructor pythonObjectConstructor = (PythonObjectConstructor)value;
+
+				Class<?> subclazz = pythonObjectConstructor.getClazz();
+
+				if((clazz != subclazz) && clazz.isAssignableFrom(subclazz)){
+
+					if(!Modifier.isAbstract(subclazz.getModifiers())){
+						result.add(pythonObjectConstructor);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	static
+	protected String formatClassNames(List<? extends ClassDictConstructor> dictConstructors){
+		List<String> classNames = dictConstructors.stream()
+			.map(ClassDictConstructorUtil::getClassName)
+			.sorted()
+			.collect(Collectors.toList());
+
+		return ExceptionUtil.formatNames(classNames);
 	}
 
 	static

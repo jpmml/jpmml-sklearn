@@ -18,7 +18,10 @@
  */
 package sklearn;
 
+import java.util.List;
+
 import org.jpmml.python.ClassDictUtil;
+import org.jpmml.python.PythonObjectConstructor;
 import sklearn2pmml.preprocessing.ExpressionTransformer;
 
 public class TransformerCastFunction<E extends Transformer> extends StepCastFunction<E> {
@@ -37,6 +40,12 @@ public class TransformerCastFunction<E extends Transformer> extends StepCastFunc
 		String className = getClassName(object);
 
 		if(className != null){
+			List<PythonObjectConstructor> subclassConstructors = getInstantiableSubclassConstructors(className);
+
+			if(!subclassConstructors.isEmpty()){
+				return "Replace this transformer with one of its supported subclasses " + formatClassNames(subclassConstructors);
+			}
+
 			return "Replace this transformer with the " + (ExpressionTransformer.class).getName() + " transformer. Alternatively, develop and register a custom JPMML-SkLearn converter";
 		}
 
@@ -48,6 +57,12 @@ public class TransformerCastFunction<E extends Transformer> extends StepCastFunc
 		String className = getClassName(object);
 
 		if(className != null){
+			List<PythonObjectConstructor> subclassConstructors = getInstantiableSubclassConstructors(className);
+
+			if(!subclassConstructors.isEmpty()){
+				return null;
+			}
+
 			return ExpressionTransformer.formatSimpleExample();
 		}
 
