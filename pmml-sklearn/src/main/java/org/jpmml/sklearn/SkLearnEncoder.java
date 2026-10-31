@@ -284,8 +284,19 @@ public class SkLearnEncoder extends PythonEncoder {
 		org.dmg.pmml.Field<?> pmmlField = getField(name);
 
 		if(pmmlField instanceof DataField){
-			throw new SkLearnException("Field " + ExceptionUtil.formatName(name) + " cannot be renamed")
-				.setSolution("Rename input fields in Python beforehand (eg. as DataFrame columns)");
+			Stage stage = getStage();
+
+			switch(stage){
+				case MAIN:
+					throw new SkLearnException("Input field " + ExceptionUtil.formatName(name) + " cannot be renamed")
+						.setSolution("Customize input field names before the data enters the estimator or pipeline, by renaming the columns of the data container")
+						.setExample("X.columns = [\"new_name\", ...]");
+				case OUTPUT:
+					throw new SkLearnException("Output field " + ExceptionUtil.formatName(name) + " cannot be renamed")
+						.setSolution("Customize output field names at the estimator level");
+				default:
+					throw new IllegalArgumentException();
+			}
 		}
 
 		checkField(renamedName);
