@@ -87,13 +87,19 @@ public class MulticlassOptimalBinning extends OptimalBinning {
 			double constant = ((double)OptimalBinningUtil.sumExact(eventCounts)  / (double)OptimalBinningUtil.sumExact(nonEventCounts));
 
 			for(int row = 0; row < rows; row++){
-				double eventRate = (double)eventCounts.get(row) / (double)numberOfRecords.get(row);
+				Integer events = eventCounts.get(row);
+				Integer nonEvents = nonEventCounts.get(row);
+
+				// The WoE of a pure bin is 0
+				if(events == 0 || nonEvents == 0){
+					woes.add(0d);
+
+					continue;
+				}
+
+				double eventRate = (double)events / (double)numberOfRecords.get(row);
 
 				double woe = Math.log(((1d / eventRate) - 1d) * constant);
-
-				if(Double.isNaN(woe)){
-					woe = 0d;
-				}
 
 				woes.add(woe);
 			}

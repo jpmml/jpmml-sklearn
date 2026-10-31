@@ -282,7 +282,17 @@ public class OptimalBinning extends Transformer {
 		List<Double> result = new ArrayList<>();
 
 		for(int i = 0; i < numberOfEvents.size(); i++){
-			double eventRate = (double)numberOfEvents.get(i) / (double)Math.addExact(numberOfEvents.get(i), numberOfNonEvents.get(i));
+			Integer events = numberOfEvents.get(i);
+			Integer nonEvents = numberOfNonEvents.get(i);
+
+			// The event rate and WoE of a pure bin are 0
+			if(events == 0 || nonEvents == 0){
+				result.add(0d);
+
+				continue;
+			}
+
+			double eventRate = (double)events / (double)Math.addExact(events, nonEvents);
 
 			switch(metric){
 				case OptimalBinning.METRIC_EVENT_RATE:

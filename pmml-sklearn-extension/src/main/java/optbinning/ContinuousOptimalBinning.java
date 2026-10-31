@@ -49,7 +49,16 @@ public class ContinuousOptimalBinning extends OptimalBinning {
 		List<Double> result = new ArrayList<>();
 
 		for(int i = 0; i < numberOfRecords.size(); i++){
-			double mean = (sums.get(i)).doubleValue() / (double)numberOfRecords.get(i);
+			Integer records = numberOfRecords.get(i);
+
+			// The mean of an empty bin is 0
+			if(records == 0){
+				result.add(0d);
+
+				continue;
+			}
+
+			double mean = (sums.get(i)).doubleValue() / (double)records;
 
 			result.add(mean);
 		}
