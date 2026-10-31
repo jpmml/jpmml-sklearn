@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.dmg.pmml.Apply;
@@ -64,8 +65,13 @@ public class OptimalBinning extends Transformer {
 		List<Number> splits = getSplitsOptimal();
 
 		List<Double> categoriesOut = getCategoriesOut();
+		Object metricSpecial = getMetricSpecial();
+		Object metricMissing = getMetricMissing();
 
 		ClassDictUtil.checkSize(splits.size() + 3, categoriesOut);
+
+		Double specialCategory = selectCategory(metricSpecial, categoriesOut.get(categoriesOut.size() - 2));
+		Double missingCategory = selectCategory(metricMissing, categoriesOut.get(categoriesOut.size() - 1));
 
 		// Drop the last two elements, which correspond to "special" and "missing" categories
 		categoriesOut = categoriesOut.subList(0, categoriesOut.size() - 2);
@@ -84,7 +90,7 @@ public class OptimalBinning extends Transformer {
 			switch(dtype){
 				case OptimalBinning.DTYPE_NUMERICAL:
 					{
-						expression = encodeNumericalBinning(feature, splits, categoriesOut, predicateManager, predicates);
+						expression = encodeNumericalBinning(feature, splits, categoriesOut, missingCategory, predicateManager, predicates);
 					}
 					break;
 				case OptimalBinning.DTYPE_CATEGORICAL:
@@ -104,7 +110,7 @@ public class OptimalBinning extends Transformer {
 							feature = wildcardFeature.toCategoricalFeature(categoriesIn);
 						}
 
-						expression = encodeCategoricalBinning(feature, splits, categoriesIn, categoriesOut, predicateManager, predicates);
+						expression = encodeCategoricalBinning(feature, splits, categoriesIn, categoriesOut, missingCategory, predicateManager, predicates);
 					}
 					break;
 				default:
@@ -116,7 +122,7 @@ public class OptimalBinning extends Transformer {
 			Expression apply = ExpressionUtil.createApply(PMMLFunctions.IF,
 				ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
 				ExpressionUtil.createConstant(null, categoriesOut.get(0)),
-				ExpressionUtil.createConstant(OptimalBinning.CATEGORY_MISSING)
+				ExpressionUtil.createConstant(missingCategory)
 			);
 
 			expression = apply;
@@ -138,7 +144,7 @@ public class OptimalBinning extends Transformer {
 
 			expression = ExpressionUtil.createApply(PMMLFunctions.IF,
 				valueApply,
-				ExpressionUtil.createConstant(OptimalBinning.CATEGORY_SPECIAL),
+				ExpressionUtil.createConstant(specialCategory),
 				expression
 			);
 
@@ -146,7 +152,7 @@ public class OptimalBinning extends Transformer {
 
 			predicates.add(specialPredicate);
 
-			categories = OptimalBinningUtil.ensureCategory(categories, OptimalBinning.CATEGORY_SPECIAL);
+			categories = OptimalBinningUtil.ensureCategory(categories, specialCategory);
 		} else
 
 		{
@@ -159,7 +165,7 @@ public class OptimalBinning extends Transformer {
 
 			predicates.add(missingPredicate);
 
-			categories = OptimalBinningUtil.ensureCategory(categories, OptimalBinning.CATEGORY_MISSING);
+			categories = OptimalBinningUtil.ensureCategory(categories, missingCategory);
 		}
 
 		DerivedField derivedField = encoder.createDerivedField(createFieldName("optBinning", feature), OpType.CATEGORICAL, DataType.DOUBLE, expression);
@@ -169,11 +175,11 @@ public class OptimalBinning extends Transformer {
 		return Collections.singletonList(feature);
 	}
 
-	private Discretize encodeNumericalBinning(Feature feature, List<Number> splits, List<Double> categoriesOut, PredicateManager predicateManager, List<Predicate> predicates){
+	private Discretize encodeNumericalBinning(Feature feature, List<Number> splits, List<Double> categoriesOut, Double missingCategory, PredicateManager predicateManager, List<Predicate> predicates){
 		ContinuousFeature continuousFeature = feature.toContinuousFeature();
 
 		Discretize discretize = new Discretize(continuousFeature.getName())
-			.setMapMissingTo(OptimalBinning.CATEGORY_MISSING);
+			.setMapMissingTo(missingCategory);
 
 		for(int i = 0; i <= splits.size(); i++){
 			Number leftMargin = null;
@@ -225,7 +231,7 @@ public class OptimalBinning extends Transformer {
 		return discretize;
 	}
 
-	private MapValues encodeCategoricalBinning(Feature feature, List<Number> splits, List<?> categoriesIn, List<Double> categoriesOut, PredicateManager predicateManager, List<Predicate> predicates){
+	private MapValues encodeCategoricalBinning(Feature feature, List<Number> splits, List<?> categoriesIn, List<Double> categoriesOut, Double missingCategory, PredicateManager predicateManager, List<Predicate> predicates){
 		List<Object> inputValues = new ArrayList<>();
 		List<Double> outputValues = new ArrayList<>();
 
@@ -261,9 +267,21 @@ public class OptimalBinning extends Transformer {
 		}
 
 		MapValues mapValues = ExpressionUtil.createMapValues(feature.getName(), inputValues, outputValues)
-			.setMapMissingTo(OptimalBinning.CATEGORY_MISSING);
+			.setMapMissingTo(missingCategory);
 
 		return mapValues;
+	}
+
+	static
+	private Double selectCategory(Object metricValue, Double empiricalCategory){
+
+		if(Objects.equals(OptimalBinning.METRIC_VALUE_EMPIRICAL, metricValue)){
+			return empiricalCategory;
+		}
+
+		Number number = (Number)metricValue;
+
+		return number.doubleValue();
 	}
 
 	public List<Object> getCategoriesIn(){
@@ -342,6 +360,33 @@ public class OptimalBinning extends Transformer {
 		return this;
 	}
 
+	public Object getMetricSpecial(){
+		return getMetricValue("metric_special");
+	}
+
+	public Object getMetricMissing(){
+		return getMetricValue("metric_missing");
+	}
+
+	private Object getMetricValue(String name){
+
+		if(!hasattr(name)){
+			return OptimalBinning.METRIC_VALUE_DEFAULT;
+		}
+
+		Object value = getObject(name);
+
+		if(value instanceof String){
+			String string = (String)value;
+
+			return getEnum(name, this::getString, Arrays.asList(OptimalBinning.METRIC_VALUE_EMPIRICAL));
+		} else
+
+		{
+			return getNumber(name);
+		}
+	}
+
 	public List<Integer> getNumberOfEvents(){
 		return getIntegerArray("_n_event");
 	}
@@ -364,12 +409,12 @@ public class OptimalBinning extends Transformer {
 		return getNumberArray("_splits_optimal");
 	}
 
-	public static final Double CATEGORY_MISSING = 0d;
-	public static final Double CATEGORY_SPECIAL = 0d;
-
 	private static final String DTYPE_CATEGORICAL = "categorical";
 	private static final String DTYPE_NUMERICAL = "numerical";
 
 	private static final String METRIC_EVENT_RATE = "event_rate";
 	private static final String METRIC_WOE = "woe";
+
+	private static final Integer METRIC_VALUE_DEFAULT = 0;
+	private static final String METRIC_VALUE_EMPIRICAL = "empirical";
 }

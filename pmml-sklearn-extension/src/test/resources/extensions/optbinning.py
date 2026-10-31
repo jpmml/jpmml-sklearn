@@ -13,6 +13,9 @@ from sklearn2pmml.decoration import Alias
 from sklearn2pmml.pipeline import PMMLPipeline
 from sklearn2pmml.preprocessing import ExpressionTransformer
 
+# XXX
+BinningProcess.__sklearn_is_fitted__ = lambda self: True
+
 datasets = []
 
 if __name__ == "__main__":
@@ -49,9 +52,9 @@ def build_ob_audit(audit_df, classifier, name):
 	audit_X, audit_y = split_csv(audit_df)
 
 	mapper = DataFrameMapper([
-		(["Age"], [Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else (-999 if (X[0] < 21 or X[0] > 65) else X[0])", dtype = int), name = "clean(Age)"), BinningProcess(variable_names = ["clean(Age)"], special_codes = [-999], binning_transform_params = {"clean(Age)" : {"metric" : "event_rate"}})]),
-		(["Hours"], BinningProcess(variable_names = ["Hours"], binning_transform_params = {"Hours" : {"metric" : "event_rate"}})),
-		(["Income"], BinningProcess(variable_names = ["Income"], binning_transform_params = {"Income" : {"metric" : "woe"}}))
+		(["Age"], [Alias(ExpressionTransformer("-999 if pandas.isnull(X[0]) else (-999 if (X[0] < 21 or X[0] > 65) else X[0])", dtype = int), name = "clean(Age)"), BinningProcess(variable_names = ["clean(Age)"], special_codes = [-999], binning_transform_params = {"clean(Age)" : {"metric" : "event_rate", "metric_special" : "empirical"}})]),
+		(["Hours"], BinningProcess(variable_names = ["Hours"], binning_transform_params = {"Hours" : {"metric" : "event_rate", "metric_missing" : "empirical"}})),
+		(["Income"], BinningProcess(variable_names = ["Income"], binning_transform_params = {"Income" : {"metric" : "woe", "metric_missing" : "empirical"}}))
 	])
 
 	pipeline = PMMLPipeline([
