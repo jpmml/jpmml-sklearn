@@ -19,12 +19,14 @@
 package sklearn2pmml.preprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.jpmml.converter.Feature;
 import org.jpmml.converter.TypeUtil;
@@ -116,5 +118,14 @@ public class MultiLookupTransformer extends LookupTransformer implements HasMult
 		}
 
 		return result;
+	}
+
+	@Override
+	protected Object decodeKey(Object key){
+		Object[] values = (Object[])key;
+
+		return Arrays.stream(values)
+			.map(ScalarUtil::decode)
+			.toArray();
 	}
 }

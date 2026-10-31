@@ -282,12 +282,12 @@ def build_audit_na(audit_na_df, classifier, name, with_proba = True, fit_params 
 	audit_na_X, audit_na_y = split_csv(audit_na_df)
 
 	employment_mapping = {
-		"CONSULTANT" : "PRIVATE",
-		"PSFEDERAL" : "PUBLIC",
-		"PSLOCAL" : "PUBLIC",
-		"PSSTATE" : "PUBLIC",
-		"SELFEMP" : "PRIVATE",
-		"PRIVATE" : "PRIVATE"
+		numpy.str_("CONSULTANT") : "PRIVATE",
+		numpy.str_("PSFEDERAL") : "PUBLIC",
+		numpy.str_("PSLOCAL") : "PUBLIC",
+		numpy.str_("PSSTATE") : "PUBLIC",
+		numpy.str_("SELFEMP") : "PRIVATE",
+		numpy.str_("PRIVATE") : "PRIVATE"
 	}
 	gender_mapping = {
 		"FEMALE" : 0.0,
@@ -929,16 +929,16 @@ def build_auto(auto_df, regressor, name, fit_params = {}, predict_params = {}, *
 	auto_X, auto_y = split_csv(auto_df)
 
 	cylinders_origin_mapping = {
-		(8, 1) : "8/1",
-		(6, 1) : "6/1",
-		(4, 1) : "4/1",
-		(6, 2) : "6/2",
-		(4, 2) : "4/2",
-		(4, 3) : "4/3"
+		(numpy.int8(8), 1) : numpy.str_("8/1"),
+		(numpy.int8(6), 1) : numpy.str_("6/1"),
+		(numpy.int8(4), 1) : numpy.str_("4/1"),
+		(numpy.int8(6), 2) : numpy.str_("6/2"),
+		(numpy.int8(4), 2) : numpy.str_("4/2"),
+		(numpy.int8(4), 3) : numpy.str_("4/3")
 	}
 	mapper = DataFrameMapper([
 		(["cylinders"], [CategoricalDomain(with_statistics = True), Alias(ExpressionTransformer("X[0] % 2.0 > 0.0", dtype = numpy.int8), name = "odd(cylinders)", prefit = True)]),
-		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain(with_statistics = True)]), MultiLookupTransformer(cylinders_origin_mapping, default_value = "other"), OneHotEncoder()]),
+		(["cylinders", "origin"], [MultiDomain([None, CategoricalDomain(with_statistics = True)]), MultiLookupTransformer(cylinders_origin_mapping, default_value = numpy.str_("other")), OneHotEncoder()]),
 		(["model_year"], [CategoricalDomain(with_statistics = True), CastTransformer(str), ExpressionTransformer("'19' + X[0] + '-01-01'"), CastTransformer("datetime64[D]"), DaysSinceYearTransformer(1977), Binarizer(threshold = 0)], {"alias" : "bin(model_year, 1977)"}),
 		(["model_year", "origin"], [ConcatTransformer("/"), OneHotEncoder(sparse_output = False, max_categories = 15), SelectorProxy(SelectFromModel(RandomForestRegressor(n_estimators = 3, random_state = 13), threshold = "0.75 * mean"))]),
 		(["weight", "displacement"], [ContinuousDomain(with_statistics = True), ExpressionTransformer("(X[0] / X[1]) + 0.5", dtype = numpy.float64)], {"alias" : "weight / displacement + 0.5"}),

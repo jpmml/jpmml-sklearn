@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.FieldColumnPair;
@@ -138,10 +139,32 @@ public class LookupTransformer extends Transformer {
 	}
 
 	public Map<?, ?> getMapping(){
-		return getDict("mapping");
+		Map<?, ?> mapping = getDict("mapping");
+
+		Map<Object, Object> result = new LinkedHashMap<>();
+
+		Collection<? extends Map.Entry<?, ?>> entries = mapping.entrySet();
+		for(Map.Entry<?, ?> entry : entries){
+			Object key = decodeKey(entry.getKey());
+			Object value = decodeValue(entry.getValue());
+
+			result.put(key, value);
+		}
+
+		return result;
 	}
 
 	public Object getDefaultValue(){
-		return getOptionalObject("default_value");
+		Object defaultValue = getOptionalObject("default_value");
+
+		return decodeValue(defaultValue);
+	}
+
+	protected Object decodeKey(Object key){
+		return ScalarUtil.decode(key);
+	}
+
+	protected Object decodeValue(Object value){
+		return ScalarUtil.decode(value);
 	}
 }
