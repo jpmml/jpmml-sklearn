@@ -38,6 +38,7 @@ import org.dmg.pmml.VisitorAction;
 import org.jpmml.converter.CategoricalLabel;
 import org.jpmml.converter.DiscreteLabel;
 import org.jpmml.converter.ExceptionUtil;
+import org.jpmml.converter.InvalidLabelException;
 import org.jpmml.converter.Label;
 import org.jpmml.converter.MissingLabelException;
 import org.jpmml.converter.ModelUtil;
@@ -114,6 +115,20 @@ public class Classifier extends Estimator implements HasClasses {
 	@Override
 	public boolean hasProbabilityDistribution(){
 		return true;
+	}
+
+	@Override
+	public void checkLabel(Label label){
+		super.checkLabel(label);
+
+		if(label instanceof DiscreteLabel){
+			DiscreteLabel discreteLabel = (DiscreteLabel)label;
+
+			if(discreteLabel.size() < 2){
+				throw new InvalidLabelException("Expected 2 or more target categories, got " + discreteLabel.size())
+					.setSolution("Re-fit the classifier with a new dataset where the target is not constant (eg. by using different filtering or splitting criteria)");
+			}
+		}
 	}
 
 	@Override
