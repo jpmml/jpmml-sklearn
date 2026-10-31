@@ -340,6 +340,11 @@ public class PMMLPipeline extends SkLearnPipeline {
 			}
 
 			@Override
+			protected Stage getStage(){
+				return Stage.OUTPUT;
+			}
+
+			@Override
 			public Field<?> getField(String name){
 
 				try {

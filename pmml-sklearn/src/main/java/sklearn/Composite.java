@@ -45,7 +45,7 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	 * Subsequent cast operations, if any, must agree with the first one on the Step subclass.
 	 *
 	 * Furthermore, all cast operations must return the same object instance,
-	 * in order to enable the same step graph (not simply an equivalent step graph!) to be created and re-created in different encoding stages.
+	 * in order to enable the same step graph (not simply an equivalent step graph!) to be created and re-created in different encoding passes.
 	 */
 	private Object castResult = null;
 

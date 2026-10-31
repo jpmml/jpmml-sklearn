@@ -27,6 +27,7 @@ import org.jpmml.python.Attribute;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.MissingAttributeException;
 import org.jpmml.python.PythonObject;
+import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
 
@@ -223,13 +224,17 @@ public class Step extends PythonObject implements HasNumberOfFeatures, HasType {
 	 * A physically topmost step is a standalone Scikit-Learn object that the user passed to the converter.
 	 * A logically topmost step is one that does not connect to the surrounding step graph,
 	 * such as an ad-hoc step that exists inside another Scikit-Learn object unbeknownst to the user.
+	 *
+	 * @see SkLearnEncoder.Stage#MAIN
 	 */
 	public static final Step PARENT_ROOT = null;
 
 	/**
 	 * The parent step for &quot;topmost&quot; steps in the output step graph.
-	 * The main step graph (transforms features) and the output step graph (transforms predictions) are encoded in separate contexts,
+	 * The main step graph and the output step graph are encoded in separate encoder stages,
 	 * and therefore, symbolically, merit separate rooting.
+	 *
+	 * @see SkLearnEncoder.Stage#OUTPUT
 	 */
 	public static final Step PARENT_OUTPUT_ROOT = null;
 

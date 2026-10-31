@@ -316,6 +316,10 @@ public class SkLearnEncoder extends PythonEncoder {
 		}
 	}
 
+	protected Stage getStage(){
+		return Stage.MAIN;
+	}
+
 	public boolean isFrozen(String name){
 		Map<String, Domain> domains = getDomains();
 
@@ -437,6 +441,21 @@ public class SkLearnEncoder extends PythonEncoder {
 		}
 
 		throw new IllegalArgumentException(name);
+	}
+
+	static
+	protected enum Stage {
+
+		/**
+		 * The main step graph, which transforms features.
+		 */
+		MAIN,
+
+		/**
+		 * The output (aka post-processing) step graph, which further transforms the predictions of the main step graph.
+		 */
+		OUTPUT,
+		;
 	}
 
 	static {
