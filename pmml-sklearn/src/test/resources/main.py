@@ -469,6 +469,7 @@ if "Audit" in datasets:
 
 	build_multi_audit(audit_df, DecisionTreeClassifier(min_samples_leaf = 2, random_state = 13), "MultiDecisionTreeAudit", with_proba = True)
 	build_multi_audit(audit_df, DummyClassifier(strategy = "prior"), "MultiDummyAudit", with_proba = True)
+	build_multi_audit(audit_df, ExtraTreesClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "MultiExtraTreesAudit", with_proba = True)
 	build_multi_audit(audit_df, KNeighborsClassifier(metric = "euclidean"), "MultiKNNAudit", with_kneighbors = True)
 	build_multi_audit(audit_df, MultiOutputClassifier(LogisticRegression()), "MultiLogisticRegressionAudit")
 	build_multi_audit(audit_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "MultiRandomForestAudit", with_proba = True)
@@ -1216,6 +1217,7 @@ if "Auto" in datasets:
 
 	build_multi_auto(auto_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "MultiDecisionTreeAuto")
 	build_multi_auto(auto_df, DummyRegressor(strategy = "median"), "MultiDummyAuto")
+	build_multi_auto(auto_df, ExtraTreesRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "MultiExtraTreesAuto")
 	build_multi_auto(auto_df, LinearRegression(), "MultiLinearRegressionAuto")
 	build_multi_auto(auto_df, KNeighborsRegressor(algorithm = "brute"), "MultiKNNAuto", with_kneighbors = True)
 	build_multi_auto(auto_df, MLPRegressor(solver = "lbfgs", random_state = 13), "MultiMLPAuto")

@@ -107,7 +107,7 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 						return OptionsUtil.generateOptionsMatrix(options);
 					} else
 
-					if(Objects.equals(MULTI_DECISION_TREE, algorithm) || Objects.equals(MULTI_RANDOM_FOREST, algorithm)){
+					if(Objects.equals(MULTI_DECISION_TREE, algorithm) || Objects.equals(MULTI_EXTRA_TREES, algorithm) || Objects.equals(MULTI_RANDOM_FOREST, algorithm)){
 						Map<String, Object> options = new LinkedHashMap<>();
 						options.put(HasTreeOptions.OPTION_COMPACT, new Boolean[]{false, true});
 
@@ -265,8 +265,13 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
-	public void evaluatExtraTreesAudit() throws Exception {
+	public void evaluateExtraTreesAudit() throws Exception {
 		evaluate(EXTRA_TREES, AUDIT);
+	}
+
+	@Test
+	public void evaluateMultiExtraTreesAudit() throws Exception {
+		evaluate(MULTI_EXTRA_TREES, AUDIT);
 	}
 
 	@Test

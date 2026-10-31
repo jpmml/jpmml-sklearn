@@ -35,6 +35,7 @@ public interface SkLearnAlgorithms {
 	String MULTI_DUMMY = "Multi" + DUMMY;
 	String ELASTIC_NET = "ElasticNet";
 	String EXTRA_TREES = "ExtraTrees";
+	String MULTI_EXTRA_TREES = "Multi" + EXTRA_TREES;
 	String GAMMA_REGRESSION = "GammaRegression";
 	String GAUSSIAN_NB = "GaussianNB";
 	String GRADIENT_BOOSTING = "GradientBoosting";
