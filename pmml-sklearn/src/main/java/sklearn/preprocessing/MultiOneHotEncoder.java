@@ -25,9 +25,16 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import org.dmg.pmml.Apply;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
+import org.dmg.pmml.DerivedField;
+import org.dmg.pmml.Error;
+import org.dmg.pmml.Field;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
+import org.dmg.pmml.MissingValueTreatmentMethod;
+import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMMLFunctions;
 import org.jpmml.converter.BinaryFeature;
 import org.jpmml.converter.BinaryThresholdFeature;
 import org.jpmml.converter.CategoricalFeature;
@@ -35,8 +42,11 @@ import org.jpmml.converter.ContinuousFeature;
 import org.jpmml.converter.Decorator;
 import org.jpmml.converter.DiscreteFeature;
 import org.jpmml.converter.ExceptionUtil;
+import org.jpmml.converter.ExpressionUtil;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.FeatureUtil;
 import org.jpmml.converter.InvalidValueDecorator;
+import org.jpmml.converter.MissingValueDecorator;
 import org.jpmml.converter.MissingValueFeature;
 import org.jpmml.converter.ObjectFeature;
 import org.jpmml.converter.TypeUtil;
@@ -187,7 +197,21 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 			{
 				throw new UnsupportedFeatureException("Expected a categorical or categorical-like feature, got " + ExceptionUtil.formatFeature(feature));
-			} // End if
+			}
+
+			switch(handleUnknown){
+				case MultiOneHotEncoder.HANDLEUNKNOWN_ERROR:
+					{
+						// Scikit-Learn treats any value that was not present in the training dataset as unknown.
+						// Therefore, a one-hot encoder that was trained on a dense dataset treats missing values the same way as invalid values.
+						if(!hasMissingCategory(featureCategories)){
+							feature = toNonMissing(feature, encoder);
+						}
+					}
+					break;
+				default:
+					break;
+			}
 
 			if(featureInfrequentEnabled){
 
@@ -257,6 +281,65 @@ public class MultiOneHotEncoder extends BaseEncoder {
 
 	public List<List<Number>> getInfrequentIndices(){
 		return getArrayList("_infrequent_indices", Number.class);
+	}
+
+	private Feature toNonMissing(Feature feature, SkLearnEncoder encoder){
+
+		if(feature instanceof DiscreteFeature){
+			DiscreteFeature discreteFeature = (DiscreteFeature)feature;
+
+			Feature valueFeature;
+
+			try {
+				valueFeature = discreteFeature.toCategoricalFeature();
+			} catch(UnsupportedOperationException uoe){
+				valueFeature = feature;
+			}
+
+			// XXX
+			if(valueFeature != feature){
+				return feature;
+			}
+		}
+
+		Field<?> field = feature.getField();
+
+		if(field instanceof DataField){
+			encoder.addDecorator(field, new MissingValueDecorator(MissingValueTreatmentMethod.RETURN_INVALID, null));
+
+			return feature;
+		} else
+
+		{
+			return encodeNonMissingFeature(feature, encoder);
+		}
+	}
+
+	private Feature encodeNonMissingFeature(Feature feature, SkLearnEncoder encoder){
+		Error error = new Error()
+			.setMessage("Field \"" + feature.getName() + "\" cannot accept missing value");
+
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
+			feature.ref(),
+			error
+		);
+
+		DataType dataType = feature.getDataType();
+
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("nonMissing", feature), OpType.CATEGORICAL, dataType, apply);
+
+		if(feature instanceof DiscreteFeature){
+			DiscreteFeature discreteFeature = (DiscreteFeature)feature;
+
+			List<?> values = discreteFeature.getValues();
+
+			return new CategoricalFeature(encoder, derivedField, values);
+		} else
+
+		{
+			return FeatureUtil.createFeature(derivedField, encoder);
+		}
 	}
 
 	static

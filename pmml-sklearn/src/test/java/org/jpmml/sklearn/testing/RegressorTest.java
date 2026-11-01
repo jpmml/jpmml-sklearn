@@ -27,10 +27,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
+import org.dmg.pmml.Error;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.converter.testing.OptionsUtil;
+import org.jpmml.evaluator.ErrorException;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.TableCollector;
@@ -308,6 +310,13 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluateLinearRegressionAuto() throws Exception {
 		evaluate(LINEAR_REGRESSION, AUTO);
+
+		List<Integer> rows = Arrays.asList(1, 10, 100);
+
+		Error error = new Error()
+			.setMessage("Field \"lookup(cylinders, origin)\" cannot accept missing value");
+
+		evaluate(LINEAR_REGRESSION, AUTO, new ValueAssignment("origin", rows, null), new ExceptionAssignment(rows, new ErrorException(error)));
 	}
 
 	@Test
@@ -488,6 +497,7 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 
 		List<Integer> rows = Arrays.asList(1, 10, 100);
 
+		evaluate(POISSON_REGRESSION, VISIT, new ValueAssignment("edlevel", rows, null), new ExceptionAssignment(rows, new ValueCheckException("Field \"edlevel\" cannot accept missing value")));
 		evaluate(POISSON_REGRESSION, VISIT, new ValueAssignment("edlevel", rows, "Kindergarten"), new ExceptionAssignment(rows, new ValueCheckException("Field \"edlevel\" cannot accept invalid value \"Kindergarten\"")));
 	}
 
