@@ -34,6 +34,7 @@ import org.jpmml.converter.testing.OptionsUtil;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.TableCollector;
+import org.jpmml.evaluator.ValueCheckException;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
@@ -484,6 +485,10 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	@Test
 	public void evaluatePoissonRegressionVisit() throws Exception {
 		evaluate(POISSON_REGRESSION, VISIT);
+
+		List<Integer> rows = Arrays.asList(1, 10, 100);
+
+		evaluate(POISSON_REGRESSION, VISIT, new ValueAssignment("edlevel", rows, "Kindergarten"), new ExceptionAssignment(rows, new ValueCheckException("Field \"edlevel\" cannot accept invalid value \"Kindergarten\"")));
 	}
 
 	@Test

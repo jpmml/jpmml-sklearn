@@ -18,6 +18,7 @@
  */
 package org.jpmml.sklearn.testing;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -27,6 +28,7 @@ import net.razorvine.pickle.Unpickler;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.Table;
 import org.jpmml.python.testing.PythonEncoderBatch;
 import org.jpmml.sklearn.SkLearnUnpickler;
 import org.jpmml.sklearn.SkLearnUtil;
@@ -80,6 +82,36 @@ public class SkLearnEncoderBatch extends PythonEncoderBatch {
 		} finally {
 			deactivate(object);
 		}
+	}
+
+	@Override
+	public Table getInput() throws IOException {
+		SkLearnEncoderBatchTest batchTest = getArchiveBatchTest();
+
+		Table table = super.getInput();
+
+		TableMutation inputMutation = batchTest.getInputMutation();
+		if(inputMutation != null){
+			table = inputMutation.apply(table);
+		}
+
+		return table;
+	}
+
+	@Override
+	public Table getOutput() throws IOException {
+		SkLearnEncoderBatchTest batchTest = getArchiveBatchTest();
+
+		Table table = super.getOutput();
+
+		TableMutation outputMutation = batchTest.getOutputMutation();
+		if(outputMutation != null){
+			table = outputMutation.apply(table);
+
+			batchTest.setExpectedOutput(table);
+		}
+
+		return table;
 	}
 
 	@Override
