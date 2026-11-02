@@ -19,6 +19,7 @@
 package org.jpmml.sklearn.testing;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,14 +29,17 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.base.Equivalence;
+import org.dmg.pmml.Error;
 import org.jpmml.converter.FieldNameUtil;
 import org.jpmml.converter.FieldNames;
 import org.jpmml.converter.testing.Datasets;
 import org.jpmml.converter.testing.Fields;
 import org.jpmml.converter.testing.OptionsUtil;
+import org.jpmml.evaluator.ErrorException;
 import org.jpmml.evaluator.ResultField;
 import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.TableCollector;
+import org.jpmml.evaluator.ValueCheckException;
 import org.jpmml.evaluator.testing.PMMLEquivalence;
 import org.jpmml.model.visitors.VisitorBattery;
 import org.junit.jupiter.api.Test;
@@ -53,7 +57,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 				String algorithm = getAlgorithm();
 				String dataset = getDataset();
 
-				if(Objects.equals(dataset, AUDIT) || Objects.equals(dataset, AUDIT_NA)){
+				if(Objects.equals(dataset, AUDIT)){
+					setRecordCount(1899);
+				} else
+
+				if(Objects.equals(dataset, AUDIT_NA)){
 
 					if(Objects.equals(algorithm, "OneHotEncoder") || Objects.equals(algorithm, "TargetEncoder")){
 						setRecordCount(1498);
@@ -364,6 +372,21 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateNearestCentroidAuditDict() throws Exception {
 		evaluate(NEAREST_CENTROID, AUDIT + "Dict");
+	}
+
+	@Test
+	public void evaluateOneHotEncoderAudit() throws Exception {
+		evaluate("OneHotEncoder", AUDIT);
+
+		List<Integer> rows = Arrays.asList(1, 10, 100);
+
+		evaluate("OneHotEncoder", AUDIT, new ValueAssignment("Occupation", rows, null), new ExceptionAssignment(rows, new ValueCheckException("Field \"Occupation\" cannot accept missing value")));
+		evaluate("OneHotEncoder", AUDIT, new ValueAssignment("Occupation", rows, "Astronaut"), new ExceptionAssignment(rows, new ValueCheckException("Field \"Occupation\" cannot accept invalid value \"Astronaut\"")));
+
+		Error error = new Error()
+			.setMessage("Field \"lower(Deductions)\" cannot accept invalid value");
+
+		evaluate("OneHotEncoder", AUDIT, new ValueAssignment("Deductions", rows, "MAYBE"), new ExceptionAssignment(rows, new ErrorException(error)));
 	}
 
 	@Test

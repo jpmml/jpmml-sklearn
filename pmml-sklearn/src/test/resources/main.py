@@ -33,7 +33,7 @@ from sklearn.preprocessing import Binarizer, FunctionTransformer, KBinsDiscretiz
 from sklearn.svm import LinearSVC, LinearSVR, NuSVC, NuSVR, OneClassSVM, SVC, SVR
 from sklearn2pmml import make_pmml_pipeline
 from sklearn2pmml import EstimatorProxy, SelectorProxy
-from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, ContinuousDomainEraser, DiscreteDomainEraser, MultiAlias, MultiDomain
+from sklearn2pmml.decoration import Alias, CategoricalDomain, ContinuousDomain, ContinuousDomainEraser, DiscreteDomainEraser, MultiAlias, MultiDomain, OrdinalDomain
 from sklearn2pmml.ensemble import GBDTLRClassifier
 from sklearn2pmml.feature_extraction.text import Matcher, Splitter
 from sklearn2pmml.feature_selection import SelectUnique
@@ -75,6 +75,11 @@ def make_model_explanation(pipeline, quality_impl, X, y):
 		.with_all_metrics()
 	model_explanation.append(quality)
 	return model_explanation.tostring()
+
+def make_missing_mask(X, column, step):
+	mask = DataFrame(False, index = X.index, columns = X.columns)
+	mask.loc[mask.index[::step], column] = True
+	return mask
 
 datasets = []
 
@@ -381,6 +386,39 @@ if "Audit" in datasets:
 
 	build_tree_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
 	build_tree_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuditNA", allow_missing = True)
+
+def build_ohe_audit(audit_df, classifier, name, **pmml_options):
+	audit_X, audit_y = split_csv(audit_df)
+
+	mask = make_missing_mask(audit_X, "Deductions", 50)
+
+	mapper = DataFrameMapper([
+		(["Age", "Hours", "Income"], ContinuousDomain(with_statistics = True)),
+		(["Employment"], [CategoricalDomain(with_statistics = True), OneHotEncoder(handle_unknown = "warn", min_frequency = 50)]),
+		(["Education"], [CategoricalDomain(with_statistics = True), OneHotEncoder(handle_unknown = "infrequent_if_exist", min_frequency = 1000)]),
+		(["Occupation"], [CategoricalDomain(with_statistics = True), OneHotEncoder(min_frequency = 50)]),
+		(["Marital"], OneHotEncoder(drop = "if_binary")),
+		(["Gender"], [CategoricalDomain(with_statistics = True), OneHotEncoder(drop = "first", min_frequency = 10000)]),
+		(["Deductions"], [CategoricalDomain(invalid_value_treatment = "as_is"), Alias(ExpressionTransformer("X[0].lower() if pandas.notnull(X[0]) else None", dtype = str), name = "lower(Deductions)", prefit = True), OneHotEncoder()])
+	])
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("classifier", classifier)
+	])
+	pipeline.fit(audit_X.mask(mask), audit_y)
+	pipeline.configure(**pmml_options)
+	pipeline.verify(audit_X.sample(frac = 0.05, random_state = 13))
+	pipeline.customize(command = "insert", pmml_element = make_model_explanation(pipeline, BinaryClassifierQuality, audit_X, audit_y))
+	store_pkl(pipeline, name)
+	adjusted = DataFrame(pipeline.predict(audit_X), columns = ["Adjusted"])
+	adjusted_proba = DataFrame(pipeline.predict_proba(audit_X), columns = ["probability(0)", "probability(1)"])
+	adjusted = pandas.concat((adjusted, adjusted_proba), axis = 1)
+	store_csv(adjusted, name)
+
+if "Audit" in datasets:
+	audit_df = load_audit("Audit")
+
+	build_ohe_audit(audit_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "OneHotEncoderAudit", allow_missing = True)
 
 def build_encoder_audit_na(audit_na_df, classifier, name, cont_transformer = None, cat_transformer = None, with_invalid = False, **pmml_options):
 	audit_na_X, audit_na_y = split_csv(audit_na_df)
@@ -1136,6 +1174,35 @@ if "Auto" in datasets:
 	build_tree_auto_na(auto_na_df, DecisionTreeRegressor(min_samples_leaf = 2, random_state = 13), "DecisionTreeAutoNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True)
 	build_tree_auto_na(auto_na_df, ExtraTreesRegressor(n_estimators = 10, min_samples_leaf = 5, random_state = 13), "ExtraTreesAutoNA", allow_missing = True)
 	build_tree_auto_na(auto_na_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAutoNA", allow_missing = True)
+
+def build_ohe_auto(auto_df, regressor, name, **pmml_options):
+	auto_X, auto_y = split_csv(auto_df)
+
+	mask = make_missing_mask(auto_X, "origin", 25)
+
+	mapper = DataFrameMapper([
+		(["horsepower", "weight", "acceleration"], ContinuousDomain(with_statistics = True)),
+		(["cylinders"], [OrdinalDomain(with_statistics = True), OneHotEncoder()]),
+		(["model_year"], [CategoricalDomain(with_statistics = True), OrdinalEncoder(), OneHotEncoder()]),
+		(["displacement"], [ContinuousDomain(with_statistics = True), KBinsDiscretizer(n_bins = 3, encode = "ordinal", strategy = "uniform"), OneHotEncoder()]),
+		(["origin"], OneHotEncoder(handle_unknown = "ignore", min_frequency = 20))
+	])
+	pipeline = PMMLPipeline([
+		("mapper", mapper),
+		("regressor", regressor)
+	])
+	pipeline.fit(auto_X.mask(mask), auto_y)
+	pipeline.configure(**pmml_options)
+	pipeline.verify(auto_X.sample(frac = 0.05, random_state = 13))
+	pipeline.customize(command = "insert", pmml_element = make_model_explanation(pipeline, RegressorQuality, auto_X, auto_y))
+	store_pkl(pipeline, name)
+	mpg = DataFrame(pipeline.predict(auto_X), columns = ["mpg"])
+	store_csv(mpg, name)
+
+if "Auto" in datasets:
+	auto_df = load_auto("Auto")
+
+	build_ohe_auto(auto_df, RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "OneHotEncoderAuto")
 
 def build_encoder_auto_na(auto_na_df, regressor, name, cont_transformer = None, cat_transformer = None, with_invalid = False, **pmml_options):
 	auto_na_X, auto_na_y = split_csv(auto_na_df)

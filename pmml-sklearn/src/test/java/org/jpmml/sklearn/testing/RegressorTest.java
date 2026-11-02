@@ -342,6 +342,15 @@ public class RegressorTest extends ValidatingSkLearnEncoderBatchTest implements 
 	}
 
 	@Test
+	public void evaluateOneHotEncoderAuto() throws Exception {
+		evaluate("OneHotEncoder", AUTO);
+
+		List<Integer> rows = Arrays.asList(1, 10, 100);
+
+		evaluate("OneHotEncoder", AUTO, new ValueAssignment("cylinders", rows, null), new ExceptionAssignment(rows, new ValueCheckException("Field \"cylinders\" cannot accept missing value")));
+	}
+
+	@Test
 	public void evaluateOneHotEncoderAutoNA() throws Exception {
 		evaluate("OneHotEncoder", AUTO_NA);
 	}
