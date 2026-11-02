@@ -26,10 +26,12 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import org.dmg.pmml.Apply;
+import org.dmg.pmml.Constant;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.DerivedField;
 import org.dmg.pmml.Error;
+import org.dmg.pmml.Expression;
 import org.dmg.pmml.Field;
 import org.dmg.pmml.InvalidValueTreatmentMethod;
 import org.dmg.pmml.MissingValueTreatmentMethod;
@@ -86,12 +88,6 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				featureInfrequentEnabled = false;
 			}
 
-			Object infrequentCategory = null;
-
-			if(featureInfrequentEnabled){
-				infrequentCategory = getInfrequentCategory(feature);
-			}
-
 			Decorator invalidValueDecorator;
 
 			switch(handleUnknown){
@@ -101,20 +97,10 @@ public class MultiOneHotEncoder extends BaseEncoder {
 					}
 					break;
 				case MultiOneHotEncoder.HANDLEUNKNOWN_IGNORE:
-					{
-						invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null);
-					}
-					break;
 				case MultiOneHotEncoder.HANDLEUNKNOWN_INFREQUENT_IF_EXIST:
 				case MultiOneHotEncoder.HANDLEUNKNOWN_WARN:
 					{
-						if(featureInfrequentEnabled){
-							invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_VALUE, infrequentCategory);
-						} else
-
-						{
-							invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null);
-						}
+						invalidValueDecorator = new InvalidValueDecorator(InvalidValueTreatmentMethod.AS_IS, null);
 					}
 					break;
 				default:
@@ -177,13 +163,9 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			if(feature instanceof WildcardFeature){
 				WildcardFeature wildcardFeature = (WildcardFeature)feature;
 
-				if(hasMissingCategory(featureCategories)){
-					feature = wildcardFeature.toCategoricalFeature(dropMissingCategory(featureCategories));
-				} else
+				List<Object> values = dropMissingCategory(featureCategories);
 
-				{
-					feature = wildcardFeature.toCategoricalFeature(featureCategories);
-				}
+				feature = wildcardFeature.toCategoricalFeature(values);
 
 				CategoricalFeature categoricalFeature = (CategoricalFeature)feature;
 
@@ -199,46 +181,49 @@ public class MultiOneHotEncoder extends BaseEncoder {
 				throw new UnsupportedFeatureException("Expected a categorical or categorical-like feature, got " + ExceptionUtil.formatFeature(feature));
 			}
 
+			List<Object> frequentCategories = new ArrayList<>(featureCategories);
+			List<Object> infrequentCategories = Collections.emptyList();
+
+			if(featureInfrequentEnabled){
+				infrequentCategories = selectValues(featureCategories, featureInfrequentIndices);
+
+				frequentCategories.removeAll(infrequentCategories);
+			}
+
+			List<Object> binaryCategories = new ArrayList<>(frequentCategories);
+
+			boolean dropInfrequent = false;
+
+			if(dropIdx != null){
+				Integer index = dropIdx.get(i);
+
+				if(index != null){
+					Object dropCategory = featureCategories.get(index);
+
+					if(infrequentCategories.contains(dropCategory)){
+						dropInfrequent = true;
+					} else
+
+					{
+						binaryCategories.remove(dropCategory);
+					}
+				}
+			}
+
 			switch(handleUnknown){
 				case MultiOneHotEncoder.HANDLEUNKNOWN_ERROR:
 					{
 						// Scikit-Learn treats any value that was not present in the training dataset as unknown.
 						// Therefore, a one-hot encoder that was trained on a dense dataset treats missing values the same way as invalid values.
-						if(!hasMissingCategory(featureCategories)){
-							feature = toNonMissing(feature, encoder);
-						}
+						feature = toValid(feature, featureCategories, encoder);
 					}
 					break;
 				default:
 					break;
 			}
 
-			if(featureInfrequentEnabled){
-
-				if(infrequentCategory == null || featureCategories.contains(infrequentCategory)){
-					throw new IllegalArgumentException();
-				}
-
-				List<Object> featureInfrequentCategories = selectValues(featureCategories, featureInfrequentIndices);
-
-				featureCategories.removeAll(featureInfrequentCategories);
-
-				feature = EncoderUtil.encodeRegroupFeature(this, feature, featureInfrequentCategories, infrequentCategory, encoder);
-			} // End if
-
-			if(dropIdx != null){
-				Integer index = dropIdx.get(i);
-
-				if(index != null){
-					// Unbox to primitive value in order to ensure correct List#remove(int) vs. List#remove(Object) method resolution
-					int intIndex = dropIdx.get(i);
-
-					featureCategories.remove(intIndex);
-				}
-			}
-
-			for(int j = 0; j < featureCategories.size(); j++){
-				Object category = featureCategories.get(j);
+			for(int j = 0; j < binaryCategories.size(); j++){
+				Object category = binaryCategories.get(j);
 
 				if(EncoderUtil.isMissingCategory(category)){
 					result.add(new MissingValueFeature(encoder, feature));
@@ -250,7 +235,12 @@ public class MultiOneHotEncoder extends BaseEncoder {
 			}
 
 			if(featureInfrequentEnabled){
-				result.add(new BinaryFeature(encoder, feature, infrequentCategory));
+
+				if(!dropInfrequent){
+					Feature infrequentFeature = encodeInfrequentFeature(feature, featureCategories, frequentCategories, infrequentCategories, encoder);
+
+					result.add(infrequentFeature);
+				}
 			}
 		}
 
@@ -283,7 +273,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		return getArrayList("_infrequent_indices", Number.class);
 	}
 
-	private Feature toNonMissing(Feature feature, SkLearnEncoder encoder){
+	private Feature toValid(Feature feature, List<Object> categories, SkLearnEncoder encoder){
 
 		if(feature instanceof DiscreteFeature){
 			DiscreteFeature discreteFeature = (DiscreteFeature)feature;
@@ -305,29 +295,47 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		Field<?> field = feature.getField();
 
 		if(field instanceof DataField){
-			encoder.addDecorator(field, new MissingValueDecorator(MissingValueTreatmentMethod.RETURN_INVALID, null));
+
+			if(!hasMissingCategory(categories)){
+				encoder.addDecorator(field, new MissingValueDecorator(MissingValueTreatmentMethod.RETURN_INVALID, null));
+			}
 
 			return feature;
 		} else
 
 		{
-			return encodeNonMissingFeature(feature, encoder);
+			return encodeValidFeature(feature, categories, encoder);
 		}
 	}
 
-	private Feature encodeNonMissingFeature(Feature feature, SkLearnEncoder encoder){
-		Error error = new Error()
-			.setMessage("Field \"" + feature.getName() + "\" cannot accept missing value");
-
-		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
-			ExpressionUtil.createApply(PMMLFunctions.ISNOTMISSING, feature.ref()),
-			feature.ref(),
-			error
-		);
-
+	private Feature encodeValidFeature(Feature feature, List<Object> categories, SkLearnEncoder encoder){
 		DataType dataType = feature.getDataType();
 
-		DerivedField derivedField = encoder.createDerivedField(createFieldName("nonMissing", feature), OpType.CATEGORICAL, dataType, apply);
+		List<Object> validCategories = EncoderUtil.filterCategories(categories);
+
+		Apply validApply = ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createValueApply(feature.ref(), dataType, validCategories),
+			feature.ref(),
+			createError("Field \"" + feature.getName() + "\" cannot accept invalid value")
+		);
+
+		Expression missingExpression;
+
+		if(hasMissingCategory(categories)){
+			missingExpression = feature.ref();
+		} else
+
+		{
+			missingExpression = createError("Field \"" + feature.getName() + "\" cannot accept missing value");
+		}
+
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createApply(PMMLFunctions.ISMISSING, feature.ref()),
+			missingExpression,
+			validApply
+		);
+
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("valid", feature), OpType.CATEGORICAL, dataType, apply);
 
 		if(feature instanceof DiscreteFeature){
 			DiscreteFeature discreteFeature = (DiscreteFeature)feature;
@@ -340,6 +348,109 @@ public class MultiOneHotEncoder extends BaseEncoder {
 		{
 			return FeatureUtil.createFeature(derivedField, encoder);
 		}
+	}
+
+	private Feature encodeInfrequentFeature(Feature feature, List<Object> categories, List<Object> frequentCategories, List<Object> infrequentCategories, SkLearnEncoder encoder){
+		String handleUnknown = getHandleUnknown();
+
+		boolean unknownInfrequent;
+
+		switch(handleUnknown){
+			case MultiOneHotEncoder.HANDLEUNKNOWN_ERROR:
+			case MultiOneHotEncoder.HANDLEUNKNOWN_IGNORE:
+				unknownInfrequent = false;
+				break;
+			case MultiOneHotEncoder.HANDLEUNKNOWN_INFREQUENT_IF_EXIST:
+			case MultiOneHotEncoder.HANDLEUNKNOWN_WARN:
+				unknownInfrequent = true;
+				break;
+			default:
+				throw new IllegalArgumentException(handleUnknown);
+		}
+
+		boolean missingInfrequent;
+
+		if(hasMissingCategory(categories)){
+			missingInfrequent = hasMissingCategory(infrequentCategories);
+		} else
+
+		{
+			missingInfrequent = unknownInfrequent;
+		}
+
+		DataType dataType = feature.getDataType();
+
+		Expression valueExpression;
+
+		if(unknownInfrequent){
+			List<Object> values = EncoderUtil.filterCategories(frequentCategories);
+
+			if(values.isEmpty()){
+				valueExpression = createIndicatorConstant(true);
+			} else
+
+			{
+				Apply apply = ExpressionUtil.createApply(PMMLFunctions.ISNOTIN, feature.ref());
+
+				for(int i = 0; i < values.size(); i++){
+					Object value = values.get(i);
+
+					Constant constant = ExpressionUtil.createConstant(dataType, value);
+
+					apply.addExpressions(constant);
+				}
+
+				valueExpression = createIndicator(apply);
+			}
+		} else
+
+		{
+			List<Object> values = EncoderUtil.filterCategories(infrequentCategories);
+
+			if(values.isEmpty()){
+				valueExpression = createIndicatorConstant(false);
+			} else
+
+			{
+				Apply apply = ExpressionUtil.createValueApply(feature.ref(), dataType, values);
+
+				valueExpression = createIndicator(apply);
+			}
+		}
+
+		Apply apply = ExpressionUtil.createApply(PMMLFunctions.IF,
+			ExpressionUtil.createApply(PMMLFunctions.ISMISSING, feature.ref()),
+			createIndicatorConstant(missingInfrequent),
+			valueExpression
+		);
+
+		DerivedField derivedField = encoder.createDerivedField(createFieldName("infrequent", feature), OpType.CATEGORICAL, DataType.INTEGER, apply);
+
+		CategoricalFeature categoricalFeature = new CategoricalFeature(encoder, derivedField, Arrays.asList(0, 1));
+
+		return new BinaryFeature(encoder, categoricalFeature, 1);
+	}
+
+	static
+	private Error createError(String message){
+		Error error = new Error()
+			.setMessage(message);
+
+		return error;
+	}
+
+	static
+	private Expression createIndicator(Expression expression){
+		return ExpressionUtil.createApply(PMMLFunctions.IF,
+			expression,
+			createIndicatorConstant(true),
+			createIndicatorConstant(false)
+		);
+	}
+
+	static
+	private Expression createIndicatorConstant(boolean value){
+		return ExpressionUtil.createConstant(DataType.INTEGER, value ? 1 : 0);
 	}
 
 	static
@@ -365,28 +476,7 @@ public class MultiOneHotEncoder extends BaseEncoder {
 	}
 
 	static
-	private Object getInfrequentCategory(Feature feature){
-		DataType dataType = feature.getDataType();
-
-		switch(dataType){
-			case STRING:
-				return "infrequent";
-			case INTEGER:
-			case FLOAT:
-			case DOUBLE:
-				return -999;
-			default:
-				return null;
-		}
-	}
-
-	static
 	private <E> List<E> selectValues(List<E> values, Collection<Number> indices){
-
-		if(indices == null || indices.isEmpty()){
-			return Collections.emptyList();
-		}
-
 		List<E> result = new ArrayList<>();
 
 		for(Number index : indices){

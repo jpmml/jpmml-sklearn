@@ -431,7 +431,7 @@ if "Audit" in datasets:
 	def make_rf_classifier():
 		return RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13)
 
-	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "OneHotEncoderAuditNA", cat_transformer = OneHotEncoder(handle_unknown = "ignore"), with_invalid = True, allow_missing = True)
+	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "OneHotEncoderAuditNA", cat_transformer = OneHotEncoder(handle_unknown = "ignore", min_frequency = 0.05), with_invalid = True, allow_missing = True)
 	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "OrdinalEncoderAuditNA", cat_transformer = make_pipeline(OrdinalEncoder(), OneHotEncoder()), with_invalid = False, allow_missing = True)
 	build_encoder_audit_na(audit_na_df, make_rf_classifier(), "TargetEncoderAuditNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
 
@@ -1177,7 +1177,7 @@ if "Auto" in datasets:
 	def make_rf_regressor():
 		return RandomForestRegressor(n_estimators = 10, min_samples_leaf = 3, random_state = 13)
 
-	build_encoder_auto_na(auto_na_df, make_rf_regressor(), "OneHotEncoderAutoNA", cat_transformer = OneHotEncoder(handle_unknown = "ignore"), with_invalid = True, allow_missing = True)
+	build_encoder_auto_na(auto_na_df, make_rf_regressor(), "OneHotEncoderAutoNA", cat_transformer = OneHotEncoder(handle_unknown = "infrequent_if_exist", max_categories = 4), with_invalid = True, allow_missing = True)
 	build_encoder_auto_na(auto_na_df, make_rf_regressor(), "OrdinalEncoderAutoNA", cat_transformer = make_pipeline(OrdinalEncoder(), OneHotEncoder()), with_invalid = False, allow_missing = True)
 	build_encoder_auto_na(auto_na_df, make_rf_regressor(), "TargetEncoderAutoNA", cat_transformer = TargetEncoder(random_state = 13), with_invalid = True, allow_missing = True)
 
