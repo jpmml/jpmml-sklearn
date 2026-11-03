@@ -19,15 +19,18 @@
 package sklearn;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.PMML;
 import org.jpmml.converter.ConversionException;
 import org.jpmml.converter.Feature;
+import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.sklearn.SkLearnEncoder;
 
 abstract
-public class Initializer extends Transformer {
+public class Initializer extends Transformer implements PMMLEncodable {
 
 	public Initializer(String module, String name){
 		super(module, name);
@@ -49,6 +52,11 @@ public class Initializer extends Transformer {
 	@Override
 	public int getNumberOfFeatures(){
 		return HasNumberOfFeatures.UNKNOWN;
+	}
+
+	@Override
+	public PMML encodePMML(Map<String, ?> options){
+		return TransformerUtil.encodePMML(this);
 	}
 
 	@Override
