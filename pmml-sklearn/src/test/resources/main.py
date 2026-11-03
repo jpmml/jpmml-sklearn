@@ -384,7 +384,7 @@ def build_tree_audit_na(audit_na_df, classifier, name, apply_transformer = None,
 if "Audit" in datasets:
 	audit_na_df = load_audit("AuditNA")
 
-	build_tree_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True, class_extensions = {"event" : {"0" : False, "1" : True}})
+	build_tree_audit_na(audit_na_df, DecisionTreeClassifier(min_samples_leaf = 5, random_state = 13), "DecisionTreeAuditNA", apply_transformer = Alias(ExpressionTransformer("X[0] - 1", dtype = int), "eval(nodeId)", prefit = True), allow_missing = True, winner_id = True, class_extensions = {"event" : {0 : False, 1 : True}})
 	build_tree_audit_na(audit_na_df, RandomForestClassifier(n_estimators = 10, min_samples_leaf = 3, random_state = 13), "RandomForestAuditNA", allow_missing = True)
 
 def build_ohe_audit(audit_df, classifier, name, **pmml_options):
@@ -726,6 +726,29 @@ if "Iris" in datasets:
 	iris_df = load_iris("Iris")
 
 	build_iris_frozen(iris_df)
+
+def build_iris_search(iris_df, searcher, name):
+	iris_X, iris_y = split_csv(iris_df)
+
+	searcher.fit(iris_X, iris_y)
+
+	store_pkl(searcher, name)
+	species = DataFrame(searcher.predict(iris_X), columns = ["y"])
+	species_proba = DataFrame(searcher.predict_proba(iris_X), columns = ["probability(setosa)", "probability(versicolor)", "probability(virginica)"])
+	species = pandas.concat((species, species_proba), axis = 1)
+	store_csv(species, name)
+
+if "Iris" in datasets:
+	iris_df = load_iris("Iris")
+
+	def make_search_pipeline():
+		return Pipeline([
+			("scaler", StandardScaler()),
+			("classifier", LogisticRegression())
+		])
+
+	build_iris_search(iris_df, GridSearchCV(make_search_pipeline(), {"classifier__C" : [0.1, 1.0, 10.0]}), "GridSearchIris")
+	build_iris_search(iris_df, RandomizedSearchCV(make_search_pipeline(), {"classifier__C" : [0.1, 1.0, 10.0]}, n_iter = 2, random_state = 13), "RandomizedSearchIris")
 
 def build_iris_cat(iris_df, classifier, name, allow_float = False, **pmml_options):
 	iris_X, iris_y = split_csv(iris_df)

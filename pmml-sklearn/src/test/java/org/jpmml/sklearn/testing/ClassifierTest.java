@@ -181,6 +181,8 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 						case DUMMY:
 						case MULTI_DUMMY:
 						case "Frozen":
+						case "GridSearch":
+						case "RandomizedSearch":
 							break;
 						default:
 							visitorBattery.add(ModelStatsInspector.class);
@@ -505,6 +507,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	}
 
 	@Test
+	public void evaluateGridSearchIris() throws Exception {
+		evaluate("GridSearch", IRIS);
+	}
+
+	@Test
 	public void evaluateHistGradientBoostingIris() throws Exception {
 		evaluate(HIST_GRADIENT_BOOSTING, IRIS);
 	}
@@ -562,6 +569,11 @@ public class ClassifierTest extends ValidatingSkLearnEncoderBatchTest implements
 	@Test
 	public void evaluateRandomForestIrisNA() throws Exception {
 		evaluate(RANDOM_FOREST, IRIS_NA);
+	}
+
+	@Test
+	public void evaluateRandomizedSearchIris() throws Exception {
+		evaluate("RandomizedSearch", IRIS);
 	}
 
 	@Test
