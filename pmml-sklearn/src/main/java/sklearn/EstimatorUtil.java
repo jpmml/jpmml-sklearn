@@ -173,7 +173,7 @@ public class EstimatorUtil {
 	}
 
 	static
-	public <E extends Estimator & HasFeatureNamesIn & HasSkLearnOptions> PMML encodePMML(E estimator){
+	public <E extends Estimator & HasSkLearnOptions> PMML encodePMML(E estimator){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		if(estimator.isSupervised()){

@@ -47,13 +47,12 @@ import org.jpmml.sklearn.HasSkLearnOptions;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.Classifier;
 import sklearn.EstimatorUtil;
-import sklearn.HasFeatureNamesIn;
 import sklearn.Regressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class NGBClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, HasTreeOptions, PMMLEncodable {
+public class NGBClassifier extends Classifier implements HasSkLearnOptions, HasTreeOptions, PMMLEncodable {
 
 	public NGBClassifier(String module, String name){
 		super(module, name);

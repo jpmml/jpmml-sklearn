@@ -25,7 +25,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 
-public class CompositeClassifier extends Classifier implements HasFeatureNamesIn, HasHead, Proxy {
+public class CompositeClassifier extends Classifier implements HasHead, Proxy {
 
 	private Composite composite = null;
 

@@ -26,12 +26,11 @@ import org.dmg.pmml.DataType;
 import org.dmg.pmml.OpType;
 import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLEncodable;
-import sklearn.HasFeatureNamesIn;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
 abstract
-public class BaseEncoder extends Transformer implements HasFeatureNamesIn, PMMLEncodable, BaseEncoderConstants {
+public class BaseEncoder extends Transformer implements PMMLEncodable, BaseEncoderConstants {
 
 	public BaseEncoder(String module, String name){
 		super(module, name);

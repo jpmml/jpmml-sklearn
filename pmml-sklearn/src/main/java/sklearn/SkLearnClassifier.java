@@ -25,7 +25,7 @@ import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
 
 abstract
-public class SkLearnClassifier extends Classifier implements HasFeatureNamesIn, HasSkLearnOptions, PMMLEncodable {
+public class SkLearnClassifier extends Classifier implements HasSkLearnOptions, PMMLEncodable {
 
 	public SkLearnClassifier(String module, String name){
 		super(module, name);

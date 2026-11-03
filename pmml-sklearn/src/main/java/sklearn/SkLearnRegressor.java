@@ -25,7 +25,7 @@ import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
 
 abstract
-public class SkLearnRegressor extends Regressor implements HasFeatureNamesIn, HasSkLearnOptions, PMMLEncodable {
+public class SkLearnRegressor extends Regressor implements HasSkLearnOptions, PMMLEncodable {
 
 	public SkLearnRegressor(String module, String name){
 		super(module, name);

@@ -25,7 +25,7 @@ import org.jpmml.converter.PMMLEncodable;
 import org.jpmml.sklearn.HasSkLearnOptions;
 
 abstract
-public class SkLearnClusterer extends Clusterer implements HasFeatureNamesIn, HasSkLearnOptions, PMMLEncodable {
+public class SkLearnClusterer extends Clusterer implements HasSkLearnOptions, PMMLEncodable {
 
 	public SkLearnClusterer(String module, String name){
 		super(module, name);

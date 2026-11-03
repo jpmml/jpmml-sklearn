@@ -22,12 +22,11 @@ import java.util.List;
 
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
-import sklearn.HasFeatureNamesIn;
 import sklearn.HasNumberOfFeatures;
 import sklearn.Selector;
 import sklearn2pmml.SelectorProxy;
 
-public class SkLearnSelector extends Selector implements HasFeatureNamesIn {
+public class SkLearnSelector extends Selector {
 
 	public SkLearnSelector(String module, String name){
 		super(module, name);

@@ -57,14 +57,13 @@ import org.jpmml.python.ClassDictConstructorUtil;
 import org.jpmml.python.ClassDictUtil;
 import org.jpmml.sklearn.SkLearnException;
 import sklearn.EstimatorUtil;
-import sklearn.HasFeatureNamesIn;
 import sklearn.HasRegressorOptions;
 import sklearn.Regressor;
 import sklearn.tree.HasTreeOptions;
 import sklearn.tree.TreeRegressor;
 import sklearn.tree.TreeUtil;
 
-public class NGBRegressor extends Regressor implements HasFeatureNamesIn, HasRegressorOptions, HasTreeOptions, PMMLEncodable {
+public class NGBRegressor extends Regressor implements HasRegressorOptions, HasTreeOptions, PMMLEncodable {
 
 	public NGBRegressor(String module, String name){
 		super(module, name);

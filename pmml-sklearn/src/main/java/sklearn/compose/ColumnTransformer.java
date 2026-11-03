@@ -30,7 +30,6 @@ import org.jpmml.python.CastFunction;
 import org.jpmml.python.HasArray;
 import org.jpmml.python.TupleUtil;
 import org.jpmml.sklearn.SkLearnEncoder;
-import sklearn.HasFeatureNamesIn;
 import sklearn.HasSparseOutput;
 import sklearn.Initializer;
 import sklearn.InitializerUtil;
@@ -38,7 +37,7 @@ import sklearn.SkLearnTransformerCastFunction;
 import sklearn.Transformer;
 import sklearn.TransformerUtil;
 
-public class ColumnTransformer extends Initializer implements HasFeatureNamesIn, HasSparseOutput, PMMLEncodable {
+public class ColumnTransformer extends Initializer implements HasSparseOutput, PMMLEncodable {
 
 	public ColumnTransformer(String module, String name){
 		super(module, name);

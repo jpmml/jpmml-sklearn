@@ -25,7 +25,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 
-public class CompositeRegressor extends Regressor implements HasFeatureNamesIn, HasHead, Proxy {
+public class CompositeRegressor extends Regressor implements HasHead, Proxy {
 
 	private Composite composite = null;
 

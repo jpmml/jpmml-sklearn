@@ -35,7 +35,7 @@ import org.jpmml.sklearn.SkLearnEncoder;
 import org.jpmml.sklearn.SkLearnException;
 
 abstract
-public class Composite extends Step implements Castable, HasFeatureNamesIn, HasHead, HasTail {
+public class Composite extends Step implements Castable, HasHead, HasTail {
 
 	/**
 	 * The result of casting this composite step.

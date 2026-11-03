@@ -24,7 +24,7 @@ import org.dmg.pmml.PMML;
 import org.jpmml.converter.PMMLEncodable;
 
 abstract
-public class SkLearnTransformer extends Transformer implements HasFeatureNamesIn, PMMLEncodable {
+public class SkLearnTransformer extends Transformer implements PMMLEncodable {
 
 	public SkLearnTransformer(String module, String name){
 		super(module, name);

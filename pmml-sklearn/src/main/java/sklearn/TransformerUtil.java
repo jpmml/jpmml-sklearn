@@ -30,7 +30,7 @@ public class TransformerUtil {
 	}
 
 	static
-	public <E extends Transformer & HasFeatureNamesIn> PMML encodePMML(E transformer){
+	public PMML encodePMML(Transformer transformer){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
 		List<String> activeFields = StepUtil.getOrGenerateFeatureNames(transformer);

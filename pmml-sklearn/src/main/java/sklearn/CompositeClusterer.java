@@ -25,7 +25,7 @@ import org.dmg.pmml.Model;
 import org.dmg.pmml.OpType;
 import org.jpmml.converter.Schema;
 
-public class CompositeClusterer extends Clusterer implements HasFeatureNamesIn, HasHead, Proxy {
+public class CompositeClusterer extends Clusterer implements HasHead, Proxy {
 
 	private Composite composite = null;
 
