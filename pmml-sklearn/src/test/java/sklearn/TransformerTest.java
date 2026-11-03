@@ -20,6 +20,7 @@ package sklearn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.dmg.pmml.DataType;
@@ -40,6 +41,31 @@ public class TransformerTest extends StepTest {
 		List<Step> scalerParents = new ArrayList<>();
 		List<Step> encoderParents = new ArrayList<>();
 
+		ColumnTransformer columnTransformer = createColumnTransformer(scalerParents, encoderParents);
+
+		SkLearnPipeline pipeline = createPipeline("columnTransformer", columnTransformer);
+
+		pipeline.encodePMML();
+
+		checkParents(Arrays.asList(columnTransformer, pipeline), scalerParents);
+		checkParents(Arrays.asList(columnTransformer, pipeline), encoderParents);
+	}
+
+	@Test
+	public void encodeStandaloneColumnTransformer(){
+		List<Step> scalerParents = new ArrayList<>();
+		List<Step> encoderParents = new ArrayList<>();
+
+		ColumnTransformer columnTransformer = createColumnTransformer(scalerParents, encoderParents);
+
+		columnTransformer.encodePMML(Collections.emptyMap());
+
+		checkParents(Collections.singletonList(columnTransformer), scalerParents);
+		checkParents(Collections.singletonList(columnTransformer), encoderParents);
+	}
+
+	static
+	private ColumnTransformer createColumnTransformer(List<Step> scalerParents, List<Step> encoderParents){
 		Transformer scaler = new StandardScaler(null, null){
 
 			@Override
@@ -77,6 +103,11 @@ public class TransformerTest extends StepTest {
 		ColumnTransformer columnTransformer = new ColumnTransformer(null, null){
 
 			@Override
+			public List<String> getFeatureNamesIn(){
+				return Arrays.asList("x1", "x2");
+			}
+
+			@Override
 			public List<Object[]> getFittedTransformers(){
 				return Arrays.asList(
 					new Object[]{"scaler", scaler, "x1"},
@@ -85,11 +116,6 @@ public class TransformerTest extends StepTest {
 			}
 		};
 
-		SkLearnPipeline pipeline = createPipeline("columnTransformer", columnTransformer);
-
-		pipeline.encodePMML();
-
-		checkParents(Arrays.asList(columnTransformer, pipeline), scalerParents);
-		checkParents(Arrays.asList(columnTransformer, pipeline), encoderParents);
+		return columnTransformer;
 	}
 }

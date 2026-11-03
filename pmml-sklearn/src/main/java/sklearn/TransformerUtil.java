@@ -18,6 +18,7 @@
  */
 package sklearn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dmg.pmml.PMML;
@@ -33,11 +34,15 @@ public class TransformerUtil {
 	public PMML encodePMML(Transformer transformer){
 		SkLearnEncoder encoder = new SkLearnEncoder();
 
-		List<String> activeFields = StepUtil.getOrGenerateFeatureNames(transformer);
+		List<Feature> features = new ArrayList<>();
 
-		List<Feature> features = encoder.initFeatures(transformer, activeFields);
+		if(!(transformer instanceof Initializer)){
+			List<String> activeFields = StepUtil.getOrGenerateFeatureNames(transformer);
 
-		features = transformer.encodeFeatures(features, encoder);
+			features = encoder.initFeatures(transformer, activeFields);
+		}
+
+		features = transformer.encode(Step.PARENT_ROOT, features, encoder);
 
 		encoder.setFeatures(features);
 
