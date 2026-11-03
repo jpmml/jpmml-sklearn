@@ -301,43 +301,38 @@ public class Composite extends Step implements Castable, HasFeatureNamesIn, HasH
 	protected List<String> initFeatures(List<String> activeFields, SkLearnEncoder encoder){
 		Step head = getHead();
 
-		try {
-			if(head instanceof Transformer){
+		if(head instanceof Transformer){
 
-				if(!(head instanceof Initializer)){
-
-					if(activeFields == null){
-						activeFields = initActiveFields(head);
-					}
-
-					encoder.initFeatures(head, activeFields);
-				}
-
-				// XXX
-				List<Feature> features = new ArrayList<>();
-				features.addAll(encoder.getFeatures());
-
-				features = encodeFeatures(features, encoder);
-
-				encoder.setFeatures(features);
-			} else
-
-			if(head instanceof Estimator){
+			if(!(head instanceof Initializer)){
 
 				if(activeFields == null){
 					activeFields = initActiveFields(head);
 				}
 
 				encoder.initFeatures(head, activeFields);
-			} else
-
-			{
-				throw new SkLearnException("The head object (" + ClassDictUtil.formatClass(head)  + ") is not a supported Transformer or Estimator")
-					.setSolution("Develop and register a custom JPMML-SkLearn converter");
 			}
-		} catch(UnsupportedOperationException uoe){
-			throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(head) + ") does not specify feature type information")
-				.setSolution("Prepend Domain decorators");
+
+			// XXX
+			List<Feature> features = new ArrayList<>();
+			features.addAll(encoder.getFeatures());
+
+			features = encodeFeatures(features, encoder);
+
+			encoder.setFeatures(features);
+		} else
+
+		if(head instanceof Estimator){
+
+			if(activeFields == null){
+				activeFields = initActiveFields(head);
+			}
+
+			encoder.initFeatures(head, activeFields);
+		} else
+
+		{
+			throw new SkLearnException("The head object (" + ClassDictUtil.formatClass(head)  + ") is not a supported Transformer or Estimator")
+				.setSolution("Develop and register a custom JPMML-SkLearn converter");
 		}
 
 		return activeFields;

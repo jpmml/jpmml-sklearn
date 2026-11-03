@@ -56,6 +56,7 @@ import org.jpmml.converter.SchemaUtil;
 import org.jpmml.converter.WildcardFeature;
 import org.jpmml.model.ReflectionUtil;
 import org.jpmml.model.UnsupportedAttributeException;
+import org.jpmml.python.ClassDictUtil;
 import org.jpmml.python.PickleUtil;
 import org.jpmml.python.PythonEncoder;
 import sklearn.Classifier;
@@ -163,8 +164,16 @@ public class SkLearnEncoder extends PythonEncoder {
 		for(int i = 0; i < names.size(); i++){
 			String name = names.get(i);
 
-			OpType opType = hasMultiType.getOpType(i);
-			DataType dataType = hasMultiType.getDataType(i);
+			OpType opType;
+			DataType dataType;
+
+			try {
+				opType = hasMultiType.getOpType(i);
+				dataType = hasMultiType.getDataType(i);
+			} catch(UnsupportedOperationException uoe){
+				throw new SkLearnException("The feature initializer object (" + ClassDictUtil.formatClass(step) + ") does not specify feature type information")
+					.setSolution("Prepend Domain decorators");
+			}
 
 			DataField dataField = createDataField(name, opType, dataType);
 
