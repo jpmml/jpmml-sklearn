@@ -56,7 +56,7 @@ import org.jpmml.sklearn.SkLearnException;
 import sklearn2pmml.SkLearn2PMMLFields;
 
 abstract
-public class Classifier extends Estimator implements HasClasses {
+public class Classifier extends Estimator implements HasClassifierOptions, HasClasses {
 
 	public Classifier(String module, String name){
 		super(module, name);
