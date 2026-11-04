@@ -73,6 +73,8 @@ import sklearn2pmml.decoration.Domain;
 
 public class SkLearnEncoder extends PythonEncoder {
 
+	private Stage stage = null;
+
 	private Map<String, Domain> domains = new LinkedHashMap<>();
 
 	private Label label = null;
@@ -87,6 +89,11 @@ public class SkLearnEncoder extends PythonEncoder {
 
 
 	public SkLearnEncoder(){
+		this(Stage.MAIN);
+	}
+
+	protected SkLearnEncoder(Stage stage){
+		setStage(stage);
 	}
 
 	@Override
@@ -336,10 +343,6 @@ public class SkLearnEncoder extends PythonEncoder {
 		}
 	}
 
-	protected Stage getStage(){
-		return Stage.MAIN;
-	}
-
 	public boolean isFrozen(String name){
 		Map<String, Domain> domains = getDomains();
 
@@ -362,6 +365,14 @@ public class SkLearnEncoder extends PythonEncoder {
 		{
 			domains.remove(name);
 		}
+	}
+
+	public Stage getStage(){
+		return this.stage;
+	}
+
+	private void setStage(Stage stage){
+		this.stage = Objects.requireNonNull(stage);
 	}
 
 	public Map<String, Domain> getDomains(){
@@ -464,7 +475,7 @@ public class SkLearnEncoder extends PythonEncoder {
 	}
 
 	static
-	protected enum Stage {
+	public enum Stage {
 
 		/**
 		 * The main step graph, which transforms features.

@@ -332,16 +332,11 @@ public class PMMLPipeline extends SkLearnPipeline {
 	}
 
 	private void encodeOutput(Output output, List<OutputField> outputFields, Transformer transformer, SkLearnEncoder encoder){
-		SkLearnEncoder outputEncoder = new SkLearnEncoder(){
+		SkLearnEncoder outputEncoder = new SkLearnEncoder(SkLearnEncoder.Stage.OUTPUT){
 
 			@Override
 			public void addTransformer(Model transformer){
 				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			protected Stage getStage(){
-				return Stage.OUTPUT;
 			}
 
 			@Override
